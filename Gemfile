@@ -20,7 +20,11 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
+gem "devise"
+
 gem 'jquery-rails'
+
+gem 'rails3_acts_as_paranoid'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
