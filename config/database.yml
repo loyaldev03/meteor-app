@@ -12,16 +12,19 @@ test:
   adapter: mysql2
   database: sac_platform_test
   host: localhost
+  encoding: utf8
   user: root
 
 production:
   adapter: mysql2
   database: sac_platform_staging
   host: localhost
+  encoding: utf8
   user: root
 
-production:
+staging:
   adapter: mysql2
   database: sac_platform_production
   host: localhost
+  encoding: utf8
   user: root
