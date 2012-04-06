@@ -32,4 +32,14 @@ gem 'jquery-rails'
 # gem 'unicorn'
 
 # To use debugger
-gem 'ruby-debug19', :require => 'ruby-debug'
+group :development do
+  gem 'ruby-debug19', :require => 'ruby-debug'
+end
+
+group :test do
+  gem 'factory_girl'
+  gem 'faker'
+  gem 'mocha'
+end
+
+
