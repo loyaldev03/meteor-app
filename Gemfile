@@ -23,7 +23,7 @@ end
 gem 'devise'
 gem 'settingslogic'
 gem 'wirble'
-gem 'will_paginate'
+gem 'bootstrap-will_paginate'
 gem 'nokogiri'
 
 gem 'twitter-bootstrap-rails'
