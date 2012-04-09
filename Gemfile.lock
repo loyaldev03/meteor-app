@@ -82,6 +82,7 @@ GEM
       metaclass (~> 0.0.1)
     multi_json (1.2.0)
     mysql2 (0.3.11)
+    nokogiri (1.5.2)
     orm_adapter (0.0.7)
     polyglot (0.3.3)
     rack (1.4.1)
@@ -162,6 +163,7 @@ DEPENDENCIES
   jquery-rails
   mocha
   mysql2
+  nokogiri
   rails (= 3.2.3)
   rails3_acts_as_paranoid
   ruby-debug19

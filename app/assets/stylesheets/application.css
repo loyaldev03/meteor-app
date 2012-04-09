@@ -12,3 +12,6 @@
  *= requiretwitter/bootstrap
  *= require_tree .
 */
+form .clearfix:before, form .clearfix:after {
+  display: inline;
+}
