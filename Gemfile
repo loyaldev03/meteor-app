@@ -21,6 +21,10 @@ group :assets do
 end
 
 gem "devise"
+gem "settingslogic"
+gem "wirble"
+
+gem 'twitter-bootstrap-rails'
 
 gem 'jquery-rails'
 

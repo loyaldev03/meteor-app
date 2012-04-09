@@ -1,0 +1,14 @@
+defaults: &defaults
+  payment_gateways:
+  - MES
+  - LITLE
+
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults
