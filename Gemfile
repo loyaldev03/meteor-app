@@ -20,9 +20,9 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
-gem "devise"
-gem "settingslogic"
-gem "wirble"
+gem 'devise'
+gem 'settingslogic'
+gem 'wirble'
 
 gem 'twitter-bootstrap-rails'
 
