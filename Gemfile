@@ -23,6 +23,7 @@ end
 gem 'devise'
 gem 'settingslogic'
 gem 'wirble'
+gem 'will_paginate'
 
 gem 'twitter-bootstrap-rails'
 
@@ -45,7 +46,7 @@ group :development do
 end
 
 group :test do
-  gem 'factory_girl'
+  gem 'factory_girl_rails'
   gem 'faker'
   gem 'mocha'
 end
