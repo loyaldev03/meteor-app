@@ -64,7 +64,24 @@ class User < ActiveRecord::Base
    end
 
    def self.find_record(login)
-     where(["username = :value OR email = :value", { :value => login }]).first
+      where(["username = :value OR email = :value", { :value => login }]).first
    end
 
+   def self.lock_by_admin(id)
+      user = User.find(id)
+      user.locked_at = Time.now
+      user.unlock_token = generate_token
+      user.save
+   end
+   
+   def self.unlock_by_admin(id)
+      user = User.find(id)
+      user.locked_at = nil
+      user.unlock_token = nil
+      user.save
+   end
+  
+   def self.generate_token
+    return rand(40**40).to_s(36)
+   end
 end

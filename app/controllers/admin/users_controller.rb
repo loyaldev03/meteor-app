@@ -2,7 +2,7 @@ class Admin::UsersController < ApplicationController
   # GET /users
   # GET /users.xml
   def index
-    @users = User.paginate :per_page => 1, :page => 1
+    @users = User.paginate :per_page => 2, :page => 1
 
     respond_to do |format|
       format.html # index.html.erb
@@ -81,4 +81,16 @@ class Admin::UsersController < ApplicationController
     end
   end
 
+  def lock
+    user = User.find(params[:user_id])
+    User.lock_by_admin(user.id)
+    #redirect_to admin_users_path
+    redirect_to(admin_users_path, :notice => "User number #{user.id} - #{user.username} - was locked.")
+  end
+
+  def unlock
+    user = User.find(params[:user_id])
+    User.unlock_by_admin(user.id)
+    redirect_to(admin_users_path, :notice => "User number #{user.id} - #{user.username} - was unlocked.")
+  end
 end
