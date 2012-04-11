@@ -8,6 +8,10 @@ SacPlatform::Application.routes.draw do
     end
   end
 
+  scope '(:partner_prefix)' do
+    resources :domains
+  end
+
 
 
   # The priority is based upon order of creation:
