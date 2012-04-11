@@ -83,14 +83,13 @@ class Admin::UsersController < ApplicationController
 
   def lock
     user = User.find(params[:user_id])
-    User.lock_by_admin(user.id)
-    #redirect_to admin_users_path
+    user.lock_access!
     redirect_to(admin_users_path, :notice => "User number #{user.id} - #{user.username} - was locked.")
   end
 
   def unlock
     user = User.find(params[:user_id])
-    User.unlock_by_admin(user.id)
+    user.unlock_access!
     redirect_to(admin_users_path, :notice => "User number #{user.id} - #{user.username} - was unlocked.")
   end
 end
