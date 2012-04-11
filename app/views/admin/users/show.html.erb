@@ -27,11 +27,11 @@
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:current_sign_in_at) %>:</strong><br>
-  <%= @user.current_sign_in_at %>
+  <%= I18n.l @user.current_sign_in_at, :format => :long if !@user.current_sign_in_at.nil? %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:last_sign_in_at) %>:</strong><br>
-  <%= @user.last_sign_in_at %>
+  <%= I18n.l @user.last_sign_in_at, :format => :long if !@user.last_sign_in_at.nil? %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:current_sign_in_ip) %>:</strong><br>
@@ -51,11 +51,11 @@
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:confirmed_at) %>:</strong><br>
-  <%= @user.confirmed_at %>
+  <%= I18n.l @user.confirmed_at, :format => :long if !@user.confirmed_at.nil? %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:confirmation_sent_at) %>:</strong><br>
-  <%= @user.confirmation_sent_at %>
+  <%= I18n.l @user.confirmation_sent_at, :format => :long %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:unconfirmed_email) %>:</strong><br>
@@ -71,7 +71,7 @@
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:locked_at) %>:</strong><br>
-  <%= @user.locked_at %>
+  <%= I18n.l @user.locked_at, :format => :long if !@user.locked_at.nil? %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:username) %>:</strong><br>

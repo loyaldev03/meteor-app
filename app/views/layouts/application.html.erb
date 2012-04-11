@@ -32,13 +32,15 @@
           <% if current_user %>
             <div class="container nav-collapse">
               <ul class="nav">
-                <li><%= link_to "Users", admin_users_path  %></li>
+                <li><%= link_to t('menu.users'), admin_users_path  %></li>
                 <li><%= link_to "Link2", "/path2"  %></li>
-                <li><a href="#" onclick="$('#current_user').find('form:first').submit();"><%= t('menu.logout') %></a>
+                <li><%= link_to t('menu.logout'), destroy_user_session_path, :method => :delete  %></li>
+                <!-- Doesn work... it was replaced with the line above -->
+                <!-- <li><a href="#" onclick="$('#current_user').find('form:first').submit();"><%= t('menu.logout') %></a>
                   <div style="display: none;">
                     <%= button_to t('menu.logout'), destroy_user_session_path, :method=>:delete, :class=>:destroy, :id=> "button_log_out", :confirm=> t('text.are_you_sure') %>
                   </div>
-                </li>
+                 --></li>
               </ul>
             </div><!--/.nav-collapse -->
           <% end %>           

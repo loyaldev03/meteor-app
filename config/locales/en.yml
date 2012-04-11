@@ -2,9 +2,23 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
+  show: 'Show'
+  destroy: 'Destroy'
+  lock: 'Lock'
+  unlock: 'Unlock'
+  new: 'New'
   menu: 
     logout: Logout
+    users: Users
   activerecord:
     attributes:
       user:  
         login: "Username or email"
+        password: "Password"
+        remember_me: "Remember me"
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%b %d"
+      long: "%B %d, %Y"
+
