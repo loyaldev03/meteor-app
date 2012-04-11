@@ -12,6 +12,7 @@ class User < ActiveRecord::Base
   # attr_accessible :title, :body
 
   validates :username, :uniqueness => true
+  validates :username, :email, :presence => :true  
 
   # Virtual attribute for authenticating by either username or email
   # This is in addition to a real persisted field like 'username'
