@@ -7,10 +7,16 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 FactoryGirl.define do
 
-
   factory :user do
     password "secret"
     password_confirmation {password}
+    sequence(:email) {|n| "carla#{n}@test.no" }
+  end
+
+  factory :admin do
+    username "test"
+    password "secret"
+    password_confirmation { password }
     sequence(:email) {|n| "carla#{n}@test.no" }
   end
 

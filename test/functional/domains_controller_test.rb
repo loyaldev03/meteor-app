@@ -2,6 +2,8 @@ require 'test_helper'
 
 class DomainsControllerTest < ActionController::TestCase
   setup do
+    @admin_user = FactoryGirl.build(:admin)
+    sign_in @admin_user
     @domain = FactoryGirl.build(:domain)
   end
 
