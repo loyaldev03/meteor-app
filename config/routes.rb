@@ -10,7 +10,9 @@ SacPlatform::Application.routes.draw do
   end
 
   scope '(:partner_prefix)' do
+
     resources :domains
+    match 'dashboard' => 'admin/partners#dashboard', as: 'admin_partner_dashboard'
   end
 
 

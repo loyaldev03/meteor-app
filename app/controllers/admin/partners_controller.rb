@@ -80,4 +80,9 @@ class Admin::PartnersController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  def dashboard
+    @partner = @current_partner
+  end
+
 end
