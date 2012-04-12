@@ -29,6 +29,7 @@
             <span class="icon-bar"></span>
           </a>
           <a class="brand" href="<%= root_path %>">SacPlatform</a>
+          <%= @current_partner.name unless @current_partner.nil? %>
           <% if current_user %>
             <div class="container nav-collapse">
               <ul class="nav">
