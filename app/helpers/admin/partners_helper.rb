@@ -1,2 +1,2 @@
-module PartnersHelper
+module Admin::PartnersHelper
 end

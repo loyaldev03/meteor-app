@@ -1,9 +1,8 @@
 SacPlatform::Application.routes.draw do
-  resources :partners
-
   devise_for :users
 
   namespace :admin do
+    resources :partners
     resources :users do
       get :lock
       get :unlock

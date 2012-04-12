@@ -1,4 +1,4 @@
-class PartnersController < ApplicationController
+class Admin::PartnersController < ApplicationController
   # GET /partners
   # GET /partners.json
   def index

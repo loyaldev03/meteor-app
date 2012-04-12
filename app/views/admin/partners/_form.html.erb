@@ -1,4 +1,4 @@
-<%= form_for @partner, :html => { :class => 'form-horizontal' } do |f| %>
+<%= form_for [ :admin, @partner ], :html => { :class => 'form-horizontal' } do |f| %>
   <% if @partner.new_record? %>
     <div class="control-group">
       <%= f.label :prefix, :class => 'control-label' %>
@@ -41,6 +41,6 @@
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                partners_path, :class => 'btn' %>
+                admin_partners_path, :class => 'btn' %>
   </div>
 <% end %>

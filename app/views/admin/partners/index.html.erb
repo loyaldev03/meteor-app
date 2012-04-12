@@ -16,7 +16,7 @@
   <tbody>
     <% @partners.each do |partner| %>
       <tr>
-        <td><%= link_to partner.id, partner_path(partner) %></td>
+        <td><%= link_to partner.id, admin_partner_path(partner) %></td>
         <td><%= partner.prefix %></td>
         <td><%= partner.name %></td>
         <td><%= partner.contract_uri %></td>
@@ -25,9 +25,9 @@
         <td><%=l partner.created_at %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_partner_path(partner), :class => 'btn btn-mini' %>
+                      admin_edit_partner_path(partner), :class => 'btn btn-mini' %>
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      partner_path(partner),
+                      admin_partner_path(partner),
                       :method => :delete,
                       :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
                       :class => 'btn btn-mini btn-danger' %>
