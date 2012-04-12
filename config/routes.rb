@@ -1,4 +1,6 @@
 SacPlatform::Application.routes.draw do
+  resources :partners
+
   devise_for :users
 
   namespace :admin do
@@ -7,6 +9,11 @@ SacPlatform::Application.routes.draw do
       get :unlock
     end
   end
+
+  scope '(:partner_prefix)' do
+    resources :domains
+  end
+
 
 
 
