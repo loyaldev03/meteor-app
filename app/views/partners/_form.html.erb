@@ -11,10 +11,12 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :prefix %><br />
-    <%= f.text_field :prefix %>
-  </div>
+  <% if params[:action] != 'edit' %>
+    <div class="field">
+      <%= f.label :prefix %><br />
+      <%= f.text_field :prefix %>
+    </div>
+  <% end %>
   <div class="field">
     <%= f.label :name %><br />
     <%= f.text_field :name %>
@@ -33,11 +35,7 @@
   </div>
   <div class="field">
     <%= f.label :logo %><br />
-    <%= f.text_field :logo %>
-  </div>
-  <div class="field">
-    <%= f.label :deleted_at %><br />
-    <%= f.datetime_select :deleted_at %>
+    <%= f.file_field :logo %>
   </div>
   <div class="actions">
     <%= f.submit %>

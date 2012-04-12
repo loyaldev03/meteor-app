@@ -21,7 +21,7 @@
     <td><%= partner.contract_uri %></td>
     <td><%= partner.website_url %></td>
     <td><%= partner.description %></td>
-    <td><%= partner.logo %></td>
+    <td><%= image_tag partner.logo.url %></td>
     <td><%= partner.deleted_at %></td>
     <td><%= link_to 'Show', partner %></td>
     <td><%= link_to 'Edit', edit_partner_path(partner) %></td>
