@@ -1,6 +1,7 @@
 class CreatePartners < ActiveRecord::Migration
-  def change
-    create_table :partners do |t|
+  def up
+    create_table :partners, { :id => false } do |t|
+      t.integer :id, :limit => 8
       t.string :prefix
       t.string :name
       t.string :contract_uri
@@ -8,9 +9,11 @@ class CreatePartners < ActiveRecord::Migration
       t.text :description
       t.has_attached_file :logo
       t.datetime :deleted_at
-
       t.timestamps
     end
-    execute "ALTER TABLE zzzz CHANGE id id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT;"
+    execute "ALTER TABLE partners ADD PRIMARY KEY (id);" 
+  end
+  def down
+    drop_table :partners
   end
 end
