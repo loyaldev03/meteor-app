@@ -1,5 +1,6 @@
 class Domain < ActiveRecord::Base
-  attr_accessible :data_rights, :deleted_at, :description, :hosted, :partner_id, :url
+  belongs_to :partner
+  attr_accessible :data_rights, :deleted_at, :description, :hosted, :partner, :url
 
   acts_as_paranoid
 end

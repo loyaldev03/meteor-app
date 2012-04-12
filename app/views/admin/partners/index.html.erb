@@ -24,7 +24,7 @@
         <td><%= partner.description %></td>
         <td><%=l partner.created_at %></td>
         <td>
-          <%= link_to t(:show), admin_partner_dashboard_path(partner.prefix), :class => 'btn btn-mini' %>
+          <%= link_to t(:dashboard), admin_partner_dashboard_path(partner.prefix), :class => 'btn btn-mini' %>
 
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_admin_partner_path(partner), :class => 'btn btn-mini' %>

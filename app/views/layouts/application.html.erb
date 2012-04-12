@@ -30,11 +30,17 @@
           </a>
 
           <a class="brand" href="<%= root_path %>">SacPlatform</a>
-          <%= @current_partner.name unless @current_partner.nil? %>
 
           <% if current_user %>
             <div class="container nav-collapse">
               <ul class="nav">
+                <% unless @current_partner.nil? %>
+                  <% if @current_partner.logo.nil? %>
+                    <li><%= @current_partner.name %></li>
+                  <% else %>
+                    <li><%= image_tag @current_partner.logo.url %></li>
+                  <% end %>
+                <% end %>
                 <li><%= link_to t('menu.users'), admin_users_path  %></li>
                 <li><%= link_to t('menu.partners'), admin_partners_path  %></li>
                 <li><%= link_to t('menu.logout'), destroy_user_session_path, :method => :delete  %></li>
