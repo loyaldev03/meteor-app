@@ -16,6 +16,8 @@
 
 .rvmrc
 
+/test/fixtures
+
 /db/schema.rb
 /Gemfile.lock
 /test/fixtures/*

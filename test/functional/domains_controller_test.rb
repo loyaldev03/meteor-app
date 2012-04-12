@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DomainsControllerTest < ActionController::TestCase
   setup do
-    @domain = domains(:one)
+    @domain = FactoryGirl.build(:domain)
   end
 
   test "should get index" do
