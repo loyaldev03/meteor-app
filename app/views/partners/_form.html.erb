@@ -1,43 +1,46 @@
-<%= form_for(@partner) do |f| %>
-  <% if @partner.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@partner.errors.count, "error") %> prohibited this partner from being saved:</h2>
-
-      <ul>
-      <% @partner.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
+<%= form_for @partner, :html => { :class => 'form-horizontal' } do |f| %>
+  <% if @partner.new_record? %>
+    <div class="control-group">
+      <%= f.label :prefix, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :prefix, :class => 'text_field' %>
+      </div>
     </div>
   <% end %>
-
-  <% if params[:action] != 'edit' %>
-    <div class="field">
-      <%= f.label :prefix %><br />
-      <%= f.text_field :prefix %>
+  <div class="control-group">
+    <%= f.label :name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'text_field' %>
     </div>
-  <% end %>
-  <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
   </div>
-  <div class="field">
-    <%= f.label :contract_uri %><br />
-    <%= f.text_field :contract_uri %>
+  <div class="control-group">
+    <%= f.label :contract_uri, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :contract_uri, :class => 'text_field' %>
+    </div>
   </div>
-  <div class="field">
-    <%= f.label :website_url %><br />
-    <%= f.text_field :website_url %>
+  <div class="control-group">
+    <%= f.label :website_url, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :website_url, :class => 'text_field' %>
+    </div>
   </div>
-  <div class="field">
-    <%= f.label :description %><br />
-    <%= f.text_area :description %>
+  <div class="control-group">
+    <%= f.label :description, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_area :description, :class => 'text_area' %>
+    </div>
   </div>
-  <div class="field">
-    <%= f.label :logo %><br />
-    <%= f.file_field :logo %>
+  <div class="control-group">
+    <%= f.label :logo, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.file_field :logo, :class => 'text_field' %>
+    </div>
   </div>
-  <div class="actions">
-    <%= f.submit %>
+
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                partners_path, :class => 'btn' %>
   </div>
 <% end %>

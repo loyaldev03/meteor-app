@@ -1,40 +1,38 @@
-<p id="notice"><%= notice %></p>
+<%- model_class = @partner.class -%>
+<h1><%=t '.title', :default => model_class.model_name.human %></h1>
 
 <p>
-  <b>Prefix:</b>
+  <strong><%= model_class.human_attribute_name(:prefix) %>:</strong><br>
   <%= @partner.prefix %>
 </p>
-
 <p>
-  <b>Name:</b>
+  <strong><%= model_class.human_attribute_name(:name) %>:</strong><br>
   <%= @partner.name %>
 </p>
-
 <p>
-  <b>Contract uri:</b>
+  <strong><%= model_class.human_attribute_name(:contract_uri) %>:</strong><br>
   <%= @partner.contract_uri %>
 </p>
-
 <p>
-  <b>Website url:</b>
+  <strong><%= model_class.human_attribute_name(:website_url) %>:</strong><br>
   <%= @partner.website_url %>
 </p>
-
 <p>
-  <b>Description:</b>
+  <strong><%= model_class.human_attribute_name(:description) %>:</strong><br>
   <%= @partner.description %>
 </p>
 
-<p>
-  <b>Logo:</b>
-  <%= image_tag @partner.logo.url %>
-</p>
-
-<p>
-  <b>Deleted at:</b>
-  <%= @partner.deleted_at %>
-</p>
+TODO: show domains
 
 
-<%= link_to 'Edit', edit_partner_path(@partner) %> |
-<%= link_to 'Back', partners_path %>
+<div class="form-actions">
+  <%= link_to t('.back', :default => t("helpers.links.back")),
+              partners_path, :class => 'btn'  %>
+  <%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_partner_path(@partner), :class => 'btn' %>
+  <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              partner_path(@partner),
+              :method => 'delete',
+              :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
+              :class => 'btn btn-danger' %>
+</div>
