@@ -1,7 +1,6 @@
 class CreateDomains < ActiveRecord::Migration
   def up
     create_table :domains, { :id => false } do |t|
-      t.integer :id, :limit => 8
       t.string :url
       t.text :description
       t.text :data_rights
@@ -10,7 +9,7 @@ class CreateDomains < ActiveRecord::Migration
       t.datetime :deleted_at
       t.timestamps
     end
-    execute "ALTER TABLE domains ADD PRIMARY KEY (id);" 
+    execute "ALTER TABLE domains ADD COLUMN id BIGINT(22) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 
   end
   def down
     drop_table :domains

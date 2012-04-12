@@ -11,9 +11,9 @@ class ApplicationController < ActionController::Base
     end
   end
   def validate_partner_presence
-    unless params[:partner_prefix].nil? and params[:controller].include?('admin/')
+    if params[:partner_prefix].nil? and not params[:controller].include?('admin/')
       flash[:error] = "No partner was selected."
-      redirect_to partners_path
+      redirect_to admin_partners_path
     end
   end
 

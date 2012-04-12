@@ -25,7 +25,7 @@
         <td><%=l partner.created_at %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      admin_edit_partner_path(partner), :class => 'btn btn-mini' %>
+                      edit_admin_partner_path(partner), :class => 'btn btn-mini' %>
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       admin_partner_path(partner),
                       :method => :delete,
@@ -38,5 +38,5 @@
 </table>
 
 <%= link_to t('.new', :default => t("helpers.links.new")),
-            new_partner_path,
+            new_admin_partner_path,
             :class => 'btn btn-primary' %>
