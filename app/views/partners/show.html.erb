@@ -1,0 +1,40 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Prefix:</b>
+  <%= @partner.prefix %>
+</p>
+
+<p>
+  <b>Name:</b>
+  <%= @partner.name %>
+</p>
+
+<p>
+  <b>Contract uri:</b>
+  <%= @partner.contract_uri %>
+</p>
+
+<p>
+  <b>Website url:</b>
+  <%= @partner.website_url %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%= @partner.description %>
+</p>
+
+<p>
+  <b>Logo:</b>
+  <%= @partner.logo %>
+</p>
+
+<p>
+  <b>Deleted at:</b>
+  <%= @partner.deleted_at %>
+</p>
+
+
+<%= link_to 'Edit', edit_partner_path(@partner) %> |
+<%= link_to 'Back', partners_path %>
