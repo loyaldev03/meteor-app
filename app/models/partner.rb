@@ -1,5 +1,6 @@
 class Partner < ActiveRecord::Base
   has_many :domains
+  has_many :clubs
 
   attr_accessible :contract_uri, :deleted_at, :description, :name, :prefix, :website_url, :logo
   

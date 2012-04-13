@@ -1,0 +1,31 @@
+<%- model_class = @club.class -%>
+<h1><%=t '.title', :default => model_class.model_name.human %></h1>
+
+<p>
+  <strong><%= model_class.human_attribute_name(:description) %>:</strong><br>
+  <%= @club.description %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:name) %>:</strong><br>
+  <%= @club.name %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:partner_id) %>:</strong><br>
+  <%= @club.partner_id %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:deleted_at) %>:</strong><br>
+  <%= @club.deleted_at %>
+</p>
+
+<div class="form-actions">
+  <%= link_to t('.back', :default => t("helpers.links.back")),
+              clubs_path, :class => 'btn'  %>
+  <%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_club_path(@club), :class => 'btn' %>
+  <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              club_path(@club),
+              :method => 'delete',
+              :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
+              :class => 'btn btn-danger' %>
+</div>

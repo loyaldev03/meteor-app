@@ -9,7 +9,7 @@ class CreateDomains < ActiveRecord::Migration
       t.datetime :deleted_at
       t.timestamps
     end
-    execute "ALTER TABLE domains ADD COLUMN id BIGINT(22) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 
+    execute "ALTER TABLE domains ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 
   end
   def down
     drop_table :domains

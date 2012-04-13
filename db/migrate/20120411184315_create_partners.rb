@@ -10,7 +10,7 @@ class CreatePartners < ActiveRecord::Migration
       t.datetime :deleted_at
       t.timestamps
     end
-    execute "ALTER TABLE partners ADD COLUMN id BIGINT(22) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 
+    execute "ALTER TABLE partners ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 
   end
   def down
     drop_table :partners
