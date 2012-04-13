@@ -13,10 +13,10 @@
 
     <%= stylesheet_link_tag "application", :media => "all" %>
 
-    <link href="images/favicon.ico" rel="shortcut icon">
-    <link href="images/apple-touch-icon.png" rel="apple-touch-icon">
-    <link href="images/apple-touch-icon-72x72.png" rel="apple-touch-icon" sizes="72x72">
-    <link href="images/apple-touch-icon-114x114.png" rel="apple-touch-icon" sizes="114x114">
+    <link href="/images/favicon.ico" rel="shortcut icon">
+    <link href="/images/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="/images/apple-touch-icon-72x72.png" rel="apple-touch-icon" sizes="72x72">
+    <link href="/images/apple-touch-icon-114x114.png" rel="apple-touch-icon" sizes="114x114">
   </head>
   <body>
 
@@ -38,7 +38,7 @@
                   <% if @current_partner.logo.nil? %>
                     <li><%= @current_partner.name %></li>
                   <% else %>
-                    <li><%= image_tag @current_partner.logo.url %></li>
+                    <li><%= image_tag @current_partner.logo.url(:thumb) %></li>
                   <% end %>
                 <% end %>
                 <li><%= link_to t('menu.users'), admin_users_path  %></li>

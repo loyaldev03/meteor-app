@@ -28,7 +28,7 @@ SacPlatform::Application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  config.force_ssl = true
 
   # See everything in the log (default is :info)
   # config.log_level = :debug
@@ -65,5 +65,17 @@ SacPlatform::Application.configure do
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
-  # config.action_mailer.default_url_options = { :host => 'localhost:3000' }
+  config.action_mailer.default_url_options = { :host => 'https://50.116.16.84:3000/' }
+
+  # these options are only needed if you choose smtp delivery
+  config.action_mailer.smtp_settings = {
+    :enable_starttls_auto => true,
+    :address        => 'smtp.gmail.com',
+    :port           => 587,
+    :domain         => 'xagax.com',
+    :authentication => :login,
+    :user_name      => 'platform@xagax.com',
+    :password       => 'a4my0fm3'
+  }
+
 end
