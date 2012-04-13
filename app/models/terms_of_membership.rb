@@ -1,6 +1,7 @@
 class TermsOfMembership < ActiveRecord::Base
   attr_accessible :bill_type, :enrollment_price, :grace_period, 
-    :max_reactivations, :mode, :needs_enrollment_approval, :trial_days, :year_price
+    :max_reactivations, :mode, :needs_enrollment_approval, :trial_days, 
+    :year_price, :description
 
   belongs_to :club
 
