@@ -1,0 +1,55 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Club:</b>
+  <%= @terms_of_membership.club_id %>
+</p>
+
+<p>
+  <b>Year price:</b>
+  <%= @terms_of_membership.year_price %>
+</p>
+
+<p>
+  <b>Trial days:</b>
+  <%= @terms_of_membership.trial_days %>
+</p>
+
+<p>
+  <b>Mode:</b>
+  <%= @terms_of_membership.mode %>
+</p>
+
+<p>
+  <b>Needs enrollment approval:</b>
+  <%= @terms_of_membership.needs_enrollment_approval %>
+</p>
+
+<p>
+  <b>Enrollment price:</b>
+  <%= @terms_of_membership.enrollment_price %>
+</p>
+
+<p>
+  <b>Max reactivations:</b>
+  <%= @terms_of_membership.max_reactivations %>
+</p>
+
+<p>
+  <b>Grace period:</b>
+  <%= @terms_of_membership.grace_period %>
+</p>
+
+<p>
+  <b>Bill type:</b>
+  <%= @terms_of_membership.bill_type %>
+</p>
+
+<p>
+  <b>Deleted at:</b>
+  <%= @terms_of_membership.deleted_at %>
+</p>
+
+
+<%= link_to 'Edit', edit_terms_of_membership_path(@terms_of_membership) %> |
+<%= link_to 'Back', terms_of_memberships_path %>

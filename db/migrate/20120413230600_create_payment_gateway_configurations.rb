@@ -5,7 +5,7 @@ class CreatePaymentGatewayConfigurations < ActiveRecord::Migration
       t.string :merchant_key
       t.string :login
       t.string :password
-      t.string :mode
+      t.string :mode, :default => 'development'
       t.string :descriptor_name
       t.string :descriptor_phone
       t.string :order_mark

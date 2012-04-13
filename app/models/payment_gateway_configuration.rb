@@ -11,16 +11,19 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   validates :gateway, :presence => true
   validates :club, :presence => true
 
+  GATEWAYS = ['mes', 'litle']
+  MODES = ['development', 'production']
+
   def mes?
-    self.gateway == "mes"
+    self.gateway == 'mes'
   end
   def litle?
-    self.gateway == "litle"
+    self.gateway == 'litle'
   end
   def production?
-    self.mode == "production"
+    self.mode == 'production'
   end
   def development?
-    self.mode == "development"
+    self.mode == 'development'
   end
 end

@@ -1,0 +1,57 @@
+<%= form_for(@terms_of_membership) do |f| %>
+  <% if @terms_of_membership.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@terms_of_membership.errors.count, "error") %> prohibited this terms_of_membership from being saved:</h2>
+
+      <ul>
+      <% @terms_of_membership.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :club_id %><br />
+    <%= f.number_field :club_id %>
+  </div>
+  <div class="field">
+    <%= f.label :year_price %><br />
+    <%= f.text_field :year_price %>
+  </div>
+  <div class="field">
+    <%= f.label :trial_days %><br />
+    <%= f.number_field :trial_days %>
+  </div>
+  <div class="field">
+    <%= f.label :mode %><br />
+    <%= f.text_field :mode %>
+  </div>
+  <div class="field">
+    <%= f.label :needs_enrollment_approval %><br />
+    <%= f.check_box :needs_enrollment_approval %>
+  </div>
+  <div class="field">
+    <%= f.label :enrollment_price %><br />
+    <%= f.text_field :enrollment_price %>
+  </div>
+  <div class="field">
+    <%= f.label :max_reactivations %><br />
+    <%= f.number_field :max_reactivations %>
+  </div>
+  <div class="field">
+    <%= f.label :grace_period %><br />
+    <%= f.number_field :grace_period %>
+  </div>
+  <div class="field">
+    <%= f.label :bill_type %><br />
+    <%= f.text_field :bill_type %>
+  </div>
+  <div class="field">
+    <%= f.label :deleted_at %><br />
+    <%= f.datetime_select :deleted_at %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
