@@ -3,10 +3,12 @@
 
 en:
   show: 'Show'
+  edit: 'Edit'
   destroy: 'Destroy'
   lock: 'Lock'
   unlock: 'Unlock'
   new: 'New'
+  dashboard: 'Dashboard'
   menu: 
     logout: Logout
     users: Users

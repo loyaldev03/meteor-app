@@ -5,7 +5,7 @@ class Partner < ActiveRecord::Base
   
   acts_as_paranoid
   validates_presence_of :name, :prefix
-  validates_uniqueness_of :prefix
+  validates_uniqueness_of :prefix, :name
 
   has_attached_file :logo, :path => ":rails_root/public/system/:attachment/:id/:style/:filename", :url => "/system/:attachment/:id/:style/:filename"
 
