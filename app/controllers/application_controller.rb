@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   before_filter :authenticate_user!
-  before_filter :validate_partner_presence, :except => [:index]
+  before_filter :validate_partner_presence
   protect_from_forgery
 
   private
