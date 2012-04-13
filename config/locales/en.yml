@@ -8,7 +8,9 @@ en:
   lock: 'Lock'
   unlock: 'Unlock'
   new: 'New'
+  back: 'Back'
   dashboard: 'Dashboard'
+  cancel: 'Cancel'
   menu: 
     logout: Logout
     users: Users
