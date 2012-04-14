@@ -11,9 +11,6 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   validates :gateway, :presence => true
   validates :club, :presence => true
 
-  GATEWAYS = ['mes', 'litle']
-  MODES = ['development', 'production']
-
   def mes?
     self.gateway == 'mes'
   end

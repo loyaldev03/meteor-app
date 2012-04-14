@@ -2,6 +2,19 @@ defaults: &defaults
   payment_gateways:
   - MES
   - LITLE
+  modes:
+  - development
+  - production
+  bill_types:
+  - monthly
+  - yearly
+  credit_card_types:
+  - visa
+  - all
+  - master
+  decline_types:
+  - soft
+  - hard
 
 
 development:
