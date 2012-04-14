@@ -1,4 +1,5 @@
 class DomainsController < ApplicationController
+  layout '2-cols'
 
   # GET /domains
   # GET /domains.json

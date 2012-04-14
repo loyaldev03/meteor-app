@@ -1,4 +1,6 @@
 class Admin::PartnersController < ApplicationController
+  layout :set_layout
+
   # GET /partners
   # GET /partners.json
   def index
@@ -85,4 +87,10 @@ class Admin::PartnersController < ApplicationController
     @partner = @current_partner
   end
 
+  private
+    def set_layout
+      params[:action] == 'dashboard' ? '2-cols' : 'application'
+    end
+
 end
+

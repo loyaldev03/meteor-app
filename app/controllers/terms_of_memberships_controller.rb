@@ -1,4 +1,6 @@
 class TermsOfMembershipsController < ApplicationController
+  layout '2-cols'
+  
   # GET /terms_of_memberships
   # GET /terms_of_memberships.json
   def index

@@ -1,4 +1,6 @@
 class ClubsController < ApplicationController
+  layout '2-cols'
+
   # GET /clubs
   # GET /clubs.json
   def index
