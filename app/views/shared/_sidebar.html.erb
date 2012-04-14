@@ -1,13 +1,15 @@
-<div class="well sidebar-nav">
-  <% if current_user %>
-    Hello <%= current_user.email %> <br>
-    <h3>Sidebar</h3>
-    <% if @current_partner %>
-      <ul class="nav nav-list">
-        <li class="nav-header">General</li>
-        <li><%= link_to "Domains", domains_path  %></li>
-        <li><%= link_to "Clubs", clubs_path  %></li>
-      </ul>
-    <% end %>
-  <% end %>
-</div><!--/.well -->
+<% if current_user %>
+  <div class="span3">
+    <div class="well sidebar-nav">
+      Hello <%= current_user.email %> <br>
+      <h3>Sidebar</h3>
+      <% if @current_partner %>
+        <ul class="nav nav-list">
+          <li class="nav-header">General</li>
+          <li><%= link_to "Domains", domains_path  %></li>
+          <li><%= link_to "Clubs", clubs_path  %></li>
+        </ul>
+      <% end %>
+    </div><!--/.well -->
+  </div><!--/span-->
+<% end %>

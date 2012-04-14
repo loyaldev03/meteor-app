@@ -57,12 +57,10 @@
     <div class="container">
       <div class="content">
         <div class="row">
-           <div class="span9">
-              <%= yield %>
-            </div>
-            <div class="span3">
-              <%= render :partial => "shared/sidebar"%>
-            </div><!--/span-->
+          <div class="span9">
+            <%= yield %>
+          </div>
+          <%= render :partial => "shared/sidebar"%>
         </div><!--/row-->
       </div><!--/content-->
 
