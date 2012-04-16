@@ -9,5 +9,6 @@ class Club < ActiveRecord::Base
   acts_as_paranoid
 
   validates :partner_id, :presence => 'true'
+  validates :name, :presence => 'true'
 
 end
