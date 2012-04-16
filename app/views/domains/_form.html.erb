@@ -33,8 +33,12 @@
       <%= f.check_box :hosted, :class => 'check_box' %>
     </div>
   </div>
-
-  <%=  %>
+  <div class="control-group">
+    <%= f.label :Club, :class => 'control-label' %>
+    <div class="controls">
+      <%= generate_select_club_id f, @domain, @club %>
+    </div>
+  </div>
   
 
   <div class="form-actions">

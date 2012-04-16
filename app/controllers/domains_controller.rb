@@ -28,6 +28,7 @@ class DomainsController < ApplicationController
   def new
     @domain = Domain.new :partner => @current_partner
     @partner = Partner.all
+    @club = Club.all
 
     respond_to do |format|
       format.html # new.html.erb
