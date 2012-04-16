@@ -14,13 +14,7 @@
   <div class="control-group">
     <%= f.label :partner_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.number_field :partner_id, :class => 'number_field' %>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :deleted_at, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.datetime_select :deleted_at, :class => 'datetime_select' %>
+      <%= generate_select_partner_id f, @club, @partner %>
     </div>
   </div>
 
