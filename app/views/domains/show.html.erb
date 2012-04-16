@@ -2,6 +2,10 @@
 <h1><%=t '.title', :default => model_class.model_name.human %></h1>
 
 <p>
+  <strong><%= model_class.human_attribute_name(:partner_id) %>:</strong><br>
+  <%= @domain.partner_id %>
+</p>
+<p>
   <strong><%= model_class.human_attribute_name(:url) %>:</strong><br>
   <%= @domain.url %>
 </p>
@@ -27,11 +31,11 @@
 </p>
 
 <div class="form-actions">
-  <%= link_to t('.back', :default => t("helpers.links.back")),
+  <%= link_to t(:back),
               domains_path, :class => 'btn'  %>
-  <%= link_to t('.edit', :default => t("helpers.links.edit")),
+  <%= link_to t(:edit),
               edit_domain_path(@domain), :class => 'btn' %>
-  <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+  <%= link_to t(:destroy),
               domain_path(@domain),
               :method => 'delete',
               :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
