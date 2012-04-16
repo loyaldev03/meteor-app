@@ -4,7 +4,10 @@ class Club < ActiveRecord::Base
   has_many :payment_gateway_configurations
   has_many :terms_of_memberships
   
-  attr_accessible :deleted_at, :description, :name, :partner
+  attr_accessible :deleted_at, :description, :name, :partner_id
 
   acts_as_paranoid
+
+  validates :partner_id, :presence => 'true'
+
 end
