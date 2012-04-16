@@ -27,6 +27,7 @@ class DomainsController < ApplicationController
   # GET /domains/new.json
   def new
     @domain = Domain.new :partner => @current_partner
+    @partner = Partner.all
 
     respond_to do |format|
       format.html # new.html.erb
