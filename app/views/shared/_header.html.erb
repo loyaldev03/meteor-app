@@ -16,7 +16,7 @@
               <% if @current_partner.logo.nil? %>
                 <li><%= @current_partner.name %></li>
               <% else %>
-                <li><%= image_tag @current_partner.logo.url(:thumb) %></li>
+                <li><%= image_tag @current_partner.logo.url %></li>
               <% end %>
             <% end %>
             <li><%= link_to t('menu.users'), admin_users_path  %></li>
