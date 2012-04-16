@@ -4,5 +4,7 @@ class Domain < ActiveRecord::Base
 
   attr_accessible :data_rights, :deleted_at, :description, :hosted, :partner, :url
 
+  validates :partner_id, :presence => true 
+
   acts_as_paranoid
 end
