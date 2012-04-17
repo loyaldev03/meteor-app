@@ -6,6 +6,7 @@ class ClubsController < ApplicationController
   def index
     @clubs = Club.all
 
+
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @clubs }
@@ -44,10 +45,11 @@ class ClubsController < ApplicationController
   # POST /clubs.json
   def create
     @club = Club.new(params[:club])
+    @club.partner = @current_partner
 
     respond_to do |format|
       if @club.save
-        format.html { redirect_to @club, notice: 'Club was successfully created.' }
+        format.html { redirect_to club_path(:id => @club), notice: 'Club was successfully created.' }
         format.json { render json: @club, status: :created, location: @club }
       else
         format.html { render action: "new" }
@@ -63,7 +65,7 @@ class ClubsController < ApplicationController
 
     respond_to do |format|
       if @club.update_attributes(params[:club])
-        format.html { redirect_to @club, notice: 'Club was successfully updated.' }
+        format.html { redirect_to club_path(:id => @club), notice: 'Club was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
