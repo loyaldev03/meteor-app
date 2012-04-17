@@ -10,7 +10,7 @@ class Member < ActiveRecord::Base
       :next_bill_date, :quota, :state, :terms_of_membership_id, :work_phone, :zip, 
       :club_id, :partner_id
 
-      # t.integer :member_cancel_reason_type_id # TODO
+      # t.integer :member_cancel_reason_type_id # TODO: We have to set cancel reason somewhere (maybe event should do it)
 
 
   validates :first_name, :presence => true
@@ -23,14 +23,25 @@ class Member < ActiveRecord::Base
    #   t.string :zip
    #   t.string :country
    #   t.integer :terms_of_membership_id, :limit => 8
-    
 
-   # TODO => sacar esto
-      # t.string :status
-      # t.integer :bill_date
-      # t.integer :created_by
-      # t.datetime :next_bill_date
-      # t.integer :quota, :default => 0
-
+  state_machine :status, :initial => :provisional do
+    # A Member is within their review period. These members have joined a Subscription program that has a “Provisional” 
+    # period whereby the Member has an opportunity to review the benfits of the program risk free for the duration of 
+    # the Provisional period. 
+    state :provisional
+    # A Member who has joineda subscription program that has been successfully billed the the 
+    # Membership Billing Amount and is still active in the Program. 
+    state :paid
+    # Where a Member in Provisional or Paid Status Cancels their Subscription or their Subscription 
+    # was canceled by the platform due to unsuccessful billing of the Membership Amount or Renewal Amount.
+    state :lapsed
+    # (ONLY IN NFLA PLAYER PROGRAM) When a member has been submitted information as a Prospect 
+    # COF and is in provisional status who needs to be approved to join the NFLA, (Approvals are 
+    # done through NFLA and managed by Stoneacre)
+    state :applied
+    # (ONLY IN NFLA PLAYER PROGRAM) When an Applied Member has been “approved” to join the NFLA, 
+    # they are considered an approved member. (Approvals are done through NFLA and managed by Stoneacre)
+    state :approved
+  end
 
 end

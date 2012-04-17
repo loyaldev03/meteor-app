@@ -28,6 +28,6 @@ class CreateMembers < ActiveRecord::Migration
     execute "ALTER TABLE members ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 
   end
   def down
-      drop_table :members
+    drop_table :members
   end
 end

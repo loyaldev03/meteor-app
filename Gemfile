@@ -25,6 +25,7 @@ gem 'settingslogic'
 gem 'wirble'
 gem 'bootstrap-will_paginate'
 gem 'nokogiri'
+gem 'state_machine'
 
 gem 'twitter-bootstrap-rails'
 
