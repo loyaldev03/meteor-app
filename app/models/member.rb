@@ -25,12 +25,12 @@ class Member < ActiveRecord::Base
    #   t.integer :terms_of_membership_id, :limit => 8
     
 
-
-      t.string :status
-      t.integer :bill_date
-      t.integer :created_by
-      t.datetime :next_bill_date
-      t.integer :quota, :default => 0
+   # TODO => sacar esto
+      # t.string :status
+      # t.integer :bill_date
+      # t.integer :created_by
+      # t.datetime :next_bill_date
+      # t.integer :quota, :default => 0
 
 
 end
