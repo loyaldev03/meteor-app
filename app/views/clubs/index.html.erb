@@ -22,6 +22,7 @@
         <td><%= club.deleted_at %></td>
         <td><%=l club.created_at %></td>
         <td>
+          <%= link_to t(:members), members_path(@current_partner.prefix, club.name), :class => 'btn btn-mini' %>
           <%= link_to t(:edit),
                       edit_club_path(:id => club.id), :class => 'btn btn-mini' %>
           <%= link_to t(:destroy),

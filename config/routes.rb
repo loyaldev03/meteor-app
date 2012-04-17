@@ -9,13 +9,15 @@ SacPlatform::Application.routes.draw do
     end
   end
 
-  scope ':partner_prefix' do
+  scope '/partner/:partner_prefix' do
     resources :clubs
+    scope '/club/:club_prefix' do
+      resources :members
+    end
     resources :domains
     resources :terms_of_memberships
     match 'dashboard' => 'admin/partners#dashboard', as: 'admin_partner_dashboard'
   end
-
 
 
 

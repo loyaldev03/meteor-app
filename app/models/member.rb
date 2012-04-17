@@ -26,4 +26,11 @@ class Member < ActiveRecord::Base
     
 
 
+      t.string :status
+      t.integer :bill_date
+      t.integer :created_by
+      t.datetime :next_bill_date
+      t.integer :quota, :default => 0
+
+
 end

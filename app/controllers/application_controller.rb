@@ -21,4 +21,20 @@ class ApplicationController < ActionController::Base
         end
       end
     end
+    def validate_club_presence
+      if current_user 
+        if params[:club_prefix].nil?
+          flash[:error] = "No club was selected."
+          redirect_to clubs_path
+          false
+        else
+          @current_club = Club.find_by_name(params[:club_prefix])
+          if @current_club.nil?
+            flash[:error] = "No club was selected."
+            redirect_to clubs_path
+            false
+          end
+        end
+      end
+    end
 end
