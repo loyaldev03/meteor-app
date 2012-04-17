@@ -39,6 +39,7 @@ class DomainsController < ApplicationController
   # GET /domains/1/edit
   def edit
     @domain = Domain.find(params[:id])
+    @club = Club.all
   end
 
   # POST /domains
