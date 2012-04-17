@@ -12,4 +12,6 @@ class Partner < ActiveRecord::Base
                            :url => "/system/:attachment/:id/:style/:filename",
                            :style => {:thumb=> "100x100#", :small  => "150x150>"}
                            
+  accepts_nested_attributes_for :domains
+
 end

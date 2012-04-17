@@ -38,6 +38,26 @@
     </div>
   </div>
 
+  <div class="control-group">
+    <%= f.fields_for :domains do |domain_fields| %>
+      <div class="controls">dasdasdadasd
+        <%= domain_fields.text_field :url, :class => 'text_field' %>
+      </div>
+      <div class="controls">
+        <%= domain_fields.text_area :description, :class => 'text_area' %>
+      </div>
+      <div class="controls">
+        <%= domain_fields.text_area :data_rights, :class => 'control-label' %>
+      </div>
+      <div class="controls">
+        <%= domain_fields.check_box :hosted, :class => 'check_box' %>
+      </div>
+      <div class="controls">     
+        <%= domain_fields.text_area :data_rights, :class => 'text_area' %>
+      </div>
+    <% end %>
+  </div>
+
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
     <%= link_to t(:cancel),
