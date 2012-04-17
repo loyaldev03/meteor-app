@@ -4,6 +4,7 @@ class TermsOfMembership < ActiveRecord::Base
     :year_price, :description
 
   belongs_to :club
+  has_many :members
 
   acts_as_paranoid
 
