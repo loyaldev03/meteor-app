@@ -37,23 +37,39 @@
       <%= f.file_field :logo, :class => 'text_field' %>
     </div>
   </div>
+<h1> New Domain </h1>
 
   <div class="control-group">
     <%= f.fields_for :domains do |domain_fields| %>
-      <div class="controls">dasdasdadasd
-        <%= domain_fields.text_field :url, :class => 'text_field' %>
+      <div class="control-group">
+        <%= domain_fields.label :url, :class => 'control-label' %>
+        <div class="controls">
+          <%= domain_fields.text_field :url, :class => 'text_field' %>
+        </div>
       </div>
-      <div class="controls">
-        <%= domain_fields.text_area :description, :class => 'text_area' %>
+      <div class="control-group">
+        <%= domain_fields.label :description, :class => 'control-label' %>
+        <div class="controls">
+          <%= domain_fields.text_area :description, :class => 'text_area' %>
+        </div>
       </div>
-      <div class="controls">
-        <%= domain_fields.text_area :data_rights, :class => 'control-label' %>
+      <div class="control-group">
+        <%= domain_fields.label :data_rights, :class => 'control-label' %>
+        <div class="controls">
+          <%= domain_fields.text_area :data_rights, :class => 'control-label' %>
+        </div>
       </div>
-      <div class="controls">
-        <%= domain_fields.check_box :hosted, :class => 'check_box' %>
+      <div class="control-group">
+        <%= domain_fields.label :hosted, :class => 'control-label' %>
+        <div class="controls">
+          <%= domain_fields.check_box :hosted, :class => 'check_box' %>
+        </div>
       </div>
-      <div class="controls">     
-        <%= domain_fields.text_area :data_rights, :class => 'text_area' %>
+      <div class="control-group">
+        <%= domain_fields.label :Club, :class => 'control-label' %>
+        <div class="controls">
+          <%= domain_fields.select :club_id, options_from_collection_for_select(@clubs, "id", "name")  %>
+        </div>
       </div>
     <% end %>
   </div>

@@ -27,7 +27,8 @@ class Admin::PartnersController < ApplicationController
   # GET /partners/new.json
   def new
     @partner = Partner.new
-
+    @clubs = Club.all
+    
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @partner }
