@@ -37,42 +37,39 @@
       <%= f.file_field :logo, :class => 'text_field' %>
     </div>
   </div>
-<h1> New Domain </h1>
+
+<% if @partner.new_record? %>
+  <h1> New Domain </h1>
 
   <div class="control-group">
-    <%= f.fields_for :domains do |domain_fields| %>
+    <%= fields_for :domain do |domain_fields| %>
       <div class="control-group">
         <%= domain_fields.label :url, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.text_field :url, :class => 'text_field' %>
+          <%= domain_fields.text_field :url, :class => 'text_field', :name => "partner[domains_attributes][0][url]" %>
         </div>
       </div>
       <div class="control-group">
         <%= domain_fields.label :description, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.text_area :description, :class => 'text_area' %>
+          <%= domain_fields.text_area :description, :class => 'text_area', :name => "partner[domains_attributes][0][description]" %>
         </div>
       </div>
       <div class="control-group">
         <%= domain_fields.label :data_rights, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.text_area :data_rights, :class => 'control-label' %>
+          <%= domain_fields.text_area :data_rights, :class => 'control-label', :name => "partner[domains_attributes][0][data_rights]" %>
         </div>
       </div>
       <div class="control-group">
         <%= domain_fields.label :hosted, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.check_box :hosted, :class => 'check_box' %>
-        </div>
-      </div>
-      <div class="control-group">
-        <%= domain_fields.label :Club, :class => 'control-label' %>
-        <div class="controls">
-          <%= domain_fields.select :club_id, options_from_collection_for_select(@clubs, "id", "name")  %>
+          <%= domain_fields.check_box :hosted, :class => 'check_box', :name => "partner[domains_attributes][0][hosted]" %>
         </div>
       </div>
     <% end %>
   </div>
+<% end %>
 
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
