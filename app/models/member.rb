@@ -4,14 +4,16 @@ class Member < ActiveRecord::Base
   belongs_to :partner
   belongs_to :created_by, :class_name => 'User', :foreign_key => 'created_by_id'
   has_many :member_notes
+  has_many :credit_cards
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :enroll_attempts, :external_id, :first_name, :home_phone, 
-      :join_date, :last_name, :member_cancel_reason_type_id, :status, 
+      :join_date, :last_name, :status, 
       :next_bill_date, :quota, :state, :terms_of_membership_id, :work_phone, :zip, 
       :club_id, :partner_id
 
-      # t.integer :member_cancel_reason_type_id # TODO: We have to set cancel reason somewhere (maybe event should do it)
+  # TODO: We have to set cancel reason somewhere (maybe event should do it)
+  # t.integer :member_cancel_reason_type_id 
 
 
   validates :first_name, :presence => true
