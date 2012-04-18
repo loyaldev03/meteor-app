@@ -38,9 +38,9 @@
   <%= link_to t(:back),
               domains_path, :class => 'btn'  %>
   <%= link_to t(:edit),
-              edit_domain_path(@domain), :class => 'btn' %>
+              edit_domain_path(:id => @domain.id), :class => 'btn' %>
   <%= link_to t(:destroy),
-              domain_path(@domain),
+              domain_path(:id => @domain.id),
               :method => 'delete',
               :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
               :class => 'btn btn-danger' %>
