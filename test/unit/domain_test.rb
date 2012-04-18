@@ -12,4 +12,14 @@ class DomainTest < ActiveSupport::TestCase
 		domain.club_id = nil
 		assert !domain.save, "Domain was saved without a club_id"
 	end
+
+	test "Domain shouldnt be destroyed is its the last one" do
+		partner = FactoryGirl.create(:partner)
+		first_domain = FactoryGirl.create(:domain, :partner_id => partner.id)
+		second_domain = FactoryGirl.create(:domain, :partner_id => partner.id)
+        
+        first_domain.destroy
+        assert !second_domain.destroy, "Domain was destroyed when it was the last one"     
+	end
+
 end
