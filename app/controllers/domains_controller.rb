@@ -4,7 +4,7 @@ class DomainsController < ApplicationController
   # GET /domains
   # GET /domains.json
   def index
-    @domains = Domain.all
+    @domains = Domain.where(:partner_id => @current_partner)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -27,8 +27,7 @@ class DomainsController < ApplicationController
   # GET /domains/new.json
   def new
     @domain = Domain.new :partner => @current_partner
-    @partner = Partner.all
-    @club = Club.all
+    @club = Club.where(:partner_id => @current_partner)
 
     respond_to do |format|
       format.html # new.html.erb
@@ -39,7 +38,7 @@ class DomainsController < ApplicationController
   # GET /domains/1/edit
   def edit
     @domain = Domain.find(params[:id])
-    @club = Club.all
+    @club = Club.where(:partner_id => @current_partner)
   end
 
   # POST /domains
@@ -79,11 +78,16 @@ class DomainsController < ApplicationController
   # DELETE /domains/1.json
   def destroy
     @domain = Domain.find(params[:id])
-    @domain.destroy
+    @partner = Partner.find(@domain.partner_id)
 
-    respond_to do |format|
-      format.html { redirect_to domains_url }
-      format.json { head :no_content }
+    if @partner.domains.count != 1
+      @domain.destroy
+      respond_to do |format|
+        format.html { redirect_to domains_url }
+        format.json { head :no_content }
+      end
+    else
+      redirect_to domains_path,:flash => {:error => "Cannot destroy last domain. Partner must have at least one domain."}
     end
   end
 end
