@@ -2,12 +2,12 @@
 <h1><%=t '.title', :default => model_class.model_name.human %></h1>
 
 <p>
-  <strong><%= model_class.human_attribute_name(:description) %>:</strong><br>
-  <%= @club.description %>
-</p>
-<p>
   <strong><%= model_class.human_attribute_name(:name) %>:</strong><br>
   <%= @club.name %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:description) %>:</strong><br>
+  <%= @club.description %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:partner_id) %>:</strong><br>

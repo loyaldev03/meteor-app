@@ -4,8 +4,8 @@
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
-      <th><%= model_class.human_attribute_name(:description) %></th>
       <th><%= model_class.human_attribute_name(:name) %></th>
+      <th><%= model_class.human_attribute_name(:description) %></th>
       <th><%= model_class.human_attribute_name(:partner_id) %></th>
       <th><%= model_class.human_attribute_name(:deleted_at) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
@@ -16,8 +16,8 @@
     <% @clubs.each do |club| %>
       <tr>
         <td><%= link_to club.id, club_path(:id => club.id) %></td>
-        <td><%= club.description %></td>
         <td><%= club.name %></td>
+        <td><%= club.description %></td>
         <td><%= club.partner_id %></td>
         <td><%= club.deleted_at %></td>
         <td><%=l club.created_at %></td>
