@@ -46,7 +46,7 @@ class Admin::PartnersController < ApplicationController
 
     respond_to do |format|
       if @partner.save
-        format.html { redirect_to [ :admin, @partner ], notice: 'Partner was successfully created.' }
+        format.html { redirect_to [ :admin, @partner ], notice: "The partner #{@partner.prefix} - #{@partner.name} was successfully created." }
         format.json { render json: @partner, status: :created, location: @partner }
       else
         format.html { render action: "new" }
@@ -62,7 +62,7 @@ class Admin::PartnersController < ApplicationController
 
     respond_to do |format|
       if @partner.update_attributes(params[:partner])
-        format.html { redirect_to [ :admin, @partner ], notice: 'Partner was successfully updated.' }
+        format.html { redirect_to [ :admin, @partner ], notice: "The partner #{@partner.prefix} - #{@partner.name} was successfully updated." }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }

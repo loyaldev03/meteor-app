@@ -49,7 +49,7 @@ class DomainsController < ApplicationController
 
     respond_to do |format|
       if @domain.save
-        format.html { redirect_to domain_path(:id => @domain), notice: 'Domain was successfully created.' }
+        format.html { redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.name} was successfully created." }
         format.json { render json: @domain, status: :created, location: @domain }
       else
         format.html { render action: "new" }
@@ -65,7 +65,7 @@ class DomainsController < ApplicationController
 
     respond_to do |format|
       if @domain.update_attributes(params[:domain])
-        format.html { redirect_to domain_path(:id => @domain), notice: 'Domain was successfully updated.' }
+        format.html { redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.name} was successfully updated." }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
