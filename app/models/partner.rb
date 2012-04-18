@@ -3,7 +3,9 @@ class Partner < ActiveRecord::Base
   has_many :clubs
   has_many :members
 
-  attr_accessible :contract_uri, :deleted_at, :description, :name, :prefix, :website_url, :logo, :domains_attributes    
+  attr_accessible :contract_uri, :deleted_at, :description, :name, :prefix, 
+    :website_url, :logo, :domains_attributes
+
   accepts_nested_attributes_for :domains, :limit => 1
 
   acts_as_paranoid

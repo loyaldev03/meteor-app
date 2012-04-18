@@ -15,6 +15,7 @@ defaults: &defaults
   decline_types:
   - soft
   - hard
+  max_reactivations: 3
 
 
 development:

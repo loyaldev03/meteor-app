@@ -10,7 +10,7 @@ class CreatePaymentGatewayConfigurations < ActiveRecord::Migration
       t.string :descriptor_phone
       t.string :order_mark
       t.string :gateway
-      t.integer :club_id, :limit => 8
+      t.integer :domain_id, :limit => 8
       t.datetime :deleted_at
       t.timestamps
     end

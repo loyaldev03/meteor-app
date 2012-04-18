@@ -2,7 +2,6 @@ class CreateCreditCards < ActiveRecord::Migration
   def up
     create_table :credit_cards, {:id => false} do |t|
       t.integer :member_id, :limit => 8
-      t.string :member_prefix
       t.boolean :active, :default => true
       t.string :encrypted_number
       t.integer :expire_month

@@ -8,13 +8,9 @@ class Member < ActiveRecord::Base
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :enroll_attempts, :external_id, :first_name, :home_phone, 
-      :join_date, :last_name, :status, 
-      :next_bill_date, :quota, :state, :terms_of_membership_id, :work_phone, :zip, 
+      :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
+      :bill_date, :quota, :state, :terms_of_membership_id, :work_phone, :zip, 
       :club_id, :partner_id
-
-  # TODO: We have to set cancel reason somewhere (maybe event should do it)
-  # t.integer :member_cancel_reason_type_id 
-
 
   validates :first_name, :presence => true
    # TODO: add the following attributes as required.
