@@ -4,7 +4,7 @@ class ClubsController < ApplicationController
   # GET /clubs
   # GET /clubs.json
   def index
-    @clubs = Club.all
+    @clubs = Club.where(:partner_id => @current_partner)
 
 
     respond_to do |format|
@@ -28,7 +28,6 @@ class ClubsController < ApplicationController
   # GET /clubs/new.json
   def new
     @club = Club.new
-    @partner = Partner.all
 
     respond_to do |format|
       format.html # new.html.erb
