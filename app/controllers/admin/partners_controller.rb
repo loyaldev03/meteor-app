@@ -27,7 +27,6 @@ class Admin::PartnersController < ApplicationController
   # GET /partners/new.json
   def new
     @partner = Partner.new
-    @clubs = Club.all
     
     respond_to do |format|
       format.html # new.html.erb
@@ -47,7 +46,7 @@ class Admin::PartnersController < ApplicationController
 
     respond_to do |format|
       if @partner.save
-        format.html { redirect_to [ :admin, @partner ], notice: 'Partner was successfully created.' }
+        format.html { redirect_to [ :admin, @partner ], notice: "The partner #{@partner.prefix} - #{@partner.name} was successfully created." }
         format.json { render json: @partner, status: :created, location: @partner }
       else
         format.html { render action: "new" }
@@ -63,7 +62,7 @@ class Admin::PartnersController < ApplicationController
 
     respond_to do |format|
       if @partner.update_attributes(params[:partner])
-        format.html { redirect_to [ :admin, @partner ], notice: 'Partner was successfully updated.' }
+        format.html { redirect_to [ :admin, @partner ], notice: "The partner #{@partner.prefix} - #{@partner.name} was successfully updated." }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
@@ -86,6 +85,7 @@ class Admin::PartnersController < ApplicationController
 
   def dashboard
     @partner = @current_partner
+    @domains = Domain.where(:partner_id => @current_partner)
   end
 
   private

@@ -4,7 +4,7 @@ class ClubsController < ApplicationController
   # GET /clubs
   # GET /clubs.json
   def index
-    @clubs = Club.all
+    @clubs = Club.where(:partner_id => @current_partner)
 
 
     respond_to do |format|
@@ -28,7 +28,6 @@ class ClubsController < ApplicationController
   # GET /clubs/new.json
   def new
     @club = Club.new
-    @partner = Partner.all
 
     respond_to do |format|
       format.html # new.html.erb
@@ -49,7 +48,7 @@ class ClubsController < ApplicationController
 
     respond_to do |format|
       if @club.save
-        format.html { redirect_to club_path(:id => @club), notice: 'Club was successfully created.' }
+        format.html { redirect_to club_path(:id => @club), notice: "The club #{@club.name} was successfully created." }
         format.json { render json: @club, status: :created, location: @club }
       else
         format.html { render action: "new" }
@@ -65,7 +64,7 @@ class ClubsController < ApplicationController
 
     respond_to do |format|
       if @club.update_attributes(params[:club])
-        format.html { redirect_to club_path(:id => @club), notice: 'Club was successfully updated.' }
+        format.html { redirect_to club_path(:id => @club), notice: "The club #{@club.name} was successfully updated." }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
