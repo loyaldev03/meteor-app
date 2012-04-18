@@ -1,6 +1,8 @@
 class CreateMembers < ActiveRecord::Migration
   def up
-    create_table :members, { :id => false } do |t|
+    execute "CREATE TABLE members (id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, " +
+      "prefix VARCHAR(255) NOT NULL, PRIMARY KEY (prefix, id));" 
+    change_table :members do |t|
       t.text :description
       t.string :first_name
       t.string :last_name
@@ -25,7 +27,6 @@ class CreateMembers < ActiveRecord::Migration
       t.integer :quota, :default => 0
       t.timestamps
     end
-    execute "ALTER TABLE members ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 
   end
   def down
     drop_table :members
