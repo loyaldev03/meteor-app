@@ -1,12 +1,12 @@
 class ApplicationController < ActionController::Base
-  before_filter :authenticate_user!
+  before_filter :authenticate_agent!
   before_filter :validate_partner_presence
   protect_from_forgery
 
   private
 
     def validate_partner_presence
-      if current_user 
+      if current_agent
         if params[:partner_prefix].nil? and not params[:controller].include?('admin/') and not params[:controller].include?('devise/')
           flash[:error] = "No partner was selected."
           redirect_to admin_partners_path
@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
     end
 
     def validate_club_presence
-      if current_user 
+      if current_agent 
         if params[:club_prefix].nil?
           flash[:error] = "No club was selected."
           redirect_to clubs_path
@@ -41,7 +41,7 @@ class ApplicationController < ActionController::Base
 
   protected
     def add_operation(object, description)
-      o = Operation.new :created_by_id => current_user.id, :operation_date => Date.today, 
+      o = Operation.new :created_by_id => current_agent.id, :operation_date => Date.today, 
         :resource => object, :description => description
       o.save!
     end

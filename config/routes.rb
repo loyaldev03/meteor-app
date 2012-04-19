@@ -1,5 +1,5 @@
 SacPlatform::Application.routes.draw do
-  devise_for :users
+  devise_for :agents
 
   namespace :api do
     scope 'v1' do
@@ -9,7 +9,7 @@ SacPlatform::Application.routes.draw do
 
   namespace :admin do
     resources :partners
-    resources :users do
+    resources :agents do
       get :lock
       get :unlock
     end

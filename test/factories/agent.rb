@@ -1,12 +1,12 @@
 FactoryGirl.define do
 
-  factory :user do
+  factory :agent do
     password "secret"
     password_confirmation {password}
     sequence(:email) {|n| "carla#{n}@test.no" }
   end
 
-  factory :confirmed_admin_user, class: User do
+  factory :confirmed_admin_agent, class: Agent do
     username "test"
     password "secret"
     password_confirmation { password }

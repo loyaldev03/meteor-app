@@ -6,8 +6,7 @@ class MembersController < ApplicationController
   end
 
   def create
-    # TODO: this method must set created_by = current_user.id
-    # TODO: this method should use add_operation
+    # Call API
   end
 
   def show

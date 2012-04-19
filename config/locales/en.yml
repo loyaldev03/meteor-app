@@ -14,10 +14,10 @@ en:
   actions: 'Actions'
   menu: 
     logout: Logout
-    users: Users
+    agents: Agents
   activerecord:
     attributes:
-      user:  
+      agent:  
         login: "Username or email"
         password: "Password"
         remember_me: "Remember me"

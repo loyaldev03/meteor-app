@@ -20,7 +20,7 @@ class Api::MembersController < ApplicationController
       if club.domain.url == params[:domain_url]
         # member = Member.new params[:member]
         # member.credit_cards << CreditCard.new :
-        # member.created_by_id = current_user.id
+        # member.created_by_id = current_agent.id
         # member.club = club
         # member.bill
 

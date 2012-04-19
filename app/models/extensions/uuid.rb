@@ -3,7 +3,7 @@ module Extensions
     extend ActiveSupport::Concern
 
     included do
-      set_primary_key 'uuid'
+      self.primary_key = 'uuid'
       before_create :generate_uuid
       
       def generate_uuid
