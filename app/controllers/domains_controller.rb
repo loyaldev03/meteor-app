@@ -80,14 +80,13 @@ class DomainsController < ApplicationController
     @domain = Domain.find(params[:id])
     @partner = Partner.find(@domain.partner_id)
 
-    if @partner.domains.count != 1
-      @domain.destroy
+    if @domain.destroy
       respond_to do |format|
         format.html { redirect_to domains_url }
         format.json { head :no_content }
       end
     else
-      redirect_to domains_path,:flash => {:error => "Cannot destroy last domain. Partner must have at least one domain."}
+      redirect_to domains_path(:id => @domain), :flash => { error: "The domain #{@domain.url} cannot be destroyed. You must have at least one domain."}
     end
   end
 end

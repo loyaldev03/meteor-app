@@ -1,5 +1,4 @@
-<%= form_for @domain, :html => { :class => 'form-horizontal' } do |f| %>
- 
+
   <div class="control-group">
     <%= f.label :url, :class => 'control-label' %>
     <div class="controls">
@@ -39,4 +38,3 @@
     <%= f.submit nil, :class => 'btn btn-primary' %>
     <%= link_to t(:cancel), domains_path, :class => 'btn' %>
   </div>
-<% end %>
