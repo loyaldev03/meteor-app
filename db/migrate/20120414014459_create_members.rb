@@ -1,6 +1,8 @@
 class CreateMembers < ActiveRecord::Migration
   def up
-    create_table :members, {:id => false} do |t|
+    execute "CREATE TABLE members (visible_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, club_id BIGINT(20) NOT NULL, PRIMARY KEY (club_id, visible_id));" 
+    change_table :members do |t|
+      t.string :uuid, :limit => 36
       t.string :external_id
       t.text :description
       t.string :first_name
@@ -16,7 +18,6 @@ class CreateMembers < ActiveRecord::Migration
       t.string :status
       t.integer :terms_of_membership_id, :limit => 8
       t.integer :partner_id, :limit => 8
-      t.integer :club_id, :limit => 8
       t.integer :enroll_attempts, :default => 0
       t.datetime :join_date
       t.date :cancel_date
@@ -27,7 +28,6 @@ class CreateMembers < ActiveRecord::Migration
       t.boolean :recyle, :default => false
       t.timestamps
     end
-    execute "ALTER TABLE members ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 
   end
   def down
     drop_table :members
