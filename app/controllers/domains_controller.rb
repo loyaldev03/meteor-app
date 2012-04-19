@@ -38,7 +38,7 @@ class DomainsController < ApplicationController
   # GET /domains/1/edit
   def edit
     @domain = Domain.find(params[:id])
-    @club = Club.where(:partner_id => @current_partner)
+    @clubs = Club.where(:partner_id => @current_partner)
   end
 
   # POST /domains
