@@ -3,6 +3,8 @@
 class DeclineStrategy < ActiveRecord::Base
   acts_as_paranoid
 
+  has_many :transactions
+
   def soft_decline?
     self.decline_type == 'soft'
   end

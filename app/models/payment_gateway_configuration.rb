@@ -2,6 +2,7 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   attr_accessible :login, :merchant_key, :password, :mode, :gateway
   
   belongs_to :domain
+  has_many :transactions
 
   acts_as_paranoid
 
