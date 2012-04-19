@@ -21,6 +21,7 @@ class ApplicationController < ActionController::Base
         end
       end
     end
+
     def validate_club_presence
       if current_user 
         if params[:club_prefix].nil?
@@ -36,5 +37,12 @@ class ApplicationController < ActionController::Base
           end
         end
       end
+    end
+
+  protected
+    def add_operation(object, description)
+      o = Operation.new :created_by_id => current_user.id, :operation_date => Date.today, 
+        :resource => object, :description => description
+      o.save!
     end
 end
