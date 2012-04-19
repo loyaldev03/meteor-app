@@ -1,4 +1,7 @@
 <%- model_class = @club.class -%>
 <h1><%=t '.title', :default => t('helpers.titles.edit', :model => model_class.model_name.human,
                                  :default => "Edit #{model_class.model_name.human}") %></h1>
-<%= render :partial => 'form' %>
+
+<%= form_for @club, :as => :club, :url => club_path(:id => @club), :html => { :class => 'form-horizontal' } do |f| %>
+<%= render :partial => 'form', :locals => { :f => f } %>
+<% end %>
