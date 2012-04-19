@@ -1,4 +1,6 @@
 class Member < ActiveRecord::Base
+  include Extensions::UUID
+  
   belongs_to :terms_of_membership
   belongs_to :club
   belongs_to :partner
