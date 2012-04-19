@@ -7,17 +7,18 @@ class User < ActiveRecord::Base
 
   acts_as_paranoid
 
-  # Setup accessible (or protected) attributes for your model
-  attr_accessible :email, :password, :password_confirmation, :remember_me, :username
-  # attr_accessible :title, :body
-
-  validates :username, :uniqueness => true
-  validates :username, :email, :presence => :true  
+  has_many :created_members, :class_name => 'Member'
+  has_many :operations
 
   # Virtual attribute for authenticating by either username or email
   # This is in addition to a real persisted field like 'username'
   attr_accessor :login
-  attr_accessible :login
+
+  # Setup accessible (or protected) attributes for your model
+  attr_accessible :email, :password, :password_confirmation, :remember_me, :username, :login
+
+  validates :username, :uniqueness => true
+  validates :username, :email, :presence => :true  
 
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
