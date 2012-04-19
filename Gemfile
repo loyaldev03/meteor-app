@@ -10,6 +10,8 @@ gem 'uuidtools'
 
 gem "paperclip", "~> 3.0"
 
+gem 'exception_notification', :require => 'exception_notifier'
+
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do

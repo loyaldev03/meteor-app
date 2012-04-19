@@ -16,6 +16,14 @@ defaults: &defaults
   - soft
   - hard
   max_reactivations: 3
+  transaction_types:
+  - Sale
+  - Credit
+  - Void
+  - Authorization
+  - AuthorizationCapture
+  - Refund
+  - Capture
 
 
 development:
