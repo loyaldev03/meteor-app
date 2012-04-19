@@ -1,5 +1,5 @@
 class CreditCard < ActiveRecord::Base
-  belogns_to :member
+  belongs_to :member
 
   attr_accessible :active, :encrypted_number, :expire_month, :expire_year
 
