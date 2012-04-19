@@ -27,7 +27,7 @@
   <div class="control-group">
     <%= f.label :Club, :class => 'control-label' %>
     <div class="controls">
-      <%= generate_select_club_id f, @domain, @club %>
+      <%= f.select :club_id, options_from_collection_for_select(@clubs, "id", "name"), :disabled => true if @domain.new_record? %>
     </div>
   </div>
 
@@ -36,3 +36,5 @@
     <%= link_to t(:cancel), domains_path, :class => 'btn' %>
   </div>
 <% end %>
+#generate_select_club_id f, @domain, @club
+#
