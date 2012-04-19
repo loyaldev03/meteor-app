@@ -13,6 +13,7 @@ class Member < ActiveRecord::Base
       :club_id, :partner_id
 
   validates :first_name, :presence => true
+  validates :email, :presence => true, :uniqueness => { :scope => :club_id }
    # TODO: add the following attributes as required.
    #   t.string :last_name
    #   t.string :email
