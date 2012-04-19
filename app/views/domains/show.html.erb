@@ -1,10 +1,7 @@
 <%- model_class = @domain.class -%>
 <h1><%=t '.title', :default => model_class.model_name.human %></h1>
 
-<p>
-  <strong><%= model_class.human_attribute_name(:partner_id) %>:</strong><br>
-  <%= @domain.partner_id %>
-</p>
+
 <p>
   <strong><%= model_class.human_attribute_name(:url) %>:</strong><br>
   <%= @domain.url %>
@@ -16,10 +13,6 @@
 <p>
   <strong><%= model_class.human_attribute_name(:data_rights) %>:</strong><br>
   <%= @domain.data_rights %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:partner_id) %>:</strong><br>
-  <%= @domain.partner_id %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:hosted) %>:</strong><br>
