@@ -12,5 +12,6 @@ class CreateOperations < ActiveRecord::Migration
     execute "ALTER TABLE operations ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 
   end
   def down
+    drop_table :operations
   end
 end
