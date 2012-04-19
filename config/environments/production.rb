@@ -78,4 +78,9 @@ SacPlatform::Application.configure do
     :password       => 'a4my0fm3'
   }
 
+  config.middleware.use ExceptionNotifier,
+    :email_prefix => "[Exception] ",
+    :sender_address => %{"Phenix" <splatform@xagax.com>},
+    :exception_recipients => %w{platform@xagax.com}
+
 end
