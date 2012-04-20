@@ -8,8 +8,10 @@ class Domain < ActiveRecord::Base
   # this validation is comented because it does not works the nested form
   # of partner. TODO: can we add this validation without problems?
   # validates :partner, :presence => true 
-  validates :url, :presence => true, :uniqueness => true
-
+  validates :url, :presence => true, 
+                  :uniqueness => true, 
+                  :format =>  /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
+                  
   acts_as_paranoid
 
   before_destroy :veriby_if_is_last_domain
