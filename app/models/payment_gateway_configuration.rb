@@ -1,7 +1,7 @@
 class PaymentGatewayConfiguration < ActiveRecord::Base
-  attr_accessible :login, :merchant_key, :password, :mode, :gateway
+  attr_accessible :login, :merchant_key, :password, :mode, :gateway, :club
   
-  belongs_to :domain
+  belongs_to :club
   has_many :transactions
 
   acts_as_paranoid
@@ -11,7 +11,7 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   validates :password, :presence => true
   validates :mode, :presence => true
   validates :gateway, :presence => true
-  validates :domain, :presence => true
+  validates :club, :presence => true
 
   def mes?
     self.gateway == 'mes'
