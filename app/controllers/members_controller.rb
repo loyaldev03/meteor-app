@@ -5,10 +5,6 @@ class MembersController < ApplicationController
   def index
   end
 
-  def create
-    # Call API
-  end
-
   def show
   end
 
