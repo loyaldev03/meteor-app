@@ -8,7 +8,7 @@ dclass CreateUsers < ActiveRecord::Migration
       t.string :referer_path
       t.text :referer_params
       t.boolean :cookie_set
-      t.integer :domain, :limit => 8
+      t.integer :domain_id, :limit => 8
       t.timestamps
     end
   end
