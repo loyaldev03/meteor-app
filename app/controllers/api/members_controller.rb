@@ -22,12 +22,13 @@ class Api::MembersController < ApplicationController
         if user.nil?
           response = { :message => "User not found", :code => 403 }
         else
+          credit_card = CreditCard.new params[:credit_card]
           member = Member.new params[:member]
-          member.credit_cards << CreditCard.new params[:credit_card]
+          member.credit_cards << credit_card
           member.created_by_id = current_agent.id
           member.club = club
           if member.valid?
-            # user.enroll!(member)
+            # user.enroll!(member, credit_card, params[:enrollment_amount])
             begin
               member.save!
               # add_operation

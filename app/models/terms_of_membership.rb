@@ -25,4 +25,8 @@ class TermsOfMembership < ActiveRecord::Base
     self.mode == 'development'
   end
 
+  def payment_gateway_configuration
+    club.payment_gateway_configurations.find_by_mode(mode)
+  end
+
 end
