@@ -78,7 +78,6 @@ class DomainsController < ApplicationController
   # DELETE /domains/1.json
   def destroy
     @domain = Domain.find(params[:id])
-    @partner = Partner.find(@domain.partner_id)
 
     if @domain.destroy
       respond_to do |format|
