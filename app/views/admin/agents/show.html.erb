@@ -1,78 +1,66 @@
-<%- model_class = @user.class -%>
+<%- model_class = @agent.class -%>
 <h1><%=t '.title', :default => model_class.model_name.human %></h1>
 
 <p>
   <strong><%= model_class.human_attribute_name(:email) %>:</strong><br>
-  <%= @user.email %>
+  <%= @agent.email %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:remember_created_at) %>:</strong><br>
-  <%= @user.remember_created_at %>
+  <%= @agent.remember_created_at %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:sign_in_count) %>:</strong><br>
-  <%= @user.sign_in_count %>
+  <%= @agent.sign_in_count %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:current_sign_in_at) %>:</strong><br>
-  <%= I18n.l @user.current_sign_in_at, :format => :long if !@user.current_sign_in_at.nil? %>
+  <%= I18n.l @agent.current_sign_in_at, :format => :long if !@agent.current_sign_in_at.nil? %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:last_sign_in_at) %>:</strong><br>
-  <%= I18n.l @user.last_sign_in_at, :format => :long if !@user.last_sign_in_at.nil? %>
+  <%= I18n.l @agent.last_sign_in_at, :format => :long if !@agent.last_sign_in_at.nil? %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:current_sign_in_ip) %>:</strong><br>
-  <%= @user.current_sign_in_ip %>
+  <%= @agent.current_sign_in_ip %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:last_sign_in_ip) %>:</strong><br>
-  <%= @user.last_sign_in_ip %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:password_salt) %>:</strong><br>
-  <%= @user.password_salt %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:confirmation_token) %>:</strong><br>
-  <%= @user.confirmation_token %>
+  <%= @agent.last_sign_in_ip %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:confirmed_at) %>:</strong><br>
-  <%= I18n.l @user.confirmed_at, :format => :long if !@user.confirmed_at.nil? %>
+  <%= I18n.l @agent.confirmed_at, :format => :long if !@agent.confirmed_at.nil? %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:confirmation_sent_at) %>:</strong><br>
-  <%= I18n.l @user.confirmation_sent_at, :format => :long %>
+  <%= I18n.l @agent.confirmation_sent_at, :format => :long %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:unconfirmed_email) %>:</strong><br>
-  <%= @user.unconfirmed_email %>
+  <%= @agent.unconfirmed_email %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:failed_attempts) %>:</strong><br>
-  <%= @user.failed_attempts %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:unlock_token) %>:</strong><br>
-  <%= @user.unlock_token %>
+  <%= @agent.failed_attempts %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:locked_at) %>:</strong><br>
-  <%= I18n.l @user.locked_at, :format => :long if !@user.locked_at.nil? %>
+  <%= I18n.l @agent.locked_at, :format => :long if !@agent.locked_at.nil? %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:username) %>:</strong><br>
-  <%= @user.username %>
+  <%= @agent.username %>
 </p>
 
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),
-              admin_users_path, :class => 'btn'  %>
+              admin_agents_path, :class => 'btn'  %>
   <%= link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_admin_user_path(@user), :class => 'btn' %>
+              edit_admin_agent_path(@agent), :class => 'btn' %>
   <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-              admin_user_path(@user),
+              admin_agent_path(@agent),
               :method => 'delete',
               :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
               :class => 'btn btn-danger' %>

@@ -13,9 +13,9 @@ class DomainTest < ActiveSupport::TestCase
 		first_domain = FactoryGirl.create(:domain, :partner_id => partner.id, :url => 'http://prueba.com')
 		second_domain = FactoryGirl.create(:domain, :partner_id => partner.id, :url => 'http://prueba2.com')
 
-        first_domain.destroy
-        assert !second_domain.destroy, "Domain was destroyed when it was the last one"     
-        puts
+    first_domain.destroy
+    assert !second_domain.destroy, "Domain was destroyed when it was the last one"     
+    puts
 	end
 
 	test "Should not save two domains with the same url" do

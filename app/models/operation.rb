@@ -1,5 +1,5 @@
 class Operation < ActiveRecord::Base
-  belongs_to :created_by, :class_name => 'User', :foreign_key => 'created_by_id'
+  belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
   belongs_to :resource, :polymorphic => true
   attr_accessible :description
 

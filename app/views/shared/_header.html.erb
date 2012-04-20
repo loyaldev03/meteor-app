@@ -9,7 +9,7 @@
 
       <a class="brand" href="<%= root_path %>">SacPlatform</a>
 
-      <% if current_user %>
+      <% if current_agent %>
         <div class="container nav-collapse">
           <ul class="nav">
             <% unless @current_partner.nil? %>
@@ -19,10 +19,15 @@
                 <li><%= image_tag @current_partner.logo.url %></li>
               <% end %>
             <% end %>
-            <li><%= link_to t('menu.users'), admin_users_path  %></li>
+            <li><%= link_to t('menu.agents'), admin_agents_path  %></li>
             <li><%= link_to t('menu.partners'), admin_partners_path  %></li>
-            <li><%= link_to t('menu.logout'), destroy_user_session_path, :method => :delete  %></li>
+            <li><%= link_to t('menu.logout'), destroy_agent_session_path, :method => :delete  %></li>
             <li>TODO: search memebr</li>
+            <li>
+              <%= select_tag "change_partner",
+                options_for_select(Club.all.collect{ |u| [u.name, members_path(u.partner.prefix, u.name) ] }), 
+                :onchange => "window.open(this.options[this.selectedIndex].value, '_top')" %>
+            </li>
           </ul>
         </div><!--/.nav-collapse -->
       <% end %>           
