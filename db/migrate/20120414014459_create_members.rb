@@ -17,7 +17,6 @@ class CreateMembers < ActiveRecord::Migration
       t.string :country
       t.string :status
       t.integer :terms_of_membership_id, :limit => 8
-      t.integer :enroll_attempts, :default => 0
       t.datetime :join_date
       t.date :cancel_date
       t.date :bill_date
