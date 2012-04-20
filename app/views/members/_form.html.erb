@@ -16,7 +16,7 @@
   <div class="control-group" >
     <%= f.label :state, :class => 'help-inline' %> <%= f.text_field :state, :class => 'text_field input-medium'%> 
     <%= f.label :country, :class => 'help-inline' %> <%= f.text_field :country, :class => 'text_field input-medium'%>
-    <%= f.label :zip, :class => 'help-inline' %> <%= f.text_field :zip, :class => 'text_field input-medium'%>
+    <%= f.label :zip, :class => 'help-inline' %> <%= f.text_field :zip, :class => 'text_field input-small'%>
   </div>
   <hr>
   <div class="control-group" >
@@ -26,4 +26,15 @@
   <div class="control-group" >
     <%= f.label :email, :class => 'help-inline' %> <%= f.text_field :email, :class => 'text_field'%> 
   </div>  
+  <hr>
+  <div class="control-group" >
+    <%= f.label :terms_of_membership_id, :class => 'help-inline' %> <%= f.text_field :terms_of_membership_id, :class => 'text_field'%> 
+  </div>  
+  <hr>
+
+  <div class="control-group">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t(:Cancel), members_path, :class => 'btn' %>
+  </div>
 </div>
+
