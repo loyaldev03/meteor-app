@@ -26,8 +26,8 @@
                       edit_domain_path(:id => domain.id), :class => 'btn btn-mini' %>
           <%= link_to t(:destroy),
                       domain_path(:id => domain.id),
-                      :method => :delete,
-                      :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
+                      :method => :delete, 
+                      :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => "Are you sure?")),
                       :class => 'btn btn-mini btn-danger' %>
         </td>
       </tr>
