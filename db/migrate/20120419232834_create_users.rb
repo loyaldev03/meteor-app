@@ -1,4 +1,4 @@
-dclass CreateUsers < ActiveRecord::Migration
+class CreateUsers < ActiveRecord::Migration
   def up
     create_table :users, {:id => false} do |t|
       t.string :id, :primary => true
