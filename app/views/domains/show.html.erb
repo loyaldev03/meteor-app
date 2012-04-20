@@ -21,7 +21,7 @@
 
 <p>
   <strong><%= model_class.human_attribute_name(:club_id) %>:</strong><br>
-  <%= @domain.club.name %>
+  <%= @domain.club.nil? ? "It has no club assosiated" : @domain.club.name %>
 </p>
 
 <div class="form-actions">
