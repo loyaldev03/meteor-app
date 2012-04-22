@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UserTest < ActiveSupport::TestCase
+class PartnerTest < ActiveSupport::TestCase
 
   test "Shouldn not save partner without name and prefix" do
     partner = FactoryGirl.build(:partner)

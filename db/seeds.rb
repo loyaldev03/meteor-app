@@ -25,10 +25,10 @@ d.save!
 d = Domain.new :url => "http://test2.com.ar/", :partner => p, :club_id => c2.id
 d.save!
 
-pgc = PaymentGatewayConfiguration.new :login => "0000000", :merchant_key => "key", :password => "234", :mode => "development", :gateway => "mes", :club => c
+pgc = PaymentGatewayConfiguration.new :login => "94100010881800000023", :merchant_key => "key", :password => "UGajmzKGUjlvyMzbyndVsaHzRmyRFKXq", :mode => "development", :gateway => "mes", :club => c
 pgc.save!
 
-pgc = PaymentGatewayConfiguration.new :login => "0000000", :merchant_key => "key", :password => "234", :mode => "development", :gateway => "mes", :club => c2
+pgc = PaymentGatewayConfiguration.new :login => "94100010881800000023", :merchant_key => "key", :password => "UGajmzKGUjlvyMzbyndVsaHzRmyRFKXq", :mode => "development", :gateway => "mes", :club => c2
 pgc.save!
 
 
