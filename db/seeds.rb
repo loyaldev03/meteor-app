@@ -15,14 +15,20 @@ u.confirm!
 p = Partner.new :prefix => 'NFL', :name => 'NFL'
 p.save!
 
-c = Club.new :partner_id => p.id, :name => "Fans"
+c = Club.new :name => "Fans"
+c.partner = p
 c.save!
-c2 = Club.new :partner_id => p.id, :name => "Players"
+c2 = Club.new :name => "Players"
+c2.partner = p
 c2.save!
 
-d = Domain.new :url => "http://test.com.ar/", :partner => p, :club_id => c.id
+d = Domain.new :url => "http://test.com.ar/"
+d.club = c
+d.partner = p
 d.save!
-d = Domain.new :url => "http://test2.com.ar/", :partner => p, :club_id => c2.id
+d = Domain.new :url => "http://test2.com.ar/"
+d.partner = p
+d.club = c2
 d.save!
 
 pgc = PaymentGatewayConfiguration.new :login => "94100010881800000023", :merchant_key => "key", :password => "UGajmzKGUjlvyMzbyndVsaHzRmyRFKXq", :mode => "development", :gateway => "mes", :club => c
@@ -32,7 +38,9 @@ pgc = PaymentGatewayConfiguration.new :login => "94100010881800000023", :merchan
 pgc.save!
 
 
-tom = TermsOfMembership.new :club => c, :installment_amount => 34.56, :installment_type => "30.days", :needs_enrollment_approval => false
+tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "30.days", :needs_enrollment_approval => false
+tom.club = c
 tom.save!
-tom = TermsOfMembership.new :club => c2, :installment_amount => 45, :installment_type => "30.days", :needs_enrollment_approval => false
+tom = TermsOfMembership.new :installment_amount => 45, :installment_type => "30.days", :needs_enrollment_approval => false
+tom.club = c2
 tom.save!
