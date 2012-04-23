@@ -4,9 +4,9 @@ class DomainsControllerTest < ActionController::TestCase
   setup do
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     sign_in @admin_user
-    @domain = FactoryGirl.create(:domain)
     @partner = FactoryGirl.create(:partner)
     @partner_prefix = @partner.prefix
+    @domain = FactoryGirl.create(:domain, :partner_id => @partner.id )
   end
 
   test "should get index" do
