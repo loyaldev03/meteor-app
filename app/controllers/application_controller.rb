@@ -39,10 +39,4 @@ class ApplicationController < ActionController::Base
       end
     end
 
-  protected
-    def add_operation(object, description)
-      o = Operation.new :created_by_id => current_agent.id, :operation_date => Date.today, 
-        :resource => object, :description => description
-      o.save!
-    end
 end

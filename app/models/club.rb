@@ -5,7 +5,7 @@ class Club < ActiveRecord::Base
   has_many :members
   has_many :payment_gateway_configurations
   
-  attr_accessible :description, :name, :partner_id
+  attr_accessible :description, :name
 
   acts_as_paranoid
 

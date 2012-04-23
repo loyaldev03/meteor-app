@@ -28,16 +28,7 @@ class Api::MembersController < ApplicationController
           member.created_by_id = current_agent.id
           member.club = club
           if member.valid?
-            # user.enroll!(member, credit_card, params[:enrollment_amount])
-            begin
-              member.save!
-              # add_operation
-            rescue Exception => e
-              # TODO: Notify devels about this!
-              # TODO: this can happend if in the same time a new member is enrolled that makes this
-              #     an invalid one. we should revert the transaction.
-              response = { :message => "Could not save member. #{e}", :code => 404 }
-            end
+            response = user.enroll(member, credit_card, params[:enrollment_amount])
           else
             errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
             response = { :message => "Member data is invalid: #{errors}", :code => 405 }

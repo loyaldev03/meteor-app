@@ -9,11 +9,9 @@ class Transaction < ActiveRecord::Base
     "reibel3y5estrada8"
   end 
 
-  # attr_accessible :title, :body
-
   def member=(member)
     member_id = member.id
-    # MeS supports only 17 chracters on order_id
+    # MeS supports only 17 characters on order_id
     invoice_number = member.id
     first_name = member.first_name
     last_name = member.last_name
@@ -44,21 +42,16 @@ class Transaction < ActiveRecord::Base
     gateway = pgc.gateway
   end
 
-  # Process only sale operations
-  def sale
-    if payment_gateway_configuration.nil?
-      { :message => "Payment gateway not found.", :code => "900" }
-    else
-      verify_card
-      if @credit_card.valid?
-        load_gateway
-        a = (amount.to_f * 100)
-        purchase_response = @gateway.purchase(a, @credit_card, @options)
-        save_response(purchase_response)
-      else
-        { :message => "Credit card not valid: #{@credit_card.errors}", :code => "9332" }
-      end
-    end
+  def prepare(member, credit_card, amount, payment_gateway_configuration)
+    self.member = member
+    self.credit_card = credit_card
+    self.amount = amount
+    self.payment_gateway_configuration = payment_gateway_configuration
+    self.save
+  end
+
+  def success?
+    response_code == "000"
   end
 
   def process
@@ -99,6 +92,25 @@ class Transaction < ActiveRecord::Base
   # decline_strategy_id: nil
 
   private
+    # Process only sale operations
+    def sale
+      if payment_gateway_configuration.nil?
+        { :message => "Payment gateway not found.", :code => "9999" }
+      elsif amount.to_f == 0.0
+        { :message => "Transaction success. Amount $0", :code => "000" }
+      else
+        verify_card
+        if @credit_card.valid?
+          load_gateway
+          a = (amount.to_f * 100)
+          purchase_response = @gateway.purchase(a, @credit_card, @options)
+          save_response(purchase_response)
+        else
+          { :message => "Credit card not valid: #{@credit_card.errors}", :code => "9332" }
+        end
+      end
+    end
+
     def save_response(answer)
       response = answer
       response_transaction_id=answer.params['transaction_id']

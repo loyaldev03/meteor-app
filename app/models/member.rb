@@ -26,7 +26,9 @@ class Member < ActiveRecord::Base
    #   t.string :country
    #   t.integer :terms_of_membership_id, :limit => 8
 
-  state_machine :status, :initial => :provisional do
+  state_machine :status, :initial => :none do
+    after_transition [:none, :lapsed] => :provisional, :do => :schedule_first_membership
+
     # A Member is within their review period. These members have joined a Subscription program that has a “Provisional” 
     # period whereby the Member has an opportunity to review the benfits of the program risk free for the duration of 
     # the Provisional period. 
@@ -44,6 +46,18 @@ class Member < ActiveRecord::Base
     # (ONLY IN NFLA PLAYER PROGRAM) When an Applied Member has been “approved” to join the NFLA, 
     # they are considered an approved member. (Approvals are done through NFLA and managed by Stoneacre)
     state :approved
+  end
+
+  def schedule_first_membership
+    bill_date = Date.today + terms_of_membership.trial_days
+    next_retry_bill_date = bill_date
+    if terms_of_membership.monthly?
+      quota = 1
+    end
+    #@membership.save
+    #Delayed::Job.enqueue(MembershipBillingJob.new(@membership.id),0,bill_date)
+    #Delayed::Job.enqueue(SendRenewJob.new(member_id,bill_date),20,5.minutes.from_now)
+
   end
 
   def full_name
