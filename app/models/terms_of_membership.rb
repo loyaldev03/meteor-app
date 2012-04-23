@@ -1,6 +1,6 @@
 class TermsOfMembership < ActiveRecord::Base
   attr_accessible :grace_period, :mode, :needs_enrollment_approval, :trial_days, 
-    :installment_amount, :description, :installment_type
+    :installment_amount, :description, :installment_type, :club
 
   belongs_to :club
   has_many :members
@@ -9,7 +9,7 @@ class TermsOfMembership < ActiveRecord::Base
 
   validates :grace_period, :presence => true
   validates :mode, :presence => true
-  validates :needs_enrollment_approval, :presence => true
+  #validates :needs_enrollment_approval, :presence => true
   validates :club, :presence => true
   validates :trial_days, :presence => true
   validates :installment_amount, :presence => true
@@ -20,7 +20,13 @@ class TermsOfMembership < ActiveRecord::Base
   def production?
     self.mode == 'production'
   end
+
   def development?
     self.mode == 'development'
-  end    
+  end
+
+  def payment_gateway_configuration
+    club.payment_gateway_configurations.find_by_mode(mode)
+  end
+
 end

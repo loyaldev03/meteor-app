@@ -18,6 +18,7 @@ class CreateTransactions < ActiveRecord::Migration
       t.integer :expire_month
       t.integer :expire_year
       # transaction data
+      t.boolean :recurrent, :default => false
       t.string :transaction_type
       t.string :invoice_number
       t.string :first_name
@@ -25,13 +26,17 @@ class CreateTransactions < ActiveRecord::Migration
       t.string :home_phone
       t.string :email
       t.string :address_line
+      t.string :city
+      t.string :state
+      t.string :zip
       t.decimal :amount
       # response
       t.integer :decline_strategy_id, :limit => 8
       t.text :response
       t.string :response_code
+      t.string :response_result
       t.string :response_transaction_id
-      t.string :resposne_auth_code
+      t.string :response_auth_code
 
       t.timestamps
     end

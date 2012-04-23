@@ -12,20 +12,37 @@ class Api::MembersController < ApplicationController
   def enroll
     response = {}
     tom = TermsOfMembership.find_by_id(params[:tom_id])
-    domain = Domain.find_by_url(params[:domain_url])
     if tom.nil?
       response = { :message => "Terms of membership not found", :code => 401 }
     else
+      domain = Domain.find_by_url(params[:domain_url])
       club = tom.club
       if club.domain.url == params[:domain_url]
-        # member = Member.new params[:member]
-        # member.credit_cards << CreditCard.new :
-        # member.created_by_id = current_agent.id
-        # member.club = club
-        # member.bill
-
-
-        # add_operation
+        user = User.find(params[:user_id])
+        if user.nil?
+          response = { :message => "User not found", :code => 403 }
+        else
+          credit_card = CreditCard.new params[:credit_card]
+          member = Member.new params[:member]
+          member.credit_cards << credit_card
+          member.created_by_id = current_agent.id
+          member.club = club
+          if member.valid?
+            # user.enroll!(member, credit_card, params[:enrollment_amount])
+            begin
+              member.save!
+              # add_operation
+            rescue Exception => e
+              # TODO: Notify devels about this!
+              # TODO: this can happend if in the same time a new member is enrolled that makes this
+              #     an invalid one. we should revert the transaction.
+              response = { :message => "Could not save member. #{e}", :code => 404 }
+            end
+          else
+            errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
+            response = { :message => "Member data is invalid: #{errors}", :code => 405 }
+          end
+        end
       else
         response = { :message => "Club not found or domain invalid", :code => 402 }
       end

@@ -9,7 +9,7 @@ class Member < ActiveRecord::Base
   has_many :transactions
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
-      :email, :enroll_attempts, :external_id, :first_name, :home_phone, 
+      :email, :external_id, :first_name, :home_phone, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :work_phone, :zip, 
       :club_id, :partner_id
@@ -50,6 +50,10 @@ class Member < ActiveRecord::Base
 
   def full_name
     [first_name, last_name].join(' ')
+  end
+
+  def credit_card
+    self.credit_cards.find_by_active(true)
   end
 
 end
