@@ -11,7 +11,9 @@ class MembersController < ApplicationController
   def new
     @member = Member.new 
     @terms_of_membership = TermsOfMembership.where(:club_id => @current_club )
-    
+
+    #TODO: set country_code as US hardcoded on Controller
+
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @domain }
