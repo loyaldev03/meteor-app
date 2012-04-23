@@ -14,3 +14,9 @@
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require_tree .
+
+$('#new_member').submit( function(event) {
+  event.preventDefault()
+  $.post("/api/v1/enroll", $("#new_member").serialize());
+
+});
