@@ -10,11 +10,18 @@ class MembersController < ApplicationController
 
   def new
     @member = Member.new 
+    @terms_of_membership = TermsOfMembership.where(:club_id => @current_club )
     
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @domain }
     end
+  end
+
+  def edit
+  end
+
+  def update
   end
 
   private
