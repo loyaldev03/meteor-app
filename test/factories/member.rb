@@ -1,6 +1,10 @@
 FactoryGirl.define do
 
   factory :member do
+    # HACK: visible_id should be created automatically by mysql.
+    # but test database is not created by migrations, so our custom executes
+    # are not used. Consequence: visible_id is not auto increment.
+    visible_id 23
     first_name "first"
     last_name "last"
     address "peron 3455"
