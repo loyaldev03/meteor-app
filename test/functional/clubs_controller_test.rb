@@ -10,42 +10,42 @@ class ClubsControllerTest < ActionController::TestCase
   end
 
   test "should get index" do
-    get :index, :id => @club.id
+    get :index, partner_prefix: @partner_prefix
     assert_response :success
     assert_not_nil assigns(:clubs)
   end
 
   test "should get new" do
-    get :new
+    get :new, partner_prefix: @partner_prefix
     assert_response :success
   end
 
   test "should create club" do
     assert_difference('Club.count') do
-      post :create, club: { deleted_at: @club.deleted_at, description: @club.description, name: @club.name, partner_id: @club.partner_id }
+      post :create, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name, partner_id: @club.partner_id }
     end
 
-    assert_redirected_to club_path(assigns(:club))
+    assert_redirected_to club_path(assigns(:club), partner_prefix: @partner_prefix)
   end
 
   test "should show club" do
-    get :show, id: @club
+    get :show, id: @club, partner_prefix: @partner_prefix
     assert_response :success
   end
 
   test "should get edit" do
-    get :edit, id: @club
+    get :edit, id: @club, partner_prefix: @partner_prefix
     assert_response :success
   end
 
   test "should update club" do
-    put :update, id: @club, club: { deleted_at: @club.deleted_at, description: @club.description, name: @club.name, partner_id: @club.partner_id }
-    assert_redirected_to club_path(assigns(:club))
+    put :update, id: @club, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name, partner_id: @club.partner_id }
+    assert_redirected_to club_path(assigns(:club), partner_prefix: @partner_prefix)
   end
 
   test "should destroy club" do
     assert_difference('Club.count', -1) do
-      delete :destroy, id: @club
+      delete :destroy, id: @club, partner_prefix: @partner_prefix
     end
 
     assert_redirected_to clubs_path
