@@ -2,11 +2,15 @@ require 'test_helper'
 
 class ClubsControllerTest < ActionController::TestCase
   setup do
-    @club = clubs(:one)
+    @admin_user = FactoryGirl.create(:confirmed_admin_agent)
+    sign_in @admin_user
+    @partner = FactoryGirl.create(:partner)
+    @partner_prefix = @partner.prefix
+    @club = FactoryGirl.create(:club, :partner_id => @partner.id)
   end
 
   test "should get index" do
-    get :index
+    get :index, :id => @club.id
     assert_response :success
     assert_not_nil assigns(:clubs)
   end
