@@ -5,7 +5,7 @@ gem 'rails', '3.2.3'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'mysql2'
+gem 'mysql2', '0.3.11'
 gem 'uuidtools'
 
 gem "paperclip", "~> 3.0"
@@ -26,14 +26,14 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
-gem 'devise'
-gem 'settingslogic'
+gem 'devise', '2.0.4'
+gem 'settingslogic', '2.0.8'
 gem 'wirble'
 gem 'bootstrap-will_paginate'
 gem 'nokogiri'
-gem 'state_machine'
+gem 'state_machine', '1.1.2'
 
-gem 'twitter-bootstrap-rails'
+gem 'twitter-bootstrap-rails', '2.0.6'
 
 gem 'jquery-rails'
 
@@ -59,4 +59,4 @@ group :test do
   gem 'mocha'
 end
 
-gem 'activemerchant'
+gem 'activemerchant', :git => "git://github.com/carlaares/active_merchant"
