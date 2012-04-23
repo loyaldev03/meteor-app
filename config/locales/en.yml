@@ -12,6 +12,8 @@ en:
   dashboard: 'Dashboard'
   cancel: 'Cancel'
   actions: 'Actions'
+  url: 'Url'
+  email: 'Email'
   menu: 
     logout: Logout
     agents: Agents
@@ -21,6 +23,15 @@ en:
         login: "Username or email"
         password: "Password"
         remember_me: "Remember me"
+      member:
+        address: 'Address'
+        city: 'City'
+        state: 'State'
+        country: 'Country'
+        zip: 'Zip'
+        home_phone: 'Home phone'
+        work_phone: 'Work phone'
+        therms_of_membership_id: 'Therms of membership'
   date:
     formats:
       default: "%d/%m/%Y"
