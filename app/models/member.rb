@@ -18,14 +18,9 @@ class Member < ActiveRecord::Base
 
   validates :first_name, :presence => true
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }
+  validates :last_name, :email, :address, :city, :state, :zip, :country, :presence => true
+  validates :terms_of_membership_id, :presence => true
    # TODO: add the following attributes as required.
-   #   t.string :last_name
-   #   t.string :email
-   #   t.string :address
-   #   t.string :city
-   #   t.string :state
-   #   t.string :zip
-   #   t.string :country
    #   t.integer :terms_of_membership_id, :limit => 8
 
   state_machine :status, :initial => :none do
