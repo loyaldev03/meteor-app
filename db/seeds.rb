@@ -31,10 +31,14 @@ d.partner = p
 d.club = c2
 d.save!
 
-pgc = PaymentGatewayConfiguration.new :login => "94100010881800000023", :merchant_key => "key", :password => "UGajmzKGUjlvyMzbyndVsaHzRmyRFKXq", :mode => "development", :gateway => "mes", :club => c
+pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
+  :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
+  :mode => "development", :gateway => "mes", :club => c, :report_group => "SAC_STAGING_TEST"
 pgc.save!
 
-pgc = PaymentGatewayConfiguration.new :login => "94100010881800000023", :merchant_key => "key", :password => "UGajmzKGUjlvyMzbyndVsaHzRmyRFKXq", :mode => "development", :gateway => "mes", :club => c2
+pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
+  :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
+  :mode => "development", :gateway => "mes", :club => c2, :report_group => "SAC_STAGING_TEST"
 pgc.save!
 
 

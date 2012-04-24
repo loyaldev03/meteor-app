@@ -20,8 +20,6 @@ class Member < ActiveRecord::Base
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }
   validates :last_name, :email, :address, :city, :state, :zip, :country, :presence => true
   validates :terms_of_membership_id, :presence => true
-   # TODO: add the following attributes as required.
-   #   t.integer :terms_of_membership_id, :limit => 8
 
   state_machine :status, :initial => :none do
     after_transition [:none, :lapsed] => :provisional, :do => :schedule_first_membership

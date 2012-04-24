@@ -9,9 +9,8 @@ class DomainTest < ActiveSupport::TestCase
 	end
 
 	test "Domain shouldnt be destroyed is its the last one" do
-		partner = FactoryGirl.create(:partner)
-		first_domain = FactoryGirl.create(:domain, :partner_id => partner.id, :url => 'http://prueba.com')
-		second_domain = FactoryGirl.create(:domain, :partner_id => partner.id, :url => 'http://prueba2.com')
+		first_domain = FactoryGirl.create(:domain, :url => 'http://prueba.com')
+		second_domain = FactoryGirl.create(:domain, :url => 'http://prueba2.com')
 
     first_domain.destroy
     assert !second_domain.destroy, "Domain was destroyed when it was the last one"     
