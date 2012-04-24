@@ -20,7 +20,7 @@
         <td><%= domain.description %></td>
         <td><%= domain.data_rights %></td>
         <td><%= domain.hosted %></td>
-        <td><%=l domain.created_at %></td>
+        <td><%= I18n.l domain.created_at, :format => :long %></td>
         <td>
           <%= link_to t(:edit),
                       edit_domain_path(:id => domain.id), :class => 'btn btn-mini' %>

@@ -18,7 +18,7 @@
         <td><%= club.name %></td>
         <td><%= club.description %></td>
         <td><%= club.deleted_at %></td>
-        <td><%=l club.created_at %></td>
+        <td><%= I18n.l club.created_at, :format => :long %></td>
         <td>
           <%= link_to t(:members), members_path(@current_partner.prefix, club.name), :class => 'btn btn-mini' %>
           <%= link_to t(:edit),
