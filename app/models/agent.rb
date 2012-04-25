@@ -18,7 +18,8 @@ class Agent < ActiveRecord::Base
   attr_accessible :email, :password, :password_confirmation, :remember_me, :username, :login
 
   validates :username, :uniqueness => true
-  validates :username, :email, :presence => :true  
+  validates :username, :email, :presence => :true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
+
 
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
