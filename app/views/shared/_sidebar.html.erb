@@ -8,6 +8,7 @@
           <li class="nav-header">General</li>
           <li><%= link_to "Domains", domains_path  %></li>
           <li><%= link_to "Clubs", clubs_path  %></li>
+          <li><%= link_to "Home", admin_partner_dashboard_path(:id => @current_partner) if params[:action] != 'dashboard' %></li>
         </ul>
       <% end %>
     </div><!--/.well -->
