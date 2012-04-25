@@ -1,8 +1,8 @@
 FactoryGirl.define do
 
   factory :partner do
-    prefix "NFLF"
-    name "test"
+    prefix { Faker::Internet.domain_word.upcase }
+    name { Faker::Internet.domain_word }
   end
 
 end

@@ -24,13 +24,24 @@ en:
         password: "Password"
         remember_me: "Remember me"
       member:
-        address: 'Address'
-        city: 'City'
-        state: 'State'
-        country: 'Country'
-        zip: 'Zip'
-        home_phone: 'Home phone'
-        work_phone: 'Work phone'
+        demographic:
+          first_name: 'First name'
+          last_name: 'Last name'
+          address: 'Address'
+          city: 'City'
+          state: 'State'
+          country: 'Country'
+          zip: 'Zip'
+        contact:
+          home_phone: 'Home phone'
+          work_phone: 'Work phone'
+        membership:
+          id: 'Member id'
+          status: 'Current Status'
+          created_at: 'Member since date'
+          join_date: 'Join date'
+          bill_date: 'Next bill date'
+          cancel_date: 'Cancel date'
         therms_of_membership_id: 'Therms of membership'
   date:
     formats:

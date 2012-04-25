@@ -37,8 +37,11 @@ class DeviseCreateAgents < ActiveRecord::Migration
       t.string :authentication_token
 
       t.string :username
+      t.string :first_name
+      t.string :last_name
+      t.text :description
       t.datetime :deleted_at
-
+     
       t.timestamps
     end
 

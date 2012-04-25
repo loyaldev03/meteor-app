@@ -1,6 +1,7 @@
 FactoryGirl.define do
 
   factory :agent do
+    sequence(:username) {|n| "User#{n}" }
     password "secret"
     password_confirmation {password}
     sequence(:email) {|n| "carla#{n}@test.no" }

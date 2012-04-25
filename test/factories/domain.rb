@@ -1,12 +1,7 @@
 FactoryGirl.define do
-
   factory :domain do
-    url "http://FactoryGirl.com.ar"
-    association :partner
+    url { "http://#{Faker::Internet.domain_name}" }
+    association :partner, factory: :partner, strategy: :build
     association :club
-  end
-  factory :second_domain, class: Domain do
-    url "http://second_domain.com.ar"
-    #association :partner
   end
 end

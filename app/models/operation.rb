@@ -1,7 +1,7 @@
 class Operation < ActiveRecord::Base
   belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
   belongs_to :resource, :polymorphic => true
-  attr_accessible :description
+  attr_accessible :description, :created_by_id, :operation_date, :resource
 
   state_machine :status, :initial => :completed do
     # This operation cant have a button to do generate another operation. 
