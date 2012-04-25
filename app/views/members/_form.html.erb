@@ -52,7 +52,28 @@
         <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
         <%= f.select :terms_of_membership_id, options_from_collection_for_select(@terms_of_membership, "id", "trial_days") %> 
       </td>
-    </tr>  
+    </tr>
+    <tr class="control-group" ><td colspan="2"> <b> Credit Card </b> </td></tr>  
+
+    <% if @member.new_record? %>
+        <tr class="control-group" >
+          <td> 
+            <%= f.label :encrypted_number, t('encrypted_number'), :class => 'help-inline' %> 
+            <%= text_field :credit_card, :encrypted_number, :class => 'text_field input-medium'%> 
+          <td> 
+            <%= f.label :expire_month, t('expire_month'), :class => 'help-inline' %> 
+            <%= text_field :credit_card, :expire_month, :class => 'text_field input-medium'%>
+          </td>
+        </tr>
+        <tr class="control-group">
+          <td></td>
+          <td> 
+            <%= f.label :expire_year, t('expire_year'), :class => 'help-inline' %> 
+            <%= text_field :credit_card, :expire_year, :class => 'text_field input-small' %>
+          </td>
+        </tr>
+    </tr> 
+    <% end %>
 
     <tr class="control-group">
       <th colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>
