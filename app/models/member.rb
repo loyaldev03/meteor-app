@@ -17,7 +17,8 @@ class Member < ActiveRecord::Base
   accepts_nested_attributes_for :credit_cards, :limit => 1
 
   validates :first_name, :presence => true
-  validates :email, :presence => true, :uniqueness => { :scope => :club_id }
+  validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
+            :format => /^[a-z0-9,!#\$%&'\*\+/=\?\^_`\{\|}~-]+(\.[a-z0-9,!#\$%&'\*\+/=\?\^_`\{\|}~-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*\.([a-z]{2,})$/
   validates :last_name, :email, :address, :city, :state, :zip, :country, :presence => true
   validates :terms_of_membership_id, :presence => true
 
