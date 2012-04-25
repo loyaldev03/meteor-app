@@ -1,18 +1,20 @@
 class User < ActiveRecord::Base
-  # attr_accessible :title, :body
-  belongs_to :domain
-
   include Extensions::UUID
 
-  def enroll(member, credit_card, amount)
+  attr_accessible :ip_address, :user_agent
+  
+  belongs_to :domain
+  has_many :transactions
+
+  def enroll(member, credit_card, amount, agent = nil)
     if amount.to_f != 0.0
-      # TODO: el transaction type tiene que venir del TOM?????
       t = Transaction.new
+      # TODO: el transaction type tiene que venir del TOM?????
       t.transaction_type = "sale"
       t.prepare(member, credit_card, amount, member.terms_of_membership.payment_gateway_configuration)
       answer = t.sale
       unless t.success?
-        Auditory.audit!(self, answer)
+        Auditory.audit(agent, self, answer)
         return answer
       end
     end

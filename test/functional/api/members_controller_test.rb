@@ -18,7 +18,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns({ :code => "000", :message =>"test"})
     assert_difference('Member.count') do
       post :enroll, { member: @credit_card.member.attributes, credit_card: @credit_card.attributes, 
-        enrollment_amount: 34.34, tom_id: @terms_of_membership, user_id: @user.id, 
+        enrollment_amount: 34.34, terms_of_membership_id: @terms_of_membership.id, user_id: @user.id, 
         domain_url: @user.domain.url }, :format => :json
       assert_response :success
     end
