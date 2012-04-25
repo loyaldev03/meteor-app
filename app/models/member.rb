@@ -18,7 +18,7 @@ class Member < ActiveRecord::Base
 
   validates :first_name, :presence => true
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
-            :format => /^[a-z0-9,!#\$%&'\*\+/=\?\^_`\{\|}~-]+(\.[a-z0-9,!#\$%&'\*\+/=\?\^_`\{\|}~-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*\.([a-z]{2,})$/
+            :format => /^([0-9a-zA-Z]([-\.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
   validates :last_name, :email, :address, :city, :state, :zip, :country, :presence => true
   validates :terms_of_membership_id, :presence => true
 
