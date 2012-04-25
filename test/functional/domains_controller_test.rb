@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class DomainsControllerTest < ActionController::TestCase
-  before(:each) do
+  def setup
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     sign_in @admin_user
     @partner = FactoryGirl.create(:partner)

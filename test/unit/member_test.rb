@@ -13,7 +13,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should not create a member without last name" do
-    member = FactoryGirl.buil(:member, :last_name => nil)
+    member = FactoryGirl.build(:member, :last_name => nil)
   	assert !member.save
   end
 
