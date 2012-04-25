@@ -1,5 +1,6 @@
 class CreditCard < ActiveRecord::Base
   belongs_to :member
+  has_many :transactions
 
   attr_accessible :active, :encrypted_number, :expire_month, :expire_year
 
