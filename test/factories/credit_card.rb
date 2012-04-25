@@ -4,7 +4,7 @@ FactoryGirl.define do
     active true
     expire_month 12
     expire_year 2013
-    number "000000000000000"
+    number "4012301230123010"
     association :member
   end
 

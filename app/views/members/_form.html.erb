@@ -10,7 +10,6 @@
         <%= f.text_field :last_name, :class => 'text_field'%> 
       </td>
     </tr>
-
     <tr class="control-group" >
       <td> 
         <%= f.label :address, t('activerecord.attributes.member.demographic.address'), :class => 'help-inline' %> 
@@ -34,11 +33,7 @@
     <tr class="control-group" >
       <td> 
         <%= f.label :home_phone, t('activerecord.attributes.member.contact.home_phone'), :class => 'help-inline' %>
-        <%= f.text_field :home_phone, :class => 'text_field input-medium'%> 
-      </td>
-      <td> 
-        <%= f.label :work_phone, t('activerecord.attributes.member.contact.work_phone'), :class => 'help-inline' %> 
-        <%= f.text_field :work_phone, :class => 'text_field input-medium'%> 
+        <%= f.text_field :phone_number, :class => 'text_field input-medium'%> 
       </td>
     </tr>  
     <tr class="control-group" >
@@ -50,7 +45,7 @@
     <tr class="control-group" >
       <td colspan="2"> 
         <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
-        <%= f.select :terms_of_membership_id, options_from_collection_for_select(@terms_of_membership, "id", "trial_days") %> 
+        <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@terms_of_membership, "id", "name") %> 
       </td>
     </tr>
     <tr class="control-group" ><td colspan="2"> <b> Credit Card </b> </td></tr>  
@@ -63,17 +58,15 @@
           <td> 
             <%= f.label :expire_month, t('expire_month'), :class => 'help-inline' %> 
             <%= text_field :credit_card, :expire_month, :class => 'text_field input-medium'%>
-          </td>
-        </tr>
-        <tr class="control-group">
-          <td></td>
-          <td> 
             <%= f.label :expire_year, t('expire_year'), :class => 'help-inline' %> 
             <%= text_field :credit_card, :expire_year, :class => 'text_field input-small' %>
           </td>
         </tr>
     </tr> 
     <% end %>
+
+    <%= hidden_field_tag :enrollment_amount, :value => 0.0 %>
+    <%= f.hidden_field :country_code, :value => "US" %>
 
     <tr class="control-group">
       <th colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>

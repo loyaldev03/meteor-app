@@ -44,9 +44,11 @@ pgc.club = c2
 pgc.save!
 
 
-tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "30.days", :needs_enrollment_approval => false
+tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "30.days", 
+  :needs_enrollment_approval => false, :name => "test2"
 tom.club = c
 tom.save!
-tom = TermsOfMembership.new :installment_amount => 45, :installment_type => "30.days", :needs_enrollment_approval => false
+tom = TermsOfMembership.new :installment_amount => 45, :installment_type => "30.days", 
+  :needs_enrollment_approval => false, :name => "test"
 tom.club = c2
 tom.save!

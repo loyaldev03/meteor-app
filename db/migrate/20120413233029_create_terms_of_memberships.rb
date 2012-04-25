@@ -1,6 +1,7 @@
 class CreateTermsOfMemberships < ActiveRecord::Migration
   def up
     create_table :terms_of_memberships, {:id => false} do |t|
+      t.string :name
       t.text :description
       t.integer :club_id, :limit => 8
       t.integer :trial_days, :default => 30

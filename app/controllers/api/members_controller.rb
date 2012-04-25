@@ -8,7 +8,7 @@ class Api::MembersController < ApplicationController
   #  * domain_url
   #  * member { :first_name, :last_name, :email, :address, :city, :state, :zip, :country, :phone_number }
   #  * credit_card { :expiration_month, :expiration_year, :number }
-  #  * enrollment amount
+  #  * enrollment_amount
   # 
   def enroll
     response = {}
