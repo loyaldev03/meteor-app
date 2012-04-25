@@ -4,7 +4,8 @@ class Transaction < ActiveRecord::Base
   belongs_to :payment_gateway_configuration
   belongs_to :decline_strategy
   belongs_to :credit_card
-  belongs_to :terms_of_membership
+  # This value will be not nil only if we are billing 
+  belongs_to :terms_of_membership 
 
   attr_encrypted :encrypted_number, :key => :encryption_key, :encode => true, :algorithm => 'bf'
 

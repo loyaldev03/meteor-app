@@ -12,17 +12,22 @@
       <% if current_agent %>
         <div class="container nav-collapse">
           <ul class="nav">
-            <% unless @current_partner.nil? %>
-              <% if @current_partner.logo.nil? %>
-                <li><%= @current_partner.name %></li>
+            <% if @current_club.nil? %>
+              <% unless @current_partner.nil? %>
+                <li><%= link_to @current_partner.name, admin_partner_dashboard_path %></li>
+              <% end %>
+            <% else %>
+              <% if @current_partner.logo? %>
+                <li><%= link_to image_tag(@current_partner.logo.url), members_path(@current_partner.prefix, @current_club.name) %></li>
               <% else %>
-                <li><%= image_tag @current_partner.logo.url %></li>
+                <li><%= link_to @current_club.full_name, members_path(@current_partner.prefix, @current_club.name) %></li>
               <% end %>
             <% end %>
+            <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
             <li><%= link_to t('menu.agents'), admin_agents_path  %></li>
             <li><%= link_to t('menu.partners'), admin_partners_path  %></li>
             <li><%= link_to t('menu.logout'), destroy_agent_session_path, :method => :delete  %></li>
-            <li>TODO: search memebr</li>
+            <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
             <li>
               <%= select_tag "change_partner",
                 options_for_select(Club.all.collect{ |u| [u.name, members_path(u.partner.prefix, u.name) ] }), 

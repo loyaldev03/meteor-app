@@ -12,4 +12,8 @@ class Club < ActiveRecord::Base
   validates :partner_id, :presence => true
   validates :name, :presence => true
 
+  def full_name
+    [ partner.name, name ].join(' ')
+  end
+
 end
