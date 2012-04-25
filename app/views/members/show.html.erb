@@ -13,13 +13,64 @@
     </td>
   </tr>
   <tr>
-    <td>...Member information..</td>
+    <td> <%= t('activerecord.attributes.member.demographic.first_name') %> </td>
+    <td> <%= t('activerecord.attributes.member.demographic.last_name') %> </td>
+    <td> <%= t('activerecord.attributes.member.demographic.address') %> </td>
+    <td> <%= t('activerecord.attributes.member.demographic.city') %> </td>
+    <td> <%= t('activerecord.attributes.member.demographic.state') %> </td>
+    <td> <%= t('activerecord.attributes.member.demographic.zip') %> </td>
+  </tr>
+  <tr>
+    <td> <%= @member.first_name %> </td>
+    <td> <%= @member.last_name %> </td>
+    <td> <%= @member.address %> </td>
+    <td> <%= @member.city %> </td>
+    <td> <%= @member.state %> </td>
+    <td> <%= @member.zip %> </td>
+  </tr>
+</table>
+
+<table class="table table-bordered"> 
+  <tr> 
+    <td> Contact Information </td>
+  </tr>
+  <tr>
+    <td> <%= t('activerecord.attributes.member.contact.phone_number') %> </td>
+    <td> <%= t('activerecord.attributes.member.contact.work_number') %> </td>
+    <td> <%= t('email') %> </td>
+  </tr>
+    <tr>
+    <td> <%= @member.phone_number %> </td>
+    <td> <%= @member.work_number %> </td>
+    <td> <%= @member.email %> </td>
+  </tr>
+</table>
+
+<table class="table table-bordered"> 
+  <tr> 
+    <td> Membership Information </td>
+  </tr>
+  <tr>
+    <td> <%= t('activerecord.attributes.member.membership.member_id') %> </td>
+    <td> <%= t('activerecord.attributes.member.membership.current_status') %> </td>
+    <td> <%= t('activerecord.attributes.member.membership.member_since_date') %> </td>
+    <td> <%= t('activerecord.attributes.member.membership.join_date') %> </td>
+    <td> <%= t('activerecord.attributes.member.membership.next_bill_date') %> </td>
+    <td> <%= t('activerecord.attributes.member.membership.cancel_date') %> </td>
+  </tr>
+    <tr>
+    <td> <%= @member.id %> </td>
+    <td> <%= @member.status %> </td>
+    <td> <%= @member.created_at %> </td>
+    <td> <%= @member.join_date %> </td>
+    <td> <%= @member.bill_date %> </td>
+    <td> <%= @member.cancel_date %> </td>
   </tr>
 </table>
 
 <table class="table table-bordered">
   <tr>
-    <td>...Active Credit card..</td>
+    <td>...Active Credit card</td>
   </tr>
 </table>
 

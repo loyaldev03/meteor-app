@@ -6,38 +6,38 @@
         <%= f.text_field :first_name, :class => 'text_field'%>
       </td>
       <td> 
-        <%= f.label :last_name,t('activerecord.attributes.member.last_name'), :class => 'help-inline' %> 
+        <%= f.label :last_name,t('activerecord.attributes.member.demographic.last_name'), :class => 'help-inline' %> 
         <%= f.text_field :last_name, :class => 'text_field'%> 
       </td>
     </tr>
 
     <tr class="control-group" >
       <td> 
-        <%= f.label :address, t('activerecord.attributes.member.address'), :class => 'help-inline' %> 
+        <%= f.label :address, t('activerecord.attributes.member.demographic.address'), :class => 'help-inline' %> 
         <%= f.text_field :address, :class => 'text_field'%> 
       </td>
       <td> 
-        <%= f.label :city, t('activerecord.attributes.member.city'), :class => 'help-inline' %> 
+        <%= f.label :city, t('activerecord.attributes.member.demographic.city'), :class => 'help-inline' %> 
         <%= f.text_field :city, :class => 'text_field input-medium'%>
       </td>
     </tr>
     <tr class="control-group" >
       <td> 
-        <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline' %> 
+        <%= f.label :state, t('activerecord.attributes.member.demographic.state'), :class => 'help-inline' %> 
         <%= f.text_field :state, :class => 'text_field input-medium'%> 
       </td>
       <td colspan="2"> 
-        <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline' %> 
+        <%= f.label :zip, t('activerecord.attributes.member.demographic.zip'), :class => 'help-inline' %> 
         <%= f.text_field :zip, :class => 'text_field input-small'%> 
       </td> 
     </tr>
     <tr class="control-group" >
       <td> 
-        <%= f.label :home_phone, t('activerecord.attributes.member.home_phone'), :class => 'help-inline' %>
+        <%= f.label :home_phone, t('activerecord.attributes.member.contact.home_phone'), :class => 'help-inline' %>
         <%= f.text_field :home_phone, :class => 'text_field input-medium'%> 
       </td>
       <td> 
-        <%= f.label :work_phone, t('activerecord.attributes.member.work_phone'), :class => 'help-inline' %> 
+        <%= f.label :work_phone, t('activerecord.attributes.member.contact.work_phone'), :class => 'help-inline' %> 
         <%= f.text_field :work_phone, :class => 'text_field input-medium'%> 
       </td>
     </tr>  
