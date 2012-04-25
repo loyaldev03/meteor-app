@@ -23,7 +23,7 @@ class CreateTransactions < ActiveRecord::Migration
       t.string :invoice_number
       t.string :first_name
       t.string :last_name
-      t.string :home_phone
+      t.string :phone_number
       t.string :email
       t.string :address_line
       t.string :city

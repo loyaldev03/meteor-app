@@ -16,7 +16,7 @@ class Transaction < ActiveRecord::Base
     invoice_number = member.id
     first_name = member.first_name
     last_name = member.last_name
-    home_phone = member.home_phone
+    phone_number = member.phone_number
     email = member.email
     address_line = member.address
     city = member.city
