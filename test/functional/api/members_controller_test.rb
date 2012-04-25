@@ -5,7 +5,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     sign_in @admin_user
     @user = FactoryGirl.create :user
-    
+  end
+
+  test "should not accept HTML request" do
+    post :enroll, {}, :format => :html
+    assert_response 406
   end
 
   test "should enroll/create member" do
@@ -13,9 +17,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership = FactoryGirl.create :terms_of_membership
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns({ :code => "000", :message =>"test"})
     assert_difference('Member.count') do
-      post :enroll, member: @credit_card.member.attributes, credit_card: @credit_card.attributes, 
+      post :enroll, { member: @credit_card.member.attributes, credit_card: @credit_card.attributes, 
         enrollment_amount: 34.34, tom_id: @terms_of_membership, user_id: @user.id, 
-        domain_url: @user.domain.url
+        domain_url: @user.domain.url }, :format => :json
+      assert_response :success
     end
   end
 end

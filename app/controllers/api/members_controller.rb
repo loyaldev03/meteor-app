@@ -1,4 +1,5 @@
 class Api::MembersController < ApplicationController
+
   # Method : POST
   #
   # Params:
