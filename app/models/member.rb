@@ -55,11 +55,15 @@ class Member < ActiveRecord::Base
   end
 
   def full_name
-    [first_name, last_name].join(' ')
+    [ first_name, last_name].join(' ')
   end
 
   def credit_card
     self.credit_cards.find_by_active(true)
+  end
+
+  def full_address
+    # TODO: something like "#{self.address}, #{self.city}, #{self.state}"
   end
 
 end

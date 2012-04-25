@@ -31,7 +31,7 @@ class User < ActiveRecord::Base
       # TODO: this can happend if in the same time a new member is enrolled that makes this
       #     an invalid one. we should revert the transaction.
       message = "Could not save member. #{e}"
-      Auditory.audit!(member, message)
+      Auditory.audit(member, message)
       { :message => message, :code => 404 }
     end
   end

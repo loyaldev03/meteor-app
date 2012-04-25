@@ -33,7 +33,7 @@ class Api::MembersController < ApplicationController
         member.terms_of_membership = tom
         member.club = club
         if member.valid?
-          response = user.enroll(current_agent, member, credit_card, params[:enrollment_amount])
+          response = user.enroll(member, credit_card, params[:enrollment_amount], current_agent)
         else
           errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
           response = { :message => "Member data is invalid: #{errors}", :code => 405 }
