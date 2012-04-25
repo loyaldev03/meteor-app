@@ -4,8 +4,8 @@ class FirstUserStoriesRevisionChanges < ActiveRecord::Migration
     remove_column :members, :work_phone
     remove_column :members, :home_phone
     add_column :members, :phone_number, :string
-    add_column :members, :wrong_address, :boolean, :default => false
-    add_column :members, :wrong_phone_number, :boolean, :default => false
+    add_column :members, :wrong_address, :integer
+    add_column :members, :wrong_phone_number, :integer
   end
 
   def down
