@@ -13,8 +13,6 @@ class Member < ActiveRecord::Base
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :work_phone, :zip, 
       :club_id, :partner_id
-  
-  accepts_nested_attributes_for :credit_cards, :limit => 1
 
   validates :first_name, :presence => true
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
