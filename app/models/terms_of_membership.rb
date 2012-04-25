@@ -3,6 +3,7 @@ class TermsOfMembership < ActiveRecord::Base
     :installment_amount, :description, :installment_type, :club, :name
 
   belongs_to :club
+  has_many :transactions
   has_many :members
 
   acts_as_paranoid
