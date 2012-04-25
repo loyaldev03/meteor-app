@@ -1,7 +1,7 @@
 class CreateUsers < ActiveRecord::Migration
   def up
     create_table :users, {:id => false} do |t|
-      t.string :id, :primary => true
+      t.string :uuid, :primary => true
       t.string :ip_address
       t.string :user_agent
       t.string :referer_host

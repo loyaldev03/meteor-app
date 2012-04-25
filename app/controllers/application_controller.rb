@@ -7,7 +7,10 @@ class ApplicationController < ActionController::Base
 
     def validate_partner_presence
       if current_agent
-        if params[:partner_prefix].nil? and not params[:controller].include?('admin/') and not params[:controller].include?('devise/')
+        if params[:partner_prefix].nil? and 
+                not params[:controller].include?('api/') and 
+                not params[:controller].include?('admin/') and 
+                not params[:controller].include?('devise/')
           flash[:error] = "No partner was selected."
           redirect_to admin_partners_path
           false

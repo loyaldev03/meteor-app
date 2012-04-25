@@ -2,6 +2,8 @@ class User < ActiveRecord::Base
   # attr_accessible :title, :body
   belongs_to :domain
 
+  include Extensions::UUID
+
   def enroll(member, credit_card, amount)
     if amount.to_f != 0.0
       # TODO: el transaction type tiene que venir del TOM?????
