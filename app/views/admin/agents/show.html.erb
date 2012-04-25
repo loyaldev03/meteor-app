@@ -53,6 +53,15 @@
   <strong><%= model_class.human_attribute_name(:username) %>:</strong><br>
   <%= @agent.username %>
 </p>
+<p>
+  <strong><%= model_class.human_attribute_name(:first_name) %>:</strong><br>
+  <%= @agent.first_name %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:last_name) %>:</strong><br>
+  <%= @agent.last_name %>
+</p>
+
 
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),
