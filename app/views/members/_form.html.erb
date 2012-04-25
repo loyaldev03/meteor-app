@@ -2,7 +2,7 @@
   <thead>
     <tr class="control-group" >
       <td> 
-        <%= f.label :url, t('url'), :class => 'help-inline' %> 
+        <%= f.label :url, t('activerecord.attributes.member.demographic.first_name'), :class => 'help-inline' %> 
         <%= f.text_field :first_name, :class => 'text_field'%>
       </td>
       <td> 
@@ -49,7 +49,7 @@
     </tr>  
     <tr class="control-group" >
       <td colspan="2"> 
-        <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.therms_of_membership_id'), :class => 'help-inline' %> 
+        <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
         <%= f.select :terms_of_membership_id, options_from_collection_for_select(@terms_of_membership, "id", "trial_days") %> 
       </td>
     </tr>  

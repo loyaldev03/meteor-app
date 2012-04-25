@@ -42,7 +42,7 @@ en:
           join_date: 'Join date'
           bill_date: 'Next bill date'
           cancel_date: 'Cancel date'
-        therms_of_membership_id: 'Therms of membership'
+        terms_of_membership_id: 'Terms of membership'
   date:
     formats:
       default: "%d/%m/%Y"
