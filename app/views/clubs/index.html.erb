@@ -6,8 +6,7 @@
       <th><%= model_class.human_attribute_name(:id) %></th>
       <th><%= model_class.human_attribute_name(:name) %></th>
       <th><%= model_class.human_attribute_name(:description) %></th>
-      <th><%= model_class.human_attribute_name(:deleted_at) %></th>
-      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%= model_class.human_attribute_name(:members_count) %></th>
       <th><%= t(:actions) %></th>
     </tr>
   </thead>
@@ -17,8 +16,7 @@
         <td><%= link_to club.id, club_path(:id => club.id) %></td>
         <td><%= club.name %></td>
         <td><%= club.description %></td>
-        <td><%= club.deleted_at %></td>
-        <td><%= I18n.l club.created_at, :format => :long %></td>
+        <td><%= club.members.count %></td>
         <td>
           <%= link_to t(:members), members_path(@current_partner.prefix, club.name), :class => 'btn btn-mini' %>
           <%= link_to t(:edit),
