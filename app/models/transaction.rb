@@ -2,6 +2,7 @@ class Transaction < ActiveRecord::Base
   belongs_to :member
   belongs_to :payment_gateway_configuration
   belongs_to :decline_strategy
+  belongs_to :credit_card
 
   attr_encrypted :encrypted_number, :key => :encryption_key, :encode => true, :algorithm => 'bf'
 
@@ -24,6 +25,7 @@ class Transaction < ActiveRecord::Base
   end
 
   def credit_card=(credit_card)
+    credit_card_id = credit_card.id
     encrypted_number = credit_card.encrypted_number
     expire_month = credit_card.expire_month
     expire_year = credit_card.expire_year
@@ -123,7 +125,9 @@ class Transaction < ActiveRecord::Base
         # we keep this if, just because it was on Litle version (compatibility).
         # MeS seems to not send this param
         {:message=>"Duplicated Transaction: #{response.params[:response]}",:code=>"900"}
-      elsif response.success? 
+      elsif response.success?
+        self.credit_card.last_successful_bill_date = DateTime.now
+        self.credit_card.save
         {:message=>response.message,:code=>"000"}
       else
         {:message=>"Error: " + response.message,:code=>response.params['error_code']}

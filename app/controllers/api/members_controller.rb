@@ -5,8 +5,8 @@ class Api::MembersController < ApplicationController
   #  * user_id
   #  * tom_id
   #  * domain_url
-  #  * member { :first_name, :last_name .... }
-  #  * credit_card { :expiration_month .... }
+  #  * member { :first_name, :last_name, :email, :address, :city, :state, :zip, :country }
+  #  * credit_card { :expiration_month, :expiration_year, :number }
   #  * enrollment amount
   # 
   def enroll
