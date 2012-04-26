@@ -10,6 +10,8 @@
       <%= link_to "Password reset", "#", :class => "btn btn-warning" %>
       <%= link_to "Cancel", "#", :class => "btn btn-warning" %>
       <%= link_to "Refulfill", "#", :class => "btn btn-warning" %>
+      <%= link_to "Refund", "#", :class => "btn btn-warning" %>
+
     </td>
   </tr>
   <tr>
@@ -18,19 +20,23 @@
 </table>
 
 <table class="table table-bordered"> 
-  <tr> 
-    <td> Contact Information </td>
-  </tr>
-    <tr>
+  <thead>
+    <tr> 
+      <th colspan="2"> Contact Information </th>
+    </tr>
+  </thead>  
+  <tr>
     <td> <%= t('activerecord.attributes.member.contact.phone_number') %>: <%= @member.phone_number %> </td>
     <td> <%= t('email') %>: <%= @member.email %> </td>
   </tr>
 </table>
 
 <table class="table table-bordered"> 
-  <tr> 
-    <td colspan="5"> Membership Information </td>
-  </tr>
+  <thead>
+    <tr> 
+      <th colspan="5">Membership Information </th>
+    </tr>
+  </thead>  
   <tr>
     <td> <%= t('activerecord.attributes.member.membership.current_status') %> </td>
     <td> <%= t('activerecord.attributes.member.membership.member_since_date') %> </td>
@@ -63,11 +69,4 @@
 </table>
 
 
-<table class="table table-bordered">
-  <tr>
-    <td>
-            <%= link_to "Refund", "#", :class => "btn btn-warning" %>
-
-      ...Operations..</td>
-  </tr>
-</table>
+<%= render :partial => 'operations', :locals => { :operations => @operations} %>

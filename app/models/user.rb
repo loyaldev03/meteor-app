@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
   
   belongs_to :domain
   has_many :transactions
+  has_many :operations, :as => :resource
 
   def enroll(member, credit_card, amount, agent = nil)
     if amount.to_f != 0.0

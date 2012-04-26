@@ -7,6 +7,7 @@ class Member < ActiveRecord::Base
   has_many :member_notes
   has_many :credit_cards
   has_many :transactions
+  has_many :operations, :as => :resource
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_number, 

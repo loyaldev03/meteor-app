@@ -6,24 +6,15 @@ class MembersController < ApplicationController
   end
 
   def show
+    @operations = @member.operations.paginate(:page => params[:page], :order => "operation_date DESC")
   end
 
   def new
     @member = Member.new 
     @terms_of_membership = TermsOfMembership.where(:club_id => @current_club )
-
-    #TODO: set country_code as US hardcoded on Controller
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @domain }
-    end
   end
 
   def edit
-  end
-
-  def update
   end
 
   private
