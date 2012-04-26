@@ -1,6 +1,5 @@
 class Transaction < ActiveRecord::Base
   belongs_to :member
-  belongs_to :user
   belongs_to :payment_gateway_configuration
   belongs_to :decline_strategy
   belongs_to :credit_card
@@ -44,6 +43,7 @@ class Transaction < ActiveRecord::Base
   end
 
   def prepare(member, credit_card, amount, payment_gateway_configuration)
+    self.transaction_type = "sale"
     self.member = member
     self.credit_card = credit_card
     self.amount = amount

@@ -67,4 +67,44 @@ class Member < ActiveRecord::Base
     address # TODO: something like "#{self.address}, #{self.city}, #{self.state}"
   end
 
+  def enroll(credit_card, amount, agent = nil)
+    if amount.to_f != 0.0
+      trans = Transaction.new
+      trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
+      answer = trans.process
+      unless trans.success?
+        Auditory.audit(agent, self, answer)
+        Auditory.add_redmine_ticket
+        return answer
+      end
+    end
+
+    begin
+      join_date = DateTime.now
+      save!
+      credit_card.member = self
+      credit_card.save!
+      if trans
+        # We cant assign this information before , because models must be created AFTER transaction
+        # is completed succesfully
+        trans.member_id = self.id
+        trans.credit_card_id = credit_card.id
+        trans.save
+        credit_card.accepted_on_billing
+      end
+      # if amount.to_f == 0.0 => TODO: we should activate this member!!!!
+      message = "Member enrolled successfully $#{amount}"
+      Auditory.audit(agent, self, message, self)
+      { :message => message, :code => "000", :member_id => self.id }
+    rescue Exception => e
+      # TODO: Notify devels about this!
+      # TODO: this can happend if in the same time a new member is enrolled that makes this
+      #     an invalid one. we should revert the transaction.
+      message = "Could not save member. #{e}"
+      Auditory.audit(agent, self, message)
+      { :message => message, :code => 404 }
+    end
+  end
+
+
 end
