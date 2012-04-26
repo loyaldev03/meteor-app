@@ -12,7 +12,7 @@ class Member < ActiveRecord::Base
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
-      :bill_date, :quota, :state, :terms_of_membership_id, :work_phone, :zip, 
+      :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
       :club_id, :partner_id
 
   validates :first_name, :presence => true
