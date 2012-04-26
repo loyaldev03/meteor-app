@@ -11,7 +11,7 @@
       <%= link_to "Cancel", "#", :class => "btn btn-warning" %>
       <%= link_to "Refulfill", "#", :class => "btn btn-warning" %>
       <%= link_to "Refund", "#", :class => "btn btn-warning" %>
-
+      <%= link_to 'Edit', edit_member_path(:id => @member), :class => "btn btn-warning" %>
     </td>
   </tr>
   <tr>
@@ -38,25 +38,23 @@
     </tr>
   </thead>  
   <tr>
-    <td> <%= t('activerecord.attributes.member.current_status') %> </td>
-    <td> <%= t('activerecord.attributes.member.member_since_date') %> </td>
-    <td> <%= t('activerecord.attributes.member.join_date') %> </td>
-    <td> <%= t('activerecord.attributes.member.next_bill_date') %> </td>
-    <td> <%= t('activerecord.attributes.member.cancel_date') %> </td>
+    <td> <%= t('activerecord.attributes.member.current_status') %>: <%= @member.status %> </td>
+    <td> <%= t('activerecord.attributes.member.member_since_date') %>: <%= @member.created_at %> </td>
+    <td> <%= t('activerecord.attributes.member.join_date') %>: <%= @member.join_date %> </td>
   </tr>
-    <tr>
-    <td> <%= @member.status %> </td>
-    <td> <%= @member.created_at %> </td>
-    <td> <%= @member.join_date %> </td>
-    <td> <%= @member.bill_date %> </td>
-    <td> <%= @member.cancel_date %> </td>
+  <tr>
+    <td> <%= t('activerecord.attributes.member.next_bill_date') %>: <%= @member.bill_date %> </td>
+    <td colspan="2"> <%= t('activerecord.attributes.member.cancel_date') %>: <%= @member.cancel_date %> </td>
   </tr>
 </table>
 
 <table class="table table-bordered">
+  <thead>
   <tr>
-    <td>...Active Credit card</td>
+    <th colspan="5"> Active Credit card </th>
   </tr>
+
+  </thead>
 </table>
 
 <ul class="nav nav-tabs">
