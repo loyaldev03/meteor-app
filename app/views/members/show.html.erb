@@ -11,7 +11,7 @@
       <%= link_to "Cancel", "#", :class => "btn btn-warning" %>
       <%= link_to "Refulfill", "#", :class => "btn btn-warning" %>
       <%= link_to "Refund", "#", :class => "btn btn-warning" %>
-      <%= link_to 'Edit', edit_member_path(:id => @member), :class => "btn btn-warning" %>
+      <%= link_to 'Edit', edit_member_path(:id => @member.visible_id), :class => "btn btn-warning" %>
     </td>
   </tr>
   <tr>
