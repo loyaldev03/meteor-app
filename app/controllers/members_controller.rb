@@ -1,6 +1,6 @@
 class MembersController < ApplicationController
   before_filter :validate_club_presence
-  before_filter :setup_member, :only => [ :show ]
+  before_filter :setup_member, :only => [ :show,:edit ]
 
   def index
   end
@@ -18,7 +18,6 @@ class MembersController < ApplicationController
   end
 
   def edit
-    @member = Member.find(params[:id])
   end
 
   private
