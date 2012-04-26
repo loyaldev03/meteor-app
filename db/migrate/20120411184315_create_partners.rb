@@ -6,7 +6,6 @@ class CreatePartners < ActiveRecord::Migration
       t.string :contract_uri
       t.string :website_url
       t.text :description
-      t.has_attached_file :logo
       t.datetime :deleted_at
       t.timestamps
     end

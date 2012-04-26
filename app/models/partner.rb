@@ -11,10 +11,4 @@ class Partner < ActiveRecord::Base
   validates :name , :presence => true, :uniqueness => true, :name_is_not_admin => true
   validates :prefix, :presence => true, :uniqueness => true, :prefix_is_not_admin => true
 
-  has_attached_file :logo, :path => ":rails_root/public/system/:attachment/:id/:style/:filename", 
-                           :url => "/system/:attachment/:id/:style/:filename",
-                           :style => {:thumb=> "100x100#", :small  => "150x150>"}
-
-
-
 end

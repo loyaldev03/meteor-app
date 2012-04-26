@@ -4,6 +4,7 @@ class CreateClubs < ActiveRecord::Migration
       t.text :description
       t.string :name
       t.integer :partner_id, :limit => 8
+      t.has_attached_file :logo
       t.datetime :deleted_at
       t.timestamps
     end

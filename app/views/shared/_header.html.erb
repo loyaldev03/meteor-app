@@ -17,8 +17,8 @@
                 <li><%= link_to @current_partner.name, admin_partner_dashboard_path %></li>
               <% end %>
             <% else %>
-              <% if @current_partner.logo? %>
-                <li><%= link_to image_tag(@current_partner.logo.url), members_path(@current_partner.prefix, @current_club.name) %></li>
+              <% if @current_club.logo? %>
+                <li><%= link_to image_tag(@current_club.logo.url), members_path(@current_partner.prefix, @current_club.name) %></li>
               <% else %>
                 <li><%= link_to @current_club.full_name, members_path(@current_partner.prefix, @current_club.name) %></li>
               <% end %>
