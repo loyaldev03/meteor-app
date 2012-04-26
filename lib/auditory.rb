@@ -8,4 +8,7 @@ class Auditory
       logger.error " * * * * * CANT SAVE OPERATION #{e}"
     end
   end
+  def self.add_redmine_ticket
+     #TODO: #18775
+  end
 end

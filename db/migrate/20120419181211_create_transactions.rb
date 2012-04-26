@@ -27,7 +27,7 @@ class CreateTransactions < ActiveRecord::Migration
       t.string :last_name
       t.string :phone_number
       t.string :email
-      t.string :address_line
+      t.string :address
       t.string :city
       t.string :state
       t.string :zip

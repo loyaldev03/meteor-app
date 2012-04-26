@@ -28,14 +28,14 @@ class Api::MembersController < ApplicationController
 #      if not club.domains.find_by_url(params[:domain_url]).nil? and params[:domain_url] == user.domain.url
         credit_card = CreditCard.new params[:credit_card]
         member = Member.new params[:member]
-        member.credit_cards << credit_card
         member.created_by_id = current_agent.id
         member.terms_of_membership = tom
         member.club = club
-        if member.valid?
+        if member.valid? and credit_card.valid?
           response = user.enroll(member, credit_card, params[:enrollment_amount], current_agent)
         else
-          errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
+          errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n') + 
+                    credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
           response = { :message => "Member data is invalid: #{errors}", :code => 405 }
         end
 #      else

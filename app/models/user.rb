@@ -8,13 +8,14 @@ class User < ActiveRecord::Base
 
   def enroll(member, credit_card, amount, agent = nil)
     if amount.to_f != 0.0
-      t = Transaction.new
+      trans = Transaction.new
       # TODO: el transaction type tiene que venir del TOM?????
-      t.transaction_type = "sale"
-      t.prepare(member, credit_card, amount, member.terms_of_membership.payment_gateway_configuration)
-      answer = t.sale
-      unless t.success?
+      trans.transaction_type = "sale"
+      trans.prepare(member, credit_card, amount, member.terms_of_membership.payment_gateway_configuration)
+      answer = trans.process
+      unless trans.success?
         Auditory.audit(agent, self, answer)
+        Auditory.add_redmine_ticket
         return answer
       end
     end
@@ -22,16 +23,26 @@ class User < ActiveRecord::Base
     begin
       member.join_date = DateTime.now
       member.save!
+      credit_card.member = member
+      credit_card.save!
+      if trans
+        # We cant assign this information before , because models must be created AFTER transaction
+        # is completed succesfully
+        trans.member_id = member.id
+        trans.credit_card_id = credit_card.id
+        trans.save
+        credit_card.accepted_on_billing
+      end
       # if amount.to_f == 0.0 => TODO: we should activate this member!!!!
       message = "Member enrolled successfully"
-      Auditory.audit!(member, message)
-      { :message => message, :code => "000" }
+      Auditory.audit(agent, member, message)
+      { :message => message, :code => "000", :member_id => member.id }
     rescue Exception => e
       # TODO: Notify devels about this!
       # TODO: this can happend if in the same time a new member is enrolled that makes this
       #     an invalid one. we should revert the transaction.
       message = "Could not save member. #{e}"
-      Auditory.audit(member, message)
+      Auditory.audit(agent, member, message)
       { :message => message, :code => 404 }
     end
   end

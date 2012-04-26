@@ -7,44 +7,40 @@ class Transaction < ActiveRecord::Base
   # This value will be not nil only if we are billing 
   belongs_to :terms_of_membership 
 
-  attr_encrypted :encrypted_number, :key => :encryption_key, :encode => true, :algorithm => 'bf'
-
-  def encryption_key
-    "reibel3y5estrada8"
-  end 
+  attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
 
   def member=(member)
-    member_id = member.id
+    self.member_id = member.id
     # MeS supports only 17 characters on order_id
-    invoice_number = member.id
-    first_name = member.first_name
-    last_name = member.last_name
-    phone_number = member.phone_number
-    email = member.email
-    address_line = member.address
-    city = member.city
-    state = member.state
-    zip = member.zip
+    self.invoice_number = member.visible_id
+    self.first_name = member.first_name
+    self.last_name = member.last_name
+    self.phone_number = member.phone_number
+    self.email = member.email
+    self.address = member.address
+    self.city = member.city
+    self.state = member.state
+    self.zip = member.zip
   end
 
   def credit_card=(credit_card)
-    credit_card_id = credit_card.id
-    encrypted_number = credit_card.encrypted_number
-    expire_month = credit_card.expire_month
-    expire_year = credit_card.expire_year
+    self.credit_card_id = credit_card.id
+    self.encrypted_number = credit_card.encrypted_number
+    self.expire_month = credit_card.expire_month
+    self.expire_year = credit_card.expire_year
   end
 
   def payment_gateway_configuration=(pgc)
-    payment_gateway_configuration_id = pgc.id
-    report_group = pgc.report_group
-    merchant_key = pgc.merchant_key
-    login = pgc.login
-    password = pgc.password
-    mode = pgc.mode
-    descriptor_name = pgc.descriptor_name
-    descriptor_phone = pgc.descriptor_phone
-    order_mark = pgc.order_mark
-    gateway = pgc.gateway
+    self.payment_gateway_configuration_id = pgc.id
+    self.report_group = pgc.report_group
+    self.merchant_key = pgc.merchant_key
+    self.login = pgc.login
+    self.password = pgc.password
+    self.mode = pgc.mode
+    self.descriptor_name = pgc.descriptor_name
+    self.descriptor_phone = pgc.descriptor_phone
+    self.order_mark = pgc.order_mark
+    self.gateway = pgc.gateway
   end
 
   def prepare(member, credit_card, amount, payment_gateway_configuration)
@@ -111,17 +107,18 @@ class Transaction < ActiveRecord::Base
           purchase_response = @gateway.purchase(a, @credit_card, @options)
           save_response(purchase_response)
         else
-          { :message => "Credit card not valid: #{@credit_card.errors}", :code => "9332" }
+          errors = @credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
+          { :message => "Credit card not valid: #{errors}", :code => "9332" }
         end
       end
     end
 
     def save_response(answer)
-      response = answer
-      response_transaction_id=answer.params['transaction_id']
-      response_auth_code=answer.params['auth_code']
-      response_code=answer.params['error_code']
-      response_result=answer.message
+      self.response = answer
+      self.response_transaction_id=answer.params['transaction_id']
+      self.response_auth_code=answer.params['auth_code']
+      self.response_code=answer.params['error_code']
+      self.response_result=answer.message
       save
 
       if response.params[:duplicate]=="true"
@@ -129,8 +126,9 @@ class Transaction < ActiveRecord::Base
         # MeS seems to not send this param
         {:message=>"Duplicated Transaction: #{response.params[:response]}",:code=>"900"}
       elsif response.success?
-        self.credit_card.last_successful_bill_date = DateTime.now
-        self.credit_card.save
+        unless self.credit_card.nil?
+          self.credit_card.accepted_on_billing
+        end
         {:message=>response.message,:code=>"000"}
       else
         {:message=>"Error: " + response.message,:code=>response.params['error_code']}
@@ -140,7 +138,7 @@ class Transaction < ActiveRecord::Base
     def verify_card
       ActiveMerchant::Billing::CreditCard.require_verification_value = false
       @credit_card ||= ActiveMerchant::Billing::CreditCard.new(
-        :number     => cc_number,
+        :number     => number,
         :month      => expire_month,
         :year       => expire_year,
         :first_name => first_name,
@@ -172,7 +170,7 @@ class Transaction < ActiveRecord::Base
           :city     => city,
           :state    => state,
           :zip      => zip.gsub(/[a-zA-Z-]/, ''),
-          :phone    => phone
+          :phone    => phone_number
           }
         }
       @options[:moto_ecommerce_ind] = 2 if recurrent

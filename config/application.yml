@@ -1,4 +1,5 @@
 defaults: &defaults
+  cc_encryption_key: reibel3y5estrada8
   payment_gateways:
   - MeS
   - little
