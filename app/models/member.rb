@@ -7,7 +7,7 @@ class Member < ActiveRecord::Base
   has_many :member_notes
   has_many :credit_cards
   has_many :transactions
-  has_many :operations, :as => :resource
+  has_many :operations
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_number, 
@@ -64,7 +64,7 @@ class Member < ActiveRecord::Base
   end
 
   def full_address
-    # TODO: something like "#{self.address}, #{self.city}, #{self.state}"
+    address # TODO: something like "#{self.address}, #{self.city}, #{self.state}"
   end
 
 end

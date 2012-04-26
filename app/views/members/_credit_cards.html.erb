@@ -1,9 +1,8 @@
-<%= link_to "Add a credit card", "#", :class => "btn btn-warning" %>
 
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th colspan="2">Credit Cards</th>
+      <th colspan="2">Credit Cards <%= link_to "Add a credit card", "#", :class => "btn btn-warning" %></th>
     </tr>
   </thead>
   <% credit_cards.each do |cc| %>
@@ -16,4 +15,7 @@
     </td>
   </tr>
   <% end %>
+
 </table>
+
+<%= will_paginate credit_cards %>

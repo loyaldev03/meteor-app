@@ -36,14 +36,14 @@ class User < ActiveRecord::Base
       end
       # if amount.to_f == 0.0 => TODO: we should activate this member!!!!
       message = "Member enrolled successfully"
-      Auditory.audit(agent, member, message)
+      Auditory.audit(agent, self, message, member)
       { :message => message, :code => "000", :member_id => member.id }
     rescue Exception => e
       # TODO: Notify devels about this!
       # TODO: this can happend if in the same time a new member is enrolled that makes this
       #     an invalid one. we should revert the transaction.
       message = "Could not save member. #{e}"
-      Auditory.audit(agent, member, message)
+      Auditory.audit(agent, self, message)
       { :message => message, :code => 404 }
     end
   end

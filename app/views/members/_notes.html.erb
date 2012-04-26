@@ -1,9 +1,8 @@
-<%= link_to "Add a note", "#", :class => "btn btn-warning" %>
 
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th colspan="2">Notes</th>
+      <th colspan="2">Notes <%= link_to "Add a note", "#", :class => "btn btn-warning" %></th>
     </tr>
   </thead>
   <tr>
@@ -17,3 +16,4 @@
   </tr>
   <% end %>
 </table>
+  <%= will_paginate notes %>
