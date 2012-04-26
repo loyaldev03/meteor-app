@@ -42,6 +42,8 @@
         <%= f.text_field :email, :class => 'text_field'%> 
       </td>
     </tr>  
+
+    <% if @member.new_record? %>
     <tr class="control-group" >
       <td colspan="2"> 
         <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
@@ -50,7 +52,7 @@
     </tr>
     <tr class="control-group" ><td colspan="2"> <b> Credit Card </b> </td></tr>  
 
-    <% if @member.new_record? %>
+
         <tr class="control-group" >
           <td> 
             <%= f.label :encrypted_number, t('activerecord.attributes.credit_card.encrypted_number'), :class => 'help-inline' %> 
