@@ -43,7 +43,6 @@ class Transaction < ActiveRecord::Base
   end
 
   def prepare(member, credit_card, amount, payment_gateway_configuration)
-    self.transaction_type = "sale"
     self.member = member
     self.credit_card = credit_card
     self.amount = amount

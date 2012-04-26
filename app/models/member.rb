@@ -70,6 +70,7 @@ class Member < ActiveRecord::Base
   def enroll(credit_card, amount, agent = nil)
     if amount.to_f != 0.0
       trans = Transaction.new
+      trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
       answer = trans.process
       unless trans.success?
