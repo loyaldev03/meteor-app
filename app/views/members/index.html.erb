@@ -3,5 +3,5 @@
 <%= form_tag('#', :method => 'get', :html => { :class => 'well form-inline' }) do %>
   Fields
   <p><%= submit_tag 'Search', :class => "btn btn-inverse" -%></p>
-  <p><%= link_to (:member), new_member_path, :class => "btn btn-primary"  %></pt>
+  <p><%= link_to 'New Member', new_member_path, :class => "btn btn-primary"  %></pt>
 <% end %>
