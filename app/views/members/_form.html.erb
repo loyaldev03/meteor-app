@@ -1,6 +1,7 @@
 <table class="table table-condensed"> 
   <thead>
-    <tr class="control-group" >
+    <tr class="control-group" ><td colspan="2"> <b> Demographic Information </b> </td></tr>
+    <tr class="control-group" >  
       <td> 
         <%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline' %> 
         <%= f.text_field :first_name, :class => 'text_field'%>
@@ -30,14 +31,13 @@
         <%= f.text_field :zip, :class => 'text_field input-small'%> 
       </td> 
     </tr>
-    <tr class="control-group" >
-      <td> 
-        <%= f.label :home_phone, t('activerecord.attributes.member.home_phone'), :class => 'help-inline' %>
-        <%= f.text_field :phone_number, :class => 'text_field input-medium'%> 
-      </td>
-    </tr>  
+    <tr class="control-group" ><td colspan="2"> <b> Contact Information </b> </td></tr>
     <tr class="control-group" >
       <td colspan="2"> 
+        <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline' %>
+        <%= f.text_field :phone_number, :class => 'text_field input-medium'%> 
+      </td>
+      <td> 
         <%= f.label :email, t('email'), :class => 'help-inline' %> 
         <%= f.text_field :email, :class => 'text_field'%> 
       </td>
