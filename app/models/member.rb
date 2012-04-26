@@ -96,7 +96,8 @@ class Member < ActiveRecord::Base
       # if amount.to_f == 0.0 => TODO: we should activate this member!!!!
       message = "Member enrolled successfully $#{amount}"
       Auditory.audit(agent, self, message, self)
-      { :message => message, :code => "000", :member_id => self.id }
+      self.reload
+      { :message => message, :code => "000", :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
       # TODO: Notify devels about this!
       # TODO: this can happend if in the same time a new member is enrolled that makes this
