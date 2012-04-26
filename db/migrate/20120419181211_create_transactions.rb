@@ -2,7 +2,6 @@ class CreateTransactions < ActiveRecord::Migration
   def up
     create_table :transactions, {:id => false} do |t|
       t.string :member_id, :limit => 36
-      t.string :user_id, :limit => 36
       t.integer :terms_of_membership_id, :limit => 8
       # payment gateway configuration
       t.integer :payment_gateway_configuration_id, :limit => 8

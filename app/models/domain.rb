@@ -1,7 +1,7 @@
 class Domain < ActiveRecord::Base
+  has_many :users
   belongs_to :partner
   belongs_to :club
-  has_many :users
 
   attr_accessible :data_rights, :deleted_at, :description, :hosted, :partner, :url, :club_id
   
