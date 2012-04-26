@@ -1,0 +1,19 @@
+<%= link_to "Add a credit card", "#", :class => "btn btn-warning" %>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th colspan="2">Credit Cards</th>
+    </tr>
+  </thead>
+  <% credit_cards.each do |cc| %>
+  <tr>
+    <td>
+      <%= cc.number %>
+    </td>
+    <td>
+      <%= cc.expire_month %> / <%= cc.expire_year %>
+    </td>
+  </tr>
+  <% end %>
+</table>

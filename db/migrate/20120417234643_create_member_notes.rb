@@ -3,6 +3,7 @@ class CreateMemberNotes < ActiveRecord::Migration
     create_table :member_notes, {:id => false} do |t|
       t.integer :member_id, :limit => 8
       t.integer :created_by_id, :limit => 8
+      t.text :description
       t.string :note_type
       t.string :communication_type
       t.timestamps

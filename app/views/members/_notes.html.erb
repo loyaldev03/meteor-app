@@ -1,0 +1,19 @@
+<%= link_to "Add a note", "#", :class => "btn btn-warning" %>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th colspan="2">Notes</th>
+    </tr>
+  </thead>
+  <tr>
+  <% notes.each do |note| %>
+    <td>
+      <%= l(note.created_at) %>
+    </td>
+    <td>
+      <%= link_to note.description[0..50], "#" %>
+    </td>
+  </tr>
+  <% end %>
+</table>
