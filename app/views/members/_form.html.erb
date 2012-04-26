@@ -33,7 +33,7 @@
     </tr>
     <tr class="control-group" ><td colspan="2"> <b> Contact Information </b> </td></tr>
     <tr class="control-group" >
-      <td colspan="2"> 
+      <td> 
         <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline' %>
         <%= f.text_field :phone_number, :class => 'text_field input-medium'%> 
       </td>
@@ -65,7 +65,7 @@
     </tr> 
     <% end %>
 
-    <%= hidden_field_tag :enrollment_amount, 0.0 %>
+    <%= hidden_field_tag :enrollment_amount, 1 %> <!-- Changed to 1 from 0.0 -->
     <%= f.hidden_field :country, :value => "US" %>
 
     <tr class="control-group">
