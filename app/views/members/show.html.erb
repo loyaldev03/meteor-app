@@ -63,11 +63,13 @@
   <li><a href="#operations" data-toggle="tab">Operations</a></li>
   <li><a href="#notes" data-toggle="tab">Notes</a></li>
   <li><a href="#credit_cards" data-toggle="tab">Credit Cards</a></li>
+  <li><a href="#transactions" data-toggle="tab">Transactions</a></li>
 </ul>
 
 <div class="tab-content">
   <div class="tab-pane active" id="operations"><%= render :partial => 'operations', :locals => { :operations => @operations} %></div>
   <div class="tab-pane" id="notes"><%= render :partial => 'notes', :locals => { :notes => @notes} %></div>
   <div class="tab-pane" id="credit_cards"><%= render :partial => 'credit_cards', :locals => { :credit_cards => @credit_cards} %></div>  
+  <div class="tab-pane" id="transactions"><%= render :partial => 'transactions', :locals => { :transactions => @transactions} %></div>  
 </div>
 
