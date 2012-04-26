@@ -1,0 +1,19 @@
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th colspan="2">Transactions</th>
+    </tr>
+  </thead>
+  <% transactions.each do |transaction| %>
+  <tr>
+    <td>
+      <%= l(transaction.created_at) %>
+    </td>
+    <td>
+      <%= link_to transaction.response_result[0..50], "#" %>
+    </td>
+  </tr>
+  <% end %>
+  
+</table>
+<%= will_paginate transactions %>

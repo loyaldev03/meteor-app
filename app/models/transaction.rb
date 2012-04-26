@@ -58,18 +58,18 @@ class Transaction < ActiveRecord::Base
     case transaction_type
       when "sale"
         sale
-      when "authorization"
-        authorization
-      when "capture"
-        capture
+      #when "authorization"
+      #  authorization
+      #when "capture"
+      #  capture
       when "credit"
         credit
       when "refund"
         refund
       when "void"
         void
-      when "authorization_capture"
-        authorization_capture
+      #when "authorization_capture"
+      #  authorization_capture
       else
         { :message=>"operation not supported",:code=> 902 }
     end
@@ -90,6 +90,7 @@ class Transaction < ActiveRecord::Base
 
   # TODO: find out if this transaction is a decline
   # decline_strategy_id: nil
+
 
   private
     # Process only sale operations
