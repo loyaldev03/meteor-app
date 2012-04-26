@@ -3,7 +3,7 @@ SacPlatform::Application.routes.draw do
 
   namespace :api do
     scope 'v1' do
-      match 'enroll' => 'members#enroll', as: 'api_v1_enroll_members', :via => :post
+      match 'enroll' => 'members#enroll', as: 'v1_enroll_members', :via => :post
     end
   end
 
