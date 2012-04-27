@@ -14,6 +14,7 @@ en:
   actions: 'Actions'
   url: 'Url'
   email: 'Email'
+  show_on_map: 'map'
   menu: 
     logout: Logout
     agents: Agents

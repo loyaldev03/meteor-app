@@ -1,5 +1,6 @@
 <h1> <%= @member.visible_id %> - <%= @member.full_name %></h1>
-<table class="table table-bordered">
+
+<table class="table table-bordered table-condensed">
   <tr>
     <td>
       <%= link_to 'Edit', edit_member_path(:id => @member.visible_id), :class => "btn btn-warning" %>
@@ -25,11 +26,14 @@
     <% end %>
   </tr>
   <tr>
-    <td colspan="5"> <%= @member.full_address %></td>
+    <td colspan="5"> 
+      <i class ="icon-home" > </i> <%= @member.full_address %> 
+      <%= link_to t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @member.full_address}&ie=UTF8&om=1", :target => '_blank' %>
+    </td>
   </tr>
 </table>
 
-<table class="table table-bordered"> 
+<table class="table table-bordered table-condensed"> 
   <thead>
     <tr> 
       <th colspan="2"> Contact Information </th>
@@ -41,7 +45,7 @@
   </tr>
 </table>
 
-<table class="table table-bordered"> 
+<table class="table table-bordered table-condensed"> 
   <thead>
     <tr> 
       <th colspan="5">Membership Information </th>
@@ -58,7 +62,7 @@
   </tr>
 </table>
 
-<table class="table table-bordered">
+<table class="table table-bordered table-condensed">
   <thead>
   <tr>
     <th colspan="5"> Active Credit card </th>
