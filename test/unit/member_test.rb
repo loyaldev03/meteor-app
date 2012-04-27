@@ -17,4 +17,10 @@ class MemberTest < ActiveSupport::TestCase
   	assert !member.save
   end
 
+  test "Member should not be billed if it is not paid or provisional" do
+    member = FactoryGirl.create(:lapsed_member)
+    answer = member.bill_membership
+    assert !(answer[:code] == "000")
+  end
+
 end
