@@ -80,12 +80,12 @@ class Member < ActiveRecord::Base
 
   def schedule_renewal
     new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
-    if self.monthly?
+    if terms_of_membership.monthly?
       self.quota = self.quota + 1
       if self.recycled_times > 1
         new_bill_date = DateTime.now + eval(terms_of_membership.installment_type)
       end
-    elsif self.yearly?
+    elsif terms_of_membership.yearly?
       # refs #15935
       self.quota = self.quota + 12
     end
@@ -183,6 +183,8 @@ class Member < ActiveRecord::Base
       else
         { :message => "Called billing method but no amount on TOM is set.", :code => "9887" }
       end
+    else
+      { :message => "Member is not in a billing status.", :code => "9886" }
     end
   end
 
