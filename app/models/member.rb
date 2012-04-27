@@ -70,7 +70,7 @@ class Member < ActiveRecord::Base
     [ first_name, last_name].join(' ')
   end
 
-  def credit_card
+  def active_credit_card
     self.credit_cards.find_by_active(true)
   end
 
@@ -107,31 +107,32 @@ class Member < ActiveRecord::Base
 
   def set_decline_strategy(trans)
     # soft / hard decline
+    type = self.terms_of_membership.installment_type
     decline = DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
-                trans.response_code, trans.installment_type, trans.credit_card_type) || 
+                trans.response_code, type, trans.credit_card_type) || 
               DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
-                trans.response_code, trans.installment_type, "all")
+                trans.response_code, type, "all")
 
     deactivate = false
     if decline.nil?
       # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
-      message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_message}"
+      message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
       self.next_retry_bill_date = Date.today + 30.days
-      Notifier.deliver_decline_strategy_not_found(message, self.id, @campaign)
+      Notifier.decline_strategy_not_found(message, self).deliver!
     else
       trans.update_attribute :decline_strategy_id, decline.id
       if decline.hard_decline?
-        message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_message}"
+        message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
         deactivate = true
       else
-        message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_message}"
+        message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
         if trans.response_code == "9999"
           self.next_retry_bill_date = terms_of_membership.grace_period.to_i.days.from_now
         else
           self.next_retry_bill_date = decline.days.days.from_now
         end
         if self.recycled_times > (decline.limit-1)
-          message = "Soft decline limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_message}"
+          message = "Soft decline limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response}"
           deactivate = true
         end
       end
@@ -153,7 +154,7 @@ class Member < ActiveRecord::Base
         # So grace period will be granted twice.
         #        limit = 0 
         #        days  = campaign.grace_period
-        if credit_card.nil?
+        if active_credit_card.nil?
           answer = if terms_of_membership.grace_period > 0
             { :code => "9999", :message => "Credit card is blank. Allowing grace period" }
           else
@@ -163,10 +164,10 @@ class Member < ActiveRecord::Base
           # TODO: @member.cc_year_exp=card_expired_rule(@member.cc_year_exp)
           trans = Transaction.new
           trans.transaction_type = "sale"
-          trans.prepare(self, self.credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
+          trans.prepare(self, self.active_credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
           answer = trans.process
           if trans.success?
-            credit_card.accepted_on_billing
+            active_credit_card.accepted_on_billing
             set_as_paid!
             schedule_renewal
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
