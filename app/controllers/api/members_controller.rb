@@ -34,6 +34,15 @@ class Api::MembersController < ApplicationController
     end    
   end
 
+
+  # Method : PUT
+  #
+  # Params:
+  #  * id
+  #  * club_id
+  #  * member { :first_name, :last_name, :email, :address, :city, :state, :zip, :phone_number }
+  # 
+
   def update_profile
     response = {}
     member = Member.find_by_visible_id_and_club_id(params[:id],params[:club_id]) 
