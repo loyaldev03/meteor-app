@@ -56,3 +56,21 @@ tom = TermsOfMembership.new :installment_amount => 45, :installment_type => "1.y
   :needs_enrollment_approval => false, :name => "test"
 tom.club = c2
 tom.save!
+
+
+[ 'incomming call' ,  'outbound call' ,  'email' ,  'chat' , 'others' ].each do |name|
+  c = CommunicationType.new
+  c.name = name
+  c.save
+end
+
+[ c.id, c2.id ].each do |id|
+  [ 'confirm', 'Website Question', 'technical support', 'Benefits question', 'Pre bill Cancellation', 
+    'Post bill cancellation', 'Pre Bill Save', 'Product question', 'Deals and Discounts', 
+    'Club cash question', 'VIP non program', 'Local Chapter question' ].each do |name|
+    c = CommunicationType.new
+    c.name = name
+    c.club_id = id
+    c.save
+  end
+end
