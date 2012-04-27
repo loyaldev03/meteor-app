@@ -18,7 +18,18 @@
 
 $('#new_member').submit( function(event) {
   event.preventDefault()
-  $.post("/api/v1/enroll", $("#new_member").serialize());
+  $.ajax({
+    type: 'POST',
+    url: "/api/v1/enroll",
+    data: $("#new_member").serialize(),
+    success: function(data) {
+    	if (data.code == 000){
+    		alert (data.message)
+    		window.location.replace('../members/'+data.v_id);
+    	}else
+    		alert (data.message)
+    },
+    });
 });
 
 $('#myTab a:last').tab('show');
