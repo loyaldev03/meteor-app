@@ -2,6 +2,10 @@
 <h1><%=t '.title', :default => t('helpers.titles.new', :model => model_class.model_name.human,
                                :default => "New #{model_class.model_name.human}") %></h1>
 
-<%= form_for @member, :name => "pepe" ,:html => { :class => 'form-horizontal' } do |f| %>
+<script> 
+  var visible_id = <%= @member.visible_id %>; 
+</script> 
+
+<%= form_for @member,:html => { :class => 'form-horizontal' } do |f| %>
 <%= render :partial => 'form', :locals => { :f => f } %>
 <% end %>
