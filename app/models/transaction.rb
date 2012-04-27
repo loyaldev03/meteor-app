@@ -87,9 +87,15 @@ class Transaction < ActiveRecord::Base
     gateway == "litle"
   end
 
-
-  # TODO: find out if this transaction is a decline
-  # decline_strategy_id: nil
+  # we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
+  # ["switch", "visa", "diners_club", "master", "forbrugsforeningen", "dankort", 
+  #    "laser", "american_express", "solo", "jcb", "discover", "maestro"]
+  def credit_card_type
+    # TODO: terminar
+    c = credit_card
+    c.valid?
+    c.type
+  end
 
 
   private

@@ -2,7 +2,7 @@ class CreateDeclineStrategies < ActiveRecord::Migration
   def up
     create_table :decline_strategies, {:id => false} do |t|
       t.string :gateway
-      t.string :bill_type, :default => 'monthly'
+      t.string :installment_type, :default => 'monthly'
       t.string :credit_card_type, :default => 'all'
       t.string :response_code
       t.integer :limit, :default => 0
