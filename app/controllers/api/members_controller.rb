@@ -35,14 +35,19 @@ class Api::MembersController < ApplicationController
   end
 
   def update_profile
-    member = Member.find_by_visible_id (params[:id]) 
-    if member.update_attributes(params[:member])
+    response = {}
+    member = Member.find_by_visible_id_and_club_id(params[:id],params[:club_id]) 
+    if member.update_attributes(params[:member]) 
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member)
-      { :message => message, :code => "000", :member_id => member.id, :v_id => member.visible_id }
+      response = { :message => message, :code => "000", :member_id => member.id, :v_id => member.visible_id }
     else
       errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
-      {:message => "Member data is invalid: #{errors}", :code => 405 }
+      response = { :message => "Member data is invalid: #{errors}", :code => 405 }
+    end
+
+    respond_to do |format|
+      format.json { render json: response }
     end
   end
 end

@@ -4,7 +4,7 @@ SacPlatform::Application.routes.draw do
   namespace :api do
     scope 'v1' do
       match 'enroll' => 'members#enroll', as: 'v1_enroll_members', :via => :post
-      match 'update_profile/:id' => 'members#update_profile', as: 'v1_update_profile_members', :via => :put
+      match 'update_profile/:id/:club_id' => 'members#update_profile', as: 'v1_update_profile_members', :via => :put
     end
   end
 
