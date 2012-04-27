@@ -1,6 +1,6 @@
 class MembersController < ApplicationController
   before_filter :validate_club_presence
-  before_filter :setup_member, :only => [ :show,:edit ]
+  before_filter :setup_member, :only => [ :show, :edit ]
 
   def index
   end
@@ -17,7 +17,7 @@ class MembersController < ApplicationController
     @terms_of_membership = TermsOfMembership.where(:club_id => @current_club )
   end
 
-  def edit
+  def edit  
   end
 
   private
