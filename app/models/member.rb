@@ -105,44 +105,6 @@ class Member < ActiveRecord::Base
     # TODO: Audit 
   end
 
-  def set_decline_strategy(trans)
-    # soft / hard decline
-    type = self.terms_of_membership.installment_type
-    decline = DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
-                trans.response_code, type, trans.credit_card_type) || 
-              DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
-                trans.response_code, type, "all")
-
-    deactivate = false
-    if decline.nil?
-      # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
-      message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
-      self.next_retry_bill_date = Date.today + 30.days
-      Notifier.decline_strategy_not_found(message, self).deliver!
-    else
-      trans.update_attribute :decline_strategy_id, decline.id
-      if decline.hard_decline?
-        message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
-        deactivate = true
-      else
-        message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
-        if trans.response_code == "9999"
-          self.next_retry_bill_date = terms_of_membership.grace_period.to_i.days.from_now
-        else
-          self.next_retry_bill_date = decline.days.days.from_now
-        end
-        if self.recycled_times > (decline.limit-1)
-          message = "Soft decline limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response}"
-          deactivate = true
-        end
-      end
-    end
-    if deactivate
-      deactivate!
-    else
-      increment(:recycled_times, 1)
-    end
-  end
 
   def bill_membership
     if provisional? or paid?
@@ -225,5 +187,43 @@ class Member < ActiveRecord::Base
     end
   end
 
+  private
+    def set_decline_strategy(trans)
+      # soft / hard decline
+      type = self.terms_of_membership.installment_type
+      decline = DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
+                  trans.response_code, type, trans.credit_card_type) || 
+                DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
+                  trans.response_code, type, "all")
 
+      deactivate = false
+      if decline.nil?
+        # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
+        message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
+        self.next_retry_bill_date = Date.today + 30.days
+        Notifier.decline_strategy_not_found(message, self).deliver!
+      else
+        trans.update_attribute :decline_strategy_id, decline.id
+        if decline.hard_decline?
+          message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
+          deactivate = true
+        else
+          message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
+          if trans.response_code == "9999"
+            self.next_retry_bill_date = terms_of_membership.grace_period.to_i.days.from_now
+          else
+            self.next_retry_bill_date = decline.days.days.from_now
+          end
+          if self.recycled_times > (decline.limit-1)
+            message = "Soft decline limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response}"
+            deactivate = true
+          end
+        end
+      end
+      if deactivate
+        deactivate!
+      else
+        increment(:recycled_times, 1)
+      end
+    end
 end

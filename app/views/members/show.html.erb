@@ -2,20 +2,30 @@
 <table class="table table-bordered">
   <tr>
     <td>
-      <%= link_to "Save the sale", "#", :class => "btn btn-warning" %>
-      <%= link_to "Cancel future", "#", :class => "btn btn-warning" %>
-      <%= link_to "Recovery", "#", :class => "btn btn-warning" %>
-      <%= link_to "Blacklist", "#", :class => "btn btn-warning" %>
-      <%= link_to "Resend welcome email", "#", :class => "btn btn-warning" %>
-      <%= link_to "Password reset", "#", :class => "btn btn-warning" %>
-      <%= link_to "Cancel", "#", :class => "btn btn-warning" %>
-      <%= link_to "Refulfill", "#", :class => "btn btn-warning" %>
-      <%= link_to "Refund", "#", :class => "btn btn-warning" %>
       <%= link_to 'Edit', edit_member_path(:id => @member.visible_id), :class => "btn btn-warning" %>
+      <%= link_to("Recovery", "#", :class => "btn btn-warning") if @member.lapsed? %>
     </td>
+    <% unless @member.lapsed? %>
+      <td>
+        <%= link_to "Resend welcome email", "#", :class => "btn btn-warning" %>
+        <%= link_to "Password reset", "#", :class => "btn btn-warning" %>
+      </td>
+      <td>
+        <%= link_to "Refulfill", "#", :class => "btn btn-warning" %>
+      </td>
+      <td>
+        <%= link_to "Refund", "#", :class => "btn btn-warning" %>
+        <%= link_to "Save the sale", "#", :class => "btn btn-warning" %>
+      </td>
+      <td>
+        <%= link_to "Blacklist", "#", :class => "btn btn-warning" %>
+        <%= link_to "Cancel future", "#", :class => "btn btn-warning" %>
+        <%= link_to "Cancel", "#", :class => "btn btn-warning" %>
+      </td>
+    <% end %>
   </tr>
   <tr>
-    <td> <%= @member.full_address %></td>
+    <td colspan="5"> <%= @member.full_address %></td>
   </tr>
 </table>
 
