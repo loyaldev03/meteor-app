@@ -12,6 +12,9 @@
     <td>
       <%= link_to transaction.response_result[0..50], "#" %>
     </td>
+    <td>
+      <%= number_to_currency transaction.amount  %>
+    </td>
   </tr>
   <% end %>
   
