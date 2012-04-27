@@ -23,13 +23,27 @@ $('#new_member').submit( function(event) {
     url: "/api/v1/enroll",
     data: $("#new_member").serialize(),
     success: function(data) {
-    	if (data.code == 000){
-    		alert (data.message)
+      alert (data.message);
+    	if (data.code == 000)
     		window.location.replace('../members/'+data.v_id);
-    	}else
-    		alert (data.message)
     },
     });
 });
+
+
+$('form[id^="edit_member"]').submit( function(event) {
+  event.preventDefault()
+  $.ajax({
+    type: 'PUT',
+    url: "/api/v1/update_profile",
+    data: $('form[id^="edit_member"]').serialize(),
+    success: function(data) {
+      alert (data.message);
+      if (data.code == 000)
+        window.location.replace('../');
+    },
+  });
+});
+
 
 $('#myTab a:last').tab('show');

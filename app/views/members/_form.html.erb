@@ -65,10 +65,15 @@
           </td>
         </tr>
     </tr> 
+      <%= hidden_field_tag :enrollment_amount, 0.0 %>
+      <%= f.hidden_field :country, :value => "US" %>
     <% end %>
+    
 
-    <%= hidden_field_tag :enrollment_amount, 0.0 %> <!-- Changed to 1 from 0.0 -->
-    <%= f.hidden_field :country, :value => "US" %>
+
+    
+
+
 
     <tr class="control-group">
       <th colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>
