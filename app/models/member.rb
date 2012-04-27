@@ -23,6 +23,18 @@ class Member < ActiveRecord::Base
 
   state_machine :status, :initial => :none do
     after_transition [:none, :lapsed] => :provisional, :do => :schedule_first_membership
+    after_transition :any => :lapsed, :do => :deactivation
+
+    event :set_as_provisional do
+      transition [:none, :lapsed] => :provisional
+    end
+    event :set_as_paid do
+      transition [:provisional, :paid] => :paid
+    end
+    event :deactivate do
+      transition [:provisional, :paid] => :lapsed
+    end
+
 
     # A Member is within their review period. These members have joined a Subscription program that has a “Provisional” 
     # period whereby the Member has an opportunity to review the benfits of the program risk free for the duration of 
@@ -44,15 +56,14 @@ class Member < ActiveRecord::Base
   end
 
   def schedule_first_membership
-    bill_date = Date.today + terms_of_membership.trial_days
-    next_retry_bill_date = bill_date
+    # TODO: send welcome email 
+    self.bill_date = Date.today + terms_of_membership.trial_days
+    self.next_retry_bill_date = bill_date
     if terms_of_membership.monthly?
-      quota = 1
+      self.quota = 1
     end
-    #@membership.save
-    #Delayed::Job.enqueue(MembershipBillingJob.new(@membership.id),0,bill_date)
-    #Delayed::Job.enqueue(SendRenewJob.new(member_id,bill_date),20,5.minutes.from_now)
-
+    self.join_date = DateTime.now 
+    self.save
   end
 
   def full_name
@@ -67,17 +78,120 @@ class Member < ActiveRecord::Base
     address # TODO: something like "#{self.address}, #{self.city}, #{self.state}"
   end
 
+  def schedule_renewal
+    new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
+    if self.monthly?
+      self.quota = self.quota + 1
+      if self.recycled_times > 1
+        new_bill_date = DateTime.now + eval(terms_of_membership.installment_type)
+      end
+    elsif self.yearly?
+      # refs #15935
+      self.quota = self.quota + 12
+    end
+    bill_date = new_bill_date
+    next_retry_bill_date = new_bill_date
+    save
+    # TODO: Audit 
+  end
+
+  def send_pre_bill
+    # TODO: send prebill email
+  end
+
+  def deactivation
+    self.next_retry_bill_date = nil
+    self.bill_date = nil
+    # TODO: Audit 
+  end
+
+  def set_decline_strategy(trans)
+    # soft / hard decline
+    decline = DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
+                trans.response_code, trans.installment_type, trans.credit_card_type) || 
+              DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
+                trans.response_code, trans.installment_type, "all")
+
+    deactivate = false
+    if decline.nil?
+      # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
+      message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_message}"
+      self.next_retry_bill_date = Date.today + 30.days
+      Notifier.deliver_decline_strategy_not_found(message, self.id, @campaign)
+    else
+      trans.update_attribute :decline_strategy_id, decline.id
+      if decline.hard_decline?
+        message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_message}"
+        deactivate = true
+      else
+        message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_message}"
+        if trans.response_code == "9999"
+          self.next_retry_bill_date = terms_of_membership.grace_period.to_i.days.from_now
+        else
+          self.next_retry_bill_date = decline.days.days.from_now
+        end
+        if self.recycled_times > (decline.limit-1)
+          message = "Soft decline limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_message}"
+          deactivate = true
+        end
+      end
+    end
+    if deactivate
+      deactivate!
+    else
+      increment(:recycled_times, 1)
+    end
+  end
+
+  def bill_membership
+    if provisional? or paid?
+      amount = self.terms_of_membership.installment_amount
+      if amount.to_f > 0.0
+        # Grace period
+        # why cero times? Because only 1 time must be Billed.
+        # Before we were using times = 1. Problem is that times = 1, on case logic will allow times values [0,1].
+        # So grace period will be granted twice.
+        #        limit = 0 
+        #        days  = campaign.grace_period
+        if credit_card.nil?
+          answer = if terms_of_membership.grace_period > 0
+            { :code => "9999", :message => "Credit card is blank. Allowing grace period" }
+          else
+            { :code => "9997", :message => "Credit card is blank and grace period is disabled" }
+          end
+        else
+          # TODO: @member.cc_year_exp=card_expired_rule(@member.cc_year_exp)
+          trans = Transaction.new
+          trans.transaction_type = "sale"
+          trans.prepare(self, self.credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
+          answer = trans.process
+          if trans.success?
+            credit_card.accepted_on_billing
+            set_as_paid!
+            schedule_renewal
+            message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
+            Auditory.audit(nil, self, message, self)
+            { :message => message, :code => "000", :member_id => self.id }
+          else
+            set_decline_strategy(trans)
+            Auditory.audit(nil, self, answer)
+            Auditory.add_redmine_ticket
+            answer
+          end
+        end
+      else
+        { :message => "Called billing method but no amount on TOM is set.", :code => "9887" }
+      end
+    end
+  end
+
   def enroll(credit_card, amount, agent = nil)
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
       answer = trans.process
-      unless trans.success?
-        Auditory.audit(agent, self, answer)
-        Auditory.add_redmine_ticket
-        return answer
-      end
+      return answer unless trans.success?
     end
 
     begin
@@ -93,7 +207,7 @@ class Member < ActiveRecord::Base
         trans.save
         credit_card.accepted_on_billing
       end
-      # if amount.to_f == 0.0 => TODO: we should activate this member!!!!
+      set_as_provisional!
       message = "Member enrolled successfully $#{amount}"
       Auditory.audit(agent, self, message, self)
       self.reload

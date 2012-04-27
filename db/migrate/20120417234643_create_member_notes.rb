@@ -4,8 +4,8 @@ class CreateMemberNotes < ActiveRecord::Migration
       t.integer :member_id, :limit => 8
       t.integer :created_by_id, :limit => 8
       t.text :description
-      t.string :note_type
-      t.string :communication_type
+      t.integer :disposition_type_id
+      t.integer :communication_type_id
       t.timestamps
     end
     execute "ALTER TABLE member_notes ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 

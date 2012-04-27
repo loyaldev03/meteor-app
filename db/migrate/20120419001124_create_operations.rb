@@ -5,7 +5,6 @@ class CreateOperations < ActiveRecord::Migration
       t.text :description
       t.datetime :operation_date
       t.integer :created_by_id
-      t.string :status
       t.references :resource, :polymorphic => true
       t.timestamps
     end

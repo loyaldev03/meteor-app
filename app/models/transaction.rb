@@ -71,7 +71,7 @@ class Transaction < ActiveRecord::Base
       #when "authorization_capture"
       #  authorization_capture
       else
-        { :message=>"operation not supported",:code=> 902 }
+        { :message=>"operation not supported",:code=> '902' }
     end
   end  
 
@@ -87,9 +87,15 @@ class Transaction < ActiveRecord::Base
     gateway == "litle"
   end
 
-
-  # TODO: find out if this transaction is a decline
-  # decline_strategy_id: nil
+  # we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
+  # ["switch", "visa", "diners_club", "master", "forbrugsforeningen", "dankort", 
+  #    "laser", "american_express", "solo", "jcb", "discover", "maestro"]
+  def credit_card_type
+    # TODO: terminar
+    c = credit_card
+    c.valid?
+    c.type
+  end
 
 
   private
@@ -108,7 +114,11 @@ class Transaction < ActiveRecord::Base
           save_response(purchase_response)
         else
           errors = @credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
-          { :message => "Credit card not valid: #{errors}", :code => "9332" }
+          message = "Credit card not valid: #{errors}"
+          self.response_code = "9332"
+          self.response_result = message
+          self.save
+          { :message => message, :code => "9332" }
         end
       end
     end
@@ -131,7 +141,7 @@ class Transaction < ActiveRecord::Base
         end
         {:message=>response.message,:code=>"000"}
       else
-        {:message=>"Error: " + response.message,:code=>response.params['error_code']}
+        {:message=>"Error: " + response.message,:code=>response_code}
       end      
     end
 

@@ -23,7 +23,7 @@ class CreateMembers < ActiveRecord::Migration
       t.date :next_retry_bill_date
       t.integer :created_by_id
       t.integer :quota, :default => 0
-      t.boolean :recyle, :default => false
+      t.integer :recycled_times, :default => 0
       t.timestamps
     end
   end

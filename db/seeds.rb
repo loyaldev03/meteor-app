@@ -6,10 +6,14 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-data = 'test@test.com.ar'
+data = 'batch@xagax.com.ar'
 u = Agent.new :email => data, :username => data, :password => data, :password_confirmation => data
 u.save!
 
+
+data = 'test@test.com.ar'
+u = Agent.new :email => data, :username => data, :password => data, :password_confirmation => data
+u.save!
 u.confirm!
 
 p = Partner.new :prefix => 'NFL', :name => 'NFL'
@@ -44,11 +48,29 @@ pgc.club = c2
 pgc.save!
 
 
-tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "30.days", 
+tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "1.month", 
   :needs_enrollment_approval => false, :name => "test2"
 tom.club = c
 tom.save!
-tom = TermsOfMembership.new :installment_amount => 45, :installment_type => "30.days", 
+tom = TermsOfMembership.new :installment_amount => 45, :installment_type => "1.year", 
   :needs_enrollment_approval => false, :name => "test"
 tom.club = c2
 tom.save!
+
+
+[ 'incomming call' ,  'outbound call' ,  'email' ,  'chat' , 'others' ].each do |name|
+  c = CommunicationType.new
+  c.name = name
+  c.save
+end
+
+[ c.id, c2.id ].each do |id|
+  [ 'confirm', 'Website Question', 'technical support', 'Benefits question', 'Pre bill Cancellation', 
+    'Post bill cancellation', 'Pre Bill Save', 'Product question', 'Deals and Discounts', 
+    'Club cash question', 'VIP non program', 'Local Chapter question' ].each do |name|
+    c = CommunicationType.new
+    c.name = name
+    c.club_id = id
+    c.save
+  end
+end

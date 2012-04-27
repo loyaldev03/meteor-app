@@ -14,6 +14,8 @@ gem 'attr_encrypted'
 
 gem 'exception_notification', :require => 'exception_notifier'
 
+gem 'acts_as_list'
+
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do

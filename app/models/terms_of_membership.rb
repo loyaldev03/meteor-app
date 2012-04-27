@@ -17,7 +17,21 @@ class TermsOfMembership < ActiveRecord::Base
   validates :installment_amount, :presence => true
   validates :installment_type, :presence => true
 
-  MODES = ['development', 'production']
+
+  ###########################################
+  # Installment types:
+  def monthly?
+    installment_type == "1.month"
+  end
+
+  def yearly?
+    installment_type == "1.year"
+  end
+
+  def lifetime?
+    installment_type == "lifetime"
+  end
+  #################################
   
   def production?
     self.mode == 'production'
