@@ -1,6 +1,7 @@
 class CreateTransactions < ActiveRecord::Migration
   def up
     create_table :transactions, {:id => false} do |t|
+      t.string :uuid, :limit => 36
       t.string :member_id, :limit => 36
       t.integer :terms_of_membership_id, :limit => 8
       # payment gateway configuration
@@ -41,7 +42,6 @@ class CreateTransactions < ActiveRecord::Migration
 
       t.timestamps
     end
-    execute "ALTER TABLE transactions ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;" 
   end
   def down
     drop_table :transactions

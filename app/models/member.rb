@@ -75,7 +75,7 @@ class Member < ActiveRecord::Base
   end
 
   def full_address
-    address # TODO: something like "#{self.address}, #{self.city}, #{self.state}"
+    [address, city, state].join(' ')
   end
 
   def schedule_renewal
