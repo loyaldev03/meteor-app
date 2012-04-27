@@ -57,12 +57,13 @@ class Member < ActiveRecord::Base
 
   def schedule_first_membership
     # TODO: send welcome email 
-    bill_date = Date.today + terms_of_membership.trial_days
-    next_retry_bill_date = bill_date
+    self.bill_date = Date.today + terms_of_membership.trial_days
+    self.next_retry_bill_date = bill_date
     if terms_of_membership.monthly?
-      quota = 1
+      self.quota = 1
     end
-    join_date = DateTime.now 
+    self.join_date = DateTime.now 
+    self.save
   end
 
   def full_name
@@ -190,11 +191,7 @@ class Member < ActiveRecord::Base
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
       answer = trans.process
-      unless trans.success?
-        Auditory.audit(agent, self, answer)
-        Auditory.add_redmine_ticket
-        return answer
-      end
+      return answer unless trans.success?
     end
 
     begin
