@@ -4,5 +4,8 @@ class Enumeration < ActiveRecord::Base
 
   acts_as_paranoid
   acts_as_list :scope => [:enumeration_type, :club_id]
+
+  validates_presence_of :name
+  validates_uniqueness_of :name, :scope => [:enumeration_type, :club_id]
   
 end
