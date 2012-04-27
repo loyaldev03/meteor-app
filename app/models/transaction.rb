@@ -97,8 +97,56 @@ class Transaction < ActiveRecord::Base
     @cc.type
   end
 
+  def self.refund(old_transaction, amount)
+    trans = Transaction.new
+    if old_transaction.amount == amount
+      trans.transaction_type = "refund"
+    elsif old_transaction.amount > amount
+      trans.transaction_type = "credit"
+    else 
+      return { :message => "Cant refund more $ than the original transaction amount", :code => '9788' }
+    end
+    trans.prepare(old_transaction.member, old_transaction.credit_card, amount, 
+        old_transaction.member.terms_of_membership.payment_gateway_configuration)
+    trans.process
+  end
+
+
 
   private
+
+    def credit
+      if payment_gateway_configuration.nil?
+        { :message => "Payment gateway not found.", :code => "9999" }
+      else
+        verify_card
+        if @cc.valid?
+          load_gateway
+          a = (amount.to_f * 100)
+          credit_response=@gateway.credit(a, @cc, @options)
+          save_response(credit_response)
+        else
+          credit_card_invalid
+        end
+      end
+    end
+
+    def refund
+      if payment_gateway_configuration.nil?
+        { :message => "Payment gateway not found.", :code => "9999" }
+      else
+        verify_card
+        if @cc.valid?
+          load_gateway
+          a = (amount.to_f * 100)
+          refund_response=@gateway.refund(a, self.response_transaction_id, @options)
+          save_response(refund_response)
+        else
+          credit_card_invalid
+        end
+      end
+    end    
+
     # Process only sale operations
     def sale
       if payment_gateway_configuration.nil?
@@ -113,14 +161,18 @@ class Transaction < ActiveRecord::Base
           purchase_response = @gateway.purchase(a, @cc, @options)
           save_response(purchase_response)
         else
-          errors = @cc.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
-          message = "Credit card not valid: #{errors}"
-          self.response_code = "9332"
-          self.response_result = message
-          self.save
-          { :message => message, :code => "9332" }
+          credit_card_invalid
         end
       end
+    end
+
+    def credit_card_invalid
+      errors = @cc.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
+      message = "Credit card not valid: #{errors}"
+      self.response_code = "9332"
+      self.response_result = message
+      self.save
+      { :message => message, :code => "9332" }
     end
 
     def save_response(answer)
