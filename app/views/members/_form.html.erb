@@ -1,83 +1,76 @@
 <table class="table table-condensed"> 
-  <thead>
-    <tr class="control-group" ><td colspan="2"> <b> Demographic Information </b> </td></tr>
-    <tr class="control-group" >  
-      <td> 
-        <%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline' %> 
-        <%= f.text_field :first_name, :class => 'text_field'%>
-      </td>
-      <td> 
-        <%= f.label :last_name,t('activerecord.attributes.member.last_name'), :class => 'help-inline' %> 
-        <%= f.text_field :last_name, :class => 'text_field'%> 
-      </td>
-    </tr>
-    <tr class="control-group" >
-      <td> 
-        <%= f.label :address, t('activerecord.attributes.member.address'), :class => 'help-inline' %> 
-        <%= f.text_field :address, :class => 'text_field'%> 
-      </td>
-      <td> 
-        <%= f.label :city, t('activerecord.attributes.member.city'), :class => 'help-inline' %> 
-        <%= f.text_field :city, :class => 'text_field input-medium'%>
-      </td>
-    </tr>
-    <tr class="control-group" >
-      <td> 
-        <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline' %> 
-        <%= f.text_field :state, :class => 'text_field input-medium'%> 
-      </td>
-      <td colspan="2"> 
-        <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline' %> 
-        <%= f.text_field :zip, :class => 'text_field input-small'%> 
-      </td> 
-    </tr>
-    <tr class="control-group" ><td colspan="2"> <b> Contact Information </b> </td></tr>
-    <tr class="control-group" >
-      <td> 
-        <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline' %>
-        <%= f.text_field :phone_number, :class => 'text_field input-medium'%> 
-      </td>
-      <td> 
-        <%= f.label :email, t('email'), :class => 'help-inline' %> 
-        <%= f.text_field :email, :class => 'text_field'%> 
-      </td>
-    </tr>  
+  <tr class="control-group" ><td colspan="2"> <b> Demographic Information </b> </td></tr>
+  <tr class="control-group" >  
+    <td> 
+      <%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline' %> 
+      <%= f.text_field :first_name, :class => 'text_field'%>
+    </td>
+    <td> 
+      <%= f.label :last_name,t('activerecord.attributes.member.last_name'), :class => 'help-inline' %> 
+      <%= f.text_field :last_name, :class => 'text_field'%> 
+    </td>
+  </tr>
+  <tr class="control-group" >
+    <td> 
+      <%= f.label :address, t('activerecord.attributes.member.address'), :class => 'help-inline' %> 
+      <%= f.text_field :address, :class => 'text_field'%> 
+    </td>
+    <td> 
+      <%= f.label :city, t('activerecord.attributes.member.city'), :class => 'help-inline' %> 
+      <%= f.text_field :city, :class => 'text_field input-medium'%>
+    </td>
+  </tr>
+  <tr class="control-group" >
+    <td> 
+      <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline' %> 
+      <%= f.text_field :state, :class => 'text_field input-medium'%> 
+    </td>
+    <td colspan="2"> 
+      <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline' %> 
+      <%= f.text_field :zip, :class => 'text_field input-small'%> 
+    </td> 
+  </tr>
+  <tr class="control-group" ><td colspan="2"> <b> Contact Information </b> </td></tr>
+  <tr class="control-group" >
+    <td> 
+      <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline' %>
+      <%= f.text_field :phone_number, :class => 'text_field input-medium'%> 
+    </td>
+    <td> 
+      <%= f.label :email, t('email'), :class => 'help-inline' %> 
+      <%= f.text_field :email, :class => 'text_field'%> 
+    </td>
+  </tr>  
 
-    <% if @member.new_record? %>
-    <tr class="control-group" >
-      <td colspan="2"> 
-        <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
-        <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@terms_of_membership, "id", "name") %> 
-      </td>
-    </tr>
-    <tr class="control-group" ><td colspan="2"> <b> Credit Card </b> </td></tr>  
-
-
-        <tr class="control-group" >
-          <td> 
-            <%= f.label :encrypted_number, t('activerecord.attributes.credit_card.encrypted_number'), :class => 'help-inline' %> 
-            <%= text_field :credit_card, :number, :class => 'text_field input-medium'%> 
-          <td> 
-            <%= f.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' %> 
-            <%= text_field :credit_card, :expire_month, :class => 'text_field input-medium'%>
-            <%= f.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %> 
-            <%= text_field :credit_card, :expire_year, :class => 'text_field input-small' %>
-          </td>
-        </tr>
-    </tr> 
-      <%= hidden_field_tag :enrollment_amount, 0.0 %>
-      <%= f.hidden_field :country, :value => "US" %>
-    <% end %>
-    
+  <% if @member.new_record? %>
+  <tr class="control-group" >
+    <td colspan="2"> 
+      <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
+      <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@terms_of_membership, "id", "name") %> 
+    </td>
+  </tr>
+  <tr class="control-group" ><td colspan="2"> <b> Credit Card </b> </td></tr>  
 
 
-    
-
-
-
-    <tr class="control-group">
-      <th colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>
-      <%= link_to t(:Cancel), :back, :class => 'btn' %> </th>
-    </tr>
-  <thead>
+      <tr class="control-group" >
+        <td> 
+          <%= f.label :encrypted_number, t('activerecord.attributes.credit_card.encrypted_number'), :class => 'help-inline' %> 
+          <%= text_field :credit_card, :number, :class => 'text_field input-medium'%> 
+        <td> 
+          <%= f.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' %> 
+          <%= text_field :credit_card, :expire_month, :class => 'text_field input-medium'%>
+          <%= f.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %> 
+          <%= text_field :credit_card, :expire_year, :class => 'text_field input-small' %>
+        </td>
+      </tr>
+  </tr> 
+  <% end %>
+  
+  <tr class="control-group">
+    <th colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t(:Cancel), :back, :class => 'btn' %> </th>
+  </tr>
 </table>
+      
+<%= hidden_field_tag :enrollment_amount, 0.0 %>
+<%= f.hidden_field :country, :value => "US" %>
