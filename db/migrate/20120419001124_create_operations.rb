@@ -3,7 +3,6 @@ class CreateOperations < ActiveRecord::Migration
     create_table :operations, {:id => false} do |t|
       t.string :member_id, :limit => 36
       t.text :description
-      t.text :notes
       t.datetime :operation_date
       t.integer :created_by_id
       t.references :resource, :polymorphic => true
