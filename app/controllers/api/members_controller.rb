@@ -36,7 +36,7 @@ class Api::MembersController < ApplicationController
 
   def update_profile
     response = {}
-    member = Member.find_by_visible_id (params[:id]) 
+    member = Member.find_by_visible_id_and_club_id(params[:id],params[:club_id]) 
     if member.update_attributes(params[:member]) 
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member)

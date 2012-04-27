@@ -4,6 +4,7 @@
 
 <script> 
   var visible_id = <%= @member.visible_id %>; 
+  var club_id = <%= @current_club.id %>
 </script> 
 
 <%= form_for @member,:html => { :class => 'form-horizontal' } do |f| %>
