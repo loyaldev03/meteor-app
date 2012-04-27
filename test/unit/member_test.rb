@@ -17,6 +17,14 @@ class MemberTest < ActiveSupport::TestCase
   	assert !member.save
   end
 
+<<<<<<< HEAD
+  test "Member should not be billed if it is not paid or provisional" do
+    member = FactoryGirl.create(:lapsed_member)
+    answer = member.bill_membership
+    assert !(answer[:code] == "000")
+  end
+
+=======
   test "Should not save with an invalid email" do
     member = FactoryGirl.build(:member, :email => 'testing.com.ar')
     member.valid?
@@ -37,4 +45,5 @@ class MemberTest < ActiveSupport::TestCase
   end
 
 
+>>>>>>> a0ef68b4849253bdb2927d6fd31a5a4721d398a9
 end

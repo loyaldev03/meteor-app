@@ -9,7 +9,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "save operation" do
     assert_difference('Operation.count') do
-      Auditory.audit!(@current_agent, @member, "test")
+      Auditory.audit(@current_agent, @member, "test")
     end
   end
 end

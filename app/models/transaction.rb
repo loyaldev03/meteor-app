@@ -1,4 +1,6 @@
 class Transaction < ActiveRecord::Base
+  include Extensions::UUID
+
   belongs_to :member
   belongs_to :payment_gateway_configuration
   belongs_to :decline_strategy
@@ -91,10 +93,8 @@ class Transaction < ActiveRecord::Base
   # ["switch", "visa", "diners_club", "master", "forbrugsforeningen", "dankort", 
   #    "laser", "american_express", "solo", "jcb", "discover", "maestro"]
   def credit_card_type
-    # TODO: terminar
-    c = credit_card
-    c.valid?
-    c.type
+    @cc.valid?
+    @cc.type
   end
 
 
@@ -107,13 +107,13 @@ class Transaction < ActiveRecord::Base
         { :message => "Transaction success. Amount $0", :code => "000" }
       else
         verify_card
-        if @credit_card.valid?
+        if @cc.valid?
           load_gateway
           a = (amount.to_f * 100)
-          purchase_response = @gateway.purchase(a, @credit_card, @options)
+          purchase_response = @gateway.purchase(a, @cc, @options)
           save_response(purchase_response)
         else
-          errors = @credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
+          errors = @cc.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
           message = "Credit card not valid: #{errors}"
           self.response_code = "9332"
           self.response_result = message
@@ -147,7 +147,7 @@ class Transaction < ActiveRecord::Base
 
     def verify_card
       ActiveMerchant::Billing::CreditCard.require_verification_value = false
-      @credit_card ||= ActiveMerchant::Billing::CreditCard.new(
+      @cc ||= ActiveMerchant::Billing::CreditCard.new(
         :number     => number,
         :month      => expire_month,
         :year       => expire_year,
