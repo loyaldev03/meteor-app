@@ -41,6 +41,8 @@ gem 'jquery-rails'
 
 gem 'rails3_acts_as_paranoid'
 
+gem 'jquery-datatables-rails'
+
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 

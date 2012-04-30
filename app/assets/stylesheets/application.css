@@ -11,6 +11,8 @@
  *= require_self
  *= requiretwitter/bootstrap
  *= require_tree .
+ *= require dataTables/jquery.dataTables
+ *= require dataTables/jquery.dataTables.bootstrap
 */
 form .clearfix:before, form .clearfix:after {
   display: inline;
@@ -20,4 +22,3 @@ form .clearfix:before, form .clearfix:after {
 	color: #FFFFFF;
 	background-color: red;
 }
-	
