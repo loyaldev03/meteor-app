@@ -47,3 +47,7 @@ $('form[id^="edit_member"]').submit( function(event) {
 
 
 $('#myTab a:last').tab('show');
+
+if (credit_card_expired){
+  $('#active_credit_card_table').addClass("card_expired")
+}
