@@ -54,11 +54,15 @@
 
 <table class="table table-bordered table-condensed">
   <thead>
-  <tr>
-    <th colspan="5"> Active Credit card </th>
-  </tr>
-
+    <tr>
+      <th colspan="5"> Active Credit card </th>
+    </tr>
   </thead>
+  <tr>
+    <td> <%= t("activerecord.attributes.credit_card.number") %> <%= @active_credit_card.number %> </td>
+    <td> <%= t("activerecord.attributes.credit_card.expire_date") %> 
+         <%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %> 
+    </td>
 </table>
 
 <ul class="nav nav-tabs">
@@ -74,4 +78,3 @@
   <div class="tab-pane" id="credit_cards"><%= render :partial => 'credit_cards', :locals => { :credit_cards => @credit_cards} %></div>  
   <div class="tab-pane" id="transactions"><%= render :partial => 'transactions', :locals => { :transactions => @transactions} %></div>  
 </div>
-
