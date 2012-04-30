@@ -8,10 +8,10 @@
   <% credit_cards.each do |cc| %>
   <tr>
     <td>
-      <%= cc.number %>
+      <%= t('activerecord.attributes.credit_card.number') %>: <%= cc.number %>
     </td>
     <td>
-      <%= cc.expire_month %> / <%= cc.expire_year %>
+      <%= t('activerecord.attributes.credit_card.expire_date') %>: <%= cc.expire_month %> / <%= cc.expire_year %>
     </td>
   </tr>
   <% end %>
