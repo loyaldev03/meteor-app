@@ -31,7 +31,7 @@
   </thead>  
   <tr>
     <td> <%= t('activerecord.attributes.member.phone_number') %>: <%= @member.phone_number %> </td>
-    <td> <%= t('email') %>: <%= @member.email %> </td>
+    <td> <i class="icon-envelope"> </i> <%= @member.email %> </td>
   </tr>
 </table>
 
@@ -43,12 +43,15 @@
   </thead>  
   <tr>
     <td> <%= t('activerecord.attributes.member.current_status') %>: <%= @member.status %> </td>
-    <td> <%= t('activerecord.attributes.member.member_since_date') %>: <%= @member.created_at %> </td>
-    <td> <%= t('activerecord.attributes.member.join_date') %>: <%= @member.join_date %> </td>
+    <td> <%= t('activerecord.attributes.member.member_since_date') %>: 
+         <%= I18n.l @member.created_at, :format => :long%> </td>
+    <td> <%= t('activerecord.attributes.member.join_date') %>: 
+         <%= I18n.l @member.join_date, :format => :long %> </td>
   </tr>
   <tr>
     <td> <%= t('activerecord.attributes.member.next_bill_date') %>: <%= @member.bill_date %> </td>
-    <td colspan="2"> <%= t('activerecord.attributes.member.cancel_date') %>: <%= @member.cancel_date %> </td>
+    <td colspan="2"> <%= t('activerecord.attributes.member.cancel_date') %>: 
+                     <%= I18n.l @member.cancel_date, :format => :long if @member.cancel_date != nil %> </td>
   </tr>
 </table>
 

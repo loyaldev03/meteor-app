@@ -7,7 +7,7 @@
   <% operations.each do |operation| %>
   <tr>
     <td>
-      <%= l(operation.operation_date) %>
+      <%= I18n.l operation.operation_date, :format => :long %>
     </td>
     <td>
       <%= link_to operation.description[0..50], "#" %>
