@@ -14,7 +14,7 @@
         <%= I18n.l operation.operation_date, :format => :long %>
       </td>  
       <td>
-        <%= link_to operation.description[0..50], "#" %>
+        <%= link_to operation.description[0..50], operation_path(@current_partner.prefix,@current_club.name,@member.visible_id,:id => operation.id) %>
       </td>
       <td>
         <%= operation.notes[0..50] if operation.notes != nil %> 

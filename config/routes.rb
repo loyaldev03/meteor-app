@@ -20,6 +20,9 @@ SacPlatform::Application.routes.draw do
     resources :clubs
     scope '/club/:club_prefix' do
       resources :members
+      scope '/member/:member_prefix' do
+        resources :operations
+      end
     end
     resources :domains
     resources :terms_of_memberships

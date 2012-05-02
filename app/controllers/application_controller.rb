@@ -42,4 +42,20 @@ class ApplicationController < ActionController::Base
       end
     end
 
+    def validate_member_presence
+      if current_agent 
+        if params[:member_prefix].nil?
+          flash[:error] = "No member was selected."
+          redirect_to clubs_path
+          false
+        else
+          @current_member = Member.find_by_visible_id(params[:member_prefix])
+          if @current_member.nil?
+            flash[:error] = "No member was selected."
+            redirect_to clubs_path
+            false
+          end
+        end
+      end
+    end
 end
