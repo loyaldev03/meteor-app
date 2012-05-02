@@ -23,13 +23,13 @@ class MembersController < ApplicationController
   end
 
   def refund
+    @transaction = Transaction.find_by_uuid_and_member_id params[:transaction_id], @current_member.uuid
     if request.post?
-      transaction = Transaction.find_by_id_and_member_id params[:old_transaction], @member.uuid
-      if transaction.nil?
+      if @transaction.nil?
         flash.error = "Transaction not found."
         redirect_to member_path
       else
-        answer = Transaction.refund(params[:amount], params[:old_transaction])
+        answer = Transaction.refund(params[:amount], @transaction)
         if answer[:code] == "000"
           flash.notice = answer[:message]
           redirect_to member_path
@@ -42,8 +42,8 @@ class MembersController < ApplicationController
 
   private
     def setup_member
-      @current_member = Member.find_by_visible_id_and_club_id(params[:id], @current_club.id)
+      @current_member = Member.find_by_visible_id_and_club_id(params[:member_prefix], @current_club.id)
       # Sebas hay que reemplazar @memebr por @current_member y borrar la linea de abajo
-      @member = Member.find_by_visible_id_and_club_id(params[:id], @current_club.id)
+      @member = Member.find_by_visible_id_and_club_id(params[:member_prefix], @current_club.id)
     end
 end

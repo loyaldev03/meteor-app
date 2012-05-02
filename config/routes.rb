@@ -19,10 +19,13 @@ SacPlatform::Application.routes.draw do
   scope '/partner/:partner_prefix' do
     resources :clubs
     scope '/club/:club_prefix' do
-      resources :members
+      match '/members/new' => 'members#new', as: 'new_member'
+      match '/members' => 'members#index', as: 'members'
       scope '/member/:member_prefix' do
+        match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
         resources :operations
-        match 'refund/:transaction_id' => 'members#refund', as: 'members_refund', :via => [:get, :post]
+        match '/refund/:transaction_id' => 'members#refund', as: 'member_refund', :via => [:get, :post]
+        match '/' => 'members#show', as: 'show_member', :via => [:get]
       end
     end
     resources :domains

@@ -77,6 +77,10 @@ class Transaction < ActiveRecord::Base
     end
   end  
 
+  def sale?
+    [ 'sale', 'capture' ].include? transaction_type
+  end
+
   def production?
     mode == "production"
   end

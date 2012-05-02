@@ -1,5 +1,4 @@
-
-<table class="table table-bordered">
+<table class="table table-bordered datatable_only_sorting">
   <thead>
     <tr>
       <th colspan="4">Transactions</th>
@@ -17,10 +16,9 @@
       <%= number_to_currency transaction.amount %>
     </td>
     <td>
-      <%= link_to "Refund", members_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning" %>
+      <%= link_to("Refund", member_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning") if transaction.sale? %>
     </td>
   </tr>
   <% end %>
   
 </table>
-<%= will_paginate transactions %>
