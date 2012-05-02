@@ -6,14 +6,16 @@
 	  <td> <%= t('activerecord.attributes.operation.description') %>: <%= @operation.description %> </td>
 	  <td> <%= t('activerecord.attributes.operation.created_by') %>: <%= @operation.created_by.username %> </td>
 	</tr>
+    <%= form_for @operation, :as => :operation, :url => operation_path(:id => @operation), do |f|%>
 	<tr> 
-	  <td colspan ="2">
-	  <%= form_for @operation, :as => :operation, :url => operation_path(:id => @operation), do |f|%>
-	  	<%= f.text_field :notes, :value => @operation.notes %>
-	    <%= f.submit nil, :class => 'btn btn-primary' %>
-	    <%= link_to t(:Cancel), member_path(:id => @current_member.visible_id), :class => 'btn' %>
-      <% end%>
-	  </td>
-	</tr>
+	  <tr>
+	  	<td colspan="2"> <%= f.text_area :notes, :value => @operation.notes, :size=> "100x18"  %> </td>
+	  </tr>
+	  <tr>
+	    <td colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>
+	         <%= link_to t(:Cancel), member_path(:id => @current_member.visible_id), :class => 'btn' %> </td>
+	  </tr>
+	</tr> 
+    <% end%>
 </table>
 
