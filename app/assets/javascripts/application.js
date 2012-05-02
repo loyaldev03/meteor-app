@@ -66,7 +66,4 @@ $('document').ready( function() {
     "bAutoWidth": false,
   });
 
-  if (credit_card_expired){
-    $('#active_credit_card_table').addClass("card_expired");
-  };
 });

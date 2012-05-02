@@ -6,7 +6,8 @@ class MembersController < ApplicationController
   end
 
   def show
-    @operations = @member.operations.paginate(:page => params[:page], :order => "operation_date DESC")
+   #@operations = @member.operations.paginate(:page => params[:page], :order => "operation_date DESC")
+    @operations = @member.operations.all
     @notes = @member.member_notes.paginate(:page => params[:page], :order => "created_at DESC")
     @credit_cards = @member.credit_cards.paginate(:page => params[:page], :order => "created_at DESC")
     @active_credit_card = @member.active_credit_card

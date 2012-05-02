@@ -1,18 +1,18 @@
 <table class="table table-bordered datatable_only_sorting">
   <thead>
     <tr>
-      <th> Created by </th>
+      <th> Date </th>
       <th> Operation </th>
       <th> Notes </th>
-      <th> Date </th>
+      <th> Created by </th>
     </tr>
   </thead>
   <tbody>
     <% operations.each do |operation| %>
     <tr>
       <td>
-        <%= operation.created_by.username %>
-      </td>
+        <%= I18n.l operation.operation_date, :format => :long %>
+      </td>  
       <td>
         <%= link_to operation.description[0..50], "#" %>
       </td>
@@ -20,8 +20,8 @@
         <%= operation.notes[0..50] if operation.notes != nil %> 
       </td>
       <td>
-        <%= I18n.l operation.operation_date, :format => :long %>
-      </td>  
+        <%= operation.created_by.username %>
+      </td>
     </tr>
     <% end %>
   </tbody>
