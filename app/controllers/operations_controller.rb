@@ -22,7 +22,7 @@ class OperationsController < ApplicationController
       if @operation.update_attributes(params[:operation])
         message = "The operation was successfully updated."
         Auditory.audit(nil, @operation, message, @operation)
-        { :message => message, :code => "000", :operation_id => @operation.id
+        { :message => message, :code => "000", :operation_id => @operation.id }
         format.html { redirect_to operation_path(:id => @operation), notice: message }
         format.json { head :no_content }
       else
