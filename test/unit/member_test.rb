@@ -23,6 +23,14 @@ class MemberTest < ActiveSupport::TestCase
     assert !(answer[:code] == "000")
   end
 
+  test "Member should be billed if it is paid or provisional" do
+    assert_difference('Operation.count') do
+      member = FactoryGirl.create(:provisional_member)
+      answer = member.bill_membership
+      assert (answer[:code] == "000"), answer.inspect
+    end
+  end
+
   test "Should not save with an invalid email" do
     member = FactoryGirl.build(:member, :email => 'testing.com.ar')
     member.valid?

@@ -1,6 +1,6 @@
 class MembersController < ApplicationController
   before_filter :validate_club_presence
-  before_filter :setup_member, :only => [ :show, :edit ]
+  before_filter :setup_member, :only => [ :show, :edit, :refund ]
 
   def index
   end
@@ -22,8 +22,28 @@ class MembersController < ApplicationController
   def edit  
   end
 
+  def refund
+    if request.post?
+      transaction = Transaction.find_by_id_and_member_id params[:old_transaction], @member.uuid
+      if transaction.nil?
+        flash.error = "Transaction not found."
+        redirect_to member_path
+      else
+        answer = Transaction.refund(params[:amount], params[:old_transaction])
+        if answer[:code] == "000"
+          flash.notice = answer[:message]
+          redirect_to member_path
+        else
+          flash.now.error = answer[:message]
+        end
+      end
+    end
+  end
+
   private
     def setup_member
+      @current_member = Member.find_by_visible_id_and_club_id(params[:id], @current_club.id)
+      # Sebas hay que reemplazar @memebr por @current_member y borrar la linea de abajo
       @member = Member.find_by_visible_id_and_club_id(params[:id], @current_club.id)
     end
 end

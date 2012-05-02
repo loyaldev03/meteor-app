@@ -97,7 +97,7 @@ class Transaction < ActiveRecord::Base
     @cc.type
   end
 
-  def self.refund(old_transaction, amount)
+  def self.refund(amount, old_transaction)
     trans = Transaction.new
     if old_transaction.amount == amount
       trans.transaction_type = "refund"

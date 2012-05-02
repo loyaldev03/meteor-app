@@ -1,7 +1,8 @@
+
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th colspan="2">Transactions</th>
+      <th colspan="4">Transactions</th>
     </tr>
   </thead>
   <% transactions.each do |transaction| %>
@@ -14,6 +15,9 @@
     </td>
     <td>
       <%= number_to_currency transaction.amount %>
+    </td>
+    <td>
+      <%= link_to "Refund", members_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning" %>
     </td>
   </tr>
   <% end %>

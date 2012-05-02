@@ -22,6 +22,7 @@ SacPlatform::Application.routes.draw do
       resources :members
       scope '/member/:member_prefix' do
         resources :operations
+        match 'refund/:transaction_id' => 'members#refund', as: 'members_refund', :via => [:get, :post]
       end
     end
     resources :domains

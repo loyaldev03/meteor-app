@@ -78,33 +78,6 @@ class Member < ActiveRecord::Base
     [address, city, state].join(' ')
   end
 
-  def schedule_renewal
-    new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
-    if terms_of_membership.monthly?
-      self.quota = self.quota + 1
-      if self.recycled_times > 1
-        new_bill_date = DateTime.now + eval(terms_of_membership.installment_type)
-      end
-    elsif terms_of_membership.yearly?
-      # refs #15935
-      self.quota = self.quota + 12
-    end
-    bill_date = new_bill_date
-    next_retry_bill_date = new_bill_date
-    save
-    # TODO: Audit 
-  end
-
-  def send_pre_bill
-    # TODO: send prebill email
-  end
-
-  def deactivation
-    self.next_retry_bill_date = nil
-    self.bill_date = nil
-    # TODO: Audit 
-  end
-
 
   def bill_membership
     if provisional? or paid?
@@ -188,6 +161,34 @@ class Member < ActiveRecord::Base
   end
 
   private
+
+    def schedule_renewal
+      new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
+      if terms_of_membership.monthly?
+        self.quota = self.quota + 1
+        if self.recycled_times > 1
+          new_bill_date = DateTime.now + eval(terms_of_membership.installment_type)
+        end
+      elsif terms_of_membership.yearly?
+        # refs #15935
+        self.quota = self.quota + 12
+      end
+      bill_date = new_bill_date
+      next_retry_bill_date = new_bill_date
+      save
+      # TODO: Audit 
+    end
+
+    def send_pre_bill
+      # TODO: send prebill email
+    end
+
+    def deactivation
+      self.next_retry_bill_date = nil
+      self.bill_date = nil
+      # TODO: Audit 
+    end
+
     def set_decline_strategy(trans)
       # soft / hard decline
       type = self.terms_of_membership.installment_type

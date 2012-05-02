@@ -3,7 +3,13 @@
     <div class="well sidebar-nav">
       Hello <%= current_agent.email %> <br>
       <h3>Sidebar</h3>
-      <% if @current_partner %>
+      <% if @current_member %>
+        <ul class="nav nav-list">
+          <li class="nav-header">Member</li>
+          <li><%= link_to "Member Dashboard", member_path(:id => @current_member.visible_id) %></li>
+          <li><%= link_to "Club Dashboard", members_path %></li>
+        </ul>
+      <% elsif @current_partner %>
         <ul class="nav nav-list">
           <li class="nav-header">General</li>
           <li><%= link_to "Domains", domains_path  %></li>
