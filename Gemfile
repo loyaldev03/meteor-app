@@ -55,6 +55,7 @@ gem 'jquery-datatables-rails'
 # To use debugger
 group :development do
   gem 'ruby-debug19', :require => 'ruby-debug'
+  gem "rails-erd"
 end
 
 group :test do
