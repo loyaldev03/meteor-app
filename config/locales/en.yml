@@ -47,6 +47,10 @@ en:
         expire_date: 'Expire date'
         expire_month: 'Expire month'
         expire_year: 'Expire year'
+      operation:
+        operation_date: 'Operation date'
+        description: 'Description'
+        created_by: 'Created by'
   date:
     formats:
       default: "%d/%m/%Y"
