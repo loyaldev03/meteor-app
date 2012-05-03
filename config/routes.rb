@@ -23,7 +23,7 @@ SacPlatform::Application.routes.draw do
       match '/members' => 'members#index', as: 'members'
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
-        resources :operations
+        resources :operations, :only => [ :show, :update ]
         match '/refund/:transaction_id' => 'members#refund', as: 'member_refund', :via => [:get, :post]
         match '/' => 'members#show', as: 'show_member', :via => [:get]
       end
