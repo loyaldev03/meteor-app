@@ -2,7 +2,7 @@ class CreditCard < ActiveRecord::Base
   belongs_to :member
   has_many :transactions
 
-  attr_accessible :active, :number, :expire_month, :expire_year
+  attr_accessible :active, :number, :expire_month, :expire_year, :blacklisted
 
   attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
 

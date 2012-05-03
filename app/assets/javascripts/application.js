@@ -50,7 +50,7 @@ $('document').ready( function() {
 
   $('.confirm').click( function(event){
     var answer = confirm('Are you sure?');
-    return answer
+    return answer 
   });
 
   $('#myTab a:last').tab('show');
