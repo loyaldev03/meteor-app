@@ -48,6 +48,10 @@ $('document').ready( function() {
     });
   });
 
+  $('.confirm').click( function(event){
+    var answer = confirm('Are you sure?');
+    return answer
+  });
 
   $('#myTab a:last').tab('show');
 
@@ -65,5 +69,8 @@ $('document').ready( function() {
     "bInfo": false,
     "bAutoWidth": false,
   });
+
+
+
 
 });
