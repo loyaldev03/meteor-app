@@ -2,7 +2,7 @@
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th colspan="2">Credit Cards <%= link_to "Add a credit card", "#", :class => "btn btn-warning" %></th>
+      <th colspan="2">Credit Cards <%= link_to "Add a credit card", new_credit_card_path, :class => "btn btn-warning" %></th>
     </tr>
   </thead>
   <% credit_cards.each do |cc| %>
@@ -12,6 +12,10 @@
     </td>
     <td>
       <%= t('activerecord.attributes.credit_card.expire_date') %>: <%= cc.expire_month %> / <%= cc.expire_year %>
+    </td>
+    <td>
+      <%= link_to 'BlackList', '#', :class => "btn btn-warning" %>
+      <%= link_to 'Activate', '#', :class=> "btn btn-warning" if !cc.active%>
     </td>
   </tr>
   <% end %>
