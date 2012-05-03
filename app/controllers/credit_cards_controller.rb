@@ -9,6 +9,8 @@ class CreditCardsController < ApplicationController
   def add
   	@new_credit_card = CreditCard.new(params[:credit_card])
   	@actual_credit_card = @current_member.active_credit_card
+
+  	#Falta terminar...
   end
 
   def activate

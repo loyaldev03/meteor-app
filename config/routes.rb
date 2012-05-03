@@ -24,6 +24,12 @@ SacPlatform::Application.routes.draw do
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
         resources :operations, :only => [ :show, :update ]
+        resources :credit_cards, :only => [ :new, :create ] do
+          #get :add
+          match '/add/:id' => 'credit_cards#add', as: 'add', :via => [:put]
+          get :activate
+          get :set_as_blacklisted
+        end
         match '/refund/:transaction_id' => 'members#refund', as: 'member_refund', :via => [:get, :post]
         match '/' => 'members#show', as: 'show_member', :via => [:get]
       end
