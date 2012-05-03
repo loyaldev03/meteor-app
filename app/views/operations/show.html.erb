@@ -1,6 +1,10 @@
 <table class="table table-bordered">
 	<tr>
-	  <td> <%= t('activerecord.attributes.operation.operation_date') %>: <%= @operation.operation_date %></td>
+		<td> <%= @current_member.first_name %> <%= @current_member.last_name %> </td>
+		<td> <%= t('activerecord.attributes.member.visible_id') %>: <%= @current_member.visible_id %> </td>
+	<tr>
+	<tr>
+	  <td colspan="2"> <%= t('activerecord.attributes.operation.operation_date') %>: <%= @operation.operation_date %></td>
 	</tr>
 	<tr> 
 	  <td> <%= t('activerecord.attributes.operation.description') %>: <%= @operation.description %> </td>
@@ -9,11 +13,11 @@
     <%= form_for @operation, :as => :operation, :url => operation_path(:id => @operation), do |f|%>
 	<tr> 
 	  <tr>
-	  	<td colspan="2"> <%= f.text_area :notes, :value => @operation.notes, :size=> "100x18"  %> </td>
+	  	<td colspan="3"> <%= f.text_area :notes, :value => @operation.notes, :style => 'width: 99%; height: 300px' %> </td>
 	  </tr>
 	  <tr>
 	    <td colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>
-	         <%= link_to t(:Cancel), member_path(:id => @current_member.visible_id), :class => 'btn' %> </td>
+	         <%= link_to t(:Cancel), show_member_path(:id => @current_member.visible_id), :class => 'btn' %> </td>
 	  </tr>
 	</tr> 
     <% end%>

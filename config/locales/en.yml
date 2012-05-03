@@ -40,6 +40,7 @@ en:
         bill_date: 'Next bill date'
         cancel_date: 'Cancel date'
         terms_of_membership_id: 'Terms of membership'
+        visible_id: 'ID'
       credit_card:
         number: 'Credit card number'
         expire_date: 'Expire date'

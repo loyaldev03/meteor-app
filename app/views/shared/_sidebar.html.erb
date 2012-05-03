@@ -6,7 +6,7 @@
       <% if @current_member %>
         <ul class="nav nav-list">
           <li class="nav-header">Member</li>
-          <li><%= link_to "Member Dashboard", member_path(:id => @current_member.visible_id) %></li>
+          <li><%= link_to "Member Dashboard", show_member_path(:id => @current_member.visible_id) %></li>
           <li><%= link_to "Club Dashboard", members_path %></li>
         </ul>
       <% elsif @current_partner %>
