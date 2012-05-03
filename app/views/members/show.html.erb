@@ -1,12 +1,12 @@
-<h1> <%= @member.visible_id %> - <%= @member.full_name %></h1>
+<h1> <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
 
 <table class="table table-bordered table-condensed">
   <tr>
     <td>
-      <%= link_to 'Edit', edit_member_path(:id => @member.visible_id), :class => "btn btn-warning" %>
-      <%= link_to("Recovery", "#", :class => "btn btn-warning") if @member.lapsed? %>
+      <%= link_to 'Edit', edit_member_path(:id => @current_member.visible_id), :class => "btn btn-warning" %>
+      <%= link_to("Recovery", "#", :class => "btn btn-warning") if @current_member.lapsed? %>
     </td>
-    <% unless @member.lapsed? %>
+    <% unless @current_member.lapsed? %>
       <td>
         <%= link_to "Resend welcome email", "#", :class => "btn btn-warning" %>
         <%= link_to "Password reset", "#", :class => "btn btn-warning" %>
@@ -26,8 +26,8 @@
   </tr>
   <tr>
     <td colspan="5"> 
-      <i class ="icon-home" > </i> <%= @member.full_address %> 
-      <%= link_to t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @member.full_address}&ie=UTF8&om=1", :target => '_blank' %>
+      <i class ="icon-home" > </i> <%= @current_member.full_address %> 
+      <%= link_to t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :target => '_blank' %>
     </td>
   </tr>
 </table>
@@ -39,8 +39,8 @@
     </tr>
   </thead>  
   <tr>
-    <td> <%= t('activerecord.attributes.member.phone_number') %>: <%= @member.phone_number %> </td>
-    <td> <i class="icon-envelope"> </i> <%= @member.email %> </td>
+    <td> <%= t('activerecord.attributes.member.phone_number') %>: <%= @current_member.phone_number %> </td>
+    <td> <i class="icon-envelope"> </i> <%= @current_member.email %> </td>
   </tr>
 </table>
 
@@ -51,16 +51,16 @@
     </tr>
   </thead>  
   <tr>
-    <td> <%= t('activerecord.attributes.member.current_status') %>: <%= @member.status %> </td>
+    <td> <%= t('activerecord.attributes.member.current_status') %>: <%= @current_member.status %> </td>
     <td> <%= t('activerecord.attributes.member.member_since_date') %>: 
-         <%= I18n.l @member.created_at, :format => :long%> </td>
+         <%= I18n.l @current_member.created_at, :format => :long%> </td>
     <td> <%= t('activerecord.attributes.member.join_date') %>: 
-         <%= I18n.l @member.join_date, :format => :long %> </td>
+         <%= I18n.l @current_member.join_date, :format => :long %> </td>
   </tr>
   <tr>
-    <td> <%= t('activerecord.attributes.member.next_bill_date') %>: <%= @member.bill_date %> </td>
+    <td> <%= t('activerecord.attributes.member.next_bill_date') %>: <%= @current_member.bill_date %> </td>
     <td colspan="2"> <%= t('activerecord.attributes.member.cancel_date') %>: 
-                     <%= I18n.l @member.cancel_date, :format => :long if @member.cancel_date != nil %> </td>
+                     <%= I18n.l @current_member.cancel_date, :format => :long if @current_member.cancel_date != nil %> </td>
   </tr>
 </table>
 

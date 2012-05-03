@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
           redirect_to clubs_path
           false
         else
-          @current_member = Member.find_by_visible_id(params[:member_prefix])
+          @current_member = Member.find_by_visible_id_and_club_id(params[:member_prefix], @current_club.id)
           if @current_member.nil?
             flash[:error] = "No member was selected."
             redirect_to clubs_path

@@ -14,7 +14,7 @@
         <%= I18n.l operation.operation_date, :format => :long %>
       </td>  
       <td>
-        <%= link_to operation.description.truncate(50), operation_path(@current_partner.prefix,@current_club.name,@member.visible_id,:id => operation.id) %>
+        <%= link_to operation.description.truncate(50), operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,:id => operation.id) %>
       </td>
       <td>
         <%= operation.notes.truncate(30) if operation.notes != nil %> 

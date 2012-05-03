@@ -1,4 +1,5 @@
 class OperationsController < ApplicationController
+  before_filter :validate_club_presence
   before_filter :validate_member_presence
   layout '2-cols'
 
@@ -6,7 +7,6 @@ class OperationsController < ApplicationController
   # GET /domains/1.json
   def show
     @operation = Operation.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @operation }
