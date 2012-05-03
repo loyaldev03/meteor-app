@@ -21,6 +21,12 @@ en:
     agents: Agents
   activerecord:
     attributes:
+      transaction:
+        transaction_types: 
+          sale: Sale
+          refund: Credit
+          credit: Credit
+          void: Credit
       agent:  
         login: "Username or email"
         password: "Password"

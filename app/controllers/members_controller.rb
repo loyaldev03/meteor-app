@@ -24,18 +24,18 @@ class MembersController < ApplicationController
 
   def refund
     @transaction = Transaction.find_by_uuid_and_member_id params[:transaction_id], @current_member.uuid
+    if @transaction.nil?
+      flash[:error] = "Transaction not found."
+      redirect_to show_member_path
+      return
+    end
     if request.post?
-      if @transaction.nil?
-        flash.error = "Transaction not found."
-        redirect_to member_path
+      answer = Transaction.refund(params[:refund_amount], params[:transaction_id])
+      if answer[:code] == "000"
+        flash[:notice] = answer[:message]
+        redirect_to show_member_path
       else
-        answer = Transaction.refund(params[:amount], @transaction)
-        if answer[:code] == "000"
-          flash.notice = answer[:message]
-          redirect_to member_path
-        else
-          flash.now.error = answer[:message]
-        end
+        flash.now[:error] = answer[:message]
       end
     end
   end
