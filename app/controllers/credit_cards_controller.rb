@@ -4,15 +4,24 @@ class CreditCardsController < ApplicationController
   layout '2-cols'
 
   def new
-    @new_credit_card = CreditCard.new(params[:credit_card])
+    @new_credit_card = CreditCard.new
     @actual_credit_card = @current_member.active_credit_card
   end
 
   def create
-    @new_credit_card = CreditCard.new(params[:credit_card])
+    @credit_card = CreditCard.new(params[:credit_card])
+    @credit_card.member_id = @current_member.id
     @actual_credit_card = @current_member.active_credit_card
-    redirect_to show_member_path
   	#Falta terminar...
+  	respond_to do |format|
+      if @credit_card.save && @actual_credit_card.update_attributes(:active => 0)
+        format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card was successfully created." }
+        format.json { render json: @credit_card, status: :created, location: @credit_Card }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @credit_card.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   def activate
