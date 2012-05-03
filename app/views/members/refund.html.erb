@@ -1,4 +1,4 @@
-<h1> Refund for <%= @current_membercurrent_member.visible_id %> - <%= @current_member.full_name %></h1>
+<h1> Refund for <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
 
 <table class="table table-bordered">
   <% form_tag(member_refund_path(:transaction_id => @transaction)) do %>
@@ -7,8 +7,8 @@
         <td>Amount to refund <%= text_field_tag :refund_amount %> </td>
       </tr>
       <tr>
-        <td> <%= f.submit nil, :class => 'btn btn-primary' %>
-             <%= link_to t(:Cancel), member_path(:id => @current_member.visible_id), :class => 'btn' %> </td>
+        <td> <%= submit_tag "Guardar", :class => 'btn btn-primary' %>
+             <%= link_to t(:Cancel), show_member_path(:id => @current_member.visible_id), :class => 'btn' %> </td>
       </tr>
     </tr> 
   <% end%>

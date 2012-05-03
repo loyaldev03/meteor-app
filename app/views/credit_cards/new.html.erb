@@ -1,9 +1,10 @@
+<%= form_for @credit_card, :as => :credit_card, :url => credit_cards_path(@credit_card), do |f|%>
+
 <table class="table table-bordered" >
   <tr>
 	<td> <%= t('member') %>: <%= @current_member.first_name %> <%= @current_member.last_name %> </td>
 	<td> <%= t('activerecord.attributes.member.visible_id') %>: <%= @current_member.visible_id %> </td>
   <tr>
-  <%= form_for @credit_card, :as => :credit_card, :url => credit_card_add_path(@credit_card), do |f|%>
     <tr>
       <td> 
         <%= f.label :encrypted_number, t('activerecord.attributes.credit_card.encrypted_number'), :class => 'help-inline' %> 
@@ -21,5 +22,5 @@
 		<%= link_to t(:Cancel), :back, :class => 'btn' %> </th>
 	</tr>
 
-  <% end%>
 </table>
+  <% end%>

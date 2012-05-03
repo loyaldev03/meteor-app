@@ -14,8 +14,9 @@
       <%= t('activerecord.attributes.credit_card.expire_date') %>: <%= cc.expire_month %> / <%= cc.expire_year %>
     </td>
     <td>
-      <%= link_to 'BlackList', '#', :class => "btn btn-warning confirm" %>
-      <%= link_to 'Activate', '#', :class=> "btn btn-warning confirm" if !cc.active%>
+      estos botones tienen que hacer un POST (usar form)
+      <%= link_to 'BlackList', credit_card_set_as_blacklisted_path(:credit_card_id => cc.id), :class => "btn btn-warning confirm" %>
+      <%= link_to 'Activate', credit_card_activate_path(:credit_card_id => cc.id), :class=> "btn btn-warning confirm" unless cc.active%>
     </td>
   </tr>
   <% end %>

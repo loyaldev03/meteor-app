@@ -4,12 +4,14 @@ class CreditCardsController < ApplicationController
   layout '2-cols'
 
   def new
+    @new_credit_card = CreditCard.new(params[:credit_card])
+    @actual_credit_card = @current_member.active_credit_card
   end
 
-  def add
-  	@new_credit_card = CreditCard.new(params[:credit_card])
-  	@actual_credit_card = @current_member.active_credit_card
-
+  def create
+    @new_credit_card = CreditCard.new(params[:credit_card])
+    @actual_credit_card = @current_member.active_credit_card
+    redirect_to show_member_path
   	#Falta terminar...
   end
 
@@ -38,6 +40,7 @@ class CreditCardsController < ApplicationController
       else
         format.html { redirect_to member_path(:id => @current_member), error: @credit_card.errors }
         format.json { render json: @credit_card.errors, status: :unprocessable_entity }
+      end
   	end
   end
 
