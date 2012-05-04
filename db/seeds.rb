@@ -68,7 +68,7 @@ end
   [ 'confirm', 'Website Question', 'technical support', 'Benefits question', 'Pre bill Cancellation', 
     'Post bill cancellation', 'Pre Bill Save', 'Product question', 'Deals and Discounts', 
     'Club cash question', 'VIP non program', 'Local Chapter question' ].each do |name|
-    c = CommunicationType.new
+    c = DispositionType.new
     c.name = name
     c.club_id = id
     c.save
