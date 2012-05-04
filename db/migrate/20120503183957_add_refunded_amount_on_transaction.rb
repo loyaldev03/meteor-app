@@ -4,6 +4,6 @@ class AddRefundedAmountOnTransaction < ActiveRecord::Migration
   end
 
   def down
-    remove_column :transactions, :refunded_amount, :decimal
+    remove_column :transactions, :refunded_amount
   end
 end

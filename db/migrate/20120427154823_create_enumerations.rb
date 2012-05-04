@@ -1,7 +1,7 @@
 class CreateEnumerations < ActiveRecord::Migration
   def up
     create_table :enumerations do |t|
-      t.string :enumeration_type
+      t.string :type
       t.string :name
       t.integer :position
       t.integer :club_id, :limit => 8
