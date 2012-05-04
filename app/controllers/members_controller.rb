@@ -57,4 +57,8 @@ class MembersController < ApplicationController
       end
     end
   end
+
+  def cancel
+    
+  end
 end

@@ -1,4 +1,4 @@
-<h1>Save the sale <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
+<h1><%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
 
 <%= form_tag(member_save_the_sale_path) do %>
   <table class="table table-bordered">

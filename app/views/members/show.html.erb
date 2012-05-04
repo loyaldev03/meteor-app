@@ -19,8 +19,7 @@
       </td>
       <td>
         <%= link_to "Blacklist", "#", :class => "btn btn-warning" %>
-        <%= link_to "Cancel future", "#", :class => "btn btn-warning" %>
-        <%= link_to "Cancel", "#", :class => "btn btn-warning" %>
+        <%= link_to("Cancel", member_cancel_path, :class => "btn btn-warning") if @current_member.can_be_canceled? %>
       </td>
     <% end %>
   </tr>
@@ -51,16 +50,7 @@
     </tr>
   </thead>  
   <tr>
-  <td 
-  <% if @current_member.provisional? %>
-    class="provisional"
-    <% elsif @current_member.lapsed? %>
-    class="lapsed"
-    <% elsif @current_member.paid? %>
-    class="paid"
-    <%end%>
-  > 
-         <%= t('activerecord.attributes.member.current_status') %>: <%= @current_member.status %> </td>
+    <td> <%= t('activerecord.attributes.member.current_status') %>: <%= @current_member.status %> </td>
     <td> <%= t('activerecord.attributes.member.member_since_date') %>: 
          <%= I18n.l @current_member.created_at, :format => :long%> </td>
     <td> <%= t('activerecord.attributes.member.join_date') %>: 

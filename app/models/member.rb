@@ -78,6 +78,11 @@ class Member < ActiveRecord::Base
     [address, city, state].join(' ')
   end
 
+  ####  METHODS USED TO SHOW OR NOT BUTTONS. 
+  def can_be_canceled?
+    !self.lapsed?
+  end
+
   def can_save_the_sale?
     self.paid? or self.provisional?
   end
@@ -85,6 +90,7 @@ class Member < ActiveRecord::Base
   def can_bill_membership?
     self.paid? or self.provisional?
   end
+  ###############################################
 
   def save_the_sale(new_tom_id, agent = nil)
     if can_save_the_sale?

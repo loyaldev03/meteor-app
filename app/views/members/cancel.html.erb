@@ -1,0 +1,22 @@
+<h1><%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
+
+<%= form_tag(member_cancel_path) do %>
+  <table class="table table-bordered">
+    <tr>
+      <td>
+        <%= label :cancel_date, t('activerecord.attributes.member.cancel_date'), :class => 'help-inline' %> 
+        <%= text_field_tag :cancel_date %> 
+      </td>
+    </tr>
+    <tr>
+      <td> <%= submit_tag t(:save), :class => 'btn btn-primary' %>
+           <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
+    </tr>
+  </table>
+<% end%>
+
+<script>
+$(function (){
+  $('#cancel_date').datepicker();
+});
+</script>

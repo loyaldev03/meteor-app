@@ -1,4 +1,4 @@
-<h1> Refund for <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
+<h1> <%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
 
 <%= form_tag(member_refund_path(:transaction_id => @transaction)) do %>
   <table class="table table-bordered">
