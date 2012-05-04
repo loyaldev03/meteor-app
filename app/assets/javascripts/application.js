@@ -30,7 +30,7 @@ $('document').ready( function() {
       	if (data.code == 000)
       		window.location.replace('../member/'+data.v_id);
       },
-      });
+    });
   });
 
   $('form[id^="edit_member"]').submit( function(event) {
@@ -58,8 +58,6 @@ $('document').ready( function() {
       var answer = confirm('Are you really sure?')
     return answer 
   });
-
-  $('.datepicker').datepicker();
 
   $('#myTab a:last').tab('show');
 
