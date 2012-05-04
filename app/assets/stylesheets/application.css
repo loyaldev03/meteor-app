@@ -13,7 +13,7 @@
  *= require_tree .
  *= require dataTables/jquery.dataTables
  *= require dataTables/jquery.dataTables.bootstrap
-*/
+*/http://kuler.adobe.com/#create/fromacolor
 form .clearfix:before, form .clearfix:after {
   display: inline;
 }
@@ -21,4 +21,16 @@ form .clearfix:before, form .clearfix:after {
 .card_expired{
 	color: #FFFFFF;
 	background-color: red;
+}
+
+.lapsed{
+	background-color: red;
+}
+
+.provisional{
+	background-color: yellow;
+}
+
+.blacklisted{
+	background-color: #F2F2F2;
 }

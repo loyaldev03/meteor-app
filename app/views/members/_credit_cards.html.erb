@@ -4,14 +4,18 @@
     <tr>
       <th> <%= t('activerecord.attributes.credit_card.number') %> </th>
       <th> <%= t('activerecord.attributes.credit_card.expire_date') %> </th>
+      <th> <%= t('activerecord.attributes.credit_card.last_successful_bill_date') %> </th>
       <th> <%= t('actions') %> </th>
     </tr>
   </thead>
   <tbody>
     <% credit_cards.each do |cc| %>
-    <tr>
+    <tr <% if cc.blacklisted %> 
+          class="blacklisted" 
+        <% end %> >
       <td> <%= cc.number %> </td>
       <td> <%= cc.expire_month %> / <%= cc.expire_year %> </td>
+      <td> <%= I18n.l cc.last_successful_bill_date, :format => :long if !cc.last_successful_bill_date.nil? %> </td>
       <td>
         <%= form_for @cc, :as => :credit_card, :url => credit_card_set_as_blacklisted_path(:credit_card_id => cc.id), do |f|  %> 
           <%= submit_tag 'BlackList', :name => 'blacklist', :class=> "btn btn-warning confirm" %>
@@ -23,7 +27,6 @@
     </tr>
   </tbody>
   <% end %>
-
 </table>
 
-<%= will_paginate credit_cards %>
+
