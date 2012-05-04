@@ -23,7 +23,7 @@ class Member < ActiveRecord::Base
 
   state_machine :status, :initial => :none do
     after_transition [:none, :lapsed, :provisional, :paid] => :provisional, :do => :schedule_first_membership
-    after_transition :any => :lapsed, :do => :deactivation
+    after_transition [:none, :provisional, :paid] => :lapsed, :do => :deactivation
 
     event :set_as_provisional do
       transition [:none, :lapsed, :paid, :provisional] => :provisional
@@ -203,7 +203,7 @@ class Member < ActiveRecord::Base
       bill_date = new_bill_date
       next_retry_bill_date = new_bill_date
       self.save
-      # TODO: Audit 
+      Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date}", self)
     end
 
     def send_pre_bill
@@ -213,7 +213,10 @@ class Member < ActiveRecord::Base
     def deactivation
       self.next_retry_bill_date = nil
       self.bill_date = nil
-      # TODO: Audit 
+      # TODO: Send email on deactivation
+      # TODO: Deactivate drupal account
+      self.save
+      Auditory.audit(nil, self, "Member deactivated", self)
     end
 
     def set_decline_strategy(trans)
