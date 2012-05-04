@@ -215,6 +215,7 @@ class Member < ActiveRecord::Base
       self.bill_date = nil
       # TODO: Send email on deactivation
       # TODO: Deactivate drupal account
+      self.save
       Auditory.audit(nil, self, "Member deactivated", self)
     end
 

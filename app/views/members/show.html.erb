@@ -3,7 +3,7 @@
 <table class="table table-bordered table-condensed">
   <tr>
     <td>
-      <%= link_to 'Edit', edit_member_path(:id => @current_member.visible_id), :class => "btn btn-warning" %>
+      <%= link_to 'Edit', edit_member_path, :class => "btn btn-warning" %>
       <%= link_to("Recovery", "#", :class => "btn btn-warning") if @current_member.lapsed? %>
     </td>
     <% unless @current_member.lapsed? %>
