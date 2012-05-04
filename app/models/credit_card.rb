@@ -15,28 +15,42 @@ class CreditCard < ActiveRecord::Base
 
 
   # refs #17832
-  def self.card_expired_rule(cc_year_exp)
-    #6 Days Later if not successful = (+3), 3/2014
-    #6 Days Later if not successful = (+2), 3/2013
-    #6 Days Later if not successful = (+4) 3/2015
-    #6 Days Later if not successful = (+1) 3/2012
-    if cc_year_exp.to_i < Date.today.year
-      case self.times
+  # 6 Days Later if not successful = (+3), 3/2014
+  # 6 Days Later if not successful = (+2), 3/2013
+  # 6 Days Later if not successful = (+4) 3/2015
+  # 6 Days Later if not successful = (+1) 3/2012
+  def self.recycle_expired_rule(acc, times)
+    if acc.expire_year.to_i < Date.today.year
+      case times
         when 1
-          new_year_exp=cc_year_exp.to_i + 3
+          new_year_exp=acc.expire_year.to_i + 3
         when 2
-          new_year_exp=cc_year_exp.to_i + 2
+          new_year_exp=acc.expire_year.to_i + 2
         when 3
-          new_year_exp=cc_year_exp.to_i + 4
+          new_year_exp=acc.expire_year.to_i + 4
         when 4
-          new_year_exp=cc_year_exp.to_i + 1
+          new_year_exp=acc.expire_year.to_i + 1
         else
-          new_year_exp=cc_year_exp
-      end  
-    else
-      new_year_exp=cc_year_exp
+          return acc
+      end
+      CreditCard.transaction do
+        begin
+          acc.update_attribute :active , false
+          cc = CreditCard.new 
+          cc.member = acc.member
+          cc.number = acc.number
+          cc.expire_month = acc.expire_month
+          cc.expire_year = new_year_exp
+          cc.active = true
+          cc.save!
+          return cc
+        rescue Exception => e
+          logger.error e
+          raise ActiveRecord::Rollback
+        end
+      end
     end
-    new_year_exp
+    acc
   end
   
 end

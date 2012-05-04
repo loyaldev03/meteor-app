@@ -30,6 +30,8 @@ class CreditCardsController < ApplicationController
   	new_credit_card = CreditCard.find(params[:credit_card_id])
   	actual_credit_card = @current_member.active_credit_card
 
+    # TODO: do we need json format??
+    # TODO: we NEED transactions!!!    
     respond_to do |format|
       if new_credit_card.update_attributes(:active => true) && actual_credit_card.update_attributes(:active => 0)
         message = "Credit card #{new_credit_card.number} set as active."

@@ -122,13 +122,13 @@ class Member < ActiveRecord::Base
             { :code => "9997", :message => "Credit card is blank and grace period is disabled" }
           end
         else
-          # TODO: @member.cc_year_exp=card_expired_rule(@member.cc_year_exp)
+          acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
           trans = Transaction.new
           trans.transaction_type = "sale"
-          trans.prepare(self, self.active_credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
+          trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
           answer = trans.process
           if trans.success?
-            active_credit_card.accepted_on_billing
+            acc.accepted_on_billing
             set_as_paid!
             schedule_renewal
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
