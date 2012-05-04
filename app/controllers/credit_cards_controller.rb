@@ -9,17 +9,19 @@ class CreditCardsController < ApplicationController
   end
 
   def create
-    @credit_card = CreditCard.new(params[:credit_card])
-    @credit_card.member_id = @current_member.id
-    @actual_credit_card = @current_member.active_credit_card
+    credit_card = CreditCard.new(params[:credit_card])
+    credit_card.member_id = @current_member.id
+    actual_credit_card = @current_member.active_credit_card
 
   	respond_to do |format|
-      if @credit_card.save && @actual_credit_card.update_attributes(:active => 0)
-        format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card was successfully created." }
-        format.json { render json: @credit_card, status: :created, location: @credit_Card }
+      if credit_card.save && actual_credit_card.update_attributes(:active => 0)
+        message = "Credit card #{credit_card.number} added and set active."
+        Auditory.audit(@current_agent, credit_card, message, @current_member)
+        format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.number} was successfully added and setted as active." }
+        format.json { render json: credit_card, status: :created, location: credit_Card }
       else
         format.html { render action: "new" }
-        format.json { render json: @credit_card.errors, status: :unprocessable_entity }
+        format.json { render json: credit_card.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -30,10 +32,12 @@ class CreditCardsController < ApplicationController
 
     respond_to do |format|
       if new_credit_card.update_attributes(:active => true) && actual_credit_card.update_attributes(:active => 0)
-        format.html { redirect_to show_member_path(:id => @current_member), notice: "The credit_card was activated." }
+        message = "Credit card #{new_credit_card.number} set as active."
+        Auditory.audit(@current_agent, new_credit_card, message, @current_member)
+        format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{new_credit_card.number} was activated." }
         format.json { head :no_content }
       else
-        format.html { redirect_to show_member_path(:id => @current_member), error: @credit_card.errors }
+        format.html { redirect_to show_member_path(:id => @current_member), error: credit_card.errors }
         format.json { render json: @credit_card.errors, status: :unprocessable_entity }
       end
     end
@@ -44,7 +48,9 @@ class CreditCardsController < ApplicationController
 
   	respond_to do |format|
       if credit_card.update_attributes(:blacklisted => true)
-        format.html { redirect_to show_member_path(:id => @current_member), notice: "The credit_card was blacklisted." }
+        message = "Credit card #{credit_card.number} blacklisted."
+        Auditory.audit(@current_agent, credit_card, message, @current_member)
+        format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.number} was blacklisted." }
         format.json { head :no_content }
       else
         format.html { redirect_to show_member_path(:id => @current_member), error: @credit_card.errors }
