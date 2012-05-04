@@ -57,7 +57,10 @@
          <%= I18n.l @current_member.join_date, :format => :long %> </td>
   </tr>
   <tr>
-    <td> <%= t('activerecord.attributes.member.next_retry_bill_date') %>: <%= @current_member.next_retry_bill_date %> </td>
+    <td>
+      <%= t('activerecord.attributes.member.next_retry_bill_date') %>: <%= @current_member.next_retry_bill_date %>
+      <%= link_to('Change', member_change_next_bill_date_path, :class => "btn btn-warning") unless @current_member.next_retry_bill_date.nil? %>
+    </td>
     <td colspan="2">
       <%= t('activerecord.attributes.member.cancel_date') %>: 
       <%= I18n.l(@current_member.cancel_date, :format => :long) unless @current_member.cancel_date.nil? %>

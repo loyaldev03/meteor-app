@@ -65,6 +65,12 @@ class Member < ActiveRecord::Base
     self.save
   end
 
+  def change_next_bill_date!(next_bill_date)
+    self.next_retry_bill_date = next_bill_date
+    self.bill_date = next_bill_date
+    self.save!
+  end
+
   def full_name
     [ first_name, last_name].join(' ')
   end
@@ -128,7 +134,6 @@ class Member < ActiveRecord::Base
           trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
           answer = trans.process
           if trans.success?
-            acc.accepted_on_billing
             set_as_paid!
             schedule_renewal
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
@@ -200,8 +205,8 @@ class Member < ActiveRecord::Base
         # refs #15935
         self.quota = self.quota + 12
       end
-      bill_date = new_bill_date
-      next_retry_bill_date = new_bill_date
+      self.bill_date = new_bill_date
+      self.next_retry_bill_date = new_bill_date
       self.save
       Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date}", self)
     end
