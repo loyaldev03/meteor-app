@@ -52,6 +52,15 @@ $('document').ready( function() {
     return answer 
   });
 
+  $('.re-confirm').click( function(event){
+    var answer = confirm('Are you sure?');
+    if (answer)
+      var answer = confirm('Are you really sure?')
+    return answer 
+  });
+
+  $('.datepicker').datepicker();
+
   $('#myTab a:last').tab('show');
 
   $('.datatable').dataTable({

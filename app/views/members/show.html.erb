@@ -19,7 +19,7 @@
       </td>
       <td>
         <%= link_to "Blacklist", "#", :class => "btn btn-warning" %>
-        <%= link_to("Cancel", member_cancel_path, :class => "btn btn-warning") if @current_member.can_be_canceled? %>
+        <%= link_to("Cancel", member_cancel_path, :class => "btn btn-danger") if @current_member.can_be_canceled? %>
       </td>
     <% end %>
   </tr>
