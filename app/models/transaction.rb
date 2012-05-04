@@ -108,14 +108,14 @@ class Transaction < ActiveRecord::Base
     old_transaction = Transaction.find_by_uuid old_transaction_id, :lock => true
     trans = Transaction.new
     if amount <= 0.0
-      return { :message => "Amount must be a positive number.", :code => '9787' }
+      return { :message => "Credit amount must be a positive number.", :code => '9787' }
     elsif old_transaction.amount == amount
       trans.transaction_type = "refund"
     elsif old_transaction.amount > amount
       trans.transaction_type = "credit"
     end
     if old_transaction.amount_available_to_refund < amount
-      return { :message => "Cant refund more $ than the original transaction amount", :code => '9788' }
+      return { :message => "Cant credit more $ than the original transaction amount", :code => '9788' }
     end
     trans.prepare(old_transaction.member, old_transaction.credit_card, amount, 
         old_transaction.member.terms_of_membership.payment_gateway_configuration)
