@@ -25,38 +25,7 @@ defaults: &defaults
   - AuthorizationCapture
   - Refund
   - Capture
-  cancel_reasons:
-  - didn’t know I enrolled
-  - can’t afford
-  - Did not use benefits
-  - did not want
-  - only wanted product
-  - can’t afford now (possible future call back)
-  - CHARGEBACK
-  note_types:
-  - confirm
-  - Website Question
-  - technical support
-  - Benefits questions
-  - Enrollment 
-  - Pre bill Cancellation
-  - Pre Bill Save
-  - Post bill cancellation
-  - Post bill save
-  - Product questions
-  - Log in issues
-  - Deals and discounts
-  - Billing questions
-  - Local chapter question
-  - Outbound calling campaign
-  - non program
-  - VIP
-  communication_types:
-  - incomming call
-  - outbound call
-  - email
-  - chat
-  - others
+
 
 
 development:
