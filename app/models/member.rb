@@ -35,7 +35,6 @@ class Member < ActiveRecord::Base
       transition [:provisional, :paid] => :lapsed
     end
 
-
     # A Member is within their review period. These members have joined a Subscription program that has a “Provisional” 
     # period whereby the Member has an opportunity to review the benfits of the program risk free for the duration of 
     # the Provisional period. 
