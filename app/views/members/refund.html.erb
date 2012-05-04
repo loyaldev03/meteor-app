@@ -1,15 +1,13 @@
 <h1> Refund for <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
 
-<table class="table table-bordered">
-  <%= form_tag(member_refund_path(:transaction_id => @transaction)) do %>
-    <tr> 
-      <tr>
-        <td>Amount to refund (e.g.: $45.34)<%= text_field_tag :refund_amount %> </td>
-      </tr>
-      <tr>
-        <td> <%= submit_tag "Guardar", :class => 'btn btn-primary' %>
-             <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
-      </tr>
-    </tr> 
-  <% end%>
-</table>
+<%= form_tag(member_refund_path(:transaction_id => @transaction)) do %>
+  <table class="table table-bordered">
+    <tr>
+      <td>Amount to refund (e.g.: $45.34)<%= text_field_tag :refund_amount %> </td>
+    </tr>
+    <tr>
+      <td> <%= submit_tag "Guardar", :class => 'btn btn-primary' %>
+           <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
+    </tr>
+  </table>
+<% end%>

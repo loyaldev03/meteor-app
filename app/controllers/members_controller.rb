@@ -1,6 +1,6 @@
 class MembersController < ApplicationController
   before_filter :validate_club_presence
-  before_filter :validate_member_presence, :only => [ :show, :edit, :refund ]
+  before_filter :validate_member_presence, :except => [ :index, :new ]
 
   def index
   end
@@ -24,11 +24,11 @@ class MembersController < ApplicationController
 
   def save_the_sale
     if request.post?
-      if TermsOfMembership.find_by_id_and_club_id(params[:new_terms_of_membership], @current_club.id).nil?
+      if TermsOfMembership.find_by_id_and_club_id(params[:terms_of_membership_id], @current_club.id).nil?
         flash[:error] = "Terms of membership not found"
         redirect_to show_member_path
       else
-        answer = @member.save_the_sale(params[:new_terms_of_membership])
+        answer = @current_member.save_the_sale(params[:terms_of_membership_id], current_agent)
         if answer[:code] == "000"
           flash[:notice] = "Save the sale succesfully applied"
           redirect_to show_member_path
