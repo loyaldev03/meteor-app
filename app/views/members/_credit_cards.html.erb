@@ -1,24 +1,27 @@
-
-<table class="table table-bordered">
+<%= link_to "Add a credit card", new_credit_card_path, :class => "btn btn-warning" %>
+<table class="table table-bordered datatable_only_sorting">
   <thead>
     <tr>
-      <th colspan="2">Credit Cards <%= link_to "Add a credit card", new_credit_card_path, :class => "btn btn-warning" %></th>
+      <th> <%= t('activerecord.attributes.credit_card.number') %> </th>
+      <th> <%= t('activerecord.attributes.credit_card.expire_date') %> </th>
+      <th> <%= t('actions') %> </th>
     </tr>
   </thead>
-  <% credit_cards.each do |cc| %>
-  <tr>
-    <td>
-      <%= t('activerecord.attributes.credit_card.number') %>: <%= cc.number %>
-    </td>
-    <td>
-      <%= t('activerecord.attributes.credit_card.expire_date') %>: <%= cc.expire_month %> / <%= cc.expire_year %>
-    </td>
-    <td>
-      estos botones tienen que hacer un POST (usar form)
-      <%= link_to 'BlackList', credit_card_set_as_blacklisted_path(:credit_card_id => cc.id), :class => "btn btn-warning confirm" %>
-      <%= link_to 'Activate', credit_card_activate_path(:credit_card_id => cc.id), :class=> "btn btn-warning confirm" unless cc.active%>
-    </td>
-  </tr>
+  <tbody>
+    <% credit_cards.each do |cc| %>
+    <tr>
+      <td> <%= cc.number %> </td>
+      <td> <%= cc.expire_month %> / <%= cc.expire_year %> </td>
+      <td>
+        <%= form_for @cc, :as => :credit_card, :url => credit_card_set_as_blacklisted_path(:credit_card_id => cc.id), do |f|  %> 
+          <%= submit_tag 'BlackList', :name => 'blacklist', :class=> "btn btn-warning confirm" %>
+        <% end %>
+        <%= form_for @cc, :as => :credit_card, :url => credit_card_activate_path(:credit_card_id => cc.id), do |f| %>
+          <%= submit_tag 'Activate', :name => 'activate', :class=> "btn btn-warning confirm" unless cc.active %>
+        <% end %>
+      </td>
+    </tr>
+  </tbody>
   <% end %>
 
 </table>
