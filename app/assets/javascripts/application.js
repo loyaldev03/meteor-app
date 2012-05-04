@@ -28,11 +28,10 @@ $('document').ready( function() {
       success: function(data) {
         alert (data.message);
       	if (data.code == 000)
-      		window.location.replace('../members/'+data.v_id);
+      		window.location.replace('../member/'+data.v_id);
       },
       });
   });
-
 
   $('form[id^="edit_member"]').submit( function(event) {
     event.preventDefault()
@@ -69,8 +68,5 @@ $('document').ready( function() {
     "bInfo": false,
     "bAutoWidth": false,
   });
-
-
-
 
 });

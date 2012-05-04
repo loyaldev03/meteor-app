@@ -16,7 +16,7 @@ class MembersController < ApplicationController
   end
 
   def new
-    @current_member = Member.new 
+    @member = Member.new 
     @terms_of_membership = TermsOfMembership.where(:club_id => @current_club )
   end
 
