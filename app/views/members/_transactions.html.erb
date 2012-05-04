@@ -10,13 +10,13 @@
       <%= l(transaction.created_at) %>
     </td>
     <td>
-      <%= link_to transaction.response_result[0..50], "#" %>
+      <%= transaction.to_label %>
     </td>
     <td>
       <%= number_to_currency transaction.amount %>
     </td>
     <td>
-      <%= link_to("Refund", member_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning") if transaction.sale? %>
+      <%= link_to("Refund", member_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning") if transaction.can_be_refunded? %>
     </td>
   </tr>
   <% end %>

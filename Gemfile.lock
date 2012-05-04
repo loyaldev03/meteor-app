@@ -136,6 +136,10 @@ GEM
       activesupport (= 3.2.3)
       bundler (~> 1.0)
       railties (= 3.2.3)
+    rails-erd (0.4.5)
+      activerecord (~> 3.0)
+      activesupport (~> 3.0)
+      ruby-graphviz (~> 0.9.18)
     rails3_acts_as_paranoid (0.2.2)
       activerecord (~> 3.2)
     railties (3.2.3)
@@ -156,6 +160,7 @@ GEM
       columnize (>= 0.3.1)
       linecache19 (>= 0.5.11)
       ruby-debug-base19 (>= 0.11.19)
+    ruby-graphviz (0.9.21)
     ruby_core_source (0.1.5)
       archive-tar-minitar (>= 0.5.2)
     sass (3.1.16)
@@ -210,6 +215,7 @@ DEPENDENCIES
   nokogiri
   paperclip (~> 3.0)
   rails (= 3.2.3)
+  rails-erd
   rails3_acts_as_paranoid
   ruby-debug19
   sass-rails (~> 3.2.3)

@@ -10,6 +10,10 @@ class Transaction < ActiveRecord::Base
 
   attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
 
+  def to_label
+    I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + ': ' + response_result[0..50]
+  end
+
   def member=(member)
     self.member_id = member.id
     # MeS supports only 17 characters on order_id
@@ -56,6 +60,11 @@ class Transaction < ActiveRecord::Base
     response_code == "000"
   end
 
+  def can_be_refunded?
+    [ 'sale', 'capture' ].include?(transaction_type) and amount_available_to_refund > 0.0
+  end
+
+
   def process
     case transaction_type
       when "sale"
@@ -73,13 +82,9 @@ class Transaction < ActiveRecord::Base
       #when "authorization_capture"
       #  authorization_capture
       else
-        { :message=>"operation not supported",:code=> '902' }
+        { :message=>"Operation -#{transaction_type}- not supported",:code=> '902' }
     end
   end  
-
-  def sale?
-    [ 'sale', 'capture' ].include? transaction_type
-  end
 
   def production?
     mode == "production"
@@ -87,10 +92,6 @@ class Transaction < ActiveRecord::Base
 
   def mes?
     gateway == "mes"
-  end
-
-  def litle?
-    gateway == "litle"
   end
 
   # we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
@@ -101,21 +102,34 @@ class Transaction < ActiveRecord::Base
     @cc.type
   end
 
-  def self.refund(amount, old_transaction)
+  def self.refund(amount, old_transaction_id)
+    amount = amount.to_f
+    # Lock transaction, so no one can use this record while we refund this member.
+    old_transaction = Transaction.find_by_uuid old_transaction_id, :lock => true
     trans = Transaction.new
-    if old_transaction.amount == amount
+    if amount <= 0.0
+      return { :message => "Amount must be a positive number.", :code => '9787' }
+    elsif old_transaction.amount == amount
       trans.transaction_type = "refund"
     elsif old_transaction.amount > amount
       trans.transaction_type = "credit"
-    else 
+    end
+    if old_transaction.amount_available_to_refund < amount
       return { :message => "Cant refund more $ than the original transaction amount", :code => '9788' }
     end
     trans.prepare(old_transaction.member, old_transaction.credit_card, amount, 
         old_transaction.member.terms_of_membership.payment_gateway_configuration)
-    trans.process
+    answer = trans.process
+    if trans.success?
+      old_transaction.refunded_amount = old_transaction.refunded_amount + amount
+      old_transaction.save
+    end
+    answer
   end
 
-
+  def amount_available_to_refund
+    amount - refunded_amount
+  end
 
   private
 
