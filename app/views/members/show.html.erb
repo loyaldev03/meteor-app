@@ -15,7 +15,7 @@
         <%= link_to "Refulfill", "#", :class => "btn btn-warning" %>
       </td>
       <td>
-        <%= link_to "Save the sale", "#", :class => "btn btn-warning" %>
+        <%= link_to "Save the sale", member_save_the_sale_path, :class => "btn btn-warning" %>
       </td>
       <td>
         <%= link_to "Blacklist", "#", :class => "btn btn-warning" %>
@@ -65,8 +65,8 @@
 </table>
 
 <table
-  <% if Time.now.month > @active_credit_card.expire_month && Time.now.year > @active_credit_card.expire_year || 
-        Time.now.month > @active_credit_card.expire_month && Time.now.year == @active_credit_card.expire_year %>
+  <% if (Time.now.year > @active_credit_card.expire_year) || 
+        (Time.now.month > @active_credit_card.expire_month && Time.now.year == @active_credit_card.expire_year) %>
     class="table table-bordered table-condensed card_expired"
   <% else %>
     class="table table-bordered table-condensed"
