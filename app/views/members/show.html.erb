@@ -65,7 +65,8 @@
 </table>
 
 <table
-  <% if Time.now.month > @active_credit_card.expire_month && Time.now.year > @active_credit_card.expire_year %>
+  <% if Time.now.month > @active_credit_card.expire_month && Time.now.year > @active_credit_card.expire_year || 
+        Time.now.month > @active_credit_card.expire_month && Time.now.year == @active_credit_card.expire_year %>
     class="table table-bordered table-condensed card_expired"
   <% else %>
     class="table table-bordered table-condensed"
