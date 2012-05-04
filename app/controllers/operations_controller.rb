@@ -16,18 +16,17 @@ class OperationsController < ApplicationController
   # PUT /domains/1
   # PUT /domains/1.json
   def update
-    @operation = Operation.find(params[:id])
+    operation = Operation.find(params[:id])
 
     respond_to do |format|
-      if @operation.update_attributes(params[:operation])
-        message = "The operation was successfully updated."
-        Auditory.audit(nil, @operation, message, @operation)
-        { :message => message, :code => "000", :operation_id => @operation.id }
-        format.html { redirect_to operation_path(:id => @operation), notice: message }
+      if operation.update_attributes(params[:operation])
+        message = "Edited operation (#{operation.operation_date}) notes."
+        Auditory.audit(@current_agent, operation, message, @current_member)
+        format.html { redirect_to operation_path(:id => operation), notice: message }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
-        format.json { render json: @operation.errors, status: :unprocessable_entity }
+        format.json { render json: operation.errors, status: :unprocessable_entity }
       end
     end
   end

@@ -4,6 +4,7 @@
 en:
   show: 'Show'
   edit: 'Edit'
+  save: 'Save'
   destroy: 'Destroy'
   lock: 'Lock'
   unlock: 'Unlock'
