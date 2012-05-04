@@ -1,0 +1,18 @@
+<h1>Save the sale <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
+
+<table class="table table-bordered">
+  <%= form_tag(member_refund_path(:transaction_id => @transaction)) do %>
+    <tr> 
+      <tr>
+        <td>
+          <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
+          <%= select_tag :terms_of_membership_id, options_from_collection_for_select(TermsOfMembership.where(:club_id => @current_club ), "id", "name") %> 
+        </td>
+      </tr>
+      <tr>
+        <td> <%= submit_tag "Guardar", :class => 'btn btn-primary' %>
+             <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
+      </tr>
+    </tr> 
+  <% end%>
+</table>

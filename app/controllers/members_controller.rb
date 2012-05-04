@@ -22,6 +22,23 @@ class MembersController < ApplicationController
   def edit  
   end
 
+  def save_the_sale
+    if request.post?
+      if TermsOfMembership.find_by_id_and_club_id(params[:new_terms_of_membership], @current_club.id).nil?
+        flash[:error] = "Terms of membership not found"
+        redirect_to show_member_path
+      else
+        answer = @member.save_the_sale(params[:new_terms_of_membership])
+        if answer[:code] == "000"
+          flash[:notice] = "Save the sale succesfully applied"
+          redirect_to show_member_path
+        else
+          flash.now[:error] = answer[:message]
+        end
+      end
+    end
+  end
+
   def refund
     @transaction = Transaction.find_by_uuid_and_member_id params[:transaction_id], @current_member.uuid
     if @transaction.nil?

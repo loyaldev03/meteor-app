@@ -29,6 +29,7 @@ SacPlatform::Application.routes.draw do
           post :set_as_blacklisted
         end
         match '/refund/:transaction_id' => 'members#refund', as: 'member_refund', :via => [:get, :post]
+        match '/save_the_sale' => 'members#save_the_sale', as: 'member_save_the_sale', :via => [:get, :post]
         match '/' => 'members#show', as: 'show_member', :via => [:get]
       end
     end
