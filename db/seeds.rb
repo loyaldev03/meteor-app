@@ -52,6 +52,10 @@ tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "
   :needs_enrollment_approval => false, :name => "test2"
 tom.club = c
 tom.save!
+tom = TermsOfMembership.new :installment_amount => 100.56, :installment_type => "1.year", 
+  :needs_enrollment_approval => false, :name => "test2-year"
+tom.club = c
+tom.save!
 tom = TermsOfMembership.new :installment_amount => 45, :installment_type => "1.year", 
   :needs_enrollment_approval => false, :name => "test"
 tom.club = c2

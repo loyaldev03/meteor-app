@@ -15,7 +15,7 @@
         <%= link_to "Refulfill", "#", :class => "btn btn-warning" %>
       </td>
       <td>
-        <%= link_to "Save the sale", member_save_the_sale_path, :class => "btn btn-warning" %>
+        <%= link_to("Save the sale", member_save_the_sale_path, :class => "btn btn-warning") if @current_member.can_save_the_sale? %>
       </td>
       <td>
         <%= link_to "Blacklist", "#", :class => "btn btn-warning" %>

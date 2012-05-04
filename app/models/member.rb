@@ -22,11 +22,11 @@ class Member < ActiveRecord::Base
   validates :terms_of_membership_id, :presence => true
 
   state_machine :status, :initial => :none do
-    after_transition [:none, :lapsed] => :provisional, :do => :schedule_first_membership
+    after_transition [:none, :lapsed, :provisional, :paid] => :provisional, :do => :schedule_first_membership
     after_transition :any => :lapsed, :do => :deactivation
 
     event :set_as_provisional do
-      transition [:none, :lapsed] => :provisional
+      transition [:none, :lapsed, :paid, :provisional] => :provisional
     end
     event :set_as_paid do
       transition [:provisional, :paid] => :paid
@@ -78,9 +78,30 @@ class Member < ActiveRecord::Base
     [address, city, state].join(' ')
   end
 
+  def can_save_the_sale?
+    self.paid? or self.provisional?
+  end
+
+  def can_bill_membership?
+    self.paid? or self.provisional?
+  end
+
+  def save_the_sale(new_tom_id, agent = nil)
+    if can_save_the_sale?
+      if new_tom_id.to_i == self.terms_of_membership_id.to_i
+        { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => "9885" }
+      else
+        Auditory.audit(agent, self, "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}", self)
+        self.terms_of_membership_id = new_tom_id
+        enroll(self.active_credit_card, 0.0, agent)
+      end
+    else
+      { :message => "Member status does not allows us to save the sale.", :code => "9886" }
+    end
+  end
 
   def bill_membership
-    if provisional? or paid?
+    if can_bill_membership?
       amount = self.terms_of_membership.installment_amount
       if amount.to_f > 0.0
         # Grace period
@@ -133,10 +154,11 @@ class Member < ActiveRecord::Base
     end
 
     begin
-      join_date = DateTime.now
       save!
-      credit_card.member = self
-      credit_card.save!
+      if credit_card.member.nil?
+        credit_card.member = self 
+        credit_card.save!
+      end
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
         # is completed succesfully
@@ -145,8 +167,8 @@ class Member < ActiveRecord::Base
         trans.save
         credit_card.accepted_on_billing
       end
-      set_as_provisional!
-      message = "Member enrolled successfully $#{amount}"
+      set_as_provisional! # set join_date
+      message = "Member enrolled successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
       Auditory.audit(agent, self, message, self)
       self.reload
       { :message => message, :code => "000", :member_id => self.id, :v_id => self.visible_id }
