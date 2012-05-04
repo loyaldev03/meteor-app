@@ -1,12 +1,12 @@
-<%- model_class = @member.class -%>
+<%- model_class = @current_member.class -%>
 <h1><%=t '.title', :default => t('helpers.titles.new', :model => model_class.model_name.human,
                                :default => "New #{model_class.model_name.human}") %></h1>
 
 <script> 
-  var visible_id = <%= @member.visible_id %>; 
+  var visible_id = <%= @current_member.visible_id %>; 
   var club_id = <%= @current_club.id %>
 </script> 
 
-<%= form_for @member,:html => { :class => 'form-horizontal' } do |f| %>
+<%= form_for @current_member, :url => edit_member_path(:id => @current_member), :html => { :class => 'form-horizontal' } do |f| %>
 <%= render :partial => 'form', :locals => { :f => f } %>
 <% end %>

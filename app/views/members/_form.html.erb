@@ -42,7 +42,7 @@
     </td>
   </tr>  
 
-  <% if @member.new_record? %>
+  <% if @current_member.new_record? %>
     <tr class="control-group" >
       <td colspan="2"> 
         <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
@@ -72,7 +72,7 @@
   </tr>
 </table>
 
-<% if @member.new_record? %>
+<% if @current_member.new_record? %>
   <%= hidden_field_tag :enrollment_amount, 0.0 %>
   <%= f.hidden_field :country, :value => "US" %>
 <% end %>
