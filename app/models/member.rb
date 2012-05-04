@@ -175,7 +175,7 @@ class Member < ActiveRecord::Base
       end
       bill_date = new_bill_date
       next_retry_bill_date = new_bill_date
-      save
+      self.save
       # TODO: Audit 
     end
 

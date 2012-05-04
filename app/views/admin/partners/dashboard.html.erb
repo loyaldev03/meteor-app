@@ -22,27 +22,6 @@
   <%= @partner.description %>
 </p>
 
-<table class="table table-striped">
-  <thread>
-    <tr>
-      <th><%= model_class.human_attribute_name(:url) %></th>
-      <th><%= model_class.human_attribute_name(:data_rights) %></th>
-      <th><%= model_class.human_attribute_name(:hosted) %></th>
-      <th><%= model_class.human_attribute_name(:created_at) %></th>
-    </tr> 
-  </thead>
-  <tbody>
-    <% @domains.each do |domain| %>
-    <tr>
-      <td> <%= domain.url %> </td>
-      <td> <%= domain.data_rights %> </td>
-      <td> <%= domain.hosted %> </td>
-      <td> <%=l domain.created_at %> </td>
-    </tr>
-    <% end %>
-  </tbody>
-</table>
-
 <div class="form-actions">
   <%= link_to t(:back),
               admin_partners_path, :class => 'btn'  %>
