@@ -23,9 +23,27 @@ class MemberTest < ActiveSupport::TestCase
     assert !(answer[:code] == "000")
   end
 
+  test "Member should not be billed if no credit card is on file." do
+    member = FactoryGirl.create(:provisional_member)
+    answer = member.bill_membership
+    assert (answer[:code] != "000")
+  end
+
+  test "Insfufficient funds hard decline" do
+    paid_member = FactoryGirl.create(:paid_member)
+    credit_card = FactoryGirl.create(:credit_card_master_card)
+    paid_member.credit_cards << credit_card
+    paid_member.save
+    answer = paid_member.bill_membership
+    assert (answer[:code] == "000"), answer.inspect
+  end
+
   test "Member should be billed if it is paid or provisional" do
     assert_difference('Operation.count') do
       member = FactoryGirl.create(:provisional_member)
+      credit_card = FactoryGirl.create(:credit_card_master_card)
+      member.credit_cards << credit_card
+      member.save
       answer = member.bill_membership
       assert (answer[:code] == "000"), answer.inspect
     end

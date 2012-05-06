@@ -7,4 +7,25 @@ FactoryGirl.define do
     association :club
   end
 
+  factory :terms_of_membership_hold_card, class: TermsOfMembership do
+    name "test Hold card 004"
+    installment_amount 0.04 
+    installment_type '1.month'
+    association :club
+  end
+
+  factory :terms_of_membership_do_not_honor, class: TermsOfMembership do
+    name "test do not honor 0045"
+    installment_amount 0.05 
+    installment_type '1.month'
+    association :club
+  end
+
+  factory :terms_of_membership_insuf_funds, class: TermsOfMembership do
+    name "test insuf funds"
+    installment_amount 0.51 
+    installment_type '1.month'
+    association :club
+  end
+
 end

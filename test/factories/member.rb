@@ -18,6 +18,22 @@ FactoryGirl.define do
     association :terms_of_membership
   end
 
+  factory :paid_member, class: Member do
+    sequence(:visible_id) {|n| n }
+    status "paid"
+    first_name "first"
+    last_name "last"
+    address "peron 3455"
+    city "test"
+    zip "345677"
+    state "CT"
+    sequence(:email) {|n| "member#{n}@test.no" }
+    phone_number "237264827652"
+    country "US"
+    association :club
+    association :terms_of_membership, factory: :terms_of_membership_insuf_funds
+  end
+
   factory :lapsed_member, class: Member do
     sequence(:visible_id) {|n| n }
     status "lapsed"

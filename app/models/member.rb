@@ -137,11 +137,11 @@ class Member < ActiveRecord::Base
             set_as_paid!
             schedule_renewal
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
-            Auditory.audit(nil, self, message, self)
+            Auditory.audit(nil, trans, message, self)
             { :message => message, :code => "000", :member_id => self.id }
           else
-            set_decline_strategy(trans)
-            Auditory.audit(nil, self, answer)
+            message = set_decline_strategy(trans)
+            Auditory.audit(nil, trans, answer + message, self)
             Auditory.add_redmine_ticket
             answer
           end
@@ -261,5 +261,6 @@ class Member < ActiveRecord::Base
       else
         increment(:recycled_times, 1)
       end
+      message
     end
 end
