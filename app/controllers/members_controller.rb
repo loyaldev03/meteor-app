@@ -65,7 +65,7 @@ class MembersController < ApplicationController
           begin
             @current_member.cancel_date = params[:cancel_date]
             @current_member.save!
-            message = "Member cancellation scheduled to #{params[:cancel_date]} + Reason: #{:reason}"
+            message = "Member cancellation scheduled to #{params[:cancel_date]} - Reason: #{params[:reason]}"
             Auditory.audit(current_agent, @current_member, message, @current_member)
             flash[:notice] = message
             redirect_to show_member_path
