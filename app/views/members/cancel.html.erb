@@ -10,7 +10,7 @@
     </tr>
     <tr>
       <td> 
-        <%= label :reason, 'Reason', :class => 'help-inline' %> 
+        <%= label :reason, t('reason'), :class => 'help-inline' %> 
         <%= select_tag :reason, options_from_collection_for_select(@member_cancel_reason, "name", "name") %>
       </td>
     </tr>

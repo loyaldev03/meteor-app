@@ -17,6 +17,7 @@ en:
   email: 'Email'
   show_on_map: 'map'
   member: 'Member'
+  reason: 'Reason'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   menu: 
     logout: Logout
