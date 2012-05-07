@@ -11,7 +11,7 @@
     <tr>
       <td> 
         <%= label :reason, 'Reason', :class => 'help-inline' %> 
-        <%= text_area_tag :reason, nil, :style => 'width: 50%; height: 200px' %>
+        <%= select_tag :reason, options_from_collection_for_select(@member_cancel_reason, "name", "name") %>
       </td>
     </tr>
     <tr>
