@@ -46,22 +46,29 @@
 <table class="table table-bordered table-condensed"> 
   <thead>
     <tr> 
-      <th colspan="5">Membership Information </th>
+      <th colspan= "3"> Membership Information </th>
+      <th <% if @current_member.lapsed? %>
+            class = "lapsed"
+          <% elsif @current_member.paid? %>
+            class = "paid"
+          <% elsif %>
+            class = "provisional"
+          <% end %>
+      > 
+      <%= @current_member.status %>      
+      </th>
     </tr>
   </thead>  
-  <tr>
-    <td> <%= t('activerecord.attributes.member.status') %>: <%= @current_member.status %> </td>
+  <tr   >
     <td> <%= t('activerecord.attributes.member.member_since_date') %>: 
          <%= I18n.l @current_member.created_at, :format => :long%> </td>
     <td> <%= t('activerecord.attributes.member.join_date') %>: 
          <%= I18n.l @current_member.join_date, :format => :long %> </td>
-  </tr>
-  <tr>
     <td>
       <%= t('activerecord.attributes.member.next_retry_bill_date') %>: <%= @current_member.next_retry_bill_date %>
       <%= link_to('Change', member_change_next_bill_date_path, :class => "btn btn-warning") unless @current_member.next_retry_bill_date.nil? %>
     </td>
-    <td colspan="2">
+    <td>
       <%= t('activerecord.attributes.member.cancel_date') %>: 
       <%= I18n.l(@current_member.cancel_date, :format => :long) unless @current_member.cancel_date.nil? %>
     </td>

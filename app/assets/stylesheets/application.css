@@ -22,6 +22,10 @@ form .clearfix:before, form .clearfix:after {
 	background-color: red;
 }
 
+.paid{
+	background-color: green;
+}
+
 .lapsed{
 	background-color: red;
 }
