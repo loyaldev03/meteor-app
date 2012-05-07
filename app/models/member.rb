@@ -192,6 +192,11 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def send_pre_bill
+    Notifier.pre_bill(email).deliver!
+    Auditory.audit(nil, self, "Pre bill email sent.", self)
+  end
+  
   private
 
     def schedule_renewal
@@ -209,11 +214,6 @@ class Member < ActiveRecord::Base
       self.next_retry_bill_date = new_bill_date
       self.save
       Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date}", self)
-    end
-
-    def send_pre_bill
-      Notifier.pre_bill(email).deliver!
-      Auditory.audit(nil, self, "Pre bill email sent.", self)
     end
 
     def deactivation
