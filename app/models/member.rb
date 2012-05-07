@@ -213,6 +213,7 @@ class Member < ActiveRecord::Base
 
     def send_pre_bill
       Notifier.pre_bill(email).deliver!
+      Auditory.audit(nil, self, "Pre bill email sent.", self)
     end
 
     def deactivation
