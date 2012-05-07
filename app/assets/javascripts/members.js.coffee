@@ -3,5 +3,5 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
 jQuery ->
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1 });
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "dd-mm-yy" });
 

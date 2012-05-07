@@ -9,6 +9,12 @@
       </td>
     </tr>
     <tr>
+      <td> 
+        <%= label :reason, 'Reason', :class => 'help-inline' %> 
+        <%= text_area_tag :reason, nil, :style => 'width: 50%; height: 200px' %>
+      </td>
+    </tr>
+    <tr>
       <td> <%= submit_tag t(:save), :class => 'btn btn-primary re-confirm' %>
            <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
     </tr>
