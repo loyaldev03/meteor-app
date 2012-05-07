@@ -27,7 +27,8 @@ namespace :billing do
   task :send_prebill => :environment do
     tall = Time.now
     begin
-      Member.find_in_batches(:conditions => [" bill_date = ? ", Date.today = 7.days ]) do |group|
+      # We use bill_date because we will only send this email once!
+      Member.find_in_batches(:conditions => [" bill_date = ? ", Date.today + 7.days ]) do |group|
         group.each do |member| 
           tz = Time.now
           begin
