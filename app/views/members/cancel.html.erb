@@ -15,7 +15,8 @@
       </td>
     </tr>
     <tr>
-      <td> <%= submit_tag t(:save), :class => 'btn btn-primary re-confirm' %>
+      <td> <%= submit_tag t(:save), :class => 'btn btn-primary confirm', 
+                                    :confirm => t('text_cancel_are_you_sure') %>
            <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
     </tr>
   </table>

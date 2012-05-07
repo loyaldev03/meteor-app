@@ -59,21 +59,25 @@ class MembersController < ApplicationController
 
   def cancel
     if request.post?
-      if params[:cancel_date].to_date > Date.today
-        begin
-          @current_member.cancel_date = params[:cancel_date]
-          @current_member.save!
-          message = "Member cancellation scheduled to #{params[:cancel_date]}"
-          Auditory.audit(current_agent, @current_member, message, @current_member)
-          o = Operation.last
-          o.update_attributes(:notes => params[:reason])
-          flash[:notice] = message
-          redirect_to show_member_path
-        rescue
-          # TODO: 
+      if !params[:reason].blank?
+        if params[:cancel_date].to_date > Date.today
+          begin
+            @current_member.cancel_date = params[:cancel_date]
+            @current_member.save!
+            message = "Member cancellation scheduled to #{params[:cancel_date]}"
+            Auditory.audit(current_agent, @current_member, message, @current_member)
+            o = Operation.last
+            o.update_attributes(:notes => params[:reason])
+            flash[:notice] = message
+            redirect_to show_member_path
+          rescue
+            # TODO: 
+          end
+        else
+          flash[:error] = "Cancellation date cant be less or equal than today."
         end
       else
-        flash[:error] = "Cancellation date cant be less or equal than today."
+        flash[:error] = "Reason cant be blank."
       end
     end    
   end

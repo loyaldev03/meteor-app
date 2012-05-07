@@ -13,7 +13,7 @@
  *= require_tree .
  *= require dataTables/jquery.dataTables
  *= require dataTables/jquery.dataTables.bootstrap
-*/http://kuler.adobe.com/#create/fromacolor
+*/
 form .clearfix:before, form .clearfix:after {
   display: inline;
 }
