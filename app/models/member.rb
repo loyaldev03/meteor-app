@@ -55,7 +55,7 @@ class Member < ActiveRecord::Base
   end
 
   def schedule_first_membership
-    # TODO: send welcome email 
+    Notifier.welcome(email).deliver!
     self.bill_date = Date.today + terms_of_membership.trial_days
     self.next_retry_bill_date = bill_date
     if terms_of_membership.monthly?
@@ -212,13 +212,13 @@ class Member < ActiveRecord::Base
     end
 
     def send_pre_bill
-      # TODO: send prebill email
+      Notifier.pre_bill(email).deliver!
     end
 
     def deactivation
       self.next_retry_bill_date = nil
       self.bill_date = nil
-      # TODO: Send email on deactivation
+      Notifier.deactivation(email).deliver!
       # TODO: Deactivate drupal account
       self.save
       Auditory.audit(nil, self, "Member deactivated", self)
