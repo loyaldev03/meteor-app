@@ -68,6 +68,7 @@ $('document').ready( function() {
     "bSort": true,
     "bInfo": false,
     "bAutoWidth": false,
+    "aaSorting": [[ 0, "desc" ]]
   });
 
 });
