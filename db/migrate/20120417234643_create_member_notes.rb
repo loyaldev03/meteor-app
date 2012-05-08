@@ -1,7 +1,7 @@
 class CreateMemberNotes < ActiveRecord::Migration
   def up
     create_table :member_notes, {:id => false} do |t|
-      t.integer :member_id, :limit => 8
+      t.string :member_id, :limit => 36
       t.integer :created_by_id, :limit => 8
       t.text :description
       t.integer :disposition_type_id
