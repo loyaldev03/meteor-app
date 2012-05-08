@@ -44,6 +44,7 @@ class Admin::AgentsController < ApplicationController
 
     respond_to do |format|
       if @agent.save
+        @agent.confirm!
         format.html { redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') }
         format.xml  { render :xml => @agent, :status => :created, :location => @agent }
       else
