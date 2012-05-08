@@ -9,7 +9,9 @@ class MemberNotesController < ApplicationController
   end
 
   def create 
-    member_note = MembersNote.new(params[:member_notes])
+    member_note = MemberNote.new(params[:member_note])
+    member_note.created_by_id = @current_agent.id
+    member_note.member_id = @current_member.id
 
     respond_to do |format|
       if member_note.save
