@@ -6,6 +6,7 @@ en:
   edit: 'Edit'
   save: 'Save'
   destroy: 'Destroy'
+  add: 'Add'
   lock: 'Lock'
   unlock: 'Unlock'
   new: 'New'
