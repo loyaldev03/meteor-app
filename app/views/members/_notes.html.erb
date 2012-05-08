@@ -1,19 +1,19 @@
-
-<table class="table table-bordered">
-  <thead>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th colspan="2">Notes <%= link_to "Add a note", new_member_note_path, :class => "btn btn-warning" %></th>
+      </tr>
+    </thead>   
     <tr>
-      <th colspan="2">Notes <%= link_to "Add a note", "#", :class => "btn btn-warning" %></th>
+    <% notes.each do |note| %>
+      <td>
+        <%= l(note.created_at) %>
+      </td>
+      <td>
+        <%= link_to note.description[0..50], "#" %>
+      </td>
     </tr>
-  </thead>
-  <tr>
-  <% notes.each do |note| %>
-    <td>
-      <%= l(note.created_at) %>
-    </td>
-    <td>
-      <%= link_to note.description[0..50], "#" %>
-    </td>
-  </tr>
-  <% end %>
+    <% end %>
 </table>
+
   <%= will_paginate notes %>

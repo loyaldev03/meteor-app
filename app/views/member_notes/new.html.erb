@@ -1,0 +1,16 @@
+<%= render :partial => "shared/member_information" %>
+
+ <%= form_for @member_note, :as => :member_note, :url => member_notes_path(:id => @member_notes), do |f|%>
+  <table class="table table-bordered">    
+    <tr>
+      <td> 
+        <%= submit_tag t('add'), :class => 'btn btn-primary' %>
+        <%= f.select :disposition_type_id, options_from_collection_for_select(@disposition_type, "id", "name") if !@disposition_type.nil? %> 
+        <%= f.select :communication_type_id, options_from_collection_for_select(@communication_type, "id", "name") if !@communication_type.nil? %>
+      </td>
+    </tr>
+    <tr>
+      <td> <%= f.text_area :description, :style => 'width: 99%; height: 60px' %> </td>
+    </tr>
+  </table>
+ <% end %>

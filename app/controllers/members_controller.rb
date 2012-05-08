@@ -98,5 +98,4 @@ class MembersController < ApplicationController
       end
     end
   end
-
 end
