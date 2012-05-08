@@ -17,6 +17,7 @@ en:
   email: 'Email'
   show_on_map: 'map'
   member: 'Member'
+  term_of_membership: 'Term of membership'
   reason: 'Reason'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   menu: 
@@ -60,6 +61,8 @@ en:
         operation_date: 'Operation date'
         description: 'Description'
         created_by: 'Created by'
+      terms_of_membership:
+        name: 'Name'
   date:
     formats:
       default: "%d/%m/%Y"

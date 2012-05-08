@@ -59,7 +59,7 @@
       </th>
     </tr>
   </thead>  
-  <tr   >
+  <tr>
     <td> <%= t('activerecord.attributes.member.member_since_date') %>: 
          <%= I18n.l @current_member.created_at, :format => :long%> </td>
     <td> <%= t('activerecord.attributes.member.join_date') %>: 
@@ -72,6 +72,11 @@
       <%= t('activerecord.attributes.member.cancel_date') %>: 
       <%= I18n.l(@current_member.cancel_date, :format => :long) unless @current_member.cancel_date.nil? %>
     </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <%= t('term_of_membership') %> 
+         <%= t('activerecord.attributes.terms_of_membership.name') %>:
+         <%= @current_member.terms_of_membership.name %> </td>
   </tr>
 </table>
 
