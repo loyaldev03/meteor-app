@@ -156,6 +156,16 @@ class Member < ActiveRecord::Base
   end
 
   def enroll(credit_card, amount, agent = nil)
+    # TODO: blacklist logic goes here
+    # 
+
+    # TODO: refs #19028. Before any transaction is done, we have to filter those duplicated memebrs
+    # or do automatic-reactivations.
+    # if email address is unique, we have to answer a code xxx if email on this club exists and
+    # member != lapsed.
+    # If member == lapsed, should we auto bill?
+    # 
+
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
