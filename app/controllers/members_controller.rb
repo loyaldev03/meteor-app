@@ -81,6 +81,10 @@ class MembersController < ApplicationController
     end    
   end
 
+  def blacklist
+    @blacklist_reason = MemberBlacklistReason.all
+  end
+
   def change_next_bill_date
     if request.post?
       if params[:next_bill_date].to_date > Date.today
