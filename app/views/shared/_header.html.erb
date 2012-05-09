@@ -11,18 +11,19 @@
 
       <% if current_agent %>
         <div class="container nav-collapse">
-          <ul class="nav">
             <% if @current_club.nil? %>
               <% unless @current_partner.nil? %>
-                <li><%= link_to @current_partner.name, admin_partner_dashboard_path %></li>
+                <%= link_to @current_partner.name, admin_partner_dashboard_path %>
               <% end %>
             <% else %>
               <% if @current_club.logo? %>
-                <li><%= link_to image_tag(@current_club.logo.url), members_path(@current_partner.prefix, @current_club.name) %></li>
+                <%= link_to image_tag(@current_club.logo.url(:header)), members_path(@current_partner.prefix, @current_club.name) %>
               <% else %>
-                <li><%= link_to @current_club.full_name, members_path(@current_partner.prefix, @current_club.name) %></li>
+                <%= link_to @current_club.full_name, members_path(@current_partner.prefix, @current_club.name) %>
               <% end %>
             <% end %>
+
+          <ul class="nav">
             <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
             <li><%= link_to t('menu.agents'), admin_agents_path  %></li>
             <li><%= link_to t('menu.partners'), admin_partners_path  %></li>
