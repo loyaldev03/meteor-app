@@ -17,14 +17,16 @@ en:
   url: 'Url'
   email: 'Email'
   show_on_map: 'map'
-  member: 'Member'
-  term_of_membership: 'Term of membership'
   reason: 'Reason'
+  added_by: 'Added by'
+  ago: 'ago'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   menu: 
     logout: Logout
     agents: Agents
   activerecord:
+    member: 'Member'
+    term_of_membership: 'Term of membership'
     attributes:
       transaction:
         transaction_types: 
