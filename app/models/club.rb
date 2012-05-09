@@ -13,7 +13,7 @@ class Club < ActiveRecord::Base
   after_create :add_default_member_groups
 
   validates :partner_id, :presence => true
-  validates :name, :presence => true
+  validates :name, :presence => true, :uniqueness => true
 
   has_attached_file :logo, :path => ":rails_root/public/system/:attachment/:id/:style/:filename", 
                            :url => "/system/:attachment/:id/:style/:filename",
