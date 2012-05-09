@@ -2,23 +2,27 @@
 
 <%= form_tag(member_cancel_path) do %>
   <table class="table table-bordered">
-    <tr>
-      <td>
-        <%= label :cancel_date, t('activerecord.attributes.member.cancel_date'), :class => 'help-inline' %> 
-        <%= text_field_tag :cancel_date, nil ,:class => 'datepicker' %> 
-      </td>
-    </tr>
-    <tr>
-      <td> 
-        <%= label :reason, t('reason'), :class => 'help-inline' %> 
-        <%= select_tag :reason, options_from_collection_for_select(@member_cancel_reason, "name", "name") %>
-      </td>
-    </tr>
-    <tr>
-      <td> <%= submit_tag t(:save), :class => 'btn btn-primary confirm', 
-                                    :confirm => t('text_cancel_are_you_sure') %>
-           <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
-    </tr>
+    <thead>
+      <tr>
+        <th>
+          <%= label :cancel_date, t('activerecord.attributes.member.cancel_date'), :class => 'help-inline' %> 
+          <%= text_field_tag :cancel_date, nil ,:class => 'datepicker', :readonly => 'readonly' %> 
+        </th>
+      </tr>
+      <tr>
+        <th> 
+          <%= label :reason, t('reason'), :class => 'help-inline' %> 
+          <%= select_tag :reason, options_from_collection_for_select(@member_cancel_reason, "name", "name") %>
+        </th>
+      </tr>
+      <tr>
+        <th> 
+          <%= submit_tag t(:save), :class => 'btn btn-primary confirm', 
+                                   :confirm => t('text_cancel_are_you_sure') %>
+          <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> 
+        </th>
+      </tr>
+    </thead>
   </table>
 <% end%>
 
