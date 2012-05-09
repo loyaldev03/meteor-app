@@ -46,6 +46,7 @@ class DomainsController < ApplicationController
   def create
     @domain = Domain.new(params[:domain])
     @domain.partner = @current_partner
+    @clubs = Club.where(:partner_id => @current_partner)
 
     respond_to do |format|
       if @domain.save
@@ -62,7 +63,8 @@ class DomainsController < ApplicationController
   # PUT /domains/1.json
   def update
     @domain = Domain.find(params[:id])
-
+    @clubs = Club.where(:partner_id => @current_partner)
+    
     respond_to do |format|
       if @domain.update_attributes(params[:domain])
         format.html { redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully updated." }
