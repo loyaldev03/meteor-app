@@ -14,7 +14,7 @@ class Club < ActiveRecord::Base
 
   has_attached_file :logo, :path => ":rails_root/public/system/:attachment/:id/:style/:filename", 
                            :url => "/system/:attachment/:id/:style/:filename",
-                           :styles => {:thumb => "100x100#", :small  => "150x150>"}
+                           :styles => { :header => "50x50#", :thumb => "100x100#", :small  => "150x150>" }
 
   def full_name
     [ partner.name, name ].join(' ')
