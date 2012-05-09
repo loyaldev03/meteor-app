@@ -32,6 +32,7 @@ SacPlatform::Application.routes.draw do
         match '/refund/:transaction_id' => 'members#refund', as: 'member_refund', :via => [:get, :post]
         match '/save_the_sale' => 'members#save_the_sale', as: 'member_save_the_sale', :via => [:get, :post]
         match '/cancel' => 'members#cancel', as: 'member_cancel', :via => [:get, :post]
+        match '/blacklist' => 'members#blacklist', as: 'member_blacklist', :via => [:get, :post]
         match '/change_next_bill_date' => 'members#change_next_bill_date', as: 'member_change_next_bill_date', :via => [:get, :post]
         match '/' => 'members#show', as: 'show_member', :via => [:get]
       end
