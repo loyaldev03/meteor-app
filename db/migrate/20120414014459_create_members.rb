@@ -24,7 +24,6 @@ class CreateMembers < ActiveRecord::Migration
       t.integer :created_by_id
       t.integer :quota, :default => 0
       t.integer :recycled_times, :default => 0
-      t.boolean :blacklisted, :default => false
       t.timestamps
     end
   end
