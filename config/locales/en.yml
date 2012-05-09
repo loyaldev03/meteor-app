@@ -22,8 +22,9 @@ en:
   ago: 'ago'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   menu: 
-    logout: Logout
-    agents: Agents
+    logout: 'Logout'
+    agents: 'Agents'
+    partners: 'Partners'
   activerecord:
     member: 'Member'
     term_of_membership: 'Term of membership'
