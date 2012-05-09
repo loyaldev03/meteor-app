@@ -4,10 +4,13 @@ class Club < ActiveRecord::Base
   has_many :terms_of_memberships
   has_many :members
   has_many :payment_gateway_configurations
+  has_many :member_group_types
   
   attr_accessible :description, :name, :logo
 
   acts_as_paranoid
+
+  after_create :add_default_member_groups
 
   validates :partner_id, :presence => true
   validates :name, :presence => true
@@ -19,5 +22,15 @@ class Club < ActiveRecord::Base
   def full_name
     [ partner.name, name ].join(' ')
   end
+
+  private
+    def add_default_member_groups
+      ['VIP', 'Celebrity', 'Notable'].each do |name|
+        m = MemberGroupType.new
+        m.name= name
+        m.club_id = self.id
+        m.save
+      end
+    end
 
 end

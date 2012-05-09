@@ -4,6 +4,7 @@ class Member < ActiveRecord::Base
   belongs_to :terms_of_membership
   belongs_to :club
   belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
+  belongs_to :member_group_type
   has_many :member_notes
   has_many :credit_cards
   has_many :transactions
