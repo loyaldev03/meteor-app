@@ -74,9 +74,13 @@
     </td>
   </tr>
   <tr>
-    <td colspan="4"> <%= t('menu.activerecord.term_of_membership') %> 
+    <td colspan="2"> <%= t('menu.activerecord.term_of_membership') %> 
          <%= t('activerecord.attributes.terms_of_membership.name') %>:
-         <%= @current_member.terms_of_membership.name %> </td>
+         <%= @current_member.terms_of_membership.name %> 
+    </td>
+    <td colspan="2"> <%= t('activerecord.attributes.member.member_group_type') %>:
+         <%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %> 
+    </td>
   </tr>
 </table>
 

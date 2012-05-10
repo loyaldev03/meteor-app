@@ -20,6 +20,7 @@ class MembersController < ApplicationController
 
   def edit  
     @member = @current_member
+    @member_group_types = MemberGroupType.find_all_by_club_id(@current_club)
   end
 
   def save_the_sale

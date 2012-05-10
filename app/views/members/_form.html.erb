@@ -1,4 +1,14 @@
 <table class="table table-condensed"> 
+  <% if !@member.new_record? %>
+  <tr class="control-group"> 
+    <td colspan="2">
+    <%= t('activerecord.attributes.member.member_group_type') %>:
+    <%= f.select :member_group_type_id, 
+                  options_from_collection_for_select(@member_group_types, "id","name", 
+                  {:selected => @member.member_group_type_id }), :include_blank => '' %>
+    </td>
+  </tr> 
+  <% end %>
   <tr class="control-group" ><td colspan="2"> <b> Demographic Information </b> </td></tr>
   <tr class="control-group" >  
     <td> 

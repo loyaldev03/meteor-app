@@ -56,6 +56,8 @@ en:
         cancel_date: 'Cancel date'
         terms_of_membership_id: 'Terms of membership'
         visible_id: 'ID'
+        member_group_type: 'Member group type'
+        not_group_associated: 'It has no member group type associated.'
       credit_card:
         number: 'Credit card number'
         expire_date: 'Expire date'

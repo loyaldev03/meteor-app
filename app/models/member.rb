@@ -14,7 +14,7 @@ class Member < ActiveRecord::Base
       :email, :external_id, :first_name, :phone_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
-      :club_id, :partner_id
+      :club_id, :partner_id, :member_group_type_id
 
   validates :first_name, :presence => true
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
