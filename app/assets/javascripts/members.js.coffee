@@ -3,10 +3,6 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
 jQuery ->
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "dd-mm-yy", showOn: "button", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "dd-mm-yy", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
 
-
-
-
-			
-			
+  $('#member_cancelation_form').validate();

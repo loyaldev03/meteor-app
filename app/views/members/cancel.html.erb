@@ -1,12 +1,13 @@
 <h1><%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
 
-<%= form_tag(member_cancel_path) do %>
+<%= form_tag(member_cancel_path, :id => 'member_cancelation_form') do %>
   <table class="table table-bordered">
     <thead>
       <tr>
         <th>
           <%= label :cancel_date, t('activerecord.attributes.member.cancel_date'), :class => 'help-inline' %> 
-          <%= text_field_tag :cancel_date, nil ,:class => 'datepicker', :readonly => 'readonly' %> 
+          <%= text_field_tag :cancel_date, nil ,:class => 'datepicker required',
+                             :readonly => 'readonly' %> 
         </th>
       </tr>
       <tr>
