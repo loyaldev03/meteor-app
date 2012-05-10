@@ -85,12 +85,12 @@ class Admin::AgentsController < ApplicationController
   def lock
     agent = Agent.find(params[:agent_id])
     agent.lock_access!
-    redirect_to(admin_agents_path, :notice => "Agent number #{agent.id} - #{agent.agentname} - was locked.")
+    redirect_to(admin_agents_path, :notice => "Agent number #{agent.id} - #{agent.username} - was locked.")
   end
 
   def unlock
     agent = Agent.find(params[:agent_id])
     agent.unlock_access!
-    redirect_to(admin_agents_path, :notice => "Agent number #{agent.id} - #{agent.agentname} - was unlocked.")
+    redirect_to(admin_agents_path, :notice => "Agent number #{agent.id} - #{agent.username} - was unlocked.")
   end
 end
