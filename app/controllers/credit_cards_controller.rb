@@ -12,6 +12,7 @@ class CreditCardsController < ApplicationController
     credit_card = CreditCard.new(params[:credit_card])
     credit_card.member_id = @current_member.id
     actual_credit_card = @current_member.active_credit_card
+    credit_card.last_digits = credit_card.number.last(4)
 
   	respond_to do |format|
       if credit_card.save && actual_credit_card.update_attributes(:active => 0)
