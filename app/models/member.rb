@@ -9,6 +9,7 @@ class Member < ActiveRecord::Base
   has_many :credit_cards
   has_many :transactions
   has_many :operations
+  has_many :communications
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_number, 
@@ -56,7 +57,7 @@ class Member < ActiveRecord::Base
   end
 
   def schedule_first_membership
-    Notifier.welcome(email).deliver!
+    Communication.deliver!(:welcome, self)
     self.bill_date = Date.today + terms_of_membership.trial_days
     self.next_retry_bill_date = bill_date
     if terms_of_membership.monthly?
@@ -204,7 +205,7 @@ class Member < ActiveRecord::Base
   end
 
   def send_pre_bill
-    Notifier.pre_bill(email).deliver!
+    Communication.deliver!(:prebill, self)
     Auditory.audit(nil, self, "Pre bill email sent.", self)
   end
   
@@ -230,7 +231,7 @@ class Member < ActiveRecord::Base
     def deactivation
       self.next_retry_bill_date = nil
       self.bill_date = nil
-      Notifier.deactivation(email).deliver!
+      Communication.deliver!(:deactivation, self)
       # TODO: Deactivate drupal account
       self.save
       Auditory.audit(nil, self, "Member deactivated", self)

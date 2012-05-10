@@ -1,0 +1,49 @@
+class Communication < ActiveRecord::Base
+  attr_accessible :email, :run_at, :sent, :response
+  belongs_to :member
+
+  def self.deliver!(template_type, member)
+    template = EmailTemplate.find_by_terms_of_membership_id member.terms_of_membership_id
+    c = Communication.new :email => member.email
+    c.member_id = member.id
+    c.client = template.client
+    c.external_id = template.external_id
+    c.template_type = template.template_type
+    c.save
+    if template.lyris?
+      c.deliver_lyris
+    elsif template.action_mailer?
+      c.deliver_action_mailer
+    else
+      logger.error "* * * * * Client not supported"
+    end
+  end
+
+  def deliver_lyris
+    raise "error not defined yet!!!"
+  end
+  handle_asynchronously :deliver_lyris
+
+  def deliver_action_mailer
+    case template_type.to_sym
+    when :welcome
+      Notifier.welcome(member.email).deliver!
+    when :active
+      #TODO:
+    when :deactivation
+      Notifier.deactivation(member.email).deliver!
+    when :prebill
+      Notifier.pre_bill(member.email).deliver!
+    when :refund
+      #TODO:
+    else
+      logger.error "Template type #{template_type} not supported."
+    end
+    update_attributes :sent => true, :run_at => DateTime.now
+  rescue Exception => e
+    logger.error "* * * * * #{e}"
+    update_attributes :sent => false, :response => e, :run_at => DateTime.now
+  end
+  handle_asynchronously :deliver_action_mailer
+
+end
