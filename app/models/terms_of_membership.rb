@@ -5,8 +5,11 @@ class TermsOfMembership < ActiveRecord::Base
   belongs_to :club
   has_many :transactions
   has_many :members
+  has_many :email_templates
 
   acts_as_paranoid
+
+  after_create :setup_defaul_email_templates
 
   validates :name, :presence => true
   validates :grace_period, :presence => true
@@ -44,5 +47,19 @@ class TermsOfMembership < ActiveRecord::Base
   def payment_gateway_configuration
     club.payment_gateway_configurations.find_by_mode(mode)
   end
+
+  private
+
+    def setup_defaul_email_templates
+      if development?
+        EmailTemplate::TEMPLATE_TYPES.each do |type|
+          et = EmailTemplate.new 
+          et.client = :action_mailer
+          et.template_type = type
+          et.terms_of_membership_id = self.id
+          et.save
+        end
+      end
+    end
 
 end

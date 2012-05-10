@@ -16,6 +16,8 @@ gem 'exception_notification', :require => 'exception_notifier'
 
 gem 'acts_as_list'
 
+gem 'delayed_job_active_record'
+
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
