@@ -54,6 +54,7 @@ class TermsOfMembership < ActiveRecord::Base
       if development?
         EmailTemplate::TEMPLATE_TYPES.each do |type|
           et = EmailTemplate.new 
+          et.name = "Test #{type}"
           et.client = :action_mailer
           et.template_type = type
           et.terms_of_membership_id = self.id

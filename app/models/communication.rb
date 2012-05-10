@@ -6,6 +6,7 @@ class Communication < ActiveRecord::Base
     template = EmailTemplate.find_by_terms_of_membership_id member.terms_of_membership_id
     c = Communication.new :email => member.email
     c.member_id = member.id
+    c.template_name = template.name
     c.client = template.client
     c.external_id = template.external_id
     c.template_type = template.template_type

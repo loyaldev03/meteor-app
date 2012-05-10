@@ -2,6 +2,7 @@ class CreateCommunications < ActiveRecord::Migration
   def change
     create_table :communications do |t|
       t.string :member_id, :limit => 36
+      t.string :template_name
       t.string :email
       t.datetime :run_at
       t.string :client 
