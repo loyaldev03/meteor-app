@@ -58,6 +58,7 @@ en:
         visible_id: 'ID'
         member_group_type: 'Member group type'
         not_group_associated: 'It has no member group type associated.'
+        does_not_have_member_groups: 'It has no groups to be selected.'
       credit_card:
         number: 'Credit card number'
         expire_date: 'Expire date'

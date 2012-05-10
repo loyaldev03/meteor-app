@@ -3,9 +3,13 @@
   <tr class="control-group"> 
     <td colspan="2">
     <%= t('activerecord.attributes.member.member_group_type') %>:
-    <%= f.select :member_group_type_id, 
+    <% if !@member_group_types.nil? %>
+      <%= f.select :member_group_type_id, 
                   options_from_collection_for_select(@member_group_types, "id","name", 
                   {:selected => @member.member_group_type_id }), :include_blank => '' %>
+    <% else %>
+      <%= t('activerecord.attributes.member.does_not_have_member_groups')  %>
+    <% end %>
     </td>
   </tr> 
   <% end %>
