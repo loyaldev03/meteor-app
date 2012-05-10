@@ -5,12 +5,13 @@
     <tr>
       <td> 
         <%= submit_tag t('add'), :class => 'btn btn-primary' %>
-        <%= f.select :disposition_type_id, options_from_collection_for_select(@disposition_type, "id", "name") if !@disposition_type.nil? %> 
-        <%= f.select :communication_type_id, options_from_collection_for_select(@communication_type, "id", "name") if !@communication_type.nil? %>
+        <%= f.select :disposition_type_id, options_from_collection_for_select(@disposition_types, "id", "name") if !@disposition_types.nil? %> 
+        <%= f.select :communication_type_id, options_from_collection_for_select(@communication_types, "id", "name") if !@communication_types.nil? %>
       </td>
     </tr>
     <tr>
-      <td> <%= f.text_area :description, :style => 'width: 99%; height: 60px' %> </td>
+      <td> <%= f.text_area :description, :style => 'width: 99%; height: 200px' %> </td>
     </tr>
+    <tr> <td> <%= link_to t(:back), :back, :class => 'btn' %> </td> </tr>
   </table>
  <% end %>
