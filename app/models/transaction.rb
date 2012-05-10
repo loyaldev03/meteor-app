@@ -123,6 +123,7 @@ class Transaction < ActiveRecord::Base
     if trans.success?
       old_transaction.refunded_amount = old_transaction.refunded_amount + amount
       old_transaction.save
+      Communication.deliver!(:refund, old_transaction.member)
     end
     answer
   end

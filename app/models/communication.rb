@@ -30,13 +30,13 @@ class Communication < ActiveRecord::Base
     when :welcome
       Notifier.welcome(member.email).deliver!
     when :active
-      #TODO:
+      Notifier.active(member.email).deliver!
     when :deactivation
       Notifier.deactivation(member.email).deliver!
     when :prebill
       Notifier.pre_bill(member.email).deliver!
     when :refund
-      #TODO:
+      Notifier.refund(member.email).deliver!
     else
       logger.error "Template type #{template_type} not supported."
     end

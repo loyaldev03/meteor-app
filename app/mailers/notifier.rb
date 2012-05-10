@@ -24,4 +24,14 @@ class Notifier < ActionMailer::Base
     mail :to => email, :subject => "welcome email"
   end
 
+  def active(email)
+    email = nil
+    mail :to => email, :subject => "active"
+  end
+
+  def refund(email)
+    email = nil
+    mail :to => email, :subject => "refund"
+  end
+
 end

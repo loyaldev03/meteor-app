@@ -26,6 +26,7 @@ class Member < ActiveRecord::Base
   state_machine :status, :initial => :none do
     after_transition [:none, :lapsed, :provisional, :paid] => :provisional, :do => :schedule_first_membership
     after_transition [:none, :provisional, :paid] => :lapsed, :do => :deactivation
+    after_transition :provisional => :paid, :do => :member_activation_notification
 
     event :set_as_provisional do
       transition [:none, :lapsed, :paid, :provisional] => :provisional
@@ -65,6 +66,10 @@ class Member < ActiveRecord::Base
     end
     self.join_date = DateTime.now 
     self.save
+  end
+
+  def member_activation_notification
+    Communication.deliver!(:active, self)
   end
 
   def change_next_bill_date!(next_bill_date)
