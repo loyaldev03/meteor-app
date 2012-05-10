@@ -41,9 +41,11 @@ class Communication < ActiveRecord::Base
       logger.error "Template type #{template_type} not supported."
     end
     update_attributes :sent => true, :run_at => DateTime.now
+    Auditory.audit(nil, self, "Communication '#{template_name}' sent", member)
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent => false, :response => e, :run_at => DateTime.now
+    Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member)
   end
   handle_asynchronously :deliver_action_mailer
 
