@@ -20,7 +20,7 @@ SacPlatform::Application.routes.draw do
     resources :clubs
     scope '/club/:club_prefix' do
       match '/members/new' => 'members#new', as: 'new_member'
-      match '/members' => 'members#index', as: 'members'
+      match '/members' => 'members#index', as: 'members', :via => [:get, :post]
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
         resources :operations, :only => [ :show, :update ]

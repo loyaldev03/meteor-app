@@ -1,0 +1,10 @@
+<table class="table table-bordered">
+<% members.each do |member| %>
+  <tr> 
+    <td> <%= member.full_name %> </td>
+    <td> <%= member.full_address %> </td>
+    <td> <%= member.active_credit_card.number %> </td>
+    <td> <%= link_to t(:show), show_member_path(:member_prefix => member.visible_id) %> </td>
+  </tr>
+<% end %>
+</table>

@@ -2,8 +2,18 @@ class MembersController < ApplicationController
   before_filter :validate_club_presence
   before_filter :validate_member_presence, :except => [ :index, :new ]
 
-  def index
-  end
+    def index
+      if request.post?
+        @members = Member.where([" visible_id like ? AND first_name like ? AND last_name like ? AND address like ? AND
+                                   phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
+                                   AND bill_date like ? AND club_id like ?", 
+                                 '%'+params[:member][:member_id]+'%','%'+params[:member][:first_name]+'%',
+                                 '%'+params[:member][:last_name]+'%','%'+params[:member][:address]+'%',
+                                 '%'+params[:member][:phone_number]+'%','%'+params[:member][:city]+'%',
+                                 '%'+params[:member][:state]+'%','%'+params[:member][:zip]+'%', 
+                                 '%'+params[:member][:email]+'%','%'+params[:member][:bill_date]+'%', @current_club])
+      end
+    end
 
   def show
     @operations = @current_member.operations.all
