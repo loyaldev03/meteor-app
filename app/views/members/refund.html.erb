@@ -7,7 +7,8 @@
     </tr>
     <tr>
       <td>  <%= submit_tag t(:save), :class => 'btn btn-primary' %>
-           <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
+      		<%= link_to t(:full_save), member_full_save_path , :class=> 'btn btn-success' %>
+            <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
     </tr>
   </table>
 <% end%>

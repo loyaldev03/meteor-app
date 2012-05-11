@@ -70,6 +70,13 @@ class MembersController < ApplicationController
     end
   end
 
+  def full_save
+    message = "Full save done"
+    Auditory.audit(@current_agent, nil, message, @current_member)
+    flash[:notice] = message
+    redirect_to show_member_path
+  end
+
   def cancel
     @member_cancel_reason = MemberCancelReason.all
     if request.post?
