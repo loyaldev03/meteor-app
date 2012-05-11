@@ -50,7 +50,7 @@
       <th <% if @current_member.lapsed? %>
             class = "lapsed"
           <% elsif @current_member.paid? %>
-            class = "paid"
+            class = "active"
           <% elsif %>
             class = "provisional"
           <% end %>
