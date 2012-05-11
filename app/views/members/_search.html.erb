@@ -4,6 +4,7 @@
   	<tr>
       <th> <%= t('activerecord.attributes.member.status') %> </th>
       <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
+      <th> <%= t('activerecord.attributes.member.external_id') %> </th>
       <th> <%= t('activerecord.attributes.member.full_name') %> </th>
       <th> <%= t('activerecord.attributes.member.full_address') %> </th>
   	</tr>
@@ -20,6 +21,7 @@
       <%= member.status %>      
       </th>
       <th> <%= member.visible_id %> </th>
+      <th> <%= member.external_id if !member.external_id.nil? %> </th>
       <th> <%= member.full_name %> </th>
       <th> <%= member.full_address %> </th>
       <th> <%= link_to t(:show), show_member_path(:member_prefix => member.visible_id)%> </th>
