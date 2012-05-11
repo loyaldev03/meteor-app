@@ -22,15 +22,15 @@ form .clearfix:before, form .clearfix:after {
 	background-color: red;
 }
 
-.active{
+.green{
 	background-color: green;
 }
 
-.lapsed{
+.red{
 	background-color: red;
 }
 
-.provisional{
+.yellow{
 	background-color: yellow;
 }
 

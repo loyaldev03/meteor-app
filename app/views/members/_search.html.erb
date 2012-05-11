@@ -10,11 +10,11 @@
   <% members.each do |member| %>
     <tr> 
       <th <% if member.lapsed? %>
-            class = "lapsed"
+            class = "red"
           <% elsif member.paid? %>
-            class = "active"
+            class = "green"
           <% elsif %>
-            class = "provisional"
+            class = "yellow"
           <% end %>
       > 
       <%= member.status %>      
