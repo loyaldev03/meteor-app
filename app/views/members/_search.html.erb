@@ -1,10 +1,30 @@
-<table class="table table-bordered">
-<% members.each do |member| %>
-  <tr> 
-    <td> <%= member.full_name %> </td>
-    <td> <%= member.full_address %> </td>
-    <td> <%= member.active_credit_card.number %> </td>
-    <td> <%= link_to t(:show), show_member_path(:member_prefix => member.visible_id) %> </td>
-  </tr>
-<% end %>
+<p> Resultados </p>
+<table class="table table-bordered table-condensed">
+  <thead>
+  	<tr>
+      <th> <%= t('activerecord.attributes.member.status') %> </th>
+      <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
+      <th> <%= t('activerecord.attributes.member.full_name') %> </th>
+      <th> <%= t('activerecord.attributes.member.full_address') %> </th>
+  	</tr>
+  <% members.each do |member| %>
+    <tr> 
+      <th <% if member.lapsed? %>
+            class = "lapsed"
+          <% elsif member.paid? %>
+            class = "paid"
+          <% elsif %>
+            class = "provisional"
+          <% end %>
+      > 
+      <%= member.status %>      
+      </th>
+      <th> <%= member.visible_id %> </th>
+      <th> <%= member.full_name %> </th>
+      <th> <%= member.full_address %> </th>
+      <th> <%= link_to t(:show), show_member_path(:member_prefix => member.visible_id)%> </th>
+    </tr>
+
+  <% end %>
+  </thead>  
 </table>
