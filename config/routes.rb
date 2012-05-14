@@ -39,7 +39,6 @@ SacPlatform::Application.routes.draw do
       end
     end
     resources :domains
-    resources :terms_of_memberships
     match 'dashboard' => 'admin/partners#dashboard', as: 'admin_partner_dashboard'
   end
 
