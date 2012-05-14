@@ -29,8 +29,7 @@ class Communication < ActiveRecord::Base
     lyris = LyrisService.new
     # subscribe user
     lyris.subscribe_user!(self)
-    response = lyris.send_email!(communication.external_attributes[:mlid], 
-      communication.external_attributes[:trigger_id], email)
+    response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
     update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response
     Auditory.audit(nil, self, "Communication '#{template_name}' sent", member)
   rescue Exception => e
