@@ -14,9 +14,9 @@ class Notifier < ActionMailer::Base
     mail :to => email, :subject => "Pre bill email"
   end
 
-  def deactivation(email)
+  def cancellation(email)
     email = nil
-    mail :to => email, :subject => "deactivtion"
+    mail :to => email, :subject => "cancellation"
   end
 
   def welcome(email)

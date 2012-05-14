@@ -4,11 +4,12 @@ class CreateCommunications < ActiveRecord::Migration
       t.string :member_id, :limit => 36
       t.string :template_name
       t.string :email
-      t.datetime :run_at
+      t.datetime :scheduled_at
+      t.datetime :processed_at
       t.string :client 
-      t.string :external_id 
+      t.string :external_attributes 
       t.string :template_type
-      t.boolean :sent
+      t.boolean :sent_success
       t.text :request
       t.text :response
       t.timestamps

@@ -13,6 +13,16 @@ class CreditCard < ActiveRecord::Base
     update_attribute :last_successful_bill_date, DateTime.now
   end
 
+  def am_card
+    ActiveMerchant::Billing::CreditCard.require_verification_value = false
+    @cc ||= ActiveMerchant::Billing::CreditCard.new(
+      :number     => number,
+      :month      => expire_month,
+      :year       => expire_year #,
+      #:first_name => first_name,
+      #:last_name  => last_name
+    )
+  end
 
   # refs #17832
   # 6 Days Later if not successful = (+3), 3/2014

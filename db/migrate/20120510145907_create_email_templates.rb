@@ -3,7 +3,7 @@ class CreateEmailTemplates < ActiveRecord::Migration
     create_table :email_templates do |t|
       t.string :name
       t.string :client # lyris - ActionMailer - Amazon
-      t.string :external_id #lyris will store trigger and mlid
+      t.string :external_attributes #lyris will store trigger and mlid
       t.string :template_type
       t.integer :terms_of_membership_id, :limit => 8
       t.timestamps

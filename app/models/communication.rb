@@ -10,6 +10,7 @@ class Communication < ActiveRecord::Base
     c.client = template.client
     c.external_id = template.external_id
     c.template_type = template.template_type
+    c.scheduled_at = DateTime.now
     c.save
     if template.lyris?
       c.deliver_lyris
@@ -31,8 +32,8 @@ class Communication < ActiveRecord::Base
       Notifier.welcome(member.email).deliver!
     when :active
       Notifier.active(member.email).deliver!
-    when :deactivation
-      Notifier.deactivation(member.email).deliver!
+    when :cancellation
+      Notifier.cancellation(member.email).deliver!
     when :prebill
       Notifier.pre_bill(member.email).deliver!
     when :refund
@@ -40,11 +41,11 @@ class Communication < ActiveRecord::Base
     else
       logger.error "Template type #{template_type} not supported."
     end
-    update_attributes :sent => true, :run_at => DateTime.now
+    update_attributes :sent_success => true, :processed_at => DateTime.now
     Auditory.audit(nil, self, "Communication '#{template_name}' sent", member)
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    update_attributes :sent => false, :response => e, :run_at => DateTime.now
+    update_attributes :sent_success => false, :response => e, :processed_at => DateTime.now
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member)
   end
   handle_asynchronously :deliver_action_mailer

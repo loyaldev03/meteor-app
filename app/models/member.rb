@@ -25,7 +25,7 @@ class Member < ActiveRecord::Base
 
   state_machine :status, :initial => :none do
     after_transition [:none, :lapsed, :provisional, :paid] => :provisional, :do => :schedule_first_membership
-    after_transition [:none, :provisional, :paid] => :lapsed, :do => :deactivation
+    after_transition [:none, :provisional, :paid] => :lapsed, :do => :cancellation
     after_transition :provisional => :paid, :do => :member_activation_notification
 
     event :set_as_provisional do
@@ -34,7 +34,7 @@ class Member < ActiveRecord::Base
     event :set_as_paid do
       transition [:provisional, :paid] => :paid
     end
-    event :deactivate do
+    event :set_as_canceled do
       transition [:provisional, :paid] => :lapsed
     end
 
@@ -172,6 +172,10 @@ class Member < ActiveRecord::Base
     # If member == lapsed, should we auto bill?
     # 
 
+    unless credit_card.am_card.valid?
+      return { :message => "Credit card is invalid or is expired!", :code => "9506" }
+    end
+
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
@@ -196,7 +200,7 @@ class Member < ActiveRecord::Base
       end
       set_as_provisional! # set join_date
       message = "Member enrolled successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
-      Auditory.audit(agent, self, message, self)
+      Auditory.audit(agent, trans, message, self)
       self.reload
       { :message => message, :code => "000", :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
@@ -227,19 +231,20 @@ class Member < ActiveRecord::Base
         # refs #15935
         self.quota = self.quota + 12
       end
+      self.recycled_times = 0
       self.bill_date = new_bill_date
       self.next_retry_bill_date = new_bill_date
       self.save
       Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date}", self)
     end
 
-    def deactivation
+    def cancellation
       self.next_retry_bill_date = nil
       self.bill_date = nil
-      Communication.deliver!(:deactivation, self)
+      Communication.deliver!(:cancellation, self)
       # TODO: Deactivate drupal account
       self.save
-      Auditory.audit(nil, self, "Member deactivated", self)
+      Auditory.audit(nil, self, "Member canceled", self)
     end
 
     def set_decline_strategy(trans)
@@ -250,7 +255,7 @@ class Member < ActiveRecord::Base
                 DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
                   trans.response_code, type, "all")
 
-      deactivate = false
+      set_as_canceled = false
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
         message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
@@ -260,7 +265,7 @@ class Member < ActiveRecord::Base
         trans.update_attribute :decline_strategy_id, decline.id
         if decline.hard_decline?
           message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
-          deactivate = true
+          set_as_canceled = true
         else
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
           if trans.response_code == "9999"
@@ -270,12 +275,12 @@ class Member < ActiveRecord::Base
           end
           if self.recycled_times > (decline.limit-1)
             message = "Soft decline limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response}"
-            deactivate = true
+            set_as_canceled = true
           end
         end
       end
-      if deactivate
-        deactivate!
+      if set_as_canceled
+        set_as_canceled!
       else
         increment(:recycled_times, 1)
       end

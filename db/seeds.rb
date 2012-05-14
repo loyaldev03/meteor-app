@@ -6,7 +6,7 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-data = 'batch@xagax.com.ar'
+data = 'batch@xagax.com'
 u = Agent.new :email => data, :username => data, :password => data, :password_confirmation => data
 u.save!
 
