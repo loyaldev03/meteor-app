@@ -14,6 +14,11 @@ class CreditCardsController < ApplicationController
     actual_credit_card = @current_member.active_credit_card
     credit_card.last_digits = credit_card.number.last(4)
 
+    unless credit_card.am_card.valid?
+      return { :message => "Credit card is invalid or is expired!", :code => "9506" }
+    end
+
+
   	respond_to do |format|
       if credit_card.save && actual_credit_card.update_attributes(:active => 0)
         message = "Credit card #{credit_card.number} added and set active."

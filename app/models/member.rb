@@ -164,6 +164,7 @@ class Member < ActiveRecord::Base
   def enroll(credit_card, amount, agent = nil)
     # TODO: blacklist logic goes here
     # 
+    # TODO: use Settings.max_reactivations
 
     # TODO: refs #19028. Before any transaction is done, we have to filter those duplicated memebrs
     # or do automatic-reactivations.

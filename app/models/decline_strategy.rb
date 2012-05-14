@@ -5,6 +5,8 @@ class DeclineStrategy < ActiveRecord::Base
 
   has_many :transactions
 
+  CREDIT_CARD_TYPE = [ :visa, :all, :master ]
+
   def soft_decline?
     self.decline_type == 'soft'
   end
