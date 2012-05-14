@@ -9,3 +9,4 @@ sudo aptitude install graphviz
 Generate Model 
 rake erd
 rake assets:precompile
+

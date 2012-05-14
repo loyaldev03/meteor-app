@@ -30,8 +30,6 @@ class Communication < ActiveRecord::Base
     case template_type.to_sym
     when :welcome
       Notifier.welcome(member.email).deliver!
-    when :active
-      Notifier.active(member.email).deliver!
     when :cancellation
       Notifier.cancellation(member.email).deliver!
     when :prebill
