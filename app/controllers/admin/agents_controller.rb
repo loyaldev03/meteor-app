@@ -61,6 +61,7 @@ class Admin::AgentsController < ApplicationController
 
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
+        @agent.confirm!
         format.html { redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') }
         format.xml  { head :ok }
       else

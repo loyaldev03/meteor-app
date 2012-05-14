@@ -187,7 +187,8 @@ class Member < ActiveRecord::Base
     begin
       save!
       if credit_card.member.nil?
-        credit_card.member = self 
+        credit_card.member = self
+        credit_card.last_digits = credit_card.number.last(4) 
         credit_card.save!
       end
       if trans

@@ -3,6 +3,18 @@ class MembersController < ApplicationController
   before_filter :validate_member_presence, :except => [ :index, :new ]
 
   def index
+    if request.post?
+      @members = Member.joins(:credit_cards).where([" visible_id like ? AND first_name like ? AND last_name like ? AND address like ? AND
+                                 phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
+                                 AND bill_date like ? AND club_id like ? AND credit_cards.active = 1 AND (credit_cards.last_digits like ?
+                                 OR credit_cards.last_digits is null)", 
+                               '%'+params[:member][:member_id]+'%','%'+params[:member][:first_name]+'%',
+                               '%'+params[:member][:last_name]+'%','%'+params[:member][:address]+'%',
+                               '%'+params[:member][:phone_number]+'%','%'+params[:member][:city]+'%',
+                               '%'+params[:member][:state]+'%','%'+params[:member][:zip]+'%', 
+                               '%'+params[:member][:email]+'%','%'+params[:member][:bill_date]+'%', @current_club,
+                               '%'+params[:member][:last_digits]+'%'])
+    end
   end
 
   def show
@@ -56,6 +68,13 @@ class MembersController < ApplicationController
         flash.now[:error] = answer[:message]
       end
     end
+  end
+
+  def full_save
+    message = "Full save done"
+    Auditory.audit(@current_agent, nil, message, @current_member)
+    flash[:notice] = message
+    redirect_to show_member_path
   end
 
   def cancel

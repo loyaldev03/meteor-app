@@ -1,0 +1,32 @@
+<p> Resultados </p>
+<table class="table table-bordered table-condensed">
+  <thead>
+  	<tr>
+      <th> <%= t('activerecord.attributes.member.status') %> </th>
+      <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
+      <th> <%= t('activerecord.attributes.member.external_id') %> </th>
+      <th> <%= t('activerecord.attributes.member.full_name') %> </th>
+      <th> <%= t('activerecord.attributes.member.full_address') %> </th>
+  	</tr>
+  <% members.each do |member| %>
+    <tr> 
+      <th <% if member.lapsed? %>
+            class = "red"
+          <% elsif member.paid? %>
+            class = "green"
+          <% elsif %>
+            class = "yellow"
+          <% end %>
+      > 
+      <%= member.status %>      
+      </th>
+      <th> <%= member.visible_id %> </th>
+      <th> <%= member.external_id if !member.external_id.nil? %> </th>
+      <th> <%= member.full_name %> </th>
+      <th> <%= member.full_address %> </th>
+      <th> <%= link_to t(:show), show_member_path(:member_prefix => member.visible_id)%> </th>
+    </tr>
+
+  <% end %>
+  </thead>  
+</table>
