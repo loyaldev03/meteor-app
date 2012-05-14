@@ -13,7 +13,6 @@ gem "paperclip", "~> 3.0"
 gem 'attr_encrypted'
 
 gem 'exception_notification', :require => 'exception_notifier'
-
 gem 'acts_as_list'
 
 gem 'delayed_job_active_record'

@@ -1,6 +1,7 @@
 class Communication < ActiveRecord::Base
   attr_accessible :email, :processed_at, :sent_success, :response
   belongs_to :member
+  serialize :external_attributes
 
   def self.deliver!(template_type, member)
     template = EmailTemplate.find_by_terms_of_membership_id member.terms_of_membership_id
@@ -21,25 +22,38 @@ class Communication < ActiveRecord::Base
     end
   end
 
+# m = Member.find('dd76774a-9d03-4fe0-91f3-9537296d988e')
+# Communication.deliver!('welcome', m)
+
   def deliver_lyris
-    raise "error not defined yet!!!"
+    lyris = LyrisService.new
+    # subscribe user
+    lyris.subscribe_user!(self)
+    response = lyris.send_email!(communication.external_attributes[:mlid], 
+      communication.external_attributes[:trigger_id], email)
+    update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response
+    Auditory.audit(nil, self, "Communication '#{template_name}' sent", member)
+  rescue Exception => e
+    logger.error "* * * * * #{e}"
+    update_attributes :sent_success => false, :response => e, :processed_at => DateTime.now
+    Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member)
   end
   handle_asynchronously :deliver_lyris
 
   def deliver_action_mailer
-    case template_type.to_sym
+    response = case template_type.to_sym
     when :welcome
-      Notifier.welcome(member.email).deliver!
+      Notifier.welcome(email).deliver!
     when :cancellation
-      Notifier.cancellation(member.email).deliver!
+      Notifier.cancellation(email).deliver!
     when :prebill
-      Notifier.pre_bill(member.email).deliver!
+      Notifier.pre_bill(email).deliver!
     when :refund
-      Notifier.refund(member.email).deliver!
+      Notifier.refund(email).deliver!
     else
       logger.error "Template type #{template_type} not supported."
     end
-    update_attributes :sent_success => true, :processed_at => DateTime.now
+    update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response
     Auditory.audit(nil, self, "Communication '#{template_name}' sent", member)
   rescue Exception => e
     logger.error "* * * * * #{e}"
