@@ -60,7 +60,7 @@ class MembersController < ApplicationController
       return
     end
     if request.post?
-      answer = Transaction.refund(params[:refund_amount], params[:transaction_id])
+      answer = Transaction.refund(params[:refund_amount], params[:transaction_id], current_agent)
       if answer[:code] == "000"
         flash[:notice] = answer[:message]
         redirect_to show_member_path

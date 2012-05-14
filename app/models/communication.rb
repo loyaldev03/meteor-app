@@ -1,5 +1,5 @@
 class Communication < ActiveRecord::Base
-  attr_accessible :email, :run_at, :sent, :response
+  attr_accessible :email, :processed_at, :sent_success, :response
   belongs_to :member
 
   def self.deliver!(template_type, member)
@@ -8,7 +8,7 @@ class Communication < ActiveRecord::Base
     c.member_id = member.id
     c.template_name = template.name
     c.client = template.client
-    c.external_id = template.external_id
+    c.external_attributes = template.external_attributes
     c.template_type = template.template_type
     c.scheduled_at = DateTime.now
     c.save

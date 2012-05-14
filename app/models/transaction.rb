@@ -102,7 +102,7 @@ class Transaction < ActiveRecord::Base
     @cc.type
   end
 
-  def self.refund(amount, old_transaction_id)
+  def self.refund(amount, old_transaction_id, agent=nil)
     amount = amount.to_f
     # Lock transaction, so no one can use this record while we refund this member.
     old_transaction = Transaction.find_by_uuid old_transaction_id, :lock => true
@@ -123,6 +123,7 @@ class Transaction < ActiveRecord::Base
     if trans.success?
       old_transaction.refunded_amount = old_transaction.refunded_amount + amount
       old_transaction.save
+      Auditory.audit(agent, trans, "Credit success $#{amount}", old_transaction.member)
       Communication.deliver!(:refund, old_transaction.member)
     end
     answer
