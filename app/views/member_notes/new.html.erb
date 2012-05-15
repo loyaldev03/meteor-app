@@ -4,7 +4,6 @@
   <table class="table table-bordered">    
     <tr>
       <td> 
-        <%= submit_tag t('add'), :class => 'btn btn-primary' %>
         <%= f.select :disposition_type_id, options_from_collection_for_select(@disposition_types, "id", "name") if !@disposition_types.nil? %> 
         <%= f.select :communication_type_id, options_from_collection_for_select(@communication_types, "id", "name") if !@communication_types.nil? %>
       </td>
@@ -12,6 +11,10 @@
     <tr>
       <td> <%= f.text_area :description, :style => 'width: 99%; height: 200px', :class => 'required' %> </td>
     </tr>
-    <tr> <td> <%= link_to t(:back), :back, :class => 'btn' %> </td> </tr>
+    <tr> 
+      <td> <%= submit_tag t('add'), :class => 'btn btn-primary' %>
+           <%= link_to t(:back), :back, :class => 'btn' %> 
+      </td> 
+    </tr>
   </table>
  <% end %>
