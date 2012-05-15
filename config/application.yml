@@ -1,35 +1,25 @@
 defaults: &defaults
   cc_encryption_key: reibel3y5estrada8
-  payment_gateways:
-  - MeS
-  - litle
-  modes:
-  - development
-  - production
-  bill_types:
-  - monthly
-  - yearly
-  credit_card_types:
-  - visa
-  - all
-  - master
-  decline_types:
-  - soft
-  - hard
   max_reactivations: 3
-  transaction_types:
-  - Sale
-  - Credit
-  - Void
-  - Authorization
-  - AuthorizationCapture
-  - Refund
-  - Capture
   lyris_service:
     domain: 'www.elabs10.com'
     url: '/API/mailing_list.html'
     username: '2010001547'
     password: 'ARcor86'
+  operation_types: 
+    enrollment_billing: 100
+    membership_billing: 101
+    full_save: 102
+    change_next_bill_date: 103
+    credit: 104
+    cancel: 200
+    future_cancel: 201
+    save_the_sale: 202
+    welcome_email: 300
+    prebill_email: 301
+    cancellation_email: 302
+    refund_email: 303
+    others: 1000
 
 
 development:

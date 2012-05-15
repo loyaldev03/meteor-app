@@ -72,7 +72,7 @@ class MembersController < ApplicationController
 
   def full_save
     message = "Full save done"
-    Auditory.audit(@current_agent, nil, message, @current_member)
+    Auditory.audit(@current_agent, nil, message, @current_member, Settings.operation_types.full_save)
     flash[:notice] = message
     redirect_to show_member_path
   end
@@ -86,7 +86,7 @@ class MembersController < ApplicationController
             @current_member.cancel_date = params[:cancel_date]
             @current_member.save!
             message = "Member cancellation scheduled to #{params[:cancel_date]} - Reason: #{params[:reason]}"
-            Auditory.audit(current_agent, @current_member, message, @current_member)
+            Auditory.audit(current_agent, @current_member, message, @current_member, Settings.operation_types.future_cancel)
             flash[:notice] = message
             redirect_to show_member_path
           rescue
@@ -111,7 +111,7 @@ class MembersController < ApplicationController
         begin
           @current_member.change_next_bill_date!(params[:next_bill_date])
           message = "Next bill date changed to #{params[:next_bill_date]}"
-          Auditory.audit(current_agent, @current_member, message, @current_member)
+          Auditory.audit(current_agent, @current_member, message, @current_member, Settings.operation_types.change_next_bill_date)
           flash[:notice] = message
           redirect_to show_member_path
         rescue Exception => e

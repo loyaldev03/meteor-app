@@ -13,15 +13,18 @@ class CreditCard < ActiveRecord::Base
     update_attribute :last_successful_bill_date, DateTime.now
   end
 
-  def am_card
+  def self.am_card(number, expire_month, expire_year, first_name, last_name)
     ActiveMerchant::Billing::CreditCard.require_verification_value = false
     @cc ||= ActiveMerchant::Billing::CreditCard.new(
       :number     => number,
       :month      => expire_month,
-      :year       => expire_year #,
-      #:first_name => first_name,
-      #:last_name  => last_name
+      :year       => expire_year,
+      :first_name => first_name,
+      :last_name  => last_name
     )
+  end
+  def am_card
+    @cc ||= CreditCard.am_card(number, expire_month, expire_year, member.first_name, member.last_name)
   end
 
   # refs #17832

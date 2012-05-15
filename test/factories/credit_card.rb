@@ -12,7 +12,7 @@ FactoryGirl.define do
     active true
     expire_month 12
     expire_year 2013
-    number "5589548939080095 "
+    number "5589548939080095"
   end
 
 end

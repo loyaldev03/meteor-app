@@ -109,9 +109,13 @@ class Member < ActiveRecord::Base
       if new_tom_id.to_i == self.terms_of_membership_id.to_i
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => "9885" }
       else
-        Auditory.audit(agent, self, "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}", self)
         self.terms_of_membership_id = new_tom_id
-        enroll(self.active_credit_card, 0.0, agent)
+        res = enroll(self.active_credit_card, 0.0, agent)
+        if res[:code] == "000"
+          message = "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}"
+          Auditory.audit(agent, self, message, TermsOfMembership.find(new_tom_id), Settings.operation_types.save_the_sale)
+        end
+        res
       end
     else
       { :message => "Member status does not allows us to save the sale.", :code => "9886" }
@@ -144,11 +148,11 @@ class Member < ActiveRecord::Base
             set_as_paid!
             schedule_renewal
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
-            Auditory.audit(nil, trans, message, self)
+            Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
             { :message => message, :code => "000", :member_id => self.id }
           else
             message = set_decline_strategy(trans)
-            Auditory.audit(nil, trans, answer + message, self)
+            Auditory.audit(nil, trans, answer + message, self, Settings.operation_types.membership_billing)
             Auditory.add_redmine_ticket
             answer
           end
@@ -164,6 +168,7 @@ class Member < ActiveRecord::Base
   def enroll(credit_card, amount, agent = nil)
     # TODO: blacklist logic goes here
     # 
+    # TODO: use Settings.max_reactivations
 
     # TODO: refs #19028. Before any transaction is done, we have to filter those duplicated memebrs
     # or do automatic-reactivations.
@@ -172,7 +177,7 @@ class Member < ActiveRecord::Base
     # If member == lapsed, should we auto bill?
     # 
 
-    unless credit_card.am_card.valid?
+    unless CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
       return { :message => "Credit card is invalid or is expired!", :code => "9506" }
     end
 
@@ -201,7 +206,7 @@ class Member < ActiveRecord::Base
       end
       set_as_provisional! # set join_date
       message = "Member enrolled successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
-      Auditory.audit(agent, trans, message, self)
+      Auditory.audit(agent, trans, message, self, Settings.operation_types.enrollment_billing)
       self.reload
       { :message => message, :code => "000", :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
@@ -209,14 +214,13 @@ class Member < ActiveRecord::Base
       # TODO: this can happend if in the same time a new member is enrolled that makes this
       #     an invalid one. we should revert the transaction.
       message = "Could not save member. #{e}"
-      Auditory.audit(agent, self, message)
+      Auditory.audit(agent, self, message, nil, Settings.operation_types.enrollment_billing)
       { :message => message, :code => 404 }
     end
   end
 
   def send_pre_bill
     Communication.deliver!(:prebill, self)
-    Auditory.audit(nil, self, "Pre bill email sent.", self)
   end
   
   private
@@ -245,7 +249,7 @@ class Member < ActiveRecord::Base
       Communication.deliver!(:cancellation, self)
       # TODO: Deactivate drupal account
       self.save
-      Auditory.audit(nil, self, "Member canceled", self)
+      Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
     end
 
     def set_decline_strategy(trans)
