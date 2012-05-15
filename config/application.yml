@@ -15,7 +15,7 @@ defaults: &defaults
     cancel: 200
     future_cancel: 201
     save_the_sale: 202
-    welcome_email: 300
+    active_email: 300
     prebill_email: 301
     cancellation_email: 302
     refund_email: 303

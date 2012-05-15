@@ -4,21 +4,25 @@ class Communication < ActiveRecord::Base
   serialize :external_attributes
 
   def self.deliver!(template_type, member)
-    template = EmailTemplate.find_by_terms_of_membership_id member.terms_of_membership_id
-    c = Communication.new :email => member.email
-    c.member_id = member.id
-    c.template_name = template.name
-    c.client = template.client
-    c.external_attributes = template.external_attributes
-    c.template_type = template.template_type
-    c.scheduled_at = DateTime.now
-    c.save
-    if template.lyris?
-      c.deliver_lyris
-    elsif template.action_mailer?
-      c.deliver_action_mailer
+    template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
+    if template.nil?
+      logger.error "* * * * * Template does not exist"
     else
-      logger.error "* * * * * Client not supported"
+      c = Communication.new :email => member.email
+      c.member_id = member.id
+      c.template_name = template.name
+      c.client = template.client
+      c.external_attributes = template.external_attributes
+      c.template_type = template.template_type
+      c.scheduled_at = DateTime.now
+      c.save
+      if template.lyris?
+        c.deliver_lyris
+      elsif template.action_mailer?
+        c.deliver_action_mailer
+      else
+        logger.error "* * * * * Client not supported"
+      end
     end
   end
 
@@ -42,8 +46,8 @@ class Communication < ActiveRecord::Base
 
   def deliver_action_mailer
     response = case template_type.to_sym
-    when :welcome
-      Notifier.welcome(email).deliver!
+    when :active
+      Notifier.active(email).deliver!
     when :cancellation
       Notifier.cancellation(email).deliver!
     when :prebill
