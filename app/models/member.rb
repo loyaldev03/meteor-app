@@ -31,7 +31,7 @@ class Member < ActiveRecord::Base
   state_machine :status, :initial => :none do
     after_transition [:none, :lapsed, :provisional, :paid] => :provisional, :do => :schedule_first_membership
     after_transition [:none, :provisional, :paid] => :lapsed, :do => :cancellation
-    after_transition :provisional => :paid, :do => send_active_email
+    after_transition :provisional => :paid, :do => :send_active_email
 
     event :set_as_provisional do
       transition [:none, :lapsed, :paid, :provisional] => :provisional
