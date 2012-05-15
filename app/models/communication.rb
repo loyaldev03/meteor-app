@@ -31,13 +31,14 @@ class Communication < ActiveRecord::Base
     lyris.subscribe_user!(self)
     response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
     update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response
-    Auditory.audit(nil, self, "Communication '#{template_name}' sent", member)
+    Auditory.audit(nil, self, "Communication '#{template_name}' sent", member, Settings.operation_types["#{template_type}_email"])
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => DateTime.now
-    Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member)
+    Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_lyris
+
 
   def deliver_action_mailer
     response = case template_type.to_sym
@@ -53,11 +54,11 @@ class Communication < ActiveRecord::Base
       logger.error "Template type #{template_type} not supported."
     end
     update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response
-    Auditory.audit(nil, self, "Communication '#{template_name}' sent", member)
+    Auditory.audit(nil, self, "Communication '#{template_name}' sent", member, Settings.operation_types["#{template_type}_email"])
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => DateTime.now
-    Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member)
+    Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_action_mailer
 

@@ -6,6 +6,20 @@ defaults: &defaults
     url: '/API/mailing_list.html'
     username: '2010001547'
     password: 'ARcor86'
+  operation_types: 
+    enrollment_billing: 100
+    membership_billing: 101
+    full_save: 102
+    change_next_bill_date: 103
+    credit: 104
+    save_the_sale: 105
+    cancel: 200
+    future_cancel: 201
+    welcome_email: 300
+    prebill_email: 301
+    cancellation_email: 302
+    refund_email: 303
+    others: 1000
 
 
 development:
