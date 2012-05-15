@@ -177,7 +177,7 @@ class Member < ActiveRecord::Base
     # If member == lapsed, should we auto bill?
     # 
 
-    unless credit_card.am_card.valid?
+    unless CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
       return { :message => "Credit card is invalid or is expired!", :code => "9506" }
     end
 
