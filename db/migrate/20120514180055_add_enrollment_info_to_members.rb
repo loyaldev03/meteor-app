@@ -4,6 +4,6 @@ class AddEnrollmentInfoToMembers < ActiveRecord::Migration
   end
 
   def down
-    remove_column :mombers, :enrollment_info, :text
+    remove_column :members, :enrollment_info, :text
    end
 end
