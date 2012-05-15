@@ -31,6 +31,7 @@ class Member < ActiveRecord::Base
   state_machine :status, :initial => :none do
     after_transition [:none, :lapsed, :provisional, :paid] => :provisional, :do => :schedule_first_membership
     after_transition [:none, :provisional, :paid] => :lapsed, :do => :cancellation
+    after_transition :provisional => :paid, :do => send_active_email
 
     event :set_as_provisional do
       transition [:none, :lapsed, :paid, :provisional] => :provisional
@@ -61,8 +62,11 @@ class Member < ActiveRecord::Base
     state :approved
   end
 
+  def send_active_email
+    Communication.deliver!(:active, self)
+  end
+
   def schedule_first_membership
-    Communication.deliver!(:welcome, self)
     self.bill_date = Date.today + terms_of_membership.trial_days
     self.next_retry_bill_date = bill_date
     if terms_of_membership.monthly?

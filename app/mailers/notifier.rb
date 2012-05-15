@@ -19,11 +19,6 @@ class Notifier < ActionMailer::Base
     mail :to => email, :subject => "cancellation"
   end
 
-  def welcome(email)
-    email = nil
-    mail :to => email, :subject => "welcome email"
-  end
-
   def active(email)
     email = nil
     mail :to => email, :subject => "active"
