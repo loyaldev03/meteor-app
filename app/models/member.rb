@@ -224,7 +224,9 @@ class Member < ActiveRecord::Base
   end
 
   def send_pre_bill
-    Communication.deliver!(:prebill, self)
+    if can_bill_membership?
+      Communication.deliver!(:prebill, self)
+    end
   end
   
   private
