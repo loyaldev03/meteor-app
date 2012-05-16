@@ -29,7 +29,7 @@ class LyrisService
     end    
   end
 
-  # res = LyrisService.new.unsubscribed(82416, 'debi1@zoomtown.com')
+  # LyrisService.new.unsubscribed?(82416, 'debi1@zoomtown.com')
   def unsubscribed?(mlid, email_address)
     query_data_detailed!(mlid, email_address).include?('<DATA type="extra" id="state">unsubscribed</DATA>')
   end
