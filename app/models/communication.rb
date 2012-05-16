@@ -16,18 +16,24 @@ class Communication < ActiveRecord::Base
       c.template_type = template.template_type
       c.scheduled_at = DateTime.now
       c.save
-      if template.lyris?
-        c.deliver_lyris
-      elsif template.action_mailer?
-        c.deliver_action_mailer
+      if member.email_unsubscribed_at.nil?
+        if template.lyris?
+          c.deliver_lyris
+        elsif template.action_mailer?
+          c.deliver_action_mailer
+        else
+          logger.error "* * * * * Client not supported"
+        end
       else
-        logger.error "* * * * * Client not supported"
+        c.update_attributes :sent_success => false, 
+            :response => "Member requested unsubscription to newsletters on #{member.email_unsubscribed_at}", 
+            :processed_at => DateTime.now
+        Auditory.audit(nil, c, "Communication '#{c.template_name}' wont be sent because email is unsubscribed.", 
+          member, Settings.operation_types["#{c.template_type}_email"])
       end
     end
   end
 
-# m = Member.find('dd76774a-9d03-4fe0-91f3-9537296d988e')
-# Communication.deliver!('welcome', m)
 
   def deliver_lyris
     lyris = LyrisService.new

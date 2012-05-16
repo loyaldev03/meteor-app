@@ -251,6 +251,7 @@ class Member < ActiveRecord::Base
     def cancellation
       self.next_retry_bill_date = nil
       self.bill_date = nil
+      self.email_unsubscribed_at = nil
       Communication.deliver!(:cancellation, self)
       # TODO: Deactivate drupal account
       self.save
