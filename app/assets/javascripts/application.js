@@ -19,7 +19,7 @@
 //= require dataTables/jquery.dataTables.bootstrap
 
 
-$('document').ready( function() {
+$(document).ready( function() {
   $('#new_member').submit( function(event) {
     event.preventDefault()
     $.ajax({
@@ -70,5 +70,20 @@ $('document').ready( function() {
     "bAutoWidth": false,
     "aaSorting": [[ 0, "desc" ]]
   });
-
 });
+
+  function search_functions(){
+    $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+    
+    $('#at_least_one_required').submit(function (){
+      result = false
+      $('#at_least_one_required').find(':text').each(function (){
+        if ($(this).val() != '')  
+          result = true;
+      if (!result){ 
+        alert ('Compleate at least one field')
+        return result;
+      }
+      });
+    });
+  };
