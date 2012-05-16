@@ -7,12 +7,6 @@ class LyrisService
     @member = nil
   end
 
-  def user_exists?(mlid, email_address)
-    send_request!(mlid,'record', 'query-data') do |body|
-      body.DATA email_address, :type => 'email'
-    end
-  end
-
   def subscribe_user!(communication)
     action = user_exists?(communication.external_attributes[:mlid], communication.email) ? 'update' : 'add'
     send_request!(communication.external_attributes[:mlid],'record', action, true) do |body|
@@ -35,7 +29,24 @@ class LyrisService
     end    
   end
 
+  # res = LyrisService.new.unsubscribed(82416, 'debi1@zoomtown.com')
+  def unsubscribed?(mlid, email_address)
+    query_data_detailed!(mlid, email_address).include?('<DATA type="extra" id="state">unsubscribed</DATA>')
+  end
+
   private
+    def query_data_detailed!(mlid, email_address)
+      send_request!(mlid,'record', 'query-data', true) do |body|
+        body.DATA email_address, :type => 'email'
+      end
+    end
+
+    def user_exists?(mlid, email_address)
+      send_request!(mlid,'record', 'query-data') do |body|
+        body.DATA email_address, :type => 'email'
+      end
+    end
+
     def send_request!(mlid, type, activity, return_body = false)
       xml = Builder::XmlMarkup.new :target => (input = '')
       xml.DATASET do
@@ -58,6 +69,5 @@ class LyrisService
 
       return_body ? response : response.include?("<TYPE>success</TYPE>")
     end
-
 
 end
