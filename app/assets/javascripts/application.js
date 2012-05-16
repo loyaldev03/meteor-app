@@ -53,6 +53,26 @@ $(document).ready( function() {
     return answer 
   });
 
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+  
+  $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+
+  $('#member_cancelation_form').validate();  
+
+  $('#new_member_note').validate();
+
+  $('#at_least_one_required').submit(function (){
+    result = false
+    $('#at_least_one_required').find(':text').each(function (){
+      if ($(this).val() != '')  
+        result = true;
+    if (!result){ 
+      alert ('Compleate at least one field')
+      return result;
+    }
+    });
+  });
+ 
   $('#myTab a:last').tab('show');
 
   $('.datatable').dataTable({
@@ -72,18 +92,6 @@ $(document).ready( function() {
   });
 });
 
-  function search_functions(){
-    $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
-    
-    $('#at_least_one_required').submit(function (){
-      result = false
-      $('#at_least_one_required').find(':text').each(function (){
-        if ($(this).val() != '')  
-          result = true;
-      if (!result){ 
-        alert ('Compleate at least one field')
-        return result;
-      }
-      });
-    });
+  function member_index_functions(){
+    //every function that we use on member#index
   };
