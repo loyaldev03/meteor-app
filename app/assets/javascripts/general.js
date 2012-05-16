@@ -33,27 +33,7 @@ $(document).ready( function() {
     var answer = confirm('Are you sure?');
     return answer 
   });
-
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
-  
-  $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
-
-  $('#member_cancelation_form').validate();  
-
-  $('#new_member_note').validate();
-
-  $('#at_least_one_required').submit(function (){
-    result = false
-    $('#at_least_one_required').find(':text').each(function (){
-      if ($(this).val() != '')  
-        result = true;
-    if (!result){ 
-      alert ('Compleate at least one field')
-      return result;
-    }
-    });
-  });
- 
+   
   $('#myTab a:last').tab('show');
 
   $('.datatable').dataTable({
@@ -74,5 +54,32 @@ $(document).ready( function() {
 });
 
   function member_index_functions(){
-    //every function that we use on member#index
+    $('#at_least_one_required').submit(function (){
+      result = false
+      $('#at_least_one_required').find(':text').each(function (){
+        if ($(this).val() != '')
+          result = true;
+      });
+      if (!result){ 
+        alert ('Compleate at least one field')
+        return result
+      }
+    });
+    $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
+                                             showOn: "both", buttonImage: "/icon-calendar.png", 
+                                             buttonImageOnly: true});
   };
+
+  function member_show_functions(){
+
+  }
+
+  function member_cancellation_functions(){
+    $('#member_cancelation_form').validate();
+    $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+ 
+  }
+
+  function member_note_functions(){
+    $('#new_member_note').validate();
+  }
