@@ -58,7 +58,7 @@ namespace :members do
           tz = Time.now
           begin
             Rails.logger.info "  * processing member ##{member.uuid}"
-            member.deactivate!
+            member.set_as_canceled!
           rescue
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
