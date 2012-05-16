@@ -118,7 +118,7 @@ class MembersController < ApplicationController
           flash[:error] = "Could not set the NBD on this member. #{e}"
         end
       else
-        flash[:error] = "Next nill date cant be older than today or today."
+        flash[:error] = "Next bill date should be older that actual date."
       end
     end
   end
