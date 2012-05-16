@@ -16,20 +16,13 @@ class Communication < ActiveRecord::Base
       c.template_type = template.template_type
       c.scheduled_at = DateTime.now
       c.save
-      if member.email_unsubscribed_at.nil?
-        if template.lyris?
-          c.deliver_lyris
-        elsif template.action_mailer?
-          c.deliver_action_mailer
-        else
-          logger.error "* * * * * Client not supported"
-        end
+
+      if template.lyris?
+        c.deliver_lyris
+      elsif template.action_mailer?
+        c.deliver_action_mailer
       else
-        c.update_attributes :sent_success => false, 
-            :response => "Member requested unsubscription to newsletters on #{member.email_unsubscribed_at}", 
-            :processed_at => DateTime.now
-        Auditory.audit(nil, c, "Communication '#{c.template_name}' wont be sent because email is unsubscribed.", 
-          member, Settings.operation_types["#{c.template_type}_email"])
+        logger.error "* * * * * Client not supported"
       end
     end
   end
@@ -39,9 +32,17 @@ class Communication < ActiveRecord::Base
     lyris = LyrisService.new
     # subscribe user
     lyris.subscribe_user!(self)
-    response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
-    update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response
-    Auditory.audit(nil, self, "Communication '#{template_name}' sent", member, Settings.operation_types["#{template_type}_email"])
+    if lyris.unsubscribed?(external_attributes[:mlid], email)
+      c.update_attributes :sent_success => false, 
+          :response => "Member requested unsubscription to newsletters on #{member.email_unsubscribed_at}", 
+          :processed_at => DateTime.now
+      Auditory.audit(nil, c, "Communication '#{c.template_name}' wont be sent because email is unsubscribed.", 
+        member, Settings.operation_types["#{c.template_type}_email"])
+    else
+      response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
+      update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response
+      Auditory.audit(nil, self, "Communication '#{template_name}' sent", member, Settings.operation_types["#{template_type}_email"])
+    end
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => DateTime.now

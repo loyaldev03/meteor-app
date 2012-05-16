@@ -71,34 +71,4 @@ namespace :members do
     end
   end
 
-  desc "Get unsubscribed emails from Lyris"
-  task :unsubscribed_emails => :environment do 
-    lyris = LyrisService.new
-    tall = Time.now
-    begin
-
-
-email_unsubscribed_at
-
-      EmailTemplate.find_in_batches(:conditions => [" client = ? ", 'lyris' ]) do |group|
-        group.each do |template| 
-          tz = Time.now
-          begin
-            Rails.logger.info "  * processing template ##{template.id}"
-            
-            lyris.unsubscribed?(82416, member.email)
-            Auditory.audit(nil, nil, "Member requested unsubscription at lyris.", member)
-
-          rescue
-            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          end
-          Rails.logger.info "    ... took #{Time.now - tz} for member ##{member.id}"
-        end
-        sleep(5) # Make sure it doesn't get too crowded in there!
-      end
-    ensure
-      Rails.logger.info "It all took #{Time.now - tall}"
-    end
-  end
-
 end
