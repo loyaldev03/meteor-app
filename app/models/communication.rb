@@ -33,10 +33,10 @@ class Communication < ActiveRecord::Base
     # subscribe user
     lyris.subscribe_user!(self)
     if lyris.unsubscribed?(external_attributes[:mlid], email)
-      c.update_attributes :sent_success => false, 
-          :response => "Member requested unsubscription to newsletters on #{member.email_unsubscribed_at}", 
+      update_attributes :sent_success => false, 
+          :response => "Member requested unsubscription to mlid #{external_attributes[:mlid]} at lyris", 
           :processed_at => DateTime.now
-      Auditory.audit(nil, c, "Communication '#{c.template_name}' wont be sent because email is unsubscribed.", 
+      Auditory.audit(nil, self, "Communication '#{c.template_name}' wont be sent because email is unsubscribed", 
         member, Settings.operation_types["#{c.template_type}_email"])
     else
       response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
