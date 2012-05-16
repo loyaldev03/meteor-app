@@ -14,20 +14,17 @@ class CreditCardsController < ApplicationController
     actual_credit_card = @current_member.active_credit_card
     credit_card.last_digits = credit_card.number.last(4)
 
-    unless credit_card.am_card.valid?
-      return { :message => "Credit card is invalid or is expired!", :code => "9506" }
-    end
-
-
-  	respond_to do |format|
-      if credit_card.save && actual_credit_card.update_attributes(:active => 0)
-        message = "Credit card #{credit_card.number} added and set active."
-        Auditory.audit(@current_agent, credit_card, message, @current_member)
-        format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.number} was successfully added and setted as active." }
-        format.json { render json: credit_card, status: :created, location: credit_Card }
+    respond_to do |format|
+      if credit_card.am_card.valid?
+        if credit_card.save && actual_credit_card.update_attributes(:active => 0)
+          message = "Credit card #{credit_card.number} added and set active."
+          Auditory.audit(@current_agent, credit_card, message, @current_member)
+          format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.number} was successfully added and setted as active."  } 
+        else
+          format.html { redirect_to new_credit_card_path, alert: credit_card.errors } 
+        end
       else
-        format.html { render action: "new" }
-        format.json { render json: credit_card.errors, status: :unprocessable_entity }
+        format.html { redirect_to new_credit_card_path, alert: "Credit card is invalid or is expired!" } 
       end
     end
   end
