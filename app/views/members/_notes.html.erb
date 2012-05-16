@@ -1,28 +1,26 @@
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th colspan="2">Notes <%= link_to "Add a note", new_member_note_path, :class => "btn btn-warning" %></th>
-      </tr>
+<table class="table table-bordered">
+  <thead>
     <tr>
-    </thead> 
-    <% notes.each do |note| %>
-    <table class="table table-bordered">
-      <tr>
-        <th>
-          <%= note.disposition_type if !note.disposition_type.nil? %> - 
-          <%= note.communication_type if !note.communication_type.nil? %>        
-          <%= t('added_by') %>
-          <%= note.created_by.username %>
-          <%= distance_of_time_in_words(note.created_at, Time.now, include_seconds = false, options = {}) %> <%= t(:ago) %>
-        </th>
-      <tr style = 'height:auto; display:inline-block; word-wrap: break-word' >
-        <td>
-          <%= note.description %>
-        </td>
-      </tr>
-    </table>
-    <% end %>
+      <th colspan="2">Notes <%= link_to "Add a note", new_member_note_path, :class => "btn btn-warning" %></th>
+    </tr>
+  </thead> 
+</table>    
+<% notes.each do |note| %>
+  <table class="table table-bordered">
+    <tr>
+      <th>
+        <%= note.disposition_type if !note.disposition_type.nil? %> - 
+        <%= note.communication_type if !note.communication_type.nil? %>        
+        <%= t('added_by') %>
+        <%= note.created_by.username %>
+        <%= distance_of_time_in_words(note.created_at, Time.now, include_seconds = false, options = {}) %> <%= t(:ago) %>
+      </th>
+    <tr style = 'height:auto; display:inline-block; word-wrap: break-word' >
+      <td>
+        <%= note.description %>
+      </td>
+    </tr>
+  </table>
+<% end %>
   
-</table>
-
-  <%= will_paginate notes %>
+<%= will_paginate notes %>
