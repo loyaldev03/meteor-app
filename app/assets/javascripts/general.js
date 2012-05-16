@@ -33,8 +33,6 @@ $(document).ready( function() {
     var answer = confirm('Are you sure?');
     return answer 
   });
-   
-  $('#myTab a:last').tab('show');
 
   $('.datatable').dataTable({
     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",

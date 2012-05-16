@@ -16,4 +16,5 @@
 //= require dataTables/jquery.dataTables
 //= require dataTables/jquery.dataTables.bootstrap
 //= require jquery.validate
+//= require twitter/bootstrap/bootstrap-tab.js
 //= require general
