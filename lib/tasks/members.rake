@@ -70,4 +70,5 @@ namespace :members do
       Rails.logger.info "It all took #{Time.now - tall}"
     end
   end
+
 end

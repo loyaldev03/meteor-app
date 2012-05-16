@@ -16,6 +16,7 @@ class Communication < ActiveRecord::Base
       c.template_type = template.template_type
       c.scheduled_at = DateTime.now
       c.save
+
       if template.lyris?
         c.deliver_lyris
       elsif template.action_mailer?
@@ -26,16 +27,22 @@ class Communication < ActiveRecord::Base
     end
   end
 
-# m = Member.find('dd76774a-9d03-4fe0-91f3-9537296d988e')
-# Communication.deliver!('welcome', m)
 
   def deliver_lyris
     lyris = LyrisService.new
     # subscribe user
     lyris.subscribe_user!(self)
-    response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
-    update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response
-    Auditory.audit(nil, self, "Communication '#{template_name}' sent", member, Settings.operation_types["#{template_type}_email"])
+    if lyris.unsubscribed?(external_attributes[:mlid], email)
+      update_attributes :sent_success => false, 
+          :response => "Member requested unsubscription to mlid #{external_attributes[:mlid]} at lyris", 
+          :processed_at => DateTime.now
+      Auditory.audit(nil, self, "Communication '#{c.template_name}' wont be sent because email is unsubscribed", 
+        member, Settings.operation_types["#{c.template_type}_email"])
+    else
+      response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
+      update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response
+      Auditory.audit(nil, self, "Communication '#{template_name}' sent", member, Settings.operation_types["#{template_type}_email"])
+    end
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => DateTime.now
