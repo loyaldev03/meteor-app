@@ -16,7 +16,7 @@
   </tr>
 	<tr class="control-group">
 		<th colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>
-		<%= link_to t(:Cancel), :back, :class => 'btn' %> </th>
+		<%= link_to t(:Cancel), show_member_path(:id => @current_member), :class => 'btn' %> </th>
 	</tr>
 
 </table>
