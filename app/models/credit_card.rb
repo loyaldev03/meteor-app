@@ -15,7 +15,7 @@ class CreditCard < ActiveRecord::Base
 
   def self.am_card(number, expire_month, expire_year, first_name, last_name)
     ActiveMerchant::Billing::CreditCard.require_verification_value = false
-    @cc ||= ActiveMerchant::Billing::CreditCard.new(
+    ActiveMerchant::Billing::CreditCard.new(
       :number     => number,
       :month      => expire_month,
       :year       => expire_year,
