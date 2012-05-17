@@ -39,3 +39,7 @@ form .clearfix:before, form .clearfix:after {
 }
 
 .help {position: relative}​ /*Without this the popover won't work.*/
+
+.comment {height:auto; 
+	      display:inline-block; 
+	      word-wrap: break-word }
