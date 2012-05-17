@@ -4,8 +4,10 @@
   <tr>
     <td>
       <%= link_to 'Edit', edit_member_path, :class => "btn btn-warning" %>
-      <%= form_for @current_member, :url => member_recovery_path, do |f| %>
-        <%= f.submit t('recovery'), :class => 'btn btn-warning'  if @current_member.lapsed? %>
+      <% if @current_member.can_recover? %>
+        <%= form_tag member_recover_path do %>
+          <%= submit_tag t('recovery'), :class => 'btn btn-warning', :confirm => 'Are you sure you want to recover this member? No enrollment fee will be billed.' %>
+        <% end %>
       <% end %>
     </td>
     <% unless @current_member.lapsed? %>

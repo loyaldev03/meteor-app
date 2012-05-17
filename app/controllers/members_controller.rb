@@ -52,16 +52,16 @@ class MembersController < ApplicationController
     end
   end
 
-  def recovery
+  def recover
     if request.post?
       answer = @current_member.recover(@current_member.terms_of_membership_id, current_agent)
       if answer[:code] == Settings.error_codes.success
         flash[:notice] = "Save the sale succesfully applied"
-        redirect_to show_member_path
       else
-        flash.now[:error] = answer[:message]
+        flash[:error] = answer[:message]
       end
     end
+    redirect_to show_member_path
   end
 
   def refund

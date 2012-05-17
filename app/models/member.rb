@@ -29,7 +29,7 @@ class Member < ActiveRecord::Base
   validates :zip,  :format => /^[0-9]{5}[-]?[0-9]{4}?$/
 
   state_machine :status, :initial => :none do
-    after_transition [:none, :provisional] => :provisional, :do => :schedule_first_membership
+    after_transition [:none, :provisional, :lapsed] => :provisional, :do => :schedule_first_membership
     after_transition [:provisional, :paid] => :lapsed, :do => :cancellation
     after_transition [:provisional] => :paid, :do => :send_active_email
 
@@ -77,6 +77,7 @@ class Member < ActiveRecord::Base
       self.quota = (terms_of_membership.monthly? ? 1 :  0)
     end
     self.join_date = DateTime.now 
+    self.cancel_date = nil
     self.save
   end
 
@@ -212,15 +213,11 @@ class Member < ActiveRecord::Base
   end    
 
   def enroll(credit_card, amount, agent = nil)
-    unless self.can_recover?
+    if not self.can_recover?
       return { :message => "Cant recover member. Max reactivations reached.", :code => 407 }
-    end
-
-    unless CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
+    elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
       return { :message => "Credit card is invalid or is expired!", :code => "9506" }
-    end
-
-    if credit_card.blacklisted? or self.blacklisted?
+    elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => 406 }
     end
 
@@ -253,7 +250,7 @@ class Member < ActiveRecord::Base
         increment!(:reactivation_times, 1)
         self.recovered!
         message = "Member recovered successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
-        Auditory.audit(agent, self, message, TermsOfMembership.find(new_tom_id), Settings.operation_types.recovery)
+        Auditory.audit(agent, terms_of_membership, message, self, Settings.operation_types.recovery)
       else      
         self.set_as_provisional! # set join_date
         message = "Member enrolled successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
