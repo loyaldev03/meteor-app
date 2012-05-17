@@ -68,8 +68,9 @@ class Member < ActiveRecord::Base
   def schedule_first_membership
     self.bill_date = Date.today + terms_of_membership.trial_days
     self.next_retry_bill_date = bill_date
-    if terms_of_membership.monthly?
-      self.quota = 1
+    # Documentation #18928 - recoveries will not change the quota number.
+    if reactivation_times == 0
+      self.quota = (terms_of_membership.monthly? ? 1 :  0)
     end
     self.join_date = DateTime.now 
     self.save
@@ -137,7 +138,8 @@ class Member < ActiveRecord::Base
         self.terms_of_membership_id = new_tom_id
         res = enroll(self.active_credit_card, 0.0, agent)
         if res[:code] == "000"
-          message = "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}"
+          increment!(:reactivation_times, 1)
+          message = "Recovery on TOMID #{new_tom_id} success"
           Auditory.audit(agent, self, message, TermsOfMembership.find(new_tom_id), Settings.operation_types.save_the_sale)
         end
         res
