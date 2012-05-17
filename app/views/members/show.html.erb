@@ -61,7 +61,7 @@
   </thead>  
   <tr>
     <td> <%= t('activerecord.attributes.member.member_since_date') %>: 
-         <%= I18n.l @current_member.member_since_date, :format => :long if !@current_member.member_since_date.nil? %> </td>
+         <%= I18n.l @current_member.member_since_date, :format => :long %> </td>
     <td> <%= t('activerecord.attributes.member.join_date') %>: 
          <%= I18n.l @current_member.join_date, :format => :long %> </td>
     <td>
@@ -74,9 +74,12 @@
     </td>
   </tr>
   <tr>
-    <td colspan="2"> <%= t('menu.activerecord.term_of_membership') %> 
+    <td> <%= t('menu.activerecord.term_of_membership') %> 
          <%= t('activerecord.attributes.terms_of_membership.name') %>:
          <%= @current_member.terms_of_membership.name %> 
+    </td>
+    <td> <%= t('activerecord.attributes.member.reactivation_times') %> 
+         <%= @current_member.reactivation_times %> 
     </td>
     <td colspan="2"> <%= t('activerecord.attributes.member.member_group_type') %>:
          <%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %> 
