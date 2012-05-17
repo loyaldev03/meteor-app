@@ -21,6 +21,7 @@ en:
   added_by: 'Added by'
   ago: 'ago'
   example: 'Example'
+  refund: 'Refund'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   menu: 
     logout: 'Logout'
@@ -36,6 +37,10 @@ en:
           refund: Credit
           credit: Credit
           void: Credit
+        date: 'Date'
+        description: 'Description'
+        amount: 'Amount'
+        gw_trans: 'Gw trans'
       agent:  
         login: "Username or email"
         password: "Password"

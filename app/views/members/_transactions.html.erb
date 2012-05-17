@@ -1,17 +1,17 @@
 <table class="table table-bordered datatable_only_sorting">
   <thead>
     <tr>
-      <th>Fecha</th>
-      <th>Description</th>
-      <th>Amount</th>
-      <th>GW Trans</th>
+      <th> <%= t('activerecord.attributes.transaction.date') %> </th>
+      <th> <%= t('activerecord.attributes.transaction.description') %> </th>
+      <th> <%= t('activerecord.attributes.transaction.amount') %> </th>
+      <th> <%= t('activerecord.attributes.transaction.gw_trans') %> </th>
       <th></th>
     </tr>
   </thead>
   <% transactions.each do |transaction| %>
   <tr>
     <td>
-      <%= l(transaction.created_at) %>
+      <%= I18n.l transaction.created_at, :format => 'long' %>
     </td>
     <td>
       <%= transaction.to_label %>
@@ -23,7 +23,7 @@
       <%= transaction.response_transaction_id %>
     </td>
     <td>
-      <%= link_to("Refund", member_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning") if transaction.can_be_refunded? %>
+      <%= link_to( t('refund'), member_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning") if transaction.can_be_refunded? %>
     </td>
   </tr>
   <% end %>
