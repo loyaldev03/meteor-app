@@ -4,7 +4,7 @@
   <tr>
     <td>
       <%= link_to 'Edit', edit_member_path, :class => "btn btn-warning" %>
-      <%= link_to("Recovery", "#", :class => "btn btn-warning") if @current_member.lapsed? %>
+      <%= link_to("Recovery", member_recovery_path, :class => "btn btn-warning") if @current_member.lapsed? %>
     </td>
     <% unless @current_member.lapsed? %>
       <td>
