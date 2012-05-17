@@ -59,6 +59,8 @@ $(document).ready( function() {
       });
     });
 
+    $('#zip_help').popover({offset: 10});
+    $('#phone_number_help').popover({offset: 10});   
   }
 
   function edit_member_functions(){

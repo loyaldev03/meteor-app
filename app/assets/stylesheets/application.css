@@ -37,3 +37,5 @@ form .clearfix:before, form .clearfix:after {
 .blacklisted{
 	background-color: #EEE8CD;
 }
+
+.help {position: relative}​ /*Without this the popover won't work.*/
