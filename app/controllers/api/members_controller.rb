@@ -17,6 +17,7 @@ class Api::MembersController < ApplicationController
       club = tom.club
       credit_card = CreditCard.new params[:credit_card]
       member = Member.new params[:member]
+      # TODO: check if memebr exist and its reactivation_times
       member.created_by_id = current_agent.id
       member.terms_of_membership = tom
       member.club = club
