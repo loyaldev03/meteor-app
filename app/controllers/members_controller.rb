@@ -52,6 +52,23 @@ class MembersController < ApplicationController
     end
   end
 
+  def recovery
+    if request.post?
+      if TermsOfMembership.find_by_id_and_club_id(params[:terms_of_membership_id], @current_club.id).nil?
+        flash[:error] = "Terms of membership not found"
+        redirect_to show_member_path
+      else
+        answer = @current_member.recovery(params[:terms_of_membership_id], current_agent)
+        if answer[:code] == "000"
+          flash[:notice] = "Save the sale succesfully applied"
+          redirect_to show_member_path
+        else
+          flash.now[:error] = answer[:message]
+        end
+      end
+    end
+  end
+
   def refund
     @transaction = Transaction.find_by_uuid_and_member_id params[:transaction_id], @current_member.uuid
     if @transaction.nil?

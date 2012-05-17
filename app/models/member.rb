@@ -105,10 +105,32 @@ class Member < ActiveRecord::Base
   def can_bill_membership?
     self.paid? or self.provisional?
   end
+
+  def can_recovery?
+    self.lapsed? and reactivation_times < Settings.max_reactivations
+  end
   ###############################################
 
   def save_the_sale(new_tom_id, agent = nil)
     if can_save_the_sale?
+      if new_tom_id.to_i == self.terms_of_membership_id.to_i
+        { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => "9885" }
+      else
+        self.terms_of_membership_id = new_tom_id
+        res = enroll(self.active_credit_card, 0.0, agent)
+        if res[:code] == "000"
+          message = "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}"
+          Auditory.audit(agent, self, message, TermsOfMembership.find(new_tom_id), Settings.operation_types.save_the_sale)
+        end
+        res
+      end
+    else
+      { :message => "Member status does not allows us to save the sale.", :code => "9886" }
+    end
+  end
+
+  def recovery(new_tom_id, agent = nil)
+    if can_recovery?
       if new_tom_id.to_i == self.terms_of_membership_id.to_i
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => "9885" }
       else

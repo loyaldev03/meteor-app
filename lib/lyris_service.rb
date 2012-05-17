@@ -2,7 +2,7 @@ class LyrisService
   def initialize
     @domain = Settings.lyris_service.domain
     @url = Settings.lyris_service.url
-    @site_id = Settings.lyris_service.username
+    @site_id = nil
     @password = Settings.lyris_service.password
   end
 
