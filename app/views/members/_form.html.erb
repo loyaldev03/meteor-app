@@ -41,7 +41,8 @@
     </td>
     <td colspan="2"> 
       <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline' %> 
-      <%= f.text_field :zip, :class => 'text_field input-small'%> 
+      <%= f.text_field :zip, :class => 'text_field input-small'%>
+      <i class ="icon-question-sign help" id ="zip_help" rel="popover" data-original-title= <%=t('example') %> data-content= "<%= t('activerecord.attributes.member.zip_help') %>"> </i>
     </td> 
   </tr>
   <tr class="control-group" ><td colspan="2"> <b> Contact Information </b> </td></tr>
@@ -49,6 +50,7 @@
     <td> 
       <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline' %>
       <%= f.text_field :phone_number, :class => 'text_field input-medium'%> 
+      <i class ="icon-question-sign help" id ="phone_number_help" rel="popover" data-original-title= <%=t('example') %> data-content= "<%= t('activerecord.attributes.member.phone_number_help') %>"> </i>
     </td>
     <td> 
       <%= f.label :email, t('email'), :class => 'help-inline' %> 

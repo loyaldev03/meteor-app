@@ -7,8 +7,6 @@ $(document).ready( function() {
     return answer 
   });
 
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
-
   $('.datatable').dataTable({
     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
     "sPaginationType": "bootstrap"
@@ -59,6 +57,8 @@ $(document).ready( function() {
       });
     });
 
+    $('#zip_help').popover({offset: 10});
+    $('#phone_number_help').popover({offset: 10});   
   }
 
   function edit_member_functions(){
@@ -80,9 +80,14 @@ $(document).ready( function() {
 
   function member_cancellation_functions(){
     $('#member_cancelation_form').validate();
+    $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
   }
 
   function member_note_functions(){
     $('#new_member_note').validate();
   }
 
+  function member_change_next_bill_date(){
+    $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+
+  }
