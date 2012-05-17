@@ -20,6 +20,8 @@ defaults: &defaults
     cancellation_email: 302
     refund_email: 303
     others: 1000
+  error_codes:
+    success: '000'
 
 
 development:

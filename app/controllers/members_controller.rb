@@ -42,7 +42,7 @@ class MembersController < ApplicationController
         redirect_to show_member_path
       else
         answer = @current_member.save_the_sale(params[:terms_of_membership_id], current_agent)
-        if answer[:code] == "000"
+        if answer[:code] == Settings.error_codes.success
           flash[:notice] = "Save the sale succesfully applied"
           redirect_to show_member_path
         else
@@ -55,7 +55,7 @@ class MembersController < ApplicationController
   def recovery
     if request.post?
       answer = @current_member.recover(@current_member.terms_of_membership_id, current_agent)
-      if answer[:code] == "000"
+      if answer[:code] == Settings.error_codes.success
         flash[:notice] = "Save the sale succesfully applied"
         redirect_to show_member_path
       else
@@ -73,7 +73,7 @@ class MembersController < ApplicationController
     end
     if request.post?
       answer = Transaction.refund(params[:refund_amount], params[:transaction_id], current_agent)
-      if answer[:code] == "000"
+      if answer[:code] == Settings.error_codes.success
         flash[:notice] = answer[:message]
         redirect_to show_member_path
       else
