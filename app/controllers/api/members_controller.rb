@@ -14,20 +14,7 @@ class Api::MembersController < ApplicationController
     if tom.nil?
       response = { :message => "Terms of membership not found", :code => 401 }
     else
-      club = tom.club
-      credit_card = CreditCard.new params[:credit_card]
-      member = Member.new params[:member]
-      # TODO: check if memebr exist and its reactivation_times
-      member.created_by_id = current_agent.id
-      member.terms_of_membership = tom
-      member.club = club
-      if member.valid? and credit_card.valid?
-        response = member.enroll(credit_card, params[:enrollment_amount], current_agent)
-      else
-        errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n') + 
-                  credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
-        response = { :message => "Member data is invalid: #{errors}", :code => 405 }
-      end
+      response = Member.enroll(tom, params[:member], params[:credit_card])
     end
 
     respond_to do |format|

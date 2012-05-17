@@ -16,6 +16,7 @@ class Member < ActiveRecord::Base
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
       :club_id, :partner_id, :member_group_type_id
+
   before_create :record_date
   validates :first_name, :presence => true, :format => /^[A-Za-z ']+$/
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
@@ -28,18 +29,21 @@ class Member < ActiveRecord::Base
   validates :zip,  :format => /^[0-9]{5}[-]?[0-9]{4}?$    /
 
   state_machine :status, :initial => :none do
-    after_transition [:none, :lapsed, :provisional, :paid] => :provisional, :do => :schedule_first_membership
-    after_transition [:none, :provisional, :paid] => :lapsed, :do => :cancellation
-    after_transition :provisional => :paid, :do => :send_active_email
+    after_transition [:none, :provisional] => :provisional, :do => :schedule_first_membership
+    after_transition [:provisional, :paid] => :lapsed, :do => :cancellation
+    after_transition [:provisional] => :paid, :do => :send_active_email
 
     event :set_as_provisional do
-      transition [:none, :lapsed, :paid, :provisional] => :provisional
+      transition [:none, :provisional] => :provisional
     end
     event :set_as_paid do
       transition [:provisional, :paid] => :paid
     end
     event :set_as_canceled do
       transition [:provisional, :paid] => :lapsed
+    end
+    event :recovered do 
+      transition [:lapsed] => :provisional
     end
 
     # A Member is within their review period. These members have joined a Subscription program that has a “Provisional” 
@@ -107,7 +111,8 @@ class Member < ActiveRecord::Base
     self.paid? or self.provisional?
   end
 
-  def can_recovery?
+  # Add logic to recover some one max 3 times in 5 years
+  def can_recover?
     self.lapsed? and reactivation_times < Settings.max_reactivations
   end
   ###############################################
@@ -130,23 +135,9 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def recovery(new_tom_id, agent = nil)
-    if can_recovery?
-      if new_tom_id.to_i == self.terms_of_membership_id.to_i
-        { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => "9885" }
-      else
-        self.terms_of_membership_id = new_tom_id
-        res = enroll(self.active_credit_card, 0.0, agent)
-        if res[:code] == "000"
-          increment!(:reactivation_times, 1)
-          message = "Recovery on TOMID #{new_tom_id} success"
-          Auditory.audit(agent, self, message, TermsOfMembership.find(new_tom_id), Settings.operation_types.save_the_sale)
-        end
-        res
-      end
-    else
-      { :message => "Member status does not allows us to save the sale.", :code => "9886" }
-    end
+  def recover(new_tom_id, agent = nil)
+    self.terms_of_membership_id = new_tom_id
+    enroll(self.active_credit_card, 0.0, agent)
   end
 
   def bill_membership
@@ -192,20 +183,45 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def enroll(credit_card, amount, agent = nil)
-    # TODO: blacklist logic goes here
-    # 
-    # TODO: use Settings.max_reactivations
+  def self.enroll(tom, member_params = {}, credit_card_params = {})
+    club = tom.club
+    # Member exist?
+    member = Member.find_by_email_and_club_id(member_params[:email], club.id)
+    if member.nil?
+      # credit card exist?
+      credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.club_id == club.id }
+      if credit_card.nil?
+        unless member.valid? and credit_card.valid?
+          errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n') + 
+                    credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
+          return { :message => "Member data is invalid: #{errors}", :code => 405 }
+        end
+        # enroll allowed
+      else
+        member = credit_card.member
+      end
+    end
+    credit_card = CreditCard.new credit_card_params
+    member = Member.new member_params
 
-    # TODO: refs #19028. Before any transaction is done, we have to filter those duplicated memebrs
-    # or do automatic-reactivations.
-    # if email address is unique, we have to answer a code xxx if email on this club exists and
-    # member != lapsed.
-    # If member == lapsed, should we auto bill?
-    # 
+    member.created_by_id = current_agent.id
+    member.terms_of_membership = tom
+    member.club = club
+
+    member.enroll(credit_card, params[:enrollment_amount], current_agent)
+  end    
+
+  def enroll(credit_card, amount, agent = nil)
+    unless self.can_recover?
+      return { :message => "Cant recover member. Max reactivations reached.", :code => 407 }
+    end
 
     unless CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
       return { :message => "Credit card is invalid or is expired!", :code => "9506" }
+    end
+
+    if credit_card.blacklisted? or self.blacklisted?
+      return { :message => "Member or credit card are blacklisted", :code => 406 }
     end
 
     if amount.to_f != 0.0
@@ -217,7 +233,7 @@ class Member < ActiveRecord::Base
     end
 
     begin
-      save!
+      self.save!
       if credit_card.member.nil?
         credit_card.member = self
         credit_card.last_digits = credit_card.number.last(4) 
@@ -231,9 +247,19 @@ class Member < ActiveRecord::Base
         trans.save
         credit_card.accepted_on_billing
       end
-      set_as_provisional! # set join_date
-      message = "Member enrolled successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
-      Auditory.audit(agent, trans, message, self, Settings.operation_types.enrollment_billing)
+
+      # is a recovery?
+      if self.lapsed?
+        increment!(:reactivation_times, 1)
+        self.recovered!
+        message = "Member recovered successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
+        Auditory.audit(agent, self, message, TermsOfMembership.find(new_tom_id), Settings.operation_types.recovery)
+      else      
+        self.set_as_provisional! # set join_date
+        message = "Member enrolled successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
+        Auditory.audit(agent, trans, message, self, Settings.operation_types.enrollment_billing)
+      end
+
       self.reload
       { :message => message, :code => "000", :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e

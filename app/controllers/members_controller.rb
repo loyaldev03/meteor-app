@@ -54,7 +54,7 @@ class MembersController < ApplicationController
 
   def recovery
     if request.post?
-      answer = @current_member.recovery(@current_member.terms_of_membership_id, current_agent)
+      answer = @current_member.recover(@current_member.terms_of_membership_id, current_agent)
       if answer[:code] == "000"
         flash[:notice] = "Save the sale succesfully applied"
         redirect_to show_member_path
