@@ -75,7 +75,8 @@ $(document).ready( function() {
             window.location.replace('../'+data.v_id);
         },
       });
-   });
+    });
+    $('.help').popover({offset: 10});
   }
 
 
