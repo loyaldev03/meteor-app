@@ -22,6 +22,7 @@ en:
   ago: 'ago'
   example: 'Example'
   refund: 'Refund'
+  recovery: 'Recovery'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   menu: 
     logout: 'Logout'
