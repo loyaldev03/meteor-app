@@ -27,10 +27,10 @@ class Communication < ActiveRecord::Base
     end
   end
 
-
   def deliver_lyris
     lyris = LyrisService.new
     # subscribe user
+    lyris.site_id = external_attributes[:site_id]
     lyris.subscribe_user!(self)
     if lyris.unsubscribed?(external_attributes[:mlid], email)
       update_attributes :sent_success => false, 

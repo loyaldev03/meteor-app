@@ -4,7 +4,10 @@ class LyrisService
     @url = Settings.lyris_service.url
     @site_id = Settings.lyris_service.username
     @password = Settings.lyris_service.password
-    @member = nil
+  end
+
+  def site_id=(s)
+    @site_id = s
   end
 
   def subscribe_user!(communication)
@@ -18,7 +21,7 @@ class LyrisService
       body.DATA communication.member.terms_of_membership.installment_amount, :type => 'demographic', :id => 56846
       body.DATA communication.external_attributes[:trigger_id], :type => 'extra', :id => 'trigger_id'
       body.DATA "yes", :type => 'extra', :id => 'trigger'
-      Rails.logger.debug YAML.dump(body)
+      # Rails.logger.debug YAML.dump(body)
     end
   end
 
@@ -55,7 +58,7 @@ class LyrisService
         xml.DATA @password, :type => 'extra', :id => 'password'
         yield xml
       end
-      Rails.logger.debug YAML.dump(xml)
+      # Rails.logger.debug YAML.dump(xml)
 
       conn = Net::HTTP.new(@domain, 443)
       conn.use_ssl = true
