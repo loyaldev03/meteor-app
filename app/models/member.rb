@@ -16,7 +16,7 @@ class Member < ActiveRecord::Base
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
       :club_id, :partner_id, :member_group_type_id
-
+  before_create :record_date
   validates :first_name, :presence => true, :format => /^[A-Za-z ']+$/
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
             :format => /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
@@ -25,7 +25,7 @@ class Member < ActiveRecord::Base
   validates :phone_number, :format => /^[+?]?[0-9]+[ \(.+?\\)? -]?[0-9]*[ \(.+?\\)? -]?[0-9]*[ \(.+?\\)? -]?[0-9]+[ \(.+?\\)? -]?[0-9]+[ \(.+?\\)? -]?$/ 
   validates :address, :city, :state, :zip, :country, :terms_of_membership_id, :presence => true, :format => /^[A-Za-z0-9,\s]+$/
   validates :city, :state, :format => /^[A-Za-z \s]+$/
-  validates :zip,  :format => /^[0-9]{5}[- 0-9]{5}?$/
+  validates :zip,  :format => /^[0-9]{5}[-]?[0-9]{4}?$    /
 
   state_machine :status, :initial => :none do
     after_transition [:none, :lapsed, :provisional, :paid] => :provisional, :do => :schedule_first_membership
@@ -251,6 +251,9 @@ class Member < ActiveRecord::Base
   end
   
   private
+    def record_date
+      self.member_since_date = DateTime.now
+    end
 
     def schedule_renewal
       new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
