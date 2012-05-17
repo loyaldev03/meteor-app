@@ -4,6 +4,7 @@
       <th>Fecha</th>
       <th>Description</th>
       <th>Amount</th>
+      <th>GW Trans</th>
       <th></th>
     </tr>
   </thead>
@@ -17,6 +18,9 @@
     </td>
     <td>
       <%= number_to_currency transaction.amount %>
+    </td>
+    <td>
+      <%= transaction.response_transaction_id %>
     </td>
     <td>
       <%= link_to("Refund", member_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning") if transaction.can_be_refunded? %>
