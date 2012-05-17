@@ -22,6 +22,7 @@ en:
   ago: 'ago'
   example: 'Example'
   refund: 'Refund'
+  recovery: 'Recovery'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   menu: 
     logout: 'Logout'
@@ -64,6 +65,7 @@ en:
         cancel_date: 'Cancel date'
         terms_of_membership_id: 'Terms of membership'
         visible_id: 'ID'
+        reactivation_times: 'Reactivation times'
         member_group_type: 'Member group type'
         not_group_associated: 'It has no member group type associated.'
         does_not_have_member_groups: 'It has no groups to be selected.'

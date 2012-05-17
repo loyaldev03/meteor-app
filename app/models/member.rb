@@ -26,7 +26,7 @@ class Member < ActiveRecord::Base
   validates :phone_number, :format => /^[+?]?[0-9]+[ \(.+?\\)? -]?[0-9]*[ \(.+?\\)? -]?[0-9]*[ \(.+?\\)? -]?[0-9]+[ \(.+?\\)? -]?[0-9]+[ \(.+?\\)? -]?$/ 
   validates :address, :city, :state, :zip, :country, :terms_of_membership_id, :presence => true, :format => /^[A-Za-z0-9,\s]+$/
   validates :city, :state, :format => /^[A-Za-z \s]+$/
-  validates :zip,  :format => /^[0-9]{5}[-]?[0-9]{4}?$    /
+  validates :zip,  :format => /^[0-9]{5}[-]?[0-9]{4}?$/
 
   state_machine :status, :initial => :none do
     after_transition [:none, :provisional] => :provisional, :do => :schedule_first_membership

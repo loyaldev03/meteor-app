@@ -59,6 +59,7 @@ $(document).ready( function() {
 
     $('#zip_help').popover({offset: 10});
     $('#phone_number_help').popover({offset: 10});   
+    $('.help').popover({offset: 10});
   }
 
   function edit_member_functions(){
@@ -74,7 +75,8 @@ $(document).ready( function() {
             window.location.replace('../'+data.v_id);
         },
       });
-   });
+    });
+    $('.help').popover({offset: 10});
   }
 
 

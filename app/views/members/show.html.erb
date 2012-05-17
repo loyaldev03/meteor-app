@@ -4,7 +4,9 @@
   <tr>
     <td>
       <%= link_to 'Edit', edit_member_path, :class => "btn btn-warning" %>
-      <%= link_to("Recovery", "#", :class => "btn btn-warning") if @current_member.lapsed? %>
+      <%= form_for @current_member, :url => member_recovery_path, do |f| %>
+        <%= f.submit t('recovery'), :class => 'btn btn-warning'  if @current_member.lapsed? %>
+      <% end %>
     </td>
     <% unless @current_member.lapsed? %>
       <td>
