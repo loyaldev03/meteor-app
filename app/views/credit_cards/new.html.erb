@@ -1,6 +1,6 @@
 <%= render :partial => "shared/member_information" %>
 
-<%= form_for @credit_card, :as => :credit_card, :url => credit_cards_path(@credit_card), do |f| %>
+<%= form_for @credit_card, :as => :credit_card, :url => credit_cards_path, do |f| %>
 <table class="table table-bordered" >
   <tr>
     <td> 
@@ -16,7 +16,7 @@
   </tr>
 	<tr class="control-group">
 		<th colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>
-		<%= link_to t(:Cancel), :back, :class => 'btn' %> </th>
+		<%= link_to t(:Cancel), show_member_path(:id => @current_member), :class => 'btn' %> </th>
 	</tr>
 
 </table>

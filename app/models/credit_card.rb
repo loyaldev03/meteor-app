@@ -8,6 +8,7 @@ class CreditCard < ActiveRecord::Base
 
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 } 
+  validates :number, :numericality => true
   
   def accepted_on_billing
     update_attribute :last_successful_bill_date, DateTime.now
