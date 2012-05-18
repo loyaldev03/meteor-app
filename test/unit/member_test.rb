@@ -35,17 +35,22 @@ class MemberTest < ActiveSupport::TestCase
     paid_member.credit_cards << credit_card
     paid_member.save
     answer = paid_member.bill_membership
-    assert (answer[:code] == Settings.error_codes.success), answer.inspect
+    assert (answer[:code] == Settings.error_codes.success)
   end
 
-  test "Member should be billed if it is paid or provisional" do
+  test "Monthly member should be billed if it is paid or provisional" do
     assert_difference('Operation.count') do
       member = FactoryGirl.create(:provisional_member)
       credit_card = FactoryGirl.create(:credit_card_master_card)
       member.credit_cards << credit_card
       member.save
+      prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
-      assert (answer[:code] == "000"), answer.inspect
+      assert (answer[:code] == Settings.error_codes.success)
+      assert member.quota == 2
+      assert member.recycled_times == 1
+      assert member.bill_date == member.next_retry_bill_date
+      assert member.next_retry_bill_date == (prev_bill_date + 1.month)
     end
   end
 
@@ -67,5 +72,18 @@ class MemberTest < ActiveSupport::TestCase
     member_two = FactoryGirl.build(:member)
     assert member_two.save
   end
+
+  test "Paid member cant be recovered" do
+    member = FactoryGirl.create(:paid_member)
+    answer = member.recover(4)
+    assert answer[:code] == "407"
+  end
+
+  test "Lapsed member can be recovered" do
+    member = FactoryGirl.create(:lapsed_member)
+    answer = member.recover(TermsOfMembership.first)
+    assert answer[:code] == Settings.error_codes.success
+  end
+
 
 end
