@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :club do
-    name "My Club"
+    name Faker::Name.name
     description "My description"
     association :partner
   end

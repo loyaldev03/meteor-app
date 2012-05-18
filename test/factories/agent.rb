@@ -8,7 +8,7 @@ FactoryGirl.define do
   end
 
   factory :confirmed_admin_agent, class: Agent do
-    username "test"
+    sequence(:username) {|n| "User#{n}" }
     password "secret"
     password_confirmation { password }
     sequence(:email) {|n| "carla#{n}@test.no" }

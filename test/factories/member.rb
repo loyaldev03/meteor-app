@@ -5,46 +5,53 @@ FactoryGirl.define do
     # but test database is not created by migrations, so our custom executes
     # are not used. Consequence: visible_id is not auto increment.
     sequence(:visible_id) {|n| n }
-    first_name "first"
-    last_name "last"
-    address "peron 3455"
-    city "test"
-    zip "345677"
-    state "CT"
+    first_name Faker::Name.first_name 
+    last_name Faker::Name.last_name
+    address Faker::Address.street_address 
+    city Faker::Address.city
+    zip Faker::Address.zip
+    state Faker::Address.us_state
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number "237264827652"
+    phone_number Faker::PhoneNumber.phone_number
     country "US"
     association :club
     association :terms_of_membership
+
+    after(:create) do |member, evaluator|
+      FactoryGirl.create_list(:credit_card, 1, memebr: member)
+    end
   end
 
   factory :paid_member, class: Member do
     sequence(:visible_id) {|n| n }
     status "paid"
-    first_name "first"
-    last_name "last"
-    address "peron 3455"
-    city "test"
-    zip "345677"
-    state "CT"
+    first_name Faker::Name.first_name 
+    last_name Faker::Name.last_name
+    address Faker::Address.street_address 
+    city Faker::Address.city
+    zip Faker::Address.zip
+    state Faker::Address.us_state
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number "237264827652"
+    phone_number Faker::PhoneNumber.phone_number
     country "US"
     association :club
     association :terms_of_membership, factory: :terms_of_membership_insuf_funds
+    after(:create) do |member, evaluator|
+      FactoryGirl.create_list(:credit_card, 1, memebr: member)
+    end
   end
 
   factory :lapsed_member, class: Member do
     sequence(:visible_id) {|n| n }
     status "lapsed"
-    first_name "first"
-    last_name "last"
-    address "peron 3455"
-    city "test"
-    zip "345677"
-    state "CT"
+    first_name Faker::Name.first_name 
+    last_name Faker::Name.last_name
+    address Faker::Address.street_address 
+    city Faker::Address.city
+    zip Faker::Address.zip
+    state Faker::Address.us_state
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number "237264827652"
+    phone_number Faker::PhoneNumber.phone_number
     country "US"
     association :club
     association :terms_of_membership
@@ -53,20 +60,23 @@ FactoryGirl.define do
   factory :provisional_member, class: Member do
     sequence(:visible_id) {|n| n }
     status "provisional"
-    first_name "first"
-    last_name "last"
-    address "peron 3455"
-    city "test"
-    zip "345677"
-    state "CT"
+    first_name Faker::Name.first_name 
+    last_name Faker::Name.last_name
+    address Faker::Address.street_address 
+    city Faker::Address.city
+    zip Faker::Address.zip
+    state Faker::Address.us_state
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number "237264827652"
+    phone_number Faker::PhoneNumber.phone_number
     country "US"
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     association :club
     association :terms_of_membership
+    after(:create) do |member, evaluator|
+      FactoryGirl.create_list(:credit_card, 1, memebr: member)
+    end
   end
 
 end
