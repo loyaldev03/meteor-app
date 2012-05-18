@@ -288,7 +288,7 @@ class Member < ActiveRecord::Base
   def send_fulfillment
     # we always send fulfillment to new members or members that do not have 
     # opened fulfillments (meaning that previous fulfillments expired).
-    if self.fulfillments.empty? or self.fulfillments.open.nil?
+    if self.fulfillments.find_by_status('open').nil?
       # TODO: how do we know if sloop product must be sent????
       [ Settings.fulfillment_products.kit_card ].each do |product|
         f = Fulfillment.new :product => product
