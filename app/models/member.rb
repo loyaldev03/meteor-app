@@ -211,7 +211,7 @@ class Member < ActiveRecord::Base
           errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n') + 
                     credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
           return { :message => "Member data is invalid: #{errors}", 
-                   :code => Settings.error_code.member_data_invalid }
+                   :code => Settings.error_codes.member_data_invalid }
         end
         # enroll allowed
       else
