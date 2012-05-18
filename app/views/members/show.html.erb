@@ -4,10 +4,8 @@
   <tr>
     <td>
       <%= link_to 'Edit', edit_member_path, :class => "btn btn-warning" %>
-      <% if @current_member.can_recover? %>
-        <%= form_tag member_recover_path do %>
-          <%= submit_tag t('recovery'), :class => 'btn btn-warning', :confirm => 'Are you sure you want to recover this member? No enrollment fee will be billed.' %>
-        <% end %>
+      <%= form_for @current_member, :url => member_recover_path, do |f| %>
+        <%= f.submit t('recovery'), :class => 'btn btn-warning'  if @current_member.lapsed? %>
       <% end %>
     </td>
     <% unless @current_member.lapsed? %>
@@ -70,7 +68,7 @@
          <%= I18n.l @current_member.join_date, :format => :long %> </td>
     <td>
       <%= t('activerecord.attributes.member.next_retry_bill_date') %>: <%= @current_member.next_retry_bill_date %>
-      <%= link_to('Change', member_change_next_bill_date_path, :class => "btn btn-warning") unless @current_member.next_retry_bill_date.nil? %>
+      <%= link_to('Change', member_change_next_bill_date_path, :class => "btn btn-warning") unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
     </td>
     <td>
       <%= t('activerecord.attributes.member.cancel_date') %>: 
@@ -124,3 +122,4 @@
   <div class="tab-pane" id="credit_cards"><%= render :partial => 'credit_cards', :locals => { :credit_cards => @credit_cards} %></div>  
   <div class="tab-pane" id="transactions"><%= render :partial => 'transactions', :locals => { :transactions => @transactions} %></div>  
 </div>
+
