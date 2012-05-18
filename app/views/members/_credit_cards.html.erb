@@ -1,4 +1,4 @@
-<%= link_to "Add a credit card", new_credit_card_path, :class => "btn btn-warning" %>
+<%= link_to "Add a credit card", new_credit_card_path, :class => "btn btn-warning" unless @current_member.lapsed? %>
 <table class="table table-bordered datatable_only_sorting">
   <thead>
     <tr>
@@ -18,10 +18,10 @@
       <td> <%= I18n.l cc.last_successful_bill_date, :format => :long if !cc.last_successful_bill_date.nil? %> </td>
       <td>
         <%= form_for @cc, :as => :credit_card, :url => credit_card_set_as_blacklisted_path(:credit_card_id => cc.id), do |f|  %> 
-          <%= submit_tag 'BlackList', :name => 'blacklist', :class=> "btn btn-warning confirm" %>
+          <%= submit_tag 'BlackList', :name => 'blacklist', :class=> "btn btn-warning confirm" unless @current_member.lapsed? %>
         <% end %>
         <%= form_for @cc, :as => :credit_card, :url => credit_card_activate_path(:credit_card_id => cc.id), do |f| %>
-          <%= submit_tag 'Activate', :name => 'activate', :class=> "btn btn-warning confirm" unless cc.active %>
+          <%= submit_tag 'Activate', :name => 'activate', :class=> "btn btn-warning confirm" unless cc.active || @current_member.lapsed? %>
         <% end %>
       </td>
     </tr>
