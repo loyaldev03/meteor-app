@@ -1,5 +1,7 @@
 <h1> <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
-
+<% if @current_member.blacklisted? %>
+<h1> Blacklisted! </h1>
+<% end %>
 <table class="table table-bordered table-condensed">
   <tr>
     <td>
@@ -23,7 +25,7 @@
         <%= link_to("Save the sale", member_save_the_sale_path, :class => "btn btn-warning") if @current_member.can_save_the_sale? %>
       </td>
       <td>
-        <%= link_to "Blacklist", member_blacklist_path, :class => "btn btn-warning" %>
+        <%= link_to "Blacklist", member_blacklist_path, :class => "btn btn-warning" unless @current_member.blacklisted? %>
         <%= link_to("Cancel", member_cancel_path, :class => "btn btn-danger") if @current_member.can_be_canceled? %>
       </td>
     <% end %>
