@@ -22,7 +22,8 @@ defaults: &defaults
     others: 1000
   error_codes:
     success: '000'
-
+    not_found: '401'
+    data_invalid: '405'
 
 development:
   <<: *defaults
