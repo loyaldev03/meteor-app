@@ -121,18 +121,18 @@ class Member < ActiveRecord::Base
   def save_the_sale(new_tom_id, agent = nil)
     if can_save_the_sale?
       if new_tom_id.to_i == self.terms_of_membership_id.to_i
-        { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => "9885" }
+        { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
         self.terms_of_membership_id = new_tom_id
         res = enroll(self.active_credit_card, 0.0, agent)
-        if res[:code] == "000"
+        if res[:code] == Settings.error_codes.success
           message = "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}"
           Auditory.audit(agent, self, message, TermsOfMembership.find(new_tom_id), Settings.operation_types.save_the_sale)
         end
         res
       end
     else
-      { :message => "Member status does not allows us to save the sale.", :code => "9886" }
+      { :message => "Member status does not allows us to save the sale.", :code => Settings.error_codes.member_status_dont_allow }
     end
   end
 
@@ -153,9 +153,11 @@ class Member < ActiveRecord::Base
         #        days  = campaign.grace_period
         if active_credit_card.nil?
           answer = if terms_of_membership.grace_period > 0
-            { :code => "9999", :message => "Credit card is blank. Allowing grace period" }
+            { :code => Settings.error_codes.credit_card_blank_with_grace, 
+              :message => "Credit card is blank. Allowing grace period" }
           else
-            { :code => "9997", :message => "Credit card is blank and grace period is disabled" }
+            { :code => Settings.error_codes.credit_card_blank_without_grace,
+              :message => "Credit card is blank and grace period is disabled" }
           end
         else
           acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
@@ -168,7 +170,7 @@ class Member < ActiveRecord::Base
             schedule_renewal
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
             Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
-            { :message => message, :code => "000", :member_id => self.id }
+            { :message => message, Settings.error_codes.success, :member_id => self.id }
           else
             message = set_decline_strategy(trans)
             Auditory.audit(nil, trans, answer + message, self, Settings.operation_types.membership_billing)
@@ -177,10 +179,10 @@ class Member < ActiveRecord::Base
           end
         end
       else
-        { :message => "Called billing method but no amount on TOM is set.", :code => "9887" }
+        { :message => "Called billing method but no amount on TOM is set.", :code => Settings.error_codes.no_amount }
       end
     else
-      { :message => "Member is not in a billing status.", :code => "9886" }
+      { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
     end
   end
 
@@ -195,7 +197,8 @@ class Member < ActiveRecord::Base
         unless member.valid? and credit_card.valid?
           errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n') + 
                     credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
-          return { :message => "Member data is invalid: #{errors}", :code => 405 }
+          return { :message => "Member data is invalid: #{errors}", 
+                   :code => Settings.error_code.member_data_invalid }
         end
         # enroll allowed
       else
@@ -214,11 +217,11 @@ class Member < ActiveRecord::Base
 
   def enroll(credit_card, amount, agent = nil)
     if not self.can_recover?
-      return { :message => "Cant recover member. Max reactivations reached.", :code => 407 }
+      return { :message => "Cant recover member. Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
-      return { :message => "Credit card is invalid or is expired!", :code => "9506" }
+      return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card }
     elsif credit_card.blacklisted? or self.blacklisted?
-      return { :message => "Member or credit card are blacklisted", :code => 406 }
+      return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
     end
 
     if amount.to_f != 0.0
@@ -265,7 +268,7 @@ class Member < ActiveRecord::Base
       #     an invalid one. we should revert the transaction.
       message = "Could not save member. #{e}"
       Auditory.audit(agent, self, message, nil, Settings.operation_types.enrollment_billing)
-      { :message => message, :code => 404 }
+      { :message => message, :code => Settings.error_codes.member_save }
     end
   end
 
@@ -329,7 +332,7 @@ class Member < ActiveRecord::Base
           set_as_canceled = true
         else
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
-          if trans.response_code == "9999"
+          if trans.response_code == Settings.error_codes.credit_card_blank_with_grace
             self.next_retry_bill_date = terms_of_membership.grace_period.to_i.days.from_now
           else
             self.next_retry_bill_date = decline.days.days.from_now
