@@ -23,7 +23,7 @@
       <%= transaction.response_transaction_id %>
     </td>
     <td>
-      <%= link_to( t('refund'), member_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning") if transaction.can_be_refunded? %>
+      <%= link_to( t('refund'), member_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning") if transaction.can_be_refunded? || @current_member.blacklisted? %>
     </td>
   </tr>
   <% end %>
