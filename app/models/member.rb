@@ -10,6 +10,7 @@ class Member < ActiveRecord::Base
   has_many :transactions
   has_many :operations
   has_many :communications
+  has_many :fulfillments
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_number, 
@@ -70,6 +71,7 @@ class Member < ActiveRecord::Base
   end
 
   def schedule_first_membership
+    send_fulfillment
     self.bill_date = Date.today + terms_of_membership.trial_days
     self.next_retry_bill_date = bill_date
     # Documentation #18928 - recoveries will not change the quota number.
@@ -272,6 +274,21 @@ class Member < ActiveRecord::Base
   def send_pre_bill
     if can_bill_membership?
       Communication.deliver!(:prebill, self)
+    end
+  end
+  
+  def send_fulfillment
+    # we always send fulfillment to new members or members that do not have 
+    # opened fulfillments (meaning that previous fulfillments expired).
+    if self.fulfillments.empty? or self.fulfillments.open.nil?
+      # TODO: how do we know if sloop product must be sent????
+      [ Settings.fulfillment_products.kit_card ].each do |product|
+        f = Fulfillment.new :product => product
+        f.member_id = self.uuid
+        f.assigned_at = DateTime.now
+        f.save
+        f.set_as_open!
+      end
     end
   end
   

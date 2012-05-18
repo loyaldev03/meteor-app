@@ -4,7 +4,7 @@ namespace :billing do
   task :for_today => :environment do
     tall = Time.now
     begin
-      Member.find_in_batches(:conditions => [" next_retry_bill_date <= ? ", Date.today]) do |group|
+      Member.find_in_batches(:conditions => [" date(next_retry_bill_date) <= ? ", Date.today]) do |group|
         group.each do |member| 
           tz = Time.now
           begin
@@ -28,7 +28,7 @@ namespace :billing do
     tall = Time.now
     begin
       # We use bill_date because we will only send this email once!
-      Member.find_in_batches(:conditions => [" bill_date = ? ", Date.today + 7.days ]) do |group|
+      Member.find_in_batches(:conditions => [" date(bill_date) = ? ", Date.today + 7.days ]) do |group|
         group.each do |member| 
           tz = Time.now
           begin
@@ -53,7 +53,7 @@ namespace :members do
   task :cancel => :environment do
     tall = Time.now
     begin
-      Member.find_in_batches(:conditions => [" cancel_date <= ? AND status != ? ", Date.today, 'lapsed' ]) do |group|
+      Member.find_in_batches(:conditions => [" date(cancel_date) <= ? AND status != ? ", Date.today, 'lapsed' ]) do |group|
         group.each do |member| 
           tz = Time.now
           begin
@@ -71,4 +71,26 @@ namespace :members do
     end
   end
 
+  desc "Process fulfillments"
+  # This task should be run each day at 3 am 
+  task :process_fulfillments => :environment do
+    tall = Time.now
+    begin
+      Fulfillment.find_in_batches(:conditions => [" date(renewable_at) = ? ", Date.today ]) do |group|
+        group.each do |fulfillment| 
+          tz = Time.now
+          begin
+            Rails.logger.info "  * processing member ##{fulfillment.member.uuid} fulfillment ##{fulfillment.id}"
+            fulfillment.send_new
+          rescue
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+          Rails.logger.info "    ... took #{Time.now - tz} for member ##{member.id}"
+        end
+        sleep(5) # Make sure it doesn't get too crowded in there!
+      end
+    ensure
+      Rails.logger.info "It all took #{Time.now - tall}"
+    end
+  end
 end
