@@ -4,7 +4,7 @@ class CreditCardsController < ApplicationController
   layout '2-cols'
 
   def new
-    @new_credit_card = CreditCard.new
+    @credit_card = CreditCard.new
     @actual_credit_card = @current_member.active_credit_card
   end
 
@@ -15,17 +15,19 @@ class CreditCardsController < ApplicationController
     credit_card.last_digits = credit_card.number.last(4)
 
     respond_to do |format|
-      if credit_card.am_card.valid?
+      #if credit_card.am_card.valid?
         if credit_card.save && actual_credit_card.update_attributes(:active => 0)
           message = "Credit card #{credit_card.number} added and set active."
           Auditory.audit(@current_agent, credit_card, message, @current_member)
           format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.number} was successfully added and setted as active."  } 
         else
-          format.html { redirect_to new_credit_card_path, alert: credit_card.errors } 
+          flash[:error] = "Credit card is invalid or is expired!"
+          format.html { render "new" } 
         end
-      else
-        format.html { redirect_to new_credit_card_path, alert: "Credit card is invalid or is expired!" } 
-      end
+     # else
+     #   flash[:error] = "Credit card is invalid or is expired!"
+      #  format.html { render "new" } 
+      #end
     end
   end
 
