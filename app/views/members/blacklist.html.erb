@@ -1,6 +1,6 @@
 <h1><%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
 
-<%= form_tag(member_cancel_path) do %>
+<%= form_tag(member_blacklist_path) do %>
   <table class="table table-bordered">
     <tr>
       <td> 

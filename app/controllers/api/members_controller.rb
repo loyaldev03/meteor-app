@@ -12,7 +12,7 @@ class Api::MembersController < ApplicationController
     response = {}
     tom = TermsOfMembership.find_by_id(params[:terms_of_membership_id])
     if tom.nil?
-      response = { :message => "Terms of membership not found", :code => 401 }
+      response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
     else
       response = Member.enroll(tom, current_agent, params[:enrollment_amount], params[:member], params[:credit_card])
     end
@@ -37,10 +37,10 @@ class Api::MembersController < ApplicationController
     if member.update_attributes(params[:member]) 
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member)
-      response = { :message => message, :code => "000", :member_id => member.id, :v_id => member.visible_id }
+      response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id, :v_id => member.visible_id }
     else
       errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
-      response = { :message => "Member data is invalid: #{errors}", :code => 405 }
+      response = { :message => "Member data is invalid: #{errors}", :code => Settings.error_code.member_data_invalid }
     end
 
     respond_to do |format|

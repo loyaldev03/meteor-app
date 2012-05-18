@@ -23,11 +23,23 @@ defaults: &defaults
     others: 1000
   error_codes:
     success: '000'
+    not_found: '401'
+    member_data_invalid: '405'
+    member_save:'404'
+    blacklisted: '406'
+    cant_recover_member: '407'
+    invalid_credit_card: '9506'
+    credit_card_amount_invalid: '9787'
+    refund_invalid: '9788'
+    nothing_to_change_tom: '9885'
+    member_status_dont_allow: '9886'
+    no_amount: '9887'    
+    credit_card_blank_with_grace: '9999'
+    credit_card_blank_without_grace: '9997'
   fulfillment_products:
     all: All
     kit_card: Kit - Card
     sloop: Sloop
-
 
 development:
   <<: *defaults

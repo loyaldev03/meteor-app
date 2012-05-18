@@ -18,7 +18,11 @@ class MembersController < ApplicationController
   end
 
   def show
-    @operations = @current_member.operations.all
+    if request.post?
+      @operations = @current_member.find_all_by_
+    else  
+      @operations = @current_member.operations.all
+    end
     @notes = @current_member.member_notes.paginate(:page => params[:page], :order => "created_at DESC")
     @credit_cards = @current_member.credit_cards.all
     @active_credit_card = @current_member.active_credit_card
@@ -114,7 +118,18 @@ class MembersController < ApplicationController
   end
 
   def blacklist
-    @blacklist_reason = MemberBlacklistReason.all
+      @blacklist_reason = MemberBlacklistReason.all
+    if request.post? 
+      if @current_member.update_attributes(:blacklisted => true)
+        message = "Blacklisted member. Reason: #{params[:blacklist_reason]}"
+        Auditory.audit(current_agent, @current_member, message, @current_member, Settings.operation_types.cancel)
+        flash[:notice] = "Blacklisted member."
+        redirect_to show_member_path
+      else
+        flash[:error] = "Could not blacklisted this member."
+        redirect_to show_member_path 
+      end
+    end
   end
 
   def change_next_bill_date

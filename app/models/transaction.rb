@@ -58,7 +58,7 @@ class Transaction < ActiveRecord::Base
   end
 
   def success?
-    response_code == "000"
+    response_code == Settings.error_codes.success
   end
 
   def can_be_refunded?
@@ -109,14 +109,14 @@ class Transaction < ActiveRecord::Base
     old_transaction = Transaction.find_by_uuid old_transaction_id, :lock => true
     trans = Transaction.new
     if amount <= 0.0
-      return { :message => "Credit amount must be a positive number.", :code => '9787' }
+      return { :message => "Credit amount must be a positive number.", :code => Settings.error_codes.credit_amount_invalid }
     elsif old_transaction.amount == amount
       trans.transaction_type = "refund"
     elsif old_transaction.amount > amount
       trans.transaction_type = "credit"
     end
     if old_transaction.amount_available_to_refund < amount
-      return { :message => "Cant credit more $ than the original transaction amount", :code => '9788' }
+      return { :message => "Cant credit more $ than the original transaction amount", :code => Settings.error_codes.refund_invalid }
     end
     trans.prepare(old_transaction.member, old_transaction.credit_card, amount, 
         old_transaction.member.terms_of_membership.payment_gateway_configuration)
@@ -138,7 +138,7 @@ class Transaction < ActiveRecord::Base
 
     def credit
       if payment_gateway_configuration.nil?
-        { :message => "Payment gateway not found.", :code => "9999" }
+        { :message => "Payment gateway not found.", :code => Settings.error_codes.credit_card_blank_with_grace }
       else
         verify_card
         if @cc.valid?
