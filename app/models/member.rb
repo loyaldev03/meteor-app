@@ -178,7 +178,7 @@ class Member < ActiveRecord::Base
             schedule_renewal
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
             Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
-            { :message => message, Settings.error_codes.success, :member_id => self.id }
+            { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
           else
             message = set_decline_strategy(trans)
             Auditory.audit(nil, trans, answer + message, self, Settings.operation_types.membership_billing)
