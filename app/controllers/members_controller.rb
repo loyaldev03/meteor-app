@@ -120,7 +120,7 @@ class MembersController < ApplicationController
   def blacklist
       @blacklist_reason = MemberBlacklistReason.all
     if request.post? 
-      if @current_member.update_attributes(:blacklisted => true) && @current_member.active_credit_card.update_attributes(:blacklisted => true)
+      if @current_member.update_attributes(:blacklisted => true)
         message = "Blacklisted member. Reason: #{params[:blacklist_reason]}"
         Auditory.audit(current_agent, @current_member, message, @current_member, Settings.operation_types.cancel)
         flash[:notice] = "Blacklisted member."
