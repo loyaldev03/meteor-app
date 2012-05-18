@@ -10,6 +10,7 @@ class Member < ActiveRecord::Base
   has_many :transactions
   has_many :operations
   has_many :communications
+  has_many :fulfillments
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_number, 
@@ -70,6 +71,7 @@ class Member < ActiveRecord::Base
   end
 
   def schedule_first_membership
+    send_fulfillment
     self.bill_date = Date.today + terms_of_membership.trial_days
     self.next_retry_bill_date = bill_date
     # Documentation #18928 - recoveries will not change the quota number.
@@ -114,7 +116,13 @@ class Member < ActiveRecord::Base
 
   # Add logic to recover some one max 3 times in 5 years
   def can_recover?
-    self.lapsed? and reactivation_times < Settings.max_reactivations
+    self.lapsed? and reactivation_times <= Settings.max_reactivations
+  end
+
+  # Do we need rules on fulfillment renewal?
+  # Add logic here!!!
+  def can_receive_another_fulfillment?
+    self.paid? or self.provisional?
   end
   ###############################################
 
@@ -186,14 +194,19 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def self.enroll(tom, member_params = {}, credit_card_params = {})
+  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params)
     club = tom.club
     # Member exist?
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
       # credit card exist?
-      credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.club_id == club.id }
-      if credit_card.nil?
+      credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.member.club_id == club.id }
+      if credit_card.empty?
+        credit_card = CreditCard.new credit_card_params
+        member = Member.new member_params
+        member.club = club
+        member.created_by_id = current_agent.id
+        member.terms_of_membership = tom
         unless member.valid? and credit_card.valid?
           errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n') + 
                     credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
@@ -202,21 +215,18 @@ class Member < ActiveRecord::Base
         end
         # enroll allowed
       else
-        member = credit_card.member
+        return { :message => "Credit card is already in use. call support.", :code => "9507" }
       end
+    else
+      # TODO: should we update member profile? and Credit card information?
     end
-    credit_card = CreditCard.new credit_card_params
-    member = Member.new member_params
-
-    member.created_by_id = current_agent.id
+    
     member.terms_of_membership = tom
-    member.club = club
-
-    member.enroll(credit_card, params[:enrollment_amount], current_agent)
+    member.enroll(credit_card, enrollment_amount, current_agent)
   end    
 
   def enroll(credit_card, amount, agent = nil)
-    if not self.can_recover?
+    if not self.new_record? and not self.can_recover?
       return { :message => "Cant recover member. Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
       return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card }
@@ -275,6 +285,21 @@ class Member < ActiveRecord::Base
   def send_pre_bill
     if can_bill_membership?
       Communication.deliver!(:prebill, self)
+    end
+  end
+  
+  def send_fulfillment
+    # we always send fulfillment to new members or members that do not have 
+    # opened fulfillments (meaning that previous fulfillments expired).
+    if self.fulfillments.find_by_status('open').nil?
+      # TODO: how do we know if sloop product must be sent????
+      [ Settings.fulfillment_products.kit_card ].each do |product|
+        f = Fulfillment.new :product => product
+        f.member_id = self.uuid
+        f.assigned_at = DateTime.now
+        f.save
+        f.set_as_open!
+      end
     end
   end
   
