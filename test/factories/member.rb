@@ -16,10 +16,7 @@ FactoryGirl.define do
     country "US"
     association :club
     association :terms_of_membership
-
-    after(:create) do |member, evaluator|
-      FactoryGirl.create_list(:credit_card, 1, memebr: member)
-    end
+    credit_cards [ 'credit_card' ]
   end
 
   factory :paid_member, class: Member do
@@ -36,9 +33,7 @@ FactoryGirl.define do
     country "US"
     association :club
     association :terms_of_membership, factory: :terms_of_membership_insuf_funds
-    after(:create) do |member, evaluator|
-      FactoryGirl.create_list(:credit_card, 1, memebr: member)
-    end
+    credit_cards [ 'credit_card' ]
   end
 
   factory :lapsed_member, class: Member do
@@ -74,9 +69,7 @@ FactoryGirl.define do
     bill_date { DateTime.now }
     association :club
     association :terms_of_membership
-    after(:create) do |member, evaluator|
-      FactoryGirl.create_list(:credit_card, 1, memebr: member)
-    end
+    credit_cards [ 'credit_card' ]
   end
 
 end
