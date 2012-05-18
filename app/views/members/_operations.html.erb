@@ -1,18 +1,12 @@
+
+<%= form_for (show_member_path), do %>
 <table>
-  <td>
-
-  </td>
-  <td>
-
-  </td>
-  <td>
-
-  </td>
-  <td>
-
-  </td>
-  
+  <td> <%= submit_tag('Billing', {:name => "filter", :value => "Billing" }) %> </td>
+  <td> <%= submit_tag('Communications', {:name => "filter", :value => "Communications" }) %> </td>
+  <td> <%= submit_tag('Profile', {:name => "filter", :value => "Profile" }) %> </td>
+  <td> <%= submit_tag('Others', {:name => "filter", :value => "Others" }) %> </td>
 </table>
+<% end %>
 <table class="table table-bordered datatable_only_sorting">
   <thead>
     <tr>

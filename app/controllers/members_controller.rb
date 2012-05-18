@@ -19,7 +19,28 @@ class MembersController < ApplicationController
 
   def show
     if request.post?
-      @operations = @current_member.find_all_by_
+      if params[:filter] == 'Billing'
+        search = [Settings.operation_types.enrollment_billing, Settings.operation_types.membership_billing,
+                  Settings.operation_types.full_save, Settings.operation_types.change_next_bill_date,
+                  Settings.operation_types.credit ]
+        @operations = Operation.where(["(operation_type like ? or ? or ? or ? or ?) AND member_id like ?",
+                      search[0],search[1],search[2],search[3],search[4],'%'+@current_member.id+'%'])
+
+      elsif params[:filter] == 'Communications'
+        search = [Settings.operation_types.active_email, Settings.operation_types.prebill_email,
+                  Settings.operation_types.cancellation_email, Settings.operation_types.refund_email]
+        @operations = Operation.where(["(operation_type like ? or ? or ? or ?) AND member_id like ?",
+                      search[0],search[1],search[2],search[3],'%'+@current_member.id+'%'])
+      elsif params[:filter] == 'Profile'
+        search = [Settings.operation_types.cancel, Settings.operation_types.future_cancel,
+                  Settings.operation_types.save_the_sale]
+        @operations = Operation.where("(operation_type like ? or ? or ?) AND member_id like ?",
+                      search[0],search[1],search[2],'%'+@current_member.id+'%')
+      else 
+        search = Settings.operation_types.others
+        @operations = Operation.where("operation_type like ? AND member_id like ?",
+                      search[0],'%'+@current_member.id+'%')
+      end
     else  
       @operations = @current_member.operations.all
     end
