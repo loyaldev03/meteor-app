@@ -85,3 +85,9 @@ end
   m.name = name
   m.save
 end
+
+[ 'Spam', 'Inappropriate behaviour' ].each do |name|
+  m = MemberBlacklistReason.new
+  m.name = name
+  m.save
+end
