@@ -1,6 +1,7 @@
 #
 # assigned_at => The day this fulfillment is assigned to our member.
-# delivered_at => The day CS or our delivery provider send the fulfillment. If fulfillment is resend it because of a wrong address. 
+# delivered_at => The day CS or our delivery provider send the fulfillment. 
+#     If fulfillment is resend it is because of a wrong address. 
 #     this value will be updated.
 # renewable_at => This day is assigned_at + 1.year (at first time). 
 #     Will be used by fulfillment script to check which members need a new fulfillment
@@ -30,18 +31,22 @@ class Fulfillment < ActiveRecord::Base
     state :open
   end
 
-  def send_new
+  def renew
     fulfillment.set_as_archived!
-    f = Fulfillment.new :product => self.product
-    f.member_id = self.member_id
-    f.assigned_at = DateTime.now
-    f.save
-    f.set_as_open!
+    unless member.can_receive_another_fulfillment?
+      f = Fulfillment.new :product => self.product
+      f.member_id = self.member_id
+      f.assigned_at = DateTime.now
+      f.save
+      f.set_as_open!
+    end
   end
 
   private
     # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
     def set_renewable_at
       self.renewable_at = self.assigned_at + 1.year
+      # TODO: check this with carlos 
+      self.delivered_at = DateTime.now
     end
 end

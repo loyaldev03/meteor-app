@@ -81,7 +81,7 @@ namespace :members do
           tz = Time.now
           begin
             Rails.logger.info "  * processing member ##{fulfillment.member.uuid} fulfillment ##{fulfillment.id}"
-            fulfillment.send_new
+            fulfillment.renew
           rescue
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end

@@ -118,6 +118,12 @@ class Member < ActiveRecord::Base
   def can_recover?
     self.lapsed? and reactivation_times <= Settings.max_reactivations
   end
+
+  # Do we need rules on fulfillment renewal?
+  # Add logic here!!!
+  def can_receive_another_fulfillment?
+    self.paid? or self.provisional?
+  end
   ###############################################
 
   def save_the_sale(new_tom_id, agent = nil)
