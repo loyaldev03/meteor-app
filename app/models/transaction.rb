@@ -7,6 +7,7 @@ class Transaction < ActiveRecord::Base
   belongs_to :credit_card
   # This value will be not nil only if we are billing 
   belongs_to :terms_of_membership 
+  has_many :operations, :as => :resource
 
   attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
 
