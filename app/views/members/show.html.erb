@@ -2,7 +2,9 @@
 <% if @current_member.blacklisted? %>
 <h1> Blacklisted! </h1>
 <% end %>
+
 <table class="table table-bordered table-condensed">
+  <thead>
   <tr>
     <td>
       <%= link_to 'Edit', edit_member_path, :class => "btn btn-warning" %>
@@ -31,11 +33,17 @@
     <% end %>
   </tr>
   <tr>
-    <td colspan="5"> 
+    <th colspan="6" 
+    <% unless @current_member.wrong_address.nil? %>
+      class = "yellow"
+    <% end %>
+    > 
       <i class ="icon-home" > </i> <%= @current_member.full_address %> 
       <%= link_to t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :target => '_blank', :class => "btn btn-info" %>
-    </td>
+      <%= link_to t('set_undeliverable'), member_set_undeliverable_path, :class => "btn btn-danger" if @current_member.wrong_address.nil? %>
+    </th>
   </tr>
+  </thead>
 </table>
 
 <table class="table table-bordered table-condensed"> 

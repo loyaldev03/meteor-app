@@ -41,6 +41,10 @@ defaults: &defaults
     all: All
     kit_card: Kit - Card
     sloop: Sloop
+  wrong_address_options:
+    undeliverable_all: 'All'
+    undeliverable_sloop: 'Sloop'
+    undeliverable_kit_card: 'Kit - Card'
 
 development:
   <<: *defaults
