@@ -8,7 +8,10 @@ class MemberTest < ActiveSupport::TestCase
 
   test "Should create a member" do
   	member = FactoryGirl.build(:member)
-  	assert member.save
+  	assert !member.save, member.errors.inspect
+    member.club =  @terms_of_membership_with_gateway.club
+    member.terms_of_membership =  @terms_of_membership_with_gateway
+    assert member.save
   end
 
   test "Should not create a member without first name" do
@@ -24,27 +27,27 @@ class MemberTest < ActiveSupport::TestCase
   test "Member should not be billed if it is not paid or provisional" do
     member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     answer = member.bill_membership
-    assert !(answer[:code] == Settings.error_codes.success)
+    assert !(answer[:code] == Settings.error_codes.success), answer[:message]
   end
 
   test "Member should not be billed if no credit card is on file." do
     member = FactoryGirl.create(:provisional_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     answer = member.bill_membership
-    assert (answer[:code] != Settings.error_codes.success)
+    assert (answer[:code] != Settings.error_codes.success), answer[:message]
   end
 
   test "Insfufficient funds hard decline" do
     paid_member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     answer = paid_member.bill_membership
-    assert (answer[:code] == Settings.error_codes.success)
+    assert (answer[:code] == Settings.error_codes.success), answer[:message]
   end
 
   test "Monthly member should be billed if it is paid or provisional" do
     assert_difference('Operation.count') do
-      member = FactoryGirl.create(:provisional_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+      member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
-      assert (answer[:code] == Settings.error_codes.success)
+      assert (answer[:code] == Settings.error_codes.success), answer[:message]
       assert member.quota == 2
       assert member.recycled_times == 1
       assert member.bill_date == member.next_retry_bill_date
@@ -60,17 +63,19 @@ class MemberTest < ActiveSupport::TestCase
 
   test "Should not be two members with the same email within the same club" do
     member = FactoryGirl.build(:member)
+    member.club =  @terms_of_membership_with_gateway.club
     member.terms_of_membership =  @terms_of_membership_with_gateway
     member.save
     member_two = FactoryGirl.build(:member)
+    member_two.club =  @terms_of_membership_with_gateway.club
     member_two.terms_of_membership =  @terms_of_membership_with_gateway
     member_two.valid?
     assert_not_nil member_two, member_two.errors.full_messages.inspect
   end
 
-  test "Should let save two members with the same email in diferents clubs" do
+  test "Should let save two members with the same email in differents clubs" do
     member = FactoryGirl.create(:member, :club_id => 30)
-    member_two = FactoryGirl.build(:member)
+    member_two = FactoryGirl.build(:member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     assert member_two.save
   end
 
