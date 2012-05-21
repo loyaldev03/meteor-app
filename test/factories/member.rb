@@ -4,6 +4,7 @@ FactoryGirl.define do
     # HACK: visible_id should be created automatically by mysql.
     # but test database is not created by migrations, so our custom executes
     # are not used. Consequence: visible_id is not auto increment.
+    sequence(:visible_id) {|n| n }
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
     address { Faker::Address.street_address  }
