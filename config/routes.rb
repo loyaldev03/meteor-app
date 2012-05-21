@@ -29,7 +29,7 @@ SacPlatform::Application.routes.draw do
           post :activate
           post :set_as_blacklisted
         end
-        match '/recover' => 'members#recover', as: 'member_recover', :via => [:post]
+        match '/recover' => 'members#recover', as: 'member_recover', :via => [:put]
         match '/refund/:transaction_id' => 'members#refund', as: 'member_refund', :via => [:get, :post]
         match '/full_save' => 'members#full_save', as: 'member_full_save', :via => [:get]
         match '/save_the_sale' => 'members#save_the_sale', as: 'member_save_the_sale', :via => [:get, :post]
