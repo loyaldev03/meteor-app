@@ -14,9 +14,9 @@ class Domain < ActiveRecord::Base
                   
   acts_as_paranoid
 
-  before_destroy :veriby_if_is_last_domain
+  before_destroy :verify_if_is_last_domain
 
-  def veriby_if_is_last_domain
+  def verify_if_is_last_domain
   	@domains = Domain.where(:partner_id =>partner_id)
       if @domains.count == 1
         errors.add :base, :error => "Cannot destroy last domain. Partner must have at least one domain."

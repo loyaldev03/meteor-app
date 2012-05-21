@@ -28,4 +28,11 @@ FactoryGirl.define do
     association :club
   end
 
+  factory :terms_of_membership_with_gateway, class: TermsOfMembership do
+    name "test"
+    installment_amount 100
+    installment_type '1.month'
+    association :club, factory: :club_with_gateway
+  end
+
 end

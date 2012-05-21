@@ -21,8 +21,9 @@ class ClubsControllerTest < ActionController::TestCase
   end
 
   test "should create club" do
+    @club = FactoryGirl.build(:club, :partner_id => @partner.id)
     assert_difference('Club.count') do
-      post :create, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name, partner_id: @club.partner_id }
+      post :create, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name }
     end
 
     assert_redirected_to club_path(assigns(:club), partner_prefix: @partner_prefix)
@@ -39,7 +40,7 @@ class ClubsControllerTest < ActionController::TestCase
   end
 
   test "should update club" do
-    put :update, id: @club, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name, partner_id: @club.partner_id }
+    put :update, id: @club, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name }
     assert_redirected_to club_path(assigns(:club), partner_prefix: @partner_prefix)
   end
 

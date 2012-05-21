@@ -3,6 +3,12 @@ FactoryGirl.define do
     name { Faker::Name.name }
     description "My description"
     association :partner
-    payment_gateway_configurations {|ccs| [ccs.association(:payment_gateway_configuration)]}
   end
+
+  factory :club_with_gateway do
+    name { Faker::Name.name }
+    description "My description"
+    association :partner
+    payment_gateway_configurations {|ccs| [ccs.association(:payment_gateway_configuration)]}
+  end  
 end
