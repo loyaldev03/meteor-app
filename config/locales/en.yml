@@ -71,7 +71,7 @@ en:
         not_group_associated: 'It has no member group type associated.'
         does_not_have_member_groups: 'It has no groups to be selected.'
         zip_help: 'It supports zips with format xxxxx or xxxxx-xxxx. Only numbers.'
-        phone_number_help: 'Formats: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx). Only numbers.'
+        phone_number_help: 'Formats: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.'
       credit_card:
         number: 'Credit card number'
         expire_date: 'Expire date'
