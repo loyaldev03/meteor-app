@@ -26,6 +26,7 @@ class Member < ActiveRecord::Base
   #the phone_number's validation suṕports +54 11-xxxx-xxxx(xxxx)
   validates :phone_number, :format => /^[+?]?[0-9]+[ \(.+?\\)? -]?[0-9]*[ \(.+?\\)? -]?[0-9]*[ \(.+?\\)? -]?[0-9]+[ \(.+?\\)? -]?[0-9]+[ \(.+?\\)? -]?$/ 
   validates :address, :city, :state, :country, :presence => true, :format => /^[A-Za-z0-9,\s]+$/
+  validates :terms_of_membership_id => :presence => true
   validates :city, :state, :format => /^[A-Za-z \s]+$/
   validates :zip, :presence => true, :format => /^[0-9]{5}(-?[0-9]{4})?$/
 
