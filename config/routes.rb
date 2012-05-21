@@ -36,6 +36,7 @@ SacPlatform::Application.routes.draw do
         match '/cancel' => 'members#cancel', as: 'member_cancel', :via => [:get, :post]
         match '/blacklist' => 'members#blacklist', as: 'member_blacklist', :via => [:get, :post]
         match '/change_next_bill_date' => 'members#change_next_bill_date', as: 'member_change_next_bill_date', :via => [:get, :post]
+        match '/set_undeliverable' => 'members#set_undeliverable', as: 'member_set_undeliverable', :via => [:get, :post]
         match '/' => 'members#show', as: 'show_member', :via => [:get, :post]
       end
     end
