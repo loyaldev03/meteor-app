@@ -31,7 +31,7 @@
             <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
             <li>
               <%= select_tag "change_partner",
-                options_for_select(Club.all.collect{ |u| [u.name, members_path(u.partner.prefix, u.name) ] }), 
+                options_for_select(Club.all.collect{ |u| [ "#{u.partner.prefix} - #{u.name}", members_path(u.partner.prefix, u.name) ] }), 
                 :onchange => "window.open(this.options[this.selectedIndex].value, '_top')" %>
             </li>
           </ul>
