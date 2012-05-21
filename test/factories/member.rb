@@ -28,8 +28,6 @@ FactoryGirl.define do
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
     country "US"
-    association :terms_of_membership, factory: :terms_of_membership_with_gateway
-    credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
   factory :lapsed_member, class: Member do
@@ -44,7 +42,6 @@ FactoryGirl.define do
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
     country "US"
-    association :terms_of_membership, factory: :terms_of_membership_with_gateway
   end
 
   factory :provisional_member, class: Member do
@@ -62,7 +59,6 @@ FactoryGirl.define do
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
-    association :terms_of_membership, factory: :terms_of_membership_with_gateway
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 

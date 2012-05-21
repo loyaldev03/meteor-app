@@ -9,6 +9,6 @@ FactoryGirl.define do
     name { Faker::Name.name }
     description "My description"
     association :partner
-    payment_gateway_configurations {|ccs| [ccs.association(:payment_gateway_configuration)]}
+    after_create { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end  
 end
