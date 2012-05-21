@@ -215,7 +215,9 @@ class Member < ActiveRecord::Base
         end
         # enroll allowed
       else
-        return { :message => "Credit card is already in use. call support.", :code => "9507" }
+        message = "Credit card is already in use. call support."
+        Auditory.audit(agent, tom, message, credit_card.member, Settings.operation_types.credit_card_already_in_use)
+        return { :message => message, :code => "9507" }
       end
     else
       # TODO: should we update member profile? and Credit card information?
