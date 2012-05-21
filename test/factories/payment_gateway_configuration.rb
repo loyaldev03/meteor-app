@@ -7,7 +7,6 @@ FactoryGirl.define do
     mode "development"
     gateway "mes"
     report_group "SAC_STAGING_TEST"
-    association :club
   end
 
 end

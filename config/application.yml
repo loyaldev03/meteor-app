@@ -20,6 +20,7 @@ defaults: &defaults
     prebill_email: 301
     cancellation_email: 302
     refund_email: 303
+    credit_card_already_in_use: 401
     others: 1000
   error_codes:
     success: '000'
