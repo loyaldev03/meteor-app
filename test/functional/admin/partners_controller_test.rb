@@ -5,7 +5,6 @@ class Admin::PartnersControllerTest < ActionController::TestCase
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     sign_in @admin_user
     @partner = FactoryGirl.create(:partner)
-    @domain = FactoryGirl.create(:domain, :partner_id => @partner.id)
     @partner_prefix = @partner.prefix
   end
 
@@ -21,8 +20,9 @@ class Admin::PartnersControllerTest < ActionController::TestCase
   end
 
   test "should create partner" do
+    partner = FactoryGirl.build(:partner)
     assert_difference('Partner.count') do
-      post :create, partner: { :prefix => @partner_prefix, :name => @partner.name, :contract_uri => @partner.contract_uri, :website_url => @partner.website_url, :description => @partner.description }
+      post :create, partner: { :prefix => partner.prefix, :name => partner.name, :contract_uri => partner.contract_uri, :website_url => partner.website_url, :description => partner.description }
     end
 
     assert_redirected_to partner_path(assigns(:partner))

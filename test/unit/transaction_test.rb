@@ -4,6 +4,8 @@ class TransactionTest < ActiveSupport::TestCase
   setup do
     @current_agent = FactoryGirl.create(:agent)
     @terms_of_membership = FactoryGirl.create(:terms_of_membership)
+    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, club_id: @terms_of_membership.club_id)
+    @terms_of_membership.club.payment_gateway_configurations << @payment_gateway_configuration
     @member = FactoryGirl.build(:member)
     @member.terms_of_membership = @terms_of_membership
     @credit_card = FactoryGirl.build(:credit_card)
