@@ -61,8 +61,12 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should not be two members with the same email within the same club" do
-    member = FactoryGirl.create(:member)
+    tom = FactoryGirl.create(:terms_of_membership_with_gateway)
+    member = FactoryGirl.build(:member)
+    member.terms_of_membership = tom
+    member.save
     member_two = FactoryGirl.build(:member)
+    member_two.terms_of_membership = tom
     member_two.valid?
     assert_not_nil member_two, member_two.errors.full_messages.inspect
   end
