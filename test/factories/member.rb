@@ -13,6 +13,7 @@ FactoryGirl.define do
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
+    status "none"
     country "US"
   end
 
@@ -27,8 +28,10 @@ FactoryGirl.define do
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
+    join_date { DateTime.now }
+    next_retry_bill_date { DateTime.now } 
+    bill_date { DateTime.now }
     country "US"
-    association :terms_of_membership, factory: :terms_of_membership_with_gateway
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
@@ -43,8 +46,29 @@ FactoryGirl.define do
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
+    join_date { DateTime.now }
+    next_retry_bill_date { DateTime.now } 
+    bill_date { DateTime.now }
     country "US"
-    association :terms_of_membership, factory: :terms_of_membership_with_gateway
+    credit_cards {|ccs| [ccs.association(:credit_card)]}
+  end
+
+  factory :provisional_member_with_cc, class: Member do
+    sequence(:visible_id) {|n| n }
+    status "provisional"
+    first_name { Faker::Name.first_name  }
+    last_name { Faker::Name.last_name }
+    address { Faker::Address.street_address  }
+    city { Faker::Address.city }
+    zip { Faker::Address.zip }
+    state { Faker::Address.us_state }
+    sequence(:email) {|n| "member#{n}@test.no" }
+    phone_number { Faker::PhoneNumber.phone_number }
+    country "US"
+    join_date { DateTime.now }
+    next_retry_bill_date { DateTime.now } 
+    bill_date { DateTime.now }
+    credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
   factory :provisional_member, class: Member do
@@ -62,8 +86,7 @@ FactoryGirl.define do
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
-    association :terms_of_membership, factory: :terms_of_membership_with_gateway
-    credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
+
 
 end
