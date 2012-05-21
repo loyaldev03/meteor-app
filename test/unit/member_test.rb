@@ -48,10 +48,10 @@ class MemberTest < ActiveSupport::TestCase
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
-      assert member.quota == 2
-      assert member.recycled_times == 1
-      assert member.bill_date == member.next_retry_bill_date
-      assert member.next_retry_bill_date == (prev_bill_date + 1.month)
+      assert_equal member.quota, 2
+      assert_equal member.recycled_times, 1
+      assert_equal member.bill_date, member.next_retry_bill_date
+      assert_equal member.next_retry_bill_date, (prev_bill_date + 1.month)
     end
   end
 
@@ -74,20 +74,20 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should let save two members with the same email in differents clubs" do
-    member = FactoryGirl.create(:member, :club_id => 30)
+    member = FactoryGirl.create(:member, terms_of_membership_id: 20, club_id: 13)
     member_two = FactoryGirl.build(:member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     assert member_two.save
   end
 
   test "Paid member cant be recovered" do
-    member = FactoryGirl.create(:paid_member)
+    member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     answer = member.recover(4)
     assert answer[:code] == "407"
   end
 
   test "Lapsed member can be recovered" do
-    member = FactoryGirl.create(:lapsed_member)
-    answer = member.recover(TermsOfMembership.first)
+    member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    answer = member.recover(@terms_of_membership_with_gateway)
     assert answer[:code] == Settings.error_codes.success
   end
 

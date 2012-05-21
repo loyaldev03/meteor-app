@@ -234,6 +234,8 @@ class Member < ActiveRecord::Base
       return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card }
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
+    elsif not self.valid? 
+      return { :message => "Member data is invalid", :code => Settings.error_codes.member_data_invalid }
     end
 
     if amount.to_f != 0.0
