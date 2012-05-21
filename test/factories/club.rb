@@ -5,7 +5,7 @@ FactoryGirl.define do
     association :partner
   end
 
-  factory :club_with_gateway do
+  factory :club_with_gateway, class: Club do
     name { Faker::Name.name }
     description "My description"
     association :partner

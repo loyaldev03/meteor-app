@@ -21,8 +21,10 @@ class DomainsControllerTest < ActionController::TestCase
   end
 
   test "should create domain" do
+    domain = FactoryGirl.build(:domain, :partner_id => @partner.id )
     assert_difference('Domain.count') do
-      post :create, partner_prefix: @partner_prefix, domain: { data_rights: @domain.data_rights, deleted_at: @domain.deleted_at, description: @domain.description, hosted: @domain.hosted, url: @domain.url }
+      post :create, partner_prefix: @partner_prefix, domain: { data_rights: domain.data_rights, 
+        description: domain.description, hosted: domain.hosted, url: domain.url }
     end
 
     assert_redirected_to domain_path(assigns(:domain), partner_prefix: @partner_prefix)
@@ -39,7 +41,7 @@ class DomainsControllerTest < ActionController::TestCase
   end
 
   test "should update domain" do
-    put :update, id: @domain, partner_prefix: @partner_prefix, domain: { data_rights: @domain.data_rights, deleted_at: @domain.deleted_at, description: @domain.description, hosted: @domain.hosted, url: @domain.url }
+    put :update, id: @domain, partner_prefix: @partner_prefix, domain: { data_rights: @domain.data_rights, description: @domain.description, hosted: @domain.hosted, url: @domain.url }
     assert_redirected_to domain_path(assigns(:domain), partner_prefix: @partner_prefix)
   end
 

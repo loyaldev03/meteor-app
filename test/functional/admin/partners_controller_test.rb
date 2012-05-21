@@ -25,7 +25,7 @@ class Admin::PartnersControllerTest < ActionController::TestCase
       post :create, partner: { :prefix => partner.prefix, :name => partner.name, :contract_uri => partner.contract_uri, :website_url => partner.website_url, :description => partner.description }
     end
 
-    assert_redirected_to partner_path(assigns(:partner))
+    assert_redirected_to admin_partner_path(assigns(:partner))
   end
 
   test "should show partner" do
