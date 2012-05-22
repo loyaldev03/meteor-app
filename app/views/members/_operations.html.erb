@@ -1,10 +1,12 @@
 
-<%= form_for (show_member_path), do %>
+<%= form_for (show_member_path), :html => { :id => "operation_filter" }  do %>
 <table>
-  <td> <%= submit_tag('Billing', {:name => "filter", :value => "Billing" }) %> </td>
-  <td> <%= submit_tag('Communications', {:name => "filter", :value => "Communications" }) %> </td>
-  <td> <%= submit_tag('Profile', {:name => "filter", :value => "Profile" }) %> </td>
-  <td> <%= submit_tag('Others', {:name => "filter", :value => "Others" }) %> </td>
+  <td> <%= submit_tag('Billing', {:name => "filter", :value => "all", :id => "all" }) %> </td>
+  <td> <%= submit_tag('Billing', {:name => "filter", :value => "billing", :id => "billing" }) %> </td>
+  <td> <%= submit_tag('Communications', {:name => "filter", :value => "communications", 
+                                         :id => "communications" }) %> </td>
+  <td> <%= submit_tag('Profile', {:name => "filter", :value => "profile", :id => "profile"  }) %> </td>
+  <td> <%= submit_tag('Others', {:name => "filter", :value => "others", :id => "others"  }) %> </td>
 </table>
 <% end %>
 <table class="table table-bordered datatable_only_sorting">
@@ -35,3 +37,8 @@
     <% end %>
   </tbody>
 </table>
+
+<script>
+  var filter = "<%= @operation_filter %>";
+  $(document).ready(operation_member_functions());
+</script>
