@@ -33,15 +33,19 @@
     <% end %>
   </tr>
   <tr>
-    <th colspan="6"
+    <td colspan="6"
     <% unless @current_member.wrong_address.nil? %>
       class = "yellow"
     <% end %>
     >
       <i class ="icon-home" > </i> <%= @current_member.full_address %> 
       <%= link_to t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :target => '_blank', :class => "btn btn-info" %>
-      <%= link_to t('set_undeliverable'), member_set_undeliverable_path, :class => "btn btn-danger" if @current_member.wrong_address.nil? if @current_member.wrong_address.nil? %>
-    </th>
+      <% if @current_member.wrong_address.nil? %>
+        <%= link_to t('set_undeliverable'), member_set_undeliverable_path, :class => "btn btn-danger" %>
+      <% else %>
+        <%= t('activerecord.attributes.member.undeliverable') %>
+      <% end %>
+    </td>
   </tr>
   </thead>
 </table>
@@ -51,13 +55,23 @@
     <tr> 
       <th colspan="2"> Contact Information </th>
     </tr>
-  </thead>  
-  <tr>
-    <td> 
-      <%= t('activerecord.attributes.member.phone_number') %>: <%= @current_member.phone_number %>  <%= link_to t('set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger" if @current_member.wrong_phone_number.nil? %>
-    </td>
-    <td> <i class="icon-envelope"> </i> <%= @current_member.email %> </td>
-  </tr>
+    <tr>
+
+      <td   
+      <% unless @current_member.wrong_phone_number.nil? %> 
+        class = "yellow" 
+      <% end %>
+      > 
+        <%= t('activerecord.attributes.member.phone_number') %>: <%= @current_member.phone_number %>   
+          <% if @current_member.wrong_phone_number.nil? %>
+            <%= link_to t('set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger" %>
+          <% else %>
+            <%= t('activerecord.attributes.member.unreachable') %>
+          <% end %>
+      </td>
+      <td> <i class="icon-envelope"> </i> <%= @current_member.email %> </td>
+    </tr>
+  </thead> 
 </table>
 
 <table class="table table-bordered table-condensed"> 
