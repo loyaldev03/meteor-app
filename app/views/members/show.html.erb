@@ -66,7 +66,7 @@
           <% if @current_member.wrong_phone_number.nil? %>
             <%= link_to t('set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger" %>
           <% else %>
-            <%= t('activerecord.attributes.member.unreachable') %>
+            <%= @current_member.wrong_phone_number %>
           <% end %>
       </td>
       <td> <i class="icon-envelope"> </i> <%= @current_member.email %> </td>
@@ -143,6 +143,7 @@
   <li><a href="#notes" data-toggle="tab">Notes</a></li>
   <li><a href="#credit_cards" data-toggle="tab">Credit Cards</a></li>
   <li><a href="#transactions" data-toggle="tab">Transactions</a></li>
+  <li><a href="#fulfillments" data-toogle="tab">Fulfillments</a></li>
 </ul>
 
 <div class="tab-content">
@@ -150,5 +151,6 @@
   <div class="tab-pane" id="notes"><%= render :partial => 'notes', :locals => { :notes => @notes} %></div>
   <div class="tab-pane" id="credit_cards"><%= render :partial => 'credit_cards', :locals => { :credit_cards => @credit_cards} %></div>  
   <div class="tab-pane" id="transactions"><%= render :partial => 'transactions', :locals => { :transactions => @transactions} %></div>  
+  <div class="tab-pane" id="fulfillments"><%= render :partial => 'fulfillments', :locals => { :fulfillments => @fulfillments} %></div>
 </div>
 
