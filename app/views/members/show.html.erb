@@ -5,36 +5,41 @@
 
 <table class="table table-bordered table-condensed">
   <thead>
-    <tr>
+  <tr>
+    <td>
+      <%= link_to 'Edit', edit_member_path, :class => "btn btn-warning" %>
+    </td>
+    <% if @current_member.lapsed? %>
       <td>
-        <%= link_to 'Edit', edit_member_path, :class => "btn btn-warning" %>
-      </td>
-      <% if @current_member.lapsed? %>
-        <td>
-          <%= form_for @current_member, :url => member_recover_path, do |f| %>
-            <%= f.submit t('recovery'), :class => 'btn btn-warning' %>
-          <% end %>
-        </td>
-      <% end %>
-      
-      <% unless @current_member.lapsed? %>
-        <td>
-          <%= link_to "Resend welcome email", "#", :class => "btn btn-warning" %>
-          <%= link_to "Password reset", "#", :class => "btn btn-warning" %>
-        </td>
-        <% if @current_member.can_save_the_sale? %>
-          <td>
-            <%= link_to("Save the sale", member_save_the_sale_path, :class => "btn btn-warning") %>
-          </td>
+        <%= form_for @current_member, :url => member_recover_path, do |f| %>
+          <%= f.submit t('recovery'), :class => 'btn btn-warning' %>
         <% end %>
+      </td>
+    <% end %>
+    
+    <% unless @current_member.lapsed? %>
+      <td>
+        <%= link_to "Resend welcome email", "#", :class => "btn btn-warning" %>
+        <%= link_to "Password reset", "#", :class => "btn btn-warning" %>
+      </td>
+      <% if @current_member.can_save_the_sale? %>
         <td>
-          <%= link_to "Blacklist", member_blacklist_path, :class => "btn btn-warning" unless @current_member.blacklisted? %>
-          <%= link_to("Cancel", member_cancel_path, :class => "btn btn-danger") if @current_member.can_be_canceled? %>
+          <%= link_to("Save the sale", member_save_the_sale_path, :class => "btn btn-warning") %>
         </td>
       <% end %>
-    </tr>
+      <td>
+        <%= link_to "Blacklist", member_blacklist_path, :class => "btn btn-warning" unless @current_member.blacklisted? %>
+        <%= link_to("Cancel", member_cancel_path, :class => "btn btn-danger") if @current_member.can_be_canceled? %>
+      </td>
+    <% end %>
+  </tr>
+  </thead>
+</table>
+
+<table class="table table-bordered table-condensed"> 
+  <thead>
     <tr>
-      <td colspan="6"
+      <td colspan="2"
       <% unless @current_member.wrong_address.nil? %>
         class = "yellow"
       <% end %>
@@ -52,7 +57,6 @@
       <th colspan="2"> Contact Information </th>
     </tr>
     <tr>
-
       <td   
       <% unless @current_member.wrong_phone_number.nil? %> 
         class = "yellow" 

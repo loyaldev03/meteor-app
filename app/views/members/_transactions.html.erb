@@ -4,6 +4,7 @@
       <th> <%= t('activerecord.attributes.transaction.date') %> </th>
       <th> <%= t('activerecord.attributes.transaction.description') %> </th>
       <th> <%= t('activerecord.attributes.transaction.amount') %> </th>
+      <th> <%= t('activerecord.attributes.transaction.refundable') %> </th>
       <th> <%= t('activerecord.attributes.transaction.gw_trans') %> </th>
       <th></th>
     </tr>
@@ -11,13 +12,16 @@
   <% transactions.each do |transaction| %>
   <tr>
     <td>
-      <%= I18n.l transaction.created_at, :format => 'long' %>
+      <%= I18n.l transaction.created_at %>
     </td>
     <td>
       <%= transaction.to_label %>
     </td>
     <td>
       <%= number_to_currency transaction.amount %>
+    </td>
+    <td>
+      <%= number_to_currency transaction.amount_available_to_refund if transaction.can_be_refunded? %>
     </td>
     <td>
       <%= transaction.response_transaction_id %>
