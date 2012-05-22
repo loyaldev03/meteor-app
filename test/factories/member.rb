@@ -35,6 +35,23 @@ FactoryGirl.define do
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
+
+  factory :paid_member_without_cc, class: Member do
+    status "paid"
+    first_name { Faker::Name.first_name  }
+    last_name { Faker::Name.last_name }
+    address { Faker::Address.street_address  }
+    city { Faker::Address.city }
+    zip { Faker::Address.zip }
+    state { Faker::Address.us_state }
+    sequence(:email) {|n| "member#{n}@test.no" }
+    phone_number { Faker::PhoneNumber.phone_number }
+    join_date { DateTime.now }
+    next_retry_bill_date { DateTime.now } 
+    bill_date { DateTime.now }
+    country "US"
+  end
+
   factory :lapsed_member, class: Member do
     status "lapsed"
     first_name { Faker::Name.first_name  }
