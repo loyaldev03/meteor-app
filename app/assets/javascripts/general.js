@@ -62,6 +62,10 @@ $(document).ready( function() {
     $('.help').popover({offset: 10});
   }
 
+  function operation_member_functions(){
+    $('#'+filter).toggleClass("btn-info")
+  }
+
   function edit_member_functions(){
     $('form').submit( function(event) {
       event.preventDefault()

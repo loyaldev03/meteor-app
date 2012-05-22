@@ -19,29 +19,32 @@ class MembersController < ApplicationController
 
   def show
     if request.post?
-      if params[:filter] == 'Billing'
+      if params[:filter] == 'billing'
         search = [Settings.operation_types.enrollment_billing, Settings.operation_types.membership_billing,
                   Settings.operation_types.full_save, Settings.operation_types.change_next_bill_date,
                   Settings.operation_types.credit ]
         @operations = Operation.where(["(operation_type in(?,?,?,?,?)) AND member_id like ?",
                       search[0],search[1],search[2],search[3],search[4],'%'+@current_member.id+'%'])
-      elsif params[:filter] == 'Communications'
+      elsif params[:filter] == 'communications'
         search = [Settings.operation_types.active_email, Settings.operation_types.prebill_email,
                   Settings.operation_types.cancellation_email, Settings.operation_types.refund_email]
         @operations = Operation.where(["(operation_type in(?,?,?,?)) AND member_id like ?",
                       search[0],search[1],search[2],search[3],'%'+@current_member.id+'%'])
-      elsif params[:filter] == 'Profile'
+      elsif params[:filter] == 'profile'
         search = [Settings.operation_types.cancel, Settings.operation_types.future_cancel,
                   Settings.operation_types.save_the_sale]
         @operations = Operation.where("(operation_type in(?,?,?)) AND member_id like ?",
                       search[0],search[1],search[2],'%'+@current_member.id+'%')
-      else
+      elsif params[:filter] == 'others'
         @operations = Operation.where("operation_type like ? AND member_id like ?",
                       Settings.operation_types.others,'%'+@current_member.id+'%')
+      else
+        @operations = @current_member.operations.all
       end
     else  
       @operations = @current_member.operations.all
     end
+    @operation_filter = params[:filter]
     @notes = @current_member.member_notes.paginate(:page => params[:page], :order => "created_at DESC")
     @credit_cards = @current_member.credit_cards.all
     @active_credit_card = @current_member.active_credit_card
