@@ -97,5 +97,11 @@ class MemberTest < ActiveSupport::TestCase
     assert answer[:code] == Settings.error_codes.success, answer[:message]
   end
 
-
+  test "Should let create member with correct format number" do
+    ['(+54) 11-4632-5895', '11-4632-5895', '338.560.1829 (5755)', '338.560.1829 int5755', 
+       '338.560.1829 x5755', '(801)585-5189', '216.463.8898'].each {|phone| phone 
+    member = FactoryGirl.create(:member, phone_number: phone,terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    assert member.save, "member cant be save #{member.errors.inspect}"
+    }
+  end
 end
