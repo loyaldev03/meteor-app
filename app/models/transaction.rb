@@ -64,7 +64,7 @@ class Transaction < ActiveRecord::Base
   end
 
   def can_be_refunded?
-    [ 'sale', 'capture' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !@current_member.blacklisted?
+    [ 'sale', 'capture' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted?
   end
 
 
