@@ -9,6 +9,8 @@ class Transaction < ActiveRecord::Base
   belongs_to :terms_of_membership 
   has_many :operations, :as => :resource
 
+  serialize :response
+
   attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
 
   def to_label
@@ -173,7 +175,7 @@ class Transaction < ActiveRecord::Base
       if payment_gateway_configuration.nil?
         { :message => "Payment gateway not found.", :code => "9999" }
       elsif amount.to_f == 0.0
-        { :message => "Transaction success. Amount $0", :code => "000" }
+        { :message => "Transaction success. Amount $0.0", :code => Settings.error_codes.success }
       else
         verify_card
         if @cc.valid?
@@ -198,23 +200,25 @@ class Transaction < ActiveRecord::Base
 
     def save_response(answer)
       self.response = answer
-      self.response_transaction_id=answer.params['transaction_id']
-      self.response_auth_code=answer.params['auth_code']
-      self.response_code=answer.params['error_code']
+      if answer.params
+        self.response_transaction_id=answer.params['transaction_id']
+        self.response_auth_code=answer.params['auth_code']
+        self.response_code=answer.params['error_code']
+      end
       self.response_result=answer.message
       save
 
-      if response.params[:duplicate]=="true"
+      if response.params and response.params[:duplicate]=="true"
         # we keep this if, just because it was on Litle version (compatibility).
         # MeS seems to not send this param
-        {:message=>"Duplicated Transaction: #{response.params[:response]}",:code=>"900"}
+        { :message => "Duplicated Transaction: #{response.params[:response]}", :code => "900" }
       elsif response.success?
         unless self.credit_card.nil?
           self.credit_card.accepted_on_billing
         end
-        {:message=>response.message,:code=>"000"}
+        { :message => response.message, :code=> Settings.error_codes.success }
       else
-        {:message=>"Error: " + response.message,:code=>response_code}
+        { :message=>"Error: " + response.message, :code=>response_code }
       end      
     end
 

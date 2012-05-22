@@ -1,10 +1,11 @@
 FactoryGirl.define do
-
-  factory :member do
-    # HACK: visible_id should be created automatically by mysql.
+    # HACK only if using schema as rb instead of sql: 
+    # visible_id should be created automatically by mysql.
     # but test database is not created by migrations, so our custom executes
     # are not used. Consequence: visible_id is not auto increment.
-    sequence(:visible_id) {|n| n }
+    # sequence(:visible_id) {|n| n }
+
+  factory :member do
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
     address { Faker::Address.street_address  }
@@ -18,7 +19,6 @@ FactoryGirl.define do
   end
 
   factory :paid_member, class: Member do
-    sequence(:visible_id) {|n| n }
     status "paid"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
@@ -36,7 +36,6 @@ FactoryGirl.define do
   end
 
   factory :lapsed_member, class: Member do
-    sequence(:visible_id) {|n| n }
     status "lapsed"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
@@ -54,7 +53,6 @@ FactoryGirl.define do
   end
 
   factory :provisional_member_with_cc, class: Member do
-    sequence(:visible_id) {|n| n }
     status "provisional"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
@@ -72,7 +70,6 @@ FactoryGirl.define do
   end
 
   factory :provisional_member, class: Member do
-    sequence(:visible_id) {|n| n }
     status "provisional"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }

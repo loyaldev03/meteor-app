@@ -6,6 +6,9 @@ class TransactionTest < ActiveSupport::TestCase
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway)
     @member = FactoryGirl.build(:member)
     @credit_card = FactoryGirl.build(:credit_card)
+    @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+    @hd_strategy = FactoryGirl.create(:hard_decline_strategy)
+    @use_active_merchant = false
   end
 
   test "save operation" do
@@ -14,7 +17,8 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "enrollment" do
+  test "Enrollment" do
+    active_merchant_stubs unless @use_active_merchant
     assert_difference('Operation.count') do
       answer = Member.enroll(@terms_of_membership, @current_agent, 23, 
         { first_name: @member.first_name,
@@ -35,17 +39,19 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "controlled refund (refund completely a transaction)" do
+    active_merchant_stubs unless @use_active_merchant
     paid_member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
     amount = @terms_of_membership.installment_amount
     answer = paid_member.bill_membership
     assert_equal paid_member.status, 'paid'
     assert_difference('Operation.count') do
-      count = Transaction.count
+      tcount, ccount = Transaction.count, Communication.count
       trans = paid_member.transactions.last
       answer = Transaction.refund(amount, trans)
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
       trans.reload
-      assert_equal Transaction.count, count + 1
+      assert_equal Transaction.count, tcount + 1
+      assert_equal Communication.count, ccount + 1
       assert_equal trans.refunded_amount, amount
       assert_equal trans.amount_available_to_refund, 0.0
     end
@@ -57,5 +63,44 @@ class TransactionTest < ActiveSupport::TestCase
   # - member yearly bill, NBD change
   # - member bill SD, NBD change , bill_date not change, recycled_times increment
   # - member bill HD, Cancellation => envio mail
+
+  ######################################
+  ############ DECLINE ###################
+  test "Billing with SD is re-scheduled" do 
+    active_merchant_stubs(@sd_strategy.response_code)
+    assert_difference('Operation.count', +2) do
+      assert_difference('Transaction.count') do
+        paid_member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+        answer = paid_member.bill_membership
+
+      end
+    end
+  end
+  test "Billing with SD reaches the recycle limit, and HD cancels member." do 
+    active_merchant_stubs(@sd_strategy.response_code) 
+    assert_difference('Operation.count', +2) do
+      paid_member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+      amount = @terms_of_membership.installment_amount
+      answer = paid_member.bill_membership
+    end
+  end
+  test "Billing with HD cancels member" do 
+    active_merchant_stubs(@sd_strategy.response_code)
+    assert_difference('Operation.count', +2) do
+      paid_member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+      amount = @terms_of_membership.installment_amount
+      answer = paid_member.bill_membership
+    end
+  end
+  test "Billing declined, but there is no decline rule. Send email" do 
+    active_merchant_stubs("34234") 
+    assert_difference('ActionMailer::Base.deliveries.size', 1) do 
+      paid_member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+      amount = @terms_of_membership.installment_amount
+      answer = paid_member.bill_membership
+    end
+  end
+  ############################################
+
 
 end
