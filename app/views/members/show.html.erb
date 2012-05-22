@@ -22,9 +22,6 @@
         <%= link_to "Resend welcome email", "#", :class => "btn btn-warning" %>
         <%= link_to "Password reset", "#", :class => "btn btn-warning" %>
       </td>
-      <td>
-        <%= link_to "Refulfill", "#", :class => "btn btn-warning" %>
-      </td>
       <% if @current_member.can_save_the_sale? %>
         <td>
           <%= link_to("Save the sale", member_save_the_sale_path, :class => "btn btn-warning") %>
