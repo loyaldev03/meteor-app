@@ -102,15 +102,13 @@ class TransactionTest < ActiveSupport::TestCase
   end
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
-    assert_difference('Operation.count', +1) do
+    assert_difference('Operation.count', +2) do
       paid_member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
       amount = @terms_of_membership.installment_amount
       paid_member.recycled_times = 4
       paid_member.save
       answer = paid_member.bill_membership
-      require 'ruby-debug'
-      debugger
-      assert (answer.code != Settings.error_codes.success), "#{answer.code} cant be 000 (success)"
+      assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
       assert paid_member.lapsed?, "member should be lapsed after recycle limit is reached"
       assert_nil paid_member.next_retry_bill_date, "next_retry_bill_date should be nil"
       assert_nil paid_member.bill_date, "bill_date should be nil"
