@@ -181,9 +181,9 @@ class Member < ActiveRecord::Base
             { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
           else
             message = set_decline_strategy(trans)
-            Auditory.audit(nil, trans, answer + message, self, Settings.operation_types.membership_billing)
+            Auditory.audit(nil, trans, answer[:message] + ' ' + message, self, Settings.operation_types.membership_billing)
             Auditory.add_redmine_ticket
-            answer
+            answer # TODO: should we answer set_decline_strategy message too?
           end
         end
       else
@@ -352,7 +352,7 @@ class Member < ActiveRecord::Base
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
         message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
-        self.next_retry_bill_date = Date.today + 30.days
+        self.next_retry_bill_date = Date.today + eval(Settings.next_retry_on_missing_decline)
         Notifier.decline_strategy_not_found(message, self).deliver!
       else
         trans.update_attribute :decline_strategy_id, decline.id
@@ -367,7 +367,7 @@ class Member < ActiveRecord::Base
             self.next_retry_bill_date = decline.days.days.from_now
           end
           if self.recycled_times > (decline.limit-1)
-            message = "Soft decline limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response}"
+            message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response}"
             set_as_canceled = true
           end
         end

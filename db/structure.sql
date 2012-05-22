@@ -205,14 +205,14 @@ CREATE TABLE `members` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `phone_number` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `wrong_address` int(11) DEFAULT NULL,
-  `wrong_phone_number` int(11) DEFAULT NULL,
   `blacklisted` tinyint(1) DEFAULT '0',
   `member_group_type_id` int(11) DEFAULT NULL,
   `enrollment_info` text COLLATE utf8_unicode_ci,
   `email_unsubscribed_at` date DEFAULT NULL,
   `reactivation_times` int(11) DEFAULT '0',
   `member_since_date` datetime DEFAULT NULL,
+  `wrong_address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `wrong_phone_number` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`club_id`,`visible_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -386,3 +386,7 @@ INSERT INTO schema_migrations (version) VALUES ('20120517152910');
 INSERT INTO schema_migrations (version) VALUES ('20120518120706');
 
 INSERT INTO schema_migrations (version) VALUES ('20120518134941');
+
+INSERT INTO schema_migrations (version) VALUES ('20120521181809');
+
+INSERT INTO schema_migrations (version) VALUES ('20120521235718');

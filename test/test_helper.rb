@@ -12,11 +12,14 @@ class ActiveSupport::TestCase
   # Add more helper methods to be used by all tests here...
 
   def active_merchant_stubs(code = "000", message = "This transaction has been approved with stub", success = true)
-    ActiveMerchant::Billing::Response.new(success, message, 
+    answer = ActiveMerchant::Billing::Response.new(success, message, 
       { "transaction_id"=>"c25ccfecae10384698a44360444dead8", "error_code"=> code, 
        "auth_response_text"=>"No Match", "avs_result"=>"N", "auth_code"=>"T5768H" }, 
       { "code"=>"N", "message"=>"Street address and postal code do not match.", 
         "street_match"=>"N", "postal_match"=>"N" })
+    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns(answer)
+    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:refund).returns(answer)
+    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:credit).returns(answer)
   end
 
 end
