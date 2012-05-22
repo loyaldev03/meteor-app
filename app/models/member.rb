@@ -365,17 +365,17 @@ class Member < ActiveRecord::Base
       else
         trans.update_attribute :decline_strategy_id, decline.id
         if decline.hard_decline?
-          message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
+          message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           set_as_canceled = true
         else
-          message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response}"
+          message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           if trans.response_code == Settings.error_codes.credit_card_blank_with_grace
             self.next_retry_bill_date = terms_of_membership.grace_period.to_i.days.from_now
           else
             self.next_retry_bill_date = decline.days.days.from_now
           end
           if self.recycled_times > (decline.limit-1)
-            message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response}"
+            message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
             set_as_canceled = true
           end
         end
