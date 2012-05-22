@@ -32,8 +32,8 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def renew
-    fulfillment.set_as_archived!
-    unless member.can_receive_another_fulfillment?
+    self.set_as_archived!
+    if member.can_receive_another_fulfillment?
       f = Fulfillment.new :product => self.product
       f.member_id = self.member_id
       f.assigned_at = DateTime.now

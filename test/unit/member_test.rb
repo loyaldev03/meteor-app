@@ -94,9 +94,38 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Lapsed member can be recovered" do
-    member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    answer = member.recover(@terms_of_membership_with_gateway)
-    assert answer[:code] == Settings.error_codes.success, answer[:message]
+    assert_difference('Fulfillment.count') do
+      member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+      answer = member.recover(@terms_of_membership_with_gateway)
+      assert answer[:code] == Settings.error_codes.success, answer[:message]
+    end
+  end
+
+  test "Paid member can receive fulfillments" do 
+    member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    assert member.can_receive_another_fulfillment?
+  end
+
+  test "fulfillment" do 
+    member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    fulfillment = FactoryGirl.build(:fulfillment)
+    fulfillment.member = member
+    fulfillment.save
+    fulfillment.set_as_open!
+    assert_difference('Fulfillment.count') do
+      fulfillment.renew
+    end
+  end
+
+  test "Archived fulfillment cant be archived again or opened." do 
+    member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    fulfillment = FactoryGirl.build(:fulfillment)
+    fulfillment.member = member
+    fulfillment.save
+    fulfillment.set_as_open!
+    fulfillment.set_as_archived!
+    assert_raise(StateMachine::InvalidTransition){ fulfillment.set_as_archived! }
+    assert_raise(StateMachine::InvalidTransition){ fulfillment.set_as_open! }
   end
 
   test "Should let create member with correct format number" do

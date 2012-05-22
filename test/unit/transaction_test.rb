@@ -20,21 +20,23 @@ class TransactionTest < ActiveSupport::TestCase
   test "Enrollment" do
     active_merchant_stubs unless @use_active_merchant
     assert_difference('Operation.count') do
-      answer = Member.enroll(@terms_of_membership, @current_agent, 23, 
-        { first_name: @member.first_name,
-          last_name: @member.last_name, address: @member.address, city: @member.city,
-          zip: @member.zip, state: @member.state, email: @member.email, 
-          phone_number: @member.phone_number, country: 'US' }, 
-        { number: @credit_card.number, 
-          expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
-      assert (answer[:code] == Settings.error_codes.success), answer[:message]
-      member = Member.find_by_uuid(answer[:member_id])
-      assert_not_nil member
-      assert_equal member.status, 'provisional'
-      assert_not_nil member.next_retry_bill_date, "NBD should not be nil"
-      assert_not_nil member.join_date, "join date should not be nil"
-      assert_not_nil member.bill_date, "bill date should not be nil"
-      assert_equal member.recycled_times, 0, "recycled_times should be 0"
+      assert_difference('Fulfillment.count') do
+        answer = Member.enroll(@terms_of_membership, @current_agent, 23, 
+          { first_name: @member.first_name,
+            last_name: @member.last_name, address: @member.address, city: @member.city,
+            zip: @member.zip, state: @member.state, email: @member.email, 
+            phone_number: @member.phone_number, country: 'US' }, 
+          { number: @credit_card.number, 
+            expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
+        assert (answer[:code] == Settings.error_codes.success), answer[:message]
+        member = Member.find_by_uuid(answer[:member_id])
+        assert_not_nil member
+        assert_equal member.status, 'provisional'
+        assert_not_nil member.next_retry_bill_date, "NBD should not be nil"
+        assert_not_nil member.join_date, "join date should not be nil"
+        assert_not_nil member.bill_date, "bill date should not be nil"
+        assert_equal member.recycled_times, 0, "recycled_times should be 0"
+      end
     end
   end
 

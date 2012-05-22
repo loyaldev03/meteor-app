@@ -296,8 +296,7 @@ class Member < ActiveRecord::Base
     # we always send fulfillment to new members or members that do not have 
     # opened fulfillments (meaning that previous fulfillments expired).
     if self.fulfillments.find_by_status('open').nil?
-      # TODO: how do we know if sloop product must be sent????
-      [ Settings.fulfillment_products.kit_card ].each do |product|
+      fulfillments_products_to_send.each do |product|
         f = Fulfillment.new :product => product
         f.member_id = self.uuid
         f.assigned_at = DateTime.now
@@ -308,6 +307,15 @@ class Member < ActiveRecord::Base
   end
   
   private
+    def fulfillments_products_to_send
+      # TODO: this must be review after #19110 is finished
+      if enrollment_info and enrollment_info[:megachannel].include?('sloop')
+        [ Settings.fulfillment_products.sloop, Settings.fulfillment_products.kit_card ]
+      else
+        [ Settings.fulfillment_products.kit_card ]
+      end
+    end
+
     def record_date
       self.member_since_date = DateTime.now
     end

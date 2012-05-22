@@ -65,7 +65,7 @@ SacPlatform::Application.configure do
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
-  config.action_mailer.default_url_options = { :host => 'https://50.116.16.84:3000/' }
+  config.action_mailer.default_url_options = { :host => 'prototype.platform.xagax.com:3001' }
 
   # these options are only needed if you choose smtp delivery
   config.action_mailer.smtp_settings = {
