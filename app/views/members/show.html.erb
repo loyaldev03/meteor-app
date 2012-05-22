@@ -53,7 +53,9 @@
     </tr>
   </thead>  
   <tr>
-    <td> <%= t('activerecord.attributes.member.phone_number') %>: <%= @current_member.phone_number %> </td>
+    <td> 
+      <%= t('activerecord.attributes.member.phone_number') %>: <%= @current_member.phone_number %>  <%= link_to t('set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger" if @current_member.wrong_phone_number.nil? %>
+    </td>
     <td> <i class="icon-envelope"> </i> <%= @current_member.email %> </td>
   </tr>
 </table>

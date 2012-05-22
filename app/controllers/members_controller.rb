@@ -171,15 +171,29 @@ class MembersController < ApplicationController
 
   def set_undeliverable 
     if request.post?
-      if @current_member.update_attributes(:wrong_address => params[:reason])
-        message = "Address #{@current_member.full_address} was set as undeliverable."
+      begin
+        @current_member.update_attributes(:wrong_address => params[:reason])
+        message = "Address #{@current_member.full_address} is undeliverable."
         flash[:notice] = message
-        Auditory.audit(current_agent,@current_member,message,@current_member)
+        Auditory.audit(@current_agent,@current_member,message,@current_member)
         redirect_to show_member_path
-      else
-        flash[:error] = "Could not set the NBD on this member"
+      rescue Exception => e
+        flash[:error] = "Could not set the NBD on this member #{e}"
       end
     end
   end
 
+  def set_unreachable
+    if request.post?
+      begin
+        @current_member.update_attributes(:wrong_phone_number => params[:reason])
+        message = "Phone number #{@current_member.phone_number} is unreachable"
+        flash[:notice] = message
+        Auditory.audit(@current_agent,@current_member,message,@current_member)
+        redirect_to show_member_path
+      rescue Exception => e
+        flash[:error] = "Could not set the NBD on this member #{e}"
+      end
+    end
+  end
 end
