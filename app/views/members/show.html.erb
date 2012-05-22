@@ -9,12 +9,14 @@
     <td>
       <%= link_to 'Edit', edit_member_path, :class => "btn btn-warning" %>
     </td>
-    <td>
-      <%= form_for @current_member, :url => member_recover_path, do |f| %>
-        <%= f.submit t('recovery'), :class => 'btn btn-warning'  if @current_member.lapsed? %>
-      <% end %>
-    </td>
-    </td>
+    <% if @current_member.lapsed? %>
+      <td>
+        <%= form_for @current_member, :url => member_recover_path, do |f| %>
+          <%= f.submit t('recovery'), :class => 'btn btn-warning' %>
+        <% end %>
+      </td>
+    <% end %>
+    
     <% unless @current_member.lapsed? %>
       <td>
         <%= link_to "Resend welcome email", "#", :class => "btn btn-warning" %>
@@ -23,9 +25,11 @@
       <td>
         <%= link_to "Refulfill", "#", :class => "btn btn-warning" %>
       </td>
-      <td>
-        <%= link_to("Save the sale", member_save_the_sale_path, :class => "btn btn-warning") if @current_member.can_save_the_sale? %>
-      </td>
+      <% if @current_member.can_save_the_sale? %>
+        <td>
+          <%= link_to("Save the sale", member_save_the_sale_path, :class => "btn btn-warning") %>
+        </td>
+      <% end %>
       <td>
         <%= link_to "Blacklist", member_blacklist_path, :class => "btn btn-warning" unless @current_member.blacklisted? %>
         <%= link_to("Cancel", member_cancel_path, :class => "btn btn-danger") if @current_member.can_be_canceled? %>
