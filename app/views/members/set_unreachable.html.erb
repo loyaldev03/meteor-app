@@ -7,8 +7,7 @@
     <tr>
       <th>
         <%= label :reason, t('reason'), :class => 'help-inline' %> 
-        <%= select_tag "reason", options_for_select([Settings.wrong_phone_number_options.unreachable_all, Settings.wrong_phone_number_options.unreachable_sloop,
-        Settings.wrong_phone_number_options.unreachable_kit_card]) %>
+        <%= select_tag "reason", options_for_select([Settings.wrong_phone_number.unreachable,                                     Settings.wrong_phone_number.wrong_phone_number]) %>
       </th>
     </tr>
     <tr>
