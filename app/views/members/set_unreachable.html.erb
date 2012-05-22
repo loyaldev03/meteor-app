@@ -1,0 +1,23 @@
+<h1><%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
+
+
+<%= form_for(member_set_unreachable_path) do %>
+  <table class="table table-bordered">
+    <thead>
+    <tr>
+      <th>
+        <%= label :reason, t('reason'), :class => 'help-inline' %> 
+        <%= select_tag "reason", options_for_select([Settings.wrong_phone_number_options.unreachable_all, Settings.wrong_phone_number_options.unreachable_sloop,
+        Settings.wrong_phone_number_options.unreachable_kit_card]) %>
+      </th>
+    </tr>
+    <tr>
+    <th> 
+      <%= submit_tag t(:save), :class => 'btn btn-primary', 
+                               :confirm => t('text_cancel_are_you_sure') %>
+      <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> 
+    </th>
+    </tr>
+    </thead>
+  </table>
+<% end %>

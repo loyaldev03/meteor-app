@@ -1,0 +1,23 @@
+<h1><%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
+
+
+<%= form_for(member_set_undeliverable_path) do %>
+  <table class="table table-bordered">
+    <thead>
+    <tr>
+      <th>
+        <%= label :reason, t('reason'), :class => 'help-inline' %> 
+        <%= select_tag "reason", options_for_select([Settings.wrong_address_options.undeliverable_all, Settings.wrong_address_options.undeliverable_sloop,
+        Settings.wrong_address_options.undeliverable_kit_card]) %>
+      </th>
+    </tr>
+    <tr>
+    <th> 
+      <%= submit_tag t(:save), :class => 'btn btn-primary', 
+                               :confirm => t('text_cancel_are_you_sure') %>
+      <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> 
+    </th>
+    </tr>
+    </thead>
+  </table>
+<% end %>

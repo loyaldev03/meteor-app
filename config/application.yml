@@ -45,6 +45,10 @@ defaults: &defaults
     undeliverable_all: 'All'
     undeliverable_sloop: 'Sloop'
     undeliverable_kit_card: 'Kit - Card'
+  wrong_phone_number_options:
+    unreachable_all: 'All'
+    unreachable_sloop: 'Sloop'
+    unreachable_kit_card: 'Kit - Card'
 
 development:
   <<: *defaults
