@@ -4,6 +4,7 @@ class MemberTest < ActiveSupport::TestCase
 
   setup do
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
+    @use_active_merchant = false
   end
 
   test "Should create a member" do
@@ -37,13 +38,14 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Insfufficient funds hard decline" do
+    active_merchant_stubs unless @use_active_merchant
     paid_member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     answer = paid_member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
   end
 
   test "Monthly member should be billed if it is paid or provisional" do
-    assert_difference('Operation.count') do
+    assert_difference('Operation.count', +3) do
       member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
