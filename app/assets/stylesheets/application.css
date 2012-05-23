@@ -26,6 +26,10 @@ form .clearfix:before, form .clearfix:after {
 	background-color: green;
 }
 
+.ligthgreen{
+	background-color: #90EE90;
+}
+
 .red{
 	background-color: red;
 }
