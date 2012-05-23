@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# 15 0 * * * rake_task_runner
+
+`cd /var/www/backend-sac-platform/current && RAILS_ENV=production rake members:cancel`
+# billing should be executed after cancel jobs finishes
+`cd /var/www/backend-sac-platform/current && RAILS_ENV=production rake billing:send_prebill &`
+`cd /var/www/backend-sac-platform/current && RAILS_ENV=production rake members:process_fulfillments &`
+`cd /var/www/backend-sac-platform/current && RAILS_ENV=production rake billing:for_today`

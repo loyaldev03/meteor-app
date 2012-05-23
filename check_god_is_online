@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# */5 * * * * /bin/sh /var/www/god_files/check_god_is_online.sh & >> /dev/null 2>&1
+
+COUNT=`/usr/local/bin/god status | wc -l`
+if [ "$COUNT" -eq 1 ]; then
+  echo "God no esta corriendo. lo reinicio"
+  `/usr/local/bin/god -c /var/www/god_files/delayed_jobs.god`
+fi
+

@@ -6,6 +6,7 @@ class Communication < ActiveRecord::Base
   def self.deliver!(template_type, member)
     template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
     if template.nil?
+      Auditory.add_redmine_ticket
       logger.error "* * * * * Template does not exist"
     else
       c = Communication.new :email => member.email
@@ -22,6 +23,7 @@ class Communication < ActiveRecord::Base
       elsif template.action_mailer?
         c.deliver_action_mailer
       else
+        Auditory.add_redmine_ticket
         logger.error "* * * * * Client not supported"
       end
     end
@@ -62,6 +64,7 @@ class Communication < ActiveRecord::Base
     when :refund
       Notifier.refund(email).deliver!
     else
+      Auditory.add_redmine_ticket
       logger.error "Template type #{template_type} not supported."
     end
     update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response
