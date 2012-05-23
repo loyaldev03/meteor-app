@@ -49,6 +49,7 @@ class MembersController < ApplicationController
     @credit_cards = @current_member.credit_cards.all
     @active_credit_card = @current_member.active_credit_card
     @transactions = @current_member.transactions.paginate(:page => params[:page], :order => "created_at DESC")
+    @fulfillments = @current_member.fulfillments.all
   end
 
   def new
@@ -197,6 +198,17 @@ class MembersController < ApplicationController
       rescue Exception => e
         flash[:error] = "Could not set the NBD on this member #{e}"
       end
+    end
+  end
+
+  def resend_fulfillment 
+    #TODO : Talk with Carlos to see what does this method.
+    if request.post?
+      fulfillment = Fulfillment.find(params[:fulfillment_id])
+      message = "Resend fulfillment #{fulfillment.product}."
+      Auditory.audit(@current_agent,@current_member,message,@current_member)    
+      flash[:notice] = message 
+      redirect_to show_member_path
     end
   end
 end

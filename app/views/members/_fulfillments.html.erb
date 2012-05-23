@@ -2,7 +2,7 @@
 <table class="table table-bordered datatable_only_sorting">
   <thead>
   	<tr>
-	  <th> <%= t('activerecord.attributes.fulfillment.producto') %> </th>
+	  <th> <%= t('activerecord.attributes.fulfillment.product') %> </th>
 	  <th> <%= t('activerecord.attributes.fulfillment.asigned_at') %> </th>
 	  <th> <%= t('activerecord.attributes.fulfillment.delivered_at') %> </th>
 	  <th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>    
@@ -10,20 +10,20 @@
    	</tr>
    </thead>
    <tbody>
-   	  <% unless fulfillments.nil? %>
-      <% fulfillments.each do |fulfillment| %>
-      	<tr 
-      	  <% if fulfillment.status == 'open' %>
-      	  class = "yellow"
-      	  <% end %>
-      	>
+   	  <% unless @fulfillments.nil? %>
+      <% @fulfillments.each do |fulfillment| %>
+      	<tr <% if fulfillment.status == 'open' %>
+      	  class = "blacklisted"
+      	  <% end %> >
 			<td> <%= fulfillment.product %> </td>
-			<td> <%= I18n.l fulfillment.asigned_at, :format => 'long' %> </td>
-			<td> <%= I18n.l delivered_at, :format => 'long' %> </td>
-			<td> <%= I18n.l renewable_at, :format => 'long' %> </td>
+			<td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
+			<td> <%= I18n.l fulfillment.delivered_at, 
+			         :format => :long unless fulfillment.delivered_at.nil? %> </td>
+			<td> <%= I18n.l fulfillment.renewable_at, 
+			         :format => :long unless fulfillment.renewable_at.nil? %> </td>
 			<td>
 			  <%= form_for @fulfillment, :as => :fulfillment, :url => member_resend_fulfillment_path(:fulfillment_id => fulfillment.id), do |f| %>
-			  	<%= f.submit t('resend'), :name => 'resend', :class => "btn confirm" %>
+			  	<%= f.submit t('resend'), :name => 'resend', :class => "btn confirm" if fulfillment.status == 'open' %>
 			  <% end %>
 			</td>
 		</tr>
