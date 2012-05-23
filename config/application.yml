@@ -58,3 +58,7 @@ test:
 
 production:
   <<: *defaults
+
+staging:
+  <<: *defaults
+

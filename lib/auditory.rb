@@ -22,6 +22,5 @@ class Auditory
       :error_message => "#{error}: #{message}",
       :parameters    => params
     )    
-     #TODO: #18775
   end
 end
