@@ -79,7 +79,7 @@ namespace :members do
   task :process_fulfillments => :environment do
     tall = Time.now
     begin
-      Fulfillment.find_in_batches(:conditions => [" date(renewable_at) = ? ", Date.today ]) do |group|
+      Fulfillment.find_in_batches(:conditions => [" date(renewable_at) <= ? and status = ? ", Date.today, 'open' ]) do |group|
         group.each do |fulfillment| 
           tz = Time.now
           begin
