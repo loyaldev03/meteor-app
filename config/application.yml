@@ -24,6 +24,7 @@ defaults: &defaults
     cancellation_email: 302
     refund_email: 303
     credit_card_already_in_use: 401
+    credit_card_blacklisted: 402
     others: 1000
   error_codes:
     success: '000'

@@ -40,4 +40,12 @@ FactoryGirl.define do
     association :club, factory: :club_with_gateway
   end
 
+  factory :terms_of_membership_with_gateway_needs_approval, class: TermsOfMembership do
+    name "test"
+    installment_amount 100
+    installment_type '1.month'
+    needs_enrollment_approval true
+    association :club, factory: :club_with_gateway
+  end
+
 end
