@@ -35,7 +35,7 @@
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:confirmation_sent_at) %>:</strong><br>
-  <%= I18n.l @agent.confirmation_sent_at, :format => :long %>
+  <%= I18n.l @agent.confirmation_sent_at, :format => :long if !@agent.confirmation_sent_at.nil?  %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:unconfirmed_email) %>:</strong><br>
