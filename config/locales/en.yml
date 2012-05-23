@@ -23,6 +23,7 @@ en:
   example: 'Example'
   refund: 'Refund'
   recovery: 'Recovery'
+  resend: 'Resend'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
   menu: 
@@ -88,6 +89,11 @@ en:
         created_by: 'Created by'
       terms_of_membership:
         name: 'Name'
+      fulfillment:
+        product: 'Product'
+        asigned_at: 'Asigned at'
+        delivered_at: 'Delivered at'
+        renewable_at: 'Renewable at'
   date:
     formats:
       default: "%d/%m/%Y"
