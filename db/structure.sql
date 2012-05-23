@@ -165,7 +165,7 @@ CREATE TABLE `fulfillments` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `member_notes` (
   `member_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -229,7 +229,7 @@ CREATE TABLE `operations` (
   `notes` text COLLATE utf8_unicode_ci,
   `operation_type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `partners` (
   `prefix` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,

@@ -115,7 +115,6 @@ class MemberTest < ActiveSupport::TestCase
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
     fulfillment.save
-    fulfillment.set_as_open!
     assert_difference('Fulfillment.count') do
       fulfillment.renew
     end
@@ -126,10 +125,8 @@ class MemberTest < ActiveSupport::TestCase
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
     fulfillment.save
-    fulfillment.set_as_open!
     fulfillment.set_as_archived!
     assert_raise(StateMachine::InvalidTransition){ fulfillment.set_as_archived! }
-    assert_raise(StateMachine::InvalidTransition){ fulfillment.set_as_open! }
   end
 
   test "Should let create member with correct format number" do

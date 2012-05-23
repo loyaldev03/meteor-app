@@ -33,6 +33,7 @@ class Member < ActiveRecord::Base
     after_transition [:none, :provisional, :lapsed] => :provisional, :do => :schedule_first_membership
     after_transition [:provisional, :paid] => :lapsed, :do => :cancellation
     after_transition [:provisional] => :paid, :do => :send_active_email
+    after_transition :lapsed => :any, :do => :increment_reactivations
 
     event :set_as_provisional do
       transition [:none, :provisional] => :provisional
@@ -45,6 +46,9 @@ class Member < ActiveRecord::Base
     end
     event :recovered do 
       transition [:lapsed] => :provisional
+    end
+    event :set_as_applied do 
+      transition [:lapsed, :none] => :applied
     end
 
     # A Member is within their review period. These members have joined a Subscription program that has a “Provisional” 
@@ -68,6 +72,10 @@ class Member < ActiveRecord::Base
 
   def send_active_email
     Communication.deliver!(:active, self)
+  end
+
+  def increment_reactivations
+    increment!(:reactivation_times, 1)
   end
 
   def schedule_first_membership
@@ -261,22 +269,12 @@ class Member < ActiveRecord::Base
         credit_card.accepted_on_billing
       end
 
-      # is a recovery?
-      if self.lapsed?
-        increment!(:reactivation_times, 1)
-        self.recovered!
-        message = "Member recovered successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
-        Auditory.audit(agent, terms_of_membership, message, self, Settings.operation_types.recovery)
-      else      
-        self.set_as_provisional! # set join_date
-        message = "Member enrolled successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
-        Auditory.audit(agent, trans, message, self, Settings.operation_types.enrollment_billing)
-      end
+      message = set_status_on_enrollment!(agent, trans, amount)
 
       self.reload
       { :message => message, :code => "000", :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
-      # TODO: Notify devels about this!
+      Auditory.add_redmine_ticket("Member:enroll", e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this
       #     an invalid one. we should revert the transaction.
       message = "Could not save member. #{e}"
@@ -305,6 +303,36 @@ class Member < ActiveRecord::Base
   end
   
   private
+    def set_status_on_enrollment!(agent, trans, amount)
+      operation_type = Settings.operation_types.enrollment_billing
+      description = 'enrolled'
+
+      # Member approval need it?
+      if terms_of_membership.needs_enrollment_approval?
+        self.set_as_applied!
+        # is a recovery?
+        if self.lapsed?
+          description = 'recovered pending approval'
+          operation_type = Settings.operation_types.recovery_needs_approval
+        else
+          description = 'enrolled pending approval'
+          operation_type = Settings.operation_types.enrollment_needs_approval
+        end
+      elsif self.lapsed? # is a recovery?
+        self.recovered!
+        description = 'recovered'
+        operation_type = Settings.operation_types.recovery
+      else      
+        self.set_as_provisional! # set join_date
+      end
+
+      message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
+      Auditory.audit(agent, 
+        (trans.nil? ? terms_of_membership : trans), 
+        message, self, operation_type)
+      message
+    end
+
     def fulfillments_products_to_send
       # TODO: this must be review after #19110 is finished
       if enrollment_info and enrollment_info[:megachannel].include?('sloop')
