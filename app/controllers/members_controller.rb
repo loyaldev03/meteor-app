@@ -202,9 +202,9 @@ class MembersController < ApplicationController
   end
 
   def resend_fulfillment 
-    #TODO : Talk with Carlos to see what does this method.
     if request.post?
       fulfillment = Fulfillment.find(params[:fulfillment_id])
+      fulfillment.update_attribute :delivered_at, DateTime.now
       message = "Resend fulfillment #{fulfillment.product}."
       Auditory.audit(@current_agent,@current_member,message,@current_member)    
       flash[:notice] = message 

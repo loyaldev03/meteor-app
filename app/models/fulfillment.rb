@@ -17,10 +17,7 @@ class Fulfillment < ActiveRecord::Base
   scope :open, lambda { where("status = 'open'") }
 
 
-  state_machine :status, :initial => :none do
-    event :set_as_open do
-      transition :none => :open
-    end
+  state_machine :status, :initial => :open do
     event :set_as_archived do
       transition :open => :archived
     end
@@ -38,7 +35,6 @@ class Fulfillment < ActiveRecord::Base
       f.member_id = self.member_id
       f.assigned_at = DateTime.now
       f.save
-      f.set_as_open!
     end
   end
 
@@ -46,7 +42,6 @@ class Fulfillment < ActiveRecord::Base
     # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
     def set_renewable_at
       self.renewable_at = self.assigned_at + 1.year
-      # TODO: check this with carlos 
       self.delivered_at = DateTime.now
     end
 end

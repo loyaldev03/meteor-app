@@ -300,7 +300,6 @@ class Member < ActiveRecord::Base
         f.member_id = self.uuid
         f.assigned_at = DateTime.now
         f.save
-        f.set_as_open!
       end
     end
   end
