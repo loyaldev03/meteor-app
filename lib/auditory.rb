@@ -16,7 +16,12 @@ class Auditory
       Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
     end
   end
-  def self.add_redmine_ticket
+  def self.add_redmine_ticket(error = "Special Error", message = '', params = {})
+    Airbrake.notify(
+      :error_class   => error,
+      :error_message => "#{error}: #{message}",
+      :parameters    => params
+    )    
      #TODO: #18775
   end
 end
