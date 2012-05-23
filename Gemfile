@@ -12,7 +12,6 @@ gem "paperclip", "~> 3.0"
 
 gem 'attr_encrypted'
 
-gem 'exception_notification', :require => 'exception_notifier'
 gem 'acts_as_list'
 
 gem 'delayed_job_active_record'
@@ -43,6 +42,8 @@ gem 'jquery-rails'
 gem 'rails3_acts_as_paranoid'
 
 gem 'jquery-datatables-rails'
+
+gem "airbrake"
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

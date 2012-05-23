@@ -182,7 +182,6 @@ class Member < ActiveRecord::Base
           else
             message = set_decline_strategy(trans)
             Auditory.audit(nil, trans, answer[:message] + ' ' + message, self, Settings.operation_types.membership_billing)
-            Auditory.add_redmine_ticket
             answer # TODO: should we answer set_decline_strategy message too?
           end
         end

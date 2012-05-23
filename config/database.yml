@@ -24,7 +24,7 @@ production:
 
 staging:
   adapter: mysql2
-  database: sac_platform_staging
+  database: sac_platform_development
   host: localhost
   encoding: utf8
   user: root

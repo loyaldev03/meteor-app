@@ -10,7 +10,8 @@ namespace :billing do
           begin
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.bill_membership
-          rescue
+          rescue Exception => e
+            Auditory.add_redmine_ticket('Billing::Today', e.to_s)
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.now - tz} for member ##{member.id}"
@@ -34,7 +35,8 @@ namespace :billing do
           begin
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.send_pre_bill
-          rescue
+          rescue Exception => e
+            Auditory.add_redmine_ticket('Billing::SendPrebill', e.to_s)
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.now - tz} for member ##{member.id}"
@@ -59,7 +61,8 @@ namespace :members do
           begin
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.set_as_canceled!
-          rescue
+          rescue Exception => e
+            Auditory.add_redmine_ticket('Members::Cancel', e.to_s)
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.now - tz} for member ##{member.id}"
@@ -82,7 +85,8 @@ namespace :members do
           begin
             Rails.logger.info "  * processing member ##{fulfillment.member.uuid} fulfillment ##{fulfillment.id}"
             fulfillment.renew
-          rescue
+          rescue Exception => e
+            Auditory.add_redmine_ticket('Member::Fulfillment', e.to_s)
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.now - tz} for member ##{member.id}"

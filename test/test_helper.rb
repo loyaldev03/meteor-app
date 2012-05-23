@@ -27,3 +27,9 @@ end
 class ActionController::TestCase
   include Devise::TestHelpers
 end
+
+module Airbrake
+  def self.notify(exception, opts = {})
+    # do nothing.
+  end
+end
