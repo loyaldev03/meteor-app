@@ -71,14 +71,18 @@ class MemberTest < ActiveSupport::TestCase
     member_two = FactoryGirl.build(:member)
     member_two.club =  @terms_of_membership_with_gateway.club
     member_two.terms_of_membership =  @terms_of_membership_with_gateway
+    member_two.email = member.email
     member_two.valid?
     assert_not_nil member_two, member_two.errors.full_messages.inspect
   end
 
   test "Should let save two members with the same email in differents clubs" do
-    member = FactoryGirl.create(:member, terms_of_membership_id: 20, club_id: 13)
-    member_two = FactoryGirl.build(:member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    assert member_two.save, member_two.errors.inspect
+    member = FactoryGirl.build(:member, email: 'testing@xagax.com' , terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member.club_id = 1
+    member.save
+    member_two = FactoryGirl.build(:member, email: 'testing@xagax.com',terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member_two.club_id = 14
+    assert member_two.save, "member cant be save #{member_two.errors.inspect}"
   end
 
   test "Paid member cant be recovered" do
@@ -131,8 +135,26 @@ class MemberTest < ActiveSupport::TestCase
   test "Should let create member with correct format number" do
     ['(+54) 11-4632-5895', '11-4632-5895', '338.560.1829 (5755)', '338.560.1829 int5755', 
        '338.560.1829 x5755', '(801)585-5189', '216.463.8898'].each {|phone| phone 
-    member = FactoryGirl.create(:member, phone_number: phone,terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = FactoryGirl.build(:member, phone_number: phone,terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     assert member.save, "member cant be save #{member.errors.inspect}"
     }
+
+    ['4632-5895()', '()11-4632-5895', '+338.560.1829 (575584964651215465+4)', '+338.560.1829 int5755'].each {|phone| phone 
+    member = FactoryGirl.build(:member, phone_number: phone,terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    assert !member.save, "member cant be save #{member.errors.inspect}"
+    }
   end
+
+  test "Should not let create a member with a wrong format zip" do
+    ['12345-1234', '12345'].each {|zip| zip
+      member = FactoryGirl.build(:member, zip: zip, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+      assert member.save, "Member cant be save #{member.errors.inspect}"
+    }    
+    ['1234-1234', '12345-123', '1234'].each {|zip| zip
+      member = FactoryGirl.build(:member, zip: zip, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+      assert !member.save, "Member cant be save #{member.errors.inspect}"
+    }        
+
+  end
+
 end
