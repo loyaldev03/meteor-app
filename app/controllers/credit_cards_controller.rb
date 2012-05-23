@@ -16,7 +16,7 @@ class CreditCardsController < ApplicationController
 
     respond_to do |format|
       #if credit_card.am_card.valid?
-        if credit_card.save && actual_credit_card.update_attributes(:active => 0)
+        if credit_card.save && actual_credit_card.deactivate
           message = "Credit card #{credit_card.number} added and set active."
           Auditory.audit(@current_agent, credit_card, message, @current_member)
           format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.number} was successfully added and setted as active."  } 
@@ -38,7 +38,7 @@ class CreditCardsController < ApplicationController
     # TODO: do we need json format??
     # TODO: we NEED transactions!!!    
     respond_to do |format|
-      if new_credit_card.update_attributes(:active => true) && former_credit_card.update_attributes(:active => false)
+      if new_credit_card.activate && former_credit_card.deactivate
         message = "Credit card #{new_credit_card.number} set as active."
         Auditory.audit(@current_agent, new_credit_card, message, @current_member)
         format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{new_credit_card.number} was activated." }
@@ -54,7 +54,7 @@ class CreditCardsController < ApplicationController
   	credit_card = CreditCard.find(params[:credit_card_id])
 
   	respond_to do |format|
-      if credit_card.update_attributes(:blacklisted => true)
+      if credit_card.blacklist
         message = "Credit card #{credit_card.number} blacklisted."
         Auditory.audit(@current_agent, credit_card, message, @current_member)
         format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.number} was blacklisted." }
