@@ -207,6 +207,7 @@ class Member < ActiveRecord::Base
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
       # credit card exist?
+      credit_card_params[:number].gsub!(' ', '')
       credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.member.club_id == club.id }
       if credit_card.empty?
         credit_card = CreditCard.new credit_card_params
