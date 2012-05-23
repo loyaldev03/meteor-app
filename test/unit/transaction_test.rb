@@ -104,7 +104,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
-    assert_difference('Operation.count', +2) do
+    assert_difference('Operation.count', +3) do
       paid_member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
       amount = @terms_of_membership.installment_amount
       paid_member.recycled_times = 4
