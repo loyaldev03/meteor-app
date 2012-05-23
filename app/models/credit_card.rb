@@ -9,10 +9,22 @@ class CreditCard < ActiveRecord::Base
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 } 
   validates :number, :numericality => true
-  validates :active, :is_not_blacklisted => true, :on => :update
-  
+  validates :active, :is_not_blacklisted => true
+
   def accepted_on_billing
     update_attribute :last_successful_bill_date, DateTime.now
+  end
+
+  def blacklist
+    update_attribute :blacklisted, true
+  end
+
+  def activate
+    update_attribute :active, true
+  end
+
+  def deactivate
+    update_attribute :active, false
   end
 
   def self.am_card(number, expire_month, expire_year, first_name, last_name)
@@ -25,6 +37,7 @@ class CreditCard < ActiveRecord::Base
       :last_name  => last_name
     )
   end
+
   def am_card
     CreditCard.am_card(number, expire_month, expire_year, member.first_name, member.last_name)
   end

@@ -23,7 +23,7 @@
 			         :format => :long unless fulfillment.renewable_at.nil? %> </td>
 			<td>
 			  <%= form_for @fulfillment, :as => :fulfillment, :url => member_resend_fulfillment_path(:fulfillment_id => fulfillment.id), do |f| %>
-			  	<%= f.submit t('resend'), :name => 'resend', :class => "btn confirm" if fulfillment.open? %>
+			  	<%= f.submit t('resend'), :name => 'resend', :class => "btn btn-warning confirm" if fulfillment.open? %>
 			  <% end %>
 			</td>
 		</tr>
