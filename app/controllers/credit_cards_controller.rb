@@ -42,10 +42,8 @@ class CreditCardsController < ApplicationController
         message = "Credit card #{new_credit_card.number} set as active."
         Auditory.audit(@current_agent, new_credit_card, message, @current_member)
         format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{new_credit_card.number} was activated." }
-        format.json { head :no_content }
       else
         format.html { redirect_to show_member_path(:id => @current_member), error: new_credit_card.errors }
-        format.json { render json: new_credit_card.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -58,10 +56,8 @@ class CreditCardsController < ApplicationController
         message = "Credit card #{credit_card.number} blacklisted."
         Auditory.audit(@current_agent, credit_card, message, @current_member)
         format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.number} was blacklisted." }
-        format.json { head :no_content }
       else
         format.html { redirect_to show_member_path(:id => @current_member), error: credit_card.errors }
-        format.json { render json: credit_card.errors, status: :unprocessable_entity }
       end
   	end
   end
