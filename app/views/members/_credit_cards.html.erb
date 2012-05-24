@@ -11,6 +11,7 @@
   </thead>
   <tbody>
     <% credit_cards.each do |cc| %>
+    <!-- Improve css with fnCreatedCell (see the gem was updated.)-->
     <tr <% if cc.blacklisted %> 
           class="blacklisted" 
         <% elsif cc.active %>
