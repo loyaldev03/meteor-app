@@ -176,6 +176,12 @@ class Member < ActiveRecord::Base
               :message => "Credit card is blank and grace period is disabled" }
           end
         else
+          if terms_of_membership.payment_gateway_configuration.nil?
+            message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
+            # TODO: do we have to add an operation?????
+            Auditory.add_redmine_ticket("Billing", message)
+            return { :code => "9789", :message => message }
+          end
           acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
           trans = Transaction.new
           trans.transaction_type = "sale"
@@ -207,7 +213,7 @@ class Member < ActiveRecord::Base
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
       # credit card exist?
-      credit_card_params[:number].gsub!(' ', '')
+      credit_card_params[:number].gsub!(' ', '') # HOT FIX on 
       credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.member.club_id == club.id }
       if credit_card.empty?
         credit_card = CreditCard.new credit_card_params
