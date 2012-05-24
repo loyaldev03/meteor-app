@@ -7,8 +7,8 @@
     <tr>
       <th>
         <%= label :reason, t('reason'), :class => 'help-inline' %> 
-        <%= select_tag "reason", options_for_select([Settings.wrong_address_options.undeliverable_all, Settings.wrong_address_options.undeliverable_sloop,
-        Settings.wrong_address_options.undeliverable_kit_card]) %>
+        <%= select_tag "reason", options_for_select([Settings.wrong_address.undeliverable_all, Settings.wrong_address.undeliverable_sloop,
+        Settings.wrong_address.undeliverable_kit_card]) %>
       </th>
     </tr>
     <tr>
