@@ -207,8 +207,8 @@ class Member < ActiveRecord::Base
         member.created_by_id = current_agent.id
         member.terms_of_membership = tom
         unless member.valid? and credit_card.valid?
-          errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n') + 
-                    credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
+          errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n") + 
+                    credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n")
           return { :message => "Member data is invalid: #{errors}", 
                    :code => Settings.error_codes.member_data_invalid }
         end
