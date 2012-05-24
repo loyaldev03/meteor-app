@@ -9,7 +9,7 @@ class CreditCard < ActiveRecord::Base
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 } 
   validates :number, :numericality => true
-  before_update :not_blacklisted
+  #before_update :not_blacklisted, :except => [:blacklist_active_credit_card]
 
   def accepted_on_billing
     update_attribute :last_successful_bill_date, DateTime.now
@@ -20,11 +20,15 @@ class CreditCard < ActiveRecord::Base
   end
 
   def activate
-    update_attribute :active, true
+    update_attribute :active, true unless blacklisted
   end
 
   def deactivate
     update_attribute :active, false
+  end
+
+    def blacklist_active_credit_card
+    update_attribute :blacklisted, true
   end
 
   def self.am_card(number, expire_month, expire_year, first_name, last_name)
@@ -80,12 +84,12 @@ class CreditCard < ActiveRecord::Base
     end
     acc
   end
+  # Custom method to verify if its blacklisted - not using it because it doenst allow to blacklist an active creditcard.
+  # def not_blacklisted
+  #   if self.blacklisted? && self.active?
+  #     errors.add(:active, "Cannot be activated. Its blacklisted") 
+  #     false
+  #   end
+  # end
 
-  def not_blacklisted
-    if self.blacklisted? && self.active?
-      errors.add(:active, "Cannot be activated. Its blacklisted") 
-      false
-    end
-  end
-  
 end
