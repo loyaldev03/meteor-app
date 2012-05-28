@@ -24,6 +24,7 @@ en:
   refund: 'Refund'
   recovery: 'Recovery'
   resend: 'Resend'
+  are_you_sure: 'Are you sure?'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
   menu: 
