@@ -83,7 +83,7 @@ class MembersController < ApplicationController
     if request.post?
       answer = @current_member.recover(@current_member.terms_of_membership_id, current_agent)
       if answer[:code] == Settings.error_codes.success
-        flash[:notice] = "Save the sale succesfully applied"
+        flash[:notice] = "The member was successfully recovered."
       else
         flash[:error] = answer[:message]
       end

@@ -12,7 +12,7 @@
     <% if @current_member.lapsed? %>
       <td>
         <%= form_for @current_member, :url => member_recover_path, do |f| %>
-          <%= f.submit t('recovery'), :class => 'btn btn-warning' %>
+          <%= f.submit t('recover'), :class => 'btn btn-warning' %>
         <% end %>
       </td>
     <% end %>
