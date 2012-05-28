@@ -12,7 +12,7 @@
     <tr> 
       <th <% if member.lapsed? %>
             class = "red"
-          <% elsif member.paid? %>
+          <% elsif member.active? %>
             class = "green"
           <% elsif %>
             class = "yellow"
