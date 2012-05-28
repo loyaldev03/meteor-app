@@ -80,7 +80,7 @@
       <th colspan= "3"> Membership Information </th>
       <th <% if @current_member.lapsed? %>
             class = "red"
-          <% elsif @current_member.paid? %>
+          <% elsif @current_member.active? %>
             class = "green"
           <% elsif %>
             class = "yellow"

@@ -190,7 +190,7 @@ class MembersController < ApplicationController
   def set_unreachable
     if request.post?
       if @current_member.update_attribute(:wrong_phone_number, params[:reason])
-        message = "Phone number #{@current_member.phone_number} is #{params[:reason]}."
+        message = "Phone number #{@current_member.phone_number} is  #{params[:reason]}."
         flash[:notice] = message
         Auditory.audit(@current_agent,@current_member,message,@current_member)
         redirect_to show_member_path

@@ -25,7 +25,7 @@ class MemberTest < ActiveSupport::TestCase
   	assert !member.save
   end
 
-  test "Member should not be billed if it is not paid or provisional" do
+  test "Member should not be billed if it is not active or provisional" do
     member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     answer = member.bill_membership
     assert !(answer[:code] == Settings.error_codes.success), answer[:message]
@@ -39,12 +39,12 @@ class MemberTest < ActiveSupport::TestCase
 
   test "Insfufficient funds hard decline" do
     active_merchant_stubs unless @use_active_merchant
-    paid_member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    answer = paid_member.bill_membership
+    active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    answer = active_member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
   end
 
-  test "Monthly member should be billed if it is paid or provisional" do
+  test "Monthly member should be billed if it is active or provisional" do
     assert_difference('Operation.count', +3) do
       member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
       prev_bill_date = member.next_retry_bill_date
@@ -85,8 +85,8 @@ class MemberTest < ActiveSupport::TestCase
     assert member_two.save, "member cant be save #{member_two.errors.inspect}"
   end
 
-  test "Paid member cant be recovered" do
-    member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+  test "Active member cant be recovered" do
+    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     answer = member.recover(4)
     assert answer[:code] == Settings.error_codes.cant_recover_member, answer[:message]
   end
@@ -105,13 +105,13 @@ class MemberTest < ActiveSupport::TestCase
     end
   end
 
-  test "Paid member can receive fulfillments" do 
-    member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+  test "Active member can receive fulfillments" do 
+    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     assert member.can_receive_another_fulfillment?
   end
 
   test "fulfillment" do 
-    member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
     fulfillment.save
@@ -122,7 +122,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Archived fulfillment cant be archived again or opened." do 
-    member = FactoryGirl.create(:paid_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
     fulfillment.save
