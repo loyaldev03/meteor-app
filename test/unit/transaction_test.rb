@@ -17,7 +17,27 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "Enrollment" do
+  test "Enrollment with approval" do
+    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
+    active_merchant_stubs unless @use_active_merchant
+    assert_difference('Operation.count') do
+      assert_difference('Fulfillment.count') do
+        answer = Member.enroll(@terms_of_membership, @current_agent, 23, 
+          { first_name: @member.first_name,
+            last_name: @member.last_name, address: @member.address, city: @member.city,
+            zip: @member.zip, state: @member.state, email: @member.email, 
+            phone_number: @member.phone_number, country: 'US' }, 
+          { number: @credit_card.number, 
+            expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
+        assert (answer[:code] == Settings.error_codes.success), answer[:message]
+        member = Member.find_by_uuid(answer[:member_id])
+        assert_not_nil member
+        assert_equal 'applied', member.status
+      end
+    end
+  end
+
+  test "Enrollment without approval" do
     active_merchant_stubs unless @use_active_merchant
     assert_difference('Operation.count') do
       assert_difference('Fulfillment.count') do
@@ -120,7 +140,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing with HD cancels member" do 
     active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
-    assert_difference('Operation.count', +2) do
+    assert_difference('Operation.count', +3) do
       assert_difference('Communication.count', +1) do
         active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
         amount = @terms_of_membership.installment_amount

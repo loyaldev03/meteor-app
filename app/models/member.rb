@@ -33,6 +33,7 @@ class Member < ActiveRecord::Base
     after_transition [:none, :provisional, :lapsed] => :provisional, :do => :schedule_first_membership
     after_transition [:provisional, :active] => :lapsed, :do => :cancellation
     after_transition [:provisional] => :active, :do => :send_active_email
+    after_transition :lapsed => :any, :do => :increment_reactivations
 
     event :set_as_provisional do
       transition [:none, :provisional] => :provisional
@@ -46,6 +47,9 @@ class Member < ActiveRecord::Base
     event :recovered do 
       transition [:lapsed] => :provisional
     end
+    event :set_as_applied do 
+      transition [:lapsed, :none] => :applied
+    end
 
     # A Member is within their review period. These members have joined a Subscription program that has a “Provisional” 
     # period whereby the Member has an opportunity to review the benfits of the program risk free for the duration of 
@@ -54,7 +58,7 @@ class Member < ActiveRecord::Base
     # A Member who has joineda subscription program that has been successfully billed the the 
     # Membership Billing Amount and is still active in the Program. 
     state :active
-    # Where a Member in Provisional or Active Status Cancels their Subscription or their Subscription 
+    # Where a Member in Provisional or active Status Cancels their Subscription or their Subscription 
     # was canceled by the platform due to unsuccessful billing of the Membership Amount or Renewal Amount.
     state :lapsed
     # (ONLY IN NFLA PLAYER PROGRAM) When a member has been submitted information as a Prospect 
@@ -68,6 +72,10 @@ class Member < ActiveRecord::Base
 
   def send_active_email
     Communication.deliver!(:active, self)
+  end
+
+  def increment_reactivations
+    increment!(:reactivation_times, 1)
   end
 
   def schedule_first_membership
@@ -168,6 +176,12 @@ class Member < ActiveRecord::Base
               :message => "Credit card is blank and grace period is disabled" }
           end
         else
+          if terms_of_membership.payment_gateway_configuration.nil?
+            message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
+            # TODO: do we have to add an operation?????
+            Auditory.add_redmine_ticket("Billing", message)
+            return { :code => "9789", :message => message }
+          end
           acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
           trans = Transaction.new
           trans.transaction_type = "sale"
@@ -199,6 +213,7 @@ class Member < ActiveRecord::Base
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
       # credit card exist?
+      credit_card_params[:number].gsub!(' ', '') # HOT FIX on 
       credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.member.club_id == club.id }
       if credit_card.empty?
         credit_card = CreditCard.new credit_card_params
@@ -213,9 +228,13 @@ class Member < ActiveRecord::Base
                    :code => Settings.error_codes.member_data_invalid }
         end
         # enroll allowed
-      else
+      elsif not credit_card.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
+        message = "Credit card blacklisted. call support."
+        Auditory.audit(agent, tom, message, credit_card.member, Settings.operation_types.credit_card_blacklisted)
+        return { :message => message, :code => "9508" }
+      else        
         message = "Credit card is already in use. call support."
-        Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_already_in_use)
+        Auditory.audit(agent, tom, message, credit_card.member, Settings.operation_types.credit_card_already_in_use)
         return { :message => message, :code => "9507" }
       end
     else
@@ -261,22 +280,12 @@ class Member < ActiveRecord::Base
         credit_card.accepted_on_billing
       end
 
-      # is a recovery?
-      if self.lapsed?
-        increment!(:reactivation_times, 1)
-        self.recovered!
-        message = "Member recovered successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
-        Auditory.audit(agent, terms_of_membership, message, self, Settings.operation_types.recovery)
-      else      
-        self.set_as_provisional! # set join_date
-        message = "Member enrolled successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
-        Auditory.audit(agent, trans, message, self, Settings.operation_types.enrollment_billing)
-      end
+      message = set_status_on_enrollment!(agent, trans, amount)
 
       self.reload
       { :message => message, :code => "000", :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
-      # TODO: Notify devels about this!
+      Auditory.add_redmine_ticket("Member:enroll", e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this
       #     an invalid one. we should revert the transaction.
       message = "Could not save member. #{e}"
@@ -305,6 +314,36 @@ class Member < ActiveRecord::Base
   end
   
   private
+    def set_status_on_enrollment!(agent, trans, amount)
+      operation_type = Settings.operation_types.enrollment_billing
+      description = 'enrolled'
+
+      # Member approval need it?
+      if terms_of_membership.needs_enrollment_approval?
+        self.set_as_applied!
+        # is a recovery?
+        if self.lapsed?
+          description = 'recovered pending approval'
+          operation_type = Settings.operation_types.recovery_needs_approval
+        else
+          description = 'enrolled pending approval'
+          operation_type = Settings.operation_types.enrollment_needs_approval
+        end
+      elsif self.lapsed? # is a recovery?
+        self.recovered!
+        description = 'recovered'
+        operation_type = Settings.operation_types.recovery
+      else      
+        self.set_as_provisional! # set join_date
+      end
+
+      message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
+      Auditory.audit(agent, 
+        (trans.nil? ? terms_of_membership : trans), 
+        message, self, operation_type)
+      message
+    end
+
     def fulfillments_products_to_send
       # TODO: this must be review after #19110 is finished
       if enrollment_info and enrollment_info[:megachannel].include?('sloop')

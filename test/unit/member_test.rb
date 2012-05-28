@@ -8,8 +8,8 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should create a member" do
-  	member = FactoryGirl.build(:member)
-  	assert !member.save, member.errors.inspect
+    member = FactoryGirl.build(:member)
+    assert !member.save, member.errors.inspect
     member.club =  @terms_of_membership_with_gateway.club
     member.terms_of_membership =  @terms_of_membership_with_gateway
     assert member.save, "member cant be save #{member.errors.inspect}"
@@ -22,7 +22,7 @@ class MemberTest < ActiveSupport::TestCase
 
   test "Should not create a member without last name" do
     member = FactoryGirl.build(:member, :last_name => nil)
-  	assert !member.save
+    assert !member.save
   end
 
   test "Member should not be billed if it is not active or provisional" do
@@ -85,7 +85,7 @@ class MemberTest < ActiveSupport::TestCase
     assert member_two.save, "member cant be save #{member_two.errors.inspect}"
   end
 
-  test "Active member cant be recovered" do
+  test "active member cant be recovered" do
     member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     answer = member.recover(4)
     assert answer[:code] == Settings.error_codes.cant_recover_member, answer[:message]
@@ -102,10 +102,23 @@ class MemberTest < ActiveSupport::TestCase
       member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
       answer = member.recover(@terms_of_membership_with_gateway)
       assert answer[:code] == Settings.error_codes.success, answer[:message]
+      assert_equal 'provisional', member.status
+      assert_equal 1, member.reactivation_times
     end
   end
 
-  test "Active member can receive fulfillments" do 
+  test "Lapsed member can be recovered unless it needs approval" do
+    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
+    assert_difference('Fulfillment.count') do
+      member = FactoryGirl.create(:lapsed_member, terms_of_membership: @tom_approval, club: @tom_approval.club)
+      answer = member.recover(@terms_of_membership_with_gateway)
+      assert answer[:code] == Settings.error_codes.success, answer[:message]
+      assert_equal 'applied', member.status
+      assert_equal 1, member.reactivation_times
+    end
+  end
+
+  test "active member can receive fulfillments" do 
     member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     assert member.can_receive_another_fulfillment?
   end
@@ -115,7 +128,6 @@ class MemberTest < ActiveSupport::TestCase
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
     fulfillment.save
-    fulfillment.set_as_open!
     assert_difference('Fulfillment.count') do
       fulfillment.renew
     end
@@ -126,10 +138,8 @@ class MemberTest < ActiveSupport::TestCase
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
     fulfillment.save
-    fulfillment.set_as_open!
     fulfillment.set_as_archived!
     assert_raise(StateMachine::InvalidTransition){ fulfillment.set_as_archived! }
-    assert_raise(StateMachine::InvalidTransition){ fulfillment.set_as_open! }
   end
 
   test "Should let create member with correct format number" do
