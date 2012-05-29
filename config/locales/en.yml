@@ -34,6 +34,7 @@ en:
   activerecord:
     member: 'Member'
     term_of_membership: 'Term of membership'
+    email_template: 'Email template'
     attributes:
       transaction:
         transaction_types: 
@@ -90,6 +91,11 @@ en:
         created_by: 'Created by'
       terms_of_membership:
         name: 'Name'
+      email_template:
+        name: 'Name'
+        type: 'Type'
+        client: 'Client'
+        created_at: 'Created at'
       fulfillment:
         product: 'Product'
         asigned_at: 'Asigned at'

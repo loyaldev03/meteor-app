@@ -2,12 +2,12 @@
 
 <table class="table table-bordered table-condensed">
   <thead>
-    <tr colspan="3"> <th> Email Templates </th> </tr>
+    <tr> <th colspan="3"> <%= t('activerecord.email_template') %> </th> </tr>
     <tr>
-  	  <th>name</th>
-  	  <th>type</th>
-     	<th>client</th>
-      <th>created_at</th>
+  	  <th> <%= t('activerecord.attributes.email_template.name') %> </th>
+  	  <th> <%= t('activerecord.attributes.email_template.type') %> </th>
+     	<th> <%= t('activerecord.attributes.email_template.client') %> </th>
+      <th> <%= t('activerecord.attributes.email_template.created_at') %> </th>
     </tr>
   </thead>
   <tbody>
@@ -20,4 +20,7 @@
   	</tr>
   	<% end %>
   </tbody>
+  <tfoot>
+    <tr> <td colspan="4"> <%= link_to t('back'), show_member_path, :class => "btn" %> </td> </tr>
+  </tfoot>
 </table>
