@@ -1,0 +1,23 @@
+<%= render :partial => "shared/member_information" %>
+
+<table class="table table-bordered table-condensed">
+  <thead>
+    <tr colspan="3"> <th> Email Templates </th> </tr>
+    <tr>
+  	  <th>name</th>
+  	  <th>type</th>
+     	<th>client</th>
+      <th>created_at</th>
+    </tr>
+  </thead>
+  <tbody>
+  	<% @email_templates.each do |et| %>
+  	<tr>
+  	  <td> <%= et.name %> </td>
+  	  <td> <%= et.template_type%> </td>
+  	  <td> <%= et.client %> </td>
+  	  <td> <%= et.created_at %> </td>
+  	</tr>
+  	<% end %>
+  </tbody>
+</table>
