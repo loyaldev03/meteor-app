@@ -1,4 +1,30 @@
 <%= render :partial => "shared/member_information" %>
+<table class="table table-bordered table-condensed">
+  <thead>
+  <tr> <th> <%= t('activerecord.term_of_membership') %> </th> </tr>
+  </thead>
+  <tr>
+    <td> <%= t('activerecord.attributes.terms_of_membership.name') %>: <%= @tom.name %> </td>
+    <td> <%= t('activerecord.attributes.terms_of_membership.mode') %>: <%= @tom.mode %> </td>    
+    <td colspan="2"> <%= t('activerecord.attributes.terms_of_membership.created_at') %>: 
+                     <%= I18n.l @tom.created_at, :format => :long %> </td>
+  </tr>
+  <tr>
+    <td> <%= t('activerecord.attributes.terms_of_membership.installment_amount') %>: 
+         <%= @tom.installment_amount %> </td>
+    <td> <%= t('activerecord.attributes.terms_of_membership.installment_type') %>: 
+        <%= @tom.installment_type %> </td>
+    <td> <%= t('activerecord.attributes.terms_of_membership.grace_period') %>: 
+         <%= @tom.grace_period %> </td>
+    <td> <%= t('activerecord.attributes.terms_of_membership.trial_days') %>: 
+         <%= @tom.trial_days %> </td>    
+  </tr>
+  <tr>
+    <td colspan="5" class="comment"> <%= t('activerecord.attributes.terms_of_membership.description') %>: 
+                                     <%= @tom.description %> </td>
+  </tr>
+</table>
+
 
 <table class="table table-bordered table-condensed">
   <thead>
@@ -7,7 +33,7 @@
   	  <th> <%= t('activerecord.attributes.email_template.name') %> </th>
   	  <th> <%= t('activerecord.attributes.email_template.type') %> </th>
      	<th> <%= t('activerecord.attributes.email_template.client') %> </th>
-      <th> <%= t('activerecord.attributes.email_template.created_at') %> </th>
+      <th> <%= t('created_at') %> </th>
     </tr>
   </thead>
   <tbody>
@@ -16,7 +42,7 @@
   	  <td> <%= et.name %> </td>
   	  <td> <%= et.template_type%> </td>
   	  <td> <%= et.client %> </td>
-  	  <td> <%= et.created_at %> </td>
+  	  <td> <%= I18n.l et.created_at, :format => :long %> </td>
   	</tr>
   	<% end %>
   </tbody>

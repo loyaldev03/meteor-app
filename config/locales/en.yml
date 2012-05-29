@@ -19,6 +19,7 @@ en:
   show_on_map: 'map'
   reason: 'Reason'
   added_by: 'Added by'
+  created_at: 'Created at'
   ago: 'ago'
   example: 'Example'
   refund: 'Refund'
@@ -91,11 +92,16 @@ en:
         created_by: 'Created by'
       terms_of_membership:
         name: 'Name'
+        mode: 'Mode'
+        installment_amount: 'Installment amount'
+        installment_type: 'Installment type'
+        grace_period: 'Grace period'
+        trial_days: 'Trial days'
       email_template:
         name: 'Name'
         type: 'Type'
         client: 'Client'
-        created_at: 'Created at'
+
       fulfillment:
         product: 'Product'
         asigned_at: 'Asigned at'
