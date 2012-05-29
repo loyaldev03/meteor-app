@@ -4,17 +4,29 @@ class MembersController < ApplicationController
 
   def index
     if request.post?
-      @members = Member.joins(:credit_cards).where([" visible_id like ? AND first_name like ? AND last_name like ? AND address like ? AND
-                     phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
-                     AND (bill_date like ? OR bill_date is null) AND club_id like ? AND credit_cards.active = 1 AND (credit_cards.last_digits like ?
-                     OR credit_cards.last_digits is null)", 
+      unless params[:member][:last_digits].blank?
+        @members = Member.joins(:credit_cards).where([" visible_id like ? AND first_name like ? AND last_name like ? 
+                     AND address like ? AND phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
+                     AND (bill_date like ? OR bill_date is null) AND club_id like ? AND credit_cards.active = 1 
+                     AND credit_cards.last_digits = ?", 
                    '%'+params[:member][:member_id]+'%','%'+params[:member][:first_name]+'%',
                    '%'+params[:member][:last_name]+'%','%'+params[:member][:address]+'%',
                    '%'+params[:member][:phone_number]+'%','%'+params[:member][:city]+'%',
                    '%'+params[:member][:state]+'%','%'+params[:member][:zip]+'%', 
                    '%'+params[:member][:email]+'%','%'+params[:member][:bill_date]+'%', @current_club,
-                   '%'+params[:member][:last_digits]+'%'])
-    end
+                   params[:member][:last_digits]])
+      else
+        @members = Member.joins(:credit_cards).where([" visible_id like ? AND first_name like ? 
+                     AND last_name like ? AND address like ? AND phone_number like ? AND city like ? 
+                     AND state like ? AND zip like ? AND email like ? AND (bill_date like ? OR bill_date is null) 
+                     AND club_id like ?",
+                   '%'+params[:member][:member_id]+'%','%'+params[:member][:first_name]+'%',
+                   '%'+params[:member][:last_name]+'%','%'+params[:member][:address]+'%',
+                   '%'+params[:member][:phone_number]+'%','%'+params[:member][:city]+'%',
+                   '%'+params[:member][:state]+'%','%'+params[:member][:zip]+'%',
+                   '%'+params[:member][:email]+'%','%'+params[:member][:bill_date]+'%',@current_club])             
+      end
+   end
   end
 
   def show
