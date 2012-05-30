@@ -60,9 +60,11 @@
       <td colspan="2" style='padding: 8px'> 
         <%= t('activerecord.attributes.credit_card.next_bill_date') %>
         <%= text_field :member, :bill_date, :class => 'text_field datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:bill_date] if params[:member]) %> 
-        <%= link_to 'clear', '#', :id => "clear_bill_date", :class=>"icon-refresh"%>
       </td>
-      <td colspan="3" style='padding: 8px'> <%= submit_tag 'Search', :class => "btn btn-inverse" -%> </td>
+      <td colspan="3" style='padding: 8px'> 
+        <%= submit_tag 'Search', :class => "btn btn-inverse" -%> 
+        <%= link_to 'clear', '#', :id => "clear_form", :class=>"btn icon-refresh"%>
+      </td>
     </tr>
   </table>
 
