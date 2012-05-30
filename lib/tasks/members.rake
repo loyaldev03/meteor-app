@@ -55,7 +55,9 @@ namespace :members do
   task :cancel => :environment do
     tall = Time.now
     begin
-      Member.find_in_batches(:conditions => [" date(cancel_date) <= ? AND status != ? ", Date.today, 'lapsed' ]) do |group|
+      base =  Member.where(" date(cancel_date) <= ? AND status != ? ", Date.today, 'lapsed')
+      Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
+      base.find_in_batches do |group|
         group.each do |member| 
           tz = Time.now
           begin
