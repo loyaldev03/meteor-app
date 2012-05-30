@@ -4,7 +4,11 @@ class MembersController < ApplicationController
 
   def index
     if request.post?
+      #We will be validating two fields because we have to make sure that they will never be 'null',
+      #so as keep our search working properly. (If some of them are null the query wont bring us anything 'null')
+      #If we don't fill the member_id field.  
       params[:member][:member_id].blank? ? member_id = '%' : member_id = params[:member][:member_id]
+      #In case we don't fill the last_digits field.
       params[:member][:last_digits].blank? ? last_digits = '%' : last_digits = params[:member][:last_digits]
       @members = Member.joins(:credit_cards).where(["visible_id like ? AND first_name like ? AND last_name like ? 
                  AND address like ? AND phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
