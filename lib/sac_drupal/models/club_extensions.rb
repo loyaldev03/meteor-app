@@ -1,10 +1,6 @@
 module Drupal
   module ClubExtensions
     def self.included(base)
-      base.belongs_to :drupal_domain,
-        class_name:  'Domain',
-        foreign_key: 'drupal_domain_id'
-
       # base.extend ClassMethods
       base.send :include, InstanceMethods
     end

@@ -9,7 +9,6 @@ module Wordpress
     require 'sac_wordpress/faraday_middleware/full_logger'
 
     logger.info "  * extending Member and Club"
-    ::Member.send :include, Wordpress::MemberExtensions
     Club.send :include, Wordpress::ClubExtensions
 
     nil

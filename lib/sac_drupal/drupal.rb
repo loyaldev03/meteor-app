@@ -10,7 +10,6 @@ module Drupal
     require 'sac_drupal/faraday_middleware/drupal_authentication'
 
     logger.info "  * extending Member and Club"
-    ::Member.send :include, Drupal::MemberExtensions
     Club.send :include, Drupal::ClubExtensions
 
     if Faraday.respond_to? :register_middleware

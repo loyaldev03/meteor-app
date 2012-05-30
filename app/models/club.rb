@@ -9,6 +9,10 @@ class Club < ActiveRecord::Base
   has_many :payment_gateway_configurations
   has_many :member_group_types
 
+  belongs_to :api_domain,
+    class_name:  'Domain',
+    foreign_key: 'drupal_domain_id'
+
   attr_accessible :description, :name, :logo
 
   acts_as_paranoid

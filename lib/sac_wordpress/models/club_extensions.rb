@@ -1,10 +1,6 @@
 module Wordpress
   module ClubExtensions
     def self.included(base)
-      base.belongs_to :wordpress_domain,
-        class_name:  'Domain',
-        foreign_key: 'wordpress_domain_id'
-
       # base.extend ClassMethods
       base.send :include, InstanceMethods
     end
