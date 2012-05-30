@@ -1,4 +1,4 @@
-module Drupal
+module Wordpress
   mattr_accessor :logger
 
   def self.enable_integration!

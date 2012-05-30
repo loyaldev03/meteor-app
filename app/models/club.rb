@@ -1,3 +1,6 @@
+#
+# api_type column should have Drupal::Member or Wordpress::Member
+#
 class Club < ActiveRecord::Base
   belongs_to :partner
   has_many :domains
