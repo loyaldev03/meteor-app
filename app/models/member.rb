@@ -20,6 +20,9 @@ class Member < ActiveRecord::Base
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address, :wrong_phone_number
 
   before_create :record_date
+  after_save 'api_member.save!'
+  after_destroy 'api_member.destroy!'
+
   validates :first_name, :presence => true, :format => /^[A-Za-z ']+$/
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
             :format => /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
@@ -324,7 +327,7 @@ class Member < ActiveRecord::Base
   end
 
   def api_member
-    @api_member ||= Drupal::Member.new self
+    @api_member ||= eval(club.api_type).new self
   end
 
   def synced?

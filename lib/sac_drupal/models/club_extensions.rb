@@ -12,16 +12,16 @@ module Drupal
     module InstanceMethods
       def drupal
         unless @drupal_client
-          unless [self.drupal_domain, self.drupal_username, self.drupal_password].all?
+          unless [self.api_domain, self.api_username, self.api_password].all?
             raise 'no drupal_domain or drupal credentials'
           end
 
-          @drupal_client = Faraday.new(url: self.drupal_domain.url) do |builder|
+          @drupal_client = Faraday.new(url: self.api_domain.url) do |builder|
             builder.request :json
             builder.request :drupal_auth,
-              url: self.drupal_domain.url,
-              username: self.drupal_username,
-              password: self.drupal_password
+              url: self.api_domain.url,
+              username: self.api_username,
+              password: self.api_password
             builder.headers.merge!({ 'Accept' => 'application/json' })
 
             builder.response :json

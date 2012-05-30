@@ -23,11 +23,11 @@ module Wordpress
     # ] 
 
     def get
-      conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.drupal_id }).body unless self.new_record?
+      conn.get('/api/user/%{wordpress_id}' % { wordpress_id: self.member.api_id }).body unless self.new_record?
     end
 
     def update!
-      res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.member.drupal_id }, fieldmap)
+      res = conn.put('/api/user/%{wordpress_id}' % { wordpress_id: self.member.api_id }, fieldmap)
       update_member(res)
     end
 
@@ -41,12 +41,12 @@ module Wordpress
     end
 
     def destroy!
-      res = conn.delete('/api/user/%{drupal_id}' % { drupal_id: self.member.drupal_id }, fieldmap)
+      res = conn.delete('/api/user/%{wordpress_id}' % { wordpress_id: self.member.api_id }, fieldmap)
       update_member(res)
     end
 
     def new_record?
-      self.member.drupal_id.nil?
+      self.member.wordpress_id.nil?
     end
 
     def generate_admin_token!
@@ -63,13 +63,13 @@ module Wordpress
 
   private
     def conn
-      self.member.club.drupal
+      self.member.club.wordpress
     end
 
     def update_member(res)
       data = if res.status == 200
         { 
-          drupal_id: res.body['uid'],
+          wordpress_id: res.body['uid'],
           last_synced_at: Time.now,
           last_sync_error: nil
         }

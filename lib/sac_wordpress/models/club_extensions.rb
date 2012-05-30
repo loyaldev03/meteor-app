@@ -10,30 +10,30 @@ module Wordpress
     end
 
     module InstanceMethods
-      def drupal
-        unless @drupal_client
-          unless [self.drupal_domain, self.drupal_username, self.drupal_password].all?
-            raise 'no drupal_domain or drupal credentials'
+      def wordpress
+        unless @wordpress_client
+          unless [self.api_domain, self.api_username, self.api_password].all?
+            raise 'no wordpress_domain or wordpress credentials'
           end
 
-          @drupal_client = Faraday.new(url: self.drupal_domain.url) do |builder|
+          @wordpress_client = Faraday.new(url: self.api_domain.url) do |builder|
             builder.request :json
-            builder.request :drupal_auth,
-              url: self.drupal_domain.url,
-              username: self.drupal_username,
-              password: self.drupal_password
+            builder.request :wordpress_auth,
+              url: self.api_domain.url,
+              username: self.api_username,
+              password: self.api_password
             builder.headers.merge!({ 'Accept' => 'application/json' })
 
             builder.response :json
             builder.response :mashify
             # builder.response :logger, Drupal.logger
-            builder.use Drupal::FaradayMiddleware::FullLogger, Drupal.logger
+            builder.use Wordpress::FaradayMiddleware::FullLogger, Drupal.logger
 
             builder.adapter :net_http
           end
         end
 
-        @drupal_client
+        @wordpress_client
       end
     end
   end

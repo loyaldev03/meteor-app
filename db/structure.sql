@@ -46,6 +46,10 @@ CREATE TABLE `clubs` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `drupal_domain_id` int(11) DEFAULT NULL,
+  `api_username` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `api_password` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `api_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT 'Drupal::Member',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -213,6 +217,9 @@ CREATE TABLE `members` (
   `member_since_date` datetime DEFAULT NULL,
   `wrong_address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `wrong_phone_number` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `api_id` int(11) DEFAULT NULL,
+  `last_synced_at` datetime DEFAULT NULL,
+  `last_sync_error` text COLLATE utf8_unicode_ci,
   PRIMARY KEY (`club_id`,`visible_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -261,6 +268,31 @@ CREATE TABLE `payment_gateway_configurations` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `prospects` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `last_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `city` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `state` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `zip` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `url_landing` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `birth_date` datetime DEFAULT NULL,
+  `user_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `preferences` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `mega_channel` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `reporting_code` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ip_address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_agent` int(11) DEFAULT NULL,
+  `referral_host` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `referral_parameters` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cookie_value` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `schema_migrations` (
   `version` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -361,6 +393,8 @@ INSERT INTO schema_migrations (version) VALUES ('20120503183957');
 
 INSERT INTO schema_migrations (version) VALUES ('20120506210619');
 
+INSERT INTO schema_migrations (version) VALUES ('20120507185841');
+
 INSERT INTO schema_migrations (version) VALUES ('20120509160307');
 
 INSERT INTO schema_migrations (version) VALUES ('20120509191136');
@@ -387,6 +421,16 @@ INSERT INTO schema_migrations (version) VALUES ('20120518120706');
 
 INSERT INTO schema_migrations (version) VALUES ('20120518134941');
 
+INSERT INTO schema_migrations (version) VALUES ('20120521150600');
+
 INSERT INTO schema_migrations (version) VALUES ('20120521181809');
 
 INSERT INTO schema_migrations (version) VALUES ('20120521235718');
+
+INSERT INTO schema_migrations (version) VALUES ('20120522152656');
+
+INSERT INTO schema_migrations (version) VALUES ('20120524154213');
+
+INSERT INTO schema_migrations (version) VALUES ('20120528174051');
+
+INSERT INTO schema_migrations (version) VALUES ('20120530221538');

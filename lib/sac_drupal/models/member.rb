@@ -23,11 +23,11 @@ module Drupal
     # ] 
 
     def get
-      conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.drupal_id }).body unless self.new_record?
+      conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }).body unless self.new_record?
     end
 
     def update!
-      res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.member.drupal_id }, fieldmap)
+      res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }, fieldmap)
       update_member(res)
     end
 
@@ -41,12 +41,12 @@ module Drupal
     end
 
     def destroy!
-      res = conn.delete('/api/user/%{drupal_id}' % { drupal_id: self.member.drupal_id }, fieldmap)
+      res = conn.delete('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }, fieldmap)
       update_member(res)
     end
 
     def new_record?
-      self.member.drupal_id.nil?
+      self.member.api_id.nil?
     end
 
     def generate_admin_token!
