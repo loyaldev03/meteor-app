@@ -1,4 +1,5 @@
 <h1>Search</h1>
+<p><%= link_to 'New Member', new_member_path, :class => "btn btn-primary icon-user"  %></p>
 <%= form_tag(members_path, :method => 'post', :id => 'at_least_one_required' ,:html => { :class => 'well form-inline' }) do |f| %>
 
   <table class="table table-bordered table-condensed">
@@ -62,8 +63,8 @@
         <%= text_field :member, :bill_date, :class => 'text_field datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:bill_date] if params[:member]) %> 
       </td>
       <td colspan="3" style='padding: 8px'> 
-        <%= submit_tag 'Search', :class => "btn btn-inverse" -%> 
-        <%= link_to 'clear', '#', :id => "clear_form", :class=>"btn icon-refresh"%>
+        <%= submit_tag  t('search'), :class => "btn btn-inverse" %>
+        <%= link_to t('clear'), '#', :id => "clear_form", :class=>"btn icon-refresh"%>
       </td>
     </tr>
   </table>
@@ -74,7 +75,7 @@
   </div>  
   <% end %>
 
-  <p><%= link_to 'New Member', new_member_path, :class => "btn btn-primary"  %></p>
+
 <% end %>
 
 <script type="text/javascript">
