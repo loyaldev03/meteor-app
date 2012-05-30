@@ -12,6 +12,9 @@ defaults: &defaults
     full_save: 102
     change_next_bill_date: 103
     credit: 104
+    membership_billing_without_decline_strategy: 105
+    membership_billing_hard_decline: 106
+    membership_billing_soft_decline: 107
     cancel: 200
     future_cancel: 201
     save_the_sale: 202

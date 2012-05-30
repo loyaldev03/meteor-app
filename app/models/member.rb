@@ -195,7 +195,6 @@ class Member < ActiveRecord::Base
             { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
           else
             message = set_decline_strategy(trans)
-            Auditory.audit(nil, trans, answer[:message] + ' ' + message, self, Settings.operation_types.membership_billing)
             answer # TODO: should we answer set_decline_strategy message too?
           end
         end
@@ -399,6 +398,7 @@ class Member < ActiveRecord::Base
         message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
         self.next_retry_bill_date = Date.today + eval(Settings.next_retry_on_missing_decline)
         Notifier.decline_strategy_not_found(message, self).deliver!
+        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
       else
         trans.update_attribute :decline_strategy_id, decline.id
         if decline.hard_decline?
@@ -418,8 +418,10 @@ class Member < ActiveRecord::Base
         end
       end
       if set_as_canceled
+        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_hard_decline)
         set_as_canceled!
       else
+        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_soft_decline)
         increment(:recycled_times, 1)
       end
       message
