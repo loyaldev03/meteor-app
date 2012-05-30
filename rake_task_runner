@@ -1,9 +1,14 @@
 #!/bin/sh
 
-# 15 0 * * * rake_task_runner
+# needs to find ruby and rake binaries
+export PATH=$PATH:/usr/local/bin
 
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake members:cancel`
+# 15 0 * * * rake_task_runner
+logfile="/tmp/cron_rake.log"
+
+echo "PATH variable => `printenv PATH`"
+`cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake members:cancel >> $logfile 2>&1`
 # billing should be executed after cancel jobs finishes
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake billing:send_prebill &`
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake members:process_fulfillments &`
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake billing:for_today`
+`cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake billing:send_prebill >> $logfile 2>&1`
+`cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake members:process_fulfillments >> $logfile 2>&1`
+`cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake billing:for_today >> $logfile 2>&1`

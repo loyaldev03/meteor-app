@@ -12,7 +12,7 @@
     <% if @current_member.lapsed? %>
       <td>
         <%= form_for @current_member, :url => member_recover_path, do |f| %>
-          <%= f.submit t('recovery'), :class => 'btn btn-warning' %>
+          <%= f.submit t('recover'), :class => 'btn btn-warning' %>
         <% end %>
       </td>
     <% end %>
@@ -80,7 +80,7 @@
       <th colspan= "3"> Membership Information </th>
       <th <% if @current_member.lapsed? %>
             class = "red"
-          <% elsif @current_member.paid? %>
+          <% elsif @current_member.active? %>
             class = "green"
           <% elsif %>
             class = "yellow"
@@ -107,7 +107,7 @@
   <tr>
     <td> <%= t('menu.activerecord.term_of_membership') %> 
          <%= t('activerecord.attributes.terms_of_membership.name') %>:
-         <%= @current_member.terms_of_membership.name %> 
+         <%= link_to @current_member.terms_of_membership.name, terms_of_membership_path(:id => @current_member.terms_of_membership) %> 
     </td>
     <td> <%= t('activerecord.attributes.member.reactivation_times') %> 
          <%= @current_member.reactivation_times %> 

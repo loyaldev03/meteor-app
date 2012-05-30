@@ -18,8 +18,8 @@ FactoryGirl.define do
     country "US"
   end
 
-  factory :paid_member, class: Member do
-    status "paid"
+  factory :active_member, class: Member do
+    status "active"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
     address { Faker::Address.street_address  }
@@ -36,8 +36,8 @@ FactoryGirl.define do
   end
 
 
-  factory :paid_member_without_cc, class: Member do
-    status "paid"
+  factory :active_member_without_cc, class: Member do
+    status "active"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
     address { Faker::Address.street_address  }

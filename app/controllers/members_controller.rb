@@ -4,17 +4,23 @@ class MembersController < ApplicationController
 
   def index
     if request.post?
-      @members = Member.joins(:credit_cards).where([" visible_id like ? AND first_name like ? AND last_name like ? AND address like ? AND
-                                 phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
-                                 AND bill_date like ? AND club_id like ? AND credit_cards.active = 1 AND (credit_cards.last_digits like ?
-                                 OR credit_cards.last_digits is null)", 
-                               '%'+params[:member][:member_id]+'%','%'+params[:member][:first_name]+'%',
-                               '%'+params[:member][:last_name]+'%','%'+params[:member][:address]+'%',
-                               '%'+params[:member][:phone_number]+'%','%'+params[:member][:city]+'%',
-                               '%'+params[:member][:state]+'%','%'+params[:member][:zip]+'%', 
-                               '%'+params[:member][:email]+'%','%'+params[:member][:bill_date]+'%', @current_club,
-                               '%'+params[:member][:last_digits]+'%'])
-    end
+      #We will be validating two fields because we have to make sure that they will never be 'null',
+      #so as keep our search working properly. (If some of them are null the query wont bring us anything 'null')
+      #If we don't fill the member_id field.  
+      params[:member][:member_id].blank? ? member_id = '%' : member_id = params[:member][:member_id]
+      #In case we don't fill the last_digits field.
+      params[:member][:last_digits].blank? ? last_digits = '%' : last_digits = params[:member][:last_digits]
+      @members = Member.joins(:credit_cards).where(["visible_id like ? AND first_name like ? AND last_name like ? 
+                 AND address like ? AND phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
+                 AND (bill_date like ? OR bill_date is null) AND club_id like ? AND (credit_cards.active = 1 
+                 AND credit_cards.last_digits like ?)", 
+                 member_id,'%'+params[:member][:first_name]+'%',
+                 '%'+params[:member][:last_name]+'%','%'+params[:member][:address]+'%',
+                 '%'+params[:member][:phone_number]+'%','%'+params[:member][:city]+'%',
+                 '%'+params[:member][:state]+'%','%'+params[:member][:zip]+'%', 
+                 '%'+params[:member][:email]+'%','%'+params[:member][:bill_date]+'%', @current_club,
+                 last_digits])
+   end
   end
 
   def show
@@ -83,7 +89,7 @@ class MembersController < ApplicationController
     if request.post?
       answer = @current_member.recover(@current_member.terms_of_membership_id, current_agent)
       if answer[:code] == Settings.error_codes.success
-        flash[:notice] = "Save the sale succesfully applied"
+        flash[:notice] = "The member was successfully recovered."
       else
         flash[:error] = answer[:message]
       end
@@ -190,7 +196,7 @@ class MembersController < ApplicationController
   def set_unreachable
     if request.post?
       if @current_member.update_attribute(:wrong_phone_number, params[:reason])
-        message = "Phone number #{@current_member.phone_number} is #{params[:reason]}."
+        message = "Phone number #{@current_member.phone_number} is  #{params[:reason]}."
         flash[:notice] = message
         Auditory.audit(@current_agent,@current_member,message,@current_member)
         redirect_to show_member_path

@@ -19,11 +19,14 @@ en:
   show_on_map: 'map'
   reason: 'Reason'
   added_by: 'Added by'
+  created_at: 'Created at'
   ago: 'ago'
   example: 'Example'
   refund: 'Refund'
-  recovery: 'Recovery'
+  recover: 'Recover'
   resend: 'Resend'
+  search_results: 'Search results'
+
   are_you_sure: 'Are you sure?'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
@@ -34,6 +37,7 @@ en:
   activerecord:
     member: 'Member'
     term_of_membership: 'Term of membership'
+    email_template: 'Email template'
     attributes:
       transaction:
         transaction_types: 
@@ -78,6 +82,7 @@ en:
         set_undeliverable: 'Set undeliverable'
         undeliverable: 'This address is undeliverable.'
         unreachable: 'This phone number is unreachable.'
+        search_member_not_found: 'No records were found.'
       credit_card:
         number: 'Credit card number'
         expire_date: 'Expire date'
@@ -90,6 +95,16 @@ en:
         created_by: 'Created by'
       terms_of_membership:
         name: 'Name'
+        mode: 'Mode'
+        installment_amount: 'Installment amount'
+        installment_type: 'Installment type'
+        grace_period: 'Grace period'
+        trial_days: 'Trial days'
+      email_template:
+        name: 'Name'
+        type: 'Type'
+        client: 'Client'
+
       fulfillment:
         product: 'Product'
         asigned_at: 'Asigned at'

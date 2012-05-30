@@ -9,9 +9,8 @@ class Domain < ActiveRecord::Base
   # of partner. TODO: can we add this validation without problems?
   # validates :partner, :presence => true 
   validates :url, :presence => true, 
-                  :uniqueness => true, 
+                  :uniqueness => { :message => "Has already been taken" }, 
                   :format =>  /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
-                  
   acts_as_paranoid
 
   before_destroy :verify_if_is_last_domain

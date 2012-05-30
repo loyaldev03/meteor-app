@@ -26,23 +26,22 @@ class Member < ActiveRecord::Base
   validates :phone_number, :format => /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-. ]\(?(x|int)?[0-9]?{1,10}\)?)?$/ 
   validates :address, :city, :state, :country, :presence => true, :format => /^[A-Za-z0-9 ',\s]+$/
   validates :terms_of_membership_id , :presence => true
-  validates :city, :state, :format => /^[A-Za-z ' \s]+$/
   validates :zip, :presence => true, :format => /^[0-9]{5}(-?[0-9]{4})?$/
 
   state_machine :status, :initial => :none do
     after_transition [:none, :provisional, :lapsed] => :provisional, :do => :schedule_first_membership
-    after_transition [:provisional, :paid] => :lapsed, :do => :cancellation
-    after_transition [:provisional] => :paid, :do => :send_active_email
+    after_transition [:provisional, :active] => :lapsed, :do => :cancellation
+    after_transition [:provisional] => :active, :do => :send_active_email
     after_transition :lapsed => :any, :do => :increment_reactivations
 
     event :set_as_provisional do
       transition [:none, :provisional] => :provisional
     end
-    event :set_as_paid do
-      transition [:provisional, :paid] => :paid
+    event :set_as_active do
+      transition [:provisional, :active] => :active
     end
     event :set_as_canceled do
-      transition [:provisional, :paid] => :lapsed
+      transition [:provisional, :active] => :lapsed
     end
     event :recovered do 
       transition [:lapsed] => :provisional
@@ -57,8 +56,8 @@ class Member < ActiveRecord::Base
     state :provisional
     # A Member who has joineda subscription program that has been successfully billed the the 
     # Membership Billing Amount and is still active in the Program. 
-    state :paid
-    # Where a Member in Provisional or Paid Status Cancels their Subscription or their Subscription 
+    state :active
+    # Where a Member in Provisional or active Status Cancels their Subscription or their Subscription 
     # was canceled by the platform due to unsuccessful billing of the Membership Amount or Renewal Amount.
     state :lapsed
     # (ONLY IN NFLA PLAYER PROGRAM) When a member has been submitted information as a Prospect 
@@ -115,11 +114,11 @@ class Member < ActiveRecord::Base
   end
 
   def can_save_the_sale?
-    self.paid? or self.provisional?
+    self.active? or self.provisional?
   end
 
   def can_bill_membership?
-    self.paid? or self.provisional?
+    self.active? or self.provisional?
   end
 
   # Add logic to recover some one max 3 times in 5 years
@@ -130,7 +129,7 @@ class Member < ActiveRecord::Base
   # Do we need rules on fulfillment renewal?
   # Add logic here!!!
   def can_receive_another_fulfillment?
-    self.paid? or self.provisional?
+    self.active? or self.provisional?
   end
   ###############################################
 
@@ -188,7 +187,7 @@ class Member < ActiveRecord::Base
           trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
           answer = trans.process
           if trans.success?
-            set_as_paid!
+            set_as_active!
             schedule_renewal
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
             Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
