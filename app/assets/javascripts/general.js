@@ -40,8 +40,8 @@ $(document).ready( function() {
     $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
                                              showOn: "both", buttonImage: "/icon-calendar.png", 
                                              buttonImageOnly: true});
-    $("#clear_bill_date").click( function() {
-      $(".datepicker_for_search").val('') 
+    $("#clear_form").click( function() {
+      $("#at_least_one_required input[type=text] ").each(function() { $(this).val(''); }); 
     });
   };
 
