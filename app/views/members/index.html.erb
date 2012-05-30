@@ -6,60 +6,60 @@
       <td>
         <%= t('activerecord.attributes.member.member_id') %>
         <%= text_field :member, :member_id, :class => 'test_field', 
-                       :value => params[:member][:member_id] %>
+                       :value => (params[:member][:member_id] if params[:member])%>
       </td>
       <td>
         <%= t('activerecord.attributes.member.first_name') %>
         <%= text_field :member, :first_name, :class => 'test_field', 
-                       :value => params[:member][:first_name] %>
+                       :value => (params[:member][:first_name] if params[:member]) %>
       </td>
       <td>
         <%= t('activerecord.attributes.member.last_name') %>
         <%= text_field :member, :last_name, :class => 'test_field',
-                       :value => params[:member][:last_name] %>
+                       :value => (params[:member][:last_name] if params[:member]) %>
       </td>
       <td>
         <%= t('activerecord.attributes.member.address') %>
         <%= text_field :member, :address, :class => 'test_field',
-                       :value => params[:member][:address] %>
+                       :value => (params[:member][:address] if params[:member]) %>
       </td>
       <td>
         <%= t('activerecord.attributes.member.phone_number') %>
         <%= text_field :member, :phone_number, :class => 'test_field',
-                       :value => params[:member][:phone_number] %>
+                       :value => (params[:member][:phone_number] if params[:member]) %>
       </td>
     </tr>
     <tr>
       <td>
         <%= t('activerecord.attributes.member.city') %>
         <%= text_field :member, :city, :class => 'test_field',
-                       :value => params[:member][:city] %>
+                       :value => (params[:member][:city] if params[:member]) %>
       </td>
       <td>
         <%= t('activerecord.attributes.member.state') %>
         <%= text_field :member, :state, :class => 'test_field',
-                       :value => params[:member][:state] %>
+                       :value => (params[:member][:state] if params[:member]) %>
       </td>
       <td>
         <%= t('activerecord.attributes.member.zip') %>
         <%= text_field :member, :zip, :class => 'test_field',
-                       :value => params[:member][:zip] %>
+                       :value => (params[:member][:zip] if params[:member]) %>
       </td>
       <td>
         <%= t('activerecord.attributes.credit_card.email') %>
         <%= text_field :member, :email, :class => 'text_field',
-                       :value => params[:member][:email] %>         
+                       :value => (params[:member][:email] if params[:member]) %>         
       </td>
       <td> 
         <%= t('activerecord.attributes.credit_card.last_digits') %>
         <%= text_field :member, :last_digits, :class => 'text_field',
-                       :value => params[:member][:last_digits] %> 
+                       :value => (params[:member][:last_digits] if params[:member]) %> 
       </td>
     </tr>
     <tr>
       <td colspan="2" style='padding: 8px'> 
         <%= t('activerecord.attributes.credit_card.next_bill_date') %>
-        <%= text_field :member, :bill_date, :class => 'text_field datepicker_for_search', :readonly => 'readonly', :value => params[:member][:bill_date] %> 
+        <%= text_field :member, :bill_date, :class => 'text_field datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:bill_date] if params[:member]) %> 
         <%= link_to 'clear', '#', :id => "clear_bill_date", :class=>"icon-refresh"%>
       </td>
       <td colspan="3" style='padding: 8px'> <%= submit_tag 'Search', :class => "btn btn-inverse" -%> </td>
