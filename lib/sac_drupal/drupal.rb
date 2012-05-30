@@ -5,7 +5,6 @@ module Drupal
     logger.info " ** Initializing SAC Drupal integration"
 
     require 'sac_drupal/models/member'
-    require 'sac_drupal/models/member_extensions'
     require 'sac_drupal/models/club_extensions'
     require 'sac_drupal/faraday_middleware/full_logger'
     require 'sac_drupal/faraday_middleware/drupal_authentication'

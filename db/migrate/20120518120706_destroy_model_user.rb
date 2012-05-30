@@ -1,4 +1,7 @@
 class DestroyModelUser < ActiveRecord::Migration
+  def up
+    drop_table :users
+  end
   def down
     create_table :users, {:id => false} do |t|
       t.string :uuid, :primary => true
@@ -11,9 +14,6 @@ class DestroyModelUser < ActiveRecord::Migration
       t.integer :domain_id, :limit => 8
       t.timestamps
     end
-  end
-  def up
-    drop_table :users
   end
 
 end

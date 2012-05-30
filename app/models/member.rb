@@ -29,6 +29,12 @@ class Member < ActiveRecord::Base
   validates :terms_of_membership_id , :presence => true
   validates :zip, :presence => true, :format => /^[0-9]{5}(-?[0-9]{4})?$/
 
+  scope :synced, lambda { |bool=true|
+    bool ?
+      base.where('last_synced_at > updated_at') :
+      base.where('last_synced_at IS NULL OR last_synced_at < updated_at')
+  }
+
   state_machine :status, :initial => :none do
     after_transition [:none, :provisional, :lapsed] => :provisional, :do => :schedule_first_membership
     after_transition [:provisional, :active] => :lapsed, :do => :cancellation
@@ -316,6 +322,15 @@ class Member < ActiveRecord::Base
       end
     end
   end
+
+  def api_member
+    @api_member ||= Drupal::Member.new self
+  end
+
+  def synced?
+    self.last_synced_at && self.last_synced_at > self.updated_at
+  end
+
   
   private
     def set_status_on_enrollment!(agent, trans, amount)
