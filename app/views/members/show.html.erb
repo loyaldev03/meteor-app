@@ -144,6 +144,7 @@
   <li><a href="#credit_cards" data-toggle="tab">Credit Cards</a></li>
   <li><a href="#transactions" data-toggle="tab">Transactions</a></li>
   <li><a href="#fulfillments" data-toggle="tab">Fulfillments</a></li>
+  <li><a href="#communication" data-toggle="tab">Communications</a></li>
 </ul>
 
 <div class="tab-content">
@@ -151,7 +152,8 @@
   <div class="tab-pane" id="notes"><%= render :partial => 'notes', :locals => { :notes => @notes} %></div>
   <div class="tab-pane" id="credit_cards"><%= render :partial => 'credit_cards', :locals => { :credit_cards => @credit_cards} %></div>  
   <div class="tab-pane" id="transactions"><%= render :partial => 'transactions', :locals => { :transactions => @transactions} %></div>
-  <div class="tab-pane" id="fulfillments"><%= render :partial => 'fulfillments', :locals => { :transactions => @fulfillments} %></div>  
+  <div class="tab-pane" id="fulfillments"><%= render :partial => 'fulfillments', :locals => { :fulfillments => @fulfillments} %></div>  
+  <div class="tab-pane" id="communication"><%= render :partial => 'communications', :locals => { :fulfillments => @communications} %></div>
 </div>
 
 

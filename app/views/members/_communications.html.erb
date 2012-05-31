@@ -1,0 +1,22 @@
+<table class="table table-condensed table-bordered">
+  <thead>
+  	<th>template_name</th>
+  	<th>email</th>
+  	<th>scheduled_at</th>
+  	<th>processed_at</th>
+  	<th>template_type</th>
+  	<th>success</th>
+  </thead>
+  <tbody>
+  <% unless @fulfillments.nil? %>
+  	<% @communications.each do |communication| %>
+	  <td>communication.template_name</td>
+	  <td>communication.email</td>
+	  <td>communication.scheduled_at</td>
+	  <td>communication.processed_at</td>
+	  <td>communication.template_type</td>
+	  <td>coomunication.sent_success</td>
+	 <% end %>
+  <% end %>
+  </tbody>
+</table>
