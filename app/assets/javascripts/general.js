@@ -69,6 +69,10 @@ $(document).ready( function() {
     $('#'+filter).toggleClass("btn-info")
   }
 
+  function show_member_functions(){
+    $('.help').popover();
+  }
+
   function edit_member_functions(){
     $('form').submit( function(event) {
       event.preventDefault()

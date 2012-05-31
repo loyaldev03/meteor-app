@@ -105,12 +105,14 @@ en:
         name: 'Name'
         type: 'Type'
         client: 'Client'
-
       fulfillment:
         product: 'Product'
         asigned_at: 'Asigned at'
         delivered_at: 'Delivered at'
         renewable_at: 'Renewable at'
+      communication:
+        response: 'Response'
+
   date:
     formats:
       default: "%d/%m/%Y"
