@@ -93,7 +93,7 @@ $(document).ready( function() {
 
   function member_cancellation_functions(){
     $('#member_cancelation_form').validate();
-    $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+    $(".datepicker").datepicker({ constrainInpuapp/views/members/refund.html.erbt: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
   }
 
   function member_note_functions(){
