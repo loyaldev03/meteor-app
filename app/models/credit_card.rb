@@ -68,6 +68,7 @@ class CreditCard < ActiveRecord::Base
       end
       CreditCard.transaction do
         begin
+          # TODO: add operation! "Recycled Expired card"
           acc.update_attribute :active , false
           cc = CreditCard.new 
           cc.member = acc.member

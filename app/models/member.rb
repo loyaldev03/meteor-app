@@ -139,7 +139,7 @@ class Member < ActiveRecord::Base
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
         self.terms_of_membership_id = new_tom_id
-        res = enroll(self.active_credit_card, 0.0, agent)
+        res = enroll(self.active_credit_card, 0.0, agent, false)
         if res[:code] == Settings.error_codes.success
           message = "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}"
           Auditory.audit(agent, self, message, TermsOfMembership.find(new_tom_id), Settings.operation_types.save_the_sale)
@@ -194,7 +194,6 @@ class Member < ActiveRecord::Base
             { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
           else
             message = set_decline_strategy(trans)
-            Auditory.audit(nil, trans, answer[:message] + ' ' + message, self, Settings.operation_types.membership_billing)
             answer # TODO: should we answer set_decline_strategy message too?
           end
         end
@@ -244,8 +243,8 @@ class Member < ActiveRecord::Base
     member.enroll(credit_card, enrollment_amount, current_agent)
   end    
 
-  def enroll(credit_card, amount, agent = nil)
-    if not self.new_record? and not self.can_recover?
+  def enroll(credit_card, amount, agent = nil, recovery_check = true)
+    if not self.new_record? and recovery_check and not self.can_recover?
       return { :message => "Cant recover member. Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
       return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card }
@@ -398,6 +397,7 @@ class Member < ActiveRecord::Base
         message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
         self.next_retry_bill_date = Date.today + eval(Settings.next_retry_on_missing_decline)
         Notifier.decline_strategy_not_found(message, self).deliver!
+        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
       else
         trans.update_attribute :decline_strategy_id, decline.id
         if decline.hard_decline?
@@ -417,8 +417,10 @@ class Member < ActiveRecord::Base
         end
       end
       if set_as_canceled
+        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_hard_decline)
         set_as_canceled!
       else
+        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_soft_decline)
         increment(:recycled_times, 1)
       end
       message
