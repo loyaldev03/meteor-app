@@ -1,12 +1,11 @@
 <table class="table table-condensed table-bordered">
   <thead>
-    <th>success</th>
-  	<th>template_name</th>
-  	<th>email</th>
-  	<th>scheduled_at</th>
-  	<th>processed_at</th>
-  	<th>template_type</th>
-
+    <th> <%= t('success') %> </th>
+  	<th> <%= t('activerecord.attributes.communication.template_name') %> </th>
+  	<th> <%= t('activerecord.attributes.communication.email') %> </th>
+  	<th> <%= t('activerecord.attributes.communication.scheduled_at') %> </th>
+  	<th> <%= t('activerecord.attributes.communication.processed_at') %> </th>
+  	<th> <%= t('activerecord.attributes.communication.template_type') %> </th>
   </thead>
   <tbody>
   <% unless @fulfillments.nil? %>
@@ -23,7 +22,6 @@
 	  <td> <%= I18n.l communication.scheduled_at, :format => :long if communication.scheduled_at %> </td>
 	  <td> <%= I18n.l communication.processed_at, :format => :long if communication.processed_at %> </td>
 	  <td> <%= communication.template_type %> </td>
-
 	 <% end %>
   <% end %>
   </tbody>

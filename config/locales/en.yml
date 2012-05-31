@@ -112,7 +112,11 @@ en:
         renewable_at: 'Renewable at'
       communication:
         response: 'Response'
-
+        template_name: 'Template name'
+        email: 'Email'
+        scheduled_at: 'Scheduled at'
+        processed_at: 'Processed at'
+        template_type: 'Template at'
   date:
     formats:
       default: "%d/%m/%Y"
