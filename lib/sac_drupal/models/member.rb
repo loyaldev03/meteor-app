@@ -69,7 +69,7 @@ module Drupal
     def update_member(res)
       data = if res.status == 200
         { 
-          drupal_id: res.body['uid'],
+          api_id: res.body['uid'],
           last_synced_at: Time.now,
           last_sync_error: nil
         }

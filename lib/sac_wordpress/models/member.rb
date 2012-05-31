@@ -27,13 +27,22 @@ module Wordpress
     end
 
     def update!
-      res = conn.put('/api/user/%{wordpress_id}' % { wordpress_id: self.member.api_id }, fieldmap)
-      update_member(res)
+      # Do nothing. 
+      # query_string = { :sac_username => self.member.club.api_username, :sac_password => self.member.club.api_password, 
+      #   :email => self.member.email, :username => self.member.email, :firstname => self.member.first_name, 
+      #   :lastname => self.member.last_name, :action => 'update_user' }.collect {|key, value| "#{key}=#{value}"}.join('&')
+
+      # res = conn.get '/api/?'+query_string
+      # update_member(res)
     end
 
     def create!
-      res = conn.post '/api/user', fieldmap
-      update_member(res)
+      query_string = { :sac_username => self.member.club.api_username, :sac_password => self.member.club.api_password, 
+        :email => self.member.email, :username => self.member.email, :firstname => self.member.first_name, 
+        :lastname => self.member.last_name, :action => 'add_user' }.collect {|key, value| "#{key}=#{value}"}.join('&')
+
+      res = conn.get '/api/?'+query_string
+      update_member_api_id(res)
     end
 
     def save!
@@ -41,12 +50,11 @@ module Wordpress
     end
 
     def destroy!
-      res = conn.delete('/api/user/%{wordpress_id}' % { wordpress_id: self.member.api_id }, fieldmap)
-      update_member(res)
+      # res = conn.delete('/api/user/%{wordpress_id}' % { wordpress_id: self.member.api_id }, fieldmap)
     end
 
     def new_record?
-      self.member.wordpress_id.nil?
+      self.member.api_id.nil?
     end
 
     def generate_admin_token!
@@ -69,7 +77,16 @@ module Wordpress
     def update_member(res)
       data = if res.status == 200
         { 
-          wordpress_id: res.body['uid'],
+          name: res.body['name'],
+          email: res.body['email'],
+          address: res.body['address'],
+          first_name: res.body['firstname'],
+          last_name: res.body['lastname'],
+          city: res.body['city'],
+          state: res.body['state'],
+          zip: res.body['zip'],
+          country: res.body['country'],
+          phone_number: res.body['phone_number'],
           last_synced_at: Time.now,
           last_sync_error: nil
         }
@@ -81,95 +98,21 @@ module Wordpress
       ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
     end
 
-    def fieldmap
-      m = self.member
-      map = { 
-        name: m.full_name,
-        mail: m.email,
-        pass: SecureRandom.hex, 
-        field_profile_address: { 
-          und: [ 
-            { 
-              value: m.address
-            } 
-          ] 
-        }, 
-        field_profile_firstname: { 
-          und: [ 
-            { 
-              value: m.first_name
-            } 
-          ] 
-        }, 
-        field_profile_lastname: { 
-          und: [ 
-            { 
-              value: m.last_name
-            } 
-          ] 
-        }, 
-        field_profile_city: { 
-          und: [ 
-            { 
-              value: m.city
-            } 
-          ] 
-        }, 
-        field_profile_phone: { 
-          und: [ 
-            { 
-              value: m.phone_number
-            } 
-          ] 
-        }, 
-        field_profile_state_province: { 
-          und: { 
-            value: m.state
-          } 
-        }, 
-        field_profile_zip: { 
-          und: [ 
-            {
-              value: m.zip
-            } 
-          ] 
-        } 
-      }
 
-      unless m.new_record?
-        map.merge!({
-          field_profile_member_id: { 
-            und: [ 
-              {
-                value: m.reload.visible_id
-              } 
-            ] 
-          }
-        })
+    def update_member_api_id(res)
+      data = if res.status == 200
+        { 
+          api_id: res.body['user_id'],
+          last_synced_at: Time.now,
+          last_sync_error: nil
+        }
+      else
+        {
+          last_sync_error: res.body
+        }
       end
-
-      cc = m.active_credit_card
-      if false && cc
-        map.merge!({
-          field_profile_cc_month: {
-            und: {
-              value: cc.expire_month.to_s
-            }
-          },
-          field_profile_cc_year: {
-            und: {
-              value: cc.expire_year.to_s
-            }
-          },
-          field_profile_cc_number: {
-            und: {
-              value: cc.number.to_s
-            }
-          }
-        })
-      end
-
-      map
+      ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
     end
+
   end
 end
