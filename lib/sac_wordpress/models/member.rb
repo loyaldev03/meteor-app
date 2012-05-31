@@ -23,7 +23,7 @@ module Wordpress
     # ] 
 
     def get
-      conn.get('/api/user/%{wordpress_id}' % { wordpress_id: self.member.api_id }).body unless self.new_record?
+      # conn.get('/api/user/%{wordpress_id}' % { wordpress_id: self.member.api_id }).body unless self.new_record?
     end
 
     def update!
@@ -37,11 +37,8 @@ module Wordpress
     end
 
     def create!
-      query_string = { :sac_username => self.member.club.api_username, :sac_password => self.member.club.api_password, 
-        :email => self.member.email, :username => self.member.email, :firstname => self.member.first_name, 
-        :lastname => self.member.last_name, :action => 'add_user' }.collect {|key, value| "#{key}=#{value}"}.join('&')
-
-      res = conn.get '/api/?'+query_string
+      res = conn.get '/api/?' + query_string( { :email => self.member.email, :username => self.member.email, 
+        :firstname => self.member.first_name, :lastname => self.member.last_name, :action => 'add_user' })
       update_member_api_id(res)
     end
 
@@ -57,19 +54,19 @@ module Wordpress
       self.member.api_id.nil?
     end
 
-    def generate_admin_token!
-      raise 'tbd'
-    end
-
     def reset_password!
-      raise 'tbd'
+      conn.get '/api/?' + query_string({ :user_id => self.member.api_id, :email => self.member.email, :action => 'reset_password' })
     end
 
     def resend_welcome_email!
-      raise 'tbd'
+      conn.get '/api/?' + query_string({ :user_id => self.member.api_id, :email => self.member.email, :action => 'resend_welcome_email' })
     end
 
   private
+    def query_string(hash)
+      { :sac_username => self.member.club.api_username, :sac_password => self.member.club.api_password }.merge!(hash).collect {|key, value| "#{key}=#{value}"}.join('&')
+    end
+
     def conn
       self.member.club.wordpress
     end
