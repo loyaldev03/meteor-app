@@ -117,6 +117,8 @@ en:
         scheduled_at: 'Scheduled at'
         processed_at: 'Processed at'
         template_type: 'Template at'
+      transaction:
+        refund_amount_help: 'Amount to refund (e.g.: $45.34)  '
   date:
     formats:
       default: "%d/%m/%Y"

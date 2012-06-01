@@ -4,8 +4,8 @@
   <table class="table table-bordered">
     <tr>
       <td> <div class="input-prepend input-append"> 
-             Amount to refund (e.g.: $45.34) 
-             <span class="add-on">$</span><%= text_field_tag :refund_amount, nil ,:id => "refunded_amount", :class=>"icon-eye-open" %> </td>
+            <%= t('activerecord.attributes.transaction.refund_amount_help') %>
+            <span class="add-on">$</span><%= text_field_tag :refund_amount, nil ,:id => "refunded_amount", :class=>"icon-eye-open" %> </td>
            </div>
     </tr>
     <tr>
