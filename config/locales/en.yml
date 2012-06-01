@@ -121,6 +121,9 @@ en:
         template_type: 'Template at'
       transaction:
         refund_amount_help: 'Amount to refund (e.g.: $45.34)  '
+      club_cash_transaction: 
+        amount: 'Amount'
+        description: 'Description'
   date:
     formats:
       default: "%d/%m/%Y"
