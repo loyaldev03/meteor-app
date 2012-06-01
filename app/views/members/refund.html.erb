@@ -3,10 +3,12 @@
 <%= form_tag(member_refund_path(:transaction_id => @transaction)) do %>
   <table class="table table-bordered">
     <tr>
-      <td> <div class="input-prepend input-append"> 
+      <td> 
+        <div class="input-prepend input-append"> 
             <%= t('activerecord.attributes.transaction.refund_amount_help') %>
-            <span class="add-on">$</span><%= text_field_tag :refund_amount, nil ,:id => "refunded_amount", :class=>"icon-eye-open" %> </td>
-           </div>
+            <span class="add-on">$</span><%= text_field_tag :refund_amount, nil ,:id => "refunded_amount" %> 
+        </div>
+      </td>
     </tr>
     <tr>
       <td>  <%= submit_tag t(:save), :class => 'btn btn-primary' %>
