@@ -27,7 +27,6 @@ en:
   resend: 'Resend'
   search: 'Search'
   search_results: 'Search results'
-
   are_you_sure: 'Are you sure?'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
@@ -84,6 +83,8 @@ en:
         undeliverable: 'This address is undeliverable.'
         unreachable: 'This phone number is unreachable.'
         search_member_not_found: 'No records were found.'
+        club_cash_amount: 'Club cash amount'
+        add_club_cash_transaction: 'Add club cash'
       credit_card:
         number: 'Credit card number'
         expire_date: 'Expire date'
@@ -105,12 +106,23 @@ en:
         name: 'Name'
         type: 'Type'
         client: 'Client'
-
       fulfillment:
         product: 'Product'
         asigned_at: 'Asigned at'
         delivered_at: 'Delivered at'
         renewable_at: 'Renewable at'
+      communication:
+        response: 'Response'
+        template_name: 'Template name'
+        email: 'Email'
+        scheduled_at: 'Scheduled at'
+        processed_at: 'Processed at'
+        template_type: 'Template at'
+      transaction:
+        refund_amount_help: 'Amount to refund (e.g.: $45.34)  '
+      club_cash_transaction: 
+        amount: 'Amount'
+        description: 'Description'
   date:
     formats:
       default: "%d/%m/%Y"

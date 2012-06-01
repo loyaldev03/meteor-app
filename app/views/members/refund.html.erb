@@ -3,12 +3,21 @@
 <%= form_tag(member_refund_path(:transaction_id => @transaction)) do %>
   <table class="table table-bordered">
     <tr>
-      <td>Amount to refund (e.g.: $45.34)<%= text_field_tag :refund_amount %> </td>
+      <td> 
+        <div class="input-prepend input-append"> 
+            <%= t('activerecord.attributes.transaction.refund_amount_help') %>
+            <span class="add-on">$</span><%= text_field_tag :refund_amount, nil ,:id => "refunded_amount" %> 
+        </div>
+      </td>
     </tr>
     <tr>
       <td>  <%= submit_tag t(:save), :class => 'btn btn-primary' %>
-      		<%= link_to t(:full_save), member_full_save_path , :class=> 'btn btn-success' %>
+      		  <%= link_to t(:full_save), member_full_save_path , :class=> 'btn btn-success' %>
             <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
     </tr>
   </table>
 <% end%>
+
+<script>
+  $(document).ready(refound_member_functions());
+</script>

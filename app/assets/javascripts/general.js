@@ -27,21 +27,21 @@ $(document).ready( function() {
 
   function member_index_functions(){
     $('#at_least_one_required').submit(function (){
-      result = false
+      result = false;
       $('#at_least_one_required').find(':text').each(function (){
         if ($(this).val() != '')
           result = true;
       });
       if (!result){ 
-        alert ('Compleate at least one field')
-        return result
-      }
+        alert ('Compleate at least one field');
+        return result;
+      };
     });
     $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
                                              showOn: "both", buttonImage: "/icon-calendar.png", 
                                              buttonImageOnly: true});
     $("#clear_form").click( function() {
-      $("#at_least_one_required input[type=text] ").each(function() { $(this).val(''); }); 
+      $("#at_least_one_required input[type=text]").each(function() { $(this).val(''); }); 
     });
   };
 
@@ -63,15 +63,19 @@ $(document).ready( function() {
     $('#zip_help').popover({offset: 10});
     $('#phone_number_help').popover({offset: 10});   
     $('.help').popover({offset: 10});
-  }
+  };
 
   function operation_member_functions(){
-    $('#'+filter).toggleClass("btn-info")
-  }
+    $('#'+filter).toggleClass("btn-info");
+  };
+
+  function show_member_functions(){
+    $('.help').popover();
+  };
 
   function edit_member_functions(){
     $('form').submit( function(event) {
-      event.preventDefault()
+      event.preventDefault();
       $.ajax({
         type: 'PUT',
         url: "/api/v1/update_profile/"+visible_id+"/"+club_id,
@@ -84,19 +88,30 @@ $(document).ready( function() {
       });
     });
     $('.help').popover({offset: 10});
-  }
+  };
 
 
   function member_cancellation_functions(){
     $('#member_cancelation_form').validate();
     $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
-  }
+  };
 
   function member_note_functions(){
     $('#new_member_note').validate();
-  }
+  };
 
   function member_change_next_bill_date(){
     $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+  };
 
-  }
+  function refound_member_functions(){
+    $('form').submit( function(event) {
+      if ($("#refunded_amount").val().match(/^[0-9 .]+$/)){
+
+      }else{
+      alert("Incorrect refound value.")
+      event.preventDefault(); 
+      };
+    })
+  };
+

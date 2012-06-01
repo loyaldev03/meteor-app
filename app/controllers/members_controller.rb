@@ -217,4 +217,10 @@ class MembersController < ApplicationController
       redirect_to show_member_path
     end
   end
+
+  def addClubCash
+    
+
+  end
+
 end
