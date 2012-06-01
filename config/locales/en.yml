@@ -84,6 +84,8 @@ en:
         undeliverable: 'This address is undeliverable.'
         unreachable: 'This phone number is unreachable.'
         search_member_not_found: 'No records were found.'
+        club_cash_amount: 'Club cash amount'
+        add_club_cash_transaction: 'Add club cash'
       credit_card:
         number: 'Credit card number'
         expire_date: 'Expire date'

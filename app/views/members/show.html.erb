@@ -112,8 +112,13 @@
     <td> <%= t('activerecord.attributes.member.reactivation_times') %> 
          <%= @current_member.reactivation_times %> 
     </td>
-    <td colspan="2"> <%= t('activerecord.attributes.member.member_group_type') %>:
+    <td> <%= t('activerecord.attributes.member.member_group_type') %>:
          <%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %> 
+    </td>
+    <td> <%= t('activerecord.attributes.member.club_cash_amount') %>:
+         <%= @current_member.club_cash_amount %>
+         <%= link_to t('activerecord.attributes.member.add_club_cash_transaction'),
+             member_add_club_cash_transaction_path, :class => 'btn btn-warning' %> 
     </td>
   </tr>
 </table>
