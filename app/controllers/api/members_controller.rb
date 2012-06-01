@@ -1,4 +1,7 @@
 class Api::MembersController < ApplicationController
+  skip_before_filter :verify_authenticity_token
+
+  respond_to :json
 
   # Method : POST
   #
@@ -16,10 +19,7 @@ class Api::MembersController < ApplicationController
     else
       response = Member.enroll(tom, current_agent, params[:enrollment_amount], params[:member], params[:credit_card])
     end
-
-    respond_to do |format|
-      format.json { render json: response }
-    end    
+    render json: response
   end
 
 
@@ -30,7 +30,6 @@ class Api::MembersController < ApplicationController
   #  * club_id
   #  * member { :first_name, :last_name, :email, :address, :city, :state, :zip, :phone_number }
   # 
-
   def update_profile
     response = {}
     member = Member.find_by_visible_id_and_club_id(params[:id],params[:club_id]) 
@@ -42,9 +41,6 @@ class Api::MembersController < ApplicationController
       errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n")
       response = { :message => "Member data is invalid: #{errors}", :code => Settings.error_codes.member_data_invalid }
     end
-
-    respond_to do |format|
-      format.json { render json: response }
-    end
+    render json: response
   end
 end

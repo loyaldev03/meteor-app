@@ -1,5 +1,6 @@
 class Api::TokensController < ApplicationController
   skip_before_filter :verify_authenticity_token
+  skip_before_filter :authenticate_agent!
 
   respond_to :json
   def create
@@ -16,7 +17,7 @@ class Api::TokensController < ApplicationController
      return
     end
 
-    @user=User.find_by_email(email.downcase)
+    @user=Agent.find_by_email(email.downcase)
 
     if @user.nil?
       logger.info("User #{email} failed signin, user cannot be found.")
@@ -36,7 +37,7 @@ class Api::TokensController < ApplicationController
   end
 
   def destroy
-    @user=User.find_by_authentication_token(params[:id])
+    @user=Agent.find_by_authentication_token(params[:id])
     if @user.nil?
       logger.info(“Token not found.”)
       render :status=>404, :json=>{:message=>”Invalid token.”}

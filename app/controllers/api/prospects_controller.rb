@@ -1,21 +1,15 @@
 class Api::ProspectsController < ApplicationController
+  skip_before_filter :verify_authenticity_token
 
+  respond_to :json
 
   def enroll
-  	response = {}
+  	response = { :message => "Error" }
   	prospect = Prospect.new(params[:prospect])
-
-  	respond_to do |format|
-      if prospect.save!
-  	  response = "Prospect was successfuly saved."
-  	    format.html { redirect_to members_path, notice: response}	
-        format.json { render json: response }
-  	  else
-	  	format.html { redirect_to members_path, notice: response}	
-	    format.json { render json: response }
- 	  end
+  	if prospect.save!
+  	  response[:message] = "Prospect was successfuly saved."
     end   
-
+    render json: response
   end
 
 
