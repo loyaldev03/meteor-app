@@ -5,7 +5,7 @@ class ClubCashTransaction < ActiveRecord::Base
 
   attr_accessible :amount, :description
 
-  validates :amount, :presence => true , :format => { :with => /^\d+??(?:\.\d{0,2})?$/ }
+  validates :amount, :presence => true , :format => /^\d+??(?:\.\d{0,2})?$/ 
 
 
   def update_member_amount

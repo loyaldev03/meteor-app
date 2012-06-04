@@ -6,7 +6,8 @@
       <td >
         <div class="input-prepend input-append">  
 	      <%= t('activerecord.attributes.club_cash_transaction.amount') %>
-	      <%= text_field :club_cash_transaction, :amount %>
+	      <%= text_field :club_cash_transaction, :amount, 
+            :value => (params[:club_cash_transaction][:amount] if params[:club_cash_transaction]) %>
       	</div>
       </td>
     </tr>
@@ -22,3 +23,8 @@
     </tr>
   </table>
 <% end %>
+
+
+<script>
+  $(document).ready(club_cash_transaction_functions());
+</script>
