@@ -6,6 +6,8 @@ class CreditCard < ActiveRecord::Base
 
   attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
 
+  after_save :update_last_digits
+
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 } 
   validates :number, :numericality => true
@@ -45,6 +47,10 @@ class CreditCard < ActiveRecord::Base
 
   def am_card
     CreditCard.am_card(number, expire_month, expire_year, member.first_name, member.last_name)
+  end
+
+  def update_last_digits
+    last_digits = number.last(4)
   end
 
   # refs #17832

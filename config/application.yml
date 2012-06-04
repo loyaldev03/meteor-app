@@ -44,6 +44,7 @@ defaults: &defaults
     no_amount: '9887'    
     credit_card_blank_with_grace: '9999'
     credit_card_blank_without_grace: '9997'
+    member_email_blacklisted: '9996'
   fulfillment_products:
     all: All
     kit_card: Kit - Card

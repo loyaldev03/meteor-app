@@ -224,7 +224,7 @@ class Member < ActiveRecord::Base
           errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n") + 
                     credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n")
           return { :message => "Member data is invalid: #{errors}", 
-                   :code => Settings.error_codes.member_data_invalid }
+                   :code => "2222" }
         end
         # enroll allowed
       elsif not credit_card.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
@@ -240,6 +240,10 @@ class Member < ActiveRecord::Base
       end
     else
       # TODO: should we update member profile? and Credit card information?
+      if member.blacklisted
+        return { :message => "Member email is blacklisted", 
+                     :code => Settings.error_codes.member_email_blacklisted }
+      end
     end
     
     credit_card = CreditCard.new credit_card_params    
