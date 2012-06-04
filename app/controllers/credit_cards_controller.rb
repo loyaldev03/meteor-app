@@ -15,7 +15,7 @@ class CreditCardsController < ApplicationController
     credit_card.last_digits = credit_card.number.last(4)
 
     respond_to do |format|
-      #if credit_card.am_card.valid?
+      if credit_card.am_card.valid?
         if credit_card.save && actual_credit_card.deactivate
           message = "Credit card #{credit_card.number} added and set active."
           Auditory.audit(@current_agent, credit_card, message, @current_member)
@@ -24,10 +24,10 @@ class CreditCardsController < ApplicationController
           flash[:error] = "Credit card is invalid or is expired!"
           format.html { render "new" } 
         end
-     # else
-     #   flash[:error] = "Credit card is invalid or is expired!"
-      #  format.html { render "new" } 
-      #end
+      else
+        flash[:error] = "Credit card is invalid or is expired!"
+        format.html { render "new" } 
+      end
     end
   end
 
