@@ -242,6 +242,7 @@ class Member < ActiveRecord::Base
       # TODO: should we update member profile? and Credit card information?
     end
     
+    credit_card = CreditCard.new credit_card_params    
     member.terms_of_membership = tom
     member.enroll(credit_card, enrollment_amount, current_agent)
   end    
