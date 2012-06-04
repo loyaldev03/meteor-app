@@ -8,7 +8,7 @@ class Api::MembersController < ApplicationController
   # Params:
   #  * terms_of_membership_id
   #  * member { :first_name, :last_name, :email, :address, :city, :state, :zip, :country, :phone_number }
-  #  * credit_card { :expiration_month, :expiration_year, :number }
+  #  * credit_card { :expire_month, :expire_year, :number }
   #  * enrollment_amount
   # 
   def enroll
@@ -43,4 +43,31 @@ class Api::MembersController < ApplicationController
     end
     render json: response
   end
+
+
+  # Method : GET
+  #
+  # Params:
+  #  * api_id
+  # 
+  def profile
+    # TODO: improve this Member find method
+    member = Member.find_by_api_id(params[:api_id]) 
+    if member.nil?
+      render json: { code: '9345', message: 'member not found' }
+    else
+      render json: { 
+        code: '000', 
+        member: {
+          first_name: member.first_name, last_name: member.last_name, email: member.email,
+          address: member.address, city: member.city, state: member.state, zip: member.zip,
+          phone_number: member.phone_number
+        }, 
+        credit_card: {
+          expire_month: member.active_credit_card.expire_month
+          expire_year: member.active_credit_card.expire_year
+        } 
+      }
+    end
+  end    
 end
