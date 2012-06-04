@@ -117,7 +117,7 @@ $(document).ready( function() {
 
   function club_cash_transaction_functions(){
     $('form').submit( function(event) {
-      if ($("#club_cash_transaction_amount").val().match(/^[0-9 .]+[0-9]{0,2}$/)){
+      if ($("#club_cash_transaction_amount").val().match(/^\d+??(?:\.\d{0,2})?$/)){
 
       }else{
       alert("Incorrect club cash value.")
