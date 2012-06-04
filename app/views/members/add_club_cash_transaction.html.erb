@@ -6,14 +6,14 @@
       <td >
         <div class="input-prepend input-append">  
 	      <%= t('activerecord.attributes.club_cash_transaction.amount') %>
-	      <%= text_field_tag :amount %>
+	      <%= text_field :club_cash_transaction, :amount %>
       	</div>
       </td>
     </tr>
     <tr> 
       <td> 
 	    <%= label :description, t('activerecord.attributes.club_cash_transaction.description') %>
-	    <%= text_area_tag :description, nil ,:style => 'width: 99%; height: 200px' %>
+	    <%= text_area :club_cash_transaction, :description,:style => 'width: 99%; height: 200px' %>
       </td>
     </tr>
     <tr>

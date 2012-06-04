@@ -218,9 +218,21 @@ class MembersController < ApplicationController
     end
   end
 
-  def addClubCash
-    
-
+  def add_club_cash_transaction
+    if request.post?
+      cct = ClubCashTransaction.new(params[:club_cash_transaction])
+      cct.member_id = @current_member
+      
+      if cct.save
+        message = "The club cash transaction was saved successfully. Amount: $#{cct.amount}"
+        Auditory.audit(@current_agent, cct, message, @current_member)
+        flash[:notice] = message
+        redirect_to show_member_path
+      else
+        errors = cct.errors.collect {|attr, message| "#{attr}: #{message}" }.join(". ")
+        flash[:error] = "Could not saved club cash transactions: #{errors}"
+      end
+    end
   end
-
 end
+
