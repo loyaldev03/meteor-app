@@ -65,14 +65,6 @@ $(document).ready( function() {
     $('.help').popover({offset: 10});
   };
 
-  function operation_member_functions(){
-    $('#'+filter).toggleClass("btn-info");
-  };
-
-  function show_member_functions(){
-    $('.help').popover();
-  };
-
   function edit_member_functions(){
     $('form').submit( function(event) {
       event.preventDefault();
@@ -90,6 +82,14 @@ $(document).ready( function() {
     $('.help').popover({offset: 10});
   };
 
+
+  function operation_member_functions(){
+    $('#'+filter).toggleClass("btn-info");
+  };
+
+  function show_member_functions(){
+    $('.help').popover();
+  };
 
   function member_cancellation_functions(){
     $('#member_cancelation_form').validate();
@@ -117,7 +117,7 @@ $(document).ready( function() {
 
   function club_cash_transaction_functions(){
     $('form').submit( function(event) {
-      if ($("#club_cash_transaction_amount").val().match(/^\d+??(?:\.\d{0,2})?$/)){
+      if ($("#club_cash_transaction_amount").val().match(/^[0-9]+?([?:\.][0-9]{0,2})?$/)){
 
       }else{
       alert("Incorrect club cash value.")
