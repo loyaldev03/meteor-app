@@ -58,3 +58,11 @@ en:
         subject: 'Unlock Instructions'
   button:
     dashboard: 'Dashboard'
+  activerecord: 
+    attributes:
+      transaction:
+        transaction_types: 
+          sale: Sale
+          refund: Credit
+          credit: Credit
+          void: Credit
