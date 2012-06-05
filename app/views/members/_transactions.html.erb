@@ -12,7 +12,7 @@
   <% transactions.each do |transaction| %>
   <tr>
     <td>
-      <%= I18n.l transaction.created_at %>
+      <%= I18n.l transaction.created_at, :format => :long %>
     </td>
     <td>
       <%= transaction.to_label %>
