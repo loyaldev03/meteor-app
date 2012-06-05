@@ -39,6 +39,6 @@
 </table>
 
 <script>
-  var filter = "<%= @operation_filter %>";
+  var filter = "<%= @operation_filter.nil? ? 'all' : @operation_filter %>";
   $(document).ready(operation_member_functions());
 </script>
