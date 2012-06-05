@@ -10,6 +10,7 @@
   <tbody>
   <% unless @fulfillments.nil? %>
   	<% @communications.each do |communication| %>
+  	<tr>
 	  <td> 
 	  	<% if communication.sent_success %> 
 	  	<i class ="icon-ok help" rel= "popover" 
@@ -23,6 +24,7 @@
 	  <td> <%= I18n.l communication.processed_at, :format => :long if communication.processed_at %> </td>
 	  <td> <%= communication.template_type %> </td>
 	 <% end %>
+  	<tr>
   <% end %>
   </tbody>
 </table>
