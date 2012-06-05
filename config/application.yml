@@ -38,6 +38,8 @@ defaults: &defaults
     blacklisted: '406'
     cant_recover_member: '407'
     invalid_credit_card: '9506'
+    credit_card_in_use: '9507'
+    credit_card_blacklisted: '9508'
     credit_card_amount_invalid: '9787'
     refund_invalid: '9788'
     nothing_to_change_tom: '9885'
@@ -46,6 +48,7 @@ defaults: &defaults
     credit_card_blank_with_grace: '9999'
     credit_card_blank_without_grace: '9997'
     member_email_blacklisted: '9996'
+    tom_wihtout_gateway_configured: '9789'
   fulfillment_products:
     all: All
     kit_card: Kit - Card

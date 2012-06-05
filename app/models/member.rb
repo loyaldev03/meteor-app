@@ -180,7 +180,7 @@ class Member < ActiveRecord::Base
             message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
             # TODO: do we have to add an operation?????
             Auditory.add_redmine_ticket("Billing", message)
-            return { :code => "9789", :message => message }
+            return { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
           end
           acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
           trans = Transaction.new
@@ -223,17 +223,17 @@ class Member < ActiveRecord::Base
         unless member.valid? and credit_card.valid?
           errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n") + 
                     credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n")
-          return { :message => "Member data is invalid: #{errors}", :code => "2222" }
+          return { :message => "Member data is invalid: #{errors}", :code => Settings.error_codes.member_data_invalid }
         end
         # enroll allowed
       elsif not credit_card.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
         message = "Credit card blacklisted. call support."
         Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_blacklisted)
-        return { :message => message, :code => "9508" }
+        return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
       else        
         message = "Credit card is already in use. call support."
         Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_already_in_use)
-        return { :message => message, :code => "9507" }
+        return { :message => message, :code => Settings.error_codes.credit_card_in_use }
       end
     else
       # TODO: should we update member profile? and Credit card information?
@@ -287,7 +287,7 @@ class Member < ActiveRecord::Base
       message = set_status_on_enrollment!(agent, trans, amount)
 
       self.reload
-      { :message => message, :code => "000", :member_id => self.id, :v_id => self.visible_id }
+      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
       Auditory.add_redmine_ticket("Member:enroll", e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this
