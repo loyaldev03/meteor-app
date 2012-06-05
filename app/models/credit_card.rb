@@ -50,9 +50,9 @@ class CreditCard < ActiveRecord::Base
   end
 
   def update_last_digits
-    last_digits = number.last(4)
+    self.last_digits = self.number.last(4)
   end
-
+  
   # refs #17832
   # 6 Days Later if not successful = (+3), 3/2014
   # 6 Days Later if not successful = (+2), 3/2013
