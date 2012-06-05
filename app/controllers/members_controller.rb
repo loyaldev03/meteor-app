@@ -224,7 +224,7 @@ class MembersController < ApplicationController
       cct.member_id = @current_member
       
       if cct.save
-        message = "The club cash transaction was saved successfully. Amount: $#{cct.amount}"
+        message = "Club cash transaction done!. Amount: $#{cct.amount}"
         Auditory.audit(@current_agent, cct, message, @current_member)
         flash[:notice] = message
         redirect_to show_member_path

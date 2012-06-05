@@ -6,7 +6,7 @@ class CreditCard < ActiveRecord::Base
 
   attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
 
-  after_save :update_last_digits
+  before_create :update_last_digits
 
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 } 
@@ -30,7 +30,7 @@ class CreditCard < ActiveRecord::Base
     update_attribute :active, false
   end
 
-    def blacklist_active_credit_card
+  def blacklist_active_credit_card
     update_attribute :blacklisted, true
   end
 
