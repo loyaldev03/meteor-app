@@ -223,30 +223,28 @@ class Member < ActiveRecord::Base
         unless member.valid? and credit_card.valid?
           errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n") + 
                     credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n")
-          return { :message => "Member data is invalid: #{errors}", 
-                   :code => "2222" }
+          return { :message => "Member data is invalid: #{errors}", :code => "2222" }
         end
         # enroll allowed
       elsif not credit_card.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-        credit_card = CreditCard.new credit_card_params
         message = "Credit card blacklisted. call support."
         Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => "9508" }
       else        
         message = "Credit card is already in use. call support."
-        credit_card = CreditCard.new credit_card_params
         Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_already_in_use)
         return { :message => message, :code => "9507" }
       end
     else
       # TODO: should we update member profile? and Credit card information?
       if member.blacklisted
-        return { :message => "Member email is blacklisted", 
-                     :code => Settings.error_codes.member_email_blacklisted }
+        message = "Member email is blacklisted"
+        Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
+        return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
       end
+      credit_card = CreditCard.new credit_card_params
     end
     
-    credit_card = CreditCard.new credit_card_params    
     member.terms_of_membership = tom
     member.enroll(credit_card, enrollment_amount, current_agent)
   end    
