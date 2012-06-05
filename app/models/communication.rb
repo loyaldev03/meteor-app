@@ -6,7 +6,7 @@ class Communication < ActiveRecord::Base
   def self.deliver!(template_type, member)
     template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
     if template.nil?
-      Audit.add_redmine_ticket
+      Auditory.add_redmine_ticket
       logger.error "* * * * * Template does not exist"
     else
       c = Communication.new :email => member.email
@@ -23,7 +23,7 @@ class Communication < ActiveRecord::Base
       elsif template.action_mailer?
         c.deliver_action_mailer
       else
-        Audit.add_redmine_ticket
+        Auditory.add_redmine_ticket
         logger.error "* * * * * Client not supported"
       end
     end
