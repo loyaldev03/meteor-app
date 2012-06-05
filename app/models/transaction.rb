@@ -12,6 +12,7 @@ class Transaction < ActiveRecord::Base
   serialize :response
 
   attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
+  attr_accessor :refund_response_transaction_id
 
   def to_label
     I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + ': ' + response_result[0..50]
@@ -114,6 +115,7 @@ class Transaction < ActiveRecord::Base
       return { :message => "Credit amount must be a positive number.", :code => Settings.error_codes.credit_amount_invalid }
     elsif old_transaction.amount == amount
       trans.transaction_type = "refund"
+      trans.refund_response_transaction_id = old_transaction.response_transaction_id
     elsif old_transaction.amount > amount
       trans.transaction_type = "credit"
     end
@@ -162,7 +164,7 @@ class Transaction < ActiveRecord::Base
         if @cc.valid?
           load_gateway
           a = (amount.to_f * 100)
-          refund_response=@gateway.refund(a, self.response_transaction_id, @options)
+          refund_response=@gateway.refund(a, refund_response_transaction_id, @options)
           save_response(refund_response)
         else
           credit_card_invalid
