@@ -102,8 +102,8 @@ class MemberTest < ActiveSupport::TestCase
       member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
       answer = member.recover(@terms_of_membership_with_gateway)
       assert answer[:code] == Settings.error_codes.success, answer[:message]
-      assert_equal 'provisional', member.status
-      assert_equal 1, member.reactivation_times
+      assert_equal 'provisional', member.status, "Status was not updated."
+      assert_equal 1, member.reactivation_times, "Reactivation_times was not updated."
     end
   end
 
@@ -164,7 +164,5 @@ class MemberTest < ActiveSupport::TestCase
       member = FactoryGirl.build(:member, zip: zip, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
       assert !member.save, "Member cant be save #{member.errors.inspect}"
     }        
-
   end
-
 end

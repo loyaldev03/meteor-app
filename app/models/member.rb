@@ -268,10 +268,6 @@ class Member < ActiveRecord::Base
       return answer unless trans.success?
     end
 
-    if not self.new_record? and recovery_check
-      self.reactivation_times = self.reactivation_times + 1
-    end 
-
     begin
       self.save!
       if credit_card.member.nil?
