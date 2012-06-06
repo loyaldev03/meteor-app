@@ -13,7 +13,7 @@ class MembersController < ApplicationController
       @members = Member.joins(:credit_cards).where(["visible_id like ? AND first_name like ? AND last_name like ? 
                  AND address like ? AND phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
                  AND (bill_date like ? OR bill_date is null) AND club_id like ? AND (credit_cards.active = 1 
-                 AND credit_cards.last_digits like ?)", 
+                 AND credit_cards.last_digits like ?) AND status != 'lapsed'", 
                  member_id,'%'+params[:member][:first_name]+'%',
                  '%'+params[:member][:last_name]+'%','%'+params[:member][:address]+'%',
                  '%'+params[:member][:phone_number]+'%','%'+params[:member][:city]+'%',
