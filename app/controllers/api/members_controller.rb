@@ -64,7 +64,7 @@ class Api::MembersController < ApplicationController
           phone_number: member.phone_number
         }, 
         credit_card: {
-          expire_month: member.active_credit_card.expire_month
+          expire_month: member.active_credit_card.expire_month,
           expire_year: member.active_credit_card.expire_year
         } 
       }

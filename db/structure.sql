@@ -34,6 +34,14 @@ CREATE TABLE `agents` (
   UNIQUE KEY `index_agents_on_authentication_token` (`authentication_token`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE `club_cash_transactions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `member_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `amount` float DEFAULT '0',
+  `description` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE `clubs` (
   `description` text COLLATE utf8_unicode_ci,
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -131,7 +139,7 @@ CREATE TABLE `domains` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `club_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `email_templates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -220,6 +228,7 @@ CREATE TABLE `members` (
   `api_id` int(11) DEFAULT NULL,
   `last_synced_at` datetime DEFAULT NULL,
   `last_sync_error` text COLLATE utf8_unicode_ci,
+  `club_cash_amount` float DEFAULT '0',
   PRIMARY KEY (`club_id`,`visible_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -236,7 +245,7 @@ CREATE TABLE `operations` (
   `notes` text COLLATE utf8_unicode_ci,
   `operation_type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `partners` (
   `prefix` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -291,6 +300,7 @@ CREATE TABLE `prospects` (
   `referral_host` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `referral_parameters` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `cookie_value` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `joint` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -354,7 +364,7 @@ CREATE TABLE `transactions` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   `credit_card_id` bigint(20) DEFAULT NULL,
-  `refunded_amount` decimal(10,0) DEFAULT '0'
+  `refunded_amount` float DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO schema_migrations (version) VALUES ('20120406144426');
@@ -434,3 +444,11 @@ INSERT INTO schema_migrations (version) VALUES ('20120524154213');
 INSERT INTO schema_migrations (version) VALUES ('20120528174051');
 
 INSERT INTO schema_migrations (version) VALUES ('20120530221538');
+
+INSERT INTO schema_migrations (version) VALUES ('20120601165634');
+
+INSERT INTO schema_migrations (version) VALUES ('20120601175952');
+
+INSERT INTO schema_migrations (version) VALUES ('20120604151244');
+
+INSERT INTO schema_migrations (version) VALUES ('20120606141629');
