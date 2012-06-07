@@ -43,9 +43,10 @@ class Member < ActiveRecord::Base
     after_transition [:provisional, :active] => :lapsed, :do => :cancellation
     after_transition [:provisional] => :active, :do => :send_active_email
     after_transition :lapsed => :any, :do => :increment_reactivations
-
+    after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
+    
     event :set_as_provisional do
-      transition [:none, :provisional] => :provisional
+      transition [:none, :provisional,:applied] => :provisional
     end
     event :set_as_active do
       transition [:provisional, :active] => :active
@@ -96,6 +97,17 @@ class Member < ActiveRecord::Base
       self.quota = (terms_of_membership.monthly? ? 1 :  0)
     end
     self.join_date = DateTime.now 
+    self.cancel_date = nil
+    self.save
+  end
+
+  def schedule_first_membership_for_approved_member
+    send_fulfillment
+    self.bill_date = Date.today + terms_of_membership.trial_days
+    self.next_retry_bill_date = bill_date
+    if reactivation_times == 0
+      self.quota = (terms_of_membership.monthly? ? 1 :  0)
+    end
     self.cancel_date = nil
     self.save
   end
