@@ -31,7 +31,7 @@
         <%= link_to "Blacklist", member_blacklist_path, :class => "btn btn-warning" unless @current_member.blacklisted? %>
         <%= link_to "Approve", member_approve_path, :class => "btn btn-primary", 
                                :confirm => t('are_you_sure'), :method => :post %>
-        <% if @current_member.provisional? %>
+        <% if @current_member.applied? %>
           <%= link_to "Reject", member_reject_path, :class => "btn btn-warning", 
                                 :confirm => t('are_you_sure'), :method => :post %> 
         <%end%>

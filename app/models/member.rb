@@ -135,6 +135,14 @@ class Member < ActiveRecord::Base
     !self.lapsed?
   end
 
+  def can_be_approved?
+    self.applied?
+  end
+
+  def can_be_rejected?
+    self.applied?
+  end
+
   def can_save_the_sale?
     self.active? or self.provisional?
   end
@@ -200,7 +208,7 @@ class Member < ActiveRecord::Base
           if terms_of_membership.payment_gateway_configuration.nil?
             message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
             # TODO: do we have to add an operation?????
-            Airbrake.notify(:error_class   => "Billing", :error_message => message)
+            Airbrake.notify(:error_class => "Billing", :error_message => message)
             return { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
           end
           acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
@@ -310,7 +318,7 @@ class Member < ActiveRecord::Base
       self.reload
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
-      Auditory.add_redmine_ticket("Member:enroll", e)
+      Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this
       #     an invalid one. we should revert the transaction.
       message = "Could not save member. #{e}"
