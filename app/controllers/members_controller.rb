@@ -248,8 +248,9 @@ class MembersController < ApplicationController
   end
 
   def reject
-
+    @current_member.set_as_canceled
+    message = "Member was rejected and setted as canceled."
+    Auditory.audit(@current_agent, @current_member, message, @current_member)
   end
-
 end
 

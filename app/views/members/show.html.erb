@@ -29,8 +29,12 @@
       <% end %>
       <td>
         <%= link_to "Blacklist", member_blacklist_path, :class => "btn btn-warning" unless @current_member.blacklisted? %>
-        <%= link_to "Approve", member_approve_path, :class => "btn btn-primary", :confirm => t('are_you_sure')  %>
-        <%= link_to "Reject", '#', :class => "btn btn-warning"  %> 
+        <%= link_to "Approve", member_approve_path, :class => "btn btn-primary", 
+                               :confirm => t('are_you_sure'), :method => :post %>
+        <% if @current_member.provisional? %>
+          <%= link_to "Reject", member_reject_path, :class => "btn btn-warning", 
+                                :confirm => t('are_you_sure'), :method => :post %> 
+        <%end%>
         <%= link_to("Cancel", member_cancel_path, :class => "btn btn-danger") if @current_member.can_be_canceled? %>
       </td>
     <% end %>
