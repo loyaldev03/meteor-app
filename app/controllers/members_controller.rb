@@ -236,5 +236,14 @@ class MembersController < ApplicationController
       end
     end
   end
+
+  def approve
+
+  end
+
+  def reject
+
+  end
+
 end
 
