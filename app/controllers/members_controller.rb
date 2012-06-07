@@ -137,8 +137,9 @@ class MembersController < ApplicationController
             Auditory.audit(current_agent, @current_member, message, @current_member, Settings.operation_types.future_cancel)
             flash[:notice] = message
             redirect_to show_member_path
-          rescue
-            # TODO: 
+          rescue Exception => e
+            flash[:error] = "Could not cancel member. Ticket sent to IT"
+            Airbrake.notify(:error_class => "Member:cancel", :error_message => e)
           end
         else
           flash[:error] = "Cancellation date cant be less or equal than today."

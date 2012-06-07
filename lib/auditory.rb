@@ -17,10 +17,6 @@ class Auditory
     end
   end
   def self.add_redmine_ticket(error = "Special Error", message = '', params = {})
-    Airbrake.notify(
-      :error_class   => error,
-      :error_message => "#{error}: #{message}",
-      :parameters    => params
-    )    
+    Airbrake.notify(:error_class   => error, :error_message => "#{error}: #{message}", :parameters    => params)    
   end
 end
