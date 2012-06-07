@@ -239,7 +239,8 @@ class MembersController < ApplicationController
   end
 
   def approve
-    if @current_member.applied?
+    if @current_member.can_be_approved?
+      @current_member.applied?
       @current_member.set_as_provisional!
       message = "Member was approved."
       Auditory.audit(@current_agent, @current_member, message, @current_member)
@@ -249,9 +250,13 @@ class MembersController < ApplicationController
   end
 
   def reject
+    if @current_member.can_be_rejected?
     @current_member.set_as_canceled
     message = "Member was rejected and setted as canceled."
     Auditory.audit(@current_agent, @current_member, message, @current_member)
+    else
+      message = "Member cannot be rejected. It must be applied."
+    end
   end
 end
 
