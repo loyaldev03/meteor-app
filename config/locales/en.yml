@@ -120,6 +120,11 @@ en:
         template_type: 'Template at'
       transaction:
         refund_amount_help: 'Amount to refund (e.g.: $45.34)  '
+        transaction_types: 
+          sale: Sale
+          refund: Credit
+          credit: Credit
+          void: Credit
       club_cash_transaction: 
         amount: 'Amount'
         description: 'Description'
@@ -128,4 +133,4 @@ en:
       default: "%d/%m/%Y"
       short: "%b %d"
       long: "%B %d, %Y"
-
+        
