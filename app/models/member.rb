@@ -200,7 +200,7 @@ class Member < ActiveRecord::Base
           if terms_of_membership.payment_gateway_configuration.nil?
             message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
             # TODO: do we have to add an operation?????
-            Auditory.add_redmine_ticket("Billing", message)
+            Airbrake.notify(:error_class   => "Billing", :error_message => message)
             return { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
           end
           acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
