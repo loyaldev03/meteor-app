@@ -39,7 +39,11 @@ class Member < ActiveRecord::Base
   }
 
   state_machine :status, :initial => :none do
-    after_transition [:none, :provisional, :lapsed] => :provisional, :do => :schedule_first_membership
+    after_transition [ :none, # enroll
+                       :provisional, # save the sale
+                       :lapsed, # reactivation
+                       :active # save the sale
+                    ] => :provisional, :do => :schedule_first_membership
     after_transition [:provisional, :active] => :lapsed, :do => :cancellation
     after_transition [:provisional] => :active, :do => :send_active_email
     after_transition :lapsed => :any, :do => :increment_reactivations
@@ -75,9 +79,6 @@ class Member < ActiveRecord::Base
     # COF and is in provisional status who needs to be approved to join the NFLA, (Approvals are 
     # done through NFLA and managed by Stoneacre)
     state :applied
-    # (ONLY IN NFLA PLAYER PROGRAM) When an Applied Member has been “approved” to join the NFLA, 
-    # they are considered an approved member. (Approvals are done through NFLA and managed by Stoneacre)
-    state :approved
   end
 
   def send_active_email
