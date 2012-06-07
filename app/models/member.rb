@@ -20,8 +20,8 @@ class Member < ActiveRecord::Base
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address, :wrong_phone_number
 
   before_create :record_date
-  after_save 'api_member.save!'
-  after_destroy 'api_member.destroy!'
+  after_save 'api_member.save! if api_member'
+  after_destroy 'api_member.destroy! if api_member'
 
   validates :first_name, :presence => true, :format => /^[A-Za-z ']+$/
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
@@ -339,7 +339,11 @@ class Member < ActiveRecord::Base
   end
 
   def api_member
-    @api_member ||= eval(club.api_type).new self
+    @api_member ||= if club.api_type.nil?
+      nil
+    else
+      eval(club.api_type).new self
+    end
   end
 
   def synced?
