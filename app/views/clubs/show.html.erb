@@ -9,6 +9,10 @@
   <strong><%= model_class.human_attribute_name(:description) %>:</strong><br>
   <%= @club.description %>
 </p>
+<p>
+  <strong><%= model_class.human_attribute_name(:drupal_username) %>:</strong><br>
+  <%= @club.api_type %>
+</p>
 
 <div class="form-actions">
   <%= link_to t(:back),
