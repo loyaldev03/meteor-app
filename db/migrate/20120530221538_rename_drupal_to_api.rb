@@ -1,6 +1,6 @@
 class RenameDrupalToApi < ActiveRecord::Migration
   def up
-    add_column :clubs, :api_type, :string, :default => 'Drupal::Member'
+    add_column :clubs, :api_type, :string
     rename_column :members, :drupal_id, :api_id
     rename_column :clubs, :drupal_username, :api_username
     rename_column :clubs, :drupal_password, :api_password
