@@ -249,11 +249,11 @@ class Member < ActiveRecord::Base
         # enroll allowed
       elsif not credit_card.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
         message = "Credit card blacklisted. call support."
-        Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_blacklisted)
+        Auditory.audit(current_agent, tom, message, credit_card.first.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
       else        
         message = "Credit card is already in use. call support."
-        Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_already_in_use)
+        Auditory.audit(current_agent, tom, message, credit_card.first.member, Settings.operation_types.credit_card_already_in_use)
         return { :message => message, :code => Settings.error_codes.credit_card_in_use }
       end
     else
