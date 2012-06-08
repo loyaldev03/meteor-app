@@ -60,7 +60,7 @@ en:
         description: 'Description'
         amount: 'Amount'
         gw_trans: 'Gw trans'
-        not_found: 'No transactions were founded.'
+        not_found: 'No transactions were found.'
       agent:  
         login: "Username or email"
         password: "Password"
@@ -123,7 +123,7 @@ en:
         asigned_at: 'Asigned at'
         delivered_at: 'Delivered at'
         renewable_at: 'Renewable at'
-        not_found: 'No fulfillments were founded.'
+        not_found: 'No fulfillments were found.'
       communication:
         response: 'Response'
         template_name: 'Template name'
@@ -132,7 +132,7 @@ en:
         processed_at: 'Processed at'
         template_type: 'Template type'
         sent_success: 'Sent success'
-        not_found: 'No communications were founded.'
+        not_found: 'No communications were found.'
       transaction:
         refund_amount_help: 'Amount to refund (e.g.: $45.34)  '
         transaction_types: 
