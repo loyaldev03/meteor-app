@@ -221,7 +221,7 @@ class MembersController < ApplicationController
     end
   end
 
-  def add_club_cash_transaction
+  def add_club_cash
     if request.post?
       cct = ClubCashTransaction.new(params[:club_cash_transaction])
       cct.member_id = @current_member
