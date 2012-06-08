@@ -2,15 +2,6 @@
 
 require_relative 'import_models'
 
-@log = Logger.new('import_members.log', 10, 1024000)
-ActiveRecord::Base.logger = @log
-
-
-# TODO: use campaign id to find this value!
-def get_terms_of_membership_id(campaign_id)
-  1
-end
-
 BillingMember.find_in_batches do |group|
   group.each do |member| 
     tz = Time.now
