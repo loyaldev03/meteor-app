@@ -1,4 +1,4 @@
-<h1><%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
+<%= render :partial => "shared/member_information" %>
 
 <%= form_tag(member_cancel_path, :id => 'member_cancelation_form') do %>
   <table class="table table-bordered">
