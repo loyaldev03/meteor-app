@@ -8,7 +8,10 @@
   	<th> <%= t('activerecord.attributes.communication.template_type') %> </th>
   </thead>
   <tbody>
-  <% unless @fulfillments.nil? %>
+  <% unless @communications.nil? %>
+    <% if @communications.count == 0 %>
+      <tr> <td colspan="5"> <%= t('activerecord.attributes.communication.not_found') %> </td> </tr>
+    <% end %> 
   	<% @communications.each do |communication| %>
   	<tr>
 	  <td> 
