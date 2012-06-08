@@ -117,7 +117,8 @@ en:
         email: 'Email'
         scheduled_at: 'Scheduled at'
         processed_at: 'Processed at'
-        template_type: 'Template at'
+        template_type: 'Template type'
+        sent_success: 'Sent success'
       transaction:
         refund_amount_help: 'Amount to refund (e.g.: $45.34)  '
         transaction_types: 
