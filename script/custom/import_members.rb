@@ -13,9 +13,8 @@ def get_terms_of_membership_id(campaign_id)
   1
 end
 
-#BillingMember.find_in_batches(:conditions => " cs_next_bill_date IS NOT NULL ") do |group|
-  #group.each do |member| 
-  BillingMember.find(:all, :conditions => " cs_next_bill_date IS NOT NULL ", :limit => 10).each do |member|
+BillingMember.find_in_batches do |group|
+  group.each do |member| 
     tz = Time.now
     begin
       @log.info "  * processing member ##{member.id}"
@@ -25,7 +24,8 @@ end
       phoenix.visible_id = member.id
       phoenix.first_name = member.first_name
       phoenix.last_name = member.last_name
-      phoenix.email = member.email
+      phoenix.email = "test#{member.id}@xagax.com"
+      # phoenix.email = member.email
       phoenix.address = member.address
       phoenix.city = member.city
       phoenix.state = member.state
@@ -41,6 +41,7 @@ end
         phoenix.next_retry_bill_date = (member.next_bill_date rescue member.cs_next_bill_date)
       else
         phoenix.status = 'lapsed'
+        phoenix.recycled_times = 0
         phoenix.cancel_date = (member.cancelled_at rescue member.updated_at)
       end
       phoenix.join_date = member.join_date
@@ -81,8 +82,9 @@ end
     rescue Exception => e
       @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+      exit
     end
     @log.info "    ... took #{Time.now - tz} for member ##{member.id}"
   end
-  #sleep(5) # Make sure it doesn't get too crowded in there!
-#end
+  sleep(5) # Make sure it doesn't get too crowded in there!
+end

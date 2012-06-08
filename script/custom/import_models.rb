@@ -14,7 +14,7 @@ ActiveRecord::Base.configurations["phoenix"] = {
 
 ActiveRecord::Base.configurations["customer_services"] = { 
   :adapter => "mysql2",
-  :database => "onmc_customer_services",
+  :database => "onmc_customer_service",
   :host => "127.0.0.1",
   :username => "root",
   :password => "" 
@@ -53,5 +53,10 @@ end
 
 class BillingMember < ActiveRecord::Base
   establish_connection "billing" 
-  self.table_name = "members" # Use "new_members" 
+  self.table_name = "new_members" 
+end
+
+class CustomerServicesOperations < ActiveRecord::Base
+  establish_connection "customer_services" 
+  self.table_name = "operations"
 end
