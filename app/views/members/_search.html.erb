@@ -13,15 +13,8 @@
       <tr> <td colspan="5"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
     <% end %> 
   <% members.each do |member| %>
-    <tr> 
-      <th <% if member.lapsed? %>
-            class = "red"
-          <% elsif member.active? %>
-            class = "green"
-          <% elsif %>
-            class = "yellow"
-          <% end %>
-      > 
+    <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
+      <th>
       <%= member.status %>
       </th>
       <th> <%= link_to member.visible_id, show_member_path(:member_prefix => member.visible_id), :class =>"icon-share-alt" %> </th>

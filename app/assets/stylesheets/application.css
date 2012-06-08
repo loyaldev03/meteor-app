@@ -22,10 +22,6 @@ form .clearfix:before, form .clearfix:after {
 	background-color: red;
 }
 
-.green{
-	background-color: green;
-}
-
 .ligthgreen{
 	background-color: #90EE90;
 }
@@ -47,3 +43,11 @@ form .clearfix:before, form .clearfix:after {
 .comment {height:auto; 
 	      display:inline-block; 
 	      word-wrap: break-word }
+
+.odd{
+		background-color: #E0EEEE;
+}
+
+.even{
+		background-color: #FFFFFF;
+}

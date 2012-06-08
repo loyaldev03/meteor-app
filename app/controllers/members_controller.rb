@@ -59,6 +59,8 @@ class MembersController < ApplicationController
     @transactions = @current_member.transactions.paginate(:page => params[:page], :order => "created_at DESC")
     @fulfillments = @current_member.fulfillments.all
     @communications = @current_member.communications.all
+    @payment_gateway_configuration_development = PaymentGatewayConfiguration.find_by_club_id_and_mode(@current_club.id,'development')
+    @payment_gateway_configuration_production = PaymentGatewayConfiguration.find_by_club_id_and_mode(@current_club.id,'production')
   end
 
   def new
