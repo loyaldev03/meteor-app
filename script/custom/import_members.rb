@@ -5,8 +5,6 @@ require_relative 'import_models'
 @log = Logger.new('import_members.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
-CLUB = 1
-CREATED_BY = 2
 
 # TODO: use campaign id to find this value!
 def get_terms_of_membership_id(campaign_id)

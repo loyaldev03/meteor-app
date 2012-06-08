@@ -2,6 +2,11 @@ require 'rails'
 require 'active_record'
 require 'uuidtools'
 require 'attr_encrypted'
+require 'settingslogic'
+
+
+CLUB = 1
+CREATED_BY = 2
 
 # add phoenix database connection
 ActiveRecord::Base.configurations["phoenix"] = { 
@@ -60,3 +65,9 @@ class CustomerServicesOperations < ActiveRecord::Base
   establish_connection "customer_services" 
   self.table_name = "operations"
 end
+
+class Settings < Settingslogic
+  source "#{File.expand_path(File.dirname(__FILE__))}/../../config/application.yml"
+  namespace Rails.env
+end
+
