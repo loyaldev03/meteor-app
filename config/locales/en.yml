@@ -34,6 +34,9 @@ en:
     logout: 'Logout'
     agents: 'Agents'
     partners: 'Partners'
+  buttons:
+    return_to_member_show: 'Return to member show'
+    add_club_cash_transaction: 'Save club cash transaction'
   activerecord:
     member: 'Member'
     term_of_membership: 'Term of membership'
