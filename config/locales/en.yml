@@ -34,6 +34,17 @@ en:
     logout: 'Logout'
     agents: 'Agents'
     partners: 'Partners'
+  buttons:
+    return_to_member_show: 'Return to member show'
+    add_club_cash_transaction: 'Save club cash transaction'
+    blacklist_member: 'Blacklist member'
+    cancel_member: 'Cancel member'
+    change_bill_date: 'Change next bill date'
+    refund_member: 'Refund'
+    full_save: 'Full save'
+    save_te_sale: 'Save the sale'
+    set_wrong_addres: 'Set wrong address'
+    set_wrong_phone_number: 'Set wrong phone number'
   activerecord:
     member: 'Member'
     term_of_membership: 'Term of membership'
@@ -49,6 +60,7 @@ en:
         description: 'Description'
         amount: 'Amount'
         gw_trans: 'Gw trans'
+        not_found: 'No transactions were founded.'
       agent:  
         login: "Username or email"
         password: "Password"
@@ -111,13 +123,16 @@ en:
         asigned_at: 'Asigned at'
         delivered_at: 'Delivered at'
         renewable_at: 'Renewable at'
+        not_found: 'No fulfillments were founded.'
       communication:
         response: 'Response'
         template_name: 'Template name'
         email: 'Email'
         scheduled_at: 'Scheduled at'
         processed_at: 'Processed at'
-        template_type: 'Template at'
+        template_type: 'Template type'
+        sent_success: 'Sent success'
+        not_found: 'No communications were founded.'
       transaction:
         refund_amount_help: 'Amount to refund (e.g.: $45.34)  '
         transaction_types: 

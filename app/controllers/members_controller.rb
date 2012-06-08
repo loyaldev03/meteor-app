@@ -14,13 +14,13 @@ class MembersController < ApplicationController
       #Lets excecute the query:
       @members = Member.joins(:credit_cards).where(["visible_id like ? AND first_name like ? AND last_name like ? 
                  AND address like ? AND phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
-                 AND (next_retry_bill_date = ? OR next_retry_bill_date is null) AND club_id = ? AND (credit_cards.active = 1 
+                 AND (next_retry_bill_date like ? OR next_retry_bill_date is null) AND club_id = ? AND (credit_cards.active = 1 
                  AND credit_cards.last_digits like ?) AND status != ?", 
                  member_id,'%'+params[:member][:first_name]+'%',
                  '%'+params[:member][:last_name]+'%','%'+params[:member][:address]+'%',
                  '%'+params[:member][:phone_number]+'%','%'+params[:member][:city]+'%',
                  '%'+params[:member][:state]+'%','%'+params[:member][:zip]+'%', 
-                 '%'+params[:member][:email]+'%',params[:member][:next_retry_bill_date], @current_club,
+                 '%'+params[:member][:email]+'%','%'+params[:member][:next_retry_bill_date]+'%', @current_club,
                  last_digits, member_status]).order(:visible_id)
    end
   end

@@ -1,9 +1,1 @@
-<table class="table table-bordered" >
-  <tr>
-  	<td colspan="2" ><%= params[:controller].humanize %> - <%= params[:action].humanize %></td>
-  </tr>
-  <tr>
- 	<td> <%= t('activerecord.attributes.member.visible_id') %>: <%= @current_member.visible_id %> </td> 	
-	<td> <%= t('activerecord.member') %>: <%= @current_member.first_name %> <%= @current_member.last_name %> </td>
-  <tr>
-</table>
+<h1> <%= params[:controller].humanize %>: <%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.first_name %> <%= @current_member.last_name %> </h1>

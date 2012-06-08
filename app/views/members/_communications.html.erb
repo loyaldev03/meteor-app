@@ -1,6 +1,6 @@
 <table class="table table-condensed table-bordered">
   <thead>
-    <th> <%= t('success') %> </th>
+    <th> <%= t('activerecord.attributes.communication.sent_success') %> </th>
   	<th> <%= t('activerecord.attributes.communication.template_name') %> </th>
   	<th> <%= t('activerecord.attributes.communication.email') %> </th>
   	<th> <%= t('activerecord.attributes.communication.scheduled_at') %> </th>
@@ -8,7 +8,10 @@
   	<th> <%= t('activerecord.attributes.communication.template_type') %> </th>
   </thead>
   <tbody>
-  <% unless @fulfillments.nil? %>
+  <% unless @communications.nil? %>
+    <% if @communications.count == 0 %>
+      <tr> <td colspan="5"> <%= t('activerecord.attributes.communication.not_found') %> </td> </tr>
+    <% end %> 
   	<% @communications.each do |communication| %>
   	<tr>
 	  <td> 

@@ -1,4 +1,4 @@
-<h1><%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
+<%= render :partial => "shared/member_information" %>
 
 
 <%= form_for(member_set_undeliverable_path) do %>
@@ -13,9 +13,9 @@
     </tr>
     <tr>
     <th> 
-      <%= submit_tag t(:save), :class => 'btn btn-primary', 
+      <%= submit_tag t('buttons.set_wrong_addres'), :class => 'btn btn-primary', 
                                :confirm => t('are_you_sure') %>
-      <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> 
+      <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => 'btn' %> 
     </th>
     </tr>
     </thead>

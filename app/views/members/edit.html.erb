@@ -1,6 +1,4 @@
-<%- model_class = @current_member.class -%>
-<h1><%=t '.title', :default => t('helpers.titles.new', :model => model_class.model_name.human,
-                               :default => "New #{model_class.model_name.human}") %></h1>
+<%= render :partial => "shared/member_information" %>
 
 <script> 
   var visible_id = <%= @current_member.visible_id %>; 

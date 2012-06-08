@@ -50,7 +50,7 @@ class Member < ActiveRecord::Base
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
     
     event :set_as_provisional do
-      transition [:none, :provisional,:applied] => :provisional
+      transition [:none, :provisional,:applied, :active] => :provisional
     end
     event :set_as_active do
       transition [:provisional, :active] => :active

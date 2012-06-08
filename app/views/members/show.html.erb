@@ -1,4 +1,4 @@
-<h1> <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
+<%= render :partial => "shared/member_information" %>
 <% if @current_member.blacklisted? %>
 <h1> Blacklisted! </h1>
 <% end %>
@@ -97,25 +97,24 @@
     </tr>
   </thead>  
   <tr>
-    <td> <%= t('activerecord.attributes.member.member_since_date') %>: 
+    <td NOWRAP> <%= t('activerecord.attributes.member.member_since_date') %>: 
          <%= I18n.l @current_member.member_since_date, :format => :long %> </td>
-    <td> <%= t('activerecord.attributes.member.join_date') %>: 
+    <td NOWRAP> <%= t('activerecord.attributes.member.join_date') %>: 
          <%= I18n.l @current_member.join_date, :format => :long %> </td>
     <td>
       <%= t('activerecord.attributes.member.next_retry_bill_date') %>: <%= @current_member.next_retry_bill_date %>
       <%= link_to('Change', member_change_next_bill_date_path, :class => "btn btn-warning") unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
     </td>
-    <td>
+    <td NOWRAP>
       <%= t('activerecord.attributes.member.cancel_date') %>: 
       <%= I18n.l(@current_member.cancel_date, :format => :long) unless @current_member.cancel_date.nil? %>
     </td>
   </tr>
   <tr>
     <td> <%= t('menu.activerecord.term_of_membership') %> 
-         <%= t('activerecord.attributes.terms_of_membership.name') %>:
          <%= link_to @current_member.terms_of_membership.name, terms_of_membership_path(:id => @current_member.terms_of_membership) %> 
     </td>
-    <td> <%= t('activerecord.attributes.member.reactivation_times') %> 
+    <td> <%= t('activerecord.attributes.member.reactivation_times') %>:
          <%= @current_member.reactivation_times %> 
     </td>
     <td> <%= t('activerecord.attributes.member.member_group_type') %>:
@@ -142,8 +141,8 @@
       <th colspan="5"> Active Credit card </th>
     </tr>
   <tr>
-    <td> <%= t("activerecord.attributes.credit_card.number") %> <%= @active_credit_card.number %> </td>
-    <td> <%= t("activerecord.attributes.credit_card.expire_date") %> 
+    <td> <%= t("activerecord.attributes.credit_card.number") %>: <%= @active_credit_card.number %> </td>
+    <td> <%= t("activerecord.attributes.credit_card.expire_date") %>: 
          <%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %> 
     </td>
   </thead>

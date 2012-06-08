@@ -1,4 +1,4 @@
-<h1><%= params[:action].humanize %> - <%= @current_member.visible_id %> - <%= @current_member.full_name %></h1>
+<%= render :partial => "shared/member_information" %>
 
 <%= form_tag(member_change_next_bill_date_path) do %>
   <table class="table table-bordered">
@@ -9,8 +9,8 @@
       </td>
     </tr>
     <tr>
-      <td> <%= submit_tag t(:save), :class => 'btn btn-primary' %>
-           <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
+      <td> <%= submit_tag t('buttons.change_bill_date'), :class => 'btn btn-primary' %>
+           <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => 'btn' %> </td>
     </tr>
   </table>
 <% end%>

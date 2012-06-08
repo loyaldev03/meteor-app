@@ -1,4 +1,4 @@
-<p> <%= t('search_result') %> </p>
+<p> <h1> <%= t('search_result') %> </h1> </p>
 <table class="table table-bordered table-condensed">
 
   <thead>
@@ -22,13 +22,12 @@
             class = "yellow"
           <% end %>
       > 
-      <%= member.status %>      
+      <%= member.status %>
       </th>
-      <th> <%= member.visible_id %> </th>
+      <th> <%= link_to member.visible_id, show_member_path(:member_prefix => member.visible_id), :class =>"icon-share-alt" %> </th>
       <th> <%= member.external_id if !member.external_id.nil? %> </th>
       <th> <%= member.full_name %> </th>
       <th> <%= member.full_address %> </th>
-      <th> <%= link_to t(:show), show_member_path(:member_prefix => member.visible_id)%> </th>
     </tr>
   <% end %>
   </thead>  
