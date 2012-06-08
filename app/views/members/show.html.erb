@@ -1,4 +1,5 @@
 <%= render :partial => "shared/member_information" %>
+
 <% if @current_member.blacklisted? %>
 <h1> Blacklisted! </h1>
 <% end %>
@@ -126,6 +127,25 @@
              member_add_club_cash_transaction_path, :class => 'btn btn-warning' %> 
     </td>
   </tr>
+</table>
+
+<table class="table table-bordered table-condensed">
+  <thead>
+  <tr
+    <% if @payment_gateway_configuration_development.nil? %>
+      class="red"
+    <% end %>
+  >
+    <th> <%= @payment_gateway_configuration_development.nil? ? 'The does not have pay gateway configuration mode development' : 'The club has pay gateway configuration for mode development' %> </th>
+  </tr>
+  <tr
+    <% if @payment_gateway_configuration_production.nil? %>
+      class="red"
+    <% end %>
+  >
+    <th> <%= @payment_gateway_configuration_production.nil? ? 'The does not have pay gateway configuration for mode production' : 'The club has pay gateway configuration for mode production' %> </th>
+  </tr>
+  </thead>
 </table>
 
 <table
