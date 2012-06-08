@@ -43,3 +43,11 @@ form .clearfix:before, form .clearfix:after {
 .comment {height:auto; 
 	      display:inline-block; 
 	      word-wrap: break-word }
+
+.odd{
+		background-color: #E0EEEE;
+}
+
+.even{
+		background-color: #FFFFFF;
+}
