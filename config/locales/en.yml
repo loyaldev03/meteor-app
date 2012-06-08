@@ -37,6 +37,14 @@ en:
   buttons:
     return_to_member_show: 'Return to member show'
     add_club_cash_transaction: 'Save club cash transaction'
+    blacklist_member: 'Blacklist member'
+    cancel_member: 'Cancel member'
+    change_bill_date: 'Change next bill date'
+    refund_member: 'Refund'
+    full_save: 'Full save'
+    save_te_sale: 'Save the sale'
+    set_wrong_addres: 'Set wrong address'
+    set_wrong_phone_number: 'Set wrong phone number'
   activerecord:
     member: 'Member'
     term_of_membership: 'Term of membership'
