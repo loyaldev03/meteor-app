@@ -26,10 +26,11 @@ def load_refunds
         tz = Time.now
         begin
           @log.info "  * processing Chargeback ##{refund.id}"
+          @member = member
 
           transaction = PhoenixTransaction.new
           transaction.member_id = @member.uuid
-          transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
+          transaction.terms_of_membership_id = member.terms_of_membership_id
           transaction.set_payment_gateway_configuration
           transaction.gateway = 'litle'
           transaction.recurrent = false
@@ -40,19 +41,24 @@ def load_refunds
           elsif refund.reason == "Enrollment Capture"
             transaction.amount = BillingEnrollmentCapture.find(refund.capture_id).amount
           else
-            transaction.amount = refund.amount / 100.0
+            unless refund.status.nil?
+              transaction.amount = refund.status / 100.0
+            end
           end
           transaction.response = refund.result
           transaction.response_code = ( refund.result == "Success" ? "000" : "999")
           transaction.response_result = refund.result
-          transaction.response_transaction_id = refund.litleTxnId
-          transaction.created_at = response.created_at
-          transaction.updated_at = response.updated_at
+          transaction.response_transaction_id = refund.litle_txn_id
+          transaction.created_at = refund.created_at
+          transaction.updated_at = refund.updated_at
           transaction.save!
 
-          if transaction.success?
+          if refund.result == "Success"
             add_operation(transaction.created_at, transaction, "Credit success $#{transaction.amount}",
                               Settings.operation_types.credit, transaction.created_at, transaction.updated_at)
+          else
+            add_operation(transaction.created_at, transaction, "Credit $#{transaction.amount} error: #{refund.result}",
+                              Settings.operation_types.credit_error, transaction.created_at, transaction.updated_at)
           end
     
           refund.destroy

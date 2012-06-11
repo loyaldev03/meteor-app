@@ -130,6 +130,8 @@ class Transaction < ActiveRecord::Base
       old_transaction.save
       Auditory.audit(agent, trans, "Credit success $#{amount}", old_transaction.member, Settings.operation_types.credit)
       Communication.deliver!(:refund, old_transaction.member)
+    else
+      Auditory.audit(agent, trans, "Credit $#{amount} error: #{answer[:message]}", old_transaction.member, Settings.operation_types.credit_error)
     end
     answer
   end

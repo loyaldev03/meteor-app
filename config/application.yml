@@ -15,6 +15,7 @@ defaults: &defaults
     membership_billing_without_decline_strategy: 105
     membership_billing_hard_decline: 106
     membership_billing_soft_decline: 107
+    credit_error: 108
     cancel: 200
     future_cancel: 201
     save_the_sale: 202
