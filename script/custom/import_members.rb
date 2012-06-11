@@ -13,8 +13,8 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
       phoenix.visible_id = member.id
       phoenix.first_name = member.first_name
       phoenix.last_name = member.last_name
+      phoenix.email = member.email
       phoenix.email = "test#{member.id}@xagax.com"
-      # phoenix.email = member.email
       phoenix.address = member.address
       phoenix.city = member.city
       phoenix.state = member.state

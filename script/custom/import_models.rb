@@ -1,7 +1,11 @@
 # 1- load customer services and bililng databases
 # 2- Import members
-# 3- load members table on billing again
-# 4- Import transactions.
+# 3- set campaign_id on every membership authorization, to get the amount. 
+#   UPDATE onmc_billing.membership_authorizations SET campaign_id = 
+#      (SELECT campaign_id FROM onmc_billing.members WHERE id =  onmc_billing.membership_authorizations.member_id) WHERE
+#       onmc_billing.membership_authorizations campaign_id IS NULL;
+# 4- load members table on billing again
+# 5- Import transactions.
 
 require 'rails'
 require 'active_record'
@@ -151,7 +155,7 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
       campaign = BillingCampaign.find_by_id(authorization.campaign_id)
       if campaign.nil? 
         campaign = if billing_member.nil?
-          BillingCampaign.find_by_id(999)
+          BillingCampaign.find_by_id(999) 
         else
           BillingCampaign.find_by_id(billing_member.campaign_id)
         end
