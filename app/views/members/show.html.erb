@@ -33,7 +33,6 @@
         <% if @current_member.applied? %>
           <%= link_to "Approve", member_approve_path, :class => "btn btn-primary", 
                                :confirm => t('are_you_sure'), :method => :post %>
-        
           <%= link_to "Reject", member_reject_path, :class => "btn btn-warning", 
                                 :confirm => t('are_you_sure'), :method => :post %> 
         <%end%>
@@ -71,7 +70,8 @@
       <% end %>
       > 
         <%= t('activerecord.attributes.member.phone_number') %>: <%= @current_member.phone_number %>   
-          <% if @current_member.wrong_phone_number.nil? %>
+          <% if @current_member.wrong_phone_number.nil?
+           %>
             <%= link_to t('set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger" %>
           <% else %>
             <%= @current_member.wrong_phone_number %>

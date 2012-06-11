@@ -51,6 +51,7 @@ en:
     email_template: 'Email template'
     attributes:
       transaction:
+        refund_amount_help: 'Amount to refund (e.g.: $45.34)'
         transaction_types: 
           sale: Sale
           refund: Credit
@@ -136,13 +137,6 @@ en:
         template_type: 'Template type'
         sent_success: 'Sent success'
         not_found: 'No communications were found.'
-      transaction:
-        refund_amount_help: 'Amount to refund (e.g.: $45.34)  '
-        transaction_types: 
-          sale: Sale
-          refund: Credit
-          credit: Credit
-          void: Credit
       club_cash_transaction: 
         amount: 'Amount'
         description: 'Description'
