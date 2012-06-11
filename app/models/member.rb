@@ -295,6 +295,7 @@ class Member < ActiveRecord::Base
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
       answer = trans.process
+      # TODO: should we Audit this?
       return answer unless trans.success?
     end
 

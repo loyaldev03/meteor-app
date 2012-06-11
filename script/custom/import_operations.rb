@@ -2,9 +2,6 @@
 
 require_relative 'import_models'
 
-@log = Logger.new('import_members.log', 10, 1024000)
-ActiveRecord::Base.logger = @log
-
 
 def add_operation(operation_date, object, description, operation_type, created_at, updated_at, author = 999)
   # TODO: levantamos los Agents?
