@@ -178,11 +178,19 @@ class BillingMembershipCaptureResponse < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "membership_capt_responses" 
 end
+class BillingChargeback < ActiveRecord::Base
+  establish_connection "billing" 
+  self.table_name = "chargebacks" 
+end
+
+
 
 class CustomerServicesOperations < ActiveRecord::Base
   establish_connection "customer_services" 
   self.table_name = "operations"
 end
+
+
 
 class Settings < Settingslogic
   source "#{File.expand_path(File.dirname(__FILE__))}/../../config/application.yml"

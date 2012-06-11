@@ -19,7 +19,53 @@ def add_operation(operation_date, object, description, operation_type, created_a
 end
 
 def load_refunds
-  # 'void'
+  PhoenixMember.find_in_batches do |group|
+    group.each do |member|
+      refunds = BillingChargeback.find_all_by_member_id(member.visible_id)
+      refunds.each do |refund|
+        tz = Time.now
+        begin
+          @log.info "  * processing Chargeback ##{refund.id}"
+
+          transaction = PhoenixTransaction.new
+          transaction.member_id = @member.uuid
+          transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
+          transaction.set_payment_gateway_configuration
+          transaction.gateway = 'litle'
+          transaction.recurrent = false
+          transaction.transaction_type = "credit" 
+          transaction.invoice_number = member.visible_id
+          if refund.reason == "Membership Capture"
+            transaction.amount = BillingMembershipCapture.find(refund.capture_id).amount
+          elsif refund.reason == "Enrollment Capture"
+            transaction.amount = BillingEnrollmentCapture.find(refund.capture_id).amount
+          else
+            transaction.amount = refund.amount / 100.0
+          end
+          transaction.response = refund.result
+          transaction.response_code = ( refund.result == "Success" ? "000" : "999")
+          transaction.response_result = refund.result
+          transaction.response_transaction_id = refund.litleTxnId
+          transaction.created_at = response.created_at
+          transaction.updated_at = response.updated_at
+          transaction.save!
+
+          if transaction.success?
+            add_operation(transaction.created_at, transaction, "Credit success $#{transaction.amount}",
+                              Settings.operation_types.credit, transaction.created_at, transaction.updated_at)
+          end
+    
+          refund.destroy
+        rescue Exception => e
+          @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          exit
+        end
+        @log.info "    ... took #{Time.now - tz} for Chargeback ##{refund.id}"
+      end
+    end
+  end
+
 end
 
 def load_enrollment_transactions
@@ -182,8 +228,9 @@ def set_last_billing_date_on_credit_card
 end
 
 
+load_refunds
 load_enrollment_transactions
 load_membership_transactions
 set_last_billing_date_on_credit_card
-load_refunds
+
 
