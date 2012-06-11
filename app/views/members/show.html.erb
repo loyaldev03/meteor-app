@@ -71,7 +71,8 @@
       <% end %>
       > 
         <%= t('activerecord.attributes.member.phone_number') %>: <%= @current_member.phone_number %>   
-          <% if @current_member.wrong_phone_number.nil? %>
+          <% if @current_member.wrong_phone_number.nil?
+           %>
             <%= link_to t('set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger" %>
           <% else %>
             <%= @current_member.wrong_phone_number %>
