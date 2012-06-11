@@ -48,7 +48,7 @@ class Member < ActiveRecord::Base
     after_transition :provisional => :active, :do => :send_active_email
     after_transition :lapsed => :provisional, :do => :increment_reactivations
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
-    
+
     event :set_as_provisional do
       transition [:none, :provisional,:applied, :active] => :provisional
     end
@@ -56,7 +56,7 @@ class Member < ActiveRecord::Base
       transition [:provisional, :active] => :active
     end
     event :set_as_canceled do
-      transition [:provisional, :active] => :lapsed
+      transition [:provisional, :active_credit_card, :applied] => :lapsed
     end
     event :recovered do 
       transition [:lapsed] => :provisional

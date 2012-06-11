@@ -33,7 +33,6 @@
         <% if @current_member.applied? %>
           <%= link_to "Approve", member_approve_path, :class => "btn btn-primary", 
                                :confirm => t('are_you_sure'), :method => :post %>
-        
           <%= link_to "Reject", member_reject_path, :class => "btn btn-warning", 
                                 :confirm => t('are_you_sure'), :method => :post %> 
         <%end%>
