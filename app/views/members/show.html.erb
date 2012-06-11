@@ -30,9 +30,10 @@
       <% end %>
       <td>
         <%= link_to "Blacklist", member_blacklist_path, :class => "btn btn-warning" unless @current_member.blacklisted? %>
-        <%= link_to "Approve", member_approve_path, :class => "btn btn-primary", 
-                               :confirm => t('are_you_sure'), :method => :post %>
         <% if @current_member.applied? %>
+          <%= link_to "Approve", member_approve_path, :class => "btn btn-primary", 
+                               :confirm => t('are_you_sure'), :method => :post %>
+        
           <%= link_to "Reject", member_reject_path, :class => "btn btn-warning", 
                                 :confirm => t('are_you_sure'), :method => :post %> 
         <%end%>
@@ -124,28 +125,9 @@
     <td> <%= t('activerecord.attributes.member.club_cash_amount') %>:
          $<%= @current_member.club_cash_amount %>
          <%= link_to t('activerecord.attributes.member.add_club_cash_transaction'),
-             member_add_club_cash_transaction_path, :class => 'btn btn-warning' %> 
+             member_add_club_cash_path, :class => 'btn btn-warning' %> 
     </td>
   </tr>
-</table>
-
-<table class="table table-bordered table-condensed">
-  <thead>
-  <tr
-    <% if @payment_gateway_configuration_development.nil? %>
-      class="red"
-    <% end %>
-  >
-    <th> <%= @payment_gateway_configuration_development.nil? ? 'The does not have pay gateway configuration mode development' : 'The club has pay gateway configuration for mode development' %> </th>
-  </tr>
-  <tr
-    <% if @payment_gateway_configuration_production.nil? %>
-      class="red"
-    <% end %>
-  >
-    <th> <%= @payment_gateway_configuration_production.nil? ? 'The does not have pay gateway configuration for mode production' : 'The club has pay gateway configuration for mode production' %> </th>
-  </tr>
-  </thead>
 </table>
 
 <table

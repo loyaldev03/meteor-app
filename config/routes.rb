@@ -42,7 +42,7 @@ SacPlatform::Application.routes.draw do
         match '/set_undeliverable' => 'members#set_undeliverable', as: 'member_set_undeliverable', :via => [:get, :post]
         match '/set_unreachable' => 'members#set_unreachable', as: 'member_set_unreachable', :via => [:get, :post]
         match '/resend_fulfillment' => 'members#resend_fulfillment', as: 'member_resend_fulfillment', :via => [:post]
-        match '/add_club_cash_transaction' => 'members#add_club_cash_transaction', as: 'member_add_club_cash_transaction', :via => [:get, :post]
+        match '/add_club_cash' => 'members#add_club_cash', as: 'member_add_club_cash', :via => [:get, :post]
         match '/approve' => 'members#approve', as: 'member_approve', :via => [:post]
         match '/reject' => 'members#reject', as: 'member_reject', :via => [:post]  
         match '/' => 'members#show', as: 'show_member', :via => [:get, :post]
