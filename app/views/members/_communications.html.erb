@@ -16,10 +16,17 @@
   	<tr>
 	  <td> 
 	  	<% if communication.sent_success %> 
-	  	<i class ="icon-ok help" rel= "popover" 
-	  	    data-original-title = "<%= t('activerecord.attributes.communication.response')%> " 
-		    data-content = "<%= communication.response %>"></i>
-	  	<% end %>
+	      <i class ="icon-ok help" rel= "popover" data-toggle="modal" href="#myModal<%=communication.id%>" 
+           style="cursor: pointer"></i>
+        <div id="myModal<%=communication.id%>" class="well modal hide" style="border: none;">
+          <div class="modal-header">
+            <a href="#" class="close">&times;</a>
+            <h3> <%= t('activerecord.attributes.communication.response') %> </h3>
+          </div>
+          <div class="modal-body"> <%= communication.response %> </div>
+          <div class="modal-footer"> <a href="#" class="btn" data-dismiss="modal" >Close</a> </div>
+        </div>
+      <% end %>
 	  </td>
 	  <td> <%= communication.template_name %> </td>
 	  <td> <%= communication.email %> </td>
@@ -31,3 +38,5 @@
   <% end %>
   </tbody>
 </table>
+
+  

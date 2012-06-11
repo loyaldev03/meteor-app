@@ -14,7 +14,14 @@
     <% end %> 
   <% members.each do |member| %>
     <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
-      <th>
+      <th <% if member.lapsed? %>
+          class = "red"
+          <% elsif member.active? %>
+            class = "ligthgreen"
+          <% elsif %>
+            class = "yellow"
+          <% end %>
+      > 
       <%= member.status %>
       </th>
       <th> <%= link_to member.visible_id, show_member_path(:member_prefix => member.visible_id), :class =>"icon-share-alt" %> </th>
