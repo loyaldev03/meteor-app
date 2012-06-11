@@ -42,7 +42,7 @@ def load_enrollment_transactions
             transaction.gateway = 'litle'
             transaction.recurrent = false
             transaction.transaction_type = 'authorization_capture'
-            transaction.invoice_number = "#{response.created_at}-#{response.authorization.member_id}"
+            transaction.invoice_number = "#{response.created_at.to_date}-#{response.authorization.member_id}"
             transaction.amount = response.amount
             transaction.response = { :authorization => response.message, :capture => (response.capture_response.message rescue nil) }
             transaction.response_code = response.code
@@ -106,7 +106,7 @@ def load_membership_transactions
             transaction.gateway = 'litle'
             transaction.recurrent = false
             transaction.transaction_type = 'authorization_capture'
-            transaction.invoice_number = "#{response.created_at}-#{response.authorization.member_id}"
+            transaction.invoice_number = "#{response.created_at.to_date}-#{response.authorization.member_id}"
             transaction.amount = response.amount
             transaction.response = { :authorization => response.message, :capture => (response.capture_response.message rescue nil) }
             transaction.response_code = response.code
@@ -148,8 +148,28 @@ def load_membership_transactions
   end
 end
 
+def set_last_billing_date_on_credit_card
+  PhoenixMember.find_in_batches do |group|
+    group.each do |member|
+      tz = Time.now
+      begin
+        @log.info "  * processing Membership Auth response ##{response.id}"
+        transaction = PhoenixTransaction.find_by_member_id member.uuid, :order => "created_at DESC"
+        cc = member.active_credit_card
+        cc.update_attribute :last_successful_bill_date, transaction.created_at
+      rescue Exception => e
+        @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        exit
+      end
+      @log.info "    ... took #{Time.now - tz} for Membership Auth response ##{response.id}"
+    end
+  end
+end
+
 
 #load_enrollment_transactions
 load_membership_transactions
+set_last_billing_date_on_credit_card
 load_refunds
 
