@@ -23,6 +23,16 @@ $(document).ready( function() {
     "aaSorting": [[ 0, "desc" ]]
   });
 
+
+  $('#MyModal').modal({
+    show: false,
+    backdrop: true
+  });
+
+  $('#MyModal modal-footer .primary').click(function(){
+    alert("da")
+  });
+
 });
 
   function member_index_functions(){
