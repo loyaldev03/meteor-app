@@ -1,7 +1,11 @@
 # 1- load customer services and bililng databases
 # 2- Import members
-# 3- load members table on billing again
-# 4- Import transactions.
+# 3- set campaign_id on every membership authorization, to get the amount. 
+#   UPDATE onmc_billing.membership_authorizations SET campaign_id = 
+#      (SELECT campaign_id FROM onmc_billing.members WHERE id =  onmc_billing.membership_authorizations.member_id) WHERE
+#       onmc_billing.membership_authorizations campaign_id IS NULL;
+# 4- load members table on billing again
+# 5- Import transactions.
 
 require 'rails'
 require 'active_record'
@@ -10,7 +14,7 @@ require 'attr_encrypted'
 require 'settingslogic'
 
 CLUB = 1
-CREATED_BY = 2
+DEFAULT_CREATED_BY = 2
 PAYMENT_GW_CONFIGURATION = 1
 
 @log = Logger.new('import_members.log', 10, 1024000)
@@ -80,6 +84,18 @@ end
 class PhoenixPGC < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "payment_gateway_configurations" 
+end
+class PhoenixMemberNote < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "member_notes" 
+end
+class PhoenixEnumeration < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "enumerations" 
+end
+class DispositionType < PhoenixEnumeration
+end
+class CommunicationType < PhoenixEnumeration
 end
 
 
@@ -151,7 +167,7 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
       campaign = BillingCampaign.find_by_id(authorization.campaign_id)
       if campaign.nil? 
         campaign = if billing_member.nil?
-          BillingCampaign.find_by_id(999)
+          BillingCampaign.find_by_id(999) 
         else
           BillingCampaign.find_by_id(billing_member.campaign_id)
         end
@@ -174,11 +190,30 @@ class BillingMembershipCaptureResponse < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "membership_capt_responses" 
 end
+class BillingChargeback < ActiveRecord::Base
+  establish_connection "billing" 
+  self.table_name = "chargebacks" 
+end
+
+
 
 class CustomerServicesOperations < ActiveRecord::Base
   establish_connection "customer_services" 
   self.table_name = "operations"
 end
+class CustomerServicesNotes < ActiveRecord::Base
+  establish_connection "customer_services" 
+  self.table_name = "notes"
+end
+class CustomerServicesNoteType < ActiveRecord::Base
+  establish_connection "customer_services" 
+  self.table_name = "note_types" 
+end
+class CustomerServicesCommunication < ActiveRecord::Base
+  establish_connection "customer_services" 
+  self.table_name = "communications" 
+end
+
 
 class Settings < Settingslogic
   source "#{File.expand_path(File.dirname(__FILE__))}/../../config/application.yml"
@@ -193,4 +228,12 @@ end
 # TODO: => 
 def get_terms_of_membership_name(tom_id)
   "test"
+end
+# TODO: => 
+def get_agent(author = 999)
+  if author == 999
+    DEFAULT_CREATED_BY
+  else
+    DEFAULT_CREATED_BY
+  end
 end
