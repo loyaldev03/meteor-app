@@ -2,7 +2,7 @@
 
 require_relative 'import_models'
 
-BillingMember.find_in_batches do |group|
+BillingMember.where("id > 20238246005").find_in_batches do |group|
   group.each do |member| 
     tz = Time.now
     begin
@@ -39,7 +39,7 @@ BillingMember.find_in_batches do |group|
       phoenix.created_at = member.created_at
       phoenix.updated_at = member.updated_at
       phoenix.phone_number = member.phone
-      phoenix.blacklisted = false
+      phoenix.blacklisted = false # TODO: load this from new_members.blacklisted (new column)
       # phoenix.enrollment_info = { :prospect_token => member.prospect_token }
       phoenix.member_since_date = (member.member_since rescue member.created_at)
       phoenix.save!
