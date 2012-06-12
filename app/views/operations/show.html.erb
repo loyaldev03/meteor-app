@@ -14,8 +14,8 @@
 	  	<td colspan="3"> <%= f.text_area :notes, :value => @operation.notes, :style => 'width: 99%; height: 300px' %> </td>
 	  </tr>
 	  <tr>
-	    <td colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>
-	         <%= link_to t(:Cancel), show_member_path, :class => 'btn' %> </td>
+	    <td colspan="2"> <%= f.submit t('buttons.save_operation_note'), :class => 'btn btn-primary' %>
+	         <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => 'btn' %> </td>
 	  </tr>
 	</tr> 
     <% end%>

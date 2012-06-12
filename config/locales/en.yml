@@ -45,6 +45,9 @@ en:
     save_te_sale: 'Save the sale'
     set_wrong_addres: 'Set wrong address'
     set_wrong_phone_number: 'Set wrong phone number'
+    save_member_note: 'Save note'
+    save_operation_note: 'Save operation'
+    save_credit_card: 'Save credit card'
   activerecord:
     member: 'Member'
     term_of_membership: 'Term of membership'
