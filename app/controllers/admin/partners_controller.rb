@@ -8,7 +8,7 @@ class Admin::PartnersController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @partners }
+      format.json { render json: PartnersDatatable.new(view_context) }
     end
   end
 

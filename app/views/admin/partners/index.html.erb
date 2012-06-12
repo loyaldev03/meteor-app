@@ -1,6 +1,6 @@
 <%- model_class = Partner.new.class -%>
-<h1><%=t '.title', :default => model_class.model_name.human.pluralize %></h1>
-<table class="table table-striped datatable">
+
+<table id="partners_table" class="display" data-source="<%= admin_partners_url(format: "json") %>">
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
@@ -14,31 +14,14 @@
     </tr>
   </thead>
   <tbody>
-    <% @partners.each do |partner| %>
-      <tr>
-        <td><%= link_to partner.id, admin_partner_path(partner) %></td>
-        <td><%= partner.prefix %></td>
-        <td><%= partner.name %></td>
-        <td><%= partner.contract_uri %></td>
-        <td><%= partner.website_url %></td>
-        <td><%= partner.description %></td>
-        <td><%=l partner.created_at %></td>
-        <td>
-          <%= link_to t(:dashboard), admin_partner_dashboard_path(partner.prefix), :class => 'btn btn-mini' %>
-
-          <%= link_to t(:edit),
-                      edit_admin_partner_path(partner), :class => 'btn btn-mini' %>
-          <%= link_to t(:destroy),
-                      admin_partner_path(partner),
-                      :method => :delete,
-                      :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
-                      :class => 'btn btn-mini btn-danger' %>
-        </td>
-      </tr>
-    <% end %>
   </tbody>
 </table>
 
 <%= link_to t(:new),
             new_admin_partner_path,
             :class => 'btn btn-primary' %>
+
+
+<script>
+  $(document).ready(partner_index_functions());
+</script>
