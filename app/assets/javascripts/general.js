@@ -23,7 +23,6 @@ $(document).ready( function() {
     "aaSorting": [[ 0, "desc" ]]
   });
 
-
   $('#MyModal').modal({
     show: false,
     backdrop: true
@@ -95,6 +94,14 @@ $(document).ready( function() {
 
   function operation_member_functions(){
     $('#'+filter).toggleClass("btn-info");
+    $('#operations_table').dataTable({
+      "sPaginationType": "full_numbers",
+      "bJQueryUI": true,
+      "bProcessing": true,
+      "bServerSide": true,
+      "aaSorting": [[ 0, "desc" ]],
+      "sAjaxSource": $('#operations_table').data('source'),
+      });
   };
 
   function show_member_functions(){

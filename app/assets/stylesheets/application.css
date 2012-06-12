@@ -10,8 +10,10 @@
  *
  *= require_self
  *= require_tree .
- *= require dataTables/jquery.dataTables
+ *= require jquery.ui.core
+ *= require jquery.ui.theme
  *= require dataTables/jquery.dataTables.bootstrap
+ *= require dataTables/src/demo_table_jui
 */
 form .clearfix:before, form .clearfix:after {
   display: inline;

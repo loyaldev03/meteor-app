@@ -3,6 +3,16 @@ class OperationsController < ApplicationController
   before_filter :validate_member_presence
   layout '2-cols'
 
+  def index
+    if request.post?
+      filter = params[:filter]
+    end
+    respond_to do |format|
+      format.html
+      format.json { render json: OperationsDatatable.new(view_context,@current_member,@current_partner,@current_club,filter)}
+    end
+  end
+
   # GET /domains/1
   # GET /domains/1.json
   def show

@@ -1,5 +1,5 @@
 
-<%= form_for (show_member_path), :html => { :id => "operation_filter" }  do %>
+<%= form_for (operations_path), :method => :post, :html => { :id => "operation_filter" }, do %>
 <table>
   <td> <%= submit_tag('Billing', {:name => "filter", :value => "all", :id => "all" }) %> </td>
   <td> <%= submit_tag('Billing', {:name => "filter", :value => "billing", :id => "billing" }) %> </td>
@@ -9,7 +9,8 @@
   <td> <%= submit_tag('Others', {:name => "filter", :value => "others", :id => "others"  }) %> </td>
 </table>
 <% end %>
-<table class="table table-bordered datatable_only_sorting">
+
+<table id="operations_table" class="display" data-source="<%= operations_url(format: "json") %>">
   <thead>
     <tr>
       <th> Date </th>
@@ -19,22 +20,6 @@
     </tr>
   </thead>
   <tbody>
-    <% operations.each do |operation| %>
-    <tr>
-      <td>
-        <%= I18n.l operation.operation_date, :format => :long %>
-      </td>  
-      <td>
-        <%= link_to operation.description.truncate(50), operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,:id => operation.id) %>
-      </td>
-      <td>
-        <%= operation.notes.truncate(30) if operation.notes != nil %> 
-      </td>
-      <td>
-        <%= operation.created_by.username %>
-      </td>
-    </tr>
-    <% end %>
   </tbody>
 </table>
 

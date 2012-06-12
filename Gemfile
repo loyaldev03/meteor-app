@@ -25,6 +25,8 @@ group :assets do
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
   # gem 'therubyracer', :platform => :ruby
 
+  gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
+  gem 'jquery-ui-rails'
   gem 'uglifier', '>= 1.0.3'
 end
 
@@ -43,8 +45,6 @@ gem 'twitter-bootstrap-rails', '2.0.6'
 gem 'jquery-rails'
 
 gem 'rails3_acts_as_paranoid'
-
-gem 'jquery-datatables-rails'
 
 gem "airbrake"
 

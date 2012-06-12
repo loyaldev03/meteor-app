@@ -25,7 +25,8 @@ SacPlatform::Application.routes.draw do
       match '/members' => 'members#index', as: 'members', :via => [:get, :post]
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
-        resources :operations, :only => [ :show, :update ]
+        match '/operations' => 'operations#index', as: 'operations', :via => [:post, :get]
+        resources :operations, :only => [:show, :update]
         resources :member_notes, :only => [ :new, :create ]
         resources :terms_of_memberships, :only => [ :show ]
         resources :credit_cards, :only => [ :new, :create ] do
