@@ -1,5 +1,6 @@
 <%= link_to "Add a credit card", new_credit_card_path, :class => "btn btn-warning" unless @current_member.lapsed? %>
-<table class="table table-bordered table-condensed datatable_only_sorting">
+
+<table class="table table-bordered table-condensed">
   <thead>
     <tr>
       <th> <%= t('activerecord.attributes.credit_card.number') %> </th>
@@ -16,9 +17,14 @@
           class="blacklisted" 
         <% elsif cc.active %>
           class = "ligthgreen"
+        <% else %>
+          class="<%= cycle("odd","even") %>" 
         <% end %>
-    >
-      <td> <%= cc.number %> </td>
+        >
+      <td
+         > 
+        <%= cc.number %> 
+      </td>
       <td> <%= cc.expire_month %> / <%= cc.expire_year %> </td>
       <td> <%= I18n.l cc.last_successful_bill_date, :format => :long if !cc.last_successful_bill_date.nil? %> </td>
       <td>
