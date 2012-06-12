@@ -27,6 +27,7 @@ form .clearfix:before, form .clearfix:after {
 }
 
 .red{
+	color: #FFFFFF;
 	background-color: red;
 }
 
