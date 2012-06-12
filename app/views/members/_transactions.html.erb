@@ -1,4 +1,5 @@
-<table class="table table-bordered datatable_only_sorting">
+
+<table id="transactions_table" class="display" data-source="<%= transactions_url(format: "json") %>">
   <thead>
     <tr>
       <th> <%= t('activerecord.attributes.transaction.date') %> </th>
@@ -6,30 +7,13 @@
       <th> <%= t('activerecord.attributes.transaction.amount') %> </th>
       <th> <%= t('activerecord.attributes.transaction.refundable') %> </th>
       <th> <%= t('activerecord.attributes.transaction.gw_trans') %> </th>
-      <th></th>
+      <th> actions </th>
     </tr>
   </thead>
-  <% transactions.each do |transaction| %>
-  <tr>
-    <td>
-      <%= I18n.l transaction.created_at, :format => :long %>
-    </td>
-    <td>
-      <%= transaction.to_label %>
-    </td>
-    <td>
-      <%= number_to_currency transaction.amount %>
-    </td>
-    <td>
-      <%= number_to_currency transaction.amount_available_to_refund if transaction.can_be_refunded? %>
-    </td>
-    <td>
-      <%= transaction.response_transaction_id %>
-    </td>
-    <td>
-      <%= link_to( t('refund'), member_refund_path(:transaction_id => transaction.id), :class => "btn btn-warning") if transaction.can_be_refunded? %>
-    </td>
-  </tr>
-  <% end %>
-  
+  <tbody>
+  </tbody>
 </table>
+
+<script>
+  $(document).ready(transactions_member_functions());
+</script>

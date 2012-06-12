@@ -100,9 +100,22 @@ $(document).ready( function() {
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 3 ] }],
       "sAjaxSource": $('#operations_table').data('source'),
       });
   };
+
+  function transactions_member_functions(){
+    $('#transactions_table').dataTable({
+      "sPaginationType": "full_numbers",
+      "bJQueryUI": true,
+      "bProcessing": true,
+      "bServerSide": true,
+      "aaSorting": [[ 0, "desc" ]],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5 ] }],
+      "sAjaxSource": $('#transactions_table').data('source'),
+    });
+  }
 
   function show_member_functions(){
     $('.help').popover();

@@ -1,11 +1,13 @@
 <table class="table table-condensed table-bordered">
   <thead>
-    <th> <%= t('activerecord.attributes.communication.sent_success') %> </th>
-  	<th> <%= t('activerecord.attributes.communication.template_name') %> </th>
-  	<th> <%= t('activerecord.attributes.communication.email') %> </th>
-  	<th> <%= t('activerecord.attributes.communication.scheduled_at') %> </th>
-  	<th> <%= t('activerecord.attributes.communication.processed_at') %> </th>
-  	<th> <%= t('activerecord.attributes.communication.template_type') %> </th>
+    <tr>
+      <th> <%= t('activerecord.attributes.communication.sent_success') %> </th>
+    	<th> <%= t('activerecord.attributes.communication.template_name') %> </th>
+    	<th> <%= t('activerecord.attributes.communication.email') %> </th>
+    	<th> <%= t('activerecord.attributes.communication.scheduled_at') %> </th>
+    	<th> <%= t('activerecord.attributes.communication.processed_at') %> </th>
+    	<th> <%= t('activerecord.attributes.communication.template_type') %> </th>
+    </tr>
   </thead>
   <tbody>
   <% unless @communications.nil? %>

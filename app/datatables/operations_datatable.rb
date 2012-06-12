@@ -25,7 +25,7 @@ private
       [
         I18n.l(operation.operation_date,:format => :long),
         #I couldnt make it work in another way. TODO: fix operation#show url.
-        link_to(operation.description.truncate(60), "#{@current_member.visible_id}/operations/#{operation.id}"), 
+        link_to(operation.description.truncate(50), "#{@current_member.visible_id}/operations/#{operation.id}"), 
         operation.notes,
         operation.created_by.username
       ]

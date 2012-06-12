@@ -54,6 +54,7 @@ en:
     email_template: 'Email template'
     attributes:
       transaction:
+        refundable: 'Refundable'
         refund_amount_help: 'Amount to refund (e.g.: $45.34)'
         transaction_types: 
           sale: Sale

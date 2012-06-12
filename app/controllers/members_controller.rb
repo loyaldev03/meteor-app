@@ -30,7 +30,6 @@ class MembersController < ApplicationController
     @notes = @current_member.member_notes.paginate(:page => params[:page], :order => "created_at DESC")
     @credit_cards = @current_member.credit_cards.all
     @active_credit_card = @current_member.active_credit_card
-    @transactions = @current_member.transactions.paginate(:page => params[:page], :order => "created_at DESC")
     @fulfillments = @current_member.fulfillments.all
     @communications = @current_member.communications.all
   end
