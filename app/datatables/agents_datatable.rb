@@ -19,7 +19,7 @@ private
   def data
     agents.map do |agent|
       [
-        link_to(agent.id, "/agents/#{agent.id}"),
+        link_to(agent.id, "agents/#{agent.id}"),
         agent.email, 
         agent.username,
          if (agent.locked_at); I18n.l(agent.locked_at,:format=>:long) ;end,
@@ -54,7 +54,7 @@ private
   end
 
   def sort_column
-    columns = ['id', 'email', 'name', 'username', 'locked_at', 'created_at', 'actions']
+    columns = ['id', 'email', 'username', 'locked_at', 'created_at', 'actions']
     columns[params[:iSortCol_0].to_i]
   end
 

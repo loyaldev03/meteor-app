@@ -40,7 +40,7 @@ $(document).ready( function() {
       "bJQueryUI": true,
       "bProcessing": true,
       "bServerSide": true,
-      "aaSorting": [[ 0, "desc" ]],
+      "aaSorting": [[ 0, "asc" ]],
       "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 5 ] }],
       "sAjaxSource": $('#agents_table').data('source'),
     });
@@ -53,7 +53,7 @@ $(document).ready( function() {
       "bJQueryUI": true,
       "bProcessing": true,
       "bServerSide": true,
-      "aaSorting": [[ 0, "desc" ]],
+      "aaSorting": [[ 0, "asc" ]],
       "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 7 ] }],
       "sAjaxSource": $('#partners_table').data('source'),
     });
