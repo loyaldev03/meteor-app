@@ -34,14 +34,14 @@ $(document).ready( function() {
 
 });
 
-  function agent_index_functions(){
+  function agent_index_functions(column_count){
     $('#agents_table').dataTable({
       "sPaginationType": "full_numbers",
       "bJQueryUI": true,
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 5 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#agents_table').data('source'),
     });
 

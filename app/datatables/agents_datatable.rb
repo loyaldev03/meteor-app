@@ -41,7 +41,6 @@ private
   end
 
   def sort_column
-    columns = ['id', 'email', 'username', 'locked_at', 'created_at', 'actions']
-    columns[params[:iSortCol_0].to_i]
+    Agent.datatable_columns[params[:iSortCol_0].to_i]
   end
 end    

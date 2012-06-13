@@ -30,7 +30,10 @@ class Agent < ActiveRecord::Base
     where(conditions).where(["lower(username) = :value OR lower(email) = :value", { :value => login.strip.downcase }]).first
   end
 
-  
+  def self.datatable_columns
+    [ 'id', 'email', 'username', 'locked_at', 'created_at' ]
+  end
+
  protected
 
    # Attempt to find a user by it's email. If a record is found, send new
