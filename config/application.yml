@@ -30,6 +30,7 @@ defaults: &defaults
     credit_card_already_in_use: 401
     credit_card_blacklisted: 402
     member_email_blacklisted: 403
+    automatic_recycle_credit_card: 404
     others: 1000
   error_codes:
     success: '000'
