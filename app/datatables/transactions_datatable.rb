@@ -6,16 +6,14 @@ class TransactionsDatatable < Datatable
     @current_club = current_club
   end
 
-  def as_json(options = {})
-    {
-      sEcho: params[:sEcho].to_i,
-      iTotalRecords: @current_member.transactions.count,
-      iTotalDisplayRecords: transactions.total_entries,
-      aaData: data
-    }
+private
+  def total_records
+    @current_member.transactions.count
   end
 
-private
+  def total_entries
+    transactions.total_entries
+  end
 
   def data
     transactions.map do |transaction|

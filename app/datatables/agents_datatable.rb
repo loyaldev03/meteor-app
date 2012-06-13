@@ -1,15 +1,15 @@
 class AgentsDatatable < Datatable
 
-  def as_json(options = {})
-    {
-      sEcho: params[:sEcho].to_i,
-      iTotalRecords: Agent.count,
-      iTotalDisplayRecords: agents.total_entries,
-      aaData: data
-    }
-  end
 
 private
+
+  def total_records
+    Agent.count
+  end
+
+  def total_entries
+    agents.total_entries
+  end
 
   def data
     agents.map do |agent|

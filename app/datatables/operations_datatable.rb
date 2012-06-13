@@ -8,16 +8,15 @@ class OperationsDatatable < Datatable
     @filter = filter
   end
 
-  def as_json(options = {})
-    {
-      sEcho: params[:sEcho].to_i,
-      iTotalRecords: @current_member.operations.count,
-      iTotalDisplayRecords: operations.total_entries,
-      aaData: data
-    }
+private
+
+  def total_records
+    @current_member.operations.count
   end
 
-private
+  def total_entries
+    operations.total_entries
+  end
 
   def data
     operations.map do |operation|

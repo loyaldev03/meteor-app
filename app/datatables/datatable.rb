@@ -5,6 +5,15 @@ class Datatable
     @view = view
   end
 
+  def as_json(options = {})
+    {
+      sEcho: params[:sEcho].to_i,
+      iTotalRecords: total_records,
+      iTotalDisplayRecords: total_entries,
+      aaData: data
+    }
+  end
+  
 private
 
   def page

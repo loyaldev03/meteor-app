@@ -1,15 +1,13 @@
 class PartnersDatatable < Datatable
 
-  def as_json(options = {})
-    {
-      sEcho: params[:sEcho].to_i,
-      iTotalRecords: Partner.count,
-      iTotalDisplayRecords: partners.total_entries,
-      aaData: data
-    }
+private
+  def total_records
+    Partner.count
   end
 
-private
+  def total_entries
+    partners.total_entries
+  end
 
   def data
     partners.map do |partner|
