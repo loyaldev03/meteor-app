@@ -1,5 +1,4 @@
-class OperationsDatatable
-  delegate :params, :h, :link_to, :number_to_currency, to: :@view
+class OperationsDatatable < Datatable
 
   def initialize(view,current_member,current_partner,current_club,filter)
     @view = view
@@ -66,20 +65,9 @@ private
     operations
   end
 
-  def page
-    params[:iDisplayStart].to_i/per_page + 1
-  end
-
-  def per_page
-    params[:iDisplayLength].to_i > 0 ? params[:iDisplayLength].to_i : 10
-  end
-
   def sort_column
     columns = ['operation_date', 'description', 'notes', 'created_by']
     columns[params[:iSortCol_0].to_i]
   end
 
-  def sort_direction
-    params[:sSortDir_0] == "desc" ? "desc" : "asc"
-  end
 end    
