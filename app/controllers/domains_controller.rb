@@ -4,14 +4,12 @@ class DomainsController < ApplicationController
   # GET /domains
   # GET /domains.json
   def index
-    @domains = Domain.where(:partner_id => @current_partner)
-
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @domains }
+      format.json { render json: DomainsDatatable.new(view_context,@current_partner)}
     end
   end
-
+  
   # GET /domains/1
   # GET /domains/1.json
   def show

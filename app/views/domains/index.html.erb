@@ -1,6 +1,6 @@
 <%- model_class = Domain.new.class -%>
 <h1><%=t '.title', :default => model_class.model_name.human.pluralize %></h1>
-<table class="table table-striped datatable">
+<table id="domains_table" class="display" data-source="<%= domains_url(format: "json") %>">
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
@@ -13,28 +13,11 @@
     </tr>
   </thead>
   <tbody>
-    <% @domains.each do |domain| %>
-      <tr>
-        <td><%= link_to domain.id, domain_path(:id => domain.id) %></td>
-        <td><%= domain.url %></td>
-        <td><%= domain.description %></td>
-        <td><%= domain.data_rights %></td>
-        <td><%= domain.hosted %></td>
-        <td><%= I18n.l domain.created_at, :format => :long %></td>
-        <td>
-          <%= link_to t(:edit),
-                      edit_domain_path(:id => domain.id), :class => 'btn btn-mini' %>
-          <%= link_to t(:destroy),
-                      domain_path(:id => domain.id),
-                      :method => :delete, 
-                      :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => "Are you sure?")),
-                      :class => 'btn btn-mini btn-danger' %>
-        </td>
-      </tr>
-    <% end %>
   </tbody>
 </table>
 
-<%= link_to t(:new),
-            new_domain_path,
-            :class => 'btn btn-primary' %>
+<%= link_to t(:new), new_domain_path, :class => 'btn btn-primary' %>
+
+<script>
+  $(document).ready(domain_index_functions(<%= Domain.datatable_columns.size%>))
+</script>

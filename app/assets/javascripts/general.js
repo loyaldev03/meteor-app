@@ -28,10 +28,6 @@ $(document).ready( function() {
     backdrop: true
   });
 
-  $('#MyModal modal-footer .primary').click(function(){
-    alert("da")
-  });
-
 });
 
   function agent_index_functions(column_count){
@@ -69,6 +65,18 @@ $(document).ready( function() {
       "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#clubs_table').data('source'),
     });
+  }
+
+  function domain_index_functions(column_count){
+    $('#domains_table').dataTable({
+      "sPaginationType": "full_numbers",
+      "bJQueryUI": true,
+      "bProcessing": true,
+      "bServerSide": true,
+      "aaSorting": [[ 0, "asc" ]],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+      "sAjaxSource": $('#domains_table').data('source'),
+    });   
   }
 
   function member_index_functions(){
