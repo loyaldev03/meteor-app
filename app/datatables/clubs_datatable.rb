@@ -18,11 +18,11 @@ private
         club.name, 
         club.description,
         club.members.count,
-        [link_to(I18n.t('activerecord.members'), @url_helpers.members_path(@current_partner.prefix, club.name), :class => 'btn btn-mini'),
-         link_to(I18n.t(:edit), @url_helpers.edit_club_path(:partner_prefix => @current_partner.prefix,:id => club.id), :class => 'btn btn-mini'),
-         link_to(I18n.t(:destroy), @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id), :method => :delete,
+        link_to(I18n.t('activerecord.member'), @url_helpers.members_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')+
+        link_to(I18n.t(:edit), @url_helpers.edit_club_path(:partner_prefix => @current_partner.prefix,:id => club.id), :class => 'btn btn-mini')+
+        link_to(I18n.t(:destroy), @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id), :method => :delete,
                         :confirm => I18n.t('.confirm', :default => I18n.t("helpers.links.confirm", :default => 'Are you sure?')),
-                        :class => 'btn btn-mini btn-danger')]
+                        :class => 'btn btn-mini btn-danger')
       ]
     end
   end

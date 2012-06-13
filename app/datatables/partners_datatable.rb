@@ -18,11 +18,11 @@ private
         partner.name,
         partner.contract_uri,
         partner.website_url,
-        [link_to(I18n.t(:dashboard), "/partner/#{partner.prefix}/dashboard", :class => 'btn btn-mini'),
-         link_to(I18n.t(:edit), "partners/#{partner.id}/edit", :class => 'btn btn-mini' ),
-         link_to(I18n.t(:destroy), "partners/#{partner.id}", :method => :delete,
+        link_to(I18n.t(:dashboard), "/partner/#{partner.prefix}/dashboard", :class => 'btn btn-mini')+
+        link_to(I18n.t(:edit), "partners/#{partner.id}/edit", :class => 'btn btn-mini' )+
+        link_to(I18n.t(:destroy), "partners/#{partner.id}", :method => :delete,
                         :confirm => I18n.t('.confirm', :default => I18n.t("helpers.links.confirm", :default => 'Are you sure?')),
-                        :class => 'btn btn-mini btn-danger')]
+                        :class => 'btn btn-mini btn-danger')
       ]
     end
   end
