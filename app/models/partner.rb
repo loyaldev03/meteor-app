@@ -11,4 +11,9 @@ class Partner < ActiveRecord::Base
   validates :name , :presence => true, :uniqueness => true, :name_is_not_admin => true
   validates :prefix, :presence => true, :uniqueness => true, :prefix_is_not_admin => true
 
+  def self.datatable_columns
+    ['id', 'prefix', 'name', 'contract_uri', 'website_url' ]
+  end
+
+
 end

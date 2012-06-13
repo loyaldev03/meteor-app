@@ -3,13 +3,9 @@
 <table id="partners_table" class="display" data-source="<%= admin_partners_url(format: "json") %>">
   <thead>
     <tr>
-      <th><%= model_class.human_attribute_name(:id) %></th>
-      <th><%= model_class.human_attribute_name(:prefix) %></th>
-      <th><%= model_class.human_attribute_name(:name) %></th>
-      <th><%= model_class.human_attribute_name(:contract_uri) %></th>
-      <th><%= model_class.human_attribute_name(:website_url) %></th>
-      <th><%= model_class.human_attribute_name(:description) %></th>
-      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <% Partner.datatable_columns.each do |column| %>
+        <th><%= model_class.human_attribute_name(column) %></th>
+      <% end %>
       <th><%= t(:actions) %></th>
     </tr>
   </thead>
@@ -23,5 +19,5 @@
 
 
 <script>
-  $(document).ready(partner_index_functions());
+  $(document).ready(partner_index_functions(<%= Partner.datatable_columns.size %>));
 </script>

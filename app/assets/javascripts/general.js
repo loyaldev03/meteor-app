@@ -47,14 +47,14 @@ $(document).ready( function() {
 
   }
 
-  function partner_index_functions(){
+  function partner_index_functions(column_count){
     $('#partners_table').dataTable({
       "sPaginationType": "full_numbers",
       "bJQueryUI": true,
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 7 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#partners_table').data('source'),
     });
   }
