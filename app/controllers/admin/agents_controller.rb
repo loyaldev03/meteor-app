@@ -2,11 +2,9 @@ class Admin::AgentsController < ApplicationController
   # GET /agents
   # GET /agents.xml
   def index
-    #@agents = Agent.paginate :page => params[:page] we dont use this, cause we are using datatable.
-    @agents = Agent.all
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @agents }
+      format.json { render json: AgentsDatatable.new(view_context) }
     end
   end
 

@@ -34,6 +34,19 @@ $(document).ready( function() {
 
 });
 
+  function agent_index_functions(){
+    $('#agents_table').dataTable({
+      "sPaginationType": "full_numbers",
+      "bJQueryUI": true,
+      "bProcessing": true,
+      "bServerSide": true,
+      "aaSorting": [[ 0, "desc" ]],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 5 ] }],
+      "sAjaxSource": $('#agents_table').data('source'),
+    });
+
+  }
+
   function partner_index_functions(){
     $('#partners_table').dataTable({
       "sPaginationType": "full_numbers",

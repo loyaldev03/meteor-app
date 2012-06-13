@@ -71,6 +71,11 @@ en:
         login: "Username or email"
         password: "Password"
         remember_me: "Remember me"
+        id: 'ID'
+        email: 'Email'
+        username: 'Username'
+        locked_at: 'Locked ad'
+        created_at: 'Created at'
       member:
         full_name: 'Full name'
         first_name: 'First name'
