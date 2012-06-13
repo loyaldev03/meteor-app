@@ -13,7 +13,7 @@ private
   def data
     partners.map do |partner|
       [
-        link_to(partner.id, "partners/#{partner.id}"),
+        link_to(partner.id, @url_helpers.admin_partner_path(partner)),
         partner.prefix, 
         partner.name,
         partner.contract_uri,

@@ -2,6 +2,7 @@ class TransactionsDatatable < Datatable
 
   def initialize(view,current_member,current_club)
     @view = view
+    @url_helpers = Rails.application.routes.url_helpers
     @current_member = current_member
     @current_club = current_club
   end
