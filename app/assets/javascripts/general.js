@@ -117,7 +117,7 @@ $(document).ready( function() {
   };
 
 
-  function operation_member_functions(){
+  function operation_member_functions(column_count){
     $('#'+filter).toggleClass("btn-info");
     $('#operations_table').dataTable({
       "sPaginationType": "full_numbers",
@@ -125,7 +125,7 @@ $(document).ready( function() {
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 3 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#operations_table').data('source'),
       });
   };

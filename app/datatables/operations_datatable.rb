@@ -66,8 +66,7 @@ private
   end
 
   def sort_column
-    columns = ['operation_date', 'description', 'notes', 'created_by']
-    columns[params[:iSortCol_0].to_i]
+    Operation.datatable_columns[params[:iSortCol_0].to_i]
   end
 
 end    
