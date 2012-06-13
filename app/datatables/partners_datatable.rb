@@ -19,7 +19,7 @@ private
   def data
     partners.map do |partner|
       [
-        link_to(partner.id, "/partner/#{partner.id}"),
+        link_to(partner.id, "partners/#{partner.id}"),
         partner.prefix, 
         partner.name,
         partner.contract_uri,
