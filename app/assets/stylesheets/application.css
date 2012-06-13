@@ -48,9 +48,17 @@ form .clearfix:before, form .clearfix:after {
 	      word-wrap: break-word }
 
 .odd{
-		background-color: #E0EEEE;
+	background-color: #E0EEEE;
 }
 
 .even{
-		background-color: #FFFFFF;
+	background-color: #FFFFFF;
+}
+
+div.dataTables_length select {
+    float: right;
+}
+
+div.dataTables_filter input {
+    float: right;
 }
