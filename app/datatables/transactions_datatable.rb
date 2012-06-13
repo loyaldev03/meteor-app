@@ -24,7 +24,7 @@ private
         number_to_currency(transaction.amount) ,
         transaction.can_be_refunded? ? number_to_currency(transaction.amount_available_to_refund) : '',
         transaction.response_transaction_id,
-        transaction.can_be_refunded? ? link_to(I18n.t('refund'),"#{@current_member.visible_id}/refund/#{transaction.id}", :class => 'btn btn-warning') : '',
+        transaction.can_be_refunded? ? link_to(I18n.t('refund'),"#{@current_member.visible_id}/refund/#{transaction.id}", :class => 'btn btn-warning btn-mini') : '',
       ]
     end
   end

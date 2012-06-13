@@ -19,7 +19,7 @@ private
         agent.username,
         if (agent.locked_at); I18n.l(agent.locked_at,:format=>:long) ;end,
         I18n.l(agent.created_at,:format=>:long),
-        link_to(I18n.t(:edit), "agents/#{agent.id}/edit", :class => 'btn btn-mini' ),+' '+
+        link_to(I18n.t(:edit), "agents/#{agent.id}/edit", :class => 'btn btn-mini' )+' '+
         link_to(I18n.t(:destroy), "agents/#{agent.id}", :method => :delete,
                         :confirm => I18n.t('.confirm', :default => I18n.t("helpers.links.confirm", :default => 'Are you sure?')),
                         :class => 'btn btn-mini btn-danger')
