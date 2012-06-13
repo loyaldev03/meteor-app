@@ -173,7 +173,7 @@ class Member < ActiveRecord::Base
         res = enroll(self.active_credit_card, 0.0, agent, false)
         if res[:code] == Settings.error_codes.success
           message = "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}"
-          Auditory.audit(agent, self, message, TermsOfMembership.find(new_tom_id), Settings.operation_types.save_the_sale)
+          Auditory.audit(agent, TermsOfMembership.find(new_tom_id), message, self, Settings.operation_types.save_the_sale)
         end
         res
       end

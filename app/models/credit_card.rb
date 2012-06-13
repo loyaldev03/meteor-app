@@ -53,13 +53,13 @@ class CreditCard < ActiveRecord::Base
     self.last_digits = self.number.last(4)
   end
   
-  # refs #17832
+  # refs #17832 and #19603
   # 6 Days Later if not successful = (+3), 3/2014
   # 6 Days Later if not successful = (+2), 3/2013
   # 6 Days Later if not successful = (+4) 3/2015
   # 6 Days Later if not successful = (+1) 3/2012
   def self.recycle_expired_rule(acc, times)
-    if acc.expire_year.to_i < Date.today.year
+    if acc.am_card.expired?
       case times
         when 1
           new_year_exp=acc.expire_year.to_i + 3
@@ -74,7 +74,6 @@ class CreditCard < ActiveRecord::Base
       end
       CreditCard.transaction do
         begin
-          # TODO: add operation! "Recycled Expired card"
           acc.update_attribute :active , false
           cc = CreditCard.new 
           cc.member = acc.member
@@ -83,6 +82,7 @@ class CreditCard < ActiveRecord::Base
           cc.expire_year = new_year_exp
           cc.active = true
           cc.save!
+          Auditory.audit(nil, cc, "Automatic Recycled Expired card", cc.member, Settings.operation_types.automatic_recycle_credit_card)
           return cc
         rescue Exception => e
           logger.error e
