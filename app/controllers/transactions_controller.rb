@@ -5,7 +5,7 @@ class TransactionsController < ApplicationController
   def index
     respond_to do |format|
       format.html
-      format.json { render json: TransactionsDatatable.new(view_context,@current_member,@current_club)}
+      format.json { render json: TransactionsDatatable.new(view_context,@current_partner,@current_club,@current_member)}
     end
   end
 end

@@ -1,8 +1,9 @@
 class TransactionsDatatable < Datatable
 
-  def initialize(view,current_member,current_club)
+  def initialize(view,current_partner,current_club,current_member)
     @view = view
     @url_helpers = Rails.application.routes.url_helpers
+    @current_partner = current_partner
     @current_member = current_member
     @current_club = current_club
   end
@@ -24,7 +25,9 @@ private
         number_to_currency(transaction.amount) ,
         transaction.can_be_refunded? ? number_to_currency(transaction.amount_available_to_refund) : '',
         transaction.response_transaction_id,
-        transaction.can_be_refunded? ? link_to(I18n.t('refund'),"#{@current_member.visible_id}/refund/#{transaction.id}", :class => 'btn btn-warning btn-mini') : '',
+        transaction.can_be_refunded? ? link_to(I18n.t('refund'),
+            @url_helpers.member_refund_path(@current_partner.prefix,@current_club.name,@current_member.visible_id, :transaction_id => transaction.id), 
+            :class=>"btn btn-warning btn-mini") : '',
       ]
     end
   end

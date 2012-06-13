@@ -1,6 +1,6 @@
 class OperationsDatatable < Datatable
 
-  def initialize(view,current_member,current_partner,current_club,filter)
+  def initialize(view,current_partner,current_club,current_member,filter)
     @view = view
     @url_helpers = Rails.application.routes.url_helpers
     @current_member = current_member
@@ -24,7 +24,7 @@ private
       [
         I18n.l(operation.operation_date,:format => :long),
         #I couldnt make it work in another way. TODO: fix operation#show url.
-        link_to(operation.description.truncate(50), "#{@current_member.visible_id}/operations/#{operation.id}"), 
+        link_to(operation.description.truncate(50), @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,:id => operation.id)), 
         operation.notes,
         operation.created_by.username
       ]

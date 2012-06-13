@@ -18,9 +18,9 @@ private
         partner.name,
         partner.contract_uri,
         partner.website_url,
-        link_to(I18n.t(:dashboard), "/partner/#{partner.prefix}/dashboard", :class => 'btn btn-mini')+
-        link_to(I18n.t(:edit), "partners/#{partner.id}/edit", :class => 'btn btn-mini' )+
-        link_to(I18n.t(:destroy), "partners/#{partner.id}", :method => :delete,
+        link_to(I18n.t(:dashboard), @url_helpers.admin_partner_dashboard_path(partner.prefix), :class => 'btn btn-mini')+
+        link_to(I18n.t(:edit), @url_helpers.edit_admin_partner_path(partner), :class => 'btn btn-mini' )+
+        link_to(I18n.t(:destroy), @url_helpers.admin_partner_path(partner), :method => :delete,
                         :confirm => I18n.t('.confirm', :default => I18n.t("helpers.links.confirm", :default => 'Are you sure?')),
                         :class => 'btn btn-mini btn-danger')
       ]

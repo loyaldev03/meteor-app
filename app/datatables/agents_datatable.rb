@@ -14,13 +14,13 @@ private
   def data
     agents.map do |agent|
       [
-        link_to(agent.id, "agents/#{agent.id}"),
+        link_to(agent.id, @url_helpers.admin_agent_path(agent)),
         agent.email, 
         agent.username,
         if (agent.locked_at); I18n.l(agent.locked_at,:format=>:long) ;end,
         I18n.l(agent.created_at,:format=>:long),
-        link_to(I18n.t(:edit), "agents/#{agent.id}/edit", :class => 'btn btn-mini' )+' '+
-        link_to(I18n.t(:destroy), "agents/#{agent.id}", :method => :delete,
+        link_to(I18n.t(:edit), @url_helpers.edit_admin_agent_path(agent), :class => 'btn btn-mini' )+' '+
+        link_to(I18n.t(:destroy), @url_helpers.admin_agent_path(agent), :method => :delete,
                         :confirm => I18n.t('.confirm', :default => I18n.t("helpers.links.confirm", :default => 'Are you sure?')),
                         :class => 'btn btn-mini btn-danger')
       ]
