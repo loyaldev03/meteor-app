@@ -130,14 +130,14 @@ $(document).ready( function() {
       });
   };
 
-  function transactions_member_functions(){
+  function transactions_member_functions(column_count){
     $('#transactions_table').dataTable({
       "sPaginationType": "full_numbers",
       "bJQueryUI": true,
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#transactions_table').data('source'),
     });
   }

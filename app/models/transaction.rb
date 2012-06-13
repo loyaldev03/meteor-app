@@ -18,6 +18,10 @@ class Transaction < ActiveRecord::Base
     I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + ': ' + response_result[0..50]
   end
 
+  def self.datatable_columns
+    ['created_at']
+  end
+
   def member=(member)
     self.member_id = member.id
     # MeS supports only 17 characters on order_id
