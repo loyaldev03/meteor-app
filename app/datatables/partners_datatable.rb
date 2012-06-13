@@ -1,6 +1,7 @@
 class PartnersDatatable < Datatable
 
 private
+
   def total_records
     Partner.count
   end
@@ -17,8 +18,6 @@ private
         partner.name,
         partner.contract_uri,
         partner.website_url,
-        partner.description,
-        I18n.l(partner.created_at,:format=>:long),
         [link_to(I18n.t(:dashboard), "/partner/#{partner.prefix}/dashboard", :class => 'btn btn-mini'),
          link_to(I18n.t(:edit), "partners/#{partner.id}/edit", :class => 'btn btn-mini' ),
          link_to(I18n.t(:destroy), "partners/#{partner.id}", :method => :delete,
@@ -41,9 +40,7 @@ private
     partners
   end
 
-
   def sort_column
-    columns = ['id', 'prefix', 'name', 'contract_uri', 'website_url', 'description', 'created_at']
-    columns[params[:iSortCol_0].to_i]
+    Partner.datatable_columns[params[:iSortCol_0].to_i]
   end
 end    
