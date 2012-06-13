@@ -4,8 +4,6 @@ class Admin::PartnersController < ApplicationController
   # GET /partners
   # GET /partners.json
   def index
-    @partners = Partner.all
-
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: PartnersDatatable.new(view_context) }
