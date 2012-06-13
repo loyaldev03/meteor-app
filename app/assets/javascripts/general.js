@@ -34,14 +34,14 @@ $(document).ready( function() {
 
 });
 
-  function agent_index_functions(){
+  function agent_index_functions(column_count){
     $('#agents_table').dataTable({
       "sPaginationType": "full_numbers",
       "bJQueryUI": true,
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 5 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#agents_table').data('source'),
     });
 
@@ -117,7 +117,7 @@ $(document).ready( function() {
   };
 
 
-  function operation_member_functions(){
+  function operation_member_functions(column_count){
     $('#'+filter).toggleClass("btn-info");
     $('#operations_table').dataTable({
       "sPaginationType": "full_numbers",
@@ -125,19 +125,19 @@ $(document).ready( function() {
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 3 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#operations_table').data('source'),
       });
   };
 
-  function transactions_member_functions(){
+  function transactions_member_functions(column_count){
     $('#transactions_table').dataTable({
       "sPaginationType": "full_numbers",
       "bJQueryUI": true,
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#transactions_table').data('source'),
     });
   }

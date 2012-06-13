@@ -27,5 +27,5 @@
 
 <script>
   var filter = "<%= @operation_filter.nil? ? 'all' : @operation_filter %>";
-  $(document).ready(operation_member_functions());
+  $(document).ready(operation_member_functions(<% Operation.datatable_columns.size %>));
 </script>

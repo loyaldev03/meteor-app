@@ -43,8 +43,7 @@ private
   end
 
   def sort_column
-    columns = ['created_at', 'transaction_type', 'amount', 'refundable', 'gw_trans', 'actions']
-    columns[params[:iSortCol_0].to_i]
+    Transaction.datatable_columns[params[:iSortCol_0].to_i]
   end
 
 end    

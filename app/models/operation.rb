@@ -6,6 +6,10 @@ class Operation < ActiveRecord::Base
 
   before_create :set_operation_date_if_nil
 
+  def self.datatable_columns
+    ['operation_date', 'description', 'notes']
+  end
+
   private
     def set_operation_date_if_nil
       self.operation_date = DateTime.now if self.operation_date.nil?
