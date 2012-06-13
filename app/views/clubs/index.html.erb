@@ -1,6 +1,7 @@
 <%- model_class = Club.new.class -%>
 <h1><%=t '.title', :default => model_class.model_name.human.pluralize %></h1>
-<table class="table table-striped datatable">
+
+<table id="clubs_table" class="display" data-source="<%= clubs_url(format: "json") %>">
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
@@ -11,27 +12,12 @@
     </tr>
   </thead>
   <tbody>
-    <% @clubs.each do |club| %>
-      <tr>
-        <td><%= link_to club.id, club_path(:id => club.id) %></td>
-        <td><%= club.name %></td>
-        <td><%= club.description %></td>
-        <td><%= club.members.count %></td>
-        <td>
-          <%= link_to t(:members), members_path(@current_partner.prefix, club.name), :class => 'btn btn-mini' %>
-          <%= link_to t(:edit),
-                      edit_club_path(:id => club.id), :class => 'btn btn-mini' %>
-          <%= link_to t(:destroy),
-                      club_path(:id => club.id),
-                      :method => :delete,
-                      :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
-                      :class => 'btn btn-mini btn-danger' %>
-        </td>
-      </tr>
-    <% end %>
   </tbody>
 </table>
 
 <%= link_to t(:new),
             new_club_path,
             :class => 'btn btn-primary' %>
+<script>
+  $(document).ready(club_index_functions(<%= Club.datatable_columns.size %>));
+</script>

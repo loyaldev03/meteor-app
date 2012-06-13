@@ -30,6 +30,10 @@ class Club < ActiveRecord::Base
     [ partner.name, name ].join(' ')
   end
 
+  def self.datatable_columns
+    ['id', 'name', 'description' ]
+  end
+
   private
     def add_default_member_groups
       ['VIP', 'Celebrity', 'Notable'].each do |name|

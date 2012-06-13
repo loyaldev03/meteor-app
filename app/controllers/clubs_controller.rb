@@ -4,12 +4,9 @@ class ClubsController < ApplicationController
   # GET /clubs
   # GET /clubs.json
   def index
-    @clubs = Club.where(:partner_id => @current_partner)
-
-
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @clubs }
+      format.json { render json: ClubsDatatable.new(view_context,@current_partner) }
     end
   end
 

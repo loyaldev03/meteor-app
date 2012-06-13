@@ -58,6 +58,18 @@ $(document).ready( function() {
       "sAjaxSource": $('#partners_table').data('source'),
     });
   }
+  
+  function club_index_functions(column_count){
+    $('#clubs_table').dataTable({
+      "sPaginationType": "full_numbers",
+      "bJQueryUI": true,
+      "bProcessing": true,
+      "bServerSide": true,
+      "aaSorting": [[ 0, "asc" ]],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+      "sAjaxSource": $('#clubs_table').data('source'),
+    });
+  }
 
   function member_index_functions(){
     $('#at_least_one_required').submit(function (){
