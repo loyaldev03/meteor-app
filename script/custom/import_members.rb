@@ -47,14 +47,15 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
       phoenix.state = member.state
       phoenix.zip = member.zip
       phoenix.country = 'US'
+      next_bill_date = (member.next_bill_date rescue member.cs_next_bill_date)
       if member.active
         phoenix.status = 'active'
-        phoenix.bill_date = (member.next_bill_date rescue member.cs_next_bill_date)
-        phoenix.next_retry_bill_date = (member.next_bill_date rescue member.cs_next_bill_date)
+        phoenix.bill_date = next_bill_date
+        phoenix.next_retry_bill_date = next_bill_date
       elsif member.trial
         phoenix.status = 'provisional'
-        phoenix.bill_date = (member.next_bill_date rescue member.cs_next_bill_date)
-        phoenix.next_retry_bill_date = (member.next_bill_date rescue member.cs_next_bill_date)
+        phoenix.bill_date = next_bill_date
+        phoenix.next_retry_bill_date = next_bill_date
       else
         phoenix.status = 'lapsed'
         phoenix.recycled_times = 0
@@ -66,7 +67,7 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
       phoenix.created_at = member.created_at
       phoenix.updated_at = member.updated_at
       phoenix.phone_number = member.phone
-      phoenix.blacklisted = false # TODO: load this from new_members.blacklisted (new column)
+      phoenix.blacklisted = new_members.blacklisted
       # phoenix.enrollment_info = { :prospect_token => member.prospect_token }
       phoenix.member_since_date = (member.member_since rescue member.created_at)
       phoenix.save!
@@ -78,6 +79,7 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
       # phoenix.last_sync_error
       # phoenix.club_cash_amount
       # phoenix.recycled_times
+      # new_members.drupal_username
       # `new_members`.`on_renew`,
       # `new_members`.`renewable`,
 
