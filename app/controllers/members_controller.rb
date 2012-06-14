@@ -9,19 +9,30 @@ class MembersController < ApplicationController
       #If we don't fill the member_id field.  
       params[:member][:member_id].blank? ? member_id = '%' : member_id = params[:member][:member_id]
       #In case we don't fill the last_digits field.
-      params[:member][:last_digits].blank? ? last_digits = '%' : last_digits = params[:member][:last_digits]
       params[:member][:next_retry_bill_date].blank? ? member_status = '' : member_status = 'lapsed'
-      #Lets excecute the query:
-      @members = Member.joins(:credit_cards).where(["visible_id like ? AND first_name like ? AND last_name like ? 
+      
+      if params[:member][:last_digits].blank?
+        @members = Member.where(["visible_id like ? AND first_name like ? AND last_name like ? 
                  AND address like ? AND phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
-                 AND (next_retry_bill_date like ? OR next_retry_bill_date is null) AND club_id = ? AND (credit_cards.active = 1 
-                 AND credit_cards.last_digits like ?) AND status != ?", 
+                 AND (next_retry_bill_date like ? OR next_retry_bill_date is null) AND club_id = ? AND status != ?", 
                  member_id,'%'+params[:member][:first_name]+'%',
                  '%'+params[:member][:last_name]+'%','%'+params[:member][:address]+'%',
                  '%'+params[:member][:phone_number]+'%','%'+params[:member][:city]+'%',
                  '%'+params[:member][:state]+'%','%'+params[:member][:zip]+'%', 
                  '%'+params[:member][:email]+'%','%'+params[:member][:next_retry_bill_date]+'%', @current_club,
-                 last_digits, member_status]).order(:visible_id)
+                 member_status]).order(:visible_id)
+      else
+        @members = Member.joins(:credit_cards).where(["visible_id like ? AND first_name like ? AND last_name like ? 
+                 AND address like ? AND phone_number like ? AND city like ? AND state like ? AND zip like ? AND email like ? 
+                 AND (next_retry_bill_date like ? OR next_retry_bill_date is null) AND club_id = ? AND (credit_cards.active = 1 
+                 AND credit_cards.last_digits = ?) AND status != ?", 
+                 member_id,'%'+params[:member][:first_name]+'%',
+                 '%'+params[:member][:last_name]+'%','%'+params[:member][:address]+'%',
+                 '%'+params[:member][:phone_number]+'%','%'+params[:member][:city]+'%',
+                 '%'+params[:member][:state]+'%','%'+params[:member][:zip]+'%', 
+                 '%'+params[:member][:email]+'%','%'+params[:member][:next_retry_bill_date]+'%', @current_club,
+                 params[:member][:last_digits], member_status]).order(:visible_id)
+      end
    end
   end
 
