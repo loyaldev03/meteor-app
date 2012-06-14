@@ -16,7 +16,7 @@ private
   end
 
   def total_entries
-    operations.length
+    operations.count
   end
 
   def data
@@ -37,8 +37,7 @@ private
 
   def fetch_operations
     operations = Operation.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member)
-    operations = operations.page(page).per_page(per_page)
-
+    
     if params[:sSearch].present?
       if params[:sSearch] == 'billing'
         search = [Settings.operation_types.enrollment_billing, Settings.operation_types.membership_billing,
@@ -54,8 +53,11 @@ private
         operations = Operation.where('member_id' => @current_member.id,'operation_type' => [search[0],search[1],search[2]]).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'others'
         operations = Operation.where('member_id' => @current_member.id,'operation_type' => Settings.operation_types.others).order("#{sort_column} #{sort_direction}")
+      elsif params[:sSearch] == 'all'
+        operations = Operation.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member)
       end
     end
+    operations = operations.page(page).per_page(per_page)
     operations
   end
 
