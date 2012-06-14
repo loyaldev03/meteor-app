@@ -18,6 +18,14 @@ GIT
     jquery-datatables-rails (1.10.0)
       jquery-rails
 
+GIT
+  remote: https://github.com/brynary/rack-bug.git
+  revision: 1e6d33664fb21a5f08836e5d8a9d7bfcc47c8d81
+  branch: rails3
+  specs:
+    rack-bug (0.3.0)
+      rack (>= 1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -239,6 +247,7 @@ DEPENDENCIES
   mysql2 (= 0.3.11)
   nokogiri
   paperclip (~> 3.0)
+  rack-bug!
   rails (= 3.2.3)
   rails-erd
   rails3_acts_as_paranoid

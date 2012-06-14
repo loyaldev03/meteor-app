@@ -61,6 +61,7 @@ gem "airbrake"
 group :development do
   gem 'ruby-debug19', :require => 'ruby-debug'
   gem "rails-erd"
+  gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
 end
 
 group :test do
