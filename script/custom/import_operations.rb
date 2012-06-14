@@ -45,7 +45,7 @@ def load_save_the_sales
           @log.info "  * Member id ##{op.contact_id} not found "
         else
           add_operation(op.operation_date, nil, op.name, Settings.operation_types.save_the_sale, op.created_on, op.updated_on, op.author_id)
-          op.destroy
+          op.update_attribute :imported_at, Time.zone.now
         end
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
@@ -69,7 +69,7 @@ def load_reactivations
         else
           add_operation(op.operation_date, nil, op.name, Settings.operation_types.recovery, op.created_on, op.updated_on, op.author_id)
           @member.increment!(:reactivation_times)
-          op.destroy
+          op.update_attribute :imported_at, Time.zone.now
         end
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"

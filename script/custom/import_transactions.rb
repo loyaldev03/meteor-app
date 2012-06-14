@@ -45,7 +45,7 @@ def load_refunds
                               Settings.operation_types.credit_error, transaction.created_at, transaction.updated_at)
           end
     
-          refund.destroy
+          refund.update_attribute :imported_at, Time.zone.now
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
@@ -110,7 +110,7 @@ def load_enrollment_transactions
                 #              "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
                 #              Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
               end
-              response.destroy
+              response.update_attribute :imported_at, Time.zone.now
             end
           end
         rescue Exception => e
@@ -180,7 +180,7 @@ def load_membership_transactions
                               "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
                               Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
               end
-              response.destroy
+              response.update_attribute :imported_at, Time.zone.now
             end
           end
         rescue Exception => e

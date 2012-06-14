@@ -90,8 +90,7 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
       cct.member_id = phoenix.uuid
       cct.save!
       @member = phoenix
-      add_operation(Time.zone.now, cct, "Imported club cash transaction!. Amount: $#{cct.amount}",
-                  nil, Time.zone.now, Time.zone.now)
+      add_operation(Time.zone.now, cct, "Imported club cash transaction!. Amount: $#{cct.amount}", nil, Time.zone.now, Time.zone.now)
 
 
       # create CC
