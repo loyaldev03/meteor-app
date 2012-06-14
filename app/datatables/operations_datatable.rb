@@ -1,14 +1,5 @@
 class OperationsDatatable < Datatable
 
-  def initialize(view,current_partner,current_club,current_member,filter)
-    @view = view
-    @url_helpers = Rails.application.routes.url_helpers
-    @current_member = current_member
-    @current_partner = current_partner
-    @current_club = current_club
-    @filter = filter
-  end
-
 private
 
   def total_records
