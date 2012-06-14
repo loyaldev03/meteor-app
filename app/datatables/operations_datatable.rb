@@ -61,6 +61,8 @@ private
                   Settings.operation_types.others,'%'+@current_member.id+'%')
       end
     end
+
+    
     operations
   end
 
