@@ -1,14 +1,5 @@
 class OperationsDatatable < Datatable
 
-  def initialize(view,current_partner,current_club,current_member,filter)
-    @view = view
-    @url_helpers = Rails.application.routes.url_helpers
-    @current_member = current_member
-    @current_partner = current_partner
-    @current_club = current_club
-    @filter = filter
-  end
-
 private
 
   def total_records
@@ -16,7 +7,7 @@ private
   end
 
   def total_entries
-    operations.length
+    operations.count
   end
 
   def data
@@ -37,32 +28,27 @@ private
 
   def fetch_operations
     operations = Operation.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member)
-    operations = operations.page(page).per_page(per_page)
     
     if params[:sSearch].present?
       if params[:sSearch] == 'billing'
         search = [Settings.operation_types.enrollment_billing, Settings.operation_types.membership_billing,
                   Settings.operation_types.full_save, Settings.operation_types.change_next_bill_date,
                   Settings.operation_types.credit ]
-        operations = Operation.order("#{sort_column} #{sort_direction}").where(["(operation_type in(?,?,?,?,?)) AND member_id like ?",
-                      search[0],search[1],search[2],search[3],search[4],'%'+@current_member.id+'%'])
+        operations = Operation.where('member_id' => @current_member.id,'operation_type' => [search[0],search[1],search[2],search[3],search[4]]).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'communications'
         search = [Settings.operation_types.active_email, Settings.operation_types.prebill_email,
                   Settings.operation_types.cancellation_email, Settings.operation_types.refund_email]
-        operations = Operation.order("#{sort_column} #{sort_direction}").where(["(operation_type in(?,?,?,?)) AND member_id like ?",
-                      search[0],search[1],search[2],search[3],'%'+@current_member.id+'%'])
+        operations = Operation.where('member_id' => @current_member.id,'operation_type' => [search[0],search[1],search[2],search[3]]).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'profile'
-        search = [Settings.operation_types.cancel, Settings.operation_types.future_cancel,
-                  Settings.operation_types.save_the_sale]
-        operations = Operation.order("#{sort_column} #{sort_direction}").where("(operation_type in(?,?,?)) AND member_id like ?",
-                      search[0],search[1],search[2],'%'+@current_member.id+'%')
+        search = [Settings.operation_types.cancel, Settings.operation_types.future_cancel, Settings.operation_types.save_the_sale]
+        operations = Operation.where('member_id' => @current_member.id,'operation_type' => [search[0],search[1],search[2]]).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'others'
-        operations = Operation.order("#{sort_column} #{sort_direction}").where("operation_type like ? AND member_id like ?",
-                  Settings.operation_types.others,'%'+@current_member.id+'%')
+        operations = Operation.where('member_id' => @current_member.id,'operation_type' => Settings.operation_types.others).order("#{sort_column} #{sort_direction}")
+      elsif params[:sSearch] == 'all'
+        operations = Operation.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member)
       end
     end
-
-    
+    operations = operations.page(page).per_page(per_page)
     operations
   end
 

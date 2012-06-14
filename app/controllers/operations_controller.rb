@@ -9,7 +9,7 @@ class OperationsController < ApplicationController
     end
     respond_to do |format|
       format.html
-      format.json { render json: OperationsDatatable.new(view_context,@current_partner,@current_club,@current_member,filter)}
+      format.json { render json: OperationsDatatable.new(view_context,@current_partner,@current_club,@current_member)}
     end
   end
 
