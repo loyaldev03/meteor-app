@@ -2,22 +2,6 @@
 
 require_relative 'import_models'
 
-
-def add_operation(operation_date, object, description, operation_type, created_at, updated_at, author = 999)
-  # TODO: levantamos los Agents?
-  #current_agent = Agent.find_by_email('batch@xagax.com') if author == 999
-  o = PhoenixOperation.new :operation_date => operation_date, :description => description, :operation_type => operation_type
-  o.created_by_id = get_agent
-  o.created_at = created_at
-  if object.nil?
-    o.resource_type = nil
-    # o.resource_id = 0
-  end
-  o.updated_at = updated_at
-  o.member_id = @member.uuid
-  o.save!
-end
-
 def load_refunds
   PhoenixMember.find_in_batches do |group|
     group.each do |member|

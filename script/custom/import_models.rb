@@ -104,7 +104,7 @@ end
 
 class BillingMember < ActiveRecord::Base
   establish_connection "billing" 
-  self.table_name = "members" # "new_members" 
+  self.table_name = "members" 
 end
 class BillingCampaign < ActiveRecord::Base
   establish_connection "billing" 
@@ -237,4 +237,20 @@ def get_agent(author = 999)
   else
     DEFAULT_CREATED_BY
   end
+end
+
+def add_operation(operation_date, object, description, operation_type, created_at, updated_at, author = 999)
+  # TODO: levantamos los Agents?
+  #current_agent = Agent.find_by_email('batch@xagax.com') if author == 999
+  o = PhoenixOperation.new :operation_date => operation_date, :description => description, 
+      :operation_type => (operation_type || Settings.operation_types.others)
+  o.created_by_id = get_agent
+  o.created_at = created_at
+  if object.nil?
+    o.resource_type = nil
+    # o.resource_id = 0
+  end
+  o.updated_at = updated_at
+  o.member_id = @member.uuid
+  o.save!
 end

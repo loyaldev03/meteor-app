@@ -47,7 +47,7 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
       phoenix.state = member.state
       phoenix.zip = member.zip
       phoenix.country = 'US'
-      next_bill_date = (member.next_bill_date rescue member.cs_next_bill_date)
+      next_bill_date = member.cs_next_bill_date
       if member.active
         phoenix.status = 'active'
         phoenix.bill_date = next_bill_date
@@ -59,17 +59,17 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
       else
         phoenix.status = 'lapsed'
         phoenix.recycled_times = 0
-        phoenix.cancel_date = (member.cancelled_at rescue member.updated_at)
+        phoenix.cancel_date = member.cancelled_at
       end
       phoenix.join_date = member.join_date
       phoenix.created_by_id = get_agent
-      phoenix.quota = (member.quota rescue 0)
+      phoenix.quota = member.quota
       phoenix.created_at = member.created_at
       phoenix.updated_at = member.updated_at
       phoenix.phone_number = member.phone
       phoenix.blacklisted = new_members.blacklisted
       # phoenix.enrollment_info = { :prospect_token => member.prospect_token }
-      phoenix.member_since_date = (member.member_since rescue member.created_at)
+      phoenix.member_since_date = member.member_since_date
       phoenix.save!
 
       # phoenix.member_group_type_id
@@ -77,23 +77,33 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
       # phoenix.api_id
       # phoenix.last_synced_at
       # phoenix.last_sync_error
-      # phoenix.club_cash_amount
       # phoenix.recycled_times
-      # new_members.drupal_username
+      # new_members.api_id
       # `new_members`.`on_renew`,
       # `new_members`.`renewable`,
 
+      # create Club cash transaction.
+      phoenix.club_cash_amount 
+      cct = ClubCashTransaction.new 
+      cct.amount = member.club_cash_amount
+      cct.description = "Imported club cash"
+      cct.member_id = phoenix.uuid
+      cct.save!
+      @member = phoenix
+      add_operation(Time.zone.now, cct, "Imported club cash transaction!. Amount: $#{cct.amount}",
+                  nil, Time.zone.now, Time.zone.now)
+
+
       # create CC
       phoenix_cc = PhoenixCreditCard.new 
-      phoenix_cc.encrypted_number = (member.encrypted_primary_cc_number rescue member.encrypted_cc_number)
+      phoenix_cc.encrypted_number = member.encrypted_cc_number
       if phoenix_cc.number.nil?
         phoenix_cc.number = "0000000000"
       end
-      phoenix_cc.expire_month = (member.primary_cc_month_exp rescue member.cc_month_exp)
-      phoenix_cc.expire_year = (member.primary_cc_year_exp rescue member.cc_year_exp)
-      phoenix_cc.last_successful_bill_date = (member.last_charged_at rescue member.last_charged)
+      phoenix_cc.expire_month = member.cc_month_exp
+      phoenix_cc.expire_year = member.cc_year_exp
+      phoenix_cc.last_successful_bill_date = member.last_charged
       phoenix_cc.member_id = phoenix.uuid
-      phoenix_cc.last_digits = phoenix_cc.number.last(4)
       phoenix_cc.save!
 
       # load member notes
@@ -108,10 +118,10 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
         phoenix_note.created_at = note.created_on
         phoenix_note.updated_at = note.updated_on
         phoenix_note.save!
-        note.destroy
+        note.update_attribute :imported_at, Time.zone.now
       end
 
-      member.destroy
+      member.update_attribute :imported_at, Time.zone.now
     rescue Exception => e
       @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
