@@ -44,6 +44,7 @@ class Member < ActiveRecord::Base
                        :lapsed, # reactivation
                        :active # save the sale
                     ] => :provisional, :do => :schedule_first_membership
+    after_transition :none => :applied, :do => :set_join_date
     after_transition [:provisional, :active] => :lapsed, :do => :cancellation
     after_transition :provisional => :active, :do => :send_active_email
     after_transition :lapsed => :provisional, :do => :increment_reactivations
@@ -87,6 +88,11 @@ class Member < ActiveRecord::Base
 
   def increment_reactivations
     increment!(:reactivation_times, 1)
+  end
+
+  def set_join_date
+    self.join_date = DateTime.now
+    self.save
   end
 
   def schedule_first_membership
@@ -358,7 +364,6 @@ class Member < ActiveRecord::Base
   def synced?
     self.last_synced_at && self.last_synced_at > self.updated_at
   end
-
   
   private
     def set_status_on_enrollment!(agent, trans, amount)
