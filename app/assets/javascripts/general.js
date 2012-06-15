@@ -191,7 +191,7 @@ $(document).ready( function() {
       if ($("#refunded_amount").val().match(/^[0-9 .]+$/)){
 
       }else{
-      alert("Incorrect refound value.")
+      alert("Incorrect refund value.")
       event.preventDefault(); 
       };
     })
