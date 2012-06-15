@@ -88,11 +88,18 @@
       </td>
     </tr>
   </tr>
+  <tr class="control-group"> 
+    <td colspan="3"> 
+      <%= f.label :expire_month,t('Allow blank credit card?'), :class => 'help-inline' %> 
+      <%= check_box :setter, :cc_blank %> 
+    </td>
+  </tr>
   <% end %>
   
   <tr class="control-group">
     <th colspan="2"> <%= f.submit nil, :class => 'btn btn-primary' %>
-    <%= link_to t(:Cancel), :back, :class => 'btn' %> </th>
+    <%= link_to t(:Cancel), :back, :class => 'btn'  if @member.new_record? %>  
+    <%= link_to t('buttons.return_to_member_show'), :back, :class => 'btn' unless @member.new_record? %> </th>
   </tr>
 </table>
 
