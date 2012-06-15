@@ -351,7 +351,7 @@ class Member < ActiveRecord::Base
     @api_member ||= if club.api_type.nil?
       nil
     else
-      eval(club.api_type).new self
+      club.api_type.constantize.new self
     end
   end
 
