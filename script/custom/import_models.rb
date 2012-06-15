@@ -29,14 +29,6 @@ ActiveRecord::Base.configurations["phoenix"] = {
   :password => "" 
 }
 
-ActiveRecord::Base.configurations["customer_services"] = { 
-  :adapter => "mysql2",
-  :database => "onmc_customer_service",
-  :host => "127.0.0.1",
-  :username => "root",
-  :password => "" 
-}
-
 ActiveRecord::Base.configurations["billing"] = { 
   :adapter => "mysql2",
   :database => "onmc_billing",
@@ -45,11 +37,38 @@ ActiveRecord::Base.configurations["billing"] = {
   :password => "" 
 }
 
+ActiveRecord::Base.configurations["customer_services"] = { 
+  :adapter => "mysql2",
+  :database => "onmc_customer_service",
+  :host => "127.0.0.1",
+  :username => "root",
+  :password => "" 
+}
+
+ActiveRecord::Base.configurations["prospect"] = { 
+  :adapter => "mysql2",
+  :database => "onmc_prospect",
+  :host => "127.0.0.1",
+  :username => "root",
+  :password => "" 
+}
+
+class ProspectProspect < ActiveRecord::Base
+  establish_connection "prospect" 
+  self.table_name = "prospects" 
+end
+
 
 
 class PhoenixMember < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
+  self.primary_key = 'uuid'
+  before_create 'self.id = UUIDTools::UUID.random_create.to_s'
+end
+class PhoenixProspect < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "prospects" 
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 end
@@ -97,6 +116,11 @@ end
 class DispositionType < PhoenixEnumeration
 end
 class CommunicationType < PhoenixEnumeration
+end
+
+class Settings < Settingslogic
+  source "#{File.expand_path(File.dirname(__FILE__))}/../../config/application.yml"
+  namespace Rails.env
 end
 
 
@@ -216,11 +240,10 @@ class CustomerServicesCommunication < ActiveRecord::Base
 end
 
 
-class Settings < Settingslogic
-  source "#{File.expand_path(File.dirname(__FILE__))}/../../config/application.yml"
-  namespace Rails.env
-end
 
+########################################################################################################
+###########################   FUNCTIONS             ####################################################
+########################################################################################################
 
 # TODO: use campaign id to find this value!
 def get_terms_of_membership_id(campaign_id)

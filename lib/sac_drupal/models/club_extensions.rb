@@ -33,4 +33,23 @@ module Drupal
       end
     end
   end
+
+  module ClubTestExtensions
+    def self.included(base)
+      # base.extend ClassMethods
+      base.cattr_accessor :faraday_stubs
+      base.send :include, InstanceMethods
+    end
+
+    module InstanceMethods
+      def stub!
+        self.class.faraday_stubs = Faraday::Adapter::Test::Stubs.new
+        @drupal_client = Faraday.new do |builder|
+          builder.adapter :test, self.class.faraday_stubs do |stub|
+            yield stub
+          end
+        end
+      end
+    end
+  end
 end

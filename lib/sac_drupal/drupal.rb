@@ -22,5 +22,6 @@ module Drupal
   end
 
   def self.test_mode!
+    Club.send :include, Drupal::ClubTestExtensions
   end
 end
