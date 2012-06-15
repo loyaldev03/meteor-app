@@ -271,7 +271,7 @@ class Member < ActiveRecord::Base
         message = "Credit card blacklisted. call support."
         Auditory.audit(current_agent, tom, message, credit_card.first.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
-      elsif not cc_blank == '1'
+      elsif not (cc_blank == '1' or credit_card_params[:number].blank?)
         message = "Credit card is already in use. call support."
         Auditory.audit(current_agent, tom, message, credit_card.first.member, Settings.operation_types.credit_card_already_in_use)
         return { :message => message, :code => Settings.error_codes.credit_card_in_use }
@@ -285,34 +285,28 @@ class Member < ActiveRecord::Base
       end
       credit_card = CreditCard.new credit_card_params
     end
-    if cc_blank == '0'    
-      message = "Select to allow blank credit card."
-      Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_already_in_use)
+    if cc_blank == '0' and credit_card_params[:number].blank?
+      message = "Credit card is blank. Insert number or allow credit card blank."
+      Auditory.audit(current_agent, tom, message, credit_card.first.member, Settings.operation_types.credit_card_already_in_use)
       return { :message => message, :code => Settings.error_codes.credit_card_in_use }        
     end   
 
     member.terms_of_membership = tom
-    member.enroll(credit_card, enrollment_amount, current_agent, cc_blank)
+    member.enroll(credit_card, enrollment_amount, current_agent, nil ,cc_blank)
   end    
 
-  def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = '0')
-    if amount == '0.0' and cc_blank == '1'
-      allow_cc_blank = true 
-    else
-      allow_cc_blank = false
-    end  
+  def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0)
+    amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
     if not self.new_record? and recovery_check and not self.can_recover?
       return { :message => "Cant recover member. Actual status is not lapsed or Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
-      if allow_cc_blank
-        return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card }
-      end
+        return { :message => "Credit card is invalid or is expired! #{allow_cc_blank}", :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
     elsif not self.valid? 
       return { :message => "Member data is invalid", :code => Settings.error_codes.member_data_invalid }
-    end
-
+    end   
+    
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
