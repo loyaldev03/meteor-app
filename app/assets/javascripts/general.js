@@ -114,6 +114,22 @@ $(document).ready( function() {
       });
     });
 
+    $('#setter_cc_blank').click(function(){
+      if ($('#setter_cc_blank').attr('checked')) {
+        $('#credit_card_number').val('0000000000');
+        $('#credit_card_expire_month').val('');
+        $('#credit_card_expire_year').val('');
+        $('#credit_card_number').hide();
+        $('#credit_card_expire_month').hide();
+        $('#credit_card_expire_year').hide();
+      }else{
+        $('#credit_card_number').val('');
+        $('#credit_card_number').show();
+        $('#credit_card_expire_month').show();
+        $('#credit_card_expire_year').show();
+      }
+    });  
+
     $('#zip_help').popover({offset: 10});
     $('#phone_number_help').popover({offset: 10});   
     $('.help').popover({offset: 10});

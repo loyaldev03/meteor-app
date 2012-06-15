@@ -314,11 +314,6 @@ class Member < ActiveRecord::Base
     begin
       self.save!
       if credit_card.member.nil?
-        if allow_cc_blank
-          credit_card.number = '0000000000' 
-          credit_card.expire_month = nil
-          credit_card.expire_year = nil
-        end
         credit_card.member = self
         credit_card.save!
       end
