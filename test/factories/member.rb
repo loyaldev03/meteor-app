@@ -18,6 +18,22 @@ FactoryGirl.define do
     country "US"
   end
 
+  factory :member_with_api, class: Member do
+    first_name { Faker::Name.first_name  }
+    last_name { Faker::Name.last_name }
+    address { Faker::Address.street_address  }
+    city { Faker::Address.city }
+    zip { Faker::Address.zip }
+    state { Faker::Address.us_state }
+    sequence(:email) {|n| "member#{n}@test.no" }
+    phone_number { Faker::PhoneNumber.phone_number }
+    status "none"
+    country "US"
+
+    association :club, factory: :club_with_api
+    terms_of_membership
+  end
+
   factory :active_member, class: Member do
     status "active"
     first_name { Faker::Name.first_name  }

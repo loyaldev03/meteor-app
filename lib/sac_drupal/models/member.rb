@@ -1,34 +1,25 @@
 module Drupal
   class Member < Struct.new(:member)
-    # attribute: m.name
-    # randomhex: SecureRandom.hex
-    # profile: field_profile_name: { und: [ { value: m.name } ] }
-    # profile_assoc: field_profile_name: { und: [ { value: m.assoc.name } ] } if m.assoc
-    # profile_single: field_profile_name: { und: { value: m.name } }
-    # FIELDS_MAP = [ ## WIP
-    #   [:name,           :attribute,      :full_name],
-    #   [:mail,           :attribute,      :email],
-    #   [:pass,           :randomhex],
-    #   [:address,        :profile,        :address],
-    #   [:firstname,      :profile,        :first_name],
-    #   [:lastname,       :profile,        :last_name],
-    #   [:city,           :profile,        :city],
-    #   [:phone,          :profile,        :phone_number],
-    #   [:state_province, :profile_single, :state],
-    #   [:zip,            :profile,        :zip],
-    #   [:member_id,      :profile,        :visible_id],
-    #   [:cc_month,       :profile_assoc,  :active_credit_card, :expire_month],
-    #   [:cc_year,        :profile_assoc,  :active_credit_card, :expire_year],
-    #   [:cc_number,      :profile_assoc,  :active_credit_card, :number]
-    # ] 
 
     def get
-      conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }).body unless self.new_record?
+      res = conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }).body unless self.new_record?
+      rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
+        Drupal.logger.info "  => #{$!.to_s}"
+      ensure
+        res
     end
 
     def update!
-      res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }, fieldmap)
-      update_member(res)
+      if self.member.changed.present? # change tracking
+        begin
+          res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }, fieldmap)
+        rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
+          Drupal.logger.info "  => #{$!.to_s}"
+        ensure
+          update_member(res)
+          res
+        end
+      end
     end
 
     def create!
@@ -41,24 +32,28 @@ module Drupal
     end
 
     def destroy!
-      res = conn.delete('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }, fieldmap)
-      update_member(res)
+      res = conn.delete('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }) unless self.member.new_record?
+    rescue Faraday::Error::ParsingError # Drupal sends invalid application/json
+      Drupal.logger.info "  => #{$!.to_s}"
+    ensure
+      # update_member(res)
+      res
     end
 
     def new_record?
       self.member.api_id.nil?
     end
 
-    def generate_admin_token!
-      raise 'tbd'
+    def get_login_token
+      conn.get('/api/user/%{drupal_id}/urllogintoken'% { drupal_id: self.member.api_id }).body unless self.new_record?
     end
 
     def reset_password!
-      raise 'tbd'
+      conn.post('/api/user/%{drupal_id}/password_reset'% { drupal_id: self.member.api_id })
     end
 
     def resend_welcome_email!
-      raise 'tbd'
+      raise 'tbd -- once drupal sends welcome email we can trigger it'
     end
 
   private
@@ -67,22 +62,26 @@ module Drupal
     end
 
     def update_member(res)
-      data = if res.status == 200
-        { 
-          api_id: res.body['uid'],
-          last_synced_at: Time.now,
-          last_sync_error: nil
-        }
-      else
-        {
-          last_sync_error: res.body
-        }
+      if res
+        data = if res.status == 200
+          { 
+            api_id: res.body['uid'],
+            last_synced_at: Time.now,
+            last_sync_error: nil
+          }
+        else
+          {
+            last_sync_error: res.body
+          }
+        end
+        ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+        self.member.reload rescue self.member
       end
-      ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
     end
 
-    def fieldmap
+    def fieldmap(full = false)
       m = self.member
+
       map = { 
         name: m.full_name,
         mail: m.email,
