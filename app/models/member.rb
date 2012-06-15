@@ -251,12 +251,7 @@ class Member < ActiveRecord::Base
       credit_card_params[:number].gsub!(' ', '') # HOT FIX on 
       credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.member.club_id == club.id }
       if credit_card.empty? or cc_blank == '1'
-        if cc_blank == '1'
-          credit_card = CreditCard.new 
-          credit_card.number = ''
-        else
-          credit_card = CreditCard.new credit_card_params          
-        end 
+        credit_card = CreditCard.new credit_card_params
         member = Member.new member_params
         member.club = club 
         member.created_by_id = current_agent.id
@@ -319,6 +314,11 @@ class Member < ActiveRecord::Base
     begin
       self.save!
       if credit_card.member.nil?
+        if allow_cc_blank
+          credit_card.number = '0000000000' 
+          credit_card.expire_month = nil
+          credit_card.expire_year = nil
+        end
         credit_card.member = self
         credit_card.save!
       end
