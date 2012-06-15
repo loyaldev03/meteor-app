@@ -20,7 +20,7 @@ class Member < ActiveRecord::Base
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address, :wrong_phone_number
 
   before_create :record_date
-  after_save 'api_member.save! unless api_member.nil?'
+  #after_save 'api_member.save! unless api_member.nil?'
   after_destroy 'api_member.destroy! unless api_member.nil?'
 
   validates :first_name, :presence => true, :format => /^[A-Za-z ']+$/
@@ -160,7 +160,7 @@ class Member < ActiveRecord::Base
 
   # Add logic to recover some one max 3 times in 5 years
   def can_recover?
-    self.lapsed? and reactivation_times <= Settings.max_reactivations
+    self.lapsed? and reactivation_times < Settings.max_reactivations
   end
 
   # Do we need rules on fulfillment renewal?
