@@ -1,6 +1,6 @@
 class ChangeIdColumnOnProspect < ActiveRecord::Migration
   def up
-    execute "ALTER TABLE prospects MODIFY id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT" 
+    add_column :prospects, :uuid, :string, :limit => 36
   	rename_column :prospects, :phone, :phone_number 
   	add_column :prospects, :created_at, :date
   	add_column :prospects, :updated_at, :date
@@ -9,7 +9,7 @@ class ChangeIdColumnOnProspect < ActiveRecord::Migration
   end
 
   def down
-    execute "ALTER TABLE prospects MODIFY id integer UNSIGNED NOT NULL AUTO_INCREMENT" 
+    remove_column :prospects, :uuid
   	rename_column :prospects, :phone_number, :phone 
   	remove_column :prospects, :created_at
   	remove_column :prospects, :updated_at
