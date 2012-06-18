@@ -51,7 +51,9 @@
         class = "yellow"
       <% end %>
       >
-        <i class ="icon-home" > </i> <%= @current_member.full_address %> 
+        <i class ="icon-home" > </i> 
+        <%= @current_member.full_address %> 
+        <%= I18n.t @current_member.country, :scope => 'countries' %>
         <%= link_to t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :target => '_blank', :class => "btn btn-info" %>
         <% if @current_member.wrong_address.nil? %>
           <%= link_to t('set_undeliverable'), member_set_undeliverable_path, :class => "btn btn-danger" %>

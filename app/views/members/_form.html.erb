@@ -40,6 +40,11 @@
       <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.member.zip_help')} %> 
     </td>
   </tr>
+  <tr class="control-group">
+    <td> <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline' %> </td>
+    <td colspan="3"> <%= f.country_code_select(:country, [[ 'United States', 'US' ]]) %> </td>
+  </tr>
+
   <tr class="control-group" ><td colspan="4"> <b> Contact Information </b> </td></tr>
   <tr class="control-group" >
     <td>
@@ -97,7 +102,6 @@
 
 <% if @member.new_record? %>
   <%= hidden_field_tag :enrollment_amount, 0.0 %>
-  <%= f.hidden_field :country, :value => "US" %>
 <% end %>
 
 

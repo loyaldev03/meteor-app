@@ -377,6 +377,10 @@ class Member < ActiveRecord::Base
     self.last_synced_at && self.last_synced_at > self.updated_at
   end
   
+  def add_club_cash(amount)
+    update_attribute(:club_cash_amount, amount + club_cash_amount)
+  end
+
   private
     def set_status_on_enrollment!(agent, trans, amount)
       operation_type = Settings.operation_types.enrollment_billing
