@@ -59,6 +59,12 @@ div.dataTables_length select {
     float: right;
 }
 
+div.dataTables_filter label{
+    text-align:left;
+    vertical-align:text-top;
+    width:270px;
+}
+
 div.dataTables_filter input {
-    float: right;
+    float: right;    
 }
