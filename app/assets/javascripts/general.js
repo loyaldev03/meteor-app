@@ -119,14 +119,14 @@ $(document).ready( function() {
         $('#credit_card_number').val('0000000000');
         $('#credit_card_expire_month').val('');
         $('#credit_card_expire_year').val('');
-        $('#credit_card_number').hide();
-        $('#credit_card_expire_month').hide();
-        $('#credit_card_expire_year').hide();
+        $('#credit_card_number').attr('readonly', true);
+        $('#credit_card_expire_month').attr('readonly', true);
+        $('#credit_card_expire_year').attr('readonly', true);
       }else{
         $('#credit_card_number').val('');
-        $('#credit_card_number').show();
-        $('#credit_card_expire_month').show();
-        $('#credit_card_expire_year').show();
+        $('#credit_card_number').attr('readonly', false);
+        $('#credit_card_expire_month').attr('readonly', false);
+        $('#credit_card_expire_year').attr('readonly', false);
       }
     });  
 

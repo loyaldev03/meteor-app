@@ -13,86 +13,78 @@
     </td>
   </tr> 
   <% end %>
-  <tr class="control-group" ><td colspan="2"> <b> Demographic Information </b> </td></tr>
+  <tr class="control-group" ><td colspan="4"> <b> Demographic Information </b> </td></tr>
   <tr class="control-group" >  
-    <td> 
-      <%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline' %> 
-      <%= f.text_field :first_name, :class => 'text_field'%>
-    </td>
-    <td> 
-      <%= f.label :last_name,t('activerecord.attributes.member.last_name'), :class => 'help-inline' %> 
-      <%= f.text_field :last_name, :class => 'text_field'%> 
-    </td>
+    <td><%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline' %></td>
+    <td><%= f.text_field :first_name, :class => 'text_field'%> </td>
+    <td><%= f.label :last_name,t('activerecord.attributes.member.last_name'), :class => 'help-inline' %></td>
+    <td> <%= f.text_field :last_name, :class => 'text_field'%> </td>
   </tr>
   <tr class="control-group" >
-    <td> 
-      <%= f.label :address, t('activerecord.attributes.member.address'), :class => 'help-inline' %> 
-      <%= f.text_field :address, :class => 'text_field'%> 
+    <td><%= f.label :address, t('activerecord.attributes.member.address'), :class => 'help-inline' %></td>
+    <td> <%= f.text_field :address, :class => 'text_field'%> </td> 
       <% if !@member.new_record? && !@member.wrong_address.nil? %>
         <%= t('activerecord.attributes.member.unset_wrong_address') %>
         <%= check_box :setter, :wrong_address %>
       <% end %>
-    </td>
-    <td> 
-      <%= f.label :city, t('activerecord.attributes.member.city'), :class => 'help-inline' %> 
-      <%= f.text_field :city, :class => 'text_field input-medium'%>
-    </td>
+    <td> <%= f.label :city, t('activerecord.attributes.member.city'), :class => 'help-inline' %> </td>
+    <td> <%= f.text_field :city, :class => 'text_field input-medium'%> </td>
   </tr>
   <tr class="control-group" >
+    <td> <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline' %> </td>
+    <td> <%= f.text_field :state, :class => 'text_field input-medium'%> </td>
+    <td> <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline' %> </td>
     <td> 
-      <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline' %> 
-      <%= f.text_field :state, :class => 'text_field input-medium'%> 
+      <%= f.text_field :zip, :class => 'text_field input-small'%> 
+      <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.member.zip_help')} %> 
     </td>
-    <td colspan="2"> 
-      <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline' %> 
-      <%= f.text_field :zip, :class => 'text_field input-small'%>
-      <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.member.zip_help')} %>
-    </td> 
   </tr>
-  <tr class="control-group" ><td colspan="2"> <b> Contact Information </b> </td></tr>
+  <tr class="control-group" ><td colspan="4"> <b> Contact Information </b> </td></tr>
   <tr class="control-group" >
-    <td> 
+    <td>
       <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline' %>
+    </td>
+    <td> 
       <%= f.text_field :phone_number, :class => 'text_field input-medium'%> 
       <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.member.phone_number_help')} %>
+    </td>
       <% if !@member.new_record? && !@member.wrong_phone_number.nil? %>
         <%= t('activerecord.attributes.member.unset_wrong_phone_number') %>
         <%= check_box :setter, :wrong_phone_number %>
       <% end %>
     </td>
-    <td>
-      <%= f.label :email, t('email'), :class => 'help-inline' %>
-      <%= f.text_field :email, :class => 'text_field'%>
-    </td>
+    <td> <%= f.label :email, t('email'), :class => 'help-inline' %> </td>
+    <td> <%= f.text_field :email, :class => 'text_field'%> </td>
   </tr>  
 
   <% if @member.new_record? %>
-    <tr class="control-group" >
-      <td colspan="2"> 
-        <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
-        <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@terms_of_membership, "id", "name") %> 
-      </td>
+    <tr class="control-group">
+      <td> <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> </td>
+      <td colspan="3">  <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@terms_of_membership, "id", "name") %> </td>
     </tr>
-    <tr class="control-group" ><td colspan="2"> <b> Credit Card </b> </td></tr>  
-
+    
+    <tr class="control-group" >
+      <td colspan="4"> 
+      <b> Credit Card </b> 
+      <%= f.label :allow_cc_blank,t('Allow blank credit card?'), :class => 'help-inline' %> 
+      <%= check_box :setter, :cc_blank %>
+      </td>
+    </tr>  
 
     <tr class="control-group" >
-      <td> 
-        <%= f.label :encrypted_number, t('activerecord.attributes.credit_card.encrypted_number'), :class => 'help-inline' %> 
-        <%= text_field :credit_card, :number, :class => 'text_field input-medium'%> 
-      <td> 
+      <td>
+        <%= f.label :encrypted_number, t('activerecord.attributes.credit_card.number'), 
+                    :class => 'help-inline' %>
+      </td> 
+      <td> <%= text_field :credit_card, :number, :class => 'text_field input-medium'%> </td>
+      <td colspan="2"> 
         <%= f.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' %> 
-        <%= text_field :credit_card, :expire_month, :class => 'text_field input-medium'%>
+        <%= text_field :credit_card, :expire_month, :class => 'text_field input-medium' %>
         <%= f.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %> 
         <%= text_field :credit_card, :expire_year, :class => 'text_field input-small' %>
       </td>
+      </td>
     </tr>
-  </tr>
-  <tr class="control-group"> 
-    <td colspan="3"> 
-      <%= f.label :expire_month,t('Allow blank credit card?'), :class => 'help-inline' %> 
-      <%= check_box :setter, :cc_blank %> 
-    </td>
   </tr>
   <% end %>
   
