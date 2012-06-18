@@ -31,6 +31,7 @@ group :assets do
 end
 
 gem 'country_code_select', '~> 1.0.0' 
+gem 'i18n-country-translations'
 gem 'devise', '2.0.4'
 gem 'settingslogic', '2.0.8'
 gem 'wirble'
