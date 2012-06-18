@@ -9,7 +9,7 @@ class ClubCashTransaction < ActiveRecord::Base
 
   def update_member_amount
   	member = Member.find(member_id)
-  	member.update_attribute(:club_cash_amount, amount + member.club_cash_amount)
+  	member.add_club_cash(amount)
   end
 
 end
