@@ -20,6 +20,7 @@ class Member < ActiveRecord::Base
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address, :wrong_phone_number
 
   before_create :record_date
+
   after_save 'api_member.save! unless @skip_api_sync || api_member.nil?'
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
 
@@ -44,6 +45,7 @@ class Member < ActiveRecord::Base
                        :lapsed, # reactivation
                        :active # save the sale
                     ] => :provisional, :do => :schedule_first_membership
+    after_transition :none => :applied, :do => :set_join_date
     after_transition [:provisional, :active] => :lapsed, :do => :cancellation
     after_transition :provisional => :active, :do => :send_active_email
     after_transition :lapsed => :provisional, :do => :increment_reactivations
@@ -87,6 +89,11 @@ class Member < ActiveRecord::Base
 
   def increment_reactivations
     increment!(:reactivation_times, 1)
+  end
+
+  def set_join_date
+    self.join_date = DateTime.now
+    self.save
   end
 
   def schedule_first_membership
@@ -154,7 +161,7 @@ class Member < ActiveRecord::Base
 
   # Add logic to recover some one max 3 times in 5 years
   def can_recover?
-    self.lapsed? and reactivation_times <= Settings.max_reactivations
+    self.lapsed? and reactivation_times < Settings.max_reactivations
   end
 
   # Do we need rules on fulfillment renewal?
@@ -236,7 +243,7 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params)
+  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0')
     club = tom.club
     # Member exist?
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
@@ -244,7 +251,7 @@ class Member < ActiveRecord::Base
       # credit card exist?
       credit_card_params[:number].gsub!(' ', '') # HOT FIX on 
       credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.member.club_id == club.id }
-      if credit_card.empty?
+      if credit_card.empty? or cc_blank == '1'
         credit_card = CreditCard.new credit_card_params
         member = Member.new member_params
         member.skip_api_sync! if member.api_id.present? # new member with api_id comes from Drupal so do not update...
@@ -261,7 +268,7 @@ class Member < ActiveRecord::Base
         message = "Credit card blacklisted. call support."
         Auditory.audit(current_agent, tom, message, credit_card.first.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
-      else        
+      elsif not (cc_blank == '1' or credit_card_params[:number].blank?)
         message = "Credit card is already in use. call support."
         Auditory.audit(current_agent, tom, message, credit_card.first.member, Settings.operation_types.credit_card_already_in_use)
         return { :message => message, :code => Settings.error_codes.credit_card_in_use }
@@ -275,22 +282,28 @@ class Member < ActiveRecord::Base
       end
       credit_card = CreditCard.new credit_card_params
     end
-    
+    if cc_blank == '0' and credit_card_params[:number].blank?
+      message = "Credit card is blank. Insert number or allow credit card blank."
+      Auditory.audit(current_agent, tom, message, credit_card.first.member, Settings.operation_types.credit_card_already_in_use)
+      return { :message => message, :code => Settings.error_codes.credit_card_in_use }        
+    end   
+
     member.terms_of_membership = tom
-    member.enroll(credit_card, enrollment_amount, current_agent)
+    member.enroll(credit_card, enrollment_amount, current_agent, nil ,cc_blank)
   end    
 
-  def enroll(credit_card, amount, agent = nil, recovery_check = true)
+  def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0)
+    amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
     if not self.new_record? and recovery_check and not self.can_recover?
       return { :message => "Cant recover member. Actual status is not lapsed or Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
-      return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card }
+        return { :message => "Credit card is invalid or is expired! #{allow_cc_blank}", :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
     elsif not self.valid? 
       return { :message => "Member data is invalid", :code => Settings.error_codes.member_data_invalid }
-    end
-
+    end   
+    
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
@@ -299,7 +312,7 @@ class Member < ActiveRecord::Base
       # TODO: should we Audit this?
       return answer unless trans.success?
     end
-
+    
     begin
       self.save!
       if credit_card.member.nil?
@@ -363,7 +376,6 @@ class Member < ActiveRecord::Base
   def synced?
     self.last_synced_at && self.last_synced_at > self.updated_at
   end
-
   
   private
     def set_status_on_enrollment!(agent, trans, amount)
@@ -452,7 +464,7 @@ class Member < ActiveRecord::Base
         self.next_retry_bill_date = Date.today + eval(Settings.next_retry_on_missing_decline)
         Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
           :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.credit_card_type}. " + 
-                            "Campaign type: #{trans.membership_type}. We have scheduled this billing to be run in 30 days.")
+                            "Campaign type: #{trans.installment_type}. We have scheduled this billing to be run in 30 days.")
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
       else
         trans.update_attribute :decline_strategy_id, decline.id

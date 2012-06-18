@@ -29,7 +29,7 @@ def get_communication_type_id(communication_id)
 end
 
 
-BillingMember.where("id > 20238246005").find_in_batches do |group|
+BillingMember.where("imported_at IS NULL").find_in_batches do |group|
   group.each do |member| 
     tz = Time.now
     begin
@@ -46,6 +46,7 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
       phoenix.city = member.city
       phoenix.state = member.state
       phoenix.zip = member.zip
+      phoenix.joint = member.joint
       phoenix.country = 'US'
       next_bill_date = member.cs_next_bill_date
       if member.active
@@ -72,7 +73,6 @@ BillingMember.where("id > 20238246005").find_in_batches do |group|
       phoenix.member_since_date = member.member_since_date
       phoenix.save!
 
-      # phoenix.member_group_type_id
       # phoenix.reactivation_times
       # phoenix.api_id
       # phoenix.last_synced_at

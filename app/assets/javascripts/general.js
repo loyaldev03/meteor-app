@@ -114,6 +114,22 @@ $(document).ready( function() {
       });
     });
 
+    $('#setter_cc_blank').click(function(){
+      if ($('#setter_cc_blank').attr('checked')) {
+        $('#credit_card_number').val('0000000000');
+        $('#credit_card_expire_month').val('');
+        $('#credit_card_expire_year').val('');
+        $('#credit_card_number').attr('readonly', true);
+        $('#credit_card_expire_month').attr('readonly', true);
+        $('#credit_card_expire_year').attr('readonly', true);
+      }else{
+        $('#credit_card_number').val('');
+        $('#credit_card_number').attr('readonly', false);
+        $('#credit_card_expire_month').attr('readonly', false);
+        $('#credit_card_expire_year').attr('readonly', false);
+      }
+    });  
+
     $('#zip_help').popover({offset: 10});
     $('#phone_number_help').popover({offset: 10});   
     $('.help').popover({offset: 10});
@@ -191,7 +207,7 @@ $(document).ready( function() {
       if ($("#refunded_amount").val().match(/^[0-9 .]+$/)){
 
       }else{
-      alert("Incorrect refound value.")
+      alert("Incorrect refund value.")
       event.preventDefault(); 
       };
     })

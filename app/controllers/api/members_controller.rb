@@ -17,7 +17,7 @@ class Api::MembersController < ApplicationController
     if tom.nil?
       response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
     else
-      response = Member.enroll(tom, current_agent, params[:enrollment_amount], params[:member], params[:credit_card])
+      response = Member.enroll(tom, current_agent, params[:enrollment_amount], params[:member], params[:credit_card],params[:setter][:cc_blank])
     end
     render json: response
   end
@@ -33,9 +33,9 @@ class Api::MembersController < ApplicationController
   def update_profile
     response = {}
     member = Member.find_by_visible_id_and_club_id(params[:id],params[:club_id]) 
-      # member.skip_api_sync! if XXX
-      member.update_attribute(:wrong_address, nil) if params[:setter][:wrong_address] == '1' 
-      member.update_attribute(:wrong_phone_number, nil) if params[:setter][:wrong_phone_number] == '1'
+    # member.skip_api_sync! if XXX
+    member.update_attribute(:wrong_address, nil) if params[:setter][:wrong_address] == '1' unless params[:setter].nil?
+    member.update_attribute(:wrong_phone_number, nil) if params[:setter][:wrong_phone_number] == '1' unless params[:setter].nil?
     if member.update_attributes(params[:member]) 
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member)
