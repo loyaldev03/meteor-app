@@ -33,7 +33,7 @@ class Api::MembersController < ApplicationController
   def update_profile
     response = {}
     member = Member.find_by_visible_id_and_club_id(params[:id],params[:club_id]) 
-    
+      # member.skip_api_sync! if XXX
       member.update_attribute(:wrong_address, nil) if params[:setter][:wrong_address] == '1' 
       member.update_attribute(:wrong_phone_number, nil) if params[:setter][:wrong_phone_number] == '1'
     if member.update_attributes(params[:member]) 

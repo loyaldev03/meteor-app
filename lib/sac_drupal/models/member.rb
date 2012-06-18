@@ -44,8 +44,8 @@ module Drupal
       self.member.api_id.nil?
     end
 
-    def get_login_token
-      conn.get('/api/user/%{drupal_id}/urllogintoken'% { drupal_id: self.member.api_id }).body unless self.new_record?
+    def login_token
+      @token ||= Hashie::Mash.new(conn.get('/api/urllogin/%{drupal_id}'% { drupal_id: self.member.api_id }).body) unless self.new_record?
     end
 
     def reset_password!

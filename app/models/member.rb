@@ -20,8 +20,8 @@ class Member < ActiveRecord::Base
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address, :wrong_phone_number
 
   before_create :record_date
-  after_save 'api_member.save! unless api_member.nil?'
-  after_destroy 'api_member.destroy! unless api_member.nil?'
+  after_save 'api_member.save! unless @skip_api_sync || api_member.nil?'
+  after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
 
   validates :first_name, :presence => true, :format => /^[A-Za-z ']+$/
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
@@ -247,6 +247,7 @@ class Member < ActiveRecord::Base
       if credit_card.empty?
         credit_card = CreditCard.new credit_card_params
         member = Member.new member_params
+        member.skip_api_sync! if member.api_id.present? # new member with api_id comes from Drupal so do not update...
         member.club = club
         member.created_by_id = current_agent.id
         member.terms_of_membership = tom
@@ -353,6 +354,10 @@ class Member < ActiveRecord::Base
     else
       club.api_type.constantize.new self
     end
+  end
+
+  def skip_api_sync!
+    @skip_api_sync = true
   end
 
   def synced?
