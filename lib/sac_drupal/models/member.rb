@@ -1,5 +1,6 @@
 module Drupal
   class Member < Struct.new(:member)
+    OBSERVED_FIELDS = %w(first_name last_name address city phone_number state zip visible_id).to_set.freeze
 
     def get
       res = conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }).body unless self.new_record?
@@ -10,7 +11,7 @@ module Drupal
     end
 
     def update!
-      if self.member.changed.present? # change tracking
+      if sync_fields.present? # change tracking
         begin
           res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }, fieldmap)
         rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
@@ -57,6 +58,10 @@ module Drupal
     end
 
   private
+    def sync_fields
+      OBSERVED_FIELDS.intersection(self.member.changed)
+    end
+
     def conn
       self.member.club.drupal
     end
@@ -85,7 +90,6 @@ module Drupal
       map = { 
         name: m.full_name,
         mail: m.email,
-        pass: SecureRandom.hex, 
         field_profile_address: { 
           und: [ 
             { 
@@ -135,7 +139,11 @@ module Drupal
         } 
       }
 
-      unless m.new_record?
+      if m.new_record?
+        map.merge!({
+          pass: SecureRandom.hex, 
+        })
+      else
         map.merge!({
           field_profile_member_id: { 
             und: [ 
