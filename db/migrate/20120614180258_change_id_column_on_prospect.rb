@@ -1,6 +1,7 @@
 class ChangeIdColumnOnProspect < ActiveRecord::Migration
   def up
     add_column :prospects, :uuid, :string, :limit => 36
+    remove_column :prospects, :id
   	rename_column :prospects, :phone, :phone_number 
   	add_column :prospects, :created_at, :date
   	add_column :prospects, :updated_at, :date
@@ -9,6 +10,7 @@ class ChangeIdColumnOnProspect < ActiveRecord::Migration
   end
 
   def down
+    add_column :prospects, :id, :integer
     remove_column :prospects, :uuid
   	rename_column :prospects, :phone_number, :phone 
   	remove_column :prospects, :created_at
