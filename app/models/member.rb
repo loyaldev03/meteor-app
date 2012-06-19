@@ -17,7 +17,8 @@ class Member < ActiveRecord::Base
       :email, :external_id, :first_name, :phone_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
-      :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address, :wrong_phone_number
+      :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address,
+      :wrong_phone_number, :api_id
 
   before_create :record_date
 
@@ -250,11 +251,12 @@ class Member < ActiveRecord::Base
     if member.nil?
       # credit card exist?
       credit_card_params[:number].gsub!(' ', '') # HOT FIX on 
-      credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.member.club_id == club.id }
+      credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.member && cc.member.club_id == club.id }
       if credit_card.empty? or cc_blank == '1'
         credit_card = CreditCard.new credit_card_params
         member = Member.new member_params
-        member.skip_api_sync! if member.api_id.present? # new member with api_id comes from Drupal so do not update...
+        # TBD new member with api_id comes from Drupal so do not update... or current_agent.api?
+        member.skip_api_sync! if member.api_id.present? 
         member.club = club
         member.created_by_id = current_agent.id
         member.terms_of_membership = tom
