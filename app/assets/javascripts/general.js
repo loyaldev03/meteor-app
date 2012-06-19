@@ -154,7 +154,6 @@ $(document).ready( function() {
 
 
   function operation_member_functions(column_count){
-    $('#'+filter).toggleClass("btn-info");
     oTable = $('#operations_table').dataTable({
       "sPaginationType": "full_numbers",
       "oLanguage": {"sSearch": "Filtered by:"},
@@ -165,7 +164,6 @@ $(document).ready( function() {
       "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#operations_table').data('source'),
       });
-
 
     $('.dataTables_filter').hide();
     $(".dataselect").change( function () {
