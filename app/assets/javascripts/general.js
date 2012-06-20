@@ -200,7 +200,7 @@ $(document).ready( function() {
     $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
   };
 
-  function refound_member_functions(){
+  function refund_member_functions(){
     $('form').submit( function(event) {
       if ($("#refunded_amount").val().match(/^[0-9 .]+$/)){
 
