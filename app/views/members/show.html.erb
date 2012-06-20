@@ -144,12 +144,11 @@
   <thead>
     <tr>
       <th colspan="5"> Active Credit card </th>
+      <td> <%= t("activerecord.attributes.credit_card.number") %>: <%= @active_credit_card.number %> </td>
+      <td> <%= t("activerecord.attributes.credit_card.expire_date") %>: 
+           <%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %> 
+      </td>
     </tr>
-  <tr>
-    <td> <%= t("activerecord.attributes.credit_card.number") %>: <%= @active_credit_card.number %> </td>
-    <td> <%= t("activerecord.attributes.credit_card.expire_date") %>: 
-         <%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %> 
-    </td>
   </thead>
 </table>
 
