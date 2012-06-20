@@ -4,7 +4,7 @@ require_relative 'import_models'
 
 ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
   group.each do |prospect| 
-    tz = Time.now
+    tz = Time.now.utc
     @log.info "  * processing prospect ##{prospect.id}"
     PhoenixProspect.transaction do 
       begin
@@ -27,14 +27,15 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
         phoenix.terms_of_membership_id = get_terms_of_membership_id(prospect.campaign_id)
         phoenix.preferences = { :mega_channel => prospect.mega_channel, :product_id => prospect.product_id }
         phoenix.save!
-        prospect.update_attribute :imported_at, Time.zone.now
+        prospect.update_attribute :imported_at, Time.now.utc
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        exit
         raise ActiveRecord::Rollback
       end
     end
-    @log.info "    ... took #{Time.now - tz} for prospect ##{prospect.id}"
+    @log.info "    ... took #{Time.now.utc - tz} for prospect ##{prospect.id}"
   end
   sleep(5) # Make sure it doesn't get too crowded in there!
 end
