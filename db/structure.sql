@@ -228,7 +228,7 @@ CREATE TABLE `members` (
   `last_synced_at` datetime DEFAULT NULL,
   `last_sync_error` text COLLATE utf8_unicode_ci,
   `club_cash_amount` float DEFAULT '0',
-  `joint` tinyint(1) DEFAULT '1',
+  `joint` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`club_id`,`visible_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -279,7 +279,6 @@ CREATE TABLE `payment_gateway_configurations` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `prospects` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   `first_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `last_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -287,7 +286,7 @@ CREATE TABLE `prospects` (
   `state` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `zip` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone_number` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `url_landing` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `user_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `product_id` int(11) DEFAULT NULL,
@@ -296,12 +295,15 @@ CREATE TABLE `prospects` (
   `ip_address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `user_agent` int(11) DEFAULT NULL,
   `referral_host` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `joint` tinyint(1) DEFAULT '1',
+  `joint` tinyint(1) DEFAULT '0',
   `birth_date` date DEFAULT NULL,
   `preferences` text COLLATE utf8_unicode_ci,
   `referral_parameters` text COLLATE utf8_unicode_ci,
   `cookie_value` text COLLATE utf8_unicode_ci,
-  PRIMARY KEY (`id`)
+  `uuid` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` date DEFAULT NULL,
+  `updated_at` date DEFAULT NULL,
+  `club_id` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `schema_migrations` (
@@ -458,3 +460,7 @@ INSERT INTO schema_migrations (version) VALUES ('20120607144647');
 INSERT INTO schema_migrations (version) VALUES ('20120607154846');
 
 INSERT INTO schema_migrations (version) VALUES ('20120608223149');
+
+INSERT INTO schema_migrations (version) VALUES ('20120614180258');
+
+INSERT INTO schema_migrations (version) VALUES ('20120620160033');
