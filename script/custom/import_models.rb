@@ -93,6 +93,10 @@ class PhoenixOperation < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "operations" 
 end
+class PhoenixClubCashTransaction < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "club_cash_transactions" 
+end
 class PhoenixTransaction < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "transactions" 
@@ -278,7 +282,7 @@ def get_agent(author = 999)
   end
 end
 
-def add_operation(operation_date, object, description, operation_type, created_at = Time.zone.now, updated_at = Time.zone.now, author = 999)
+def add_operation(operation_date, object, description, operation_type, created_at = Time.now.utc, updated_at = Time.now.utc, author = 999)
   # TODO: levantamos los Agents?
   #current_agent = Agent.find_by_email('batch@xagax.com') if author == 999
   o = PhoenixOperation.new :operation_date => operation_date, :description => description, 
@@ -297,7 +301,7 @@ end
 
 
 def load_cancellation
-  tz = Time.now
+  tz = Time.now.utc
   begin
     @log.info "  * processing member ##{@member.uuid}"
     add_operation(@member.cancel_date, @member, "Member canceled", Settings.operation_types.cancel, @member.cancel_date, @member.cancel_date) 
@@ -306,5 +310,5 @@ def load_cancellation
     puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
     exit
   end
-  @log.info "    ... took #{Time.now - tz} for member ##{@member.uuid}"
+  @log.info "    ... took #{Time.now.utc - tz} for member ##{@member.uuid}"
 end

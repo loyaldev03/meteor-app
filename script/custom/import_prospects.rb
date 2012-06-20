@@ -31,7 +31,6 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        exit
         raise ActiveRecord::Rollback
       end
     end
