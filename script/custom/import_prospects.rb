@@ -25,7 +25,7 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
         phoenix.joint = prospect.joint
         phoenix.reporting_code = prospect.reporting_code
         phoenix.terms_of_membership_id = get_terms_of_membership_id(prospect.campaign_id)
-        phoenix.preferences = { :mega_channel => prospect.mega_channel, :product_id => prospect.product_id }
+        phoenix.preferences = { :mega_channel => prospect.mega_channel, :product_id => prospect.product_id }.to_json
         phoenix.save!
         prospect.update_attribute :imported_at, Time.now.utc
       rescue Exception => e

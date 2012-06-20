@@ -1,5 +1,7 @@
 class Member < ActiveRecord::Base
   include Extensions::UUID
+
+  serialize :enrollment_info, JSON
   
   belongs_to :terms_of_membership
   belongs_to :club

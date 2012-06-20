@@ -66,6 +66,7 @@ ActiveRecord::Base.configurations["prospect"] = {
 class ProspectProspect < ActiveRecord::Base
   establish_connection "prospect" 
   self.table_name = "prospects" 
+  serialize :preferences, JSON
 end
 
 
@@ -74,6 +75,7 @@ class PhoenixMember < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
   self.primary_key = 'uuid'
+  serialize :enrollment_info, JSON
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 end
 class PhoenixProspect < ActiveRecord::Base
