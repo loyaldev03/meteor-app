@@ -24,6 +24,8 @@ class Agent < ActiveRecord::Base
   validates :username, :presence => :true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
   validates :email, :presence => :true
 
+  before_save :ensure_authentication_token
+
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     login = conditions.delete(:login)

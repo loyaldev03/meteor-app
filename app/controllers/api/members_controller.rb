@@ -17,7 +17,7 @@ class Api::MembersController < ApplicationController
     if tom.nil?
       response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
     else
-      response = Member.enroll(tom, current_agent, params[:enrollment_amount], params[:member], params[:credit_card],params[:setter][:cc_blank])
+      response = Member.enroll(tom, current_agent, params[:enrollment_amount], params[:member], params[:credit_card],params[:setter] && params[:setter][:cc_blank])
     end
     render json: response
   end

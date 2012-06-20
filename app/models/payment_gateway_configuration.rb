@@ -9,7 +9,8 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   validates :login, :presence => true
   validates :merchant_key, :presence => true
   validates :password, :presence => true
-  validates :mode, :presence => true
+  validates :mode, :presence => true, :uniqueness => { :message => "There is already one payment gateway configuration with this mode.", 
+                                                       :scope => :club_id }
   validates :gateway, :presence => true
   validates :club, :presence => true
 

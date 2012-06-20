@@ -1,17 +1,4 @@
 
-<%= form_for (operations_path), :method => :post, :html => { :id => "operation_filter" }, do %>
-<table>
-  <tr>
-    <td> <%= submit_tag('Billing', {:name => "filter", :value => "all", :id => "all" }) %> </td>
-    <td> <%= submit_tag('Billing', {:name => "filter", :value => "billing", :id => "billing" }) %> </td>
-    <td> <%= submit_tag('Communications', {:name => "filter", :value => "communications", 
-                                           :id => "communications" }) %> </td>
-    <td> <%= submit_tag('Profile', {:name => "filter", :value => "profile", :id => "profile"  }) %> </td>
-    <td> <%= submit_tag('Others', {:name => "filter", :value => "others", :id => "others"  }) %> </td>
-  </tr>
-</table>
-<% end %>
-
 <table id="operations_table" class="display" data-source="<%= operations_url(format: "json") %>">
   <thead>
     <tr>
@@ -38,6 +25,5 @@
 </table>
 
 <script>
-  var filter = "<%= @operation_filter.nil? ? 'all' : @operation_filter %>";
   $(document).ready(operation_member_functions(<% Operation.datatable_columns.size %>));
 </script>
