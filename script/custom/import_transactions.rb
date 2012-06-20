@@ -5,7 +5,7 @@ require_relative 'import_models'
 def load_refunds
   PhoenixMember.find_in_batches do |group|
     group.each do |member|
-      refunds = BillingChargeback.find_all_by_member_id(member.visible_id)
+      refunds = BillingChargeback.find_all_by_member_id_and_imported_at(member.visible_id, nil)
       refunds.each do |refund|
         tz = Time.now
         begin
@@ -144,7 +144,7 @@ def load_membership_transactions
               transaction.member_id = @member.uuid
               transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
               transaction.set_payment_gateway_configuration
-              transaction.gateway = 'litle'
+              transaction.gateway = response.gateway.nil? ? 'litle' : response.gateway
               transaction.recurrent = false
               transaction.transaction_type = 'authorization_capture'
               transaction.invoice_number = "#{response.created_at.to_date}-#{response.authorization.member_id}"

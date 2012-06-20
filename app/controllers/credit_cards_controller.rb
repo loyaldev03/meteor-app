@@ -13,7 +13,6 @@ class CreditCardsController < ApplicationController
     credit_card.member_id = @current_member.id
     actual_credit_card = @current_member.active_credit_card
 
-
     respond_to do |format|
       if credit_card.am_card.valid?
         if credit_card.save && actual_credit_card.deactivate
@@ -35,7 +34,6 @@ class CreditCardsController < ApplicationController
   	new_credit_card = CreditCard.find(params[:credit_card_id])
   	former_credit_card = @current_member.active_credit_card
 
-    # TODO: do we need json format??
     # TODO: we NEED transactions!!!    
     respond_to do |format|
       if new_credit_card.activate && former_credit_card.deactivate

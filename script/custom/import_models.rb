@@ -1,11 +1,20 @@
-# 1- load customer services and bililng databases
-# 2- Import members
+# 1- Get access to phoenix, billing_component, customer_services and prospect databases
+# 2- Import new prospects into phoenix
+#     ruby script/custom/import_prospects.rb  
+# 3- Update members already imported and Load new members 
+#     ruby script/custom/import_members.rb  
+# 4- Import operations.
+#     ruby script/custom/import_operations.rb  
+# 5- Import member notes.
+#     ruby script/custom/import_member_notes.rb  
+# 6- Import transactions.
+#     ruby script/custom/import_transactions.rb  
+#
+#
 # 3- set campaign_id on every membership authorization, to get the amount. 
 #   UPDATE onmc_billing.membership_authorizations SET campaign_id = 
 #      (SELECT campaign_id FROM onmc_billing.members WHERE id =  onmc_billing.membership_authorizations.member_id) WHERE
 #       onmc_billing.membership_authorizations campaign_id IS NULL;
-# 4- load members table on billing again
-# 5- Import transactions.
 
 require 'rails'
 require 'active_record'
@@ -13,9 +22,10 @@ require 'uuidtools'
 require 'attr_encrypted'
 require 'settingslogic'
 
-CLUB = 1
+CLUB = 2
 DEFAULT_CREATED_BY = 2
-PAYMENT_GW_CONFIGURATION = 1
+PAYMENT_GW_CONFIGURATION = 2
+TEST = true
 
 @log = Logger.new('import_members.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
@@ -47,7 +57,7 @@ ActiveRecord::Base.configurations["customer_services"] = {
 
 ActiveRecord::Base.configurations["prospect"] = { 
   :adapter => "mysql2",
-  :database => "onmc_prospect",
+  :database => "onmc_prospects",
   :host => "127.0.0.1",
   :username => "root",
   :password => "" 
@@ -245,6 +255,10 @@ end
 ###########################   FUNCTIONS             ####################################################
 ########################################################################################################
 
+#TODO => 
+def get_enrollment_amount(campaign_id)
+  BillingCampaign.find_by_id()
+end
 # TODO: use campaign id to find this value!
 def get_terms_of_membership_id(campaign_id)
   1
@@ -262,7 +276,7 @@ def get_agent(author = 999)
   end
 end
 
-def add_operation(operation_date, object, description, operation_type, created_at, updated_at, author = 999)
+def add_operation(operation_date, object, description, operation_type, created_at = Time.zone.now, updated_at = Time.zone.now, author = 999)
   # TODO: levantamos los Agents?
   #current_agent = Agent.find_by_email('batch@xagax.com') if author == 999
   o = PhoenixOperation.new :operation_date => operation_date, :description => description, 
@@ -271,9 +285,24 @@ def add_operation(operation_date, object, description, operation_type, created_a
   o.created_at = created_at
   if object.nil?
     o.resource_type = nil
+    # TODO => 
     # o.resource_id = 0
   end
   o.updated_at = updated_at
   o.member_id = @member.uuid
   o.save!
+end
+
+
+def load_cancellation
+  tz = Time.now
+  begin
+    @log.info "  * processing member ##{@member.uuid}"
+    add_operation(@member.cancel_date, @member, "Member canceled", Settings.operation_types.cancel, @member.cancel_date, @member.cancel_date) 
+  rescue Exception => e
+    @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+    puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+    exit
+  end
+  @log.info "    ... took #{Time.now - tz} for member ##{@member.uuid}"
 end
