@@ -29,31 +29,36 @@ def get_communication_type_id(communication_id)
   enum.id
 end
 
-CustomerServicesNotes.where("imported_at IS NULL").find_in_batches do |group|
-  group.each do |note| 
-    tz = Time.now
-    begin
-      @log.info "  * processing note ##{note.id}"
-      # load member notes
-      member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, note.contact_id)
-      unless member.nil?
-        phoenix_note = PhoenixMemberNote.new
-        phoenix_note.member_id = member
-        phoenix_note.created_by_id = get_agent(note.author_id)
-        phoenix_note.description = note.content
-        phoenix_note.disposition_type_id = get_disposition_type_id(note.note_type_id, CLUB)
-        phoenix_note.communication_type_id = get_communication_type_id(note.communication_id)
-        phoenix_note.created_at = note.created_on
-        phoenix_note.updated_at = note.updated_on
-        phoenix_note.save!
-        note.update_attribute :imported_at, Time.zone.now
+def import_customer_notes
+  CustomerServicesNotes.where("imported_at IS NULL").find_in_batches do |group|
+    group.each do |note| 
+      tz = Time.now.utc
+      begin
+        @log.info "  * processing note ##{note.id}"
+        # load member notes
+        member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, note.source_id)
+        unless member.nil?
+          phoenix_note = PhoenixMemberNote.new
+          phoenix_note.member_id = member
+          phoenix_note.created_by_id = get_agent(note.author_id)
+          phoenix_note.description = note.content
+          phoenix_note.disposition_type_id = get_disposition_type_id(note.note_type_id, CLUB)
+          phoenix_note.communication_type_id = get_communication_type_id(note.communication_id)
+          phoenix_note.created_at = note.created_on
+          phoenix_note.updated_at = note.updated_on
+          phoenix_note.save!
+          note.update_attribute :imported_at, Time.now.utc
+        end
+      rescue Exception => e
+        @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        exit
       end
-    rescue Exception => e
-      @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-      puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-      exit
+      @log.info "    ... took #{Time.now.utc - tz} for note ##{note.id}"
     end
-    @log.info "    ... took #{Time.now - tz} for note ##{note.id}"
+    sleep(5) # Make sure it doesn't get too crowded in there!
   end
-  sleep(5) # Make sure it doesn't get too crowded in there!
 end
+
+
+import_customer_notes

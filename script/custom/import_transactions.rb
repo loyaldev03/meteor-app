@@ -7,7 +7,7 @@ def load_refunds
     group.each do |member|
       refunds = BillingChargeback.find_all_by_member_id_and_imported_at(member.visible_id, nil)
       refunds.each do |refund|
-        tz = Time.now
+        tz = Time.now.utc
         begin
           @log.info "  * processing Chargeback ##{refund.id}"
           @member = member
@@ -20,15 +20,7 @@ def load_refunds
           transaction.recurrent = false
           transaction.transaction_type = "credit" 
           transaction.invoice_number = member.visible_id
-          if refund.reason == "Membership Capture"
-            transaction.amount = BillingMembershipCapture.find(refund.capture_id).amount
-          elsif refund.reason == "Enrollment Capture"
-            transaction.amount = BillingEnrollmentCapture.find(refund.capture_id).amount
-          else
-            unless refund.status.nil?
-              transaction.amount = refund.status / 100.0
-            end
-          end
+          transaction.amount = refund.phoenix_amount
           transaction.response = refund.result
           transaction.response_code = ( refund.result == "Success" ? "000" : "999")
           transaction.response_result = refund.result
@@ -45,13 +37,13 @@ def load_refunds
                               Settings.operation_types.credit_error, transaction.created_at, transaction.updated_at)
           end
     
-          refund.update_attribute :imported_at, Time.zone.now
+          refund.update_attribute :imported_at, Time.now.utc
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           exit
         end
-        @log.info "    ... took #{Time.now - tz} for Chargeback ##{refund.id}"
+        @log.info "    ... took #{Time.now.utc - tz} for Chargeback ##{refund.id}"
       end
     end
   end
@@ -63,7 +55,7 @@ def load_enrollment_transactions
     group.each do |member|
       responses = BillingEnrollmentAuthorizationResponse.find_all_by_authorization_id(BillingEnrollmentAuthorization.find_all_by_member_id(member.visible_id).map(&:id))
       responses.each do |response|
-        tz = Time.now
+        tz = Time.now.utc
         begin
           @log.info "  * processing Enrollment Auth response ##{response.id}"
           if response.authorization.nil?
@@ -80,7 +72,7 @@ def load_enrollment_transactions
               transaction.gateway = 'litle'
               transaction.recurrent = false
               transaction.transaction_type = 'authorization_capture'
-              transaction.invoice_number = "#{response.created_at.to_date}-#{response.authorization.member_id}"
+              transaction.invoice_number = "response.invoice_number"
               transaction.amount = response.amount
               transaction.response = { :authorization => response.message, :capture => (response.capture_response.message rescue nil) }
               transaction.response_code = response.code
@@ -110,7 +102,7 @@ def load_enrollment_transactions
                 #              "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
                 #              Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
               end
-              response.update_attribute :imported_at, Time.zone.now
+              response.update_attribute :imported_at, Time.now.utc
             end
           end
         rescue Exception => e
@@ -118,7 +110,7 @@ def load_enrollment_transactions
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           exit
         end
-        @log.info "    ... took #{Time.now - tz} for Enrollment Auth response ##{response.id}"
+        @log.info "    ... took #{Time.now.utc - tz} for Enrollment Auth response ##{response.id}"
       end
     end
   end
@@ -130,7 +122,7 @@ def load_membership_transactions
     group.each do |member|
       responses = BillingMembershipAuthorizationResponse.find_all_by_authorization_id(BillingMembershipAuthorization.find_all_by_member_id(member.visible_id).map(&:id))
       responses.each do |response|
-        tz = Time.now
+        tz =  Time.now.utc
         begin
           @log.info "  * processing Membership Auth response ##{response.id}"
           if response.authorization.nil?
@@ -147,7 +139,7 @@ def load_membership_transactions
               transaction.gateway = response.gateway.nil? ? 'litle' : response.gateway
               transaction.recurrent = false
               transaction.transaction_type = 'authorization_capture'
-              transaction.invoice_number = "#{response.created_at.to_date}-#{response.authorization.member_id}"
+              transaction.invoice_number = response.invoice_number
               transaction.amount = response.amount
               transaction.response = { :authorization => response.message, :capture => (response.capture_response.message rescue nil) }
               transaction.response_code = response.code
@@ -180,7 +172,7 @@ def load_membership_transactions
                               "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
                               Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
               end
-              response.update_attribute :imported_at, Time.zone.now
+              response.update_attribute :imported_at, Time.now.utc
             end
           end
         rescue Exception => e
@@ -188,7 +180,7 @@ def load_membership_transactions
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           exit
         end
-        @log.info "    ... took #{Time.now - tz} for Membership Auth response ##{response.id}"
+        @log.info "    ... took #{Time.now.utc - tz} for Membership Auth response ##{response.id}"
       end
     end
   end

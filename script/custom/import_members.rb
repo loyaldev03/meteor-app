@@ -4,7 +4,7 @@ require_relative 'import_models'
 
 # 1- update existing members
 def update_members
-  BillingMember.where("imported_at IS NOT NULL AND updated_at > imported_at and is_prospect = false").find_in_batches do |group|
+  BillingMember.where("imported_at IS NOT NULL AND updated_at > imported_at and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
       PhoenixProspect.transaction do 
@@ -108,7 +108,7 @@ end
 
 # 2- import new members.
 def add_new_members
-  BillingMember.where("imported_at IS NULL and is_prospect = false").find_in_batches do |group|
+  BillingMember.where("imported_at IS NULL and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
       PhoenixProspect.transaction do 
@@ -199,7 +199,7 @@ def add_new_members
       end
       @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
-    sleep(5) # Make sure it doesn't get too crowded in there!
+    sleep(2) # Make sure it doesn't get too crowded in there!
   end
 end
 

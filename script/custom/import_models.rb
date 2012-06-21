@@ -133,6 +133,12 @@ class DispositionType < PhoenixEnumeration
 end
 class CommunicationType < PhoenixEnumeration
 end
+class PhoenixAgent < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "agents" 
+end
+
+
 
 class Settings < Settingslogic
   source "#{File.expand_path(File.dirname(__FILE__))}/../../config/application.yml"
@@ -155,6 +161,9 @@ class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
   self.table_name = "enrollment_auth_responses" 
   def authorization
     BillingEnrollmentAuthorization.find_by_id(self.authorization_id)
+  end
+  def invoice_number
+    "#{self.created_at.to_date}-#{self.authorization.member_id}"
   end
   def member
     PhoenixMember.find_by_visible_id_and_club_id(authorization.member_id, CLUB)
@@ -254,6 +263,11 @@ class CustomerServicesCommunication < ActiveRecord::Base
   establish_connection "customer_services" 
   self.table_name = "communications" 
 end
+class CustomerServicesUser < ActiveRecord::Base
+  establish_connection "customer_services" 
+  self.table_name = "users" 
+  self.inheritance_column = false
+end
 
 
 
@@ -261,13 +275,9 @@ end
 ###########################   FUNCTIONS             ####################################################
 ########################################################################################################
 
-#TODO => 
-def get_enrollment_amount(campaign_id)
-  BillingCampaign.find_by_id()
-end
 # TODO: use campaign id to find this value!
 def get_terms_of_membership_id(campaign_id)
-  1
+  1 # BillingCampaign.find_by_id(campaign_id).terms_of_membership_id
 end
 # TODO: => 
 def get_terms_of_membership_name(tom_id)
@@ -278,7 +288,18 @@ def get_agent(author = 999)
   if author == 999
     DEFAULT_CREATED_BY
   else
-    DEFAULT_CREATED_BY
+    u = CustomerServicesUser.find_by_id(author)
+    if u.nil?
+      DEFAULT_CREATED_BY
+    else
+      a = PhoenixAgent.find_by_username(u.login)
+      if a.nil?
+        a = PhoenixAgent.new :username => u.login, :first_name => u.firstname, :last_name => u.lastname, 
+            :email => u.mail
+        a.save!
+      end
+      a.id
+    end
   end
 end
 
