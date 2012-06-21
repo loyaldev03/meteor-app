@@ -41,6 +41,7 @@ gem 'faraday'
 gem 'faraday_middleware'
 gem 'hashie'
 gem 'state_machine', '1.1.2'
+gem 'cantango'
 
 gem 'twitter-bootstrap-rails', '2.0.6'
 

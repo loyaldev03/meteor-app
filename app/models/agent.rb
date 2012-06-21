@@ -8,6 +8,8 @@ class Agent < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable, 
          :encryptable, :token_authenticatable
 
+  tango_user
+
   acts_as_paranoid
 
   has_many :created_members, :class_name => 'Member'

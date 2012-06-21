@@ -472,7 +472,7 @@ class Member < ActiveRecord::Base
         self.next_retry_bill_date = Date.today + eval(Settings.next_retry_on_missing_decline)
         Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
           :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.credit_card_type}. " + 
-                            "Campaign type: #{trans.installment_type}. We have scheduled this billing to be run in 30 days.")
+                            "Campaign type: #{type}. We have scheduled this billing to be run in 30 days.")
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
       else
         trans.update_attribute :decline_strategy_id, decline.id

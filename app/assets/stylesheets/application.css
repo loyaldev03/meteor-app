@@ -55,6 +55,12 @@ form .clearfix:before, form .clearfix:after {
 	background-color: #FFFFFF;
 }
 
+label.error{
+	float:right;
+	width:70%;
+	text-align:left;
+}
+
 div.dataTables_length select {
     float: right;
 }
@@ -67,4 +73,14 @@ div.dataTables_filter label{
 
 div.dataTables_filter input {
     float: right;    
+}
+
+#dataTableSelect{
+	height:auto;
+	width:auto;
+	float:left;	
+}
+
+#operations_table_info{
+	width:33%;
 }
