@@ -197,7 +197,7 @@ class Member < ActiveRecord::Base
 
   def bill_membership
     if can_bill_membership?
-      amount = self.terms_of_membership.installment_amount
+      amount = self.terms_of_membership.number_to_currency(installment_amount)
       if amount.to_f > 0.0
         # Grace period
         # why cero times? Because only 1 time must be Billed.
