@@ -11,7 +11,8 @@ namespace :billing do
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.bill_membership
           rescue Exception => e
-            Auditory.add_redmine_ticket('Billing::Today', e.to_s)
+            message = e.to_s
+            Airbrake.notify(:error_class => "Billing::Today", :error_message => message)            
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.now - tz} for member ##{member.id}"
@@ -36,7 +37,8 @@ namespace :billing do
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.send_pre_bill
           rescue Exception => e
-            Auditory.add_redmine_ticket('Billing::SendPrebill', e.to_s)
+            message = e.to_s
+            Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => message)
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.now - tz} for member ##{member.id}"
@@ -64,7 +66,8 @@ namespace :members do
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.set_as_canceled!
           rescue Exception => e
-            Auditory.add_redmine_ticket('Members::Cancel', e.to_s)
+            message = e.to_s
+            Airbrake.notify(:error_class => "Members::Cancel", :error_message => message)
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.now - tz} for member ##{member.id}"
@@ -88,7 +91,8 @@ namespace :members do
             Rails.logger.info "  * processing member ##{fulfillment.member.uuid} fulfillment ##{fulfillment.id}"
             fulfillment.renew
           rescue Exception => e
-            Auditory.add_redmine_ticket('Member::Fulfillment', e.to_s)
+            message = e.to_s
+            Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => message)
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.now - tz} for member ##{member.id}"
