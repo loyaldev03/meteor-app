@@ -33,7 +33,6 @@
               <% if @current_club %>
                 <%= select_tag "change_partner",
                 options_for_select(Club.all.collect{ |u| [ "#{u.partner.prefix} - #{u.name}", members_path(u.partner.prefix, u.name) ]}, 
-                
                   [members_path(@current_club.partner.prefix, @current_club.name)]), 
                 :onchange => "window.open(this.options[this.selectedIndex].value, '_top')" %>
               <% end %>

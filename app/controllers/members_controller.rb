@@ -4,9 +4,15 @@ class MembersController < ApplicationController
 
   def index
     if request.post?
+      # TODO: refs @21008 complete this.. to match every like 
+      # Member.with_next_retry_bill_date(params[:member][:next_retry_bill_date])
+      #   .with_phone_number_like(params[:member][:phone_number])
+
       params[:member][:member_id].blank? ? member_id = '%' : member_id = params[:member][:member_id]
       params[:member][:next_retry_bill_date].blank? ? member_status = '' : member_status = 'lapsed'
+      # member_status is not used!
       
+      # delete this :) after #21008
       if params[:member][:last_digits].blank?
         if params[:member][:next_retry_bill_date].blank?
           @members = Member.where(["visible_id like ? AND first_name like ? AND last_name like ? 

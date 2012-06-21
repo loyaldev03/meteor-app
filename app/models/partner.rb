@@ -14,6 +14,5 @@ class Partner < ActiveRecord::Base
   def self.datatable_columns
     ['id', 'prefix', 'name', 'contract_uri', 'website_url' ]
   end
-
-
+  
 end

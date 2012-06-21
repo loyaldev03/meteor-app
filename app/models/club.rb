@@ -34,6 +34,7 @@ class Club < ActiveRecord::Base
     ['id', 'name', 'description' ]
   end
 
+
   private
     def add_default_member_groups
       ['VIP', 'Celebrity', 'Notable'].each do |name|

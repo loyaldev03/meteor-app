@@ -41,6 +41,8 @@ class Member < ActiveRecord::Base
       base.where('last_synced_at > updated_at') :
       base.where('last_synced_at IS NULL OR last_synced_at < updated_at')
   }
+  scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date = ?', value) if value }
+  scope :with_phone_number_like, lambda { |value| where('phone_number like ?', value) if value }
 
   state_machine :status, :initial => :none do
     after_transition [ :none, # enroll
