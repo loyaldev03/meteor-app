@@ -6,7 +6,8 @@ class Communication < ActiveRecord::Base
   def self.deliver!(template_type, member)
     template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
     if template.nil?
-      Auditory.add_redmine_ticket("Communication error", "Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}")
+      message = "Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
+      Airbrake.notify(:error_class => "Communication error", :error_message => message)
       logger.error "* * * * * Template does not exist"
     else
       c = Communication.new :email => member.email
@@ -23,7 +24,8 @@ class Communication < ActiveRecord::Base
       elsif template.action_mailer?
         c.deliver_action_mailer
       else
-        Auditory.add_redmine_ticket("Communication error", "Client not supported: '#{template_type}' and TOMID ##{member.terms_of_membership_id}")
+        message = "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
+        Airbrake.notify(:error_class => "Communication error", :error_message => message)
         logger.error "* * * * * Client not supported"
       end
     end
@@ -64,7 +66,8 @@ class Communication < ActiveRecord::Base
     when :refund
       Notifier.refund(email).deliver!
     else
-      Audit.add_redmine_ticket
+      message = "Deliver action could not be done."
+      Airbrake.notify(:error_class => "Communication error", :error_message => message)      
       logger.error "Template type #{template_type} not supported."
     end
     update_attributes :sent_success => true, :processed_at => DateTime.now, :response => response

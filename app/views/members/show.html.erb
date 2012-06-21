@@ -26,6 +26,10 @@
       <% if @current_member.can_save_the_sale? %>
         <td>
           <%= link_to("Save the sale", member_save_the_sale_path, :class => "btn btn-warning") %>
+          <%= link_to t('activerecord.attributes.member.add_club_cash_transaction'),
+             member_add_club_cash_path, :class => 'btn btn-warning' %> 
+          <%= link_to "Add a credit card", new_credit_card_path, :class => "btn btn-warning" unless @current_member.lapsed? %>
+          <%= link_to "Add a note", new_member_note_path, :class => "btn btn-warning" %>
         </td>
       <% end %>
       <td>
@@ -126,8 +130,6 @@
     </td>
     <td> <%= t('activerecord.attributes.member.club_cash_amount') %>:
          $<%= @current_member.club_cash_amount %>
-         <%= link_to t('activerecord.attributes.member.add_club_cash_transaction'),
-             member_add_club_cash_path, :class => 'btn btn-warning' %> 
     </td>
   </tr>
 </table>
@@ -142,12 +144,11 @@
   <thead>
     <tr>
       <th colspan="5"> Active Credit card </th>
+      <td> <%= t("activerecord.attributes.credit_card.number") %>: <%= @active_credit_card.number %> </td>
+      <td> <%= t("activerecord.attributes.credit_card.expire_date") %>: 
+           <%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %> 
+      </td>
     </tr>
-  <tr>
-    <td> <%= t("activerecord.attributes.credit_card.number") %>: <%= @active_credit_card.number %> </td>
-    <td> <%= t("activerecord.attributes.credit_card.expire_date") %>: 
-         <%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %> 
-    </td>
   </thead>
 </table>
 
