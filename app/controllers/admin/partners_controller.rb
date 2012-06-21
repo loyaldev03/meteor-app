@@ -1,9 +1,12 @@
 class Admin::PartnersController < ApplicationController
   layout :set_layout
+  # authorize_resource :partner
 
   # GET /partners
   # GET /partners.json
   def index
+    # authorize! :read, Partner
+    head 404 and return unless agent_can? :read, Partner
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: PartnersDatatable.new(view_context) }
