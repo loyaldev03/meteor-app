@@ -30,7 +30,7 @@ class Member < ActiveRecord::Base
             :format => /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
   validates :last_name , :presence => true, :format => /^[A-Za-z ']+$/
   validates :phone_number, :format => /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-. ]\(?(x|int)?[0-9]?{1,10}\)?)?$/ 
-  validates :address, :city, :state, :country, :presence => true, :format => /^[A-Za-z0-9 ',\s]+$/
+  validates :address, :city, :state, :country, :presence => true, :format => /^[A-Za-z0-9 ',.\s]+$/
   validates :terms_of_membership_id , :presence => true
   validates :zip, :presence => true, :format => /^[0-9]{5}(-?[0-9]{4})?$/
 
