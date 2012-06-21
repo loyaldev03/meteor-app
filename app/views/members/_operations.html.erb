@@ -10,19 +10,18 @@
   </thead>
   <tbody>
   </tbody>
-  <tfoot>
-    <th  colspan="4">
-      Filter by:
-      <select class="dataselect">
-        <option value="all"> all </option>
-        <option value="billing"> billing </option>
-        <option value="communications"> communications </option>
-        <option value="profile"> profile </option>
-        <option value="others"> others </option>
-      </select>
-    </th>
-  </tfoot>
 </table>
+
+<div id="dataTableSelect" class="in-front" >
+  Filter by:
+  <select class="dataselect">
+    <option value="all"> all </option>
+    <option value="billing"> billing </option>
+    <option value="communications"> communications </option>
+    <option value="profile"> profile </option>
+    <option value="others"> others </option>
+  </select>
+</div>  
 
 <script>
   $(document).ready(operation_member_functions(<% Operation.datatable_columns.size %>));

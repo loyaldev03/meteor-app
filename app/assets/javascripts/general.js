@@ -165,6 +165,8 @@ $(document).ready( function() {
       "sAjaxSource": $('#operations_table').data('source'),
       });
 
+    $('#dataTableSelect').insertAfter('#operations_table_info')
+
     $('.dataTables_filter').hide();
     $(".dataselect").change( function () {
         oTable.fnFilter( $(this).val() );

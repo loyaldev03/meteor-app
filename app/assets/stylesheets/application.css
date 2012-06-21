@@ -78,9 +78,9 @@ div.dataTables_filter input {
 #dataTableSelect{
 	height:auto;
 	width:auto;
-	float:left;
+	float:left;	
 }
 
 #operations_table_info{
-	width:auto;
+	width:33%;
 }
