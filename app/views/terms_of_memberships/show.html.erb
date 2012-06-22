@@ -30,14 +30,14 @@
         class="red"
       <% end %>
     >
-      <th> <%= @payment_gateway_configuration_development.nil? ? 'The does not have pay gateway configuration mode development' : 'The club has pay gateway configuration for mode development' %> </th>
+      <th> <%= @payment_gateway_configuration_development.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_development') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_development') %> </th>
     </tr>
     <tr
       <% if @payment_gateway_configuration_production.nil? %>
         class="red"
       <% end %>
     >
-      <th> <%= @payment_gateway_configuration_production.nil? ? 'The does not have pay gateway configuration for mode production' : 'The club has pay gateway configuration for mode production' %> </th>
+      <th> <%= @payment_gateway_configuration_production.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_production') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_production') %>  </th>
     </tr>
     </thead>
   </table>
@@ -63,6 +63,6 @@
   	<% end %>
   </tbody>
   <tfoot>
-    <tr> <td colspan="4"> <%= link_to t('back'), show_member_path, :class => "btn" %> </td> </tr>
+    <tr> <td colspan="4"> <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => "btn" %> </td> </tr>
   </tfoot>
 </table>
