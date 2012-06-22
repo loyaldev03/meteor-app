@@ -60,7 +60,7 @@
         <%= I18n.t @current_member.country, :scope => 'countries' %>
         <%= link_to t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :target => '_blank', :class => "btn btn-info" %>
         <% if @current_member.wrong_address.nil? %>
-          <%= link_to t('set_undeliverable'), member_set_undeliverable_path, :class => "btn btn-danger" %>
+          <%= link_to t('activerecord.attributes.member.set_undeliverable'), member_set_undeliverable_path, :class => "btn btn-danger" %>
         <% else %>
           <%= t('activerecord.attributes.member.undeliverable') %>
         <% end %>
@@ -78,7 +78,7 @@
         <%= t('activerecord.attributes.member.phone_number') %>: <%= @current_member.phone_number %>   
           <% if @current_member.wrong_phone_number.nil?
            %>
-            <%= link_to t('set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger" %>
+            <%= link_to t('activerecord.attributes.member.set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger" %>
           <% else %>
             <%= @current_member.wrong_phone_number %>
           <% end %>
