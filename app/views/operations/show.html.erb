@@ -11,7 +11,7 @@
     <%= form_for @operation, :as => :operation, :url => operation_path(:id => @operation), do |f|%>
 	<tr> 
 	  <tr>
-	  	<td colspan="3"> <%= f.text_area :notes, :value => @operation.notes, :style => 'width: 99%; height: 300px' %> </td>
+	  	<td colspan="3"> <%= f.text_area :notes, :value => @operation.notes, :style => 'width: 99%; height: 150px' %> </td>
 	  </tr>
 	  <tr>
 	    <td colspan="2"> <%= f.submit t('buttons.save_operation_note'), :class => 'btn btn-primary' %>
