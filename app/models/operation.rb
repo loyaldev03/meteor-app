@@ -12,6 +12,6 @@ class Operation < ActiveRecord::Base
 
   private
     def set_operation_date_if_nil
-      self.operation_date = DateTime.now if self.operation_date.nil?
+      self.operation_date = Time.zone.now if self.operation_date.nil?
     end
 end

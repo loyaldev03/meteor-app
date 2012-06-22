@@ -97,26 +97,26 @@ class Member < ActiveRecord::Base
   end
 
   def set_join_date
-    self.join_date = DateTime.now
+    self.join_date = Time.zone.now
     self.save
   end
 
   def schedule_first_membership
     send_fulfillment
-    self.bill_date = Date.today + terms_of_membership.trial_days
+    self.bill_date = Time.zone.now + terms_of_membership.trial_days
     self.next_retry_bill_date = bill_date
     # Documentation #18928 - recoveries will not change the quota number.
     if reactivation_times == 0
       self.quota = (terms_of_membership.monthly? ? 1 :  0)
     end
-    self.join_date = DateTime.now 
+    self.join_date = Time.zone.now
     self.cancel_date = nil
     self.save
   end
 
   def schedule_first_membership_for_approved_member
     send_fulfillment
-    self.bill_date = Date.today + terms_of_membership.trial_days
+    self.bill_date = Time.zone.now + terms_of_membership.trial_days
     self.next_retry_bill_date = bill_date
     if reactivation_times == 0
       self.quota = (terms_of_membership.monthly? ? 1 :  0)
@@ -362,7 +362,7 @@ class Member < ActiveRecord::Base
       fulfillments_products_to_send.each do |product|
         f = Fulfillment.new :product => product
         f.member_id = self.uuid
-        f.assigned_at = DateTime.now
+        f.assigned_at = Time.zone.now
         f.save
       end
     end
@@ -429,7 +429,7 @@ class Member < ActiveRecord::Base
     end
 
     def record_date
-      self.member_since_date = DateTime.now
+      self.member_since_date = Time.zone.now
     end
 
     def schedule_renewal
@@ -437,7 +437,7 @@ class Member < ActiveRecord::Base
       if terms_of_membership.monthly?
         self.quota = self.quota + 1
         if self.recycled_times > 1
-          new_bill_date = DateTime.now + eval(terms_of_membership.installment_type)
+          new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
         end
       elsif terms_of_membership.yearly?
         # refs #15935
@@ -471,7 +471,7 @@ class Member < ActiveRecord::Base
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
         message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
-        self.next_retry_bill_date = Date.today + eval(Settings.next_retry_on_missing_decline)
+        self.next_retry_bill_date = Time.zone.now + eval(Settings.next_retry_on_missing_decline)
         self.save
         Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
           :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.credit_card_type}. " + 

@@ -139,7 +139,7 @@ class MembersController < ApplicationController
     @member_cancel_reason = MemberCancelReason.all
     if request.post?
       if !params[:reason].blank?
-        if params[:cancel_date].to_date > Date.today
+        if params[:cancel_date].to_date > Time.zone.now.to_date
           begin
             @current_member.cancel_date = params[:cancel_date]
             @current_member.save!
@@ -178,7 +178,7 @@ class MembersController < ApplicationController
 
   def change_next_bill_date
     if request.post?
-      if params[:next_bill_date].to_date > Date.today
+      if params[:next_bill_date].to_date > Time.zone.now.to_date
         begin
           @current_member.change_next_bill_date!(params[:next_bill_date])
           message = "Next bill date changed to #{params[:next_bill_date]}"
@@ -223,7 +223,7 @@ class MembersController < ApplicationController
   def resend_fulfillment 
     if request.post?
       fulfillment = Fulfillment.find(params[:fulfillment_id])
-      fulfillment.update_attribute :delivered_at, DateTime.now
+      fulfillment.update_attribute :delivered_at, Time.zone.now
       message = "Resend fulfillment #{fulfillment.product}."
       Auditory.audit(@current_agent,@current_member,message,@current_member)    
       flash[:notice] = message 
