@@ -41,8 +41,17 @@ class Member < ActiveRecord::Base
       base.where('last_synced_at > updated_at') :
       base.where('last_synced_at IS NULL OR last_synced_at < updated_at')
   }
-  scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date = ?', value) if value }
-  scope :with_phone_number_like, lambda { |value| where('phone_number like ?', value) if value }
+  scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date = ?', value) unless value.blank? }
+  scope :with_phone_number_like, lambda { |value| where('phone_number like ?', value) unless value.blank? }
+  scope :with_visible_id, lambda { |value| where('visible_id = ?',value) unless value.blank? }
+  scope :with_first_name_like, lambda { |value| where('first_name like ?', '%'+value+'%') unless value.blank? }
+  scope :with_last_name_like, lambda { |value| where('last_name like ?', '%'+value+'%') unless value.blank? }
+  scope :with_address_like, lambda { |value| where('address like ?', '%'+value+'%') unless value.blank? }
+  scope :with_city_like, lambda { |value| where('city like ?', '%'+value+'%') unless value.blank? }
+  scope :with_state_like, lambda { |value| where('state like ?', '%'+value+'%') unless value.blank? }
+  scope :with_zip, lambda { |value| where('zip = ?', value) unless value.blank? }
+  scope :with_email_like, lambda { |value| where('email like ?', '%'+value+'%') unless value.blank? }
+  scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value) unless value.blank? }
 
   state_machine :status, :initial => :none do
     after_transition [ :none, # enroll
