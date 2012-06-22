@@ -9,7 +9,7 @@
   </tr>
   <tr>
     <td> <%= t('activerecord.attributes.terms_of_membership.installment_amount') %>: 
-         <%= @tom.installment_amount %> </td>
+         <%= number_to_currency(@tom.installment_amount) %> </td>
     <td> <%= t('activerecord.attributes.terms_of_membership.installment_type') %>: 
         <%= @tom.installment_type %> </td>
     <td> <%= t('activerecord.attributes.terms_of_membership.grace_period') %>: 
