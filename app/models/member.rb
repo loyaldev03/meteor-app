@@ -220,7 +220,7 @@ class Member < ActiveRecord::Base
         else
           if terms_of_membership.payment_gateway_configuration.nil?
             message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
-            # TODO: do we have to add an operation?????
+            Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
             Airbrake.notify(:error_class => "Billing", :error_message => message)
             return { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
           end
@@ -468,16 +468,18 @@ class Member < ActiveRecord::Base
                 DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
                   trans.response_code, type, "all")
 
-      set_as_canceled = false
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
         message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
         self.next_retry_bill_date = Date.today + eval(Settings.next_retry_on_missing_decline)
+        self.save
         Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
           :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.credit_card_type}. " + 
-                            "Campaign type: #{type}. We have scheduled this billing to be run in 30 days.")
+              "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.")
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
+        set_as_canceled = true if self.recycled_times >= 4
       else
+        set_as_canceled = false
         trans.update_attribute :decline_strategy_id, decline.id
         if decline.hard_decline?
           message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"

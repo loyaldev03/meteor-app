@@ -155,12 +155,10 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing declined, but there is no decline rule. Send email" do 
     active_merchant_stubs("34234", "decline stubbed", false) 
-    assert_difference('ActionMailer::Base.deliveries.size', 1) do 
-      active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
-      amount = @terms_of_membership.installment_amount
-      answer = active_member.bill_membership
-      assert_equal active_member.next_retry_bill_date.to_date, (Date.today + eval(Settings.next_retry_on_missing_decline)).to_date, "Next retry bill date incorrect"
-    end
+    active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+    amount = @terms_of_membership.installment_amount
+    answer = active_member.bill_membership
+    assert_equal active_member.next_retry_bill_date.to_date, (Date.today + eval(Settings.next_retry_on_missing_decline)).to_date, "Next retry bill date incorrect"
   end
   ############################################
 
