@@ -7,6 +7,7 @@ SacPlatform::Application.routes.draw do
       match 'profile' => 'members#profile', as: 'v1_get_member_profile', :via => :get
       match 'enroll' => 'members#enroll', as: 'v1_enroll_members', :via => :post
       match 'update_profile/:id/:club_id' => 'members#update_profile', as: 'v1_update_profile_members', :via => :put
+      post 'prospects' => 'prospects#enroll'
     end
   end
 
