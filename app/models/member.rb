@@ -255,9 +255,10 @@ class Member < ActiveRecord::Base
     if member.nil?
       # credit card exist?
       credit_card_params[:number].gsub!(' ', '') # HOT FIX on 
-      credit_card = CreditCard.find_all_by_number(credit_card_params[:number]).select { |cc| cc.member && cc.member.club_id == club.id }
-      if credit_card.empty? or cc_blank == '1'
-        credit_card = CreditCard.new credit_card_params
+      credit_card = CreditCard.new credit_card_params
+      credit_cards = CreditCard.joins(:member).where( :encrypted_number => credit_card.encrypted_number, :members => { :club_id => club.id } )
+
+      if credit_cards.empty? or cc_blank == '1'
         member = Member.new member_params
         # TBD new member with api_id comes from Drupal so do not update... or current_agent.api?
         member.skip_api_sync! if member.api_id.present? 
@@ -270,13 +271,13 @@ class Member < ActiveRecord::Base
           return { :message => "Member data is invalid: #{errors}", :code => Settings.error_codes.member_data_invalid }
         end
         # enroll allowed
-      elsif not credit_card.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
+      elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
         message = "Credit card blacklisted. call support."
-        Auditory.audit(current_agent, tom, message, credit_card.first.member, Settings.operation_types.credit_card_blacklisted)
+        Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
       elsif not (cc_blank == '1' or credit_card_params[:number].blank?)
         message = "Credit card is already in use. call support."
-        Auditory.audit(current_agent, tom, message, credit_card.first.member, Settings.operation_types.credit_card_already_in_use)
+        Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_already_in_use)
         return { :message => message, :code => Settings.error_codes.credit_card_in_use }
       end
     else
