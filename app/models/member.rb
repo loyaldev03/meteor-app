@@ -63,7 +63,7 @@ class Member < ActiveRecord::Base
       transition [:provisional, :active] => :active
     end
     event :set_as_canceled do
-      transition [:provisional, :active_credit_card, :applied] => :lapsed
+      transition [:provisional, :active, :applied] => :lapsed
     end
     event :recovered do 
       transition [:lapsed] => :provisional
