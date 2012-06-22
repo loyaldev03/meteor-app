@@ -1,5 +1,5 @@
 <%= render :partial => "shared/member_information" %>
-
+<%= form_for @operation, :as => :operation, :url => operation_path(:id => @operation), do |f|%>
 <table class="table table-bordered">
 	<tr>
 	  <td colspan="2"> <%= t('activerecord.attributes.operation.operation_date') %>: <%= @operation.operation_date %></td>
@@ -8,7 +8,6 @@
 	  <td> <%= t('activerecord.attributes.operation.description') %>: <%= @operation.description %> </td>
 	  <td> <%= t('activerecord.attributes.operation.created_by') %>: <%= @operation.created_by.username %> </td>
 	</tr>
-    <%= form_for @operation, :as => :operation, :url => operation_path(:id => @operation), do |f|%>
 	<tr> 
 	  <tr>
 	  	<td colspan="3"> <%= f.text_area :notes, :value => @operation.notes, :style => 'width: 99%; height: 150px' %> </td>
@@ -18,6 +17,5 @@
 	         <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => 'btn' %> </td>
 	  </tr>
 	</tr> 
-    <% end%>
 </table>
-
+<% end%>

@@ -7,7 +7,7 @@ class Operation < ActiveRecord::Base
   before_create :set_operation_date_if_nil
 
   def self.datatable_columns
-    ['operation_date', 'description', 'notes']
+    ['id', 'operation_date', 'description', 'notes']
   end
 
   private
