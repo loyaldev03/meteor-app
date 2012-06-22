@@ -15,7 +15,7 @@ class CreditCard < ActiveRecord::Base
   #before_update :not_blacklisted
 
   def accepted_on_billing
-    update_attribute :last_successful_bill_date, DateTime.now
+    update_attribute :last_successful_bill_date, Time.zone.now
   end
 
   def blacklist
@@ -50,7 +50,7 @@ class CreditCard < ActiveRecord::Base
   end
 
   def update_last_digits
-    self.last_digits = self.number.last(4) if not self.nil?
+    self.last_digits = self.number.last(4) unless self.update_last_digits.nil?
   end
   
   # refs #17832 and #19603
