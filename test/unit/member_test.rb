@@ -109,13 +109,11 @@ class MemberTest < ActiveSupport::TestCase
 
   test "Lapsed member can be recovered unless it needs approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
-    assert_difference('Fulfillment.count') do
-      member = FactoryGirl.create(:lapsed_member, terms_of_membership: @tom_approval, club: @tom_approval.club)
-      answer = member.recover(@terms_of_membership_with_gateway)
-      assert answer[:code] == Settings.error_codes.success, answer[:message]
-      assert_equal 'applied', member.status
-      assert_equal 1, member.reactivation_times
-    end
+    member = FactoryGirl.create(:lapsed_member, terms_of_membership: @tom_approval, club: @tom_approval.club)
+    answer = member.recover(@terms_of_membership_with_gateway)
+    assert answer[:code] == Settings.error_codes.success, answer[:message]
+    assert_equal 'applied', member.status
+    assert_equal 1, member.reactivation_times
   end
 
   test "active member can receive fulfillments" do 
