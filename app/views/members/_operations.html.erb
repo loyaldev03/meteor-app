@@ -2,6 +2,7 @@
 <table id="operations_table" class="display" data-source="<%= operations_url(format: "json") %>">
   <thead>
     <tr>
+      <th> ID </th>
       <th> Date </th>
       <th> Operation </th>
       <th> Notes </th>
@@ -24,5 +25,5 @@
 </div>  
 
 <script>
-  $(document).ready(operation_member_functions(<% Operation.datatable_columns.size %>));
+  $(document).ready(operation_member_functions(<%= Operation.datatable_columns.size %>));
 </script>

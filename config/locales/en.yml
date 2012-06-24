@@ -53,6 +53,7 @@ en:
     members: 'Members'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
+    credit_card: 'Credit card'
     attributes:
       transaction:
         refundable: 'Refundable'
@@ -78,6 +79,7 @@ en:
         locked_at: 'Locked ad'
         created_at: 'Created at'
       member:
+        member_id: 'Member ID'
         full_name: 'Full name'
         first_name: 'First name'
         last_name: 'Last name'
@@ -90,6 +92,7 @@ en:
         phone_number: 'Phone Number'
         id: 'Member id'
         status: 'Current Status'
+        email: 'Email'
         member_since_date: 'Member since date'
         join_date: 'Join date'
         next_retry_bill_date: 'Next bill date'
@@ -117,6 +120,7 @@ en:
         expire_month: 'Expire month'
         expire_year: 'Expire year'
         blacklisted: 'Blacklisted'
+        last_digits: 'Last digits'
       operation:
         operation_date: 'Operation date'
         description: 'Description'
@@ -128,6 +132,10 @@ en:
         installment_type: 'Installment type'
         grace_period: 'Grace period'
         trial_days: 'Trial days'
+        has_payment_gateway_development: 'The club has payment gateway configuration for development mode'
+        has_payment_gateway_production: 'The club has payment gateway configuration for production mode'
+        not_have_payment_gateway_development: 'The club does not have payment gateway configuration for development mode'
+        not_have_payment_gateway_production: 'The club does not have payment gateway configuration for production mode'
       email_template:
         name: 'Name'
         type: 'Type'

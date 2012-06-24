@@ -30,7 +30,7 @@ class OperationsController < ApplicationController
 
     respond_to do |format|
       if operation.update_attributes(params[:operation])
-        message = "Edited note #{operation.id}."
+        message = "Edited operation note #{operation.id}."
         Auditory.audit(@current_agent, operation, message, @current_member)
         format.html { redirect_to operation_path(:id => operation), notice: message }
         format.json { head :no_content }

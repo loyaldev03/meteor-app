@@ -13,9 +13,10 @@ private
   def data
     operations.map do |operation|
       [
+        operation.id,
         I18n.l(operation.operation_date,:format => :long),
         #I couldnt make it work in another way. TODO: fix operation#show url.
-        link_to(operation.description.truncate(50), @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,:id => operation.id)), 
+        link_to(operation.description.truncate(42), @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,:id => operation.id)), 
         operation.notes,
         operation.created_by.username
       ]

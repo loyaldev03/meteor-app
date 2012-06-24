@@ -47,11 +47,12 @@
                        :value => (params[:member][:zip] if params[:member]) %>
       </td>
       <td>
-        <%= t('activerecord.attributes.credit_card.email') %>
+        <%= t('activerecord.attributes.member.email') %>
         <%= text_field :member, :email, :class => 'text_field',
                        :value => (params[:member][:email] if params[:member]) %>         
       </td>
       <td> 
+        <%= t('activerecord.credit_card') %>
         <%= t('activerecord.attributes.credit_card.last_digits') %>
         <%= text_field :member, :last_digits, :class => 'text_field',
                        :value => (params[:member][:last_digits] if params[:member]) %> 
@@ -81,3 +82,5 @@
 <script type="text/javascript">
   $(document).ready( member_index_functions() );
 </script>
+
+<%= will_paginate @members if @members %>
