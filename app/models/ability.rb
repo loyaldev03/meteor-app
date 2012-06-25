@@ -4,7 +4,7 @@ class Ability
   def initialize(agent)
     can :manage, Member
 
-    if agent.has_role? :admin
+    if agent.has_role? 'admin'
       can :manage, Agent
       can :manage, Partner
     else
