@@ -80,8 +80,10 @@ namespace :members do
   # This task should be run each day at 3 am ?
   task :send_happy_birthday => :environment do
     tall = Time.zone.now
+    # TODO: this taks must run from a desnormalized database.
+    return 
     begin
-      base =  Member.where(" enrollment_info[birth_day] = ? and status IS NOT IN (?) ", Date.today, [ 'lapsed', 'applied' ])
+      base =  Member.where(" birthday = ? and status IS NOT IN (?) ", Date.today, [ 'lapsed', 'applied' ])
       Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
       base.find_in_batches do |group|
         group.each do |member| 
