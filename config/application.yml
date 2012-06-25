@@ -52,6 +52,7 @@ defaults: &defaults
     credit_card_blank_without_grace: '9997'
     member_email_blacklisted: '9996'
     tom_wihtout_gateway_configured: '9789'
+    club_cash_transaction_not_successful: '9791'
   fulfillment_products:
     all: All
     kit_card: Kit - Card

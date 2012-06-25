@@ -5,7 +5,7 @@ class ClubCashTransaction < ActiveRecord::Base
 
   attr_accessible :amount, :description
 
-  validates :amount, :presence => true , :format => /^\d+??(?:\.\d{0,2})?$/ 
+  validates :amount, :presence => true , :numericality => {:greater_than_or_equal_to => 0}
 
   def update_member_amount
   	member = Member.find(member_id)

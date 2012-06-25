@@ -62,7 +62,7 @@ class Member < ActiveRecord::Base
     after_transition :none => :applied, :do => :set_join_date
     after_transition [:provisional, :active] => :lapsed, :do => :cancellation
     after_transition :provisional => :active, :do => :send_active_email
-    after_transition :lapsed => :provisional, :do => :increment_reactivations
+    after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
 
     event :set_as_provisional do

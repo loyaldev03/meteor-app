@@ -163,4 +163,15 @@ class MemberTest < ActiveSupport::TestCase
       assert !member.save, "Member cant be save #{member.errors.inspect}"
     }        
   end
+
+  test "If member is rejected, when recovering it should increment reactivation_times" do
+    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
+    member = FactoryGirl.create(:applied_member, terms_of_membership: @tom_approval, club: @tom_approval.club)
+    member.set_as_canceled!
+    answer = member.recover(@terms_of_membership_with_gateway)
+    assert answer[:code] == Settings.error_codes.success, answer[:message]
+    assert_equal 'applied', member.status
+    assert_equal 1, member.reactivation_times
+  end
+
 end

@@ -26,5 +26,7 @@
 
 
 <script>
-  $(document).ready(club_cash_transaction_functions());
+  var visible_id = <%= @current_member.visible_id %>; 
+  var club_id = <%= @current_club.id %>
+  $(document).ready(club_cash_functions())
 </script>
