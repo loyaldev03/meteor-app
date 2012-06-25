@@ -24,7 +24,7 @@ class Member < ActiveRecord::Base
 
   before_create :record_date
 
-  after_save 'api_member.save! unless @skip_api_sync || api_member.nil?'
+  #after_save 'api_member.save! unless @skip_api_sync || api_member.nil?'
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
 
   validates :first_name, :presence => true, :format => /^[A-Za-z ']+$/
