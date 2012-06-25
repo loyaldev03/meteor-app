@@ -11,6 +11,17 @@ def update_club_cash(amount)
   add_operation(Time.now.utc, cct, "Imported club cash transaction!. Amount: $#{cct.amount}", nil)  
 end
 
+def add_fulfillment(fulfillment_kit, fulfillment_since_date, fulfillment_expire_date)
+  if not fulfillment_kit.nil? and not fulfillment_expire_date.nil? and not fulfillment_since_date.nil?
+    phoenix_f = PhoenixFulfillment.new :product => fulfillment_kit
+    phoenix_f.member_id = @member.uuid
+    phoenix_f.assigned_at = fulfillment_since_date
+    phoenix_f.delivered_at = fulfillment_since_date
+    phoenix_f.renewable_at = fulfillment_expire_date
+    phoenix_f.save!  
+  end
+end
+
 
 # 1- update existing members
 def update_members
@@ -99,6 +110,17 @@ def update_members
             end
           end
 
+          phoenix_f = PhoenixFulfillment.find_by_member_id_and_product(phoenix.uuid, member.fulfillment_kit)
+          if phoenix_f.nil?
+            add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
+          else
+            phoenix_f.product = member.fulfillment_kit
+            phoenix_f.assigned_at = member.fulfillment_since_date
+            phoenix_f.delivered_at = member.fulfillment_since_date
+            phoenix_f.renewable_at = member.fulfillment_expire_date
+            phoenix_f.save! 
+          end
+
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
@@ -185,12 +207,7 @@ def add_new_members
           phoenix_cc.member_id = phoenix.uuid
           phoenix_cc.save!
 
-
-          phoenix_f = PhoenixFulfillment.new :product => member.fulfillment_kit
-          phoenix_f.member_id = phoenix.uuid
-          phoenix_f.assigned_at = member.fulfillment_since_date
-          phoenix_f.renewable_at = member.fulfillment_expire_date
-          phoenix_f.save!
+          add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
 
           member.update_attribute :imported_at, Time.now.utc
         rescue Exception => e
