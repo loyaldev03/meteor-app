@@ -42,7 +42,6 @@ namespace :billing do
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
         end
-        sleep(5) # Make sure it doesn't get too crowded in there!
       end
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
@@ -67,6 +66,44 @@ namespace :members do
           rescue Exception => e
             message = e.to_s
             Airbrake.notify(:error_class => "Members::Cancel", :error_message => message)
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        end
+      end
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}"
+    end
+  end
+
+  desc "Send pillar emails"
+  task :send_pillar_emails => :environment do 
+    tall = Time.zone.now
+    begin
+      EmailTemplate.find_in_batches(:conditions => " template_type = 'pillar' ") do |group|
+        group.each do |template| 
+          tz = Time.zone.now
+          begin
+            Rails.logger.info "  * processing template ##{template.id}"
+            Member.find_in_batches(:conditions => 
+                [ " join_date = ? AND terms_of_membership_id = ? ", Date.today - template.days_after_join_date.days, 
+                  template.terms_of_membership_id ]) do |group1|
+              group1.each do |member| 
+                tz = Time.zone.now
+                begin
+                  Rails.logger.info "  * processing member ##{member.uuid}"
+                  Communication.deliver!(template, member)
+                rescue Exception => e
+                  message = e.to_s
+                  Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => message)
+                  Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+                end
+                Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+              end
+            end
+          rescue Exception => e
+            message = e.to_s
+            Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => message)
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"

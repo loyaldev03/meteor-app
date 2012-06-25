@@ -24,6 +24,7 @@ annual_sloop = [
   [ "Local Chapter Newsletter",116804,"-","Monthly - 2nd Tuesday","yes",,,"Sending manually currently" ]
 ]
 
+# rename 'Renewal Pre Bill" =>  to "Pre Bill" only on this csv
 annual_join_now = [
   [ "Welcome E-mail SLOOP",47386,6411,"Join","no","After",0,
   [ "Welcome E-mail Canadians",47386,6412,"Join","no","After",0,"Not doing currently; wouldn't mind testing it again" ],
@@ -34,7 +35,8 @@ annual_join_now = [
   [ "Pillar 4 - Local",47386,6421,"Join","no","After",8,],
   [ "Cancellation",47386,6424,"Cancel","no","After",0,],
   [ "Cancel with Refund ",47386,19144,"Refund","no","After",0,],
-  [ "Renewal Pre Bill",47623,6427,"NBD; Member > 350 days","yes","Before",7,],
+  # [ "Renewal Pre Bill",47623,6427,"NBD; Member > 350 days","yes","Before",7,],
+  [ "Pre Bill",47623,6427,"NBD; Member > 350 days","yes","Before",7,],
   [ "ONMC Newsletter - Annual Activated",116804,"-","Every Thursday","yes",,,"Sending manually currently"],
   [ "ONMC Newsletter - Annual Not Activated",116804,"-","Every Thursday","yes",,,"Sending manually currently"],
   [ "Forgot Password - Customer Service Initiated",9398,183590,"?","no","After",0,],
@@ -82,19 +84,23 @@ monthly_sloops = [
   [ "Local Chapter Newsletter",116804,"-","Monthly - 2nd Tuesday","yes",,,"Sending manually currently; NOTE: This is only sent to Local Chapter members"]
 ]
 
-def add_email_template(name, type, tom_id)
+def add_email_template(name, type, tom_id, trigger_id, mlid, site_id, days_after_join_date = 0)
   et = EmailTemplate.new 
   et.name = name
   et.client = :lyris
+  et.days_after_join_date = days_after_join_date
   et.template_type = type
+  et.external_attributes = { :trigger_id => trigger_id, :mlid => mlid, :site_id => site_id } 
   et.terms_of_membership_id = tom_id
   et.save
 end
 
+# TODO set SITE_ID
+
 # "Email Name ","MLID","Trigger ID","Corresponding Event Name","Recurring","Before or After","Day","Notes"
 def upload_email_services(communications, tom_id)
   communications.each do |comm|
-    type = nil
+    type, days = nil, nil
     if comm[0] == 'Activation E-mail'
       type = :active
     elsif comm[0] == 'Pre Bill'
@@ -106,10 +112,11 @@ def upload_email_services(communications, tom_id)
     # we will have prebill renewal on phoenix 1.1
     # elsif comm[0] == 'Renewal Pre Bill'
     #  type = :prebill_renewal
-    elsif comm[0] == 'Cancel with Refund'
-      type = :refund
+    elsif comm[0].include?('Pillar')
+      type = :pillar
+      days = comm[6].to_i
     end
-    add_email_template(comm[0], type, tom_id) unless type.nil?
+    add_email_template(comm[0], type, tom_id, comm[2], comm[1], SITE_ID, days) unless type.nil?
   end
 end
 

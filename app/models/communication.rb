@@ -4,7 +4,11 @@ class Communication < ActiveRecord::Base
   serialize :external_attributes
 
   def self.deliver!(template_type, member)
-    template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
+    if template_type.class == EmailTemplate
+      template = template_type
+    else
+      template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
+    end
     if template.nil?
       message = "Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
       Airbrake.notify(:error_class => "Communication error", :error_message => message)
