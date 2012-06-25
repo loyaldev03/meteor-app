@@ -23,3 +23,10 @@
     </tr>
   </table>
 <% end %>
+
+
+<script>
+  var visible_id = <%= @current_member.visible_id %>; 
+  var club_id = <%= @current_club.id %>
+  $(document).ready(club_cash_functions())
+</script>

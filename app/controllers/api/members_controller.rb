@@ -73,4 +73,39 @@ class Api::MembersController < ApplicationController
       }
     end
   end    
+
+  # Method : POST
+  #
+  # Params:
+  #  * "drupal_user_id" and "domain" if its being requested from drupal.
+  #  * "id" and "club_id" if its being requested from the platform. 
+  #  * club_cash_transaction => { amount, description}
+  # 
+  def add_club_cash
+    member_id = params[:drupal_user_id] || params[:id]
+    club_id = params[:domain] || params[:club_id]
+    response = {}
+
+    member = Member.find_by_visible_id_and_club_id(member_id, club_id)  
+    if member.nil?
+      response = { :message => "Member not found", :code => Settings.error_codes.not_found }  
+    else
+      cct = ClubCashTransaction.new()
+      cct.member_id = member
+      cct.amount = params[:club_cash_transaction][:amount] || params[:amount]
+      cct.description = params[:club_cash_transaction][:description] if params[:club_cash_transaction]
+
+      if cct.save
+        message = "Club cash transaction done!. Amount: $#{cct.amount}"
+        Auditory.audit(@current_agent, cct, message, @current_member)
+        response = { :message => message, :code => Settings.error_codes.success, :v_id => member.visible_id }
+      else
+        errors = cct.errors.collect {|attr, message| "#{attr}: #{message}" }.join(". ")
+        message = "Could not saved club cash transactions: #{errors}"
+        response = { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful, :v_id => member.visible_id  }
+      end
+    end
+    render json: response
+  end
+
 end

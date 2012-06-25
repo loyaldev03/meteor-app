@@ -154,6 +154,22 @@ $(document).ready( function() {
     $('.help').popover({offset: 10});
   };
 
+  function club_cash_functions(){
+    $('form').submit( function(event) {
+      event.preventDefault()
+      $.ajax({
+        type: 'POST',
+        url: "/api/v1/add_club_cash/"+visible_id+"/"+club_id,
+        data: $("form").serialize(),
+        success: function(data) {
+          alert (data.message);
+          if (data.code == 000)
+            window.location.replace('../'+data.v_id);
+        },
+      });
+    });
+  }
+
 
   function operation_member_functions(column_count){
     oTable = $('#operations_table').dataTable({

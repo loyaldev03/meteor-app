@@ -7,6 +7,7 @@ SacPlatform::Application.routes.draw do
       match 'profile' => 'members#profile', as: 'v1_get_member_profile', :via => :get
       match 'enroll' => 'members#enroll', as: 'v1_enroll_members', :via => :post
       match 'update_profile/:id/:club_id' => 'members#update_profile', as: 'v1_update_profile_members', :via => :put
+      match 'add_club_cash/:id/:club_id' => 'members#add_club_cash', as: 'v1_add_club_cash', :via => :post
       post 'prospects' => 'prospects#enroll'
     end
   end
@@ -45,7 +46,7 @@ SacPlatform::Application.routes.draw do
         match '/set_undeliverable' => 'members#set_undeliverable', as: 'member_set_undeliverable', :via => [:get, :post]
         match '/set_unreachable' => 'members#set_unreachable', as: 'member_set_unreachable', :via => [:get, :post]
         match '/resend_fulfillment' => 'members#resend_fulfillment', as: 'member_resend_fulfillment', :via => [:post]
-        match '/add_club_cash' => 'members#add_club_cash', as: 'member_add_club_cash', :via => [:get, :post]
+        match '/add_club_cash' => 'members#add_club_cash', as: 'member_add_club_cash'
         match '/approve' => 'members#approve', as: 'member_approve', :via => [:post]
         match '/reject' => 'members#reject', as: 'member_reject', :via => [:post]  
         match '/' => 'members#show', as: 'show_member', :via => [:get, :post]
