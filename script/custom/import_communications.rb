@@ -88,7 +88,7 @@ def add_email_template(name, type, tom_id, trigger_id, mlid, site_id, days_after
   et = EmailTemplate.new 
   et.name = name
   et.client = :lyris
-  et.days_after_join_date = days_after_join_date
+  et.days_after_join_date = days_after_join_date.to_i
   et.template_type = type
   et.external_attributes = { :trigger_id => trigger_id, :mlid => mlid, :site_id => site_id } 
   et.terms_of_membership_id = tom_id
@@ -112,9 +112,14 @@ def upload_email_services(communications, tom_id)
     # we will have prebill renewal on phoenix 1.1
     # elsif comm[0] == 'Renewal Pre Bill'
     #  type = :prebill_renewal
+    elsif comm[0].include?('Trial Comm-Day 7')
+      type = :pillar
+      days = comm[6]
     elsif comm[0].include?('Pillar')
       type = :pillar
-      days = comm[6].to_i
+      days = comm[6]
+    elsif comm[0].include?('Active Member Birthday E-mail')
+      type = :birthday
     end
     add_email_template(comm[0], type, tom_id, comm[2], comm[1], SITE_ID, days) unless type.nil?
   end

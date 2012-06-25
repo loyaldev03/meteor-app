@@ -76,6 +76,33 @@ namespace :members do
     end
   end
 
+  desc "Send Happy birthday email to members"
+  # This task should be run each day at 3 am ?
+  task :send_happy_birthday => :environment do
+    tall = Time.zone.now
+    begin
+      base =  Member.where(" enrollment_info[birth_day] = ? and status IS NOT IN (?) ", Date.today, [ 'lapsed', 'applied' ])
+      Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
+      base.find_in_batches do |group|
+        group.each do |member| 
+          tz = Time.zone.now
+          begin
+            Rails.logger.info "  * processing member ##{member.uuid}"
+            Communication.deliver!(:birthday, member)
+          rescue Exception => e
+            message = e.to_s
+            Airbrake.notify(:error_class => "Members::Cancel", :error_message => message)
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        end
+      end
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}"
+    end
+  end
+
+
   desc "Send pillar emails"
   task :send_pillar_emails => :environment do 
     tall = Time.zone.now

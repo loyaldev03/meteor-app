@@ -8,6 +8,7 @@ class EmailTemplate < ActiveRecord::Base
     :prebill, # sent 7 days before we bill member
     :prebill_renewal, # not used yet
     :refund, # sent when CS does a refund.
+    :birthday, # sent if birthday is on enrollment_info
     :pillar # emails sent after join date. they use days_after_join_date attribute
   ]
 
