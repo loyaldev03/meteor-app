@@ -3,7 +3,15 @@ class ApplicationController < ActionController::Base
   before_filter :validate_partner_presence
   protect_from_forgery
 
+  rescue_from CanCan::AccessDenied do |exception|
+    render :file => "#{Rails.root}/public/401.html", :status => 401, :layout => false
+  end
+
   private
+
+    def current_ability
+      @current_ability ||= Ability.new(current_agent)
+    end
 
     def validate_partner_presence
       if current_agent

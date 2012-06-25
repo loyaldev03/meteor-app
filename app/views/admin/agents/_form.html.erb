@@ -11,18 +11,6 @@
       <%= f.text_field :username, :class => 'text_field' %>
     </div>
   </div>
-    <div class="control-group">
-    <%= f.label :first_name, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :first_name, :class => 'text_field' %>
-    </div>
-  </div>
-    <div class="control-group">
-    <%= f.label :last_name, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :last_name, :class => 'text_field' %>
-    </div>
-  </div>
   <div class="control-group">
     <%= f.label :password, :class => 'control-label' %>
     <div class="controls">
@@ -33,6 +21,18 @@
     <%= f.label :password_confirmation, :class => 'control-label' %>
     <div class="controls">
       <%= f.password_field :password_confirmation, :class => 'text_field' %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :roles, :class => 'control-label' %>
+    <div class="controls">
+      <% Agent::ROLES.each do |role| %>
+        <%= label_tag nil, role, class: 'checkbox' do %>
+          <%= check_box_tag "agent[roles][]", role, f.object.has_role?(role), id: "agent_roles_#{role}" %>
+          <%= role -%>
+        <% end %>
+      <% end %>
     </div>
   </div>
 

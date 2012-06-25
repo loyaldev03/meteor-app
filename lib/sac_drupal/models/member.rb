@@ -148,7 +148,7 @@ module Drupal
           field_profile_member_id: { 
             und: [ 
               {
-                value: m.reload.uuid
+                value: m.reload.visible_id
               } 
             ] 
           }

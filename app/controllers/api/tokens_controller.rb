@@ -3,36 +3,33 @@ class Api::TokensController < ApplicationController
   skip_before_filter :authenticate_agent!
 
   respond_to :json
+
   def create
     email = params[:email]
     password = params[:password]
-    if request.format != :json
-      render :status=>406, :json=>{:message=>"The request must be json"}
-      return
-     end
 
     if email.nil? or password.nil?
-     render :status=>400,
-            :json=>{:message=>"The request must contain the user email and password."}
-     return
+      respond_with({:message=>"The request must contain the user email and password."}, :status=>400, 
+        :location => nil)
+      return
     end
 
     @user=Agent.find_by_email(email.downcase)
 
     if @user.nil?
       logger.info("User #{email} failed signin, user cannot be found.")
-      render :status=>401, :json=>{:message=>"Invalid email or passoword."}
+      respond_with({:message=>"Invalid email or passoword."}, :status=>401, :location => nil)
       return
     end
 
     # http://rdoc.info/github/plataformatec/devise/master/Devise/Models/TokenAuthenticatable
-    @user.ensure_authentication_token!
+    @user.reset_authentication_token!
 
     if not @user.valid_password?(password)
       logger.info("User #{email} failed signin, password \"#{password}\" is invalid")
-      render :status=>401, :json=>{:message=>"Invalid email or password."}
+      respond_with({:message=>"Invalid email or passoword."}, :status=>401, :location => nil)
     else
-      render :status=>200, :json=>{:token=>@user.authentication_token}
+      respond_with({:token=>@user.authentication_token}, :status=>200, :location => nil)
     end
   end
 
@@ -42,7 +39,7 @@ class Api::TokensController < ApplicationController
       logger.info("Token not found.")
       render :status=>404, :json=>{:message=>"Invalid token."}
     else
-      @user.reset_authentication_token!
+      @user.update_attribute :authentication_token, nil
       render :status=>200, :json=>{:token=>params[:id]}
     end
   end
