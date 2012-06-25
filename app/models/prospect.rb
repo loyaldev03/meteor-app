@@ -1,10 +1,8 @@
 class Prospect < ActiveRecord::Base
-  # include Extensions::UUID
-  include Extensions::SerializeJson
+  include Extensions::UUID
 
-  serialize_json :preferences,
-    :referral_parameters,
-    :mega_channel
+  serialize :preferences, JSON
+  serialize :referral_parameters, JSON
 
   attr_accessible :first_name, :last_name, :address, :city, :state, :zip, :email, :phone_number, :birth_date,
                   :preferences, :mega_chanel, :ip_address, :referral_host, :referral_parameters, :cookie_value,

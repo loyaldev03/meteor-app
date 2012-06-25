@@ -8,7 +8,8 @@ class Agent < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable, 
          :encryptable, :token_authenticatable
 
-  tango_user
+  easy_roles :roles
+  ROLES = %W(admin api)
 
   acts_as_paranoid
 
@@ -20,7 +21,8 @@ class Agent < ActiveRecord::Base
   attr_accessor :login
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :email, :password, :password_confirmation, :remember_me, :username, :login, :first_name, :last_name
+  attr_accessible :email, :password, :password_confirmation, :remember_me, :username, :login, :first_name, 
+    :last_name, :roles
 
   validates :username, :uniqueness => true
   validates :username, :presence => :true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
