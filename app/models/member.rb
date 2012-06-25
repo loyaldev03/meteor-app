@@ -2,7 +2,7 @@ class Member < ActiveRecord::Base
   include Extensions::UUID
 
   serialize :enrollment_info, JSON
-  
+
   belongs_to :terms_of_membership
   belongs_to :club
   belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
@@ -20,7 +20,7 @@ class Member < ActiveRecord::Base
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address,
-      :wrong_phone_number, :api_id
+      :wrong_phone_number, :api_id, :enrollment_info, :mega_channel
 
   before_create :record_date
 
@@ -385,6 +385,15 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def mega_channel
+    self.enrollment_info && self.enrollment_info['mega_channel']
+  end
+
+  def mega_channel=(value)
+    self.enrollment_info ||= {}
+    self.enrollment_info['mega_channel'] = value
+  end
+
   def skip_api_sync!
     @skip_api_sync = true
   end
@@ -429,8 +438,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      # TODO: this must be review after #19110 is finished
-      if enrollment_info and enrollment_info[:megachannel].include?('sloop')
+      if (self.mega_channel || '').include?('sloop')
         [ Settings.fulfillment_products.sloop, Settings.fulfillment_products.kit_card ]
       else
         [ Settings.fulfillment_products.kit_card ]
