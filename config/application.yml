@@ -41,6 +41,7 @@ defaults: &defaults
     member_not_saved: '404'
     blacklisted: '406'
     cant_recover_member: '407'
+    not_supported:'902'
     invalid_credit_card: '9506'
     credit_card_in_use: '9507'
     credit_card_blacklisted: '9508'

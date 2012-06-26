@@ -90,7 +90,7 @@ class Transaction < ActiveRecord::Base
       #when "authorization_capture"
       #  authorization_capture
       else
-        { :message=>"Operation -#{transaction_type}- not supported",:code=> '902' }
+        { :message=>"Operation -#{transaction_type}- not supported", :code=> Settings.error_codes.not_supported }
     end
   end  
 
