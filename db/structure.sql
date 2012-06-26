@@ -26,6 +26,7 @@ CREATE TABLE `agents` (
   `deleted_at` datetime DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
+  `roles` varchar(255) COLLATE utf8_unicode_ci DEFAULT '--- []',
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_agents_on_email` (`email`),
   UNIQUE KEY `index_agents_on_reset_password_token` (`reset_password_token`),
@@ -93,7 +94,7 @@ CREATE TABLE `credit_cards` (
   `last_digits` varchar(4) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_credit_cards_on_member_id` (`member_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=268787 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=269363 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `decline_strategies` (
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -151,6 +152,7 @@ CREATE TABLE `email_templates` (
   `terms_of_membership_id` bigint(20) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
+  `days_after_join_date` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -178,7 +180,7 @@ CREATE TABLE `fulfillments` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3112 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `member_notes` (
   `member_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -474,3 +476,7 @@ INSERT INTO schema_migrations (version) VALUES ('20120614180258');
 INSERT INTO schema_migrations (version) VALUES ('20120620160033');
 
 INSERT INTO schema_migrations (version) VALUES ('20120621211638');
+
+INSERT INTO schema_migrations (version) VALUES ('20120621213008');
+
+INSERT INTO schema_migrations (version) VALUES ('20120625171855');

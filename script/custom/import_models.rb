@@ -137,6 +137,14 @@ class PhoenixAgent < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "agents" 
 end
+class PhoenixFulfillment < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "fulfillments" 
+end
+class PhoenixTermsOfMembership < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "terms_of_memberships" 
+end
 
 
 

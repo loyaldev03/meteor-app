@@ -2,6 +2,11 @@ class Notifier < ActionMailer::Base
   default from: "platform@xagax.com"
   default bcc: "platformadmins@xagax.com"
 
+  def prebill_renewal(email)
+    email = nil
+    mail :to => email, :subject => "Renewal Pre bill email"
+  end
+
   def pre_bill(email)
     email = nil
     mail :to => email, :subject => "Pre bill email"

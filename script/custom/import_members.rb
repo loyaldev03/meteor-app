@@ -2,6 +2,27 @@
 
 require_relative 'import_models'
 
+def update_club_cash(amount)
+  cct = PhoenixClubCashTransaction.new 
+  cct.amount = amount
+  cct.description = "Imported club cash"
+  cct.member_id = @member.uuid
+  cct.save!
+  add_operation(Time.now.utc, cct, "Imported club cash transaction!. Amount: $#{cct.amount}", nil)  
+end
+
+def add_fulfillment(fulfillment_kit, fulfillment_since_date, fulfillment_expire_date)
+  if not fulfillment_kit.nil? and not fulfillment_expire_date.nil? and not fulfillment_since_date.nil?
+    phoenix_f = PhoenixFulfillment.new :product => fulfillment_kit
+    phoenix_f.member_id = @member.uuid
+    phoenix_f.assigned_at = fulfillment_since_date
+    phoenix_f.delivered_at = fulfillment_since_date
+    phoenix_f.renewable_at = fulfillment_expire_date
+    phoenix_f.save!  
+  end
+end
+
+
 # 1- update existing members
 def update_members
   BillingMember.where("imported_at IS NOT NULL AND updated_at > imported_at and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
@@ -14,6 +35,8 @@ def update_members
           if phoenix.nil?
             @log.info "  * member ##{member.id} not found on phoenix ?? "
           else
+            @member = phoenix
+
             #TODO: puede haber cambio de TOM  en ONMC production ?
             phoenix.first_name = member.first_name
             phoenix.last_name = member.last_name
@@ -24,21 +47,20 @@ def update_members
             phoenix.zip = member.zip
             phoenix.country = member.country
             phoenix.joint = member.joint
+
+            phoenix.bill_date = member.cs_next_bill_date
+            phoenix.next_retry_bill_date = member.cs_next_bill_date
+            if phoenix.status != "lapsed" and member.phoenix_status == "lapsed"
+              load_cancellation
+            end        
             phoenix.status = member.phoenix_status
-            next_bill_date = member.cs_next_bill_date
-            if member.phoenix_status == 'active'
-              phoenix.bill_date = next_bill_date
-              phoenix.next_retry_bill_date = next_bill_date
-            elsif member.phoenix_status == 'provisional'
-              phoenix.bill_date = next_bill_date
-              phoenix.next_retry_bill_date = next_bill_date
-            else
+            if member.phoenix_status == 'lapsed'
               phoenix.recycled_times = 0
               phoenix.cancel_date = member.cancelled_at
               phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
             end
+
             phoenix.join_date = member.join_date
-            phoenix.created_by_id = get_agent
             phoenix.quota = member.quota
             phoenix.created_at = member.created_at
             phoenix.updated_at = member.updated_at
@@ -54,7 +76,6 @@ def update_members
             phoenix.api_id = member.drupal_user_api_id
             phoenix.save!
 
-            @member = phoenix
 
             if phoenix.status == "lapsed"
               load_cancellation
@@ -62,12 +83,7 @@ def update_members
 
             if phoenix.club_cash_amount.to_f != member.club_cash_amount.to_f
               # create Club cash transaction.
-              cct = PhoenixClubCashTransaction.new 
-              cct.amount = (member.club_cash_amount - phoenix.club_cash_amount)
-              cct.description = "Imported club cash transaction"
-              cct.member_id = phoenix.uuid
-              cct.save!
-              add_operation(Time.now.utc, cct, "Imported club cash transaction. Amount: $#{cct.amount}", nil)
+              update_club_cash(member.club_cash_amount - phoenix.club_cash_amount)
             end
 
             phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
@@ -94,6 +110,17 @@ def update_members
             end
           end
 
+          phoenix_f = PhoenixFulfillment.find_by_member_id_and_product(phoenix.uuid, member.fulfillment_kit)
+          if phoenix_f.nil?
+            add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
+          else
+            phoenix_f.product = member.fulfillment_kit
+            phoenix_f.assigned_at = member.fulfillment_since_date
+            phoenix_f.delivered_at = member.fulfillment_since_date
+            phoenix_f.renewable_at = member.fulfillment_expire_date
+            phoenix_f.save! 
+          end
+
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
@@ -108,7 +135,7 @@ end
 
 # 2- import new members.
 def add_new_members
-  BillingMember.where("imported_at IS NULL and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
+  BillingMember.where(" imported_at IS NULL and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
       PhoenixProspect.transaction do 
@@ -163,19 +190,9 @@ def add_new_members
             load_cancellation
           end
 
-          # phoenix.reactivation_times
-          # phoenix.recycled_times
-          # `new_members`.`on_renew`,
-          # `new_members`.`renewable`,
-
           # create Club cash transaction.
           if member.club_cash_amount.to_f != 0.0
-            cct = PhoenixClubCashTransaction.new 
-            cct.amount = member.club_cash_amount
-            cct.description = "Imported club cash"
-            cct.member_id = phoenix.uuid
-            cct.save!
-            add_operation(Time.now.utc, cct, "Imported club cash transaction!. Amount: $#{cct.amount}", nil)
+            update_club_cash(member.club_cash_amount.to_f)
           end
 
           # create CC
@@ -189,6 +206,8 @@ def add_new_members
           phoenix_cc.last_successful_bill_date = member.last_charged
           phoenix_cc.member_id = phoenix.uuid
           phoenix_cc.save!
+
+          add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
 
           member.update_attribute :imported_at, Time.now.utc
         rescue Exception => e
