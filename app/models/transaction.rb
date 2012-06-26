@@ -164,7 +164,7 @@ class Transaction < ActiveRecord::Base
 
     def refund
       if payment_gateway_configuration.nil?
-        { :message => "Payment gateway not found.", :code => "9999" }
+        { :message => "Payment gateway not found.", :code => Settings.error_codes.not_found }
       else
         verify_card
         if @cc.valid?
@@ -181,7 +181,7 @@ class Transaction < ActiveRecord::Base
     # Process only sale operations
     def sale
       if payment_gateway_configuration.nil?
-        { :message => "Payment gateway not found.", :code => "9999" }
+        { :message => "Payment gateway not found.", :code => Settings.error_codes.not_found }
       elsif amount.to_f == 0.0
         { :message => "Transaction success. Amount $0.0", :code => Settings.error_codes.success }
       else
@@ -203,7 +203,7 @@ class Transaction < ActiveRecord::Base
       self.response_code = "9332"
       self.response_result = message
       self.save
-      { :message => message, :code => "9332" }
+      { :message => message, :code => Settings.error_codes.invalid_credit_card }
     end
 
     def save_response(answer)
@@ -219,7 +219,7 @@ class Transaction < ActiveRecord::Base
       if response.params and response.params[:duplicate]=="true"
         # we keep this if, just because it was on Litle version (compatibility).
         # MeS seems to not send this param
-        { :message => "Duplicated Transaction: #{response.params[:response]}", :code => "900" }
+        { :message => "Duplicated Transaction: #{response.params[:response]}", :code => Settings.error_codes.duplicate_transaction }
       elsif response.success?
         unless self.credit_card.nil?
           self.credit_card.accepted_on_billing
