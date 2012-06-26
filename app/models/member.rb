@@ -60,7 +60,7 @@ class Member < ActiveRecord::Base
                        :active # save the sale
                     ] => :provisional, :do => :schedule_first_membership
     after_transition :none => :applied, :do => :set_join_date
-    after_transition [:provisional, :active] => :lapsed, :do => :cancellation
+    after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :reset_club_cash]
     after_transition :provisional => :active, :do => :send_active_email
     after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
@@ -475,6 +475,16 @@ class Member < ActiveRecord::Base
       # TODO: Deactivate drupal account
       self.save
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
+    end
+
+    def reset_club_cash
+      cct = ClubCashTransaction.new()
+      cct.member_id = id
+      cct.amount = 0 - club_cash_amount
+      cct.description = 'Member was canceled'
+      cct.save( :validate => false )
+      message = "Club cash transaction done!. Amount: $#{cct.amount}"
+      Auditory.audit(nil, cct, message, self)
     end
 
     def set_decline_strategy(trans)
