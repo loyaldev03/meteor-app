@@ -97,7 +97,7 @@ class Api::MembersController < ApplicationController
 
       if cct.save
         message = "Club cash transaction done!. Amount: $#{cct.amount}"
-        Auditory.audit(@current_agent, cct, message, @current_member)
+        Auditory.audit(current_agent, cct, message, member)
         response = { :message => message, :code => Settings.error_codes.success, :v_id => member.visible_id }
       else
         errors = cct.errors.collect {|attr, message| "#{attr}: #{message}" }.join(". ")
