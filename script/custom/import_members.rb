@@ -135,7 +135,7 @@ end
 
 # 2- import new members.
 def add_new_members
-  BillingMember.where("imported_at IS NULL and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
+  BillingMember.where(" imported_at IS NULL and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
       PhoenixProspect.transaction do 

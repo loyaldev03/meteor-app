@@ -125,8 +125,10 @@ def upload_email_services(communications, tom_id)
   end
 end
 
-
-TermsOfMembership.all.each do |tom|
-  upload_email_services(monthly_sloops, tom.id)
+[ { :text => '%Annual%Sloop%', :array => annual_sloop } ].each do |text, array|
+  PhoenixTermsOfMembership.where(" name like '#{text}' ").find_in_batches do |group|
+    group.each do |tom| 
+      upload_email_services(array, tom.id)
+    end
+  end
 end
-
