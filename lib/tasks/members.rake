@@ -11,8 +11,7 @@ namespace :billing do
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.bill_membership
           rescue Exception => e
-            message = e.to_s
-            Airbrake.notify(:error_class => "Billing::Today", :error_message => message)            
+            Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -36,8 +35,7 @@ namespace :billing do
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.send_pre_bill
           rescue Exception => e
-            message = e.to_s
-            Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => message)
+            Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -64,8 +62,7 @@ namespace :members do
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.set_as_canceled!
           rescue Exception => e
-            message = e.to_s
-            Airbrake.notify(:error_class => "Members::Cancel", :error_message => message)
+            Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -92,8 +89,7 @@ namespace :members do
             Rails.logger.info "  * processing member ##{member.uuid}"
             Communication.deliver!(:birthday, member)
           rescue Exception => e
-            message = e.to_s
-            Airbrake.notify(:error_class => "Members::Cancel", :error_message => message)
+            Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -123,16 +119,14 @@ namespace :members do
                   Rails.logger.info "  * processing member ##{member.uuid}"
                   Communication.deliver!(template, member)
                 rescue Exception => e
-                  message = e.to_s
-                  Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => message)
+                  Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
                   Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
                 end
                 Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
               end
             end
           rescue Exception => e
-            message = e.to_s
-            Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => message)
+            Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -155,8 +149,7 @@ namespace :members do
             Rails.logger.info "  * processing member ##{fulfillment.member.uuid} fulfillment ##{fulfillment.id}"
             fulfillment.renew
           rescue Exception => e
-            message = e.to_s
-            Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => message)
+            Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
