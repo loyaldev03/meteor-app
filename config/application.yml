@@ -37,7 +37,7 @@ defaults: &defaults
     success: '000'
     not_found: '401'
     member_data_invalid: '405'
-    member_save: '404'
+    member_not_saved: '404'
     blacklisted: '406'
     cant_recover_member: '407'
     invalid_credit_card: '9506'

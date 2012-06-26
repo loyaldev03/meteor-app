@@ -354,7 +354,7 @@ class Member < ActiveRecord::Base
       #     an invalid one. we should revert the transaction.
       message = "Could not save member. #{e}"
       Auditory.audit(agent, self, message, nil, Settings.operation_types.enrollment_billing)
-      { :message => message, :code => Settings.error_codes.member_save }
+      { :message => message, :code => Settings.error_codes.member_not_saved }
     end
   end
 
