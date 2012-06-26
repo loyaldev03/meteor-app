@@ -175,12 +175,9 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should reset club_cash when member is canceled" do
-    active_merchant_stubs unless @use_active_merchant
-    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    member.club_cash_amount = 200
-    member.save
+    member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club, :club_cash_amount => 200)
     member.set_as_canceled
-    assert_equal 0, member.club_cash_amount
+    assert_equal 0, member.club_cash_amount, "The member is #{member.status} with $#{member.club_cash_amount}"
   end
 
 end
