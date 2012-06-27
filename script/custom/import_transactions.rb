@@ -3,7 +3,7 @@
 require_relative 'import_models'
 
 def load_refunds
-  BillingChargeback.where("imported_at IS NOT NULL and member_id = '11326899006'").find_in_batches do |group|
+  BillingChargeback.where("imported_at IS NOT NULL").find_in_batches do |group|
     group.each do |refund|
       @member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, refund.member_id)
       unless @member.nil?
