@@ -21,6 +21,20 @@ def add_fulfillment(fulfillment_kit, fulfillment_since_date, fulfillment_expire_
     phoenix_f.save!  
   end
 end
+def add_product_fulfillment
+  product = "Sloop"
+  if @member.has_fulfillment_product
+    if PhoenixFulfillment.find_by_member_id_and_product(@member.uuid, product).nil?
+      phoenix_f = PhoenixFulfillment.new 
+      phoenix_f.product = product
+      phoenix_f.member_id = @member.uuid
+      phoenix_f.assigned_at = @member.join_date
+      phoenix_f.delivered_at = @member.join_date
+      phoenix_f.renewable_at = nil
+      phoenix_f.save!  
+    end
+  end
+end
 
 
 # 1- update existing members
@@ -119,6 +133,7 @@ def update_members
             phoenix_f.renewable_at = member.fulfillment_expire_date
             phoenix_f.save! 
           end
+          add_product_fulfillment
 
           member.update_attribute :imported_at, Time.now.utc
 
@@ -209,6 +224,7 @@ def add_new_members
           phoenix_cc.save!
 
           add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
+          add_product_fulfillment
 
           member.update_attribute :imported_at, Time.now.utc
         rescue Exception => e
