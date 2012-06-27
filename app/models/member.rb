@@ -99,6 +99,8 @@ class Member < ActiveRecord::Base
 
   def send_active_email
     Communication.deliver!(:active, self)
+    tom = TermsOfMembership.find terms_of_membership_id
+    add_club_cash tom.club_cash_amount  
   end
 
   def increment_reactivations
