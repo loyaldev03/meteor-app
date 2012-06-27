@@ -407,16 +407,22 @@ class Member < ActiveRecord::Base
 
   ##################### Club cash ####################################
   def nillify_club_cash
-    add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation')
+    add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation') unless club_cash_amount.to_f == 0.0
   end
 
-  def set_first_club_cash!
-    self.add_club_cash(nil, terms_of_membership.club_cash_amount, "Adding club cash on new enrollment.")
+  def reset_club_cash
+    add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.') unless club_cash_amount.to_f == 0.0
+    set_first_club_cash!('Renewing club cash.')
+  end
+
+  def set_first_club_cash!(message = "Adding club cash on new enrollment.")
+    self.add_club_cash(nil, terms_of_membership.club_cash_amount, message)
     self.club_cash_expire_date = self.join_date + 1.year
     self.save!
   end
   
   def add_club_cash(agent,amount,description = nil)
+    answer = {}
     ClubCashTransaction.transaction do 
       begin
         cct = ClubCashTransaction.new(:amount => amount, :description => description)
@@ -427,16 +433,17 @@ class Member < ActiveRecord::Base
         message = "Club cash transaction done!. Amount: $#{cct.amount}"
         Auditory.audit(agent, cct, message, self)
         # TODO : hace falta :v_id => self.visible_id ??
-        return { :message => message, :code => Settings.error_codes.success, :v_id => self.visible_id }
+        answer = { :message => message, :code => Settings.error_codes.success, :v_id => self.visible_id }
       rescue Exception => e
         errors = cct.errors.collect {|attr, message| "#{attr}: #{message}" }.join(". ")
         message = "Could not saved club cash transactions: #{errors}"
         # TODO: agregar Airbrake
+        answer = { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful, :v_id => self.visible_id  }
         raise ActiveRecord::Rollback
       end
     end
     # TODO : hace falta :v_id => self.visible_id ??
-    { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful, :v_id => self.visible_id  }
+    answer
   end
   ###################################################################
 
