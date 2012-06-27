@@ -32,18 +32,20 @@ defaults: &defaults
     credit_card_blacklisted: 402
     member_email_blacklisted: 403
     automatic_recycle_credit_card: 404
+    reset_club_cash: 405
     others: 1000
   error_codes:
     success: '000'
     not_found: '401'
     member_data_invalid: '405'
-    member_save: '404'
+    member_not_saved: '404'
     blacklisted: '406'
     cant_recover_member: '407'
+    duplicate_transaction: '900'
+    not_supported: '902'
     invalid_credit_card: '9506'
     credit_card_in_use: '9507'
     credit_card_blacklisted: '9508'
-    credit_card_amount_invalid: '9787'
     refund_invalid: '9788'
     nothing_to_change_tom: '9885'
     member_status_dont_allow: '9886'

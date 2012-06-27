@@ -157,19 +157,22 @@ $(document).ready( function() {
   function club_cash_functions(){
     $('form').submit( function(event) {
       event.preventDefault()
-      $.ajax({
-        type: 'POST',
-        url: "/api/v1/add_club_cash/"+visible_id+"/"+club_id,
-        data: $("form").serialize(),
-        success: function(data) {
-          alert (data.message);
-          if (data.code == 000)
-            window.location.replace('../'+data.v_id);
-        },
-      });
+      if ($("#club_cash_transaction_amount").val().match(/^[0-9]+?([?:\.][0-9]{0,2})?$/)){
+        $.ajax({
+          type: 'POST',
+          url: "/api/v1/add_club_cash/"+visible_id+"/"+club_id,
+          data: $("form").serialize(),
+          success: function(data) {
+            alert (data.message);
+            if (data.code == 000)
+              window.location.replace('../'+data.v_id);
+          },
+        });
+      }else{
+        alert("Incorrect club cash value.")
+      };
     });
   }
-
 
   function operation_member_functions(column_count){
     oTable = $('#operations_table').dataTable({

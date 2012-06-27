@@ -11,7 +11,7 @@ class Communication < ActiveRecord::Base
     end
     if template.nil?
       message = "Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
-      Airbrake.notify(:error_class => "Communication error", :error_message => message)
+      Airbrake.notify(:error_class => "Communication Template", :error_message => message)
       logger.error "* * * * * Template does not exist"
     else
       c = Communication.new :email => member.email
@@ -29,7 +29,7 @@ class Communication < ActiveRecord::Base
         c.deliver_action_mailer
       else
         message = "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
-        Airbrake.notify(:error_class => "Communication error", :error_message => message)
+        Airbrake.notify(:error_class => "Communication Client", :error_message => message)
         logger.error "* * * * * Client not supported"
       end
     end
@@ -74,7 +74,7 @@ class Communication < ActiveRecord::Base
       Notifier.refund(email).deliver!
     else
       message = "Deliver action could not be done."
-      Airbrake.notify(:error_class => "Communication error", :error_message => message)      
+      Airbrake.notify(:error_class => "Communication Delivery", :error_message => message)      
       logger.error "Template type #{template_type} not supported."
     end
     update_attributes :sent_success => true, :processed_at => Time.zone.now, :response => response
