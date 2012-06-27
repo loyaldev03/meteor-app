@@ -25,7 +25,7 @@ end
 
 # 1- update existing members
 def update_members
-  BillingMember.where("imported_at IS NOT NULL AND updated_at > imported_at and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
+  BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
       PhoenixProspect.transaction do 
@@ -105,7 +105,6 @@ def update_members
 
               if new_phoenix_cc.save! && phoenix_cc.deactivate
                 add_operation(Time.zone.now, new_phoenix_cc, "Credit card #{new_phoenix_cc.last_digits} added and set active.", nil)
-                member.update_attribute :imported_at, Time.now.utc
               end
             end
           end
@@ -121,6 +120,8 @@ def update_members
             phoenix_f.save! 
           end
 
+          member.update_attribute :imported_at, Time.now.utc
+
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
@@ -135,7 +136,7 @@ end
 
 # 2- import new members.
 def add_new_members
-  BillingMember.where(" imported_at IS NULL and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
+  BillingMember.where(" imported_at IS NULL and is_prospect = false and is_test_member = true and phoenix_status IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
       PhoenixProspect.transaction do 

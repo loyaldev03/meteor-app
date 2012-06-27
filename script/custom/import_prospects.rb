@@ -20,7 +20,7 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
         phoenix.email = (TEST ? "test#{prospect.id}@xagax.com" : prospect.email)
         phoenix.phone_number = prospect.phone
         phoenix.created_at = prospect.created_at
-        phoenix.updated_at = prospect.updated_at
+        phoenix.updated_at = prospect.created_at # It has a reason. updated_at is modified by us ^^
         phoenix.birth_date = prospect.birth_date
         phoenix.joint = prospect.joint
         phoenix.reporting_code = prospect.reporting_code

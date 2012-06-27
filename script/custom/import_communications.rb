@@ -94,8 +94,7 @@ def add_email_template(name, type, tom_id, trigger_id, mlid, site_id, days_after
   et.terms_of_membership_id = tom_id
   et.save
 end
-
-# TODO set SITE_ID
+ 
 
 # "Email Name ","MLID","Trigger ID","Corresponding Event Name","Recurring","Before or After","Day","Notes"
 def upload_email_services(communications, tom_id)

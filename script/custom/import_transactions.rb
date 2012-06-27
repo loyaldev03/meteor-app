@@ -3,23 +3,21 @@
 require_relative 'import_models'
 
 def load_refunds
-  PhoenixMember.find_in_batches do |group|
-    group.each do |member|
-      refunds = BillingChargeback.find_all_by_member_id_and_imported_at(member.visible_id, nil)
-      refunds.each do |refund|
+  BillingChargeback.where("imported_at IS NOT NULL").find_in_batches do |group|
+    group.each do |refund|
+      @member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, refund.member_id)
+      unless @member.nil?
         tz = Time.now.utc
+        @log.info "  * processing Chargeback ##{refund.id}"
         begin
-          @log.info "  * processing Chargeback ##{refund.id}"
-          @member = member
-
           transaction = PhoenixTransaction.new
           transaction.member_id = @member.uuid
-          transaction.terms_of_membership_id = member.terms_of_membership_id
+          transaction.terms_of_membership_id = @member.terms_of_membership_id
           transaction.set_payment_gateway_configuration
           transaction.gateway = 'litle'
           transaction.recurrent = false
           transaction.transaction_type = "credit" 
-          transaction.invoice_number = member.visible_id
+          transaction.invoice_number = @member.visible_id
           transaction.amount = refund.phoenix_amount
           transaction.response = refund.result
           transaction.response_code = ( refund.result == "Success" ? "000" : "999")
@@ -36,79 +34,72 @@ def load_refunds
             add_operation(transaction.created_at, transaction, "Credit $#{transaction.amount} error: #{refund.result}",
                               Settings.operation_types.credit_error, transaction.created_at, transaction.updated_at)
           end
-    
           refund.update_attribute :imported_at, Time.now.utc
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          exit
         end
         @log.info "    ... took #{Time.now.utc - tz} for Chargeback ##{refund.id}"
       end
     end
   end
-
 end
 
 def load_enrollment_transactions
-  PhoenixMember.find_in_batches do |group|
-    group.each do |member|
-      responses = BillingEnrollmentAuthorizationResponse.find_all_by_authorization_id(BillingEnrollmentAuthorization.find_all_by_member_id(member.visible_id).map(&:id))
-      responses.each do |response|
-        tz = Time.now.utc
+  BillingEnrollmentAuthorizationResponse.where("imported_at IS NOT NULL").find_in_batches do |group|
+    group.each do |response|
+      if response.authorization.nil?
+        @log.info "  * Enrollment Authorization id not found for Auth response ##{response.id} member id ##{response.authorization_id}"
+      else
         begin
+          tz = Time.now.utc
           @log.info "  * processing Enrollment Auth response ##{response.id}"
-          if response.authorization.nil?
-            @log.info "  * Enrollment Authorization id not found for Auth response ##{response.id} member id ##{response.authorization_id}"
+          @member = response.member
+          if @member.nil?
+            @log.info "  * Member id not found for Auth response ##{response.id} member id ##{response.authorization.member_id}"
           else
-            @member = response.member
-            if @member.nil?
-              @log.info "  * Member id not found for Auth response ##{response.id} member id ##{response.authorization.member_id}"
-            else
-              transaction = PhoenixTransaction.new
-              transaction.member_id = @member.uuid
-              transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
-              transaction.set_payment_gateway_configuration
-              transaction.gateway = 'litle'
-              transaction.recurrent = false
-              transaction.transaction_type = 'authorization_capture'
-              transaction.invoice_number = "response.invoice_number"
-              transaction.amount = response.amount
-              transaction.response = { :authorization => response.message, :capture => (response.capture_response.message rescue nil) }
-              transaction.response_code = response.code
-              if response.capture and response.capture_response and response.capture_response.code
-                transaction.response_code = response.capture_response.code
-              end
-              transaction.response_result = transaction.response
-              if response.code.to_i == 0
-                transaction.response_transaction_id = response.authorization.litleTxnId
-              end
-              transaction.response_auth_code = response.authorization.auth_code
-              if response.capture and response.capture.auth_code
-                transaction.response_auth_code = response.capture.auth_code
-              end
-              transaction.created_at = response.created_at
-              transaction.updated_at = response.updated_at
-              transaction.refunded_amount = 0
-              transaction.save!
-
-              if transaction.response_code.to_i == 0 and (response.authorization.captured == 1 || response.authorization.authorized == 1)
-                add_operation(transaction.created_at, transaction, 
-                              "Member enrolled successfully $#{transaction.amount} on TOM(#{transaction.terms_of_membership_id}) -#{get_terms_of_membership_name(transaction.terms_of_membership_id)}-",
-                              Settings.operation_types.membership_billing, transaction.created_at, transaction.updated_at)
-              else
-                # Today we dont save failed enrollments operations
-                #add_operation(transaction.created_at, transaction, 
-                #              "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
-                #              Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
-              end
-              response.update_attribute :imported_at, Time.now.utc
+            transaction = PhoenixTransaction.new
+            transaction.member_id = @member.uuid
+            transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
+            transaction.set_payment_gateway_configuration
+            transaction.gateway = 'litle'
+            transaction.recurrent = false
+            transaction.transaction_type = 'authorization_capture'
+            transaction.invoice_number = "response.invoice_number"
+            transaction.amount = response.amount
+            transaction.response = { :authorization => response.message, :capture => (response.capture_response.message rescue nil) }
+            transaction.response_code = response.code
+            if response.capture and response.capture_response and response.capture_response.code
+              transaction.response_code = response.capture_response.code
             end
+            transaction.response_result = transaction.response
+            if response.code.to_i == 0
+              transaction.response_transaction_id = response.authorization.litleTxnId
+            end
+            transaction.response_auth_code = response.authorization.auth_code
+            if response.capture and response.capture.auth_code
+              transaction.response_auth_code = response.capture.auth_code
+            end
+            transaction.created_at = response.created_at
+            transaction.updated_at = response.updated_at
+            transaction.refunded_amount = 0
+            transaction.save!
+
+            if transaction.response_code.to_i == 0 and (response.authorization.captured == 1 || response.authorization.authorized == 1)
+              set_last_billing_date_on_credit_card(@member, transaction.created_at)
+              add_operation(transaction.created_at, transaction, 
+                            "Member enrolled successfully $#{transaction.amount} on TOM(#{transaction.terms_of_membership_id}) -#{get_terms_of_membership_name(transaction.terms_of_membership_id)}-",
+                            Settings.operation_types.membership_billing, transaction.created_at, transaction.updated_at)
+            else
+              # Today we dont save failed enrollments operations
+              # add_operation(transaction.created_at, transaction, "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
+              #              Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
+            end
+            response.update_attribute :imported_at, Time.now.utc
           end
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          exit
         end
         @log.info "    ... took #{Time.now.utc - tz} for Enrollment Auth response ##{response.id}"
       end
@@ -118,67 +109,64 @@ end
 
 
 def load_membership_transactions
-  PhoenixMember.find_in_batches do |group|
-    group.each do |member|
-      responses = BillingMembershipAuthorizationResponse.find_all_by_authorization_id(BillingMembershipAuthorization.find_all_by_member_id(member.visible_id).map(&:id))
-      responses.each do |response|
-        tz =  Time.now.utc
+  BillingMembershipAuthorizationResponse.where("imported_at IS NOT NULL").find_in_batches do |group|
+    group.each do |response|
+      if response.authorization.nil?
+        @log.info "  * Enrollment Authorization id not found for Auth response ##{response.id} member id ##{response.authorization_id}"
+      else
         begin
+          tz = Time.now.utc
           @log.info "  * processing Membership Auth response ##{response.id}"
-          if response.authorization.nil?
-            @log.info "  * Membership Authorization id not found for Auth response ##{response.id} member id ##{response.authorization_id}"
+          @member = response.member
+          if @member.nil?
+            @log.info "  * Member id not found for Auth response ##{response.id} member id ##{response.authorization.member_id}"              
           else
-            @member = response.member
-            if @member.nil? 
-              @log.info "  * Member id not found for Auth response ##{response.id} member id ##{response.authorization.member_id}"
-            else
-              transaction = PhoenixTransaction.new
-              transaction.member_id = @member.uuid
-              transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
-              transaction.set_payment_gateway_configuration
-              transaction.gateway = response.gateway.nil? ? 'litle' : response.gateway
-              transaction.recurrent = false
-              transaction.transaction_type = 'authorization_capture'
-              transaction.invoice_number = response.invoice_number
-              transaction.amount = response.amount
-              transaction.response = { :authorization => response.message, :capture => (response.capture_response.message rescue nil) }
-              transaction.response_code = response.code
-              if response.capture and response.capture_response
-                transaction.response_code = response.capture_response.code
-              end
-              transaction.response_result = transaction.response
-              if response.code.to_i == 0
-                transaction.response_transaction_id = response.authorization.litleTxnId
-              end
-              if response.capture and response.capture.auth_code
-                transaction.response_auth_code = response.capture.auth_code
-              else  
-                transaction.response_auth_code = response.authorization.auth_code
-              end
-              transaction.created_at = response.created_at
-              transaction.updated_at = response.updated_at
-              transaction.refunded_amount = 0
-              transaction.save!
-              if transaction.response_code.to_i == 0 and (response.authorization.captured == 1 || response.authorization.authorized == 1)
-                add_operation(transaction.created_at, transaction, 
-                              "Member billed successfully $#{transaction.amount} Transaction id: #{transaction.id}", 
-                              Settings.operation_types.membership_billing, transaction.created_at, transaction.updated_at)
-              elsif [301,327,304,303].include?(transaction.response_code.to_i)
-                add_operation(transaction.created_at, transaction, 
-                              "Hard Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}", 
-                              Settings.operation_types.membership_billing_hard_decline, transaction.created_at, transaction.updated_at)
-              else
-                add_operation(transaction.created_at, transaction, 
-                              "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
-                              Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
-              end
-              response.update_attribute :imported_at, Time.now.utc
+            transaction = PhoenixTransaction.new
+            transaction.member_id = @member.uuid
+            transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
+            transaction.set_payment_gateway_configuration
+            transaction.gateway = response.gateway.nil? ? 'litle' : response.gateway
+            transaction.recurrent = false
+            transaction.transaction_type = 'authorization_capture'
+            transaction.invoice_number = response.invoice_number
+            transaction.amount = response.amount
+            transaction.response = { :authorization => response.message, :capture => (response.capture_response.message rescue nil) }
+            transaction.response_code = response.code
+            if response.capture and response.capture_response
+              transaction.response_code = response.capture_response.code
             end
+            transaction.response_result = transaction.response
+            if response.code.to_i == 0
+              transaction.response_transaction_id = response.authorization.litleTxnId
+            end
+            if response.capture and response.capture.auth_code
+              transaction.response_auth_code = response.capture.auth_code
+            else  
+              transaction.response_auth_code = response.authorization.auth_code
+            end
+            transaction.created_at = response.created_at
+            transaction.updated_at = response.updated_at
+            transaction.refunded_amount = 0
+            transaction.save!
+            if transaction.response_code.to_i == 0 and (response.authorization.captured == 1 || response.authorization.authorized == 1)
+              set_last_billing_date_on_credit_card(@member, transaction.created_at)
+              add_operation(transaction.created_at, transaction, 
+                            "Member billed successfully $#{transaction.amount} Transaction id: #{transaction.id}", 
+                            Settings.operation_types.membership_billing, transaction.created_at, transaction.updated_at)
+            elsif [301,327,304,303].include?(transaction.response_code.to_i)
+              add_operation(transaction.created_at, transaction, 
+                            "Hard Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}", 
+                            Settings.operation_types.membership_billing_hard_decline, transaction.created_at, transaction.updated_at)
+            else
+              add_operation(transaction.created_at, transaction, 
+                            "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
+                            Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
+            end
+            response.update_attribute :imported_at, Time.now.utc
           end
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          exit
         end
         @log.info "    ... took #{Time.now.utc - tz} for Membership Auth response ##{response.id}"
       end
@@ -186,26 +174,10 @@ def load_membership_transactions
   end
 end
 
-def set_last_billing_date_on_credit_card
-  PhoenixMember.find_in_batches do |group|
-    group.each do |member|
-      tz = Time.now
-      begin
-        @log.info "  * processing Member uuid ##{member.uuid}"
-        transaction = PhoenixTransaction.find_by_member_id member.uuid, :order => "created_at DESC"
-        unless transaction.nil?
-          cc = PhoenixCreditCard.find_by_active_and_member_id true, member.id
-          if cc.last_successful_bill_date.nil? or cc.last_successful_bill_date < transaction.created_at
-            cc.update_attribute :last_successful_bill_date, transaction.created_at
-          end
-        end
-      rescue Exception => e
-        @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        exit
-      end
-      @log.info "    ... took #{Time.now - tz} for Membership Auth response ##{member.id}"
-    end
+def set_last_billing_date_on_credit_card(member, transaction_date)
+  cc = PhoenixCreditCard.find_by_active_and_member_id true, member.id
+  if cc and (cc.last_successful_bill_date.nil? or cc.last_successful_bill_date < transaction_date)
+    cc.update_attribute :last_successful_bill_date, transaction_date
   end
 end
 
@@ -213,6 +185,5 @@ end
 load_refunds
 load_enrollment_transactions
 load_membership_transactions
-set_last_billing_date_on_credit_card
 
 
