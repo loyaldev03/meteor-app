@@ -88,6 +88,7 @@ def update_members
               :prospect_token => member.prospect_token }
             phoenix.member_since_date = member.member_since_date
             phoenix.api_id = member.drupal_user_api_id
+            phoenix.club_cash_expire_date = member.club_cash_expire_date
             phoenix.save!
 
 
@@ -198,6 +199,7 @@ def add_new_members
             :prospect_token => member.prospect_token }
           phoenix.member_since_date = member.member_since_date
           phoenix.api_id = member.drupal_user_api_id
+          phoenix.club_cash_expire_date = member.club_cash_expire_date
           phoenix.save!
 
           @member = phoenix

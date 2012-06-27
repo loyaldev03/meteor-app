@@ -31,7 +31,8 @@ class Fulfillment < ActiveRecord::Base
   def renew
     self.set_as_archived!
     if member.can_receive_another_fulfillment?
-      f = Fulfillment.new :product => self.product
+      f = Fulfillment.new :
+      f.product = self.product
       f.member_id = self.member_id
       f.assigned_at = Time.zone.now
       f.save

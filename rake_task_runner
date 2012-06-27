@@ -11,6 +11,7 @@ echo "PATH variable => `printenv PATH`"
 # billing should be executed after cancel jobs finishes
 `cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake billing:send_prebill >> $logfile 2>&1`
 `cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake members:process_fulfillments >> $logfile 2>&1`
+`cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake members:process_club_cash >> $logfile 2>&1`
 `cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake billing:for_today >> $logfile 2>&1`
 `cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake members:send_pillar_emails >> $logfile 2>&1`
 `cd /var/www/backend-sac-platform/current && RAILS_ENV=staging rake members:send_happy_birthday >> $logfile 2>&1`

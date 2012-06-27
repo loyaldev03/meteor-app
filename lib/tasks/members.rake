@@ -136,6 +136,29 @@ namespace :members do
     end
   end
 
+  desc "Process club cash"
+  # This task should be run each day at 3 am 
+  task :process_club_cash => :environment do
+    tall = Time.zone.now
+    begin
+      Member.find_in_batches(:conditions => [" date(club_cash_expire_date) <= ? ", Date.today ]) do |group|
+        group.each do |member| 
+          tz = Time.zone.now
+          begin
+            Rails.logger.info "  * processing member ##{member.uuid}"
+            member.reset_club_cash("Club cash expired")
+          rescue Exception => e
+            Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        end
+      end
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}"
+    end
+  end
+
   desc "Process fulfillments"
   # This task should be run each day at 3 am 
   task :process_fulfillments => :environment do
