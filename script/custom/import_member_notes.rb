@@ -52,7 +52,6 @@ def import_customer_notes
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        exit
       end
       @log.info "    ... took #{Time.now.utc - tz} for note ##{note.id}"
     end
