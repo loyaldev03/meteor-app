@@ -3,7 +3,7 @@
 require_relative 'import_models'
 
 def load_refunds
-  BillingChargeback.where("imported_at IS NOT NULL").find_in_batches do |group|
+  BillingChargeback.where("imported_at IS NOT NULL and member_id = '11326899006'").find_in_batches do |group|
     group.each do |refund|
       @member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, refund.member_id)
       unless @member.nil?
@@ -163,12 +163,10 @@ def load_membership_transactions
                             Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
             end
             response.update_attribute :imported_at, Time.now.utc
-            end
           end
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          exit
         end
         @log.info "    ... took #{Time.now.utc - tz} for Membership Auth response ##{response.id}"
       end
