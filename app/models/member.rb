@@ -100,7 +100,7 @@ class Member < ActiveRecord::Base
   def send_active_email
     Communication.deliver!(:active, self)
     tom = TermsOfMembership.find terms_of_membership_id
-    add_club_cash tom.club_cash_amount  
+    add_club_cash(nil,tom.club_cash_amount,"Member was set to active.")
   end
 
   def increment_reactivations
@@ -404,8 +404,21 @@ class Member < ActiveRecord::Base
     self.last_synced_at && self.last_synced_at > self.updated_at
   end
   
-  def add_club_cash(amount)
-    update_attribute(:club_cash_amount, amount + club_cash_amount)
+  def add_club_cash(agent,amount,description = nil)
+    cct = ClubCashTransaction.new(:amount => amount, :description => description)
+    
+    cct.member_id = id
+    update_attribute(:club_cash_amount, self.club_cash_amount + amount.to_f)
+    
+    if cct.save
+      message = "Club cash transaction done!. Amount: $#{cct.amount}"
+      Auditory.audit(agent, cct, message, self)
+      return { :message => message, :code => Settings.error_codes.success, :v_id => self.visible_id }
+    else
+      errors = cct.errors.collect {|attr, message| "#{attr}: #{message}" }.join(". ")
+      message = "Could not saved club cash transactions: #{errors}"
+      return { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful, :v_id => member.visible_id  }
+    end
   end
 
   private
@@ -480,13 +493,9 @@ class Member < ActiveRecord::Base
     end
 
     def reset_club_cash
-      cct = ClubCashTransaction.new()
-      cct.member_id = id
-      cct.amount = 0 - club_cash_amount
-      cct.description = 'Member was canceled'
-      cct.save( :validate => false )
-      message = "Club cash transaction done!. Amount: $#{cct.amount}"
-      Auditory.audit(nil, cct, message, self)
+      amount = 0 - club_cash_amount
+      description = 'Member was canceled'
+      add_club_cash(nil,amount,description)
     end
 
     def set_decline_strategy(trans)
