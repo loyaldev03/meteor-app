@@ -61,7 +61,7 @@ class Member < ActiveRecord::Base
                     ] => :provisional, :do => :schedule_first_membership
     after_transition :none => :applied, :do => :set_join_date
     after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :reset_club_cash]
-    after_transition :provisional => :active, :do => :send_active_email
+    after_transition :provisional => :active, :do => :send_active_email_and_set_club_cash
     after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
 
@@ -97,7 +97,7 @@ class Member < ActiveRecord::Base
     state :applied
   end
 
-  def send_active_email
+  def send_active_email_and_set_club_cash
     Communication.deliver!(:active, self)
     tom = TermsOfMembership.find terms_of_membership_id
     add_club_cash(nil,tom.club_cash_amount,"Member was set to active.")
