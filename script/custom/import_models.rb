@@ -22,51 +22,100 @@ require 'uuidtools'
 require 'attr_encrypted'
 require 'settingslogic'
 
-CLUB = 2
-DEFAULT_CREATED_BY = 2
-PAYMENT_GW_CONFIGURATION = 2
-TEST = true
+CLUB = 16
+DEFAULT_CREATED_BY = 14
+PAYMENT_GW_CONFIGURATION = 4
+TERMS_OF_MEMBERSHIP = 11 # TODO: this value will be loaded from campaigns. its temporary here
+TEST = true # if true email will be replaced with a fake one
+SITE_ID = 2010001547 # lyris site id
+USE_PROD_DB = true
 
 @log = Logger.new('import_members.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
-# add phoenix database connection
-ActiveRecord::Base.configurations["phoenix"] = { 
-  :adapter => "mysql2",
-  :database => "sac_platform_development",
-  :host => "127.0.0.1",
-  :username => "root",
-  :password => "" 
-}
+if USE_PROD_DB
+  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
+  exit
+end
 
-ActiveRecord::Base.configurations["billing"] = { 
-  :adapter => "mysql2",
-  :database => "onmc_billing",
-  :host => "127.0.0.1",
-  :username => "root",
-  :password => "" 
-}
+unless USE_PROD_DB
+  ActiveRecord::Base.configurations["phoenix"] = { 
+    :adapter => "mysql2",
+    :database => "sac_platform_development",
+    :host => "127.0.0.1",
+    :username => "root",
+    :password => "" 
+  }
 
-ActiveRecord::Base.configurations["customer_services"] = { 
-  :adapter => "mysql2",
-  :database => "onmc_customer_service",
-  :host => "127.0.0.1",
-  :username => "root",
-  :password => "" 
-}
+  ActiveRecord::Base.configurations["billing"] = { 
+    :adapter => "mysql2",
+    :database => "onmc_billing",
+    :host => "127.0.0.1",
+    :username => "root",
+    :password => "" 
+  }
 
-ActiveRecord::Base.configurations["prospect"] = { 
-  :adapter => "mysql2",
-  :database => "onmc_prospects",
-  :host => "127.0.0.1",
-  :username => "root",
-  :password => "" 
-}
+  ActiveRecord::Base.configurations["customer_services"] = { 
+    :adapter => "mysql2",
+    :database => "onmc_customer_service",
+    :host => "127.0.0.1",
+    :username => "root",
+    :password => "" 
+  }
+
+  ActiveRecord::Base.configurations["prospect"] = { 
+    :adapter => "mysql2",
+    :database => "onmc_prospects",
+    :host => "127.0.0.1",
+    :username => "root",
+    :password => "" 
+  }
+else
+  # PRODUCTION !!!!!!!!!!!!!!!!
+  ActiveRecord::Base.configurations["phoenix"] = { 
+    :adapter => "mysql2",
+    :database => "sac_platform_development",
+    :host => "127.0.0.1",
+    :username => "root",
+    :password => "root911", 
+    :port => 30004 # tunnel 
+  }
+
+  ActiveRecord::Base.configurations["billing"] = { 
+    :adapter => "mysql2",
+    :database => "billingcomponent_production",
+    :host => "10.6.0.6",
+    :username => "root2",
+    :password => "f4c0n911",
+    :port => 3306
+  }
+
+  ActiveRecord::Base.configurations["customer_services"] = { 
+    :adapter => "mysql2",
+    :database => "customerservice3",
+    :host => "10.6.0.6",
+    :username => "root2",
+    :password => "f4c0n911",
+    :port => 3308
+  }
+
+  ActiveRecord::Base.configurations["prospect"] = { 
+    :adapter => "mysql2",
+    :database => "prospectcomponent",
+    :host => "10.6.0.6",
+    :username => "root2",
+    :password => "f4c0n911",
+    :port => 3306
+  }
+end
+
 
 class ProspectProspect < ActiveRecord::Base
   establish_connection "prospect" 
   self.table_name = "prospects" 
+  self.record_timestamps = false
   serialize :preferences, JSON
+  serialize :referral_parameters, JSON
 end
 
 
@@ -158,15 +207,18 @@ end
 
 class BillingMember < ActiveRecord::Base
   establish_connection "billing" 
-  self.table_name = "members" 
+  self.table_name = "members"
+  self.record_timestamps = false
 end
 class BillingCampaign < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "campaigns" 
+  self.record_timestamps = false
 end
 class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "enrollment_auth_responses" 
+  self.record_timestamps = false
   def authorization
     BillingEnrollmentAuthorization.find_by_id(self.authorization_id)
   end
@@ -193,18 +245,22 @@ end
 class BillingEnrollmentAuthorization < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "enrollment_authorizations" 
+  self.record_timestamps = false
 end
 class BillingEnrollmentCapture < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "enrollment_captures" 
+  self.record_timestamps = false
 end
 class BillingEnrollmentCaptureResponse < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "enrollment_capt_responses" 
+  self.record_timestamps = false
 end
 class BillingMembershipAuthorizationResponse < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "membership_auth_responses" 
+  self.record_timestamps = false
   def authorization
     BillingMembershipAuthorization.find_by_id(self.authorization_id)
   end
@@ -239,18 +295,22 @@ end
 class BillingMembershipAuthorization < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "membership_authorizations" 
+  self.record_timestamps = false
 end
 class BillingMembershipCapture < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "membership_captures" 
+  self.record_timestamps = false
 end
 class BillingMembershipCaptureResponse < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "membership_capt_responses" 
+  self.record_timestamps = false
 end
 class BillingChargeback < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "chargebacks" 
+  self.record_timestamps = false
 end
 
 
@@ -258,23 +318,28 @@ end
 class CustomerServicesOperations < ActiveRecord::Base
   establish_connection "customer_services" 
   self.table_name = "operations"
+  self.record_timestamps = false
 end
 class CustomerServicesNotes < ActiveRecord::Base
   establish_connection "customer_services" 
   self.table_name = "notes"
+  self.record_timestamps = false
 end
 class CustomerServicesNoteType < ActiveRecord::Base
   establish_connection "customer_services" 
   self.table_name = "note_types" 
+  self.record_timestamps = false
 end
 class CustomerServicesCommunication < ActiveRecord::Base
   establish_connection "customer_services" 
   self.table_name = "communications" 
+  self.record_timestamps = false
 end
 class CustomerServicesUser < ActiveRecord::Base
   establish_connection "customer_services" 
   self.table_name = "users" 
   self.inheritance_column = false
+  self.record_timestamps = false
 end
 
 
@@ -285,13 +350,13 @@ end
 
 # TODO: use campaign id to find this value!
 def get_terms_of_membership_id(campaign_id)
-  1 # BillingCampaign.find_by_id(campaign_id).terms_of_membership_id
+  TERMS_OF_MEMBERSHIP # BillingCampaign.find_by_id(campaign_id).terms_of_membership_id
 end
 # TODO: => 
 def get_terms_of_membership_name(tom_id)
   "test"
 end
-# TODO: => 
+
 def get_agent(author = 999)
   if author == 999
     DEFAULT_CREATED_BY
@@ -312,8 +377,6 @@ def get_agent(author = 999)
 end
 
 def add_operation(operation_date, object, description, operation_type, created_at = Time.now.utc, updated_at = Time.now.utc, author = 999)
-  # TODO: levantamos los Agents?
-  #current_agent = Agent.find_by_email('batch@xagax.com') if author == 999
   o = PhoenixOperation.new :operation_date => operation_date, :description => description, 
       :operation_type => (operation_type || Settings.operation_types.others)
   o.created_by_id = get_agent
@@ -327,7 +390,6 @@ def add_operation(operation_date, object, description, operation_type, created_a
   o.member_id = @member.uuid
   o.save!
 end
-
 
 def load_cancellation
   tz = Time.now.utc
