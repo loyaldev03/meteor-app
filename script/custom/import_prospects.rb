@@ -2,7 +2,7 @@
 
 require_relative 'import_models'
 
-ProspectProspect.where("imported_at IS NULL and id < 10").find_in_batches do |group|
+ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
   group.each do |prospect| 
     tz = Time.now.utc
     @log.info "  * processing prospect ##{prospect.id}"
