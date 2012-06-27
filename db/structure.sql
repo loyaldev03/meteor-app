@@ -233,6 +233,7 @@ CREATE TABLE `members` (
   `last_sync_error` text COLLATE utf8_unicode_ci,
   `club_cash_amount` float DEFAULT '0',
   `joint` tinyint(1) DEFAULT '0',
+  `club_cash_expire_date` date DEFAULT NULL,
   PRIMARY KEY (`club_id`,`visible_id`),
   KEY `index_members_on_uuid` (`uuid`),
   KEY `index_members_on_email` (`email`),
@@ -335,6 +336,7 @@ CREATE TABLE `terms_of_memberships` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `club_cash_amount` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -480,3 +482,5 @@ INSERT INTO schema_migrations (version) VALUES ('20120621211638');
 INSERT INTO schema_migrations (version) VALUES ('20120621213008');
 
 INSERT INTO schema_migrations (version) VALUES ('20120625171855');
+
+INSERT INTO schema_migrations (version) VALUES ('20120627161226');

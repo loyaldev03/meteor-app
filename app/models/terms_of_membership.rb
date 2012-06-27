@@ -19,7 +19,7 @@ class TermsOfMembership < ActiveRecord::Base
   validates :trial_days, :presence => true
   validates :installment_amount, :presence => true
   validates :installment_type, :presence => true
-  validates :club_cash_amount, :numericality => { :greater_than_or_equal_to => 0}
+  validates :club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
 
   ###########################################
   # Installment types:

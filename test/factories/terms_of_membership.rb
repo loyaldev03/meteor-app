@@ -5,6 +5,7 @@ FactoryGirl.define do
     installment_amount 100
     installment_type '1.month'
     needs_enrollment_approval false
+    club_cash_amount 150
     association :club
   end
 
@@ -13,6 +14,7 @@ FactoryGirl.define do
     installment_amount 0.04 
     installment_type '1.month'
     needs_enrollment_approval false
+    club_cash_amount 150
     association :club
   end
 
@@ -21,6 +23,7 @@ FactoryGirl.define do
     installment_amount 0.05 
     installment_type '1.month'
     needs_enrollment_approval false
+    club_cash_amount 150
     association :club
   end
 
@@ -29,6 +32,7 @@ FactoryGirl.define do
     installment_amount 0.51 
     installment_type '1.month'
     needs_enrollment_approval false
+    club_cash_amount 150
     association :club
   end
 
@@ -37,6 +41,7 @@ FactoryGirl.define do
     installment_amount 100
     installment_type '1.month'
     needs_enrollment_approval false
+    club_cash_amount 150
     association :club, factory: :club_with_gateway
   end
 
@@ -45,6 +50,7 @@ FactoryGirl.define do
     installment_amount 100
     installment_type '1.month'
     needs_enrollment_approval true
+    club_cash_amount 150
     association :club, factory: :club_with_gateway
   end
 

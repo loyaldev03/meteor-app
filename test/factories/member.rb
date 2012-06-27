@@ -16,6 +16,7 @@ FactoryGirl.define do
     phone_number { Faker::PhoneNumber.phone_number }
     status "none"
     country "US"
+    club_cash_amount 0
   end
 
   factory :member_with_api, class: Member do
@@ -29,6 +30,7 @@ FactoryGirl.define do
     phone_number { Faker::PhoneNumber.phone_number }
     status "none"
     country "US"
+    club_cash_amount 0
 
     association :club, factory: :club_with_api
     terms_of_membership
@@ -48,6 +50,8 @@ FactoryGirl.define do
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     country "US"
+    club_cash_amount 0
+
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
@@ -66,6 +70,7 @@ FactoryGirl.define do
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     country "US"
+    club_cash_amount 0
   end
 
   factory :lapsed_member, class: Member do
@@ -82,6 +87,8 @@ FactoryGirl.define do
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     country "US"
+    club_cash_amount 0
+
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
@@ -96,6 +103,8 @@ FactoryGirl.define do
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
     country "US"
+    club_cash_amount 0
+
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
@@ -113,6 +122,8 @@ FactoryGirl.define do
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
     country "US"
+    club_cash_amount 0
+
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
@@ -130,6 +141,8 @@ FactoryGirl.define do
     phone_number { Faker::PhoneNumber.phone_number }
     join_date { DateTime.now }
     country "US"
+    club_cash_amount 0
+
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 

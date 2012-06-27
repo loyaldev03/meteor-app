@@ -154,6 +154,7 @@ namespace :members do
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
         end
       end
+
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end

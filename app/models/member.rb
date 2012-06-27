@@ -60,7 +60,7 @@ class Member < ActiveRecord::Base
                        :active # save the sale
                     ] => :provisional, :do => :schedule_first_membership
     after_transition :none => :applied, :do => :set_join_date
-    after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :reset_club_cash]
+    after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :nillify_club_cash]
     after_transition :provisional => :active, :do => :send_active_email_and_set_club_cash
     after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
@@ -239,6 +239,8 @@ class Member < ActiveRecord::Base
           trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
           answer = trans.process
           if trans.success?
+            # club_cash_expire_date will be nil if we did not set club cash on enrollment because of a PTX.
+            set_first_club_cash! if self.club_cash_expire_date.nil?
             set_as_active!
             schedule_renewal
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
@@ -345,12 +347,8 @@ class Member < ActiveRecord::Base
         trans.save
         credit_card.accepted_on_billing
       end
-
       message = set_status_on_enrollment!(agent, trans, amount)
-
-      # TODO: Se tiene que agregar cuando se cobra el primer membership (PTX) o cuando se cobra el enrollment
-      self.add_club_cash(nil, terms_of_membership.club_cash_amount, "Adding club cash on new enrollment.")
-
+      set_first_club_cash! if trans
       self.reload
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
@@ -407,9 +405,15 @@ class Member < ActiveRecord::Base
     self.last_synced_at && self.last_synced_at > self.updated_at
   end
 
-  def reset_club_cash(reason = nil)
-    description = reason || 'Member was canceled'
-    add_club_cash(nil, -club_cash_amount, description)
+  ##################### Club cash ####################################
+  def nillify_club_cash
+    add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation')
+  end
+
+  def set_first_club_cash!
+    self.add_club_cash(nil, terms_of_membership.club_cash_amount, "Adding club cash on new enrollment.")
+    self.club_cash_expire_date = self.join_date + 1.year
+    self.save!
   end
   
   def add_club_cash(agent,amount,description = nil)
@@ -434,6 +438,7 @@ class Member < ActiveRecord::Base
     # TODO : hace falta :v_id => self.visible_id ??
     { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful, :v_id => self.visible_id  }
   end
+  ###################################################################
 
   private
     def set_status_on_enrollment!(agent, trans, amount)
