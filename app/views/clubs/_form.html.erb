@@ -7,6 +7,12 @@
     </div>
   </div>
   <div class="control-group">
+    <%= f.label :drupal_domain_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.collection_select :drupal_domain_id, @club.domains, :id, :url %>
+    </div>
+  </div>
+  <div class="control-group">
     <%= f.label :description, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_area :description, :class => 'text_area' %>

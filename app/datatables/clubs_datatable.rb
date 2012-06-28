@@ -14,7 +14,7 @@ private
   def data
     clubs.map do |club|
       [
-        link_to(club.id, @url_helpers.club_path(:partner_prefix => @current_partner, :id => club.id)),
+        link_to(club.id, @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id)),
         club.name, 
         club.description,
         club.members.count,

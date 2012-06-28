@@ -25,6 +25,7 @@ class DomainsController < ApplicationController
   # GET /domains/new.json
   def new
     @domain = Domain.new :partner => @current_partner
+    @domain.club_id = params[:club_id] if params[:club_id]
     @clubs = Club.where(:partner_id => @current_partner)
 
     respond_to do |format|
