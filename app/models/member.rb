@@ -354,14 +354,14 @@ class Member < ActiveRecord::Base
       self.save!
       if credit_card.member.nil?
         credit_card.member = self
-        credit_card.save(false)
+        credit_card.save
       end
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
         # is completed succesfully
         trans.member_id = self.id
         trans.credit_card_id = credit_card.id
-        trans.save(false)
+        trans.save
         credit_card.accepted_on_billing
       end
       message = set_status_on_enrollment!(agent, trans, amount)
@@ -370,8 +370,7 @@ class Member < ActiveRecord::Base
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
       Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
-      # TODO: this can happend if in the same time a new member is enrolled that makes this
-      #     an invalid one. we should revert the transaction.
+      # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       message = "Could not save member. #{e}"
       Auditory.audit(agent, self, message, nil, Settings.operation_types.enrollment_billing)
       { :message => message, :code => Settings.error_codes.member_not_saved }
