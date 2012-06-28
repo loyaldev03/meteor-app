@@ -139,7 +139,7 @@ module Drupal
         } 
       }
 
-      if m.new_record?
+      if self.new_record?
         map.merge!({
           pass: SecureRandom.hex, 
         })
