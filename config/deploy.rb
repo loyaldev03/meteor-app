@@ -20,11 +20,11 @@ set :campfire_options, :account => 'stoneacreinc',
 desc "Link config files."
 task :link_config_files do
   run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
-  run "if [ -e #{current_path}/rake_task_runner ]; then chmod +x #{current_path}/rake_task_runner; fi"
+  run "if [ -e #{release_path}/rake_task_runner ]; then chmod +x #{release_path}/rake_task_runner; fi"
 end
 
 task :bundle_install do
-  run "cd #{current_path}; bundle install"
+  run "cd #{release_path}; bundle install"
 end
 
 desc "Restart delayed jobs"
@@ -74,15 +74,15 @@ namespace :deploy do
   end
 
   task :migrate, :roles => :web, :except => { :no_release => true } do
-    run "cd #{current_path}; RAILS_ENV='#{stage}' rake db:migrate"
+    run "cd #{release_path}; RAILS_ENV='#{stage}' rake db:migrate"
   end
   # if you're still using the script/reaper helper you will need
   # these http://github.com/rails/irs_process_scripts
 
   # If you are using Passenger mod_rails uncomment this:
   task :restart, :roles => :web, :except => { :no_release => true } do
-    run "touch #{File.join(current_path,'tmp','restart.txt')}"
-    run "chmod 666 #{current_path}/log/*.log"
+    run "touch #{File.join(release_path,'tmp','restart.txt')}"
+    run "chmod 666 #{release_path}/log/*.log"
   end
 
   # desc "Compile assets"
