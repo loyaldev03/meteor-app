@@ -28,16 +28,20 @@ class Member < ActiveRecord::Base
   after_update :after_update_sync_remote_domain
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
 
+  REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_number' ]
+
   def after_create_sync_remote_domain
-    after_update_sync_remote_domain
-  rescue 
+    api_member.save! unless @skip_api_sync || api_member.nil?
+  rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
     # Because maybe we have already bill this member.
     Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
   end
   def after_update_sync_remote_domain
-    api_member.save! unless @skip_api_sync || api_member.nil?
+    unless (self.changed & REMOTE_API_FIELDS_TO_REPORT).empty?
+      api_member.save! unless @skip_api_sync || api_member.nil?
+    end
   end
 
   validates :first_name, :presence => true, :format => /^[A-Za-z ']+$/
