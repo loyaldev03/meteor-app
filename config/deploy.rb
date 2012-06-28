@@ -100,4 +100,4 @@ end
 
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
-before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate" 
+before "deploy:assets:precompile", "link_config_files",  "deploy:migrate" 
