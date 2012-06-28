@@ -74,7 +74,7 @@ namespace :deploy do
   end
 
   task :migrate, :roles => :web, :except => { :no_release => true } do
-    run "cd #{release_path}; RAILS_ENV='#{stage}' rake db:migrate"
+    run "cd #{release_path}; RAILS_ENV='#{stage}' rake db:migrate --trace"
   end
   # if you're still using the script/reaper helper you will need
   # these http://github.com/rails/irs_process_scripts
@@ -100,4 +100,4 @@ end
 
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
-before "deploy:assets:precompile", "link_config_files",  "deploy:migrate" 
+# before "deploy:assets:precompile", "link_config_files", # "bundle_install", "deploy:migrate" 
