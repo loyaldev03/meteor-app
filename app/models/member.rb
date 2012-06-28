@@ -448,18 +448,15 @@ class Member < ActiveRecord::Base
         self.save!
         message = "Club cash transaction done!. Amount: $#{cct.amount}"
         Auditory.audit(agent, cct, message, self)
-        # TODO : hace falta :v_id => self.visible_id ??
-        answer = { :message => message, :code => Settings.error_codes.success, :v_id => self.visible_id }
+        answer = { :message => message, :code => Settings.error_codes.success }
       rescue Exception => e
         errors = cct.errors.collect {|attr, message| "#{attr}: #{message}" }.join(". ")
         message = "Could not saved club cash transactions: #{errors}"
-        # TODO: agregar Airbrake
-        answer = { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful, :v_id => self.visible_id  }
+        Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => message)
+        answer = { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful  }
         raise ActiveRecord::Rollback
       end
     end
-    # TODO : hace falta :v_id => self.visible_id ??
-    answer
   end
   ###################################################################
 
