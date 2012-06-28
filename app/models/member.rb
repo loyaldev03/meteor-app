@@ -61,7 +61,7 @@ class Member < ActiveRecord::Base
                     ] => :provisional, :do => :schedule_first_membership
     after_transition :none => :applied, :do => :set_join_date
     after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :nillify_club_cash]
-    after_transition :provisional => :active, :do => :send_active_email_and_set_club_cash
+    after_transition :provisional => :active, :do => :send_active_email
     after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
 
@@ -97,7 +97,7 @@ class Member < ActiveRecord::Base
     state :applied
   end
 
-  def send_active_email_and_set_club_cash
+  def send_active_email
     Communication.deliver!(:active, self)
   end
 
@@ -240,7 +240,7 @@ class Member < ActiveRecord::Base
           answer = trans.process
           if trans.success?
             # club_cash_expire_date will be nil if we did not set club cash on enrollment because of a PTX.
-            set_first_club_cash! if self.club_cash_expire_date.nil?
+            assign_club_cash! if self.club_cash_expire_date.nil?
             set_as_active!
             schedule_renewal
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
@@ -348,7 +348,7 @@ class Member < ActiveRecord::Base
         credit_card.accepted_on_billing
       end
       message = set_status_on_enrollment!(agent, trans, amount)
-      set_first_club_cash! if trans
+      assign_club_cash! if trans
       self.reload
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
@@ -412,10 +412,10 @@ class Member < ActiveRecord::Base
 
   def reset_club_cash
     add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.') unless club_cash_amount.to_f == 0.0
-    set_first_club_cash!('Renewing club cash.')
+    assign_club_cash!('Renewing club cash.')
   end
 
-  def set_first_club_cash!(message = "Adding club cash on new enrollment.")
+  def assign_club_cash!(message = "Adding club cash on new enrollment.")
     self.add_club_cash(nil, terms_of_membership.club_cash_amount, message)
     self.club_cash_expire_date = self.join_date + 1.year
     self.save!
