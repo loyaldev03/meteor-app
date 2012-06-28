@@ -35,6 +35,32 @@ def add_product_fulfillment
     end
   end
 end
+def set_member_data(phoenix, member)
+  phoenix.first_name = member.first_name
+  phoenix.last_name = member.last_name
+  phoenix.email = (TEST ? "test#{member.id}@xagax.com" : member.email)
+  phoenix.address = member.address
+  phoenix.city = member.city
+  phoenix.state = member.state
+  phoenix.zip = member.zip
+  phoenix.country = member.country
+  phoenix.joint = member.joint
+  phoenix.quota = member.quota
+  phoenix.created_at = member.created_at
+  phoenix.updated_at = member.updated_at
+  phoenix.phone_number = member.phone
+  phoenix.blacklisted = member.blacklisted
+  phoenix.enrollment_info = { :mega_channel => member.mega_channel, 
+    :product_id => member.product_id,
+    :enrollment_amount => member.enrollment_amount_to_import,
+    :marketing_code => member.reporting_code, 
+    :tom_id => phoenix.terms_of_membership_id, 
+    :prospect_token => member.prospect_token }
+  phoenix.join_date = member.join_date
+  phoenix.member_since_date = member.member_since_date
+  phoenix.api_id = member.drupal_user_api_id
+  phoenix.club_cash_expire_date = member.club_cash_expire_date
+end
 
 
 # 1- update existing members
@@ -48,79 +74,50 @@ def update_members
           phoenix = PhoenixMember.find_by_club_id_and_visible_id(CLUB, member.id)
           if phoenix.nil?
             @log.info "  * member ##{member.id} not found on phoenix ?? "
-          else
-            @member = phoenix
+            next
+          end
+          
+          @member = phoenix
+          set_member_data(phoenix, member)
+          #TODO: puede haber cambio de TOM  en ONMC production ?
 
-            #TODO: puede haber cambio de TOM  en ONMC production ?
-            phoenix.first_name = member.first_name
-            phoenix.last_name = member.last_name
-            phoenix.email = (TEST ? "test#{member.id}@xagax.com" : member.email)
-            phoenix.address = member.address
-            phoenix.city = member.city
-            phoenix.state = member.state
-            phoenix.zip = member.zip
-            phoenix.country = member.country
-            phoenix.joint = member.joint
+          phoenix.bill_date = member.cs_next_bill_date
+          phoenix.next_retry_bill_date = member.cs_next_bill_date
+          if phoenix.status != "lapsed" and member.phoenix_status == "lapsed"
+            load_cancellation
+          end        
+          phoenix.status = member.phoenix_status
+          if member.phoenix_status == 'lapsed'
+            phoenix.recycled_times = 0
+            phoenix.cancel_date = member.cancelled_at
+            phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
+          end
 
-            phoenix.bill_date = member.cs_next_bill_date
-            phoenix.next_retry_bill_date = member.cs_next_bill_date
-            if phoenix.status != "lapsed" and member.phoenix_status == "lapsed"
-              load_cancellation
-            end        
-            phoenix.status = member.phoenix_status
-            if member.phoenix_status == 'lapsed'
-              phoenix.recycled_times = 0
-              phoenix.cancel_date = member.cancelled_at
-              phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
+          phoenix.save!
+
+          if phoenix.club_cash_amount.to_f != member.club_cash_amount.to_f
+            # create Club cash transaction.
+            update_club_cash(member.club_cash_amount - phoenix.club_cash_amount)
+          end
+
+          phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
+          if phoenix_cc.nil?
+            @log.info "  * member ##{member.id} does not have Credit Card active"
+          elsif phoenix_cc.encrypted_number != member.encrypted_cc_number or 
+                phoenix_cc.expire_month != member.cc_month_exp or 
+                phoenix_cc.expire_year != member.cc_year_exp
+
+            new_phoenix_cc = PhoenixCreditCard.new 
+            new_phoenix_cc.encrypted_number = member.encrypted_cc_number
+            if new_phoenix_cc.number.nil?
+              new_phoenix_cc.number = "0000000000"
             end
+            new_phoenix_cc.expire_month = member.cc_month_exp
+            new_phoenix_cc.expire_year = member.cc_year_exp
+            new_phoenix_cc.member_id = phoenix.uuid
 
-            phoenix.join_date = member.join_date
-            phoenix.quota = member.quota
-            phoenix.created_at = member.created_at
-            phoenix.updated_at = member.updated_at
-            phoenix.phone_number = member.phone
-            phoenix.blacklisted = member.blacklisted
-            phoenix.enrollment_info = { :mega_channel => member.mega_channel, 
-              :product_id => member.product_id,
-              :enrollment_amount => member.enrollment_amount_to_import,
-              :reporting_code => member.reporting_code, 
-              :tom_id => phoenix.terms_of_membership_id, 
-              :prospect_token => member.prospect_token }
-            phoenix.member_since_date = member.member_since_date
-            phoenix.api_id = member.drupal_user_api_id
-            phoenix.club_cash_expire_date = member.club_cash_expire_date
-            phoenix.save!
-
-
-            if phoenix.status == "lapsed"
-              load_cancellation
-            end        
-
-            if phoenix.club_cash_amount.to_f != member.club_cash_amount.to_f
-              # create Club cash transaction.
-              update_club_cash(member.club_cash_amount - phoenix.club_cash_amount)
-            end
-
-            phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
-            if phoenix_cc.nil?
-              @log.info "  * member ##{member.id} does not have Credit Card active"
-            elsif phoenix_cc.encrypted_number != member.encrypted_cc_number or 
-                  phoenix_cc.expire_month != member.cc_month_exp or 
-                  phoenix_cc.expire_year != member.cc_year_exp
-
-              new_phoenix_cc = PhoenixCreditCard.new 
-              new_phoenix_cc.encrypted_number = member.encrypted_cc_number
-              if new_phoenix_cc.number.nil?
-                new_phoenix_cc.number = "0000000000"
-              end
-              new_phoenix_cc.expire_month = member.cc_month_exp
-              new_phoenix_cc.expire_year = member.cc_year_exp
-              # phoenix_cc.last_successful_bill_date = member.last_charged
-              new_phoenix_cc.member_id = phoenix.uuid
-
-              if new_phoenix_cc.save! && phoenix_cc.deactivate
-                add_operation(Time.zone.now, new_phoenix_cc, "Credit card #{new_phoenix_cc.last_digits} added and set active.", nil)
-              end
+            if new_phoenix_cc.save! && phoenix_cc.deactivate
+              add_operation(Time.zone.now, new_phoenix_cc, "Credit card #{new_phoenix_cc.last_digits} added and set active.", nil)
             end
           end
 
@@ -146,7 +143,7 @@ def update_members
       end
       @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
-    sleep(5) # Make sure it doesn't get too crowded in there!
+    sleep(1) # Make sure it doesn't get too crowded in there!
   end
 end
 
@@ -162,15 +159,7 @@ def add_new_members
           phoenix.club_id = CLUB
           phoenix.terms_of_membership_id = get_terms_of_membership_id(member.campaign_id)
           phoenix.visible_id = member.id
-          phoenix.first_name = member.first_name
-          phoenix.last_name = member.last_name
-          phoenix.email = (TEST ? "test#{member.id}@xagax.com" : member.email)
-          phoenix.address = member.address
-          phoenix.city = member.city
-          phoenix.state = member.state
-          phoenix.zip = member.zip
-          phoenix.joint = member.joint
-          phoenix.country = member.country
+          set_member_data(phoenix, member)
           next_bill_date = member.cs_next_bill_date
           phoenix.status = member.phoenix_status
           if member.phoenix_status == 'active'
@@ -184,22 +173,7 @@ def add_new_members
             phoenix.cancel_date = member.cancelled_at
             phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
           end
-          phoenix.join_date = member.join_date
           phoenix.created_by_id = get_agent
-          phoenix.quota = member.quota
-          phoenix.created_at = member.created_at
-          phoenix.updated_at = member.updated_at
-          phoenix.phone_number = member.phone
-          phoenix.blacklisted = member.blacklisted
-          phoenix.enrollment_info = { :mega_channel => member.mega_channel, 
-            :product_id => member.product_id,
-            :enrollment_amount => member.enrollment_amount_to_import,
-            :reporting_code => member.reporting_code, 
-            :tom_id => phoenix.terms_of_membership_id, 
-            :prospect_token => member.prospect_token }
-          phoenix.member_since_date = member.member_since_date
-          phoenix.api_id = member.drupal_user_api_id
-          phoenix.club_cash_expire_date = member.club_cash_expire_date
           phoenix.save!
 
           @member = phoenix
@@ -221,7 +195,6 @@ def add_new_members
           end
           phoenix_cc.expire_month = member.cc_month_exp
           phoenix_cc.expire_year = member.cc_year_exp
-          phoenix_cc.last_successful_bill_date = member.last_charged
           phoenix_cc.member_id = phoenix.uuid
           phoenix_cc.save!
 
