@@ -77,7 +77,7 @@ end
 gem 'activemerchant', :git => "git://github.com/carlaares/active_merchant"
 
 # capitrano gems
-gem "capistrano"
-gem "capistrano-campfire"
+#gem "capistrano"
+#gem "capistrano-campfire"
 
 ###
