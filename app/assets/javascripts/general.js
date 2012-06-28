@@ -211,7 +211,14 @@ $(document).ready( function() {
   };
 
   function member_cancellation_functions(){
-    $('#member_cancelation_form').validate();
+    $("#member_cancelation_form").validate({
+       submitHandler: function(form) {
+        if (confirm('This member will be canceled. Are you sure?')) {
+          form.submit();            
+        }else
+        return false;
+       }
+    })
     $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
   };
 
