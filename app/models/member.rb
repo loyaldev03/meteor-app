@@ -24,8 +24,21 @@ class Member < ActiveRecord::Base
 
   before_create :record_date
 
-  after_save 'api_member.save! unless @skip_api_sync || api_member.nil?'
+  after_create :after_create_sync_remote_domain
+  after_update :after_update_sync_remote_domain
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
+
+  def after_create_sync_remote_domain
+    after_update_sync_remote_domain
+  rescue 
+    # refs #21133
+    # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
+    # Because maybe we have already bill this member.
+    Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
+  end
+  def after_update_sync_remote_domain
+    api_member.save! unless @skip_api_sync || api_member.nil?
+  end
 
   validates :first_name, :presence => true, :format => /^[A-Za-z ']+$/
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
@@ -337,14 +350,14 @@ class Member < ActiveRecord::Base
       self.save!
       if credit_card.member.nil?
         credit_card.member = self
-        credit_card.save!
+        credit_card.save(false)
       end
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
         # is completed succesfully
         trans.member_id = self.id
         trans.credit_card_id = credit_card.id
-        trans.save
+        trans.save(false)
         credit_card.accepted_on_billing
       end
       message = set_status_on_enrollment!(agent, trans, amount)
