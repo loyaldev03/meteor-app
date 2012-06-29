@@ -3,18 +3,19 @@
     <%= f.label :url, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :url, :class => 'text_field' %>
+      <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.domain.url_help')} %> 
     </div>
   </div>
   <div class="control-group">
     <%= f.label :description, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_area :description, :class => 'text_area' %>
+      <%= f.text_area :description, :class => 'text_area', :style => 'width: 90%; height: 100px' %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :data_rights, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_area :data_rights, :class => 'text_area' %>
+      <%= f.text_area :data_rights, :class => 'text_area', :style => 'width: 90%; height: 100px' %>
     </div>
   </div>
   <div class="control-group">
@@ -38,3 +39,8 @@
     <%= f.submit nil, :class => 'btn btn-primary' %>
     <%= link_to t(:cancel), domains_path, :class => 'btn' %>
   </div>
+
+
+<script>
+  $(document).ready(new_domain_functions())
+</script>

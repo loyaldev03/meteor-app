@@ -1,3 +1,15 @@
+<% if @partner.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@partner.errors.count, "error") %></h2>
+
+      <ul>
+      <% @partner.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+<%end%>
+
 <%= form_for [ :admin, @partner ], :html => { :class => 'form-horizontal' } do |f| %>
   <% if @partner.new_record? %>
     <div class="control-group">
@@ -28,7 +40,7 @@
   <div class="control-group">
     <%= f.label :description, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_area :description, :class => 'text_area' %>
+      <%= f.text_area :description, :class => 'text_area', :style => 'width: 70%; height: 100px' %>
     </div>
   </div>
 
@@ -40,19 +52,20 @@
       <div class="control-group">
         <%= domain_fields.label :url, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.text_field :url, :class => 'text_field', :name => "partner[domains_attributes][0][url]" %>
+          <%= domain_fields.text_field :url, :class => 'text_field', :name => "partner[domains_attributes][0][url]", :value => (params[:partner][:domains_attributes]["0"][:url] if params[:partner][:domains_attributes]) %>
+          <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.domain.url_help')} %> 
         </div>
       </div>
       <div class="control-group">
         <%= domain_fields.label :description, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.text_area :description, :class => 'text_area', :name => "partner[domains_attributes][0][description]" %>
+          <%= domain_fields.text_area :description, :class => 'text_area', :name => "partner[domains_attributes][0][description]", :style => 'width: 70%; height: 100px', :value => (params[:partner][:domains_attributes]["0"][:description] if params[:partner][:domains_attributes]) %>
         </div>
       </div>
       <div class="control-group">
         <%= domain_fields.label :data_rights, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.text_area :data_rights, :class => 'control-label', :name => "partner[domains_attributes][0][data_rights]" %>
+          <%= domain_fields.text_area :data_rights, :class => 'control-label', :name => "partner[domains_attributes][0][data_rights]", :style => 'width: 70%; height: 100px', :value => (params[:partner][:domains_attributes]["0"][:data_rights] if params[:partner][:domains_attributes]) %>
         </div>
       </div>
       <div class="control-group">
@@ -71,3 +84,7 @@
                 admin_partners_path, :class => 'btn' %>
   </div>
 <% end %>
+
+<script>
+  $(document).ready(new_partner_functions())
+</script>
