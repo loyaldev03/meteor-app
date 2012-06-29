@@ -1,4 +1,7 @@
 # 1- Get access to phoenix, billing_component, customer_services and prospect databases
+# UPDATE billing_component.members set imported_at = NULL where imported_at IS NOT NULL
+# UPDATE notes set imported_at = NULL where imported_at IS NOT NULL
+# UPDATE operations set imported_at = NULL where imported_at IS NOT NULL
 # 2- Import new prospects into phoenix
 #     ruby script/custom/import_prospects.rb  
 # 3- Update members already imported and Load new members 
@@ -235,11 +238,7 @@ class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
     BillingEnrollmentCaptureResponse.find_by_capture_id(capture.id)
   end
   def amount
-    if capture.nil?
-      BillingCampaign.find(authorization.campaign_id).capture_amount
-    else
-      capture.amount / 100.0
-    end
+    phoenix_amount
   end
 end
 class BillingEnrollmentAuthorization < ActiveRecord::Base
@@ -277,19 +276,7 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
     BillingMembershipCaptureResponse.find_by_capture_id(capture.id)
   end
   def amount
-    if capture.nil?
-      campaign = BillingCampaign.find_by_id(authorization.campaign_id)
-      if campaign.nil? 
-        campaign = if billing_member.nil?
-          BillingCampaign.find_by_id(999) 
-        else
-          BillingCampaign.find_by_id(billing_member.campaign_id)
-        end
-      end
-      campaign.membership_amount
-    else
-      capture.amount / 100.0
-    end
+    phoenix_amount
   end
 end
 class BillingMembershipAuthorization < ActiveRecord::Base
@@ -392,14 +379,5 @@ def add_operation(operation_date, object, description, operation_type, created_a
 end
 
 def load_cancellation
-  tz = Time.now.utc
-  begin
-    @log.info "  * processing member ##{@member.uuid}"
-    add_operation(@member.cancel_date, @member, "Member canceled", Settings.operation_types.cancel, @member.cancel_date, @member.cancel_date) 
-  rescue Exception => e
-    @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-    puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-    exit
-  end
-  @log.info "    ... took #{Time.now.utc - tz} for member ##{@member.uuid}"
+  add_operation(@member.cancel_date, @member, "Member canceled", Settings.operation_types.cancel, @member.cancel_date, @member.cancel_date) 
 end
