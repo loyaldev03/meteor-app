@@ -9,15 +9,22 @@ class Api::MembersController < ApplicationController
   #  * terms_of_membership_id
   #  * member { :first_name, :last_name, :email, :address, :city, :state, :zip, :country, :phone_number }
   #  * credit_card { :expire_month, :expire_year, :number }
-  #  * enrollment_amount
+  #  * enrollment_info {:member_id, :enrollment_amount, :product_sku, :product_description, :mega_channel,
+  #                     :marketing_code, :fulfillment_code, :ip_address, :user_agent, :referral_host,
+  #                     :referral_parameters, :referral_path, :user_id, :landing_url, :terms_of_membership_id,
+  #                     :preferences, :cookie_value, :cookie_set, :campaign_medium, :campaign_description,
+  #                     :campaign_medium_version, :is_joint}
   # 
+
+
+
   def enroll
     response = {}
     tom = TermsOfMembership.find_by_id(params[:terms_of_membership_id])
     if tom.nil?
       response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
     else
-      response = Member.enroll(tom, current_agent, params[:enrollment_amount], params[:member], params[:credit_card],params[:setter] && params[:setter][:cc_blank])
+      response = Member.enroll(tom, current_agent, params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:setter][:cc_blank], params[:enrollment_info])
     end
     render json: response
   end

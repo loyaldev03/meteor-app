@@ -101,7 +101,7 @@
 </table>
 
 <% if @member.new_record? %>
-  <%= hidden_field_tag :enrollment_amount, 0.0 %>
+  <%= hidden_field :enrollment_info, :enrollment_amount, :value => 0.0 %>
 <% end %>
 
 
