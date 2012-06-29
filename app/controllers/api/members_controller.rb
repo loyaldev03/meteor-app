@@ -52,12 +52,11 @@ class Api::MembersController < ApplicationController
   #
   # Params:
   #  * api_id
-  # 
+  #  * club_id
   def profile
-    # TODO: improve this Member find method
-    member = Member.find_by_api_id(params[:api_id]) 
+    member = Member.find_by_api_id_and_club_id(params[:api_id],params[:club_id]) 
     if member.nil?
-      render json: { code: '9345', message: 'member not found' }
+      render json: { code: Settings.error_codes.not_found, message: 'member not found' }
     else
       render json: { 
         code: '000', 

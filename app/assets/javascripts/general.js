@@ -79,6 +79,14 @@ $(document).ready( function() {
     });   
   }
 
+  function new_partner_functions(){
+    $('.help').popover({offset: 10});
+  }
+
+  function new_domain_functions(){
+    $('.help').popover({offset: 10});
+  }
+
   function member_index_functions(){
     $('#at_least_one_required').submit(function (){
       result = false;

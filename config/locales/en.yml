@@ -78,6 +78,8 @@ en:
         username: 'Username'
         locked_at: 'Locked ad'
         created_at: 'Created at'
+      domain:
+        url_help: 'Formats: http://xxxxx.xxx.xx or https://xxxxx.xxx.xx'
       member:
         member_id: 'Member ID'
         full_name: 'Full name'
