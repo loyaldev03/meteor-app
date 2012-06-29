@@ -21,9 +21,9 @@ def add_fulfillment(fulfillment_kit, fulfillment_since_date, fulfillment_expire_
     phoenix_f.save!  
   end
 end
-def add_product_fulfillment
+def add_product_fulfillment(has_fulfillment_product)
   product = "Sloop"
-  if @member.has_fulfillment_product
+  if has_fulfillment_product
     if PhoenixFulfillment.find_by_member_id_and_product(@member.uuid, product).nil?
       phoenix_f = PhoenixFulfillment.new 
       phoenix_f.product = product
@@ -50,12 +50,13 @@ def set_member_data(phoenix, member)
   phoenix.updated_at = member.updated_at
   phoenix.phone_number = member.phone
   phoenix.blacklisted = member.blacklisted
-  phoenix.enrollment_info = { :mega_channel => member.mega_channel, 
-    :product_id => member.product_id,
-    :enrollment_amount => member.enrollment_amount_to_import,
-    :marketing_code => member.reporting_code, 
-    :tom_id => phoenix.terms_of_membership_id, 
-    :prospect_token => member.prospect_token }
+  # enrollment_info => will change
+  # phoenix.enrollment_info = { :mega_channel => member.mega_channel, 
+  #   :product_id => member.product_id,
+  #   :enrollment_amount => member.enrollment_amount_to_import,
+  #   :marketing_code => member.reporting_code, 
+  #   :tom_id => phoenix.terms_of_membership_id, 
+  #   :prospect_token => member.prospect_token }
   phoenix.join_date = member.join_date
   phoenix.member_since_date = member.member_since_date
   phoenix.api_id = member.drupal_user_api_id
@@ -108,9 +109,13 @@ def update_members
                 phoenix_cc.expire_year != member.cc_year_exp
 
             new_phoenix_cc = PhoenixCreditCard.new 
-            new_phoenix_cc.encrypted_number = member.encrypted_cc_number
-            if new_phoenix_cc.number.nil?
+            if TEST
               new_phoenix_cc.number = "0000000000"
+            else
+              new_phoenix_cc.encrypted_number = member.encrypted_cc_number
+              if new_phoenix_cc.number.nil?
+                new_phoenix_cc.number = "0000000000"
+              end
             end
             new_phoenix_cc.expire_month = member.cc_month_exp
             new_phoenix_cc.expire_year = member.cc_year_exp
@@ -131,7 +136,7 @@ def update_members
             phoenix_f.renewable_at = member.fulfillment_expire_date
             phoenix_f.save! 
           end
-          add_product_fulfillment
+          add_product_fulfillment(member.has_fulfillment_product)
 
           member.update_attribute :imported_at, Time.now.utc
 
@@ -149,10 +154,12 @@ end
 
 # 2- import new members.
 def add_new_members
-  BillingMember.where(" imported_at IS NULL and is_prospect = false and is_test_member = true and phoenix_status IS NOT NULL ").find_in_batches do |group|
+  BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
+  " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
+  " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and join_date IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
-      PhoenixProspect.transaction do 
+      PhoenixMember.transaction do 
         @log.info "  * processing member ##{member.id}"
         begin
           phoenix = PhoenixMember.new 
@@ -177,6 +184,7 @@ def add_new_members
           phoenix.save!
 
           @member = phoenix
+          add_operation(Time.now.utc, nil, "Member imported into phoenix!", nil)  
 
           if phoenix.status == "lapsed"
             load_cancellation
@@ -189,9 +197,13 @@ def add_new_members
 
           # create CC
           phoenix_cc = PhoenixCreditCard.new 
-          phoenix_cc.encrypted_number = member.encrypted_cc_number
-          if phoenix_cc.number.nil?
+          if TEST
             phoenix_cc.number = "0000000000"
+          else
+            phoenix_cc.encrypted_number = member.encrypted_cc_number
+            if phoenix_cc.number.nil?
+              phoenix_cc.number = "0000000000"
+            end
           end
           phoenix_cc.expire_month = member.cc_month_exp
           phoenix_cc.expire_year = member.cc_year_exp
@@ -199,7 +211,7 @@ def add_new_members
           phoenix_cc.save!
 
           add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
-          add_product_fulfillment
+          add_product_fulfillment(member.has_fulfillment_product)
 
           member.update_attribute :imported_at, Time.now.utc
         rescue Exception => e
