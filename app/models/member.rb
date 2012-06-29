@@ -457,6 +457,7 @@ class Member < ActiveRecord::Base
         raise ActiveRecord::Rollback
       end
     end
+    answer
   end
   ###################################################################
 
