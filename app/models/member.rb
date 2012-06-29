@@ -1,8 +1,6 @@
 class Member < ActiveRecord::Base
   include Extensions::UUID
 
-  #serialize :enrollment_info, JSON
-
   belongs_to :terms_of_membership
   belongs_to :club
   belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
@@ -413,7 +411,6 @@ class Member < ActiveRecord::Base
   end
 
   def mega_channel
-    #self.enrollment_info && self.enrollment_info['mega_channel']
     EnrollmentInfo.find_by_member_id(self.id).mega_channel
   end
 
