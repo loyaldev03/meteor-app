@@ -8,11 +8,9 @@ def load_save_the_sales
     group.each do |op|
       tz = Time.now.utc
       begin
-        @log.info "  * processing CS operation ##{op.id}"
         @member = PhoenixMember.find_by_visible_id_and_club_id  op.contact_id, CLUB
-        if @member.nil?
-          @log.info "  * Member id ##{op.contact_id} not found "
-        else
+        unless @member.nil?
+          @log.info "  * processing CS operation ##{op.id}"
           add_operation(op.operation_date, nil, op.name, Settings.operation_types.save_the_sale, op.created_on, op.updated_on, op.author_id)
           op.update_attribute :imported_at, Time.now.utc
         end
@@ -21,7 +19,6 @@ def load_save_the_sales
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         exit
       end
-      @log.info "    ... took #{Time.now.utc - tz} for CS operation ##{op.id}"
     end
   end
 end
@@ -31,11 +28,9 @@ def load_reactivations
     group.each do |op|
       tz = Time.now.utc
       begin
-        @log.info "  * processing CS operation ##{op.id}"
         @member = PhoenixMember.find_by_visible_id_and_club_id  op.contact_id, CLUB
-        if @member.nil?
-          @log.info "  * Member id ##{op.contact_id} not found "
-        else
+        unless @member.nil?
+          @log.info "  * processing CS operation ##{op.id}"
           add_operation(op.operation_date, nil, op.name, Settings.operation_types.recovery, op.created_on, op.updated_on, op.author_id)
           @member.increment!(:reactivation_times)
           op.update_attribute :imported_at, Time.now.utc
@@ -45,7 +40,6 @@ def load_reactivations
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         exit
       end
-      @log.info "    ... took #{Time.now.utc - tz} for CS operation ##{op.id}"
     end
   end
 end

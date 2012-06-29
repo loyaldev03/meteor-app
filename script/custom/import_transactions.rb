@@ -3,7 +3,7 @@
 require_relative 'import_models'
 
 def load_refunds
-  BillingChargeback.where("imported_at IS NOT NULL").find_in_batches do |group|
+  BillingChargeback.where("imported_at IS NOT NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
     group.each do |refund|
       @member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, refund.member_id)
       unless @member.nil?
@@ -46,7 +46,7 @@ def load_refunds
 end
 
 def load_enrollment_transactions
-  BillingEnrollmentAuthorizationResponse.where("imported_at IS NOT NULL").find_in_batches do |group|
+  BillingEnrollmentAuthorizationResponse.where("imported_at IS NOT NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
     group.each do |response|
       if response.authorization.nil?
         @log.info "  * Enrollment Authorization id not found for Auth response ##{response.id} member id ##{response.authorization_id}"
@@ -55,9 +55,7 @@ def load_enrollment_transactions
           tz = Time.now.utc
           @log.info "  * processing Enrollment Auth response ##{response.id}"
           @member = response.member
-          if @member.nil?
-            @log.info "  * Member id not found for Auth response ##{response.id} member id ##{response.authorization.member_id}"
-          else
+          unless @member.nil?
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
             transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
@@ -109,7 +107,7 @@ end
 
 
 def load_membership_transactions
-  BillingMembershipAuthorizationResponse.where("imported_at IS NOT NULL").find_in_batches do |group|
+  BillingMembershipAuthorizationResponse.where("imported_at IS NOT NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
     group.each do |response|
       if response.authorization.nil?
         @log.info "  * Enrollment Authorization id not found for Auth response ##{response.id} member id ##{response.authorization_id}"
@@ -118,9 +116,7 @@ def load_membership_transactions
           tz = Time.now.utc
           @log.info "  * processing Membership Auth response ##{response.id}"
           @member = response.member
-          if @member.nil?
-            @log.info "  * Member id not found for Auth response ##{response.id} member id ##{response.authorization.member_id}"              
-          else
+          unless @member.nil?
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
             transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)

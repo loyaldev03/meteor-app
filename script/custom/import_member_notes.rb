@@ -34,10 +34,10 @@ def import_customer_notes
     group.each do |note| 
       tz = Time.now.utc
       begin
-        @log.info "  * processing note ##{note.id}"
         # load member notes
         member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, note.source_id)
         unless member.nil?
+          @log.info "  * processing note ##{note.id}"
           phoenix_note = PhoenixMemberNote.new
           phoenix_note.member_id = member
           phoenix_note.created_by_id = get_agent(note.author_id)
@@ -52,10 +52,10 @@ def import_customer_notes
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        exit
       end
-      @log.info "    ... took #{Time.now.utc - tz} for note ##{note.id}"
     end
-    sleep(5) # Make sure it doesn't get too crowded in there!
+    sleep(2) # Make sure it doesn't get too crowded in there!
   end
 end
 
