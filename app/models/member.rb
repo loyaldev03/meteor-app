@@ -14,6 +14,7 @@ class Member < ActiveRecord::Base
   has_many :communications
   has_many :fulfillments
   has_many :club_cash_transactions
+  has_many :enrollment_infos
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_number, 
