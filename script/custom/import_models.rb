@@ -149,6 +149,10 @@ class PhoenixClubCashTransaction < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "club_cash_transactions" 
 end
+class PhoenixEnrollmentInfo < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "enrollment_infos" 
+end
 class PhoenixTransaction < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "transactions" 

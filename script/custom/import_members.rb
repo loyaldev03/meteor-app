@@ -50,17 +50,42 @@ def set_member_data(phoenix, member)
   phoenix.updated_at = member.updated_at
   phoenix.phone_number = member.phone
   phoenix.blacklisted = member.blacklisted
-  # enrollment_info => will change
-  # phoenix.enrollment_info = { :mega_channel => member.mega_channel, 
-  #   :product_id => member.product_id,
-  #   :enrollment_amount => member.enrollment_amount_to_import,
-  #   :marketing_code => member.reporting_code, 
-  #   :tom_id => phoenix.terms_of_membership_id, 
-  #   :prospect_token => member.prospect_token }
   phoenix.join_date = member.join_date
   phoenix.member_since_date = member.member_since_date
   phoenix.api_id = member.drupal_user_api_id
   phoenix.club_cash_expire_date = member.club_cash_expire_date
+end
+def add_enrollment_info(phoenix, member)
+  # TODO: not developed yet
+  return
+
+  e_info = PhoenixEnrollmentInfo.find_by_member_id(phoenix.id)
+  if e_info.nil?
+    e_info = PhoenixEnrollmentInfo.new 
+    e_info.member_id = phoenix.id
+  end
+  e_info.enrollment_amount = member.enrollment_amount_to_import
+  e_info.product_sku = member.product_id
+  e_info.product_description
+  e_info.mega_channel = member.mega_channel
+  e_info.marketing_code = member.reporting_code
+  # e_info.fulfillment_code
+  # e_info.ip_address
+  # e_info.user_agent
+  # e_info.referral_host
+  # e_info.referral_parameters
+  # e_info.referral_path
+  # e_info.user_id
+  # e_info.landing_url
+  e_info.terms_of_membership_id = phoenix.terms_of_membership_id
+  # e_info.preferences
+  # e_info.cookie_value
+  # e_info.cookie_set
+  # e_info.campaign_medium
+  # e_info.campaign_description
+  # e_info.campaign_medium_version
+  e_info.is_joint = phoenix.joint
+  e_info.save
 end
 
 
@@ -80,6 +105,7 @@ def update_members
           
           @member = phoenix
           set_member_data(phoenix, member)
+          add_enrollment_info(phoenix, member)
           #TODO: puede haber cambio de TOM  en ONMC production ?
 
           phoenix.bill_date = member.cs_next_bill_date
@@ -212,6 +238,7 @@ def add_new_members
 
           add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
           add_product_fulfillment(member.has_fulfillment_product)
+          add_enrollment_info(phoenix, member)
 
           member.update_attribute :imported_at, Time.now.utc
         rescue Exception => e
@@ -222,7 +249,7 @@ def add_new_members
       end
       @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
-    sleep(2) # Make sure it doesn't get too crowded in there!
+    sleep(1) # Make sure it doesn't get too crowded in there!
   end
 end
 
