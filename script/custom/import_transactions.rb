@@ -13,14 +13,14 @@ def load_refunds
           transaction = PhoenixTransaction.new
           transaction.member_id = @member.uuid
           transaction.terms_of_membership_id = @member.terms_of_membership_id
-          transaction.set_payment_gateway_configuration
-          transaction.gateway = 'litle'
+          transaction.gateway = (response.gateway == 'mes' ? response.gateway : 'litle')
+          transaction.set_payment_gateway_configuration(transaction.gateway)
           transaction.recurrent = false
           transaction.transaction_type = "credit" 
           transaction.invoice_number = @member.visible_id
           transaction.amount = refund.phoenix_amount
           transaction.response = refund.result
-          transaction.response_code = ( refund.result == "Success" ? "000" : "999")
+          transaction.response_code = (refund.result == "Success" ? "000" : "999")
           transaction.response_result = refund.result
           transaction.response_transaction_id = refund.litle_txn_id
           transaction.created_at = refund.created_at
@@ -48,9 +48,7 @@ end
 def load_enrollment_transactions
   BillingEnrollmentAuthorizationResponse.where("imported_at IS NOT NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
     group.each do |response|
-      if response.authorization.nil?
-        @log.info "  * Enrollment Authorization id not found for Auth response ##{response.id} member id ##{response.authorization_id}"
-      else
+      unless response.authorization.nil?
         begin
           tz = Time.now.utc
           @log.info "  * processing Enrollment Auth response ##{response.id}"
@@ -59,8 +57,8 @@ def load_enrollment_transactions
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
             transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
-            transaction.set_payment_gateway_configuration
-            transaction.gateway = 'litle'
+            transaction.gateway = (response.gateway == 'mes' ? response.gateway : 'litle')
+            transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
             transaction.transaction_type = 'authorization_capture'
             transaction.invoice_number = "response.invoice_number"
@@ -109,9 +107,7 @@ end
 def load_membership_transactions
   BillingMembershipAuthorizationResponse.where("imported_at IS NOT NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
     group.each do |response|
-      if response.authorization.nil?
-        @log.info "  * Enrollment Authorization id not found for Auth response ##{response.id} member id ##{response.authorization_id}"
-      else
+      unless response.authorization.nil?
         begin
           tz = Time.now.utc
           @log.info "  * processing Membership Auth response ##{response.id}"
@@ -120,8 +116,8 @@ def load_membership_transactions
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
             transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
-            transaction.set_payment_gateway_configuration
-            transaction.gateway = response.gateway.nil? ? 'litle' : response.gateway
+            transaction.gateway = (response.gateway == 'mes' ? response.gateway : 'litle')
+            transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
             transaction.transaction_type = 'authorization_capture'
             transaction.invoice_number = response.invoice_number

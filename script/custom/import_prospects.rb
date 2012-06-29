@@ -36,5 +36,5 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
     end
     @log.info "    ... took #{Time.now.utc - tz} for prospect ##{prospect.id}"
   end
-  sleep(5) # Make sure it doesn't get too crowded in there!
+  sleep(2) # Make sure it doesn't get too crowded in there!
 end

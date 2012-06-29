@@ -27,13 +27,14 @@ require 'settingslogic'
 
 CLUB = 16
 DEFAULT_CREATED_BY = 14
-PAYMENT_GW_CONFIGURATION = 4
+PAYMENT_GW_CONFIGURATION_LITLE = 4
+PAYMENT_GW_CONFIGURATION_MES = 4
 TERMS_OF_MEMBERSHIP = 11 # TODO: this value will be loaded from campaigns. its temporary here
 TEST = true # if true email will be replaced with a fake one
 SITE_ID = 2010001547 # lyris site id
 USE_PROD_DB = true
 
-@log = Logger.new('import_members.log', 10, 1024000)
+@log = Logger.new('import_operations.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
 if USE_PROD_DB
@@ -127,7 +128,6 @@ class PhoenixMember < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
   self.primary_key = 'uuid'
-  serialize :enrollment_info, JSON
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 end
 class PhoenixProspect < ActiveRecord::Base
@@ -159,8 +159,12 @@ class PhoenixTransaction < ActiveRecord::Base
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 
-  def set_payment_gateway_configuration
-    pgc = PhoenixPGC.find(PAYMENT_GW_CONFIGURATION)
+  def set_payment_gateway_configuration(gateway)
+    if gateway == 'litle'
+      pgc = PhoenixPGC.find(PAYMENT_GW_CONFIGURATION_LITLE)
+    else
+      pgc = PhoenixPGC.find(PAYMENT_GW_CONFIGURATION_MES)
+    end
     self.payment_gateway_configuration_id = pgc.id
     self.report_group = pgc.report_group
     self.merchant_key = pgc.merchant_key
