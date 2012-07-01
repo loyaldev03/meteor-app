@@ -165,3 +165,10 @@ en:
       default: "%d/%m/%Y"
       short: "%b %d"
       long: "%B %d, %Y"
+      dashed: "%Y-%m-%d %H:%M"
+  time:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%b %d"
+      long: "%B %d, %Y"
+      dashed: "%Y-%m-%d %H:%M"

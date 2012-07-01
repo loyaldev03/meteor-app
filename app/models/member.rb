@@ -1,8 +1,6 @@
 class Member < ActiveRecord::Base
   include Extensions::UUID
 
-  serialize :enrollment_info, JSON
-
   belongs_to :terms_of_membership
   belongs_to :club
   belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
@@ -14,13 +12,14 @@ class Member < ActiveRecord::Base
   has_many :communications
   has_many :fulfillments
   has_many :club_cash_transactions
+  has_many :enrollment_infos
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address,
-      :wrong_phone_number, :api_id, :enrollment_info, :mega_channel
+      :wrong_phone_number, :api_id, :mega_channel
 
   before_create :record_date
 
@@ -276,7 +275,7 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0')
+  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0', params_enrollment_info = nil)
     club = tom.club
     # Member exist?
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
@@ -324,10 +323,10 @@ class Member < ActiveRecord::Base
     end   
 
     member.terms_of_membership = tom
-    member.enroll(credit_card, enrollment_amount, current_agent, nil ,cc_blank)
+    member.enroll(credit_card, enrollment_amount, current_agent, nil ,cc_blank, params_enrollment_info)
   end    
 
-  def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0)
+  def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, params_enrollment_info = nil)
     amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
     if not self.new_record? and recovery_check and not self.can_recover?
       return { :message => "Cant recover member. Actual status is not lapsed or Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
@@ -338,7 +337,12 @@ class Member < ActiveRecord::Base
     elsif not self.valid? 
       return { :message => "Member data is invalid", :code => Settings.error_codes.member_data_invalid }
     end   
-    
+
+    enrollment_info = EnrollmentInfo.new params_enrollment_info
+    enrollment_info.member_id = self.id
+    enrollment_info.enrollment_amount = amount
+    enrollment_info.save
+
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
@@ -368,6 +372,8 @@ class Member < ActiveRecord::Base
       assign_club_cash! if trans
       self.reload
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
+    
+
     rescue Exception => e
       Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
@@ -405,12 +411,12 @@ class Member < ActiveRecord::Base
   end
 
   def mega_channel
-    self.enrollment_info && self.enrollment_info['mega_channel']
+    EnrollmentInfo.find_by_member_id(self.id).mega_channel
   end
 
   def mega_channel=(value)
-    self.enrollment_info ||= {}
-    self.enrollment_info['mega_channel'] = value
+    self.enrollment_info.mega_channel ||= {}
+    self.enrollment_info.mega_channel = value
   end
 
   def skip_api_sync!
