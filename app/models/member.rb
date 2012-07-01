@@ -545,11 +545,13 @@ class Member < ActiveRecord::Base
         message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
         self.next_retry_bill_date = Time.zone.now + eval(Settings.next_retry_on_missing_decline)
         self.save
-        Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
-          :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.credit_card_type}. " + 
-              "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.")
+        unless trans.code == Settings.error_codes.invalid_credit_card 
+          Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
+            :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.credit_card_type}. " + 
+                "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.")
+        end
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
-        set_as_canceled = true if self.recycled_times >= 4
+        set_as_canceled = true if self.recycled_times >= Settings.number_of_retries_on_missing_decline
       else
         set_as_canceled = false
         trans.update_attribute :decline_strategy_id, decline.id

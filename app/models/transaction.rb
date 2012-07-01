@@ -200,7 +200,7 @@ class Transaction < ActiveRecord::Base
     def credit_card_invalid
       errors = @cc.errors.collect {|attr, message| "#{attr}: #{message}" }.join('\n')
       message = "Credit card not valid: #{errors}"
-      self.response_code = "9332"
+      self.response_code = Settings.error_codes.invalid_credit_card 
       self.response_result = message
       self.save
       { :message => message, :code => Settings.error_codes.invalid_credit_card }
