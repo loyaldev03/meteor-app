@@ -52,20 +52,20 @@
       <div class="control-group">
         <%= domain_fields.label :url, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.text_field :url, :class => 'text_field', :name => "partner[domains_attributes][0][url]", :value => (params[:partner][:domains_attributes]["0"][:url] if params[:partner][:domains_attributes]) %>
+          <%= domain_fields.text_field :url, :class => 'text_field', :name => "partner[domains_attributes][0][url]", :value => (params[:partner][:domains_attributes]["0"][:url] if params[:partner]) %>
           <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.domain.url_help')} %> 
         </div>
       </div>
       <div class="control-group">
         <%= domain_fields.label :description, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.text_area :description, :class => 'text_area', :name => "partner[domains_attributes][0][description]", :style => 'width: 70%; height: 100px', :value => (params[:partner][:domains_attributes]["0"][:description] if params[:partner][:domains_attributes]) %>
+          <%= domain_fields.text_area :description, :class => 'text_area', :name => "partner[domains_attributes][0][description]", :style => 'width: 70%; height: 100px', :value => (params[:partner][:domains_attributes]["0"][:description] if params[:partner]) %>
         </div>
       </div>
       <div class="control-group">
         <%= domain_fields.label :data_rights, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.text_area :data_rights, :class => 'control-label', :name => "partner[domains_attributes][0][data_rights]", :style => 'width: 70%; height: 100px', :value => (params[:partner][:domains_attributes]["0"][:data_rights] if params[:partner][:domains_attributes]) %>
+          <%= domain_fields.text_area :data_rights, :class => 'control-label', :name => "partner[domains_attributes][0][data_rights]", :style => 'width: 70%; height: 100px', :value => (params[:partner][:domains_attributes]["0"][:data_rights] if params[:partner]) %>
         </div>
       </div>
       <div class="control-group">
