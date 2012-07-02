@@ -144,9 +144,13 @@
   <thead>
     <tr>
       <th colspan="5"> Active Credit card </th>
-      <% if can? :see_last_digits, @active_credit_card %>
-      <td> <%= t("activerecord.attributes.credit_card.number") %>: <%= @active_credit_card.number %> </td>
+      <td>
+      <% if can? :see_credit_card, @active_credit_card %>
+        <%= t("activerecord.attributes.credit_card.number") %>: <%= @active_credit_card.number %> 
+      <% elsif can? :see_credit_card_last_digits, @active_credit_card %>
+        <%= t("activerecord.attributes.credit_card.last_digits") %>: <%= @active_credit_card.last_digits %> 
       <% end %>
+      </td>
       <td> <%= t("activerecord.attributes.credit_card.expire_date") %>: 
            <%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %> 
       </td>

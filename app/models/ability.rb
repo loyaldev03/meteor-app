@@ -5,13 +5,15 @@ class Ability
     can :manage, Member
 
     if agent.has_role? 'admin'
-      can :see_last_digits, CreditCard
+      can :see_credit_card, CreditCard
       can :enroll_member, Member      
       can :manage, Member
       can :manage, Agent
       can :manage, Partner
+      can :manage, Club
+      can :manage, Domain
     elsif agent.has_role? 'representative'
-      can :see_last_digits, CreditCard
+      can :see_credit_card_last_digits, CreditCard
       can :read, Agent
       can :read, Partner
       can :read, Club
