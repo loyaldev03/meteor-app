@@ -1,5 +1,7 @@
 <h1>Search</h1>
-<p><%= link_to 'New Member', new_member_path, :class => "btn btn-primary icon-user"  %></p>
+<% if can? :enroll_member, @current_agent %>
+  <p><%= link_to 'New Member', new_member_path, :class => "btn btn-primary icon-user"  %></p>
+<% end %>
 <%= form_tag(members_path, :method => 'post', :id => 'at_least_one_required' ,:html => { :class => 'well form-inline' }) do |f| %>
 
   <table class="table table-bordered table-condensed">

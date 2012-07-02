@@ -5,17 +5,29 @@ class Ability
     can :manage, Member
 
     if agent.has_role? 'admin'
+      can :see_last_digits, CreditCard
+      can :enroll_member, Member      
+      can :manage, Member
       can :manage, Agent
       can :manage, Partner
-    else
+    elsif agent.has_role? 'representative'
+      can :see_last_digits, CreditCard
       can :read, Agent
       can :read, Partner
+      can :read, Club
+    elsif agent.has_role? 'supervisor'
+      can :read, Agent
+      can :read, Partner
+      can :read, Club
       # EXAMPLE
       # can :manage, Partner do |partner|
       #   # agent is enabled to manage a specific partner
       #   agent.partners.include? partner
       # end
     end
+
+
+
     # Define abilities for the passed in user here. For example:
     #
     #   user ||= User.new # guest user (not logged in)
