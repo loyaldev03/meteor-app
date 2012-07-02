@@ -310,17 +310,22 @@ class Member < ActiveRecord::Base
     else
       # TODO: should we update member profile? and Credit card information?
       if member.blacklisted
-        message = "Member email is blacklisted"
+        message = "Member email is blacklisted."
         Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
         return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
       end
-      credit_card = CreditCard.new credit_card_params
+        message = "Member email is already in use."
+        Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
+        return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
     end
+
     if cc_blank == '0' and credit_card_params[:number].blank?
       message = "Credit card is blank. Insert number or allow credit card blank."
       Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_already_in_use)
       return { :message => message, :code => Settings.error_codes.credit_card_in_use }        
     end   
+
+    credit_card = CreditCard.new credit_card_params
 
     member.terms_of_membership = tom
     member.enroll(credit_card, enrollment_amount, current_agent, nil ,cc_blank, params_enrollment_info)
@@ -337,8 +342,6 @@ class Member < ActiveRecord::Base
     elsif not self.valid? 
       return { :message => "Member data is invalid", :code => Settings.error_codes.member_data_invalid }
     end   
-
-
 
     if amount.to_f != 0.0
       trans = Transaction.new
