@@ -43,10 +43,10 @@ class Member < ActiveRecord::Base
     end
   end
 
-  validates :first_name, :presence => true, :format => /^[A-Za-z '-]+$/
+  validates :first_name, :presence => true, :format => /^[A-Za-z '-.]+$/
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
             :format => /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
-  validates :last_name , :presence => true, :format => /^[A-Za-z '-]+$/
+  validates :last_name , :presence => true, :format => /^[A-Za-z '-.]+$/
   validates :phone_number, :format => /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-. ]\(?(x|int)?[0-9]?{1,10}\)?)?$/ 
   validates :address, :city, :state, :country, :presence => true, :format => /^[A-Za-z0-9 ',.\s]+$/
   validates :terms_of_membership_id , :presence => true
