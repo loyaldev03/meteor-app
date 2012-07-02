@@ -338,10 +338,7 @@ class Member < ActiveRecord::Base
       return { :message => "Member data is invalid", :code => Settings.error_codes.member_data_invalid }
     end   
 
-    enrollment_info = EnrollmentInfo.new params_enrollment_info
-    enrollment_info.member_id = self.id
-    enrollment_info.enrollment_amount = amount
-    enrollment_info.save
+
 
     if amount.to_f != 0.0
       trans = Transaction.new
@@ -356,6 +353,11 @@ class Member < ActiveRecord::Base
     
     begin
       self.save!
+      enrollment_info = EnrollmentInfo.new params_enrollment_info
+      enrollment_info.member_id = self.id
+      enrollment_info.enrollment_amount = amount
+      enrollment_info.save
+
       if credit_card.member.nil?
         credit_card.member = self
         credit_card.save
