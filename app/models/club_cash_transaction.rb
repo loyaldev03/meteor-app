@@ -3,6 +3,6 @@ class ClubCashTransaction < ActiveRecord::Base
 
   attr_accessible :amount, :description
 
-  validates :amount, :presence => true
+  validates :amount, :presence => true, :numericality => {:only_integer => true}
 
 end

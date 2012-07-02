@@ -165,7 +165,6 @@ $(document).ready( function() {
   function club_cash_functions(){
     $('form').submit( function(event) {
       event.preventDefault()
-      if ($("#club_cash_transaction_amount").val().match(/^[0-9]+?([?:\.][0-9]{0,2})?$/)){
         $.ajax({
           type: 'POST',
           url: "/api/v1/add_club_cash/"+visible_id+"/"+club_id,
@@ -176,9 +175,6 @@ $(document).ready( function() {
               window.location.replace('../'+visible_id);
           },
         });
-      }else{
-        alert("Incorrect club cash value.")
-      };
     });
   }
 
