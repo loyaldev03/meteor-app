@@ -1,6 +1,7 @@
 class EnrollmentInfo < ActiveRecord::Base
 
   belongs_to :member
+  belongs_to :prospect
 
   attr_accessible :member_id, :enrollment_amount, :product_sku, :product_description, :mega_channel,
                   :marketing_code, :fulfillment_code, :ip_address, :user_agent, :referral_host,

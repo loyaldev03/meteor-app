@@ -1,6 +1,8 @@
 class Prospect < ActiveRecord::Base
   include Extensions::UUID
 
+  has_many :enrollment_infos
+
   serialize :preferences, JSON
   serialize :referral_parameters, JSON
 

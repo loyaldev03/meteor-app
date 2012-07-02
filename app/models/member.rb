@@ -353,6 +353,7 @@ class Member < ActiveRecord::Base
     
     begin
       self.save!
+
       enrollment_info = EnrollmentInfo.new params_enrollment_info
       enrollment_info.member_id = self.id
       enrollment_info.enrollment_amount = amount
@@ -373,7 +374,7 @@ class Member < ActiveRecord::Base
       message = set_status_on_enrollment!(agent, trans, amount)
       assign_club_cash! if trans
       self.reload
-      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
+      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id, :prospect_id => enrollment_info.prospect_id }
     
 
     rescue Exception => e
