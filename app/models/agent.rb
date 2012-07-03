@@ -25,8 +25,8 @@ class Agent < ActiveRecord::Base
     :last_name, :roles
 
   validates :username, :uniqueness => true
-  validates :username, :presence => :true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
-  validates :email, :presence => :true
+  validates :username, :presence => true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
+  validates :email, :presence => true
 
   before_save :ensure_authentication_token
 

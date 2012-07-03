@@ -9,6 +9,7 @@ class Api::ProspectsController < ApplicationController
   	if prospect.save!
   	  response[:message] = "Prospect was successfuly saved."
       response[:code] = '000'
+      response[:prospect_id] = prospect.id
     end   
     render json: response
   end
