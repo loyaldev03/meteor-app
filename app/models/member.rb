@@ -314,9 +314,7 @@ class Member < ActiveRecord::Base
         Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
         return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
       end
-        message = "Member email is already in use."
-        Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
-        return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
+      credit_card = CreditCard.new credit_card_params
     end
 
     if cc_blank == '0' and credit_card_params[:number].blank?
@@ -324,8 +322,6 @@ class Member < ActiveRecord::Base
       Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_already_in_use)
       return { :message => message, :code => Settings.error_codes.credit_card_in_use }        
     end   
-
-    credit_card = CreditCard.new credit_card_params
 
     member.terms_of_membership = tom
     member.enroll(credit_card, enrollment_amount, current_agent, nil ,cc_blank, params_enrollment_info)
