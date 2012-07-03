@@ -50,7 +50,7 @@ def set_member_data(phoenix, member)
   phoenix.updated_at = member.updated_at
   phoenix.phone_number = member.phone
   phoenix.blacklisted = member.blacklisted
-  phoenix.join_date = member.join_date
+  phoenix.join_date = member.phoenix_join_date
   phoenix.member_since_date = member.member_since_date
   phoenix.api_id = member.drupal_user_api_id
   phoenix.club_cash_expire_date = member.club_cash_expire_date
@@ -91,7 +91,8 @@ end
 
 # 1- update existing members
 def update_members
-  BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) and is_prospect = false and phoenix_status IS NOT NULL ").find_in_batches do |group|
+  BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) " + 
+    " and is_prospect = false and phoenix_status IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
       PhoenixProspect.transaction do 
@@ -127,28 +128,24 @@ def update_members
             update_club_cash(member.club_cash_amount - phoenix.club_cash_amount)
           end
 
-          phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
-          if phoenix_cc.nil?
-            @log.info "  * member ##{member.id} does not have Credit Card active"
-          elsif phoenix_cc.encrypted_number != member.encrypted_cc_number or 
-                phoenix_cc.expire_month != member.cc_month_exp or 
-                phoenix_cc.expire_year != member.cc_year_exp
+          unless TEST
+            phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
+            if phoenix_cc.nil?
+              @log.info "  * member ##{member.id} does not have Credit Card active"
+            elsif phoenix_cc.encrypted_number != member.encrypted_cc_number or 
+                  phoenix_cc.expire_month != member.cc_month_exp or 
+                  phoenix_cc.expire_year != member.cc_year_exp
 
-            new_phoenix_cc = PhoenixCreditCard.new 
-            if TEST
-              new_phoenix_cc.number = "0000000000"
-            else
+              new_phoenix_cc = PhoenixCreditCard.new 
               new_phoenix_cc.encrypted_number = member.encrypted_cc_number
-              if new_phoenix_cc.number.nil?
-                new_phoenix_cc.number = "0000000000"
+              new_phoenix_cc.number = "0000000000" if new_phoenix_cc.number.nil?
+              new_phoenix_cc.expire_month = member.cc_month_exp
+              new_phoenix_cc.expire_year = member.cc_year_exp
+              new_phoenix_cc.member_id = phoenix.uuid
+              phoenix_cc.active = false
+              if new_phoenix_cc.save! && phoenix_cc.save!
+                add_operation(Time.zone.now, new_phoenix_cc, "Credit card #{new_phoenix_cc.last_digits} added and set active.", nil)
               end
-            end
-            new_phoenix_cc.expire_month = member.cc_month_exp
-            new_phoenix_cc.expire_year = member.cc_year_exp
-            new_phoenix_cc.member_id = phoenix.uuid
-
-            if new_phoenix_cc.save! && phoenix_cc.deactivate
-              add_operation(Time.zone.now, new_phoenix_cc, "Credit card #{new_phoenix_cc.last_digits} added and set active.", nil)
             end
           end
 
@@ -181,8 +178,9 @@ end
 # 2- import new members.
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
+ # " and id < 21013775003 " +
   " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
-  " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and join_date IS NOT NULL ").find_in_batches do |group|
+  " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
       PhoenixMember.transaction do 
@@ -253,5 +251,5 @@ def add_new_members
   end
 end
 
-update_members
+#update_members
 add_new_members
