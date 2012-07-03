@@ -114,19 +114,23 @@ class Member < ActiveRecord::Base
     state :applied
   end
 
+  # Sends the activation mail.
   def send_active_email
     Communication.deliver!(:active, self)
   end
 
+  # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
   def increment_reactivations
     increment!(:reactivation_times, 1)
   end
 
+  # Sets join date. It is called when members status is changed from 'none' to 'applied'
   def set_join_date
     self.join_date = Time.zone.now
     self.save
   end
 
+  # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
   def schedule_first_membership
     send_fulfillment
     self.bill_date = Time.zone.now + terms_of_membership.trial_days
@@ -140,6 +144,7 @@ class Member < ActiveRecord::Base
     self.save
   end
 
+  # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.  
   def schedule_first_membership_for_approved_member
     send_fulfillment
     self.bill_date = Time.zone.now + terms_of_membership.trial_days
@@ -151,47 +156,58 @@ class Member < ActiveRecord::Base
     self.save
   end
 
+  # Changes next bill date.
   def change_next_bill_date!(next_bill_date)
     self.next_retry_bill_date = next_bill_date
     self.bill_date = next_bill_date
     self.save!
   end
 
+  # Returns a string with first and last name concatenated. 
   def full_name
     [ first_name, last_name].join(' ').squeeze
   end
 
+  # Returns the active credit card that the member is using at the moment.
   def active_credit_card
     self.credit_cards.find_by_active(true)
   end
 
+  # Returns a string with address, city and state concatenated. 
   def full_address
     [address, city, state].join(' ')
   end
 
   ####  METHODS USED TO SHOW OR NOT BUTTONS. 
+
+  # Returns true if members is lapsed.
   def can_be_canceled?
     !self.lapsed?
   end
 
+  # Returns true if member is applied. 
   def can_be_approved?
     self.applied?
   end
 
+  # Returns true if member is applied.
   def can_be_rejected?
     self.applied?
   end
 
+  # Returns true if member is active or provisional.
   def can_save_the_sale?
     self.active? or self.provisional?
   end
 
+  # Returns true if member is active or provisional.
   def can_bill_membership?
     self.active? or self.provisional?
   end
 
-  # Add logic to recover some one max 3 times in 5 years
+  # Returns true if member is lapsed or if it didnt reach the max reactivation times.
   def can_recover?
+  # Add logic to recover some one max 3 times in 5 years
     self.lapsed? and reactivation_times < Settings.max_reactivations
   end
 
@@ -220,6 +236,7 @@ class Member < ActiveRecord::Base
     end
   end
 
+  # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
   def recover(new_tom_id, agent = nil)
     self.terms_of_membership_id = new_tom_id
     enroll(self.active_credit_card, 0.0, agent)
@@ -415,10 +432,12 @@ class Member < ActiveRecord::Base
     end
   end
 
+  # Returns mega_chanel related to member's enrollment_info
   def mega_channel
     EnrollmentInfo.find_by_member_id(self.id).mega_channel
   end
 
+  # Sets mega_chanel related to member's enrollment_info
   def mega_channel=(value)
     self.enrollment_info.mega_channel ||= {}
     self.enrollment_info.mega_channel = value
@@ -433,21 +452,26 @@ class Member < ActiveRecord::Base
   end
 
   ##################### Club cash ####################################
+
+  # Resets member club cash in case of a cancelation. It calls "add_club_cash" method
   def nillify_club_cash
     add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation') unless club_cash_amount.to_f == 0.0
   end
 
+  # Resets member club cash in case the club cash has expired. It calls "add_club_cash" method
   def reset_club_cash
     add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.') unless club_cash_amount.to_f == 0.0
     assign_club_cash!('Renewing club cash.')
   end
 
+  # Adds club cash when enrolling. It calls "add_club_cash" method
   def assign_club_cash!(message = "Adding club cash on new enrollment.")
     self.add_club_cash(nil, terms_of_membership.club_cash_amount, message)
     self.club_cash_expire_date = self.join_date + 1.year
     self.save!
   end
   
+  # Adds club cash transaction. 
   def add_club_cash(agent,amount,description = nil)
     answer = {}
     ClubCashTransaction.transaction do 
