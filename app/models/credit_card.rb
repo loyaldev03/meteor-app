@@ -33,6 +33,10 @@ class CreditCard < ActiveRecord::Base
   def blacklist_active_credit_card
     update_attribute :blacklisted, true
   end
+  
+  def error_to_s(delimiter = "\n")
+    self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
+  end
 
   def self.am_card(number, expire_month, expire_year, first_name, last_name)
     ActiveMerchant::Billing::CreditCard.require_verification_value = false

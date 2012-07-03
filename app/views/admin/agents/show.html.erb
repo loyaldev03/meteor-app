@@ -54,6 +54,13 @@
   <%= @agent.username %>
 </p>
 
+<% if @agent.authentication_token.present? %>
+  <p>
+    <strong><%= model_class.human_attribute_name(:authentication_token) %>:</strong><br>
+    <%= @agent.authentication_token %>
+  </p>
+<% end %>
+
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),
               admin_agents_path, :class => 'btn'  %>

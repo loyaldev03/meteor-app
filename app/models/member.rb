@@ -276,6 +276,10 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def error_to_s(delimiter = "\n")
+    self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
+  end
+
   def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0', params_enrollment_info = nil)
     club = tom.club
     # Member exist?
@@ -293,9 +297,8 @@ class Member < ActiveRecord::Base
         member.created_by_id = current_agent.id
         member.terms_of_membership = tom
         unless member.valid? and credit_card.valid?
-          errors = member.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n") + 
-                    credit_card.errors.collect {|attr, message| "#{attr}: #{message}" }.join("\n")
-          return { :message => "Member data is invalid: #{errors}", :code => Settings.error_codes.member_data_invalid }
+          errors = member.error_to_s + credit_card.error_to_s
+          return { :message => "Member data is invalid: \n#{errors}", :code => Settings.error_codes.member_data_invalid }
         end
         # enroll allowed
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
@@ -405,7 +408,7 @@ class Member < ActiveRecord::Base
   end
 
   def api_member
-    @api_member ||= if club.api_type.nil?
+    @api_member ||= if [club.api_type, club.api_username, club.api_password].any?(&:nil?)
       nil
     else
       club.api_type.constantize.new self
@@ -458,8 +461,7 @@ class Member < ActiveRecord::Base
         Auditory.audit(agent, cct, message, self)
         answer = { :message => message, :code => Settings.error_codes.success }
       rescue Exception => e
-        errors = cct.errors.collect {|attr, message| "#{attr}: #{message}" }.join(". ")
-        message = "Could not saved club cash transactions: #{errors}"
+        message = "Could not saved club cash transactions: #{cct.error_to_s}"
         Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => message)
         answer = { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful  }
         raise ActiveRecord::Rollback

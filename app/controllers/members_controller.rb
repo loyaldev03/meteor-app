@@ -201,8 +201,7 @@ class MembersController < ApplicationController
         flash[:notice] = message
         redirect_to show_member_path
       else
-        errors = cct.errors.collect {|attr, message| "#{attr}: #{message}" }.join(". ")
-        flash[:error] = "Could not saved club cash transactions: #{errors}"
+        flash[:error] = "Could not saved club cash transactions: #{cct.error_to_s}"
       end
     end
   end
