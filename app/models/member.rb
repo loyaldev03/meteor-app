@@ -158,7 +158,7 @@ class Member < ActiveRecord::Base
   end
 
   def full_name
-    [ first_name, last_name].join(' ')
+    [ first_name, last_name].join(' ').squeeze
   end
 
   def active_credit_card
