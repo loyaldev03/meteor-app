@@ -405,7 +405,7 @@ class Member < ActiveRecord::Base
   end
 
   def api_member
-    @api_member ||= if club.api_type.nil?
+    @api_member ||= if [club.api_type, club.api_username, club.api_password].any?(&:nil?)
       nil
     else
       club.api_type.constantize.new self
