@@ -49,6 +49,10 @@ class Admin::AgentsController < ApplicationController
   # PUT /agents/1
   # PUT /agents/1.xml
   def update
+    if params[:agent] && params[:agent][:password].blank?
+      params[:agent].delete(:password)
+      params[:agent].delete(:password_confirmation)
+    end
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
         format.html { redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') }
