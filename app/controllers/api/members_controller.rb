@@ -3,18 +3,65 @@ class Api::MembersController < ApplicationController
 
   respond_to :json
 
+  # Terms of the membership ID that which the memeber is enrolling with.
+  attr_reader :terms_of_membership_id
+
+  # Information related the member that is submitting to enroll.
+  # It has the following information:
+  # {first_name, last_name, email, address, city, state, zip, country, phone_number }
+  attr_reader :member
+
+  # Member's credit card information. 
+  # It has the following information:
+  # { expire_month, expire_year, number }
+  attr_reader :credit_card
+
+  # Adition information submited when the member enrolls. We storage that information for further reports.
+  # It has the following information:
+  # { member_id, prospect_id, enrollment_amount, product_sku, product_description, mega_channel, marketing_code, fulfillment_code, ip_address, user_agent, :referral_host,
+  # referral_parameters, referral_path, user_id, landing_url, terms_of_membership_id,
+  # preferences, cookie_value, cookie_set, campaign_medium, campaign_description,
+  # campaign_medium_version, is_joint }
+  attr_reader :enrollment_info
+
+  # Shows the method results and also informs the errors.
+  attr_reader :message
+
+  # Code related to the method result.
+  attr_reader :code
+
+  # Visible id of the member that was enrolled or recovered, or updated.
+  attr_reader :v_id
+
+  # Prospect id related to the member that was enrolled, or recoverd or updated. 
+  attr_reader :prospect_id
+
+  # ID that sends drupal.
+  attr_reader :api_id
+
+  # ID of the member.
+  attr_reader :id
+
+  # Club id that the member belongs to.
+  attr_reader :club_id
+
+  # Club cash information neccesary to add a club cash transaction. 
+  # It has the following information:{ amount, description }
+  attr_reader :club_cash_transaction
+
   # Method : POST
-  #
-  # Params:
-  #  * terms_of_membership_id
-  #  * member { :first_name, :last_name, :email, :address, :city, :state, :zip, :country, :phone_number }
-  #  * credit_card { :expire_month, :expire_year, :number }
-  #  * enrollment_info {:member_id, :prospect_id, :enrollment_amount, :product_sku, :product_description, :mega_channel,
-  #                     :marketing_code, :fulfillment_code, :ip_address, :user_agent, :referral_host,
-  #                     :referral_parameters, :referral_path, :user_id, :landing_url, :terms_of_membership_id,
-  #                     :preferences, :cookie_value, :cookie_set, :campaign_medium, :campaign_description,
-  #                     :campaign_medium_version, :is_joint }
   # 
+  # Recieves: 
+  # * terms_of_membership_id
+  # * member
+  # * credit_card
+  # * enrollment_info 
+  # Returns: 
+  # * message 
+  # * code
+  # * v_id 
+  # * prospect_id
+  #
 
   def enroll
     response = {}
@@ -22,18 +69,21 @@ class Api::MembersController < ApplicationController
     if tom.nil?
       response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
     else
-      response = Member.enroll(tom, current_agent, params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:setter][:cc_blank], params[:enrollment_info])
+      response = Member.enroll(tom, current_agent, (params[:enrollment_info][:enrollment_amount] if params[:enrollment_info]), params[:member], params[:credit_card], params[:setter][:cc_blank], params[:enrollment_info])
     end
     render json: response
   end
 
-
   # Method : PUT
   #
-  # Params:
-  #  * id
-  #  * club_id
-  #  * member { :first_name, :last_name, :email, :address, :city, :state, :zip, :phone_number }
+  # Recieves: 
+  # * id
+  # * club_id 
+  # * member 
+  # Returns: 
+  # * message 
+  # * code
+  # * v_id 
   # 
   def update_profile
     response = {}
@@ -52,12 +102,12 @@ class Api::MembersController < ApplicationController
     render json: response
   end
 
-
   # Method : GET
   #
-  # Params:
-  #  * api_id
-  #  * club_id
+  # Recieves:
+  # * api_id
+  # * club_id
+  #
   def profile
     member = Member.find_by_api_id_and_club_id(params[:api_id],params[:club_id]) 
     if member.nil?
@@ -80,11 +130,13 @@ class Api::MembersController < ApplicationController
 
   # Method : POST
   #
-  # Params:
-  #  * "drupal_user_id" and "domain" if its being requested from drupal.
-  #  * "id" and "club_id" if its being requested from the platform. 
-  #  * club_cash_transaction => { amount, description}
-  # 
+  # Recieves:
+  # * "drupal_user_id" and "domain" if its being requested from drupal.
+  # * "id" and "club_id" if its being requested from the platform. 
+  # * club_cash_transaction.
+  # Returns:
+  # * message 
+  # * code
   def add_club_cash
     response = {}
     member_id = params[:drupal_user_id] || params[:id]
