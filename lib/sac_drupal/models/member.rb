@@ -1,6 +1,6 @@
 module Drupal
   class Member < Struct.new(:member)
-    OBSERVED_FIELDS = %w(first_name last_name address city phone_number state zip visible_id).to_set.freeze
+    OBSERVED_FIELDS = %w(first_name last_name address city email phone_number state zip country visible_id).to_set.freeze
 
     def get
       res = conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }).body unless self.new_record?

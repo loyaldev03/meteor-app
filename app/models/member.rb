@@ -27,6 +27,7 @@ class Member < ActiveRecord::Base
   after_update :after_update_sync_remote_domain
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
 
+  # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
   REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_number' ]
 
   def after_create_sync_remote_domain
@@ -287,7 +288,6 @@ class Member < ActiveRecord::Base
 
       if credit_cards.empty? or cc_blank == '1'
         member = Member.new member_params
-        # TBD new member with api_id comes from Drupal so do not update... or current_agent.api?
         member.skip_api_sync! if member.api_id.present? 
         member.club = club
         member.created_by_id = current_agent.id
