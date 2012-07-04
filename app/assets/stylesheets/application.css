@@ -84,3 +84,21 @@ div.dataTables_filter input {
 #operations_table_info{
 	width:33%;
 }
+
+.btn_on_header {
+	float: right; 
+	margin-top: -25px;
+}
+
+.span_box {
+	border: 1px solid #60A4CB;
+	padding: 5px;
+}
+
+.span_box_title {
+	background-color: #B0D3E6;
+}
+
+.datepicker_for_search {
+	width: 120px;
+}

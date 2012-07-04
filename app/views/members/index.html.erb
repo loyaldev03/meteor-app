@@ -1,76 +1,123 @@
-<h1>Search</h1>
-<% if can? :enroll_member, @current_agent %>
-  <p><%= link_to 'New Member', new_member_path, :class => "btn btn-primary icon-user"  %></p>
-<% end %>
+<%= render :partial => 'shared/breadcrumb' %>
+
 <%= form_tag(members_path, :method => 'post', :id => 'at_least_one_required' ,:html => { :class => 'well form-inline' }) do |f| %>
 
-  <table class="table table-bordered table-condensed">
-    <tr>
-      <td>
-        <%= t('activerecord.attributes.member.member_id') %>
-        <%= text_field :member, :member_id, :class => 'test_field', 
-                       :value => (params[:member][:member_id] if params[:member])%>
-      </td>
-      <td>
-        <%= t('activerecord.attributes.member.first_name') %>
-        <%= text_field :member, :first_name, :class => 'test_field', 
-                       :value => (params[:member][:first_name] if params[:member]) %>
-      </td>
-      <td>
-        <%= t('activerecord.attributes.member.last_name') %>
-        <%= text_field :member, :last_name, :class => 'test_field',
-                       :value => (params[:member][:last_name] if params[:member]) %>
-      </td>
-      <td>
-        <%= t('activerecord.attributes.member.address') %>
-        <%= text_field :member, :address, :class => 'test_field',
-                       :value => (params[:member][:address] if params[:member]) %>
-      </td>
-      <td>
-        <%= t('activerecord.attributes.member.phone_number') %>
-        <%= text_field :member, :phone_number, :class => 'test_field',
-                       :value => (params[:member][:phone_number] if params[:member]) %>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <%= t('activerecord.attributes.member.city') %>
-        <%= text_field :member, :city, :class => 'test_field',
-                       :value => (params[:member][:city] if params[:member]) %>
-      </td>
-      <td>
-        <%= t('activerecord.attributes.member.state') %>
-        <%= text_field :member, :state, :class => 'test_field',
-                       :value => (params[:member][:state] if params[:member]) %>
-      </td>
-      <td>
-        <%= t('activerecord.attributes.member.zip') %>
-        <%= text_field :member, :zip, :class => 'test_field',
-                       :value => (params[:member][:zip] if params[:member]) %>
-      </td>
-      <td>
-        <%= t('activerecord.attributes.member.email') %>
-        <%= text_field :member, :email, :class => 'text_field',
-                       :value => (params[:member][:email] if params[:member]) %>         
-      </td>
-      <td> 
-        <%= t('activerecord.credit_card') %>
-        <%= t('activerecord.attributes.credit_card.last_digits') %>
-        <%= text_field :member, :last_digits, :class => 'text_field',
-                       :value => (params[:member][:last_digits] if params[:member]) %> 
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" style='padding: 8px'> 
-        <%= t('activerecord.attributes.credit_card.next_bill_date') %>
-        <%= text_field :member, :next_retry_bill_date, :class => 'text_field datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:next_retry_bill_date] if params[:member]) %> 
-      </td>
-      <td colspan="3" style='padding: 8px'> 
-        <%= submit_tag  t('search'), :class => "btn btn-inverse" %>
-        <%= link_to t('clear'), '#', :id => "clear_form", :class=>"btn icon-refresh"%>
-      </td>
-    </tr>
-  </table>
+<section>
+  <div class="page-header">
+    <h1>Search</h1>
+    <% if can? :enroll_member, @current_agent %>
+      <%= link_to 'New Member', new_member_path, :class => "btn btn-primary icon-user btn_on_header" %>
+    <% end %>
+  </div>
+ 
+  <div class="row-fluid">
+
+    <div class="span4">
+      <div class="well" style="min-height: 250px;">
+        <h3>Personal Details</h3>
+        <p>
+         <table>
+            <tr>
+              <td><%= t('activerecord.attributes.member.member_id') %></td>
+              <td>  <%= text_field :member, :member_id, :class => 'test_field', 
+                               :value => (params[:member][:member_id] if params[:member])%>
+              </td>
+            </tr>
+            <tr>
+              <td><%= t('activerecord.attributes.member.first_name') %></td>
+              <td><%= text_field :member, :first_name, :class => 'test_field', 
+                               :value => (params[:member][:first_name] if params[:member]) %>
+              </td>
+            </tr>
+            <tr>
+              <td><%= t('activerecord.attributes.member.last_name') %></td>
+              <td><%= text_field :member, :last_name, :class => 'test_field',
+                               :value => (params[:member][:last_name] if params[:member]) %>
+              </td>
+            </tr>
+            <tr>
+              <td><%= t('activerecord.attributes.member.email') %></td>
+              <td><%= text_field :member, :email, :class => 'text_field',
+                               :value => (params[:member][:email] if params[:member]) %>         
+              </td>
+            </tr>
+            <tr>
+              <td><%= t('activerecord.attributes.member.phone_number') %></td>
+              <td><%= text_field :member, :phone_number, :class => 'test_field',
+                               :value => (params[:member][:phone_number] if params[:member]) %>
+              </td>
+            </tr>
+          </table>
+
+        </p>
+      </div>
+    </div>
+    <div class="span4">
+      <div class="well" style="min-height: 250px;">
+        <h3>Contact Details</h3>
+        <p>
+          <table>
+            <tr>
+              <td><%= t('activerecord.attributes.member.city') %></td>
+              <td><%= text_field :member, :city, :class => 'test_field',
+                               :value => (params[:member][:city] if params[:member]) %>
+              </td>
+            </tr>
+            <tr>
+              <td><%= t('activerecord.attributes.member.state') %></td>
+              <td><%= text_field :member, :state, :class => 'test_field',
+                               :value => (params[:member][:state] if params[:member]) %>
+              </td>
+            </tr>
+            <tr>
+              <td><%= t('activerecord.attributes.member.address') %></td>
+              <td><%= text_field :member, :address, :class => 'test_field',
+                               :value => (params[:member][:address] if params[:member]) %>
+              </td>
+            </tr>
+            <tr>
+              <td><%= t('activerecord.attributes.member.zip') %></td>
+              <td><%= text_field :member, :zip, :class => 'test_field',
+                               :value => (params[:member][:zip] if params[:member]) %>
+              </td>
+            </tr>
+            
+          </table>
+        </p>
+      </div>
+    </div><!--/span-->
+    <div class="span4">
+      <div class="well" style="min-height: 250px;">
+        <h3>Payment Details</h3>
+        
+        <p>
+         <table>
+            <tr>
+              <td><%= t('activerecord.attributes.credit_card.next_bill_date') %></td>
+              <td>
+                <%= text_field :member, :next_retry_bill_date, :class => 'text_field datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:next_retry_bill_date] if params[:member]) %> 
+              </td>
+            </tr>
+            <tr>
+              <td><%= t('activerecord.credit_card') %> <%= t('activerecord.attributes.credit_card.last_digits') %></td>
+              <td>
+                <%= text_field :member, :last_digits, :class => 'text_field',
+                               :value => (params[:member][:last_digits] if params[:member]) %> 
+              </td>
+            </tr>
+            
+          </table>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <p style="text-align: right;">
+      <%= submit_tag  t('search'), :class => "btn btn-inverse" %></td>
+      <%= link_to t('clear'), '#', :id => "clear_form", :class=>"btn icon-refresh"%>
+    </p>
+  </div>
+</section>
 
   <% if !@members.nil? %>
   <div class="tab-pane" id="members">

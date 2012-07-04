@@ -18,5 +18,6 @@
 //= require twitter/bootstrap/bootstrap-tab.js
 //= require twitter/bootstrap/bootstrap-tooltip.js
 //= require twitter/bootstrap/bootstrap-popover.js
+//= require twitter/bootstrap/bootstrap-dropdown.js
 //= require bootstrap-modal.js
 //= require general
