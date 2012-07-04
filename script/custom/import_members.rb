@@ -54,11 +54,13 @@ def set_member_data(phoenix, member)
   phoenix.member_since_date = member.member_since_date
   phoenix.api_id = member.drupal_user_api_id
   phoenix.club_cash_expire_date = member.club_cash_expire_date
+  if member.is_chapter_member
+    phoenix.member_group_type = MEMBER_GROUP_TYPE
+  else
+    phoenix.member_group_type = nil
+  end
 end
 def add_enrollment_info(phoenix, member)
-  # TODO: not developed yet
-  return
-
   e_info = PhoenixEnrollmentInfo.find_by_member_id(phoenix.id)
   if e_info.nil?
     e_info = PhoenixEnrollmentInfo.new 
