@@ -2,6 +2,22 @@
 
 require_relative 'import_models'
 
+
+# JS Description of TOM ,Name of TOM (string),Grace Period,Payment Type,NeedsEnrollmentApproval (boolean),Membership Amount ,CID (Club ID) -- just put the club name here for now ,TID  - leave this blank - it's the id of the TOM that we'll create
+
+campaigns = [
+  [ "84 Annual",,0,"Yearly","No",84,"ONMC"],
+  [ "59.95 Annual ",,0,"Yearly","No",59.95,"ONMC"],
+  [ "Monthly 9.95 ",,0,"Monthly","No",9.95,"ONMC"],
+  [ "Monthly 10 ",,0,"Monthly","No",10,"ONMC"],
+  [ "40 Annual ",,0,"Annual ","No",40,"ONMC"],
+  [ "64 Annual",,0,"Annual ","No",64,"ONMC"],
+  [ "59 Annual ",,0,"Annual ","No",59,"ONMC"],
+  [ "Monthly 5.95 ",,0,"Monthly ","No",5.95,"ONMC"],
+  [ "Monthly 14.95",,0,"Monthly","No",14.95,"ONMC "]
+]
+
+
 # "Email Name ","MLID","Trigger ID","Corresponding Event Name","Recurring","Before or After","Day","Notes"
 
 annual_sloop = [
@@ -124,7 +140,31 @@ def upload_email_services(communications, tom_id)
   end
 end
 
-[ { :text => '%Annual%Sloop%', :array => annual_sloop } ].each do |text, array|
+
+# JS Description of TOM ,Name of TOM (string),Grace Period,Payment Type,NeedsEnrollmentApproval (boolean),Membership Amount ,CID (Club ID) -- just put the club name here for now ,TID  - leave this blank - it's the id of the TOM that we'll create
+
+campaigns.each do |description, name, grace_period, payment_type, enrollment?, amount|
+  m = PhoenixTermsOfMembership.new 
+  m.installment_amount = amount
+  m.installment_type = (payment_type == 'Yearly' ? '1.year' : '1.month')
+  m.needs_enrollment_approval = false
+  m.name = description
+  m.description = description
+  m.grace_period = grace_period
+  m.club_id = CLUB
+  m.trial_days = 0 # join now
+  m.mode = "production"
+  m.club_cash_amount = 150
+  m.save
+end
+
+
+
+[ { :text => '%Annual%Sloop%', :array => annual_sloop }, 
+  { :text => '%Annual%Join%', :array => annual_join_now },
+  { :text => '%Annual%Ptx%', :array => annual_ptx },
+  { :text => '%Monthly%Sloop%', :array => monthly_sloops } 
+].each do |text, array|
   PhoenixTermsOfMembership.where(" name like '#{text}' ").find_in_batches do |group|
     group.each do |tom| 
       upload_email_services(array, tom.id)
