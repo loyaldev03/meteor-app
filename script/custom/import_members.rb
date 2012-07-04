@@ -191,6 +191,9 @@ def add_new_members
           phoenix = PhoenixMember.new 
           phoenix.club_id = CLUB
           phoenix.terms_of_membership_id = get_terms_of_membership_id(member.campaign_id)
+          # do not load member if it does not have TOM set
+          next if phoenix.terms_of_membership_id.nil?
+
           phoenix.visible_id = member.id
           set_member_data(phoenix, member)
           next_bill_date = member.cs_next_bill_date

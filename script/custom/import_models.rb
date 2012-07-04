@@ -345,13 +345,13 @@ end
 ###########################   FUNCTIONS             ####################################################
 ########################################################################################################
 
-# TODO: use campaign id to find this value!
 def get_terms_of_membership_id(campaign_id)
-  TERMS_OF_MEMBERSHIP # BillingCampaign.find_by_id(campaign_id).terms_of_membership_id
+  b = BillingCampaign.find_by_id(campaign_id)
+  b.nil? ? nil : b.terms_of_membership_id
 end
-# TODO: => 
+
 def get_terms_of_membership_name(tom_id)
-  "test"
+  PhoenixTermsOfMembership.find_by_id(tom_id)
 end
 
 def get_agent(author = 999)
