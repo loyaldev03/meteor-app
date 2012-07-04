@@ -30,6 +30,8 @@ class Member < ActiveRecord::Base
   # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
   REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_number' ]
 
+  REGEX_FIRST_NAME = /^[A-Za-z '-.]+$/
+
   def after_create_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
   rescue Exception => e
@@ -44,7 +46,7 @@ class Member < ActiveRecord::Base
     end
   end
 
-  validates :first_name, :presence => true, :format => /^[A-Za-z '-.]+$/
+  validates :first_name, :presence => true, :format => REGEX_FIRST_NAME
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
             :format => /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
   validates :last_name , :presence => true, :format => /^[A-Za-z '-.]+$/
