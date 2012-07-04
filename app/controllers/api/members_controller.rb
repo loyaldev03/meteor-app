@@ -45,6 +45,9 @@ class Api::MembersController < ApplicationController
   # Club id that the member belongs to.
   attr_reader :club_id
 
+  #
+  attr_reader :drupal_user_id
+
   # Club cash information neccesary to add a club cash transaction. 
   # It has the following information:{ amount, description }
   attr_reader :club_cash_transaction
@@ -130,20 +133,18 @@ class Api::MembersController < ApplicationController
   # Method : POST
   #
   # Recieves:
-  # * "drupal_user_id" and "domain" if its being requested from drupal.
-  # * "id" and "club_id" if its being requested from the platform. 
+  # * id
+  # * club_id
   # * club_cash_transaction.
   # Returns:
   # * message 
   # * code
   def add_club_cash
     response = {}
-    member_id = params[:drupal_user_id] || params[:id]
-    club_id = params[:domain] || params[:club_id]
     amount = params[:club_cash_transaction][:amount] || params[:amount]
     description = params[:club_cash_transaction][:description] if params[:club_cash_transaction]
     
-    member = Member.find_by_visible_id_and_club_id(member_id, club_id)  
+    member = Member.find_by_visible_id_and_club_id(params[:id], params[:club_id])  
     if member.nil?
       response = { :message => "Member not found", :code => Settings.error_codes.not_found }  
     else
