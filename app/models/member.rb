@@ -30,7 +30,20 @@ class Member < ActiveRecord::Base
   # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
   REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_number' ]
 
-  REGEX_FIRST_NAME = /^[A-Za-z '-.]+$/
+  #Validates that there are no invalid charactes in the name. 
+  REGEX_FIRST_AND_LAST_NAME = /^[A-Za-z '-.]+$/
+
+  #Validates numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
+  REGEX_PHONE_NUMBER = /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-. ]\(?(x|int)?[0-9]?{1,10}\)?)?$/ 
+
+  #Validates that there are no invalid charactes in the address. 
+  REGEX_ADDRESS = /^[A-Za-z0-9 -',.\s]+$/
+
+  #Validates that there are no invalid charactes in the country. 
+  REGEX_CITY_AND_STATE_AND_COUNTRY = /^[A-Za-z0-9 ',.\s]+$/
+
+  #Only allows zips with the format: xxxxx or xxxxx-xxxx. Only numbers.
+  REGEX_ZIP = /^[0-9]{5}(-?[0-9]{4})?$/
 
   def after_create_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
@@ -46,14 +59,14 @@ class Member < ActiveRecord::Base
     end
   end
 
-  validates :first_name, :presence => true, :format => REGEX_FIRST_NAME
+  validates :first_name, :last_name, :presence => true, :format => REGEX_FIRST_AND_LAST_NAME
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
             :format => /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
-  validates :last_name , :presence => true, :format => /^[A-Za-z '-.]+$/
-  validates :phone_number, :format => /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-. ]\(?(x|int)?[0-9]?{1,10}\)?)?$/ 
-  validates :address, :city, :state, :country, :presence => true, :format => /^[A-Za-z0-9 ',.\s]+$/
+  validates :phone_number, :format => REGEX_PHONE_NUMBER
+  validates :address, :city, :format => REGEX_ADDRESS
+  validates :state, :country, :presence => true, :format => REGEX_CITY_AND_STATE_AND_COUNTRY
   validates :terms_of_membership_id , :presence => true
-  validates :zip, :presence => true, :format => /^[0-9]{5}(-?[0-9]{4})?$/
+  validates :zip, :presence => true, :format => REGEX_ZIP
 
   scope :synced, lambda { |bool=true|
     bool ?

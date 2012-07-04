@@ -106,9 +106,9 @@
   </thead>  
   <tr>
     <td NOWRAP> <%= t('activerecord.attributes.member.member_since_date') %>: 
-         <%= I18n.l @current_member.member_since_date, :format => :dashed %> </td>
+         <%= I18n.l @current_member.member_since_date, :format => :only_date %> </td>
     <td NOWRAP> <%= t('activerecord.attributes.member.join_date') %>: 
-         <%= I18n.l @current_member.join_date, :format => :dashed %> </td>
+         <%= I18n.l @current_member.join_date, :format => :only_date %> </td>
     <td>
       <%= t('activerecord.attributes.member.next_retry_bill_date') %>: <%= @current_member.next_retry_bill_date %>
       <%= link_to('Change', member_change_next_bill_date_path, :class => "btn btn-warning") unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
