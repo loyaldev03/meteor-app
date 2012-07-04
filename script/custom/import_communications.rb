@@ -2,20 +2,8 @@
 
 require_relative 'import_models'
 
-
-# JS Description of TOM ,Name of TOM (string),Grace Period,Payment Type,NeedsEnrollmentApproval (boolean),Membership Amount ,CID (Club ID) -- just put the club name here for now ,TID  - leave this blank - it's the id of the TOM that we'll create
-
-campaigns = [
-  [ "84 Annual",,0,"Yearly","No",84,"ONMC"],
-  [ "59.95 Annual ",,0,"Yearly","No",59.95,"ONMC"],
-  [ "Monthly 9.95 ",,0,"Monthly","No",9.95,"ONMC"],
-  [ "Monthly 10 ",,0,"Monthly","No",10,"ONMC"],
-  [ "40 Annual ",,0,"Annual ","No",40,"ONMC"],
-  [ "64 Annual",,0,"Annual ","No",64,"ONMC"],
-  [ "59 Annual ",,0,"Annual ","No",59,"ONMC"],
-  [ "Monthly 5.95 ",,0,"Monthly ","No",5.95,"ONMC"],
-  [ "Monthly 14.95",,0,"Monthly","No",14.95,"ONMC "]
-]
+# "CID ","TOM TRIAL_DAYS","Mega Channel","TOM Membership_amount","Tom Membership_Type","Campaign Description","Campaign Medium","Campaign Medium Version ","Referral Host","Marketing Code","fulfillment_code","Product Description","Product ID ","Landing URL  ","Notes","Joint"
+campaigns_list = File.open('campaigns_toms.csv')
 
 
 # "Email Name ","MLID","Trigger ID","Corresponding Event Name","Recurring","Before or After","Day","Notes"
@@ -141,33 +129,45 @@ def upload_email_services(communications, tom_id)
 end
 
 
-# JS Description of TOM ,Name of TOM (string),Grace Period,Payment Type,NeedsEnrollmentApproval (boolean),Membership Amount ,CID (Club ID) -- just put the club name here for now ,TID  - leave this blank - it's the id of the TOM that we'll create
 
-campaigns.each do |description, name, grace_period, payment_type, enrollment?, amount|
-  m = PhoenixTermsOfMembership.new 
-  m.installment_amount = amount
-  m.installment_type = (payment_type == 'Yearly' ? '1.year' : '1.month')
-  m.needs_enrollment_approval = false
-  m.name = description
-  m.description = description
-  m.grace_period = grace_period
-  m.club_id = CLUB
-  m.trial_days = 0 # join now
-  m.mode = "production"
-  m.club_cash_amount = 150
-  m.save
-end
+# "CID ","TOM TRIAL_DAYS","Mega Channel","TOM Membership_amount","Tom Membership_Type","Campaign Description","Campaign Medium","Campaign Medium Version ","Referral Host","Marketing Code","fulfillment_code","Product Description","Product ID ","Landing URL  ","Notes","Joint"
+campaigns_list = File.open('campaigns_toms.csv')
+campaigns_list.each |line|
+  cid, trial, channel, amount, type, y = line.split(',')
+  payment_type = ( type == 'Yearly' ? '1.year' : '1.month' )
 
+  next if type.blank? 
 
+  m = PhoenixTermsOfMembership.find_by_club_id_and_installment_amount_and_installment_type_and_trial_days(CLUB, amount, payment_type, trial)
+  if m.nil?
+    m = PhoenixTermsOfMembership.new 
+    m.installment_amount = amount
+    m.installment_type = payment_type
+    m.needs_enrollment_approval = false
+    m.name = "#{type} - #{channel} - #{amount}"
+    m.description = m.name
+    m.grace_period = grace_period
+    m.club_id = CLUB
+    m.trial_days = 0 # join now
+    m.mode = "production"
+    m.club_cash_amount = 150
+    m.save!
+  end
 
-[ { :text => '%Annual%Sloop%', :array => annual_sloop }, 
-  { :text => '%Annual%Join%', :array => annual_join_now },
-  { :text => '%Annual%Ptx%', :array => annual_ptx },
-  { :text => '%Monthly%Sloop%', :array => monthly_sloops } 
-].each do |text, array|
-  PhoenixTermsOfMembership.where(" name like '#{text}' ").find_in_batches do |group|
-    group.each do |tom| 
-      upload_email_services(array, tom.id)
+  if type == 'Yearly'
+    if channel == 'PTX'
+      upload_email_services(annual_ptx, m.id)
+    end
+    if channel.include?('SLOOP')
+      upload_email_services(annual_sloop, m.id)
+    end
+    if channel.include?('')
+      upload_email_services(annual_join_now, m.id)
+    end
+  else
+    if channel.include?('SLOOP')
+      upload_email_services(monthly_sloops, m.id)
     end
   end
 end
+
