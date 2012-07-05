@@ -6,18 +6,17 @@ class Api::MembersController < ApplicationController
 
 
   # Method : POST
-  # 
-  # Recieves: 
-  # * terms_of_membership_id
-  # * member: Information related to the member that is submitting to enroll.
-  # * credit_card: Information related to member's credit card. 
-  # * enrollment_info: Adition information submited when the member enrolls. We storage that information for further reports. 
-  # Returns: 
-  # * message: Shows the method results and also informs the errors.
-  # * code: Code related to the method result.
-  # * v_id: Visible id of the member that was enrolled or recovered, or updated.
-  # * prospect_id
+  # Submits a member to be enrolled  
   #
+  # @param [Integer] terms_of_membership_id
+  # @param [Hash] member: Information related to the member that is submitting to enroll.
+  # @param [Hash] credit_card: Information related to member's credit card. 
+  # @param [Hash] enrollment_info: Adition information submited when the member enrolls. We storage that information for further reports. 
+  # @return [String] *message*: Shows the method results and also informs the errors.
+  # @return [Integer] *code*: Code related to the method result.
+  # @return [Integer] *v_id*: Visible id of the member that was enrolled or recovered, or updated.
+  # @return [String] *prospect_id*
+  # 
   def enroll
     response = {}
     tom = TermsOfMembership.find_by_id(params[:terms_of_membership_id])  
@@ -30,15 +29,14 @@ class Api::MembersController < ApplicationController
   end
 
   # Method : PUT
+  # Updates a member data.
   #
-  # Recieves: 
-  # * id: ID of the member.
-  # * club_id
-  # * member
-  # Returns: 
-  # * message: Shows the method results and also informs the errors. 
-  # * code: Code related to the method result.
-  # * v_id: Visible id of the member that was enrolled or recovered, or updated.
+  # @param [Integer] id: Visible ID of member.
+  # @param [Integer] club_id .
+  # @param [Hash] member: Information related to the member that is being updated.
+  # @return [String] *message*: Shows the method results and also informs the errors.
+  # @return [Integer] *code*: Code related to the method result.
+  # @return [Integer] *v_id*: Visible id of the member that was enrolled or recovered, or updated.
   # 
   def update_profile
     response = {}
@@ -57,10 +55,13 @@ class Api::MembersController < ApplicationController
   end
 
   # Method : GET
+  # Returns information related to member and its credit card.
   #
-  # Recieves:
-  # * api_id: ID that sends drupal.
-  # * club_id
+  # @param [Integer] api_id: Member ID that sends drupal.
+  # @param [Integer] club_id.
+  # @return [Hash] *member*: Information of member profile.
+  # @return [Hash] *credit_card*: Information of member's credit card.
+  # @return [Integer] *code*: Code related to the method result.
   #
   def profile
     member = Member.find_by_api_id_and_club_id(params[:api_id],params[:club_id]) 
