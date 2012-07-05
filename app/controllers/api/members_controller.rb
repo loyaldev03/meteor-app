@@ -18,18 +18,13 @@ class Api::MembersController < ApplicationController
   # * v_id: Visible id of the member that was enrolled or recovered, or updated.
   # * prospect_id
   #
-
   def enroll
     response = {}
     tom = TermsOfMembership.find_by_id(params[:terms_of_membership_id])  
-    if params[:enrollment_info][:enrollment_amount]
-      if tom.nil?
-        response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
-      else
-        response = Member.enroll(tom, current_agent,params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:setter][:cc_blank], params[:enrollment_info])
-      end
+    if tom.nil?
+      response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
     else
-      response = {:message => "Enrollment amount was not recieved.", :code => Settings.error_codes.not_found}
+      response = Member.enroll(tom, current_agent,params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:setter][:cc_blank], params[:enrollment_info])
     end
     render json: response
   end
