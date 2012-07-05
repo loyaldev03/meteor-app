@@ -1,9 +1,27 @@
 <ul class="breadcrumb">
   <li>
-    <a href="#">Home</a> <span class="divider">/</span>
+    <a href="<%= root_path %>">Home</a> <span class="divider">/</span>
   </li>
-  <li>
-    <a href="#">Library</a> <span class="divider">/</span>
-  </li>
-  <li class="active">Data</li>
+  <% if @current_partner %>
+    <li>
+      Partner<span class="divider">/</span>
+    </li>
+    <li>
+      <a href="<%= admin_partner_dashboard_path(@current_partner.prefix) %>"><%= @current_partner.name %></a><span class="divider">/</span>
+    </li>
+  <% end %>
+  <% if @current_club %>
+    <li>
+      Club<span class="divider">/</span>
+    </li>
+    <li>
+      <a href="<%= clubs_path(@current_club.name) %>"><%= @current_club.name %></a><span class="divider">/</span>
+    </li>
+    <% if params[:controller] == 'members' and params[:action] == 'index' %>
+      <li class="active">Search</li>
+    <% end %>
+  <% end %>
+  <% if @current_member %>
+    <li class="active">Member</li>
+  <% end %>
 </ul>

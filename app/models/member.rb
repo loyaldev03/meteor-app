@@ -410,9 +410,8 @@ class Member < ActiveRecord::Base
       message = set_status_on_enrollment!(agent, trans, amount)
       assign_club_cash! if trans
       self.reload
-      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
-    
-
+      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id, :prospect_id => enrollment_info.prospect_id }
+      
     rescue Exception => e
       Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?

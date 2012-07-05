@@ -54,11 +54,13 @@ def set_member_data(phoenix, member)
   phoenix.member_since_date = member.member_since_date
   phoenix.api_id = member.drupal_user_api_id
   phoenix.club_cash_expire_date = member.club_cash_expire_date
+  if member.is_chapter_member
+    phoenix.member_group_type = MEMBER_GROUP_TYPE
+  else
+    phoenix.member_group_type = nil
+  end
 end
 def add_enrollment_info(phoenix, member)
-  # TODO: not developed yet
-  return
-
   e_info = PhoenixEnrollmentInfo.find_by_member_id(phoenix.id)
   if e_info.nil?
     e_info = PhoenixEnrollmentInfo.new 
@@ -189,6 +191,9 @@ def add_new_members
           phoenix = PhoenixMember.new 
           phoenix.club_id = CLUB
           phoenix.terms_of_membership_id = get_terms_of_membership_id(member.campaign_id)
+          # do not load member if it does not have TOM set
+          next if phoenix.terms_of_membership_id.nil?
+
           phoenix.visible_id = member.id
           set_member_data(phoenix, member)
           next_bill_date = member.cs_next_bill_date

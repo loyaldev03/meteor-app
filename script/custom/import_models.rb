@@ -33,6 +33,8 @@ TERMS_OF_MEMBERSHIP = 11 # TODO: this value will be loaded from campaigns. its t
 TEST = true # if true email will be replaced with a fake one
 SITE_ID = 2010001547 # lyris site id
 USE_PROD_DB = true
+MEMBER_GROUP_TYPE = 93 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
+
 
 @log = Logger.new('import_operations.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
@@ -343,13 +345,13 @@ end
 ###########################   FUNCTIONS             ####################################################
 ########################################################################################################
 
-# TODO: use campaign id to find this value!
 def get_terms_of_membership_id(campaign_id)
-  TERMS_OF_MEMBERSHIP # BillingCampaign.find_by_id(campaign_id).terms_of_membership_id
+  b = BillingCampaign.find_by_id(campaign_id)
+  b.nil? ? nil : b.terms_of_membership_id
 end
-# TODO: => 
+
 def get_terms_of_membership_name(tom_id)
-  "test"
+  PhoenixTermsOfMembership.find_by_id(tom_id)
 end
 
 def get_agent(author = 999)
@@ -389,3 +391,4 @@ end
 def load_cancellation
   add_operation(@member.cancel_date, @member, "Member canceled", Settings.operation_types.cancel, @member.cancel_date, @member.cancel_date) 
 end
+
