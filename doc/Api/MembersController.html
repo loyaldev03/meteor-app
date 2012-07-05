@@ -159,7 +159,7 @@ Method : POST.
 
   
     <span class="summary_desc"><div class='inline'><p>
-Method : POST Submits a member to be enrolled.
+Method : POST Submits a member to be enrolled  .
 </p>
 </div></span>
   
@@ -283,22 +283,22 @@ code
       <pre class="lines">
 
 
-95
-96
-97
-98
-99
-100
-101
-102
 103
 104
 105
 106
-107</pre>
+107
+108
+109
+110
+111
+112
+113
+114
+115</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 95</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 103</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_club_cash'>add_club_cash</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -330,8 +330,39 @@ code
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-Method : POST Submits a member to be enrolled
+Method : POST Submits a member to be enrolled  
 </p>
+<dl>
+<dt>member</dt><dd><p>
+Information related to the member that is sumbitting the enroll. 
+</p>
+</dd>
+<dt>credit_card</dt><dd><p>
+Information related to member&#8217;s credit card. 
+</p>
+</dd>
+<dt>enrollment_info</dt><dd><p>
+Adition information submited when the member enrolls. We storage that
+information for further reports. 
+</p>
+</dd>
+<dt>message</dt><dd><p>
+Shows the method results and also informs the errors.
+</p>
+</dd>
+<dt>code</dt><dd><p>
+Code related to the method result.
+</p>
+</dd>
+<dt>v_id</dt><dd><p>
+Visible id of the member that was enrolled or recovered, or updated.
+</p>
+</dd>
+<dt>prospect_id</dt><dd><p>
+ID of the prospect (if its known).
+</p>
+</dd>
+</dl>
 
 
   </div>
@@ -353,53 +384,34 @@ Method : POST Submits a member to be enrolled
   
     <li>
       
-        <span class='name'>member:</span>
+        <span class='name'>member</span>
       
       
         <span class='type'>(<tt>Hash</tt>)</span>
       
       
-      
-        &mdash;
-        <div class='inline'><p>
-Information related to the member that is submitting to enroll.
-</p>
-</div>
       
     </li>
   
     <li>
       
-        <span class='name'>credit_card:</span>
+        <span class='name'>credit_card</span>
       
       
         <span class='type'>(<tt>Hash</tt>)</span>
       
       
-      
-        &mdash;
-        <div class='inline'><p>
-Information related to member&#8217;s credit card.
-</p>
-</div>
       
     </li>
   
     <li>
       
-        <span class='name'>enrollment_info:</span>
+        <span class='name'>enrollment_info</span>
       
       
         <span class='type'>(<tt>Hash</tt>)</span>
       
       
-      
-        &mdash;
-        <div class='inline'><p>
-Adition information submited when the member enrolls. We storage that
-information for further reports.
-</p>
-</div>
       
     </li>
   
@@ -417,7 +429,7 @@ information for further reports.
       
         &mdash;
         <div class='inline'><p>
-<b>message</b>: Shows the method results and also informs the errors.
+<b>message</b>
 </p>
 </div>
       
@@ -432,7 +444,7 @@ information for further reports.
       
         &mdash;
         <div class='inline'><p>
-<b>code</b>: Code related to the method result.
+<b>code</b>
 </p>
 </div>
       
@@ -447,8 +459,7 @@ information for further reports.
       
         &mdash;
         <div class='inline'><p>
-<b>v_id</b>: Visible id of the member that was enrolled or recovered, or
-updated.
+<b>v_id</b>:
 </p>
 </div>
       
@@ -477,19 +488,19 @@ updated.
       <pre class="lines">
 
 
-20
-21
-22
-23
-24
-25
-26
-27
 28
-29</pre>
+29
+30
+31
+32
+33
+34
+35
+36
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 20</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_enroll'>enroll</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -614,14 +625,6 @@ Member ID that sends drupal.
       <pre class="lines">
 
 
-66
-67
-68
-69
-70
-71
-72
-73
 74
 75
 76
@@ -632,10 +635,18 @@ Member ID that sends drupal.
 81
 82
 83
-84</pre>
+84
+85
+86
+87
+88
+89
+90
+91
+92</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 74</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_profile'>profile</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find_by_api_id_and_club_id'>find_by_api_id_and_club_id</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:api_id</span><span class='rbracket'>]</span><span class='comma'>,</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:club_id</span><span class='rbracket'>]</span><span class='rparen'>)</span> 
@@ -793,24 +804,24 @@ updated.
       <pre class="lines">
 
 
-41
-42
-43
-44
-45
-46
-47
-48
 49
 50
 51
 52
 53
 54
-55</pre>
+55
+56
+57
+58
+59
+60
+61
+62
+63</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 41</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_profile'>update_profile</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -837,7 +848,7 @@ updated.
 </div>
 
     <div id="footer">
-  Generated on Thu Jul  5 11:17:22 2012 by
+  Generated on Thu Jul  5 11:36:20 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
