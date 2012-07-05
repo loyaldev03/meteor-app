@@ -119,7 +119,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#add_club_cash-instance_method" title="#add_club_cash (instance method)">- (Object) <strong>add_club_cash</strong> </a>
+      <a href="#add_club_cash-instance_method" title="#add_club_cash (instance method)">- (String, Integer) <strong>add_club_cash</strong> </a>
     
 
     
@@ -159,7 +159,7 @@ Method : POST.
 
   
     <span class="summary_desc"><div class='inline'><p>
-Method : POST Submits a member to be enrolled  .
+Method : POST.
 </p>
 </div></span>
   
@@ -229,7 +229,7 @@ Method : PUT Updates a member data.
       <div class="method_details first">
   <h3 class="signature first" id="add_club_cash-instance_method">
   
-    - (<tt>Object</tt>) <strong>add_club_cash</strong> 
+    - (<tt>String</tt>, <tt>Integer</tt>) <strong>add_club_cash</strong> 
   
 
   
@@ -241,41 +241,111 @@ Method : PUT Updates a member data.
 Method : POST
 </p>
 <p>
-Recieves:
+This method adds an specific amount of cash, as club cash to the member.
 </p>
-<ul>
-<li><p>
-id
+<dl>
+<dt>id</dt><dd><p>
+ID of the member inside the club. This id is an integer value. With this
+value and the club id we can search for the memeber.
 </p>
-</li>
-<li><p>
-club_id
+</dd>
+<dt>club_id</dt><dd><p>
+Id of the club the member belongs to. This club id is setted at the moment
+of enrolling according to the terms of membership that the member selected
+on enrollment.
 </p>
-</li>
-<li><p>
-club_cash_transaction.
+</dd>
+<dt>club_cash_transaction</dt><dd><p>
+Amount of club cash that is going to be added to the member. This value has
+to be an integer (without decimals).
 </p>
-</li>
-</ul>
-<p>
-Returns:
+</dd>
+<dt>message</dt><dd><p>
+Shows the method results and also informs the errors.
 </p>
-<ul>
-<li><p>
-message 
+</dd>
+<dt>code</dt><dd><p>
+Code related to the method result.
 </p>
-</li>
-<li><p>
-code
-</p>
-</li>
-</ul>
+</dd>
+</dl>
 
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>id</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>club_id.</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>club_cash_transaction</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>
+<b>message</b>
+</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>
+<b>code</b>
+</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -283,22 +353,22 @@ code
       <pre class="lines">
 
 
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131</pre>
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 119</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 190</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_club_cash'>add_club_cash</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -330,7 +400,10 @@ code
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-Method : POST Submits a member to be enrolled  
+Method : POST
+</p>
+<p>
+Submits a member to be enrolled  
 </p>
 <dl>
 <dt>member</dt><dd><p>
@@ -363,10 +436,54 @@ Information related to member&#8217;s credit card. <span class='object_link'><a 
   *expire_year: The year (in numbers) in which the credit card will expire.  
 </code></pre>
 </dd>
-<dt>enrollment_info</dt><dd></dd>
-<dt>message</dt><dd></dd>
-<dt>code</dt><dd></dd>
-<dt>v_id</dt><dd></dd>
+<dt>enrollment_info</dt><dd><p>
+Adition information submited when the member enrolls. We storage that
+information for further reports. 
+</p>
+<pre class="code ruby"><code>
+  *member_id: Id of the member the enrollment info is related to. (It is setted after creating the member)
+  *prospect_id: Id of the prospect the enrollment info is related to.
+  *enrollment_amount: Amount of money that takes to enroll or recover.
+  *product_sku: Name of the selected product.
+  *product_description: Description of the selected product.
+  *mega_chanel: 
+  *marketing_code: multi-team
+  *fulfillment_code: Id of the fulfillment we are sending to our member. (car-flag).
+  *ip_address: Ip address from where the enrollment is being submitted.
+  *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
+  *referral_host:  Link where is being redirect when after subimiting the enroll. (It shows the params in it).
+  *referral_parameters
+  *referral_path
+  *user_id
+  *landing_url: Url from where te submit comes from.
+  *terms_of_membership_id: This is the id of the term of membership the member is enrolling with. With this param
+   we will set some features such as trial days or amount of club cash the memeber will start with. For more information 
+  *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
+   This information is selected by the member. 
+  *cookie_value: Cookie from where the enrollment is being submitted.
+  *cookie_set: If the cookie_value is being recieved or not. It also inform is the client has setted a cookie on his side.
+  *campaign_medium
+  *campaign_description: The name of the campaign.
+  *campaign_medium_version
+  *is_joint
+</code></pre>
+</dd>
+<dt>message</dt><dd><p>
+Shows the method results and also informs the errors.
+</p>
+</dd>
+<dt>code</dt><dd><p>
+Code related to the method result.
+</p>
+</dd>
+<dt>v_id</dt><dd><p>
+Visible id of the member that was enrolled or recovered, or updated.
+</p>
+</dd>
+<dt>prospect_id</dt><dd><p>
+ID of the prospect (if its known).
+</p>
+</dd>
 </dl>
 
 
@@ -389,7 +506,7 @@ Information related to member&#8217;s credit card. <span class='object_link'><a 
   
     <li>
       
-        <span class='name'>member:</span>
+        <span class='name'>member</span>
       
       
         <span class='type'>(<tt>Hash</tt>)</span>
@@ -400,7 +517,7 @@ Information related to member&#8217;s credit card. <span class='object_link'><a 
   
     <li>
       
-        <span class='name'>credit_card:</span>
+        <span class='name'>credit_card</span>
       
       
         <span class='type'>(<tt>Hash</tt>)</span>
@@ -411,19 +528,12 @@ Information related to member&#8217;s credit card. <span class='object_link'><a 
   
     <li>
       
-        <span class='name'>enrollment_info:</span>
+        <span class='name'>enrollment_info</span>
       
       
         <span class='type'>(<tt>Hash</tt>)</span>
       
       
-      
-        &mdash;
-        <div class='inline'><p>
-Adition information submited when the member enrolls. We storage that
-information for further reports.
-</p>
-</div>
       
     </li>
   
@@ -441,7 +551,7 @@ information for further reports.
       
         &mdash;
         <div class='inline'><p>
-<b>message</b>: Shows the method results and also informs the errors.
+<b>message</b>
 </p>
 </div>
       
@@ -456,7 +566,7 @@ information for further reports.
       
         &mdash;
         <div class='inline'><p>
-<b>code</b>: Code related to the method result.
+<b>code</b>
 </p>
 </div>
       
@@ -471,8 +581,7 @@ information for further reports.
       
         &mdash;
         <div class='inline'><p>
-<b>v_id</b>: Visible id of the member that was enrolled or recovered, or
-updated.
+<b>v_id</b>
 </p>
 </div>
       
@@ -487,7 +596,7 @@ updated.
       
         &mdash;
         <div class='inline'><p>
-<b>prospect_id</b>: ID of the prospect (if its known).
+<b>prospect_id</b>
 </p>
 </div>
       
@@ -501,19 +610,19 @@ updated.
       <pre class="lines">
 
 
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53</pre>
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 44</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 72</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_enroll'>enroll</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -544,6 +653,52 @@ updated.
     <p>
 Method : GET Returns information related to member and its credit card.
 </p>
+<dl>
+<dt>api_id</dt><dd><p>
+This api_id is the same shared with drupal. This id is an integer value.
+The api_id unique for each member (inside an specific club). 
+</p>
+</dd>
+<dt>club_id</dt><dd><p>
+Id of the club the member belongs to. This club id is setted at the moment
+of enrolling according to the terms of membership that the member selected
+on enrollment.
+</p>
+</dd>
+<dt>member</dt><dd><p>
+Information related to the member that is sumbitting the enroll. Here is a
+list of the regex we are using to alidate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+</p>
+<pre class="code ruby"><code>
+   *first_name: The first name of the member that is enrolling. We are not accepting any invalid character.
+   *last_name: The last name of the member that is enrolling. We are not accepting any invalid character. 
+   *address: The address of the member that is being enrolled. 
+   *city: City from where the member is from.
+   *state: State from where the member is from. At the moment we are not using any kind of code.
+   *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
+   *phone_number: The member's personal phone number. We are accepting numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
+    +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
+   *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
+    mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+</code></pre>
+</dd>
+<dt>credit_card</dt><dd><p>
+Information related to member&#8217;s credit card.
+</p>
+<pre class="code ruby"><code>
+  *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
+  *expire_year: The year (in numbers) in which the credit card will expire.  
+</code></pre>
+</dd>
+<dt>message</dt><dd><p>
+Shows the method results and also informs the errors.
+</p>
+</dd>
+<dt>code</dt><dd><p>
+Code related to the method result.
+</p>
+</dd>
+</dl>
 
 
   </div>
@@ -554,18 +709,12 @@ Method : GET Returns information related to member and its credit card.
   
     <li>
       
-        <span class='name'>api_id:</span>
+        <span class='name'>api_id</span>
       
       
         <span class='type'>(<tt>Integer</tt>)</span>
       
       
-      
-        &mdash;
-        <div class='inline'><p>
-Member ID that sends drupal.
-</p>
-</div>
       
     </li>
   
@@ -638,28 +787,28 @@ Member ID that sends drupal.
       <pre class="lines">
 
 
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108</pre>
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 90</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 154</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_profile'>profile</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find_by_api_id_and_club_id'>find_by_api_id_and_club_id</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:api_id</span><span class='rbracket'>]</span><span class='comma'>,</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:club_id</span><span class='rbracket'>]</span><span class='rparen'>)</span> 
@@ -699,6 +848,49 @@ Member ID that sends drupal.
     <p>
 Method : PUT Updates a member data.
 </p>
+<dl>
+<dt>id</dt><dd><p>
+ID of the member inside the club. This id is an integer value. The
+visible_id unique for each member (inside an specific club).
+</p>
+</dd>
+<dt>club_id</dt><dd><p>
+Id of the club the member belongs to. This club id is setted at the moment
+of enrolling according to the terms of membership that the member selected
+on enrollment.
+</p>
+</dd>
+<dt>member</dt><dd><p>
+Information related to the member that is being updated.. Here is a list of
+the regex we are using to alidate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+</p>
+<pre class="code ruby"><code>
+   *first_name: The first name of the member that is enrolling. We are not accepting any invalid character.
+   *last_name: The last name of the member that is enrolling. We are not accepting any invalid character. 
+   *address: The address of the member that is being enrolled. 
+   *city: City from where the member is from.
+   *state: State from where the member is from. At the moment we are not using any kind of code.
+   *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
+   *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
+   *phone_number: The member's personal phone number. We are accepting numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
+    +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
+   *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
+    mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+</code></pre>
+</dd>
+<dt>message</dt><dd><p>
+Shows the method results and also informs the errors.
+</p>
+</dd>
+<dt>code</dt><dd><p>
+Code related to the method result.
+</p>
+</dd>
+<dt>v_id</dt><dd><p>
+Visible id of the member that was enrolled or recovered, or updated.
+</p>
+</dd>
+</dl>
 
 
   </div>
@@ -709,18 +901,12 @@ Method : PUT Updates a member data.
   
     <li>
       
-        <span class='name'>id:</span>
+        <span class='name'>id</span>
       
       
         <span class='type'>(<tt>Integer</tt>)</span>
       
       
-      
-        &mdash;
-        <div class='inline'><p>
-Visible ID of member.
-</p>
-</div>
       
     </li>
   
@@ -733,28 +919,16 @@ Visible ID of member.
       
       
       
-        &mdash;
-        <div class='inline'><p>
-.
-</p>
-</div>
-      
     </li>
   
     <li>
       
-        <span class='name'>member:</span>
+        <span class='name'>member</span>
       
       
         <span class='type'>(<tt>Hash</tt>)</span>
       
       
-      
-        &mdash;
-        <div class='inline'><p>
-Information related to the member that is being updated.
-</p>
-</div>
       
     </li>
   
@@ -772,7 +946,7 @@ Information related to the member that is being updated.
       
         &mdash;
         <div class='inline'><p>
-<b>message</b>: Shows the method results and also informs the errors.
+<b>message</b>
 </p>
 </div>
       
@@ -787,7 +961,7 @@ Information related to the member that is being updated.
       
         &mdash;
         <div class='inline'><p>
-<b>code</b>: Code related to the method result.
+<b>code</b>
 </p>
 </div>
       
@@ -802,8 +976,7 @@ Information related to the member that is being updated.
       
         &mdash;
         <div class='inline'><p>
-<b>v_id</b>: Visible id of the member that was enrolled or recovered, or
-updated.
+<b>v_id</b>
 </p>
 </div>
       
@@ -817,24 +990,24 @@ updated.
       <pre class="lines">
 
 
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79</pre>
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 110</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_profile'>update_profile</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -861,7 +1034,7 @@ updated.
 </div>
 
     <div id="footer">
-  Generated on Thu Jul  5 13:32:21 2012 by
+  Generated on Thu Jul  5 14:26:18 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
