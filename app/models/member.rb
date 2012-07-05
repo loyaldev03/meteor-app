@@ -360,14 +360,14 @@ class Member < ActiveRecord::Base
 
     member.terms_of_membership = tom
     member.enroll(credit_card, enrollment_amount, current_agent, nil ,cc_blank, params_enrollment_info)
-  end    
+  end
 
   def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, params_enrollment_info = nil)
     amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
     if not self.new_record? and recovery_check and not self.can_recover?
       return { :message => "Cant recover member. Actual status is not lapsed or Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
-        return { :message => "Credit card is invalid or is expired! #{allow_cc_blank}", :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
+      return { :message => "Credit card is invalid or is expired! #{allow_cc_blank}", :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
     elsif not self.valid? 
@@ -409,7 +409,6 @@ class Member < ActiveRecord::Base
       assign_club_cash! if trans
       self.reload
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id, :prospect_id => enrollment_info.prospect_id }
-    
 
     rescue Exception => e
       Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
