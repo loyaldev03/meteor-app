@@ -283,22 +283,22 @@ code
       <pre class="lines">
 
 
-112
-113
-114
-115
-116
-117
-118
 119
 120
 121
 122
 123
-124</pre>
+124
+125
+126
+127
+128
+129
+130
+131</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 119</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_club_cash'>add_club_cash</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -334,22 +334,35 @@ Method : POST Submits a member to be enrolled
 </p>
 <dl>
 <dt>member</dt><dd><p>
-Information related to the member that is sumbitting the enroll.<span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>
+Information related to the member that is sumbitting the enroll. Here is a
+list of the regex we are using to alidate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
 </p>
 <pre class="code ruby"><code>
-   *first_name: The first name of the member that is enrolling. We do not accept any invalid character. {Member#REGEX_FIRST_AND_LAST_NAME dad}
-   *last_name:
-   *address:
-   *city: 
-   *state:
-   *zip:
-   *country:
-   *phone_number:
-   *email:
-   *terms_of_memberhips_id:
+   *first_name: The first name of the member that is enrolling. We are not accepting any invalid character.
+   *last_name: The last name of the member that is enrolling. We are not accepting any invalid character. 
+   *address: The address of the member that is being enrolled. 
+   *city: City from where the member is from.
+   *state: State from where the member is from. At the moment we are not using any kind of code.
+   *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
+   *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
+   *phone_number: The member's personal phone number. We are accepting numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
+    +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
+   *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
+    mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+   *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
+    we will set some features such as trial days or amount of club cash the memeber will start with. For more information 
 </code></pre>
 </dd>
-<dt>credit_card</dt><dd></dd>
+<dt>credit_card</dt><dd><p>
+Information related to member&#8217;s credit card. <span class='object_link'><a href="../CreditCard.html" title="CreditCard (class)">show</a></span>
+</p>
+<pre class="code ruby"><code>
+  *number: Number of member's credit card, from where we will charge the membership or any other service.  
+   This number will be stored as a hashed value.
+  *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
+  *expire_year: The year (in numbers) in which the credit card will expire.  
+</code></pre>
+</dd>
 <dt>enrollment_info</dt><dd></dd>
 <dt>message</dt><dd></dd>
 <dt>code</dt><dd></dd>
@@ -393,12 +406,6 @@ Information related to the member that is sumbitting the enroll.<span class='obj
         <span class='type'>(<tt>Hash</tt>)</span>
       
       
-      
-        &mdash;
-        <div class='inline'><p>
-Information related to member&#8217;s credit card. <span class='object_link'><a href="../CreditCard.html" title="CreditCard (class)">show</a></span>
-</p>
-</div>
       
     </li>
   
@@ -494,19 +501,19 @@ updated.
       <pre class="lines">
 
 
-37
-38
-39
-40
-41
-42
-43
 44
 45
-46</pre>
+46
+47
+48
+49
+50
+51
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 37</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 44</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_enroll'>enroll</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -631,13 +638,6 @@ Member ID that sends drupal.
       <pre class="lines">
 
 
-83
-84
-85
-86
-87
-88
-89
 90
 91
 92
@@ -649,10 +649,17 @@ Member ID that sends drupal.
 98
 99
 100
-101</pre>
+101
+102
+103
+104
+105
+106
+107
+108</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 83</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 90</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_profile'>profile</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find_by_api_id_and_club_id'>find_by_api_id_and_club_id</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:api_id</span><span class='rbracket'>]</span><span class='comma'>,</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:club_id</span><span class='rbracket'>]</span><span class='rparen'>)</span> 
@@ -810,13 +817,6 @@ updated.
       <pre class="lines">
 
 
-58
-59
-60
-61
-62
-63
-64
 65
 66
 67
@@ -824,10 +824,17 @@ updated.
 69
 70
 71
-72</pre>
+72
+73
+74
+75
+76
+77
+78
+79</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 58</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 65</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_profile'>update_profile</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -854,7 +861,7 @@ updated.
 </div>
 
     <div id="footer">
-  Generated on Thu Jul  5 12:43:23 2012 by
+  Generated on Thu Jul  5 13:32:21 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
