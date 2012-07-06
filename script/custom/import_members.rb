@@ -10,7 +10,6 @@ def update_club_cash(amount)
   cct.save!
   add_operation(Time.now.utc, cct, "Imported club cash transaction!. Amount: $#{cct.amount}", nil)  
 end
-
 def add_fulfillment(fulfillment_kit, fulfillment_since_date, fulfillment_expire_date)
   if not fulfillment_kit.nil? and not fulfillment_expire_date.nil? and not fulfillment_since_date.nil?
     phoenix_f = PhoenixFulfillment.new :product => fulfillment_kit
@@ -46,6 +45,7 @@ def set_member_data(phoenix, member)
   phoenix.country = member.country
   phoenix.joint = member.joint
   phoenix.quota = member.quota
+  phoenix.brith_date = member.brith_date
   phoenix.created_at = member.created_at
   phoenix.updated_at = member.updated_at
   phoenix.phone_number = member.phone
@@ -66,26 +66,20 @@ def add_enrollment_info(phoenix, member)
     e_info = PhoenixEnrollmentInfo.new 
     e_info.member_id = phoenix.id
   end
+  campaign = BillingCampaign.find_by_id(member.campaign_id)
   e_info.enrollment_amount = member.enrollment_amount_to_import
   e_info.product_sku = member.product_id
-  e_info.product_description
+  e_info.product_description = campaign.product_description
   e_info.mega_channel = member.mega_channel
   e_info.marketing_code = member.reporting_code
-  # e_info.fulfillment_code
-  # e_info.ip_address
-  # e_info.user_agent
-  # e_info.referral_host
-  # e_info.referral_parameters
-  # e_info.referral_path
-  # e_info.user_id
-  # e_info.landing_url
+  e_info.fulfillment_code = campaign.fulfillment_code
+  e_info.referral_host = campaign.referral_host
+  e_info.landing_url = campaign.landing_url
   e_info.terms_of_membership_id = phoenix.terms_of_membership_id
   # e_info.preferences
-  # e_info.cookie_value
-  # e_info.cookie_set
-  # e_info.campaign_medium
-  # e_info.campaign_description
-  # e_info.campaign_medium_version
+  e_info.campaign_medium = campaign.campaign_medium
+  e_info.campaign_description = campaign.campaign_description
+  e_info.campaign_medium_version = campaign.campaign_medium_version
   e_info.is_joint = phoenix.joint
   e_info.save
 end
@@ -192,7 +186,10 @@ def add_new_members
           phoenix.club_id = CLUB
           phoenix.terms_of_membership_id = get_terms_of_membership_id(member.campaign_id)
           # do not load member if it does not have TOM set
-          next if phoenix.terms_of_membership_id.nil?
+          if phoenix.terms_of_membership_id.nil?
+            puts "CDId #{member.campaign_id} does not exist or TOM is empty"
+            next
+          end
 
           phoenix.visible_id = member.id
           set_member_data(phoenix, member)

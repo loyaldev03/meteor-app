@@ -110,32 +110,31 @@ class Transaction < ActiveRecord::Base
     @cc.type
   end
 
-  def self.refund(amount, old_transaction_id, agent=nil)
+  def self.refund(amount, sale_transaction_id, agent=nil)
     amount = amount.to_f
     # Lock transaction, so no one can use this record while we refund this member.
-    old_transaction = Transaction.find_by_uuid old_transaction_id, :lock => true
+    sale_transaction = Transaction.find_by_uuid sale_transaction_id, :lock => true
     trans = Transaction.new
     if amount <= 0.0
       return { :message => "Credit amount must be a positive number.", :code => Settings.error_codes.credit_amount_invalid }
-    elsif old_transaction.amount == amount
+    elsif sale_transaction.amount == amount
       trans.transaction_type = "refund"
-      trans.refund_response_transaction_id = old_transaction.response_transaction_id
-    elsif old_transaction.amount > amount
+      trans.refund_response_transaction_id = sale_transaction.response_transaction_id
+    elsif sale_transaction.amount > amount
       trans.transaction_type = "credit"
     end
     if old_transaction.amount_available_to_refund < amount
       return { :message => "Cant credit more $ than the original transaction amount", :code => Settings.error_codes.refund_invalid }
     end
-    trans.prepare(old_transaction.member, old_transaction.credit_card, amount, 
-        old_transaction.member.terms_of_membership.payment_gateway_configuration)
+    trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration)
     answer = trans.process
     if trans.success?
-      old_transaction.refunded_amount = old_transaction.refunded_amount + amount
-      old_transaction.save
-      Auditory.audit(agent, trans, "Credit success $#{amount}", old_transaction.member, Settings.operation_types.credit)
-      Communication.deliver!(:refund, old_transaction.member)
+      sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
+      sale_transaction.save
+      Auditory.audit(agent, trans, "Credit success $#{amount}", sale_transaction.member, Settings.operation_types.credit)
+      Communication.deliver!(:refund, sale_transaction.member)
     else
-      Auditory.audit(agent, trans, "Credit $#{amount} error: #{answer[:message]}", old_transaction.member, Settings.operation_types.credit_error)
+      Auditory.audit(agent, trans, "Credit $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
     end
     answer
   end

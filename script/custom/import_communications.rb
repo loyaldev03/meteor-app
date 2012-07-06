@@ -136,7 +136,14 @@ campaigns_list.each |line|
   cid, trial, channel, amount, type, y = line.split(',')
   payment_type = ( type == 'Yearly' ? '1.year' : '1.month' )
 
-  next if type.blank? 
+  next if type.blank? or (type != 'Yearly' and type != 'Monthly')
+  next if channel != 'SLOOP' and channel != 'PTX'
+
+  campaign = BillingCampaign.find_by_id(cid)
+  if campaign.nil? or not campaign.terms_of_membership_id.nil?
+    puts "CID #{cid} already processed."
+    next 
+  end
 
   m = PhoenixTermsOfMembership.find_by_club_id_and_installment_amount_and_installment_type_and_trial_days(CLUB, amount, payment_type, trial)
   if m.nil?
@@ -148,11 +155,13 @@ campaigns_list.each |line|
     m.description = m.name
     m.grace_period = grace_period
     m.club_id = CLUB
-    m.trial_days = 0 # join now
+    m.trial_days = trial
     m.mode = "production"
     m.club_cash_amount = 150
     m.save!
   end
+  campaign.terms_of_membership_id = m.id
+  campaign.save
 
   if type == 'Yearly'
     if channel == 'PTX'
@@ -161,9 +170,9 @@ campaigns_list.each |line|
     if channel.include?('SLOOP')
       upload_email_services(annual_sloop, m.id)
     end
-    if channel.include?('')
-      upload_email_services(annual_join_now, m.id)
-    end
+    #if channel.include?('')
+    #  upload_email_services(annual_join_now, m.id)
+    #end
   else
     if channel.include?('SLOOP')
       upload_email_services(monthly_sloops, m.id)
