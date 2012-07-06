@@ -28,6 +28,8 @@ $(document).ready( function() {
     backdrop: true
   });
 
+  $(".alert").alert();
+
 });
 
   function agent_index_functions(column_count){

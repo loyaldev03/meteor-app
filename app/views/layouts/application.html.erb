@@ -7,12 +7,12 @@
 
     <%= render :partial => "shared/header" %>
 
-    <%= render :partial => "shared/flash_messages", :locals => {:flash => flash} %>
-
     <div class="container">
       <div class="content">
         <div class="row">
           <div class="span12">
+            <%= render :partial => "shared/flash_messages", :locals => {:flash => flash} %>
+
             <%= render :partial => 'shared/breadcrumb' %>
 
             <%= yield %>

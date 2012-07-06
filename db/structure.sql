@@ -182,7 +182,7 @@ CREATE TABLE `enrollment_infos` (
   `campaign_medium` text COLLATE utf8_unicode_ci,
   `campaign_description` text COLLATE utf8_unicode_ci,
   `campaign_medium_version` int(11) DEFAULT NULL,
-  `is_joint` tinyint(1) DEFAULT NULL,
+  `joint` tinyint(1) DEFAULT NULL,
   `prospect_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -211,7 +211,7 @@ CREATE TABLE `fulfillments` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3113 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3112 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `member_notes` (
   `member_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -368,7 +368,7 @@ CREATE TABLE `terms_of_memberships` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `club_cash_amount` int(11) DEFAULT '0',
+  `club_cash_amount` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -534,8 +534,8 @@ INSERT INTO schema_migrations (version) VALUES ('20120703132710');
 
 INSERT INTO schema_migrations (version) VALUES ('20120703134504');
 
-INSERT INTO schema_migrations (version) VALUES ('20120705115440');
-
 INSERT INTO schema_migrations (version) VALUES ('20120706133424');
 
 INSERT INTO schema_migrations (version) VALUES ('20120706145800');
+
+INSERT INTO schema_migrations (version) VALUES ('20120706163030');

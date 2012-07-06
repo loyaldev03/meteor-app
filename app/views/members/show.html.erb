@@ -1,7 +1,7 @@
 <div class="page-header">
   <%= render :partial => "shared/member_information" %>
   <% if @current_member.blacklisted? %>
-  &nbsp;<h1> Blacklisted! </h1>
+  &nbsp;<small>Blacklisted! </small>
   <% end %>
 </div>
 
@@ -22,10 +22,6 @@
         <td><%= t('activerecord.attributes.member.last_name') %>:</td>
         <td><input readonly="true" type="text" class="test_field" value="<%= @current_member.last_name %>" />
         </td>
-      </tr>
-      <tr>
-        <td><%= t('activerecord.attributes.member.username') %>:</td>
-        <td><input readonly="true" type="text" class="test_field" value=""></td>
       </tr>
     </table>
   </div>
@@ -65,10 +61,18 @@
       </div>
       <div class="span4">
         <% disable_applied = @current_member.applied? == false  %>
-        <%= link_to "Approve", (!disable_applied ? member_approve_path : "#"), :class => "btn btn-large-w #{(disable_applied ? "disabled" : "btn-info")}", :confirm => t('are_you_sure'), :method => :post %>
+        <% if disable_applied %>
+          <%= link_to "Approve", "#", :class => "btn btn-large-w disabled" %>
+        <% else %>
+          <%= link_to "Approve", member_approve_path, :class => "btn btn-large-w btn-info", :confirm => t('are_you_sure'), :method => :post %>
+        <% end %>
       </div>
       <div class="span4">
-        <%= link_to "Reject", (!disable_applied ? member_reject_path : "#"), :class => "btn btn-large-w #{(disable_applied ? "disabled" : "btn-danger")}", :confirm => t('are_you_sure'), :method => :post %> 
+        <% if disable_applied %>
+          <%= link_to "Reject", "#", :class => "btn btn-large-w disabled" %>
+        <% else %>
+          <%= link_to "Reject", member_reject_path, :class => "btn btn-large-w btn-danger", :confirm => t('are_you_sure'), :method => :post %>
+        <% end %>
       </div>
     </div>  
     
@@ -89,22 +93,22 @@
   </div>
 </div>
 
-<br>
 
 <table class="table table-bordered table-condensed">
   <thead>
-    <tr class="box_title"><th colspan="5"><h4>Demographic Information</h4></th></tr>
+    <tr class="box_title"><th colspan="6"><h4>Demographic Information</h4></th></tr>
   </thead>
   <tbody>
     <tr>
-      <th>Address</th><th>City</th><th>State</th><th>Zip</th><th>Actions</th>
+      <th>Address</th><th>City</th><th>State</th><th>Country</th><th>Zip</th><th>Actions</th>
     </tr>
     <tr class="<%= (!@current_member.wrong_address.nil? ? "yellow" : "") %>">
       <td><%= @current_member.address %></td>
       <td><%= @current_member.city %></td>
       <td><%= @current_member.state %></td>
+      <td><%= @current_member.country %></td>
       <td><%= @current_member.zip %></td>
-      <td style="width: 220px;"><%= link_to " " + t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :target => '_blank', :class => "btn btn-info icon-screenshot" %>&nbsp;
+      <td style="width: 240px;"><%= link_to " " + t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :target => '_blank', :class => "btn btn-info icon-screenshot" %>&nbsp;
         <% if @current_member.wrong_address.nil? %>
           <%= link_to " " + t('activerecord.attributes.member.set_undeliverable'), member_set_undeliverable_path, :class => "btn btn-danger icon-remove" %>
         <% else %>
@@ -115,22 +119,19 @@
   </tbody>
 </table>
 
-
-
-
 <table class="table table-bordered table-condensed">
   <thead>
-    <tr class="box_title"><th colspan="3"><h4>Contact Information</h4></th></tr>
+    <tr class="box_title"><th colspan="4"><h4>Contact Information</h4></th></tr>
   </thead>
   <tbody>
     <tr>
-      <th><%= t('activerecord.attributes.member.phone_number') %></th><th>Email</th><th>Actions</th>
+      <th><%= t('activerecord.attributes.member.phone_number') %></th><th>Email</th><th>Birth date</th><th>Actions</th>
     </tr>
     <tr class="<%= (!@current_member.wrong_phone_number.nil? ? "yellow" : "") %>">
       <td><%= @current_member.phone_number %></td>
       <td><a href="mailto:<%= @current_member.email %>"><%= @current_member.email %></a></td>
-
-      <td style="width: 220px;">
+      <td><%= @current_member.birth_date %></td>
+      <td style="width: 240px;">
         <% if @current_member.wrong_phone_number.nil?
            %>
             <%= link_to " " + t('activerecord.attributes.member.set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger icon-remove" %>
@@ -220,7 +221,7 @@
           <tr class="ligthgrey">
             <th><%= t('activerecord.attributes.member.next_retry_bill_date') %></th>
             <td>
-              <%= @current_member.next_retry_bill_date %>&nbsp;&nbsp;
+              <%= @current_member.next_retry_bill_date %>&nbsp;&nbsp;&nbsp;
               <%= link_to(' Change', member_change_next_bill_date_path, :class => "btn btn-info icon-pencil") unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
             </td>
           </tr>
@@ -232,7 +233,7 @@
   
           <tr class="ligthgrey">
             <th><%= t('activerecord.attributes.member.club_cash_amount') %>:</th>
-            <td><%= number_to_currency(@current_member.club_cash_amount) %>
+            <td><%= number_to_currency(@current_member.club_cash_amount) %>&nbsp;&nbsp;&nbsp;
               <%= link_to(" " + t('activerecord.attributes.member.add_club_cash_transaction'),member_add_club_cash_path, :class => "btn btn-success icon-plus") unless disable_save_sale %> 
 
             </td>  
