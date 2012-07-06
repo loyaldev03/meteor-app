@@ -12,9 +12,8 @@ u.save!
 
 
 data = 'test@test.com.ar'
-u = Agent.new :email => data, :username => data, :password => data, :password_confirmation => data
+u = Agent.new :email => data, :username => data, :password => data, :password_confirmation => data, :roles => ['admin']
 u.save!
-u.confirm!
 
 p = Partner.new :prefix => 'NFL', :name => 'NFL'
 p.save!
