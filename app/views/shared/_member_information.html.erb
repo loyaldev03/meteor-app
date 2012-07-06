@@ -1,1 +1,1 @@
-<h1> <%= params[:controller].humanize %>: <%= params[:action].humanize unless params[:action] == 'show' %> <%= @current_member.visible_id %> - <%= @current_member.first_name %> <%= @current_member.last_name %> </h1>
+<h1> <%= params[:controller].humanize.singularize %>: <%= @current_member.visible_id %> - <%= @current_member.first_name %> <%= @current_member.last_name %> </h1>
