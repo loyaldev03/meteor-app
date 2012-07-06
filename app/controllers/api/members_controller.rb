@@ -189,7 +189,7 @@ class Api::MembersController < ApplicationController
     amount = params[:club_cash_transaction][:amount] || params[:amount]
     description = params[:club_cash_transaction][:description] if params[:club_cash_transaction]
     
-    member = Member.find_by_visible_id_and_club_id(params[:id], params[:club_id])  
+    member = Member.find(params[:member_id])
     if member.nil?
       response = { :message => "Member not found", :code => Settings.error_codes.not_found }  
     else
