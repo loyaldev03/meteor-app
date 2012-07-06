@@ -24,9 +24,13 @@
     <% end %>
     <% if @current_member %>
       <li class="active">Member</li>
-    <% end %>
-    <% if params[:controller].include?('member_notes') %>
-      <span class="divider">/</span><li class="active">Notes</li>
+      <% if params[:controller].include?('member_notes') %>
+        <span class="divider">/</span><li class="active">Notes</li>
+      <% elsif params[:controller].include?('credit_cards') %>
+        <span class="divider">/</span><li class="active">Credit card</li>
+      <% else %>
+        <span class="divider">/</span><li class="active"><%= params[:action].humanize %></li>
+      <% end %>
     <% end %>
   </ul>
 <% end %>
