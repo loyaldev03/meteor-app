@@ -64,8 +64,12 @@
 
   <% if @member.new_record? %>
     <tr class="control-group">
-      <td> <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> </td>
-      <td colspan="3">  <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@terms_of_membership, "id", "name") %> </td>
+      <td>
+       <%= label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
+      </td>
+      <td colspan="3"> 
+        <%= f.select(:terms_of_membership_id, options_from_collection_for_select(@terms_of_memberships, "id", "name")) %>
+      </td>
     </tr>
 
     <tr class="control-group" >
@@ -76,24 +80,25 @@
       </td>
     </tr>  
 
+  <%= f.fields_for :credit_card do |credit_Card| %>
     <tr class="control-group" >
       <td>
-        <%= f.label :encrypted_number, t('activerecord.attributes.credit_card.number'), 
+        <%= credit_Card.label :encrypted_number, t('activerecord.attributes.credit_card.number'), 
                     :class => 'help-inline' %>
       </td> 
-      <td> <%= text_field :credit_card, :number, :class => 'text_field input-medium'%> </td>
+      <td> <%= credit_Card.text_field :number, :class => 'text_field input-medium'%> </td>
       <td colspan="2"> 
-        <%= f.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' %> 
-        <%= text_field :credit_card, :expire_month, :class => 'text_field input-medium' %>
-        <%= f.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %> 
-        <%= text_field :credit_card, :expire_year, :class => 'text_field input-small' %>
-      </td>
+        <%= credit_Card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' %> 
+        <%=credit_Card.text_field :expire_month, :class => 'text_field input-medium' %>
+        <%= credit_Card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %> 
+        <%= credit_Card.text_field :expire_year, :class => 'text_field input-small' %>
       </td>
     </tr>
+  <% end %>
   </tr>
   <% end %>
-  
-  <tr class="control-group">
+
+ <tr class="control-group">
     <th colspan="4"> <%= f.submit nil, :class => 'btn btn-primary' %>
     <%= link_to t(:Cancel), :back, :class => 'btn'  if @member.new_record? %>  
     <%= link_to t('buttons.return_to_member_show'), :back, :class => 'btn' unless @member.new_record? %> </th>
@@ -101,5 +106,8 @@
 </table>
 
 <% if @member.new_record? %>
-  <%= hidden_field :enrollment_info, :enrollment_amount, :value => 0.0 %>
+  <%= f.fields_for :enrollment_info do |ei| %>
+  <%= ei.hidden_field :enrollment_amount, :value => 0.0 %>
+  <% end %>
 <% end %>
+
