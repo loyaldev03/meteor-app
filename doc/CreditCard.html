@@ -1,0 +1,786 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: CreditCard
+  
+    &mdash; Documentation by YARD 0.8.2.1
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index (C)</a> &raquo;
+    
+    
+    <span class="title">CreditCard</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: CreditCard
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">ActiveRecord::Base</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ActiveRecord::Base</li>
+          
+            <li class="next">CreditCard</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">app/models/credit_card.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#am_card-class_method" title="am_card (class method)">+ (Object) <strong>am_card</strong>(number, expire_month, expire_year, first_name, last_name) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#recycle_expired_rule-class_method" title="recycle_expired_rule (class method)">+ (Object) <strong>recycle_expired_rule</strong>(acc, times) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>
+refs #17832 and #19603 6 Days Later if not successful = (+3), 3/2014 6 Days
+Later if not successful = (+2), 3/2013 6 Days Later if not successful =
+(+4) 3/2015 6 Days Later if not successful = (+1) 3/2012.
+</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#accepted_on_billing-instance_method" title="#accepted_on_billing (instance method)">- (Object) <strong>accepted_on_billing</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>
+method commented.
+</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#activate-instance_method" title="#activate (instance method)">- (Object) <strong>activate</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#am_card-instance_method" title="#am_card (instance method)">- (Object) <strong>am_card</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#blacklist-instance_method" title="#blacklist (instance method)">- (Object) <strong>blacklist</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#blacklist_active_credit_card-instance_method" title="#blacklist_active_credit_card (instance method)">- (Object) <strong>blacklist_active_credit_card</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#deactivate-instance_method" title="#deactivate (instance method)">- (Object) <strong>deactivate</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#error_to_s-instance_method" title="#error_to_s (instance method)">- (Object) <strong>error_to_s</strong>(delimiter = &quot;\n&quot;) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#update_last_digits-instance_method" title="#update_last_digits (instance method)">- (Object) <strong>update_last_digits</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="am_card-class_method">
+  
+    + (<tt>Object</tt>) <strong>am_card</strong>(number, expire_month, expire_year, first_name, last_name) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 41</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_year'>expire_year</span><span class='comma'>,</span> <span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span> <span class='id identifier rubyid_last_name'>last_name</span><span class='rparen'>)</span>
+  <span class='const'>ActiveMerchant</span><span class='op'>::</span><span class='const'>Billing</span><span class='op'>::</span><span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_require_verification_value'>require_verification_value</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='const'>ActiveMerchant</span><span class='op'>::</span><span class='const'>Billing</span><span class='op'>::</span><span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='symbol'>:number</span>     <span class='op'>=&gt;</span> <span class='id identifier rubyid_number'>number</span><span class='comma'>,</span>
+    <span class='symbol'>:month</span>      <span class='op'>=&gt;</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='comma'>,</span>
+    <span class='symbol'>:year</span>       <span class='op'>=&gt;</span> <span class='id identifier rubyid_expire_year'>expire_year</span><span class='comma'>,</span>
+    <span class='symbol'>:first_name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span>
+    <span class='symbol'>:last_name</span>  <span class='op'>=&gt;</span> <span class='id identifier rubyid_last_name'>last_name</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="recycle_expired_rule-class_method">
+  
+    + (<tt>Object</tt>) <strong>recycle_expired_rule</strong>(acc, times) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>
+refs #17832 and #19603 6 Days Later if not successful = (+3), 3/2014 6 Days
+Later if not successful = (+2), 3/2013 6 Days Later if not successful =
+(+4) 3/2015 6 Days Later if not successful = (+1) 3/2012
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 65</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_recycle_expired_rule'>recycle_expired_rule</span><span class='lparen'>(</span><span class='id identifier rubyid_acc'>acc</span><span class='comma'>,</span> <span class='id identifier rubyid_times'>times</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='period'>.</span><span class='id identifier rubyid_expired?'>expired?</span>
+    <span class='kw'>case</span> <span class='id identifier rubyid_times'>times</span>
+      <span class='kw'>when</span> <span class='int'>1</span>
+        <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>+</span> <span class='int'>3</span>
+      <span class='kw'>when</span> <span class='int'>2</span>
+        <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>+</span> <span class='int'>2</span>
+      <span class='kw'>when</span> <span class='int'>3</span>
+        <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>+</span> <span class='int'>4</span>
+      <span class='kw'>when</span> <span class='int'>4</span>
+        <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>+</span> <span class='int'>1</span>
+      <span class='kw'>else</span>
+        <span class='kw'>return</span> <span class='id identifier rubyid_acc'>acc</span>
+    <span class='kw'>end</span>
+    <span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
+      <span class='kw'>begin</span>
+        <span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:active</span> <span class='comma'>,</span> <span class='kw'>false</span>
+        <span class='id identifier rubyid_cc'>cc</span> <span class='op'>=</span> <span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> 
+        <span class='id identifier rubyid_cc'>cc</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span>
+        <span class='id identifier rubyid_cc'>cc</span><span class='period'>.</span><span class='id identifier rubyid_number'>number</span> <span class='op'>=</span> <span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_number'>number</span>
+        <span class='id identifier rubyid_cc'>cc</span><span class='period'>.</span><span class='id identifier rubyid_expire_month'>expire_month</span> <span class='op'>=</span> <span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_month'>expire_month</span>
+        <span class='id identifier rubyid_cc'>cc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span> <span class='op'>=</span> <span class='id identifier rubyid_new_year_exp'>new_year_exp</span>
+        <span class='id identifier rubyid_cc'>cc</span><span class='period'>.</span><span class='id identifier rubyid_active'>active</span> <span class='op'>=</span> <span class='kw'>true</span>
+        <span class='id identifier rubyid_cc'>cc</span><span class='period'>.</span><span class='id identifier rubyid_save!'>save!</span>
+        <span class='const'>Auditory</span><span class='period'>.</span><span class='id identifier rubyid_audit'>audit</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_cc'>cc</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Automatic Recycled Expired card</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_cc'>cc</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='comma'>,</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_operation_types'>operation_types</span><span class='period'>.</span><span class='id identifier rubyid_automatic_recycle_credit_card'>automatic_recycle_credit_card</span><span class='rparen'>)</span>
+        <span class='kw'>return</span> <span class='id identifier rubyid_cc'>cc</span>
+      <span class='kw'>rescue</span> <span class='const'>Exception</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span> <span class='id identifier rubyid_e'>e</span>
+        <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Rollback</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_acc'>acc</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="accepted_on_billing-instance_method">
+  
+    - (<tt>Object</tt>) <strong>accepted_on_billing</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>
+method commented. It doesnt allow to blacklist an active credit card.  
+before_update :not_blacklisted
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+17
+18
+19</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 17</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_accepted_on_billing'>accepted_on_billing</span>
+  <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:last_successful_bill_date</span><span class='comma'>,</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="activate-instance_method">
+  
+    - (<tt>Object</tt>) <strong>activate</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+25
+26
+27</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 25</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_activate'>activate</span>
+  <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:active</span><span class='comma'>,</span> <span class='kw'>true</span> <span class='kw'>unless</span> <span class='id identifier rubyid_blacklisted'>blacklisted</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="am_card-instance_method">
+  
+    - (<tt>Object</tt>) <strong>am_card</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52
+53
+54</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_am_card'>am_card</span>
+  <span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_year'>expire_year</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_last_name'>last_name</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="blacklist-instance_method">
+  
+    - (<tt>Object</tt>) <strong>blacklist</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+21
+22
+23</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 21</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_blacklist'>blacklist</span>
+  <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:blacklisted</span><span class='comma'>,</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="blacklist_active_credit_card-instance_method">
+  
+    - (<tt>Object</tt>) <strong>blacklist_active_credit_card</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+33
+34
+35</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 33</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_blacklist_active_credit_card'>blacklist_active_credit_card</span>
+  <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:blacklisted</span><span class='comma'>,</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="deactivate-instance_method">
+  
+    - (<tt>Object</tt>) <strong>deactivate</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+29
+30
+31</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 29</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_deactivate'>deactivate</span>
+  <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:active</span><span class='comma'>,</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="error_to_s-instance_method">
+  
+    - (<tt>Object</tt>) <strong>error_to_s</strong>(delimiter = &quot;\n&quot;) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+37
+38
+39</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 37</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_error_to_s'>error_to_s</span><span class='lparen'>(</span><span class='id identifier rubyid_delimiter'>delimiter</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_collect'>collect</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_attr'>attr</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_attr'>attr</span><span class='rbrace'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_message'>message</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_delimiter'>delimiter</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="update_last_digits-instance_method">
+  
+    - (<tt>Object</tt>) <strong>update_last_digits</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+56
+57
+58</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 56</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_update_last_digits'>update_last_digits</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_last_digits'>last_digits</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_number'>number</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='lparen'>(</span><span class='int'>4</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_last_digits'>last_digits</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Fri Jul  6 17:25:59 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.2.1 (ruby-1.9.2).
+</div>
+
+  </body>
+</html>

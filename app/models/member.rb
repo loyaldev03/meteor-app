@@ -513,7 +513,7 @@ class Member < ActiveRecord::Base
         Auditory.audit(agent, cct, message, self)
         answer = { :message => message, :code => Settings.error_codes.success }
       rescue Exception => e
-        message = "Could not saved club cash transactions: #{cct.error_to_s}"
+        message = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"
         Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => message)
         answer = { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful  }
         raise ActiveRecord::Rollback

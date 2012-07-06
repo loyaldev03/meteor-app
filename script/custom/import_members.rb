@@ -2,6 +2,7 @@
 
 require_relative 'import_models'
 
+
 def update_club_cash(amount)
   cct = PhoenixClubCashTransaction.new 
   cct.amount = amount

@@ -23,6 +23,9 @@ class Api::MembersController < ApplicationController
   #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   #             *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
   #              we will set some features such as trial days or amount of club cash the memeber will start with. For more information 
+  #             *credit_card 
+  #             *enrollment_amount: Amount of money that takes to enroll or recover. 
+  #
   # [credit_card] Information related to member's credit card. {CreditCard show}
   #                 *number: Number of member's credit card, from where we will charge the membership or any other service.  
   #                  This number will be stored as a hashed value.
@@ -31,7 +34,6 @@ class Api::MembersController < ApplicationController
   # [enrollment_info] Adition information submited when the member enrolls. We storage that information for further reports. 
   #                     *member_id: Id of the member the enrollment info is related to. (It is setted after creating the member)
   #                     *prospect_id: Id of the prospect the enrollment info is related to.
-  #                     *enrollment_amount: Amount of money that takes to enroll or recover.
   #                     *product_sku: Name of the selected product.
   #                     *product_description: Description of the selected product.
   #                     *mega_chanel: 
@@ -147,8 +149,8 @@ class Api::MembersController < ApplicationController
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
   #
-  # @param [Integer] api_id
-  # @param [Integer] club_id.
+  # @param [String] *id*
+  # @return [String] *message* 
   # @return [Hash] *member*: Information of member profile.
   # @return [Hash] *credit_card*: Information of member's credit card.
   # @return [Integer] *code*: Code related to the method result.

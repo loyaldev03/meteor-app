@@ -1,11 +1,5 @@
 #!/bin/ruby
 
-require_relative 'import_models'
-
-# "CID ","TOM TRIAL_DAYS","Mega Channel","TOM Membership_amount","Tom Membership_Type","Campaign Description","Campaign Medium","Campaign Medium Version ","Referral Host","Marketing Code","fulfillment_code","Product Description","Product ID ","Landing URL  ","Notes","Joint"
-campaigns_list = File.open('campaigns_toms.csv')
-
-
 # "Email Name ","MLID","Trigger ID","Corresponding Event Name","Recurring","Before or After","Day","Notes"
 
 annual_sloop = [
@@ -131,52 +125,58 @@ end
 
 
 # "CID ","TOM TRIAL_DAYS","Mega Channel","TOM Membership_amount","Tom Membership_Type","Campaign Description","Campaign Medium","Campaign Medium Version ","Referral Host","Marketing Code","fulfillment_code","Product Description","Product ID ","Landing URL  ","Notes","Joint"
-campaigns_list = File.open('campaigns_toms.csv')
-campaigns_list.each |line|
-  cid, trial, channel, amount, type, y = line.split(',')
-  payment_type = ( type == 'Yearly' ? '1.year' : '1.month' )
-
-  next if type.blank? or (type != 'Yearly' and type != 'Monthly')
-  next if channel != 'SLOOP' and channel != 'PTX'
-
-  campaign = BillingCampaign.find_by_id(cid)
-  if campaign.nil? or not campaign.terms_of_membership_id.nil?
-    puts "CID #{cid} already processed."
-    next 
+def get_terms_of_membership_id(campaign_id)
+  campaign = BillingCampaign.find_by_id(campaign_id)
+  if campaign.nil? 
+    return nil
+  end
+  unless campaign.terms_of_membership_id.nil?
+    return campaign.terms_of_membership_id
   end
 
-  m = PhoenixTermsOfMembership.find_by_club_id_and_installment_amount_and_installment_type_and_trial_days(CLUB, amount, payment_type, trial)
+  payment_type = ( campaign.phoenix_campaign_type == 'Yearly' ? '1.year' : '1.month' )
+  return nil if campaign.phoenix_campaign_type.blank? or (campaign.phoenix_campaign_type != 'Yearly' and campaign.phoenix_campaign_type != 'Monthly')
+  return nil if campaign.phoenix_mega_channel != 'SLOOP' and campaign.phoenix_mega_channel != 'PTX' and campaign.phoenix_mega_channel != 'OTHER'
+
+  m = PhoenixTermsOfMembership.find_by_club_id_and_installment_amount_and_installment_type_and_trial_days(CLUB, 
+        campaign.phoenix_amount, payment_type, campaign.phoenix_trial_days)
+
   if m.nil?
     m = PhoenixTermsOfMembership.new 
-    m.installment_amount = amount
+    m.installment_amount = campaign.phoenix_amount
     m.installment_type = payment_type
     m.needs_enrollment_approval = false
-    m.name = "#{type} - #{channel} - #{amount}"
+    m.name = "#{type} - #{campaign.phoenix_mega_channel} - #{amount}"
     m.description = m.name
     m.grace_period = grace_period
     m.club_id = CLUB
-    m.trial_days = trial
+    m.trial_days = campaign.phoenix_trial_days
     m.mode = "production"
     m.club_cash_amount = 150
     m.save!
+
+    if campaign.phoenix_campaign_type == 'Yearly'
+      if campaign.phoenix_mega_channel == 'PTX'
+        upload_email_services(annual_ptx, m.id)
+      end
+      if campaign.phoenix_mega_channel.include?('SLOOP')
+        upload_email_services(annual_sloop, m.id)
+      end
+      if campaign.phoenix_mega_channel.include?('OTHER')
+        upload_email_services(annual_join_now, m.id)
+      end
+    else
+      if campaign.phoenix_mega_channel.include?('SLOOP')
+        upload_email_services(monthly_sloops, m.id)
+      end
+    end
   end
   campaign.terms_of_membership_id = m.id
   campaign.save
+  m.id
+end
 
-  if type == 'Yearly'
-    if channel == 'PTX'
-      upload_email_services(annual_ptx, m.id)
-    end
-    if channel.include?('SLOOP')
-      upload_email_services(annual_sloop, m.id)
-    end
-    #if channel.include?('')
-    #  upload_email_services(annual_join_now, m.id)
-    #end
-  else
-    if channel.include?('SLOOP')
-      upload_email_services(monthly_sloops, m.id)
-    end
-  end
+def get_terms_of_membership_name(tom_id)
+  PhoenixTermsOfMembership.find_by_id(tom_id)
 end
 

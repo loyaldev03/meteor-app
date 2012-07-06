@@ -345,15 +345,6 @@ end
 ###########################   FUNCTIONS             ####################################################
 ########################################################################################################
 
-def get_terms_of_membership_id(campaign_id)
-  b = BillingCampaign.find_by_id(campaign_id)
-  b.nil? ? nil : b.terms_of_membership_id
-end
-
-def get_terms_of_membership_name(tom_id)
-  PhoenixTermsOfMembership.find_by_id(tom_id)
-end
-
 def get_agent(author = 999)
   if author == 999
     DEFAULT_CREATED_BY
@@ -392,3 +383,4 @@ def load_cancellation
   add_operation(@member.cancel_date, @member, "Member canceled", Settings.operation_types.cancel, @member.cancel_date, @member.cancel_date) 
 end
 
+require_relative 'import_communications'

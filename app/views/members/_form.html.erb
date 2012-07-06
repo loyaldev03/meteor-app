@@ -100,8 +100,12 @@
 
  <tr class="control-group">
     <th colspan="4"> <%= f.submit nil, :class => 'btn btn-primary' %>
-    <%= link_to t(:Cancel), :back, :class => 'btn'  if @member.new_record? %>  
-    <%= link_to t('buttons.return_to_member_show'), :back, :class => 'btn' unless @member.new_record? %> </th>
+      <% if @member.new_record? %>
+        <%= link_to t(:Cancel), :back, :class => 'btn'   %>  
+      <% else %>
+        <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => 'btn' %> 
+      <% end %>
+    </th>
   </tr>
 </table>
 
