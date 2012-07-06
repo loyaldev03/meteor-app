@@ -27,6 +27,6 @@ module MembersHelper
         elsif
             text = "yellow"
         end
-        text + "#{(current_member.blacklisted? ? "Black.L" : "")}"
+        text + "#{(current_member.blacklisted? ? "Blist" : "")}"
     end
 end

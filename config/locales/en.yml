@@ -130,6 +130,7 @@ en:
         expire_year: 'Expire year'
         blacklisted: 'Blacklisted'
         last_digits: 'Last digits'
+        active: 'active'
       operation:
         operation_date: 'Operation date'
         description: 'Description'
