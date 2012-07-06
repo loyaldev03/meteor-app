@@ -1,165 +1,253 @@
-<%= render :partial => "shared/member_information" %>
+<div class="page-header">
+  <%= render :partial => "shared/member_information" %>
+  <% if @current_member.blacklisted? %>
+  &nbsp;<h1> Blacklisted! </h1>
+  <% end %>
+</div>
 
-<% if @current_member.blacklisted? %>
-<h1> Blacklisted! </h1>
-<% end %>
+<div class="row">
+  
+  <div class="span4">
+    <table>
+      <tr>
+        <td><%= t('activerecord.attributes.member.member_id') %>:</td>
+        <td><input readonly="true" type="text" class="test_field" value="<%= @current_member.visible_id %>" /></td>
+      </tr>
+      <tr>
+        <td><%= t('activerecord.attributes.member.first_name') %>:</td>
+        <td><input readonly="true" type="text" class="test_field" value="<%= @current_member.first_name %>" />
+        </td>
+      </tr>
+      <tr>
+        <td><%= t('activerecord.attributes.member.last_name') %>:</td>
+        <td><input readonly="true" type="text" class="test_field" value="<%= @current_member.last_name %>" />
+        </td>
+      </tr>
+      <tr>
+        <td><%= t('activerecord.attributes.member.username') %>:</td>
+        <td><input readonly="true" type="text" class="test_field" value=""></td>
+      </tr>
+    </table>
+  </div>
+  
+  <div class="span8">
+    
+    <div class="row-fluid">
+      <div class="span4">
+        <%= link_to 'Edit', edit_member_path, :class => "btn btn-success btn-large-w" %>
+      </div>
+      <div class="span4">
+        <% disable_save_sale = @current_member.can_save_the_sale? == false  %>
+        <%= link_to("Save the sale", (!disable_save_sale ? member_save_the_sale_path : "#"), :class => "btn btn-large-w #{(disable_save_sale ? "disabled" : "btn-info")}") %>
+      </div>
+      <div class="span4">
+        <% disable_black_list = @current_member.blacklisted? == true && @current_member.lapsed? == true %>
+        <%= link_to "Blacklist", (!disable_black_list ? member_blacklist_path : "#"), :class => "btn btn-large-w #{(disable_black_list ? "disabled" : "btn-danger")}" %>
+      </div>
+    </div>
+
+
+    <div class="row-fluid" style="margin-top: 8px;">
+      <div class="span4"><%= link_to "Resend welcome email", "#", :class => "btn btn-large-w #{(@current_member.lapsed? ? "disabled" : "btn-success")}" %>
+      </div>
+      <div class="span4">
+        <%= link_to "Password reset", "#", :class => "btn btn-large-w #{(@current_member.lapsed? ? "disabled" : "btn-info")}" %>
+      </div>
+      <div class="span4">
+        <% disable_cancel = @current_member.can_be_canceled? == false %>
+        <%= link_to("Cancel", (!disable_cancel ? member_cancel_path : "#"), :class => "btn  btn-large-w #{(disable_cancel ? "disabled" : "btn-danger")}")  %>
+      </div>
+    </div>  
+
+    <div class="row-fluid" style="margin-top: 8px;">
+      <div class="span4">
+        <%= link_to "Add a note", new_member_note_path, :class => "btn btn-success btn-large-w" %>
+      </div>
+      <div class="span4">
+        <% disable_applied = @current_member.applied? == false  %>
+        <%= link_to "Approve", (!disable_applied ? member_approve_path : "#"), :class => "btn btn-large-w #{(disable_applied ? "disabled" : "btn-info")}", :confirm => t('are_you_sure'), :method => :post %>
+      </div>
+      <div class="span4">
+        <%= link_to "Reject", (!disable_applied ? member_reject_path : "#"), :class => "btn btn-large-w #{(disable_applied ? "disabled" : "btn-danger")}", :confirm => t('are_you_sure'), :method => :post %> 
+      </div>
+    </div>  
+    
+    <div class="row-fluid" style="margin-top: 8px;">
+      <div class="span4">
+        <%= form_for @current_member, :url => member_recover_path, :method => :post, do |f| %>
+            <% if @current_member.lapsed? %>
+              <%= f.submit t('recover'), :class => 'btn btn-success', :style => "width: 162px;" %>
+            <% else %>
+              <%= f.submit t('recover'), :class => 'btn', :style => "width: 162px;", :disabled => true %>
+            <% end %>
+        <% end %>
+      </div>
+      <div class="span4"></div>
+      <div class="span4"></div>
+    </div>
+
+  </div>
+</div>
+
+<br>
 
 <table class="table table-bordered table-condensed">
   <thead>
-  <tr>
-    <td>
-      <%= link_to 'Edit', edit_member_path, :class => "btn btn-warning" %>
-    </td>
-    <% if @current_member.lapsed? %>
-      <td>
-        <%= form_for @current_member, :url => member_recover_path, :method => :post, do |f| %>
-          <%= f.submit t('recover'), :class => 'btn btn-warning' %>
-        <% end %>
-      </td>
-    <% end %>
-    
-    <% unless @current_member.lapsed? %>
-      <td>
-        <%= link_to "Resend welcome email", "#", :class => "btn btn-warning" %>
-        <%= link_to "Password reset", "#", :class => "btn btn-warning" %>
-      </td>
-      <% if @current_member.can_save_the_sale? %>
-        <td>
-          <%= link_to("Save the sale", member_save_the_sale_path, :class => "btn btn-warning") %>
-          <%= link_to t('activerecord.attributes.member.add_club_cash_transaction'),
-             member_add_club_cash_path, :class => 'btn btn-warning' %> 
-          <%= link_to "Add a credit card", new_credit_card_path, :class => "btn btn-warning" unless @current_member.lapsed? %>
-          <%= link_to "Add a note", new_member_note_path, :class => "btn btn-warning" %>
-        </td>
-      <% end %>
-      <td>
-        <%= link_to "Blacklist", member_blacklist_path, :class => "btn btn-warning" unless @current_member.blacklisted? %>
-        <% if @current_member.applied? %>
-          <%= link_to "Approve", member_approve_path, :class => "btn btn-primary", 
-                               :confirm => t('are_you_sure'), :method => :post %>
-          <%= link_to "Reject", member_reject_path, :class => "btn btn-warning", 
-                                :confirm => t('are_you_sure'), :method => :post %> 
-        <%end%>
-        <%= link_to("Cancel", member_cancel_path, :class => "btn btn-danger") if @current_member.can_be_canceled? %>
-      </td>
-    <% end %>
-  </tr>
+    <tr class="box_title"><th colspan="5"><h4>Demographic Information</h4></th></tr>
   </thead>
-</table>
-
-<table class="table table-bordered table-condensed"> 
-  <thead>
+  <tbody>
     <tr>
-      <td colspan="2"
-      <% unless @current_member.wrong_address.nil? %>
-        class = "yellow"
-      <% end %>
-      >
-        <i class ="icon-home" > </i> 
-        <%= @current_member.full_address %> 
-        <%= I18n.t @current_member.country, :scope => 'countries' %>
-        <%= link_to t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :target => '_blank', :class => "btn btn-info" %>
+      <th>Address</th><th>City</th><th>State</th><th>Zip</th><th>Actions</th>
+    </tr>
+    <tr class="<%= (!@current_member.wrong_address.nil? ? "yellow" : "") %>">
+      <td><%= @current_member.address %></td>
+      <td><%= @current_member.city %></td>
+      <td><%= @current_member.state %></td>
+      <td><%= @current_member.zip %></td>
+      <td style="width: 220px;"><%= link_to " " + t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :target => '_blank', :class => "btn btn-info icon-screenshot" %>&nbsp;
         <% if @current_member.wrong_address.nil? %>
-          <%= link_to t('activerecord.attributes.member.set_undeliverable'), member_set_undeliverable_path, :class => "btn btn-danger" %>
+          <%= link_to " " + t('activerecord.attributes.member.set_undeliverable'), member_set_undeliverable_path, :class => "btn btn-danger icon-remove" %>
         <% else %>
           <%= t('activerecord.attributes.member.undeliverable') %>
         <% end %>
       </td>
     </tr>
-    <tr> 
-      <th colspan="2"> Contact Information </th>
-    </tr>
+  </tbody>
+</table>
+
+
+
+
+<table class="table table-bordered table-condensed">
+  <thead>
+    <tr class="box_title"><th colspan="3"><h4>Contact Information</h4></th></tr>
+  </thead>
+  <tbody>
     <tr>
-      <td   
-      <% unless @current_member.wrong_phone_number.nil? %> 
-        class = "yellow" 
-      <% end %>
-      > 
-        <%= t('activerecord.attributes.member.phone_number') %>: <%= @current_member.phone_number %>   
-          <% if @current_member.wrong_phone_number.nil?
+      <th><%= t('activerecord.attributes.member.phone_number') %></th><th>Email</th><th>Actions</th>
+    </tr>
+    <tr class="<%= (!@current_member.wrong_phone_number.nil? ? "yellow" : "") %>">
+      <td><%= @current_member.phone_number %></td>
+      <td><a href="mailto:<%= @current_member.email %>"><%= @current_member.email %></a></td>
+
+      <td style="width: 220px;">
+        <% if @current_member.wrong_phone_number.nil?
            %>
-            <%= link_to t('activerecord.attributes.member.set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger" %>
+            <%= link_to " " + t('activerecord.attributes.member.set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger icon-remove" %>
           <% else %>
             <%= @current_member.wrong_phone_number %>
           <% end %>
+
       </td>
-      <td> <i class="icon-envelope"> </i> <%= @current_member.email %> </td>
     </tr>
-  </thead> 
+  </tbody>
 </table>
 
-<table class="table table-bordered table-condensed"> 
+
+<table class="table table-bordered table-condensed">
   <thead>
-    <tr> 
-      <th colspan= "3"> Membership Information </th>
-      <th <% if @current_member.lapsed? %>
-            class = "red"
-          <% elsif @current_member.active? %>
-            class = "ligthgreen"
-          <% elsif %>
-            class = "yellow"
-          <% end %>
-      > 
-      <%= @current_member.status %>      
+    <tr class="box_title"><th colspan="2"><h4>Active Credit Card</h4></th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th><%= t("activerecord.attributes.credit_card.expire_date") %></th>
+      <th>
+      <% if can? :see_credit_card, @active_credit_card %>
+        <%= t("activerecord.attributes.credit_card.number") %>
+      <% elsif can? :see_credit_card_last_digits, @active_credit_card %>
+        <%= t("activerecord.attributes.credit_card.last_digits") %>
+      <% end %>
       </th>
     </tr>
-  </thead>  
-  <tr>
-    <td NOWRAP> <%= t('activerecord.attributes.member.member_since_date') %>: 
-         <%= I18n.l @current_member.member_since_date, :format => :only_date %> </td>
-    <td NOWRAP> <%= t('activerecord.attributes.member.join_date') %>: 
-         <%= I18n.l @current_member.join_date, :format => :only_date %> </td>
-    <td>
-      <%= t('activerecord.attributes.member.next_retry_bill_date') %>: <%= @current_member.next_retry_bill_date %>
-      <%= link_to('Change', member_change_next_bill_date_path, :class => "btn btn-warning") unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
-    </td>
-    <td NOWRAP>
-      <%= t('activerecord.attributes.member.cancel_date') %>: 
-      <%= I18n.l(@current_member.cancel_date, :format => :dashed) unless @current_member.cancel_date.nil? %>
-    </td>
-  </tr>
-  <tr>
-    <td> <%= t('menu.activerecord.term_of_membership') %> 
-         <%= link_to @current_member.terms_of_membership.name, terms_of_membership_path(:id => @current_member.terms_of_membership) %> 
-    </td>
-    <td> <%= t('activerecord.attributes.member.reactivation_times') %>:
-         <%= @current_member.reactivation_times %> 
-    </td>
-    <td> <%= t('activerecord.attributes.member.member_group_type') %>:
-         <%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %> 
-    </td>
-    <td> <%= t('activerecord.attributes.member.club_cash_amount') %>:
-         <%= number_to_currency(@current_member.club_cash_amount) %>
-    </td>
-  </tr>
-</table>
-
-<table
-  <% if @active_credit_card.am_card.expired? %>
-    class="table table-bordered table-condensed card_expired"
-  <% else %>
-    class="table table-bordered table-condensed"
-  <% end %>
->
-  <thead>
-    <tr>
-      <th colspan="5"> Active Credit card </th>
+    <tr class="<%= (@active_credit_card.am_card.expired? ? "card_expired" : "") %>">
+      <td><%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %></td>
       <td>
-      <% if can? :see_credit_card, @active_credit_card %>
-        <%= t("activerecord.attributes.credit_card.number") %>: <%= @active_credit_card.number %> 
-      <% elsif can? :see_credit_card_last_digits, @active_credit_card %>
-        <%= t("activerecord.attributes.credit_card.last_digits") %>: <%= @active_credit_card.last_digits %> 
-      <% end %>
-      </td>
-      <td> <%= t("activerecord.attributes.credit_card.expire_date") %>: 
-           <%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %> 
+        <% if can? :see_credit_card, @active_credit_card %>
+          <%= @active_credit_card.number %>
+        <% elsif can? :see_credit_card_last_digits, @active_credit_card %>
+          <%= @active_credit_card.last_digits %>
+        <% end %>
       </td>
     </tr>
-  </thead>
+    <% unless @current_member.lapsed? %>
+    <tr>
+      <td colspan="2">
+        <div style="float: right;"><%= link_to " Add a credit card", new_credit_card_path, :class => "btn btn-success icon-plus" %></div>
+      </td>
+    </tr>
+    <% end %>
 </table>
 
+
+
+<table class="table table-bordered table-condensed table-nohover">
+  <thead>
+    <tr class="box_title"><th colspan="2"><h4>Membership Information</h4></th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="width: 50%;">
+        <table class="hidden_table_border">
+          <tr>
+            <th>Status:</th>
+            <td><span style="height: 20px; padding: 4px;" class="<%= menber_status_class(@current_member) %>"><b><%= @current_member.status %></b></span></td>  
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.member.member_since_date') %>:</th>
+            <td><%= I18n.l @current_member.member_since_date, :format => :only_date %></td>  
+          </tr>
+          <tr>
+            <th><%= t('menu.activerecord.term_of_membership') %>:</th>
+            <td><%= link_to @current_member.terms_of_membership.name, terms_of_membership_path(:id => @current_member.terms_of_membership) %></td>  
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.member.reactivation_times') %>:</th>
+            <td><%= @current_member.reactivation_times %></td>  
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.member.member_group_type') %>:</th>
+            <td><%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %></td>  
+          </tr>
+        </table>
+      </td>
+      <td style="width: 50%;">
+        <table class="hidden_table_border">
+          <tr>
+            <th><%= t('activerecord.attributes.member.join_date') %>:</th>
+            <td><%= I18n.l @current_member.join_date, :format => :only_date %></td>
+          </tr>
+          
+          <tr class="ligthgrey">
+            <th><%= t('activerecord.attributes.member.next_retry_bill_date') %></th>
+            <td>
+              <%= @current_member.next_retry_bill_date %>&nbsp;&nbsp;
+              <%= link_to(' Change', member_change_next_bill_date_path, :class => "btn btn-info icon-pencil") unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
+            </td>
+          </tr>
+
+          <tr>
+            <th><%= t('activerecord.attributes.member.cancel_date') %>:</th>
+            <td><%= I18n.l(@current_member.cancel_date, :format => :dashed) unless @current_member.cancel_date.nil? %></td>  
+          </tr>
+  
+          <tr class="ligthgrey">
+            <th><%= t('activerecord.attributes.member.club_cash_amount') %>:</th>
+            <td><%= number_to_currency(@current_member.club_cash_amount) %>
+              <%= link_to(" " + t('activerecord.attributes.member.add_club_cash_transaction'),member_add_club_cash_path, :class => "btn btn-success icon-plus") unless disable_save_sale %> 
+
+            </td>  
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
 <ul class="nav nav-tabs">
-  <li><a href="#operations" data-toggle="tab">Operations</a></li>
+  <li class="active"><a href="#operations" data-toggle="tab">Operations</a></li>
   <li><a href="#notes" data-toggle="tab">Notes</a></li>
   <li><a href="#credit_cards" data-toggle="tab">Credit Cards</a></li>
   <li><a href="#transactions" data-toggle="tab">Transactions</a></li>

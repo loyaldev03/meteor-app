@@ -19,11 +19,10 @@ class Member < ActiveRecord::Base
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address,
-      :wrong_phone_number, :api_id, :mega_channel
+      :wrong_phone_number, :api_id, :mega_channel, :credit_cards_attributes
 
   accepts_nested_attributes_for :credit_cards, :limit => 1
   accepts_nested_attributes_for :terms_of_membership, :limit => 1
-  accepts_nested_attributes_for :enrollment_infos, :limit => 1
 
   before_create :record_date
 
@@ -320,7 +319,6 @@ class Member < ActiveRecord::Base
 
   def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0', params_enrollment_info = nil)
     club = tom.club
-
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
       # credit card exist?
@@ -329,11 +327,21 @@ class Member < ActiveRecord::Base
       credit_cards = CreditCard.joins(:member).where( :encrypted_number => credit_card.encrypted_number, :members => { :club_id => club.id } )
 
       if credit_cards.empty? or cc_blank == '1'
-        member = Member.new member_params
+        member = Member.new
+        member.first_name = member_params[:first_name]
+        member.last_name = member_params[:last_name]
+        member.address = member_params[:address]
+        member.state = member_params[:state]
+        member.city = member_params[:city]
+        member.country = member_params[:country]
+        member.phone_number = member_params[:phone_number]
+        member.zip = member_params[:zip]
+        member.email = member_params[:email]
         member.skip_api_sync! if member.api_id.present? 
         member.club = club
         member.created_by_id = current_agent.id
         member.terms_of_membership = tom
+
         unless member.valid? and credit_card.valid?
           errors = member.error_to_s + credit_card.error_to_s
           return { :message => "Member data is invalid: \n #{errors}", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
@@ -375,7 +383,7 @@ class Member < ActiveRecord::Base
         return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
-    elsif self.valid? 
+    elsif not self.valid? 
       errors = self.error_to_s
       return { :message => "Member data is invalid: \n#{errors}", :code => Settings.error_codes.member_data_invalid }
     end

@@ -75,13 +75,13 @@ class Api::MembersController < ApplicationController
   # tom, current_agent,params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:enrollment_info], params[:setter][:cc_blank]
   def create
     response = {}
-    tom = TermsOfMembership.find_by_id(params[:terms_of_membership_id])  
+    tom = TermsOfMembership.find_by_id(params[:member][:terms_of_membership_id])  
     if tom.nil?
       response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
     else
-      response = Member.enroll(tom, current_agent, params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:setter][:cc_blank], params[:enrollment_info])
+      response = Member.enroll(tom, current_agent, params[:member][:enrollment_amount], params[:member], params[:member][:credit_card], params[:setter][:cc_blank], params[:member][:enrollment_info])
     end
-    render json: response    
+    render json: response 
   end
 
   # Method : PUT

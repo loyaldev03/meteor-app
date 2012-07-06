@@ -8,30 +8,23 @@
       <th> <%= t('activerecord.attributes.member.external_id') %> </th>
       <th> <%= t('activerecord.attributes.member.full_name') %> </th>
       <th> <%= t('activerecord.attributes.member.full_address') %> </th>
-      <th>View</th>
-      <th>Edit</th>
-      <th>&nbsp;</th>
+      <th style="width: 20px;">View</th>
+      <th style="width: 20px;">Edit</th>
+      <th style="width: 80px;">&nbsp;</th>
   	</tr>
     <% if members.count == 0 %>
       <tr> <td colspan="5"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
     <% end %> 
   <% members.each do |member| %>
     <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
-      <th <% if member.lapsed? %>
-          class = "red"
-          <% elsif member.active? %>
-            class = "ligthgreen"
-          <% elsif %>
-            class = "yellow"
-          <% end %>
-      > 
+      <th class="<%= menber_status_class(member) %>"> 
       <%= member.status %>
       </th>
       <th> <%= member.visible_id %> </th>
       <th> <%= member.external_id if !member.external_id.nil? %> </th>
       <th> <%= member.full_name %> </th>
       <th> <%= member.full_address %> </th>
-      <th><a href="<%= show_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-search"></i> </a></th>
+      <th><a href="<%= show_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></th>
       <th><a href="<%= edit_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a></th>
       <th><%= member_action_drop_menu(member) %></th>
     </tr>
