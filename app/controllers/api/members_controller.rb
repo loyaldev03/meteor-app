@@ -5,7 +5,9 @@ class Api::MembersController < ApplicationController
 
   # Method : POST
   #
-  # Submits a member to be enrolled  
+  # Submits a member to be created. THis method will call the method enroll on member model. It will validate
+  # the members data (including its credit card) and, in case it is correct, it will create and save the member.
+  # It will also send an welcome email and charge the enrollment, to the member's credit card.  
   #
   # [member] Information related to the member that is sumbitting the enroll. Here is a list of the regex we are using to alidate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character.
@@ -55,8 +57,10 @@ class Api::MembersController < ApplicationController
   #
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
+  # [member_id] ID of the member. This ID is unique for each member. (32 characters string)
   # [v_id] Visible id of the member that was enrolled or recovered, or updated.
   # [prospect_id] ID of the prospect (if its known).
+  # [errors] A hash with members errors. This will be use to show erros on members creation page.
   #
   # @param [Integer] terms_of_membership_id
   # @param [Hash] member
@@ -64,8 +68,10 @@ class Api::MembersController < ApplicationController
   # @param [Hash] enrollment_info
   # @return [String] *message*
   # @return [Integer] *code*
+  # @return [Integer] *member_id*
   # @return [Integer] *v_id*
   # @return [String] *prospect_id*
+  # @return [Hash] *errors*
   # tom, current_agent,params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:enrollment_info], params[:setter][:cc_blank]
   def create
     response = {}
@@ -80,8 +86,7 @@ class Api::MembersController < ApplicationController
 
   # Method : PUT
   # Updates a member data.
-  # [id] ID of the member inside the club. This id is an integer value. The visible_id unique for each member (inside an specific club).
-  # [club_id] Id of the club the member belongs to. This club id is setted at the moment of enrolling according to the terms of membership that the member selected on enrollment.
+  # [member_id] ID of the member. This ID is unique for each member. (32 characters string)
   # [member] Information related to the member that is being updated.. Here is a list of the regex we are using to alidate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character.
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character. 
@@ -98,10 +103,10 @@ class Api::MembersController < ApplicationController
   # [code] Code related to the method result.
   # [v_id] Visible id of the member that was enrolled or recovered, or updated.
   #
-  # @param [Integer] id
-  # @param [Integer] club_id
+  # @param [String] id
   # @param [Hash] member
   # @return [String] *message*
+  # @return [Integer] *member_id*  
   # @return [Integer] *code*
   # @return [Integer] *v_id*
   # 
@@ -114,7 +119,7 @@ class Api::MembersController < ApplicationController
     if member.update_attributes(params[:member]) 
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member)
-      response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id, :v_id => member.visible_id }
+      response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
     else
       response = { :message => "Member data is invalid: #{member.error_to_s}", :code => Settings.error_codes.member_data_invalid }
     end

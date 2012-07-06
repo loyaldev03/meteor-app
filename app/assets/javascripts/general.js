@@ -157,7 +157,7 @@ $(document).ready( function() {
         success: function(data) {
           alert (data.message);
           if (data.code == 000)
-            window.location.replace('../'+data.v_id);
+            window.location.replace('../'+v_id);
         },
       });
     });
