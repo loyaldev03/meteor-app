@@ -21,6 +21,10 @@ class Member < ActiveRecord::Base
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address,
       :wrong_phone_number, :api_id, :mega_channel
 
+  accepts_nested_attributes_for :credit_cards, :limit => 1
+  accepts_nested_attributes_for :terms_of_membership, :limit => 1
+  accepts_nested_attributes_for :enrollment_infos, :limit => 1
+
   before_create :record_date
 
   after_create :after_create_sync_remote_domain
