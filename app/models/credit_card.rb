@@ -38,6 +38,14 @@ class CreditCard < ActiveRecord::Base
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end
 
+  def can_be_blacklisted?
+    not self.member.lapsed? and not self.blacklisted 
+  end
+
+  def can_be_activated?
+    not self.active and not self.member.lapsed? and not self.blacklisted
+  end
+
   def self.am_card(number, expire_month, expire_year, first_name, last_name)
     ActiveMerchant::Billing::CreditCard.require_verification_value = false
     ActiveMerchant::Billing::CreditCard.new(
