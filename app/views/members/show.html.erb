@@ -77,9 +77,9 @@
       <div class="span4">
         <%= form_for @current_member, :url => member_recover_path, :method => :post, do |f| %>
             <% if @current_member.lapsed? %>
-              <%= f.submit t('recover'), :class => 'btn btn-success', :style => "width: 162px;" %>
+              <%= f.submit t('recover'), :class => 'btn btn-success', :style => "width: 182px;" %>
             <% else %>
-              <%= f.submit t('recover'), :class => 'btn', :style => "width: 162px;", :disabled => true %>
+              <%= f.submit t('recover'), :class => 'btn', :style => "width: 182px;", :disabled => true %>
             <% end %>
         <% end %>
       </div>
@@ -146,7 +146,7 @@
   <thead>
     <tr class="box_title">
       <td><h4>Active Credit Card</h4></td>
-      <td style="border: none; text-align: right;"><%= link_to " Add a credit card", new_credit_card_path, :class => "btn btn-success icon-plus" unless @current_member.lapsed? %>
+      <td style="border: none; text-align: right;"><%= link_to " Add a credit card", new_credit_card_path, :class => "btn btn-success icon-plus" %>
       </td>
     </tr>
   </thead>
@@ -171,7 +171,7 @@
         <% end %>
       </td>
     </tr>
-    
+  </tbody>
 </table>
 
 
@@ -243,8 +243,6 @@
     </tr>
   </tbody>
 </table>
-
-
 
 <ul class="nav nav-tabs">
   <li class="active"><a href="#operations" data-toggle="tab">Operations</a></li>
