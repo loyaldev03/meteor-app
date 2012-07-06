@@ -106,8 +106,6 @@
 </table>
 
 <% if @member.new_record? %>
-  <%= f.fields_for :enrollment_info do |ei| %>
-  <%= ei.hidden_field :enrollment_amount, :value => 0.0 %>
-  <% end %>
+  <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
 <% end %>
 
