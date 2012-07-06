@@ -31,8 +31,8 @@ PAYMENT_GW_CONFIGURATION_LITLE = 4
 PAYMENT_GW_CONFIGURATION_MES = 4
 TERMS_OF_MEMBERSHIP = 11 # TODO: this value will be loaded from campaigns. its temporary here
 TEST = true # if true email will be replaced with a fake one
+USE_PROD_DB = false
 SITE_ID = 2010001547 # lyris site id
-USE_PROD_DB = true
 MEMBER_GROUP_TYPE = 93 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
 
 
