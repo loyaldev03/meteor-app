@@ -8,7 +8,7 @@ SacPlatform::Application.routes.draw do
       match 'enroll' => 'members#enroll', as: 'v1_enroll_members', :via => :post
       match 'update_profile/:id/:club_id' => 'members#update_profile', as: 'v1_update_profile_members', :via => :put
       match 'add_club_cash/:id/:club_id' => 'members#add_club_cash', as: 'v1_add_club_cash', :via => :post
-      post 'prospects' => 'prospects#enroll'
+      resources :prospects, only: :create
     end
   end
 
