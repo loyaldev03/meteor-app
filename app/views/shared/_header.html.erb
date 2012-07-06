@@ -30,12 +30,11 @@
             <li><%= link_to t('menu.logout'), destroy_agent_session_path, :method => :delete  %></li>
             <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
             <li>
-              <% if @current_club %>
-                <%= select_tag "change_partner",
+              <% selected = @current_club ? [ members_path(@current_club.partner.prefix, @current_club.name) ] : nil %>
+              <%= select_tag "change_partner",
                 options_for_select(Club.all.collect{ |u| [ "#{u.partner.prefix} - #{u.name}", members_path(u.partner.prefix, u.name) ]}, 
-                  [members_path(@current_club.partner.prefix, @current_club.name)]), 
+                  selected ), 
                 :onchange => "window.open(this.options[this.selectedIndex].value, '_top')" %>
-              <% end %>
             </li>
           </ul>
         </div><!--/.nav-collapse -->

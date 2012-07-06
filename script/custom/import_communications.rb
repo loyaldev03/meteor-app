@@ -2,6 +2,10 @@
 
 require_relative 'import_models'
 
+# "CID ","TOM TRIAL_DAYS","Mega Channel","TOM Membership_amount","Tom Membership_Type","Campaign Description","Campaign Medium","Campaign Medium Version ","Referral Host","Marketing Code","fulfillment_code","Product Description","Product ID ","Landing URL  ","Notes","Joint"
+campaigns_list = File.open('campaigns_toms.csv')
+
+
 # "Email Name ","MLID","Trigger ID","Corresponding Event Name","Recurring","Before or After","Day","Notes"
 
 annual_sloop = [
@@ -124,10 +128,55 @@ def upload_email_services(communications, tom_id)
   end
 end
 
-[ { :text => '%Annual%Sloop%', :array => annual_sloop } ].each do |text, array|
-  PhoenixTermsOfMembership.where(" name like '#{text}' ").find_in_batches do |group|
-    group.each do |tom| 
-      upload_email_services(array, tom.id)
+
+
+# "CID ","TOM TRIAL_DAYS","Mega Channel","TOM Membership_amount","Tom Membership_Type","Campaign Description","Campaign Medium","Campaign Medium Version ","Referral Host","Marketing Code","fulfillment_code","Product Description","Product ID ","Landing URL  ","Notes","Joint"
+campaigns_list = File.open('campaigns_toms.csv')
+campaigns_list.each |line|
+  cid, trial, channel, amount, type, y = line.split(',')
+  payment_type = ( type == 'Yearly' ? '1.year' : '1.month' )
+
+  next if type.blank? or (type != 'Yearly' and type != 'Monthly')
+  next if channel != 'SLOOP' and channel != 'PTX'
+
+  campaign = BillingCampaign.find_by_id(cid)
+  if campaign.nil? or not campaign.terms_of_membership_id.nil?
+    puts "CID #{cid} already processed."
+    next 
+  end
+
+  m = PhoenixTermsOfMembership.find_by_club_id_and_installment_amount_and_installment_type_and_trial_days(CLUB, amount, payment_type, trial)
+  if m.nil?
+    m = PhoenixTermsOfMembership.new 
+    m.installment_amount = amount
+    m.installment_type = payment_type
+    m.needs_enrollment_approval = false
+    m.name = "#{type} - #{channel} - #{amount}"
+    m.description = m.name
+    m.grace_period = grace_period
+    m.club_id = CLUB
+    m.trial_days = trial
+    m.mode = "production"
+    m.club_cash_amount = 150
+    m.save!
+  end
+  campaign.terms_of_membership_id = m.id
+  campaign.save
+
+  if type == 'Yearly'
+    if channel == 'PTX'
+      upload_email_services(annual_ptx, m.id)
+    end
+    if channel.include?('SLOOP')
+      upload_email_services(annual_sloop, m.id)
+    end
+    #if channel.include?('')
+    #  upload_email_services(annual_join_now, m.id)
+    #end
+  else
+    if channel.include?('SLOOP')
+      upload_email_services(monthly_sloops, m.id)
     end
   end
 end
+

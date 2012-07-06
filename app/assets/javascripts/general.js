@@ -112,10 +112,12 @@ $(document).ready( function() {
       event.preventDefault()
       $.ajax({
         type: 'POST',
-        url: "/api/v1/enroll",
+        url: "/api/v1/members",
         data: $("#new_member").serialize(),
         success: function(data) {
           alert (data.message);
+          $('#error_explanation ul').empty();
+          $('.content').append("<div id='error_explanation>'<h2>Errors</h2><ul><li>"+data.message.replace('\n','<br>')+"</li></ul></div>");
           if (data.code == 000)
             window.location.replace('../member/'+data.v_id);
         },
@@ -124,19 +126,19 @@ $(document).ready( function() {
     today = new Date()
     $('#setter_cc_blank').click(function(){
       if ($('#setter_cc_blank').attr('checked')) {
-        $('#credit_card_number').val('0000000000');
-        $('#credit_card_expire_month').val(today.getMonth() + 1);
-        $('#credit_card_expire_year').val(today.getFullYear());
-        $('#credit_card_number').attr('readonly', true);
-        $('#credit_card_expire_month').attr('readonly', true);
-        $('#credit_card_expire_year').attr('readonly', true);
+        $('#member_credit_card_number').val('0000000000');
+        $('#member_credit_card_expire_month').val(today.getMonth() + 1);
+        $('#member_credit_card_expire_year').val(today.getFullYear());
+        $('#member_credit_card_number').attr('readonly', true);
+        $('#member_credit_card_expire_month').attr('readonly', true);
+        $('#member_credit_card_expire_year').attr('readonly', true);
       }else{
-        $('#credit_card_number').val('');
-        $('#credit_card_expire_month').val('');
-        $('#credit_card_expire_year').val('');
-        $('#credit_card_number').attr('readonly', false);
-        $('#credit_card_expire_month').attr('readonly', false);
-        $('#credit_card_expire_year').attr('readonly', false);
+        $('#member_credit_card_number').val('');
+        $('#member_credit_card_expire_month').val('');
+        $('#member_credit_card_expire_year').val('');
+        $('#member_credit_card_number').attr('readonly', false);
+        $('#member_credit_card_expire_month').attr('readonly', false);
+        $('#member_credit_card_expire_year').attr('readonly', false);
       }
     });  
 
@@ -150,12 +152,12 @@ $(document).ready( function() {
       event.preventDefault();
       $.ajax({
         type: 'PUT',
-        url: "/api/v1/update_profile/"+visible_id+"/"+club_id,
-        data: $('form[id^="edit_member"]').serialize(),
+        url: "/api/v1/members/"+id,
+        data: $('form').serialize(),
         success: function(data) {
           alert (data.message);
           if (data.code == 000)
-            window.location.replace('../'+data.v_id);
+            window.location.replace('../'+v_id);
         },
       });
     });
@@ -167,7 +169,7 @@ $(document).ready( function() {
       event.preventDefault()
         $.ajax({
           type: 'POST',
-          url: "/api/v1/add_club_cash/"+visible_id+"/"+club_id,
+          url: "/api/v1/members/"+member_id+"/club_cash",
           data: $("form").serialize(),
           success: function(data) {
             alert (data.message);

@@ -43,6 +43,7 @@ gem 'hashie'
 gem 'state_machine', '1.1.2'
 gem 'cancan'
 gem 'easy_roles'
+gem "yard", "~> 0.8.2.1"
 
 gem 'twitter-bootstrap-rails', '2.0.6'
 
@@ -51,6 +52,8 @@ gem 'jquery-rails'
 gem 'rails3_acts_as_paranoid'
 
 gem "airbrake"
+
+
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

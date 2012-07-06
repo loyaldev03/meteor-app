@@ -53,7 +53,7 @@ en:
     members: 'Members'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
-    credit_card: 'Credit card'
+    credit_card: 'CC'
     attributes:
       transaction:
         refundable: 'Refundable'

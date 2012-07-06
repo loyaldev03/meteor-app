@@ -1,8 +1,8 @@
 <%= render :partial => "shared/member_information" %>
 
 <script> 
-  var visible_id = <%= @current_member.visible_id %>; 
-  var club_id = <%= @current_club.id %>
+  var v_id = <%= @current_member.visible_id %>; 
+  var id = "<%= @current_member.id %>"; 
 </script> 
 
 <%= form_for @current_member, :url => edit_member_path(:id => @current_member), :html => { :class => 'form-horizontal' } do |f| %>

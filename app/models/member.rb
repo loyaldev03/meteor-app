@@ -19,14 +19,17 @@ class Member < ActiveRecord::Base
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address,
-      :wrong_phone_number, :api_id, :mega_channel
+      :wrong_phone_number, :api_id, :mega_channel, :credit_cards_attributes
+
+  accepts_nested_attributes_for :credit_cards, :limit => 1
+  accepts_nested_attributes_for :terms_of_membership, :limit => 1
 
   before_create :record_date
 
   after_create :after_create_sync_remote_domain
   after_update :after_update_sync_remote_domain
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
-
+  
   # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
   REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_number' ]
 
@@ -35,6 +38,9 @@ class Member < ActiveRecord::Base
 
   #Validates numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
   REGEX_PHONE_NUMBER = /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-. ]\(?(x|int)?[0-9]?{1,10}\)?)?$/ 
+
+  #Validates emails with format like: xxxxxx@xxxx.xxx.xx or xxxxx+xxx@xxxx.xxx.xx
+  REGEX_EMAIL = /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
 
   #Validates that there are no invalid charactes in the address. 
   REGEX_ADDRESS = /^[A-Za-z0-9 -',.\s]+$/
@@ -60,8 +66,7 @@ class Member < ActiveRecord::Base
   end
 
   validates :first_name, :last_name, :presence => true, :format => REGEX_FIRST_AND_LAST_NAME
-  validates :email, :presence => true, :uniqueness => { :scope => :club_id }, 
-            :format => /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
+  validates :email, :presence => true, :uniqueness => { :scope => :club_id }, :format => REGEX_EMAIL
   validates :phone_number, :format => REGEX_PHONE_NUMBER
   validates :address, :city, :format => REGEX_ADDRESS
   validates :state, :country, :presence => true, :format => REGEX_CITY_AND_STATE_AND_COUNTRY
@@ -314,7 +319,6 @@ class Member < ActiveRecord::Base
 
   def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0', params_enrollment_info = nil)
     club = tom.club
-    # Member exist?
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
       # credit card exist?
@@ -323,14 +327,24 @@ class Member < ActiveRecord::Base
       credit_cards = CreditCard.joins(:member).where( :encrypted_number => credit_card.encrypted_number, :members => { :club_id => club.id } )
 
       if credit_cards.empty? or cc_blank == '1'
-        member = Member.new member_params
+        member = Member.new
+        member.first_name = member_params[:first_name]
+        member.last_name = member_params[:last_name]
+        member.address = member_params[:address]
+        member.state = member_params[:state]
+        member.city = member_params[:city]
+        member.country = member_params[:country]
+        member.phone_number = member_params[:phone_number]
+        member.zip = member_params[:zip]
+        member.email = member_params[:email]
         member.skip_api_sync! if member.api_id.present? 
         member.club = club
         member.created_by_id = current_agent.id
         member.terms_of_membership = tom
+
         unless member.valid? and credit_card.valid?
           errors = member.error_to_s + credit_card.error_to_s
-          return { :message => "Member data is invalid: \n#{errors}", :code => Settings.error_codes.member_data_invalid }
+          return { :message => "Member data is invalid: \n #{errors}", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
         end
         # enroll allowed
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
@@ -354,26 +368,26 @@ class Member < ActiveRecord::Base
 
     if cc_blank == '0' and credit_card_params[:number].blank?
       message = "Credit card is blank. Insert number or allow credit card blank."
-      Auditory.audit(current_agent, tom, message, credit_card.member, Settings.operation_types.credit_card_already_in_use)
-      return { :message => message, :code => Settings.error_codes.credit_card_in_use }        
+      return { :message => message, :code => Settings.error_codes.credit_card_blank }        
     end   
 
     member.terms_of_membership = tom
-    member.enroll(credit_card, enrollment_amount, current_agent, nil ,cc_blank, params_enrollment_info)
+    member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, params_enrollment_info)
   end    
 
   def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, params_enrollment_info = nil)
     amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
-    if not self.new_record? and recovery_check and not self.can_recover?
+    if recovery_check and not self.new_record? and not self.can_recover?
       return { :message => "Cant recover member. Actual status is not lapsed or Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
-        return { :message => "Credit card is invalid or is expired! #{allow_cc_blank}", :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
+        return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
     elsif not self.valid? 
-      return { :message => "Member data is invalid", :code => Settings.error_codes.member_data_invalid }
-    end   
-
+      errors = self.error_to_s
+      return { :message => "Member data is invalid: \n#{errors}", :code => Settings.error_codes.member_data_invalid }
+    end
+        
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
@@ -393,7 +407,7 @@ class Member < ActiveRecord::Base
       enrollment_info.enrollment_amount = amount
       enrollment_info.save
 
-      if credit_card.member.nil?
+       if credit_card.member.nil?
         credit_card.member = self
         credit_card.save
       end
@@ -409,8 +423,7 @@ class Member < ActiveRecord::Base
       assign_club_cash! if trans
       self.reload
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id, :prospect_id => enrollment_info.prospect_id }
-    
-
+      
     rescue Exception => e
       Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?

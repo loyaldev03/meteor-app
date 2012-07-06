@@ -4,6 +4,14 @@ class Api::TokensController < ApplicationController
 
   respond_to :json
 
+  # Method  : POST
+  #
+  # @param [Hash] email
+  # @param [Hash] password
+  # @return [string] *message*: Shows the method results and also informs the errors.
+  # @return [Integer] *status*: Code related to the method result.
+  # @return [String] *token*: authentication token
+  # @return [String] *location*
   def create
     email = params[:email]
     password = params[:password]
@@ -33,6 +41,13 @@ class Api::TokensController < ApplicationController
     end
   end
 
+
+  # Method  : PUT
+  #
+  # @param [Integer] id
+  # @return [string] *message*: Shows the method results and also informs the errors.
+  # @return [Integer] *status*: Code related to the method result.
+  # @return [String] *token*: authentication token
   def destroy
     @user=Agent.find_by_authentication_token(params[:id])
     if @user.nil?
