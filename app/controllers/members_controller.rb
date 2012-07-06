@@ -222,9 +222,9 @@ class MembersController < ApplicationController
 
   def reject
     if @current_member.can_be_rejected?
-    @current_member.set_as_canceled!
-    message = "Member was rejected and setted as canceled."
-    Auditory.audit(@current_agent, @current_member, message, @current_member)
+      @current_member.set_as_canceled!
+      message = "Member was rejected and setted as canceled."
+      Auditory.audit(@current_agent, @current_member, message, @current_member)
     else
       message = "Member cannot be rejected. It must be applied."
     end
