@@ -149,8 +149,8 @@ class Api::MembersController < ApplicationController
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
   #
-  # @param [Integer] api_id
-  # @param [Integer] club_id.
+  # @param [String] *id*
+  # @return [String] *message* 
   # @return [Hash] *member*: Information of member profile.
   # @return [Hash] *credit_card*: Information of member's credit card.
   # @return [Integer] *code*: Code related to the method result.
