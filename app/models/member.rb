@@ -26,7 +26,7 @@ class Member < ActiveRecord::Base
   after_create :after_create_sync_remote_domain
   after_update :after_update_sync_remote_domain
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
-
+  
   # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
   REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_number' ]
 
@@ -332,7 +332,7 @@ class Member < ActiveRecord::Base
         member.terms_of_membership = tom
         unless member.valid? and credit_card.valid?
           errors = member.error_to_s + credit_card.error_to_s
-          return { :message => "Member data is invalid: \n#{errors}", :code => Settings.error_codes.member_data_invalid }
+          return { :message => "Member data is invalid: \n #{errors}", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
         end
         # enroll allowed
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted

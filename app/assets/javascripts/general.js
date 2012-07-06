@@ -112,10 +112,12 @@ $(document).ready( function() {
       event.preventDefault()
       $.ajax({
         type: 'POST',
-        url: "/api/v1/enroll",
+        url: "/api/v1/members",
         data: $("#new_member").serialize(),
         success: function(data) {
           alert (data.message);
+          $('#error_explanation ul').empty();
+          $('.content').append("<div id='error_explanation>'<h2>Errors</h2><ul><li>"+data.message.replace('\n','<br>')+"</li></ul></div>");
           if (data.code == 000)
             window.location.replace('../member/'+data.v_id);
         },
