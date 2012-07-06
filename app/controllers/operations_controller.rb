@@ -1,7 +1,6 @@
 class OperationsController < ApplicationController
   before_filter :validate_club_presence
   before_filter :validate_member_presence
-  layout '2-cols'
 
   def index
     if request.post?
