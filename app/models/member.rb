@@ -341,6 +341,7 @@ class Member < ActiveRecord::Base
         member.club = club
         member.created_by_id = current_agent.id
         member.terms_of_membership = tom
+
         unless member.valid? and credit_card.valid?
           errors = member.error_to_s + credit_card.error_to_s
           return { :message => "Member data is invalid: \n #{errors}", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
@@ -382,7 +383,7 @@ class Member < ActiveRecord::Base
         return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
-    elsif self.valid? 
+    elsif not self.valid? 
       errors = self.error_to_s
       return { :message => "Member data is invalid: \n#{errors}", :code => Settings.error_codes.member_data_invalid }
     end
