@@ -254,12 +254,36 @@
 </ul>
 
 <div class="tab-content">
-  <div class="tab-pane active" id="operations"><%= render :partial => 'operations', :locals => { :operations => @operations} %></div>
-  <div class="tab-pane" id="notes"><%= render :partial => 'notes', :locals => { :notes => @notes} %></div>
-  <div class="tab-pane" id="credit_cards"><%= render :partial => 'credit_cards', :locals => { :credit_cards => @credit_cards} %></div>  
-  <div class="tab-pane" id="transactions"><%= render :partial => 'transactions', :locals => { :transactions => @transactions} %></div>
-  <div class="tab-pane" id="fulfillments"><%= render :partial => 'fulfillments', :locals => { :fulfillments => @fulfillments} %></div>  
-  <div class="tab-pane" id="communication"><%= render :partial => 'communications', :locals => { :fulfillments => @communications} %></div>
+  <div class="tab-pane active" id="operations">
+    <div class="tab_body_padding">
+      <%= render :partial => 'operations', :locals => { :operations => @operations} %>
+    </div>
+  </div>
+  <div class="tab-pane" id="notes">
+    <div class="tab_body_padding">
+      <%= render :partial => 'notes', :locals => { :notes => @notes} %>
+    </div>
+  </div>
+  <div class="tab-pane" id="credit_cards">
+    <div class="tab_body_padding">
+      <%= render :partial => 'credit_cards', :locals => { :credit_cards => @credit_cards} %>
+    </div>
+  </div>  
+  <div class="tab-pane" id="transactions">
+    <div class="tab_body_padding">
+      <%= render :partial => 'transactions', :locals => { :transactions => @transactions} %>
+    </div>
+  </div>
+  <div class="tab-pane" id="fulfillments">
+    <div class="tab_body_padding">
+      <%= render :partial => 'fulfillments', :locals => { :fulfillments => @fulfillments} %>
+    </div>
+  </div>  
+  <div class="tab-pane" id="communication">
+    <div class="tab_body_padding">
+      <%= render :partial => 'communications', :locals => { :fulfillments => @communications} %>
+    </div>
+  </div>
 </div>
 
 <script>

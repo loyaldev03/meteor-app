@@ -110,8 +110,11 @@ div.dataTables_filter input {
 	border-style: hidden;
 }
 
-
 .tab_body_content {
   padding: 1%;
  }
+
+.tab_body_padding {
+	padding: 9px;	
+}
 
