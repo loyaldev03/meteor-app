@@ -169,7 +169,7 @@ $(document).ready( function() {
       event.preventDefault()
         $.ajax({
           type: 'POST',
-          url: "/api/v1/members/"+member_id+"/add_club_cash",
+          url: "/api/v1/members/"+member_id+"/club_cash",
           data: $("form").serialize(),
           success: function(data) {
             alert (data.message);
