@@ -3,12 +3,6 @@ class Api::MembersController < ApplicationController
 
   respond_to :json
 
-  def create
-    response = {}
-    response = enroll(params[:terms_of_membership_id], current_agent,params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:enrollment_info], params[:setter][:cc_blank])
-    render json: response
-  end
-
   # Method : POST
   #
   # Submits a member to be enrolled  
@@ -73,13 +67,15 @@ class Api::MembersController < ApplicationController
   # @return [Integer] *v_id*
   # @return [String] *prospect_id*
   # tom, current_agent,params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:enrollment_info], params[:setter][:cc_blank]
-  def enroll(tom, current_agent, amount, member_params, credit_card_params, enrollment_info_params, cc_blank_params)
+  def create
+    response = {}
     tom = TermsOfMembership.find_by_id(params[:terms_of_membership_id])  
     if tom.nil?
-      return { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
+      response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
     else
-      return Member.enroll(tom, current_agent, amount, member_params, credit_card_params, cc_blank_params, enrollment_info_params)
-    end    
+      response = Member.enroll(tom, current_agent, params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:setter][:cc_blank], params[:enrollment_info])
+    end
+    render json: response    
   end
 
   # Method : PUT

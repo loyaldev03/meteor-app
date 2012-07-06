@@ -11,7 +11,7 @@ class Api::ProspectsController < ApplicationController
   # @param [Hash] prospect: Information related to the prospect.
   # @return [string] *message*: Shows the method results and also informs the errors.
   # @return [String] *code*: Code related to the method result.
-  def enroll
+  def create
   	response = { :message => "prospect_data_invalid", :code => '405' }
   	prospect = Prospect.new(params[:prospect])
   	if prospect.save!

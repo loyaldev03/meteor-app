@@ -7,7 +7,7 @@ SacPlatform::Application.routes.draw do
       resources :members, :only => [:create, :show, :update] do
         post :add_club_cash
       end
-      resources :prospects, :only => [:create]
+      resources :prospects, :only => [:create]      
     end
   end
 
