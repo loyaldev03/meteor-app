@@ -105,9 +105,9 @@ class Api::MembersController < ApplicationController
   # @return [Integer] *code*
   # @return [Integer] *v_id*
   # 
-  def update_profile
+  def update
     response = {}
-    member = Member.find_by_visible_id_and_club_id(params[:id],params[:club_id]) 
+    member = Member.find(params[:id])
     # member.skip_api_sync! if XXX
     member.update_attribute(:wrong_address, nil) if params[:setter][:wrong_address] == '1' unless params[:setter].nil?
     member.update_attribute(:wrong_phone_number, nil) if params[:setter][:wrong_phone_number] == '1' unless params[:setter].nil?
@@ -124,8 +124,7 @@ class Api::MembersController < ApplicationController
   # Method : GET
   # Returns information related to member and its credit card.
   #
-  # [api_id] This api_id is the same shared with drupal. This id is an integer value. The api_id unique for each member (inside an specific club). 
-  # [club_id] Id of the club the member belongs to. This club id is setted at the moment of enrolling according to the terms of membership that the member selected on enrollment.
+  # [id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
   # [member] Information related to the member that is sumbitting the enroll. Here is a list of the regex we are using to alidate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character.
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character. 
@@ -149,8 +148,8 @@ class Api::MembersController < ApplicationController
   # @return [Hash] *credit_card*: Information of member's credit card.
   # @return [Integer] *code*: Code related to the method result.
   #
-  def profile
-    member = Member.find_by_api_id_and_club_id(params[:api_id],params[:club_id]) 
+  def shows
+    member = Member.find(params[:id])
     if member.nil?
       render json: { code: Settings.error_codes.not_found, message: 'member not found' }
     else
