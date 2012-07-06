@@ -1,5 +1,4 @@
-<%- model_class = Agent.new.class -%>
-<h1><%=t '.title', :default => model_class.model_name.human.pluralize %></h1>
+<%= render :partial => 'shared/page_header', :locals => { :title_text => t('.title'),:new_path => new_admin_agent_path} %>
 
 <table id="agents_table" class="display" data-source="<%= admin_agents_url(format: "json") %>">
   <thead>
@@ -16,7 +15,7 @@
   </tbody>
 </table>
 
-<%= link_to t(:new), new_admin_agent_path, :class => 'btn btn-primary' %>
+
 
 
 <script>

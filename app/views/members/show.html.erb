@@ -1,8 +1,5 @@
 <div class="page-header">
   <%= render :partial => "shared/member_information" %>
-  <% if @current_member.blacklisted? %>
-  &nbsp;<small>Blacklisted! </small>
-  <% end %>
 </div>
 
 <div class="row">
@@ -147,7 +144,11 @@
 
 <table class="table table-bordered table-condensed">
   <thead>
-    <tr class="box_title"><th colspan="2"><h4>Active Credit Card</h4></th></tr>
+    <tr class="box_title">
+      <td><h4>Active Credit Card</h4></td>
+      <td style="border: none; text-align: right;"><%= link_to " Add a credit card", new_credit_card_path, :class => "btn btn-success icon-plus" unless @current_member.lapsed? %>
+      </td>
+    </tr>
   </thead>
   <tbody>
     <tr>
@@ -170,13 +171,7 @@
         <% end %>
       </td>
     </tr>
-    <% unless @current_member.lapsed? %>
-    <tr>
-      <td colspan="2">
-        <div style="float: right;"><%= link_to " Add a credit card", new_credit_card_path, :class => "btn btn-success icon-plus" %></div>
-      </td>
-    </tr>
-    <% end %>
+    
 </table>
 
 
@@ -199,7 +194,7 @@
           </tr>
           <tr>
             <th><%= t('menu.activerecord.term_of_membership') %>:</th>
-            <td><%= link_to @current_member.terms_of_membership.name, terms_of_membership_path(:id => @current_member.terms_of_membership) %></td>  
+            <td><%= link_to " " + @current_member.terms_of_membership.name, terms_of_membership_path(:id => @current_member.terms_of_membership), :class => "btn btn-small icon-zoom-in"%></td>  
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.reactivation_times') %>:</th>
@@ -208,6 +203,10 @@
           <tr>
             <th><%= t('activerecord.attributes.member.member_group_type') %>:</th>
             <td><%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %></td>  
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.member.external_id') %>:</th>
+            <td><%= @current_member.external_id %></td>  
           </tr>
         </table>
       </td>

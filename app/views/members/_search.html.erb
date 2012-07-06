@@ -13,7 +13,7 @@
       <th style="width: 80px;">&nbsp;</th>
   	</tr>
     <% if members.count == 0 %>
-      <tr> <td colspan="5"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
+      <tr> <td colspan="8"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
     <% end %> 
   <% members.each do |member| %>
     <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 

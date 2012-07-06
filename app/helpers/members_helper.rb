@@ -19,12 +19,14 @@ module MembersHelper
 	end
 
     def menber_status_class(current_member)
+        text = ""
         if current_member.lapsed?
-            "red"
+            text = "red"
         elsif current_member.active?
-            "ligthgreen"
+            text = "ligthgreen"
         elsif
-            "yellow"
+            text = "yellow"
         end
+        text + "#{(current_member.blacklisted? ? "Black.L" : "")}"
     end
 end

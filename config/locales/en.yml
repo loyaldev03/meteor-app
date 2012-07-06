@@ -48,6 +48,13 @@ en:
     save_member_note: 'Save note'
     save_operation_note: 'Save operation'
     save_credit_card: 'Save credit card'
+  admin:
+    agents:
+      index:
+        title: Agents
+    partners:
+      index:
+        title: Partners
   activerecord:
     member: 'Member'
     members: 'Members'
