@@ -22,7 +22,6 @@ class Member < ActiveRecord::Base
       :wrong_phone_number, :api_id, :mega_channel, :credit_cards_attributes
 
   accepts_nested_attributes_for :credit_cards, :limit => 1
-  accepts_nested_attributes_for :terms_of_membership, :limit => 1
 
   before_create :record_date
 
@@ -407,7 +406,7 @@ class Member < ActiveRecord::Base
       enrollment_info.enrollment_amount = amount
       enrollment_info.save
 
-       if credit_card.member.nil?
+      if credit_card.member.nil?
         credit_card.member = self
         credit_card.save
       end
