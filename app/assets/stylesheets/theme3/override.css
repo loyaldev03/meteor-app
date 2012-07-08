@@ -1,0 +1,115 @@
+/* bootstrap override */
+.nav {
+    list-style: none outside none;
+    margin-bottom: 0;
+    margin-left: 0;
+}
+
+.tab-content {
+  border: 1px solid #ddd;
+  border-top: 0;
+  padding: 1%;
+  width: 98%;
+}
+/* end bootstrap override */
+
+form .clearfix:before, form .clearfix:after {
+  display: inline;
+}
+
+.card_expired{
+  background-color: red;
+}
+
+.ligthgreen{
+  background-color: #90EE90;
+}
+
+.red{
+  color: #FFFFFF;
+  background-color: red;
+}
+
+.yellow{
+  background-color: yellow;
+}
+
+.blacklisted{
+  background-color: #EEE8CD;
+}
+
+.ligthgrey{
+  background-color: #F5F5F5;
+}
+
+
+.help {position: relative}​ /*Without this the popover won't work.*/
+
+.comment {height:auto; 
+        display:inline-block; 
+        word-wrap: break-word }
+
+.odd{
+  background-color: #E0EEEE;
+}
+
+.even{
+  background-color: #FFFFFF;
+}
+
+label.error{
+  float:right;
+  width:70%;
+  text-align:left;
+}
+
+div.dataTables_length select {
+    float: right;
+}
+
+div.dataTables_filter label{
+    text-align:left;
+    vertical-align:text-top;
+    width:270px;
+}
+
+div.dataTables_filter input {
+    float: right;    
+}
+
+#dataTableSelect{
+  height:auto;
+  width:auto;
+  float:left; 
+}
+
+#operations_table_info{
+  width:33%;
+}
+
+.btn_on_header {
+  float: right; 
+  margin-top: -25px;
+}
+
+.box_title {
+  background-color: #B0D3E6;
+}
+
+.datepicker_for_search {
+  width: 120px;
+}
+
+.btn-large-w {
+  width: 160px; 
+}
+
+.hidden_table_border, .hidden_table_border th, .hidden_table_border td   {
+  border-style: hidden;
+}
+
+
+.tab_body_content {
+  padding: 1%;
+ }
+

@@ -19,6 +19,12 @@
     </div>
   </div>
   <div class="control-group">
+    <%= f.label :description, :class => 'control-label' %>
+    <div class="controls">
+      <%= theme_switcher f %>
+    </div>
+  </div>
+  <div class="control-group">
     <%= f.label :logo, :class => 'control-label' %>
     <div class="controls">
       <%= f.file_field :logo, :class => 'text_field' %>
