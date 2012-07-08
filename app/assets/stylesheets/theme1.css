@@ -10,7 +10,6 @@
  *
  *= require_self
  *= require scaffolds
- *= require theme1/base-bootstrap
  *= require theme1/readable
  *= require jquery.ui.core
  *= require jquery.ui.theme
