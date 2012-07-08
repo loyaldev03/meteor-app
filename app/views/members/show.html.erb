@@ -105,9 +105,16 @@
       <td><%= @current_member.state %></td>
       <td><%= @current_member.country %></td>
       <td><%= @current_member.zip %></td>
-      <td style="width: 240px;"><%= link_to " " + t('show_on_map'), "http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :target => '_blank', :class => "btn btn-info icon-screenshot" %>&nbsp;
+      <td style="width: 240px;">
+        <%= link_to("http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :class => "btn btn-info", :target => '_blank') do %> 
+          <i class="icon-screenshot"></i> <%= t('show_on_map') %>
+        <% end %>        
+
+        &nbsp;
         <% if @current_member.wrong_address.nil? %>
-          <%= link_to " " + t('activerecord.attributes.member.set_undeliverable'), member_set_undeliverable_path, :class => "btn btn-danger icon-remove" %>
+          <%= link_to(member_set_undeliverable_path, :class => "btn btn-danger") do %> 
+            <i class="icon-remove"></i> <%= t('activerecord.attributes.member.set_undeliverable') %>
+          <% end %>        
         <% else %>
           <%= t('activerecord.attributes.member.undeliverable') %>
         <% end %>
@@ -129,13 +136,13 @@
       <td><a href="mailto:<%= @current_member.email %>"><%= @current_member.email %></a></td>
       <td><%= @current_member.birth_date %></td>
       <td style="width: 240px;">
-        <% if @current_member.wrong_phone_number.nil?
-           %>
-            <%= link_to " " + t('activerecord.attributes.member.set_unreachable'), member_set_unreachable_path, :class => "btn btn-danger icon-remove" %>
-          <% else %>
-            <%= @current_member.wrong_phone_number %>
-          <% end %>
-
+        <% if @current_member.wrong_phone_number.nil? %>
+          <%= link_to(member_set_unreachable_path, :class => "btn btn-danger") do %> 
+            <i class="icon-remove"></i> <%= t('activerecord.attributes.member.set_unreachable') %>
+          <% end %>        
+        <% else %>
+          <%= @current_member.wrong_phone_number %>
+        <% end %>
       </td>
     </tr>
   </tbody>
@@ -146,7 +153,10 @@
   <thead>
     <tr class="box_title">
       <td><h4>Active Credit Card</h4></td>
-      <td style="border: none; text-align: right;"><%= link_to " Add a credit card", new_credit_card_path, :class => "btn btn-success icon-plus" %>
+      <td style="border: none; text-align: right;">
+        <%= link_to(new_credit_card_path, :class => "btn btn-success") do %> 
+          <i class="icon-plus"></i> Add a credit card
+        <% end %>
       </td>
     </tr>
   </thead>
@@ -194,7 +204,11 @@
           </tr>
           <tr>
             <th><%= t('menu.activerecord.term_of_membership') %>:</th>
-            <td><%= link_to " " + @current_member.terms_of_membership.name, terms_of_membership_path(:id => @current_member.terms_of_membership), :class => "btn btn-small icon-zoom-in"%></td>  
+            <td>
+              <%= link_to(terms_of_membership_path(:id => @current_member.terms_of_membership), :class => "btn btn-small") do %> 
+                <i class="icon-zoom-in"></i> <%= @current_member.terms_of_membership.name %>
+              <% end %>
+            </td>  
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.reactivation_times') %>:</th>
@@ -221,7 +235,11 @@
             <th><%= t('activerecord.attributes.member.next_retry_bill_date') %></th>
             <td>
               <%= @current_member.next_retry_bill_date %>&nbsp;&nbsp;&nbsp;
-              <%= link_to(' Change', member_change_next_bill_date_path, :class => "btn btn-info icon-pencil") unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
+              <% unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
+                <%= link_to(member_change_next_bill_date_path, :class => "btn btn-info") do %> 
+                  <i class="icon-pencil"></i> Change
+                <% end %>
+              <% end %>
             </td>
           </tr>
 
@@ -232,9 +250,13 @@
   
           <tr class="ligthgrey">
             <th><%= t('activerecord.attributes.member.club_cash_amount') %>:</th>
-            <td><%= number_to_currency(@current_member.club_cash_amount) %>&nbsp;&nbsp;&nbsp;
-              <%= link_to(" " + t('activerecord.attributes.member.add_club_cash_transaction'),member_add_club_cash_path, :class => "btn btn-success icon-plus") unless disable_save_sale %> 
-
+            <td>
+              <%= number_to_currency(@current_member.club_cash_amount) %>&nbsp;&nbsp;&nbsp;
+              <% unless disable_save_sale %>
+                <%= link_to(member_add_club_cash_path, :class => "btn btn-success") do %> 
+                  <i class="icon-plus"></i> <%= t('activerecord.attributes.member.add_club_cash_transaction') %>
+                <% end %>
+              <% end %>
             </td>  
           </tr>
         </table>
