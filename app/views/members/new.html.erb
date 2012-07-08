@@ -3,7 +3,7 @@
                                :default => "New #{model_class.model_name.human}") %></h1>
 
 <%= form_for @member, :html => { :class => 'form-horizontal' } do |f| %>
-<%= render :partial => 'form', :locals => { :f => f } %>
+  <%= render :partial => 'form', :locals => { :f => f } %>
 <% end %>
 
 

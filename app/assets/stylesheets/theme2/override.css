@@ -11,7 +11,7 @@
   padding: 1%;
   width: 98%;
 }
-/* end bootstrap override */
+/* end bootstrap override  */
 
 form .clearfix:before, form .clearfix:after {
   display: inline;
@@ -42,8 +42,7 @@ form .clearfix:before, form .clearfix:after {
   background-color: #F5F5F5;
 }
 
-
-.help {position: relative}​ /*Without this the popover won't work.*/
+.help {position: relative}​ // Without this the popover won't work.
 
 .comment {height:auto; 
         display:inline-block; 

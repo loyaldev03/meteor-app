@@ -4,7 +4,9 @@
   <div class="page-header">
     <h1>Search</h1>
     <% if can? :enroll_member, @current_agent %>
-      <%= link_to ' New Member', new_member_path, :class => "btn btn-primary icon-plus btn_on_header" %>
+      <%= link_to(new_member_path, :class => "btn btn-primary btn_on_header") do %> 
+        <i class="icon-plus"></i> New Member
+      <% end %>
     <% end %>
   </div>
  
@@ -111,8 +113,14 @@
   </div>
   <div class="row-fluid">
     <p style="text-align: right;">
-      <%= link_to t('clear'), '#', :id => "clear_form", :class => "btn icon-refresh"%>
-      <%= submit_tag  t('search'), :class => "btn btn-inverse icon-search", :style => "width: 190px;" %>
+
+      <%= link_to('#', :id => "clear_form", :class => "btn") do %> 
+        <i class="icon-refresh"></i> <%= t('clear') %>
+      <% end %>
+
+      <button class="btn btn-inverse" style="width: 190px;">
+        <i class="icon-search"></i> <%= t('search') %>
+      </button>
     </p>
   </div>
 </section>

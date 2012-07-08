@@ -12,5 +12,5 @@ module ApplicationHelper
       else
         type.to_s
     end
-  end  
+  end 
 end
