@@ -8,8 +8,7 @@
 .tab-content {
   border: 1px solid #ddd;
   border-top: 0;
-  padding: 1%;
-  width: 98%;
+  width: 100%;
 }
 /* end bootstrap override  */
 

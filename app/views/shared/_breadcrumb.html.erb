@@ -30,6 +30,8 @@
         <span class="divider">/</span><li class="active">Credit card</li>
       <% elsif params[:controller].include?('operations') %>
         <span class="divider">/</span><li class="active">Operation</li>
+      <% elsif params[:controller].include?('terms_of_membership') %>
+        <span class="divider">/</span><li class="active">Terms of Membership</li>
       <% else %>
         <span class="divider">/</span><li class="active"><%= params[:action].humanize %></li>
       <% end %>
