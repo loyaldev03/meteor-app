@@ -11,19 +11,17 @@
 
       <% if current_agent %>
         <div class="container nav-collapse">
-            <% if @current_club.nil? %>
-              <% unless @current_partner.nil? %>
-                <%= link_to @current_partner.name, admin_partner_dashboard_path %>
-              <% end %>
-            <% else %>
-              <% if @current_club.logo? %>
-                <%= link_to image_tag(@current_club.logo.url(:header)), members_path(@current_partner.prefix, @current_club.name) %>
-              <% else %>
-                <%= link_to @current_club.full_name, members_path(@current_partner.prefix, @current_club.name) %>
-              <% end %>
+          <% if @current_club.nil? %>
+            <% unless @current_partner.nil? %>
+              <%= link_to @current_partner.name, admin_partner_dashboard_path %>
             <% end %>
-
-
+          <% else %>
+            <% if @current_club.logo? %>
+              <%= link_to image_tag(@current_club.logo.url(:header)), members_path(@current_partner.prefix, @current_club.name) %>
+            <% else %>
+              <%= link_to @current_club.full_name, members_path(@current_partner.prefix, @current_club.name) %>
+            <% end %>
+          <% end %>
 
           <ul class="nav pull-right">
             <li class="divider-vertical"></li>

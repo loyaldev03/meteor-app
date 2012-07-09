@@ -1,39 +1,44 @@
+<% delimiter = raw ' <span class="divider">></span> ' %>
 <% if @current_agent %>
   <ul class="breadcrumb">
     <li>
-      <a href="<%= root_path %>">Home</a> <span class="divider">/</span>
+      <a href="<%= root_path %>">Home</a>
     </li>
     <% if @current_partner %>
       <li>
-        Partner<span class="divider">/</span>
+        <%= delimiter %>Partner
       </li>
       <li>
-        <a href="<%= admin_partner_dashboard_path(@current_partner.prefix) %>"><%= @current_partner.name %></a><span class="divider">/</span>
+        <%= delimiter %><a href="<%= admin_partner_dashboard_path(@current_partner.prefix) %>"><%= @current_partner.name %></a>
       </li>
     <% end %>
     <% if @current_club %>
       <li>
-        Club<span class="divider">/</span>
+        <%= delimiter %>Club
       </li>
       <li>
-        <a href="<%= clubs_path %>"><%= @current_club.name %></a><span class="divider">/</span>
+        <%= delimiter %><a href="<%= clubs_path %>"><%= @current_club.name %></a>
       </li>
       <% if params[:controller] == 'members' and params[:action] == 'index' %>
-        <li class="active">Search</li>
+        <%= delimiter %><li class="active">Search</li>
       <% end %>
     <% end %>
     <% if @current_member %>
-      <li class="active">Member</li>
+      <%= delimiter %>
+      <li>
+        <a href="<%= show_member_path %>">Member</a>
+      </li>
+      <%= delimiter %>
       <% if params[:controller].include?('member_notes') %>
-        <span class="divider">/</span><li class="active">Notes</li>
+        <li class="active">Notes</li>
       <% elsif params[:controller].include?('credit_cards') %>
-        <span class="divider">/</span><li class="active">Credit card</li>
+        <li class="active">Credit card</li>
       <% elsif params[:controller].include?('operations') %>
-        <span class="divider">/</span><li class="active">Operation</li>
+        <li class="active">Operation</li>
       <% elsif params[:controller].include?('terms_of_membership') %>
-        <span class="divider">/</span><li class="active">Terms of Membership</li>
+        <li class="active">Terms of Membership</li>
       <% else %>
-        <span class="divider">/</span><li class="active"><%= params[:action].humanize %></li>
+        <li class="active"><%= params[:action].humanize %></li>
       <% end %>
     <% end %>
   </ul>
