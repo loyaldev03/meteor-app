@@ -4,6 +4,6 @@ class AddColumnAndFixColumn < ActiveRecord::Migration
   end
 
   def down
-  	rename_column :enrollment_infos, :is_joint
+  	rename_column :enrollment_infos, :joint, :is_joint
   end
 end
