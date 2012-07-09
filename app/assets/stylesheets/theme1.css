@@ -13,6 +13,7 @@
  *= require theme1/readable
  *= require jquery.ui.core
  *= require jquery.ui.theme
+ *= require jquery.ui.datepicker
  *= require dataTables/jquery.dataTables.bootstrap
  *= require dataTables/src/demo_table_jui
  *= require theme1/override

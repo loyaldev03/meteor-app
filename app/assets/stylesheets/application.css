@@ -13,9 +13,10 @@
  *= require bootstrap_and_overrides
  *= require jquery.ui.core
  *= require jquery.ui.theme
+ *= require jquery.ui.datepicker
  *= require dataTables/jquery.dataTables.bootstrap
  *= require dataTables/src/demo_table_jui
-*/
+ */
 
 
 form .clearfix:before, form .clearfix:after {

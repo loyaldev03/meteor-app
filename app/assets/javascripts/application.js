@@ -14,11 +14,13 @@
 //= require jquery_ujs
 //= require jquery-ui
 //= require dataTables/jquery.dataTables
+//= require dataTables/jquery.dataTables.bootstrap
 //= require jquery.validate
-//= require twitter/bootstrap/bootstrap-tab.js
-//= require twitter/bootstrap/bootstrap-tooltip.js
-//= require twitter/bootstrap/bootstrap-popover.js
-//= require twitter/bootstrap/bootstrap-dropdown.js
-//= require twitter/bootstrap/bootstrap-alert.js
-//= require bootstrap-modal.js
+//= require twitter/bootstrap/bootstrap-tab
+//= require twitter/bootstrap/bootstrap-tooltip
+//= require twitter/bootstrap/bootstrap-popover
+//= require twitter/bootstrap/bootstrap-dropdown
+//= require twitter/bootstrap/bootstrap-alert
+//= require bootstrap-modal
 //= require general
+

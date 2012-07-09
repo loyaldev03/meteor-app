@@ -1,5 +1,3 @@
-
-
 $(document).ready( function() {
 
   $('.confirm').click( function(event){
@@ -21,11 +19,6 @@ $(document).ready( function() {
     "bInfo": false,
     "bAutoWidth": false,
     "aaSorting": [[ 0, "desc" ]]
-  });
-
-  $('#MyModal').modal({
-    show: false,
-    backdrop: true
   });
 
   $(".alert").alert();
@@ -186,13 +179,14 @@ $(document).ready( function() {
     oTable = $('#operations_table').dataTable({
       "sPaginationType": "full_numbers",
       "oLanguage": {"sSearch": "Filtered by:"},
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "bProcessing": true,
+      "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
       "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#operations_table').data('source'),
-      });
+    });
 
     $('#dataTableSelect').insertAfter('#operations_table_info')
 
