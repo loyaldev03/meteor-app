@@ -271,9 +271,13 @@
     <tr class="box_title"><th><h4>Preferences</h4></th></tr>
   </thead>
   <tbody>
-    <% if @preferences %>
-      <% @preferences.each do |key, value| %>
-        <tr><td> <%= key %>: <%= value %> </td></tr>
+    <% if @enrollment_info %>
+      <% @enrollment_info.each do |ei| %>
+        <% if ei.preferences %>
+          <% ei.preferences.each do |key, value| %>
+            <tr><td> <%= key %>: <%= value %> </td></tr>
+          <% end %>
+        <% end %>
       <% end %>
     <% else %>
       <tr><td> <%= t('activerecord.attributes.member.has_no_preferences_saved') %> </td></tr>
