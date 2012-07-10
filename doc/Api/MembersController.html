@@ -184,7 +184,7 @@ Method : GET Returns information related to member and its credit card.
 
   
     <span class="summary_desc"><div class='inline'><p>
-Method : PUT Updates a member data.
+Method : PUT Updates member&#8217;s data.
 </p>
 </div></span>
   
@@ -217,10 +217,10 @@ Method : POST
 </p>
 <p>
 Submits a member to be created. THis method will call the method enroll on
-member model. It will validate the members data (including its credit card)
-and, in case it is correct, it will create and save the member. It will
-also send an welcome email and charge the enrollment, to the member&#8217;s
-credit card.  
+member model. It will validate the member&#8217;s data (including its
+credit card) and, in case it is correct, it will create and save the
+member. It will also send a welcome email and charge the enrollment to the
+member&#8217;s credit card.  
 </p>
 <dl>
 <dt>current_agent</dt><dd><p>
@@ -229,23 +229,23 @@ The agent&#8217;s ID that will be enrolling the member.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is sumbitting the enroll. Here is a
-list of the regex we are using to alidate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+list of the regex we are using to validate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
 </p>
 <pre class="code ruby"><code>
-   *first_name: The first name of the member that is enrolling. We are not accepting any invalid character.
-   *last_name: The last name of the member that is enrolling. We are not accepting any invalid character. 
+   *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
+   *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;). 
    *address: The address of the member that is being enrolled. 
    *city: City from where the member is from.
    *state: State from where the member is from. At the moment we are not using any kind of code.
-   *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
+   *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
    *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
    *phone_number: The member's personal phone number. We are accepting numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
     +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
    *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
     mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
    *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
-    we will set some features such as trial days or amount of club cash the member will start with. For more information 
-   *enrollment_amount: Amount of money that takes to enroll or recover.
+    we will set some features such as provisional days or amount of club cash the member will start with.
+   *enrollment_amount: Amount of money that takes to enroll.
    *credit_card  [Hash]
    *enrollment_info  [Hash]
 </code></pre>
@@ -261,7 +261,7 @@ Information related to member&#8217;s credit card. <span class='object_link'><a 
 </code></pre>
 </dd>
 <dt>enrollment_info</dt><dd><p>
-Adition information submited when the member enrolls. We storage that
+Aditional information submited when the member enrolls. We storage that
 information for further reports. 
 </p>
 <pre class="code ruby"><code>
@@ -281,7 +281,7 @@ information for further reports.
   *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
    This information is selected by the member. 
   *cookie_value: Cookie from where the enrollment is being submitted.
-  *cookie_set: If the cookie_value is being recieved or not. It also inform is the client has setted a cookie on his side.
+  *cookie_set: If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.
   *campaign_medium
   *campaign_description: The name of the campaign.
   *campaign_medium_version
@@ -290,13 +290,12 @@ information for further reports.
 </dd>
 <dt>setter</dt><dd><p>
 Variable used to pass some boolean values as &#8220;cc_blank&#8221; for
-enrolling or &#8220;wrong_address&#8221; for update.
+enrolling, or &#8220;wrong_address&#8221; for update.
 </p>
 <pre class="code ruby"><code>
  * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blanck credit card. It should only be true
              when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following 
-             attributes: number=&gt;&quot;0000000000&quot; and expire_month and expired_year setted
-             as today's month and year respectively.
+             attributes: number=&gt;&quot;0000000000&quot; and expire_month and expired_year setted as today's month and year respectively.
 </code></pre>
 </dd>
 <dt>message</dt><dd><p>
@@ -320,7 +319,7 @@ ID of the prospect (if its known).
 </p>
 </dd>
 <dt>errors</dt><dd><p>
-A hash with members errors. This will be use to show erros on members
+A hash with members errors. This will be use to show errors on members
 creation page.
 </p>
 </dd>
@@ -458,6 +457,7 @@ creation page.
       <pre class="lines">
 
 
+79
 80
 81
 82
@@ -474,11 +474,10 @@ creation page.
 93
 94
 95
-96
-97</pre>
+96</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 79</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -525,11 +524,11 @@ unique for each member.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is sumbitting the enroll. Here is a
-list of the regex we are using to alidate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+list of the regex we are using to validate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
 </p>
 <pre class="code ruby"><code>
-   *first_name: The first name of the member that is enrolling. We are not accepting any invalid character.
-   *last_name: The last name of the member that is enrolling. We are not accepting any invalid character. 
+   *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
+   *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
    *address: The address of the member that is being enrolled. 
    *city: City from where the member is from.
    *state: State from where the member is from. At the moment we are not using any kind of code.
@@ -605,7 +604,7 @@ Code related to the method result.
       
         &mdash;
         <div class='inline'><p>
-<b>member</b>: Information of member profile.
+<b>member</b>: Information of member&#8217;s profile.
 </p>
 </div>
       
@@ -708,7 +707,7 @@ Code related to the method result.
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-Method : PUT Updates a member data.
+Method : PUT Updates member&#8217;s data.
 </p>
 <dl>
 <dt>member_id</dt><dd><p>
@@ -717,20 +716,20 @@ ID of the member. This ID is unique for each member. (32 characters string)
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is being updated.. Here is a list of
-the regex we are using to alidate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+the regex we are using to validate. <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
 </p>
 <pre class="code ruby"><code>
-   *first_name: The first name of the member that is enrolling. We are not accepting any invalid character.
-   *last_name: The last name of the member that is enrolling. We are not accepting any invalid character. 
+   *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
+   *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;). 
    *address: The address of the member that is being enrolled. 
    *city: City from where the member is from.
    *state: State from where the member is from. At the moment we are not using any kind of code.
    *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
    *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
-   *phone_number: The member's personal phone number. We are accepting numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
+   *phone_number: The member's personal phone number. We are accepting numbers with the following formats: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
     +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
    *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
-    mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+    mails with the following formats: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
 </code></pre>
 </dd>
 <dt>setter</dt><dd><p>
@@ -738,8 +737,9 @@ Variable used to pass some boolean values as &#8220;cc_blank&#8221; for
 enrolling or &#8220;wrong_address&#8221; for update.
 </p>
 <pre class="code ruby"><code>
- * wrong_address: Boolean value that (if it is true) it will tell us to unset member's addres as wrong.
- * wrong_phone_number: Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong.
+ * wrong_address: Boolean value that (if it is true) it will tell us to unset member's addres as wrong. (It will set wrong_address as nil)
+ * wrong_phone_number: Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set 
+                       wrong_phone_number as nil)
 </code></pre>
 </dd>
 <dt>message</dt><dd><p>
@@ -751,7 +751,7 @@ Code related to the method result.
 </p>
 </dd>
 <dt>v_id</dt><dd><p>
-Visible id of the member that was enrolled or recovered, or updated.
+Visible id of the member that was updated.
 </p>
 </dd>
 </dl>
@@ -913,7 +913,7 @@ Visible id of the member that was enrolled or recovered, or updated.
 </div>
 
     <div id="footer">
-  Generated on Tue Jul 10 10:40:11 2012 by
+  Generated on Tue Jul 10 11:42:50 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
