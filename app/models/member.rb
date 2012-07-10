@@ -517,6 +517,17 @@ class Member < ActiveRecord::Base
   end
   ###################################################################
 
+  def update_member_data_by_params(params)
+    self.first_name = params[:first_name]
+    self.last_name = params[:last_name]
+    self.address = params[:address]
+    self.state = params[:state]
+    self.city = params[:city]
+    self.country = params[:country]
+    self.phone_number = params[:phone_number]
+    self.zip = params[:zip]
+    self.email = params[:email]
+  end
   private
     def set_status_on_enrollment!(agent, trans, amount)
       operation_type = Settings.operation_types.enrollment_billing
@@ -635,18 +646,6 @@ class Member < ActiveRecord::Base
         increment(:recycled_times, 1)
       end
       message
-    end
-
-    def update_member_data_by_params(params)
-      self.first_name = params[:first_name]
-      self.last_name = params[:last_name]
-      self.address = params[:address]
-      self.state = params[:state]
-      self.city = params[:city]
-      self.country = params[:country]
-      self.phone_number = params[:phone_number]
-      self.zip = params[:zip]
-      self.email = params[:email]
     end
 
 end
