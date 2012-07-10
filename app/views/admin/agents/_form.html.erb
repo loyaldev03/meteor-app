@@ -25,13 +25,33 @@
   </div>
 
   <div class="control-group">
-    <%= f.label :roles, :class => 'control-label' %>
+    <%= f.label :roles, 'Global Roles', :class => 'control-label' %>
     <div class="controls">
       <% Agent::ROLES.each do |role| %>
         <%= label_tag nil, role, class: 'checkbox' do %>
-          <%= check_box_tag "agent[roles][]", role, f.object.has_role?(role), id: "agent_roles_#{role}" %>
+          <%= check_box_tag "agent[roles][]", role, @agent.has_role?(role), id: "agent_roles_#{role}" %>
           <%= role -%>
         <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
+    <div class="controls">
+      <%= f.fields_for :club_roles, @agent.club_roles do |role| %>
+        <div style='border: 1px solid #ccc; margin-bottom: 0.2em;'>
+          ROLE: <%= role.object.role %>
+          CLUB ID: <%= role.object.club_id %>
+          DELETE ME: <%= label_tag nil, 'DELETE ME', class: 'chckbox' do %>
+            <%= role.check_box '_destroy' %>
+          <% end %>
+        </div>
+      <% end %>
+      <%= f.fields_for :club_roles, @agent.club_roles.build do |role| %>
+        <%= role.select :role, Agent::ROLES %>
+        <%= role.text_field :club_id %>
+        <%= role.submit 'add' %>
       <% end %>
     </div>
   </div>

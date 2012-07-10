@@ -22,7 +22,7 @@ class Agent < ActiveRecord::Base
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me, :username, :login, :first_name, 
-    :last_name, :roles
+    :last_name, :roles, :club_roles_attributes
 
   validates :username, :uniqueness => true
   validates :username, :presence => true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
@@ -40,7 +40,32 @@ class Agent < ActiveRecord::Base
     [ 'id', 'email', 'username', 'locked_at', 'created_at' ]
   end
 
- protected
+  has_many :club_roles
+  accepts_nested_attributes_for :club_roles,
+    allow_destroy: true
+
+  def has_role_with_club?(role, club = nil)
+    club = club.to_param
+    self.has_role_without_club?(role) || club && self.role_for(role, club).present?
+  end
+  alias_method_chain :has_role?, :club
+
+  def role_for(role, club)
+    self.club_roles.where(role: role, club_id: club).first
+  end
+
+  def add_role_with_club(role, club = nil)
+    if club.present? 
+      if self.role_for(role, club).blank?
+        self.club_roles.create(role: role, club_id: club.to_param)
+      end
+    else
+      self.add_role_without_club(role)
+    end
+  end
+  alias_method_chain :add_role, :club
+
+  protected
 
    # Attempt to find a user by it's email. If a record is found, send new
    # password instructions to it. If not user is found, returns a new user

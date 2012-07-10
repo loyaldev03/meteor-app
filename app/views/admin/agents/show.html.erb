@@ -61,6 +61,25 @@
   </p>
 <% end %>
 
+<h2>Global Roles</h2>
+<ul>
+  <% @agent.roles.each do |role| %>
+    <li><%= role %></li>
+  <% end %>
+</ul>
+
+<h2>Club Roles</h2>
+<ul>
+  <% @agent.club_roles.each do |role| %>
+    <li>
+      <%= role.role %> for 
+      <%= link_to role.club do %>
+        Club#<%=role.club_id -%> <%=role.club.full_name -%>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
+
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),
               admin_agents_path, :class => 'btn'  %>
