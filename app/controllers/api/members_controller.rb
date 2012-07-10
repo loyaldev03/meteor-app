@@ -9,6 +9,8 @@ class Api::MembersController < ApplicationController
   # the members data (including its credit card) and, in case it is correct, it will create and save the member.
   # It will also send an welcome email and charge the enrollment, to the member's credit card.  
   #
+  # [current_agent] The agent's ID that will be enrolling the member.
+  #
   # [member] Information related to the member that is sumbitting the enroll. Here is a list of the regex we are using to alidate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character.
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character. 
@@ -22,10 +24,10 @@ class Api::MembersController < ApplicationController
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   #             *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
-  #              we will set some features such as trial days or amount of club cash the memeber will start with. For more information 
-  #             *credit_card 
-  #             *enrollment_amount: Amount of money that takes to enroll or recover. 
-  #
+  #              we will set some features such as trial days or amount of club cash the member will start with. For more information 
+  #             *enrollment_amount: Amount of money that takes to enroll or recover.
+  #             *credit_card  
+  #             *enrollment_info
   # [credit_card] Information related to member's credit card. {CreditCard show}
   #                 *number: Number of member's credit card, from where we will charge the membership or any other service.  
   #                  This number will be stored as a hashed value.
@@ -47,7 +49,7 @@ class Api::MembersController < ApplicationController
   #                     *user_id
   #                     *landing_url: Url from where te submit comes from.
   #                     *terms_of_membership_id: This is the id of the term of membership the member is enrolling with. With this param
-  #                      we will set some features such as trial days or amount of club cash the memeber will start with. For more information 
+  #                      we will set some features such as trial days or amount of club cash the member will start with. For more information 
   #                     *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
   #                      This information is selected by the member. 
   #                     *cookie_value: Cookie from where the enrollment is being submitted.
@@ -56,6 +58,11 @@ class Api::MembersController < ApplicationController
   #                     *campaign_description: The name of the campaign.
   #                     *campaign_medium_version
   #                     *is_joint
+  # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling or "wrong_address" for update.
+  #           * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blanck credit card. It should only be true
+  #                       when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following 
+  #                       attributes: number=>"0000000000" and expire_month and expired_year setted
+  #                       as today's month and year respectively.
   #
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
@@ -65,16 +72,18 @@ class Api::MembersController < ApplicationController
   # [errors] A hash with members errors. This will be use to show erros on members creation page.
   #
   # @param [Integer] terms_of_membership_id
+  # @param [Integer] current_agent
   # @param [Hash] member
   # @param [Hash] credit_card
   # @param [Hash] enrollment_info
+  # @param [Hash] setter
   # @return [String] *message*
   # @return [Integer] *code*
   # @return [Integer] *member_id*
   # @return [Integer] *v_id*
   # @return [String] *prospect_id*
   # @return [Hash] *errors*
-  # tom, current_agent,params[:enrollment_info][:enrollment_amount], params[:member], params[:credit_card], params[:enrollment_info], params[:setter][:cc_blank]
+  # 
   def create
     response = {}
     tom = TermsOfMembership.find_by_id(params[:member][:terms_of_membership_id])  
@@ -103,18 +112,23 @@ class Api::MembersController < ApplicationController
   #             *address: The address of the member that is being enrolled. 
   #             *city: City from where the member is from.
   #             *state: State from where the member is from. At the moment we are not using any kind of code.
-  #             *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
+  #             *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
   #             *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
   #             *phone_number: The member's personal phone number. We are accepting numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
   #              +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+  # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling or "wrong_address" for update.
+  #           * wrong_address: Boolean value that (if it is true) it will tell us to unset member's addres as wrong.
+  #           * wrong_phone_number: Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong.
+  #
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
   # [v_id] Visible id of the member that was enrolled or recovered, or updated.
   #
   # @param [String] id
   # @param [Hash] member
+  # @param [Hash] setter
   # @return [String] *message*
   # @return [Integer] *member_id*  
   # @return [Integer] *code*
