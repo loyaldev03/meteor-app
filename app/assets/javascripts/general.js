@@ -177,7 +177,6 @@ $(document).ready( function() {
 
   function operation_member_functions(column_count){
     oTable = $('#operations_table').dataTable({
-      "sPaginationType": "full_numbers",
       "oLanguage": {"sSearch": "Filtered by:"},
       "bJQueryUI": false,
       "bProcessing": true,
@@ -197,10 +196,11 @@ $(document).ready( function() {
   };
 
   function transactions_member_functions(column_count){
-    $('#transactions_table').dataTable({
-      "sPaginationType": "full_numbers",
-      "bJQueryUI": true,
+    oTable = $('#transactions_table').dataTable({
+      "oLanguage": {"sSearch": "Filtered by:"},
+      "bJQueryUI": false,
       "bProcessing": true,
+      "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
       "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],

@@ -12,8 +12,8 @@ class OperationsController < ApplicationController
     end
   end
 
-  # GET /domains/1
-  # GET /domains/1.json
+  # GET /operations/1
+  # GET /operations/1.json
   def show
     @operation = Operation.find(params[:id])
     respond_to do |format|
@@ -22,8 +22,8 @@ class OperationsController < ApplicationController
     end
   end
 
-  # PUT /domains/1
-  # PUT /domains/1.json
+  # PUT /operations/1
+  # PUT /operations/1.json
   def update
     operation = Operation.find(params[:id])
 
