@@ -266,24 +266,18 @@
   </tbody>
 </table>
 
-<table class = "table table-bordered table-condensed table-nohover">
-  <thead>
-    <tr class="box_title"><th><h4>Preferences</h4></th></tr>
-  </thead>
-  <tbody>
-    <% if @enrollment_info %>
-      <% @enrollment_info.each do |ei| %>
-        <% if ei.preferences %>
-          <% ei.preferences.each do |key, value| %>
-            <tr><td> <%= key %>: <%= value %> </td></tr>
-          <% end %>
-        <% end %>
+<% if @enrollment_info and not @enrollment_info.preferences.nil? %>
+  <table class = "table table-bordered table-condensed table-nohover">
+    <thead>
+      <tr class="box_title"><th><h4>Preferences</h4></th></tr>
+    </thead>
+    <tbody>
+      <% @enrollment_info.preferences.each do |key, value| %>
+        <tr><td> <%= key %>: <%= value %> </td></tr>
       <% end %>
-    <% else %>
-      <tr><td> <%= t('activerecord.attributes.member.has_no_preferences_saved') %> </td></tr>
-    <% end %>
-  </tbody>
-</table>
+    </tbody>
+  </table>
+<% end %>
 
 <ul class="nav nav-tabs">
   <li class="active"><a href="#operations" data-toggle="tab">Operations</a></li>
