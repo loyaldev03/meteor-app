@@ -327,15 +327,7 @@ class Member < ActiveRecord::Base
 
       if credit_cards.empty? or cc_blank == '1'
         member = Member.new
-        member.first_name = member_params[:first_name]
-        member.last_name = member_params[:last_name]
-        member.address = member_params[:address]
-        member.state = member_params[:state]
-        member.city = member_params[:city]
-        member.country = member_params[:country]
-        member.phone_number = member_params[:phone_number]
-        member.zip = member_params[:zip]
-        member.email = member_params[:email]
+        member.update_member_data_by_params member_params
         member.skip_api_sync! if member.api_id.present? 
         member.club = club
         member.created_by_id = current_agent.id
@@ -363,6 +355,7 @@ class Member < ActiveRecord::Base
         return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
       end
       credit_card = CreditCard.new credit_card_params
+      member.update_member_data_by_params member_params
     end
 
     if cc_blank == '0' and credit_card_params[:number].blank?
@@ -372,7 +365,7 @@ class Member < ActiveRecord::Base
 
     member.terms_of_membership = tom
     member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, params_enrollment_info)
-  end    
+  end
 
   def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, params_enrollment_info = nil)
     amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
@@ -398,13 +391,13 @@ class Member < ActiveRecord::Base
       end
     end
     
+    enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => self.terms_of_membership_id
+    enrollment_info.update_enrollment_info_by_hash params_enrollment_info
+
     begin
       self.save!
 
-      enrollment_info = EnrollmentInfo.new params_enrollment_info
       enrollment_info.member_id = self.id
-      enrollment_info.terms_of_membership_id = self.terms_of_membership_id
-      enrollment_info.enrollment_amount = amount
       enrollment_info.save
 
       if credit_card.member.nil?
@@ -524,6 +517,17 @@ class Member < ActiveRecord::Base
   end
   ###################################################################
 
+  def update_member_data_by_params(params)
+    self.first_name = params[:first_name]
+    self.last_name = params[:last_name]
+    self.address = params[:address]
+    self.state = params[:state]
+    self.city = params[:city]
+    self.country = params[:country]
+    self.phone_number = params[:phone_number]
+    self.zip = params[:zip]
+    self.email = params[:email]
+  end
   private
     def set_status_on_enrollment!(agent, trans, amount)
       operation_type = Settings.operation_types.enrollment_billing
@@ -643,4 +647,5 @@ class Member < ActiveRecord::Base
       end
       message
     end
+
 end

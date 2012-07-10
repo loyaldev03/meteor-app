@@ -43,7 +43,17 @@ CREATE TABLE `club_cash_transactions` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `club_roles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `agent_id` int(11) DEFAULT NULL,
+  `club_id` int(11) DEFAULT NULL,
+  `role` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `clubs` (
   `description` text COLLATE utf8_unicode_ci,
@@ -63,7 +73,7 @@ CREATE TABLE `clubs` (
   `api_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `theme` varchar(255) COLLATE utf8_unicode_ci DEFAULT 'application',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `communications` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -98,7 +108,7 @@ CREATE TABLE `credit_cards` (
   `last_digits` varchar(4) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_credit_cards_on_member_id` (`member_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=269365 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=269368 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `decline_strategies` (
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -185,8 +195,10 @@ CREATE TABLE `enrollment_infos` (
   `campaign_medium_version` int(11) DEFAULT NULL,
   `joint` tinyint(1) DEFAULT NULL,
   `prospect_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `enumerations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -199,7 +211,7 @@ CREATE TABLE `enumerations` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `fulfillments` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -212,7 +224,7 @@ CREATE TABLE `fulfillments` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3114 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3116 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `member_notes` (
   `member_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -286,7 +298,7 @@ CREATE TABLE `operations` (
   `operation_type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_operations_on_member_id` (`member_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15105 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15113 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `partners` (
   `prefix` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -359,7 +371,7 @@ CREATE TABLE `terms_of_memberships` (
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `description` text COLLATE utf8_unicode_ci,
   `club_id` bigint(20) DEFAULT NULL,
-  `trial_days` int(11) DEFAULT '30',
+  `provisional_days` int(11) DEFAULT '30',
   `mode` varchar(255) COLLATE utf8_unicode_ci DEFAULT 'development',
   `needs_enrollment_approval` tinyint(1) DEFAULT '0',
   `grace_period` int(11) DEFAULT '0',
@@ -539,8 +551,14 @@ INSERT INTO schema_migrations (version) VALUES ('20120705115440');
 
 INSERT INTO schema_migrations (version) VALUES ('20120706133424');
 
+INSERT INTO schema_migrations (version) VALUES ('20120706142527');
+
 INSERT INTO schema_migrations (version) VALUES ('20120706145800');
 
 INSERT INTO schema_migrations (version) VALUES ('20120706163030');
 
 INSERT INTO schema_migrations (version) VALUES ('20120708203028');
+
+INSERT INTO schema_migrations (version) VALUES ('20120710115812');
+
+INSERT INTO schema_migrations (version) VALUES ('20120710182053');

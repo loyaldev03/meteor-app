@@ -28,7 +28,7 @@ class MembersController < ApplicationController
     @active_credit_card = @current_member.active_credit_card
     @fulfillments = @current_member.fulfillments.all
     @communications = @current_member.communications.all
-    @enrollment_info = EnrollmentInfo.find_all_by_member_id(@current_member)
+    @enrollment_info = EnrollmentInfo.find_by_member_id(@current_member, :order => "created_at DESC")
   end
 
   def new
