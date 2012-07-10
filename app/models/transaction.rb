@@ -123,7 +123,7 @@ class Transaction < ActiveRecord::Base
     elsif sale_transaction.amount > amount
       trans.transaction_type = "credit"
     end
-    if old_transaction.amount_available_to_refund < amount
+    if sale_transaction.amount_available_to_refund < amount
       return { :message => "Cant credit more $ than the original transaction amount", :code => Settings.error_codes.refund_invalid }
     end
     trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration)
