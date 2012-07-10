@@ -152,7 +152,7 @@ class Member < ActiveRecord::Base
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
   def schedule_first_membership
     send_fulfillment
-    self.bill_date = Time.zone.now + terms_of_membership.trial_days
+    self.bill_date = Time.zone.now + terms_of_membership.provisional_days
     self.next_retry_bill_date = bill_date
     # Documentation #18928 - recoveries will not change the quota number.
     if reactivation_times == 0
@@ -166,7 +166,7 @@ class Member < ActiveRecord::Base
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.  
   def schedule_first_membership_for_approved_member
     send_fulfillment
-    self.bill_date = Time.zone.now + terms_of_membership.trial_days
+    self.bill_date = Time.zone.now + terms_of_membership.provisional_days
     self.next_retry_bill_date = bill_date
     if reactivation_times == 0
       self.quota = (terms_of_membership.monthly? ? 1 :  0)

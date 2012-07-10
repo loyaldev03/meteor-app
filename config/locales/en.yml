@@ -141,7 +141,7 @@ en:
         installment_amount: 'Installment amount'
         installment_type: 'Installment type'
         grace_period: 'Grace period'
-        trial_days: 'Trial days'
+        provisional_days: 'Provisional days'
         has_payment_gateway_development: 'The club has payment gateway configuration for development mode'
         has_payment_gateway_production: 'The club has payment gateway configuration for production mode'
         not_have_payment_gateway_development: 'The club does not have payment gateway configuration for development mode'

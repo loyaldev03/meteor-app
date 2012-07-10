@@ -1,5 +1,5 @@
 class TermsOfMembership < ActiveRecord::Base
-  attr_accessible :grace_period, :mode, :needs_enrollment_approval, :trial_days, 
+  attr_accessible :grace_period, :mode, :needs_enrollment_approval, :provisional_days, 
     :installment_amount, :description, :installment_type, :club, :name
 
   belongs_to :club
@@ -16,7 +16,7 @@ class TermsOfMembership < ActiveRecord::Base
   validates :mode, :presence => true
   #validates :needs_enrollment_approval, :presence => true
   validates :club, :presence => true
-  validates :trial_days, :presence => true
+  validates :provisional_days, :presence => true
   validates :installment_amount, :presence => true
   validates :installment_type, :presence => true
   validates :club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
