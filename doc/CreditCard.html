@@ -290,6 +290,50 @@ method commented.
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#can_be_activated%3F-instance_method" title="#can_be_activated? (instance method)">- (Boolean) <strong>can_be_activated?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#can_be_blacklisted%3F-instance_method" title="#can_be_blacklisted? (instance method)">- (Boolean) <strong>can_be_blacklisted?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#deactivate-instance_method" title="#deactivate (instance method)">- (Object) <strong>deactivate</strong> </a>
     
 
@@ -378,19 +422,19 @@ method commented.
       <pre class="lines">
 
 
-41
-42
-43
-44
-45
-46
-47
-48
 49
-50</pre>
+50
+51
+52
+53
+54
+55
+56
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 41</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_year'>expire_year</span><span class='comma'>,</span> <span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span> <span class='id identifier rubyid_last_name'>last_name</span><span class='rparen'>)</span>
   <span class='const'>ActiveMerchant</span><span class='op'>::</span><span class='const'>Billing</span><span class='op'>::</span><span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_require_verification_value'>require_verification_value</span> <span class='op'>=</span> <span class='kw'>false</span>
@@ -436,14 +480,6 @@ Later if not successful = (+2), 3/2013 6 Days Later if not successful =
       <pre class="lines">
 
 
-65
-66
-67
-68
-69
-70
-71
-72
 73
 74
 75
@@ -469,10 +505,18 @@ Later if not successful = (+2), 3/2013 6 Days Later if not successful =
 95
 96
 97
-98</pre>
+98
+99
+100
+101
+102
+103
+104
+105
+106</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_recycle_expired_rule'>recycle_expired_rule</span><span class='lparen'>(</span><span class='id identifier rubyid_acc'>acc</span><span class='comma'>,</span> <span class='id identifier rubyid_times'>times</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='period'>.</span><span class='id identifier rubyid_expired?'>expired?</span>
@@ -607,12 +651,12 @@ before_update :not_blacklisted
       <pre class="lines">
 
 
-52
-53
-54</pre>
+60
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 52</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_am_card'>am_card</span>
   <span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_year'>expire_year</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_last_name'>last_name</span><span class='rparen'>)</span>
@@ -676,6 +720,110 @@ before_update :not_blacklisted
 
 <span class='kw'>def</span> <span class='id identifier rubyid_blacklist_active_credit_card'>blacklist_active_credit_card</span>
   <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:blacklisted</span><span class='comma'>,</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="can_be_activated?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>can_be_activated?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+45
+46
+47</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 45</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_can_be_activated?'>can_be_activated?</span>
+  <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_active'>active</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_lapsed?'>lapsed?</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_blacklisted'>blacklisted</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="can_be_blacklisted?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>can_be_blacklisted?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+41
+42
+43</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 41</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_can_be_blacklisted?'>can_be_blacklisted?</span>
+  <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_lapsed?'>lapsed?</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_blacklisted'>blacklisted</span> 
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -757,12 +905,12 @@ before_update :not_blacklisted
       <pre class="lines">
 
 
-56
-57
-58</pre>
+64
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 64</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_last_digits'>update_last_digits</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_last_digits'>last_digits</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_number'>number</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='lparen'>(</span><span class='int'>4</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_last_digits'>last_digits</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -777,7 +925,7 @@ before_update :not_blacklisted
 </div>
 
     <div id="footer">
-  Generated on Fri Jul  6 17:25:59 2012 by
+  Generated on Tue Jul 10 10:40:09 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

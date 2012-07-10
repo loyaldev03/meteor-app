@@ -26,15 +26,14 @@ class Api::MembersController < ApplicationController
   #             *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
   #              we will set some features such as trial days or amount of club cash the member will start with. For more information 
   #             *enrollment_amount: Amount of money that takes to enroll or recover.
-  #             *credit_card  
-  #             *enrollment_info
+  #             *credit_card  [Hash]
+  #             *enrollment_info  [Hash]
   # [credit_card] Information related to member's credit card. {CreditCard show}
   #                 *number: Number of member's credit card, from where we will charge the membership or any other service.  
   #                  This number will be stored as a hashed value.
   #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   #                 *expire_year: The year (in numbers) in which the credit card will expire.  
   # [enrollment_info] Adition information submited when the member enrolls. We storage that information for further reports. 
-  #                     *member_id: Id of the member the enrollment info is related to. (It is setted after creating the member)
   #                     *prospect_id: Id of the prospect the enrollment info is related to.
   #                     *product_sku: Name of the selected product.
   #                     *product_description: Description of the selected product.
@@ -48,8 +47,6 @@ class Api::MembersController < ApplicationController
   #                     *referral_path
   #                     *user_id
   #                     *landing_url: Url from where te submit comes from.
-  #                     *terms_of_membership_id: This is the id of the term of membership the member is enrolling with. With this param
-  #                      we will set some features such as trial days or amount of club cash the member will start with. For more information 
   #                     *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
   #                      This information is selected by the member. 
   #                     *cookie_value: Cookie from where the enrollment is being submitted.
@@ -71,11 +68,7 @@ class Api::MembersController < ApplicationController
   # [prospect_id] ID of the prospect (if its known).
   # [errors] A hash with members errors. This will be use to show erros on members creation page.
   #
-  # @param [Integer] terms_of_membership_id
-  # @param [Integer] current_agent
   # @param [Hash] member
-  # @param [Hash] credit_card
-  # @param [Hash] enrollment_info
   # @param [Hash] setter
   # @return [String] *message*
   # @return [Integer] *code*
