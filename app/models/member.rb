@@ -316,6 +316,18 @@ class Member < ActiveRecord::Base
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end
 
+  def update_member_data_by_params(params)
+    member.first_name = params[:first_name]
+    member.last_name = params[:last_name]
+    member.address = params[:address]
+    member.state = params[:state]
+    member.city = params[:city]
+    member.country = params[:country]
+    member.phone_number = params[:phone_number]
+    member.zip = params[:zip]
+    member.email = params[:email]
+  end
+
   def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0', params_enrollment_info = nil)
     club = tom.club
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
@@ -327,15 +339,7 @@ class Member < ActiveRecord::Base
 
       if credit_cards.empty? or cc_blank == '1'
         member = Member.new
-        member.first_name = member_params[:first_name]
-        member.last_name = member_params[:last_name]
-        member.address = member_params[:address]
-        member.state = member_params[:state]
-        member.city = member_params[:city]
-        member.country = member_params[:country]
-        member.phone_number = member_params[:phone_number]
-        member.zip = member_params[:zip]
-        member.email = member_params[:email]
+        member.update_member_data_by_params member_params
         member.skip_api_sync! if member.api_id.present? 
         member.club = club
         member.created_by_id = current_agent.id
@@ -363,6 +367,7 @@ class Member < ActiveRecord::Base
         return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
       end
       credit_card = CreditCard.new credit_card_params
+      member.update_member_data_by_params member_params
     end
 
     if cc_blank == '0' and credit_card_params[:number].blank?
@@ -372,7 +377,7 @@ class Member < ActiveRecord::Base
 
     member.terms_of_membership = tom
     member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, params_enrollment_info)
-  end    
+  end
 
   def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, params_enrollment_info = nil)
     amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
