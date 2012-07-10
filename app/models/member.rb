@@ -403,6 +403,7 @@ class Member < ActiveRecord::Base
 
       enrollment_info = EnrollmentInfo.new params_enrollment_info
       enrollment_info.member_id = self.id
+      enrollment_info.terms_of_membership_id = self.terms_of_membership_id
       enrollment_info.enrollment_amount = amount
       enrollment_info.save
 
