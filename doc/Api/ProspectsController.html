@@ -226,6 +226,21 @@ Information related to the prospect.
       
     </li>
   
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>
+<b>prospect_id</b>: Prospect id that was created.
+</p>
+</div>
+      
+    </li>
+  
 </ul>
 
 </div><table class="source_code">
@@ -234,7 +249,6 @@ Information related to the prospect.
       <pre class="lines">
 
 
-14
 15
 16
 17
@@ -243,10 +257,11 @@ Information related to the prospect.
 20
 21
 22
-23</pre>
+23
+24</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/prospects_controller.rb', line 14</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/prospects_controller.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
 	<span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prospect_data_invalid</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>405</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
@@ -268,7 +283,7 @@ Information related to the prospect.
 </div>
 
     <div id="footer">
-  Generated on Tue Jul 10 11:05:46 2012 by
+  Generated on Tue Jul 10 12:03:58 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
