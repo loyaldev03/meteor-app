@@ -528,6 +528,7 @@ class Member < ActiveRecord::Base
     self.zip = params[:zip]
     self.email = params[:email]
   end
+  
   private
     def set_status_on_enrollment!(agent, trans, amount)
       operation_type = Settings.operation_types.enrollment_billing
@@ -612,7 +613,7 @@ class Member < ActiveRecord::Base
         message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
         self.next_retry_bill_date = Time.zone.now + eval(Settings.next_retry_on_missing_decline)
         self.save
-        unless trans.code == Settings.error_codes.invalid_credit_card 
+        unless trans.response_code == Settings.error_codes.invalid_credit_card 
           Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
             :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.credit_card_type}. " + 
                 "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.")
