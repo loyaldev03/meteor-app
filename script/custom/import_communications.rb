@@ -139,7 +139,7 @@ def get_terms_of_membership_id(campaign_id)
   return nil if campaign.phoenix_mega_channel != 'SLOOP' and campaign.phoenix_mega_channel != 'PTX' and campaign.phoenix_mega_channel != 'OTHER'
 
   m = PhoenixTermsOfMembership.find_by_club_id_and_installment_amount_and_installment_type_and_provisional_days(CLUB, 
-        campaign.phoenix_amount, payment_type, campaign.phoenix_provisional_days)
+        campaign.phoenix_amount, payment_type, campaign.phoenix_trial_days)
 
   if m.nil?
     m = PhoenixTermsOfMembership.new 
@@ -150,7 +150,7 @@ def get_terms_of_membership_id(campaign_id)
     m.description = m.name
     m.grace_period = grace_period
     m.club_id = CLUB
-    m.provisional_days = campaign.phoenix_provisional_days
+    m.provisional_days = campaign.phoenix_trial_days
     m.mode = "production"
     m.club_cash_amount = 150
     m.save!
