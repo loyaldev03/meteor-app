@@ -10,5 +10,10 @@ class EnrollmentInfo < ActiveRecord::Base
                   :preferences, :cookie_value, :cookie_set, :campaign_medium, :campaign_description,
                   :campaign_medium_version, :is_joint
 
+  private
+    def update_enrollment_info_by_hash(params)
+      self.product_sku = params[:product_sku]
+      #TODO: complete with each param we get from API hash
+    end
 
 end

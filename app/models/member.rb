@@ -316,18 +316,6 @@ class Member < ActiveRecord::Base
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end
 
-  def update_member_data_by_params(params)
-    member.first_name = params[:first_name]
-    member.last_name = params[:last_name]
-    member.address = params[:address]
-    member.state = params[:state]
-    member.city = params[:city]
-    member.country = params[:country]
-    member.phone_number = params[:phone_number]
-    member.zip = params[:zip]
-    member.email = params[:email]
-  end
-
   def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0', params_enrollment_info = nil)
     club = tom.club
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
@@ -403,13 +391,13 @@ class Member < ActiveRecord::Base
       end
     end
     
+    enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => self.terms_of_membership_id
+    enrollment_info.update_enrollment_info_by_hash params_enrollment_info
+
     begin
       self.save!
 
-      enrollment_info = EnrollmentInfo.new params_enrollment_info
       enrollment_info.member_id = self.id
-      enrollment_info.terms_of_membership_id = self.terms_of_membership_id
-      enrollment_info.enrollment_amount = amount
       enrollment_info.save
 
       if credit_card.member.nil?
@@ -648,4 +636,17 @@ class Member < ActiveRecord::Base
       end
       message
     end
+
+    def update_member_data_by_params(params)
+      self.first_name = params[:first_name]
+      self.last_name = params[:last_name]
+      self.address = params[:address]
+      self.state = params[:state]
+      self.city = params[:city]
+      self.country = params[:country]
+      self.phone_number = params[:phone_number]
+      self.zip = params[:zip]
+      self.email = params[:email]
+    end
+
 end
