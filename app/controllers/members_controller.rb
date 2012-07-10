@@ -28,6 +28,7 @@ class MembersController < ApplicationController
     @active_credit_card = @current_member.active_credit_card
     @fulfillments = @current_member.fulfillments.all
     @communications = @current_member.communications.all
+    @preferences = EnrollmentInfo.find_by_member_id(@current_member).preferences
   end
 
   def new

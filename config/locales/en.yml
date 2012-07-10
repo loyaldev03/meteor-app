@@ -123,6 +123,7 @@ en:
         add_club_cash_transaction: 'Add club cash'
         unset_wrong_address: 'Address setted as wrong. Would you like to unset it?'
         unset_wrong_phone_number: 'Phone setted as wrong. Would you like to unset it?'
+        has_no_preferences_saved: 'There are no preferences saved.'
       credit_card:
         number: 'Credit card number'
         expire_date: 'Expire date'

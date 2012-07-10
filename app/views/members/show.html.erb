@@ -266,6 +266,21 @@
   </tbody>
 </table>
 
+<table class = "table table-bordered table-condensed table-nohover">
+  <thead>
+    <tr class="box_title"><th><h4>Preferences</h4></th></tr>
+  </thead>
+  <tbody>
+    <% if @preferences %>
+      <% @preferences.each do |key, value| %>
+        <tr><td> <%= key %>: <%= value %> </td></tr>
+      <% end %>
+    <% else %>
+      <tr><td> <%= t('activerecord.attributes.member.has_no_preferences_saved') %> </td></tr>
+    <% end %>
+  </tbody>
+</table>
+
 <ul class="nav nav-tabs">
   <li class="active"><a href="#operations" data-toggle="tab">Operations</a></li>
   <li><a href="#notes" data-toggle="tab">Notes</a></li>
