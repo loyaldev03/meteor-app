@@ -87,14 +87,14 @@
                     :class => 'help-inline' %>
       </td> 
       <td> <%= credit_Card.text_field :number, :class => 'text_field input-medium', 
-                                      :name => "member[credit_cards_attributes][number]"%> </td>
+                                      :name => "member[credit_card][number]"%> </td>
       <td colspan="2"> 
         <%= credit_Card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' %> 
         <%=credit_Card.text_field :expire_month, :class => 'text_field input-medium',
-                                  :name => "member[credit_cards_attributes][expire_month]" %>
+                                  :name => "member[credit_card][expire_month]" %>
         <%= credit_Card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %> 
         <%= credit_Card.text_field :expire_year, :class => 'text_field input-small',
-                                   :name => "member[credit_cards_attributes][expire_year]" %>
+                                   :name => "member[credit_card][expire_year]" %>
       </td>
     </tr>
   <% end %>
