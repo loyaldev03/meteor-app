@@ -5,14 +5,16 @@
     <tr>
       <td> 
         <%= label :reason, t('reason'), :class => 'help-inline' %> 
-        <%= select_tag :reason, options_from_collection_for_select(@blacklist_reason, "name", "name") %>
+        <%= select_tag :reason, options_from_collection_for_select(@blacklist_reason, "name", "name"), :class => "required", :include_blank => true %>
       </td>
     </tr>
     <tr>
-      <td> <%= submit_tag t('buttons.blacklist_member'), :class => 'btn btn-primary', 
-                                    :confirm => t('text_blacklist_are_you_sure') %>
+      <td> <%= submit_tag t('buttons.blacklist_member'), :class => 'btn btn-primary' %>
            <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => 'btn' %> </td>
     </tr>
   </table>
 <% end%>
 
+<script>
+  $(document).ready(blacklist_member_functions());
+</script>

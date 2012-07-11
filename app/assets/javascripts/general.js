@@ -214,7 +214,7 @@ $(document).ready( function() {
   function member_cancellation_functions(){
     $("#member_cancelation_form").validate({
        submitHandler: function(form) {
-        if (confirm('This member will be canceled. Are you sure?')) {
+        if (confirm('This member will be canceled. Are you really sure?')) {
           form.submit();            
         }else
         return false;
@@ -222,6 +222,17 @@ $(document).ready( function() {
     })
     $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
   };
+
+  function blacklist_member_functions(){
+    $("form").validate({
+       submitHandler: function(form) {
+        if (confirm('This member will be blacklisted. Are you really sure?')) {
+          form.submit();            
+        }else
+        return false;
+       }
+    })
+  }
 
   function member_note_functions(){
     $('#new_member_note').validate();
