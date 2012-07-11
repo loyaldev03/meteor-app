@@ -476,12 +476,12 @@ class Member < ActiveRecord::Base
 
   # Resets member club cash in case of a cancelation. It calls "add_club_cash" method
   def nillify_club_cash
-    add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation') unless club_cash_amount.to_f == 0.0
+    add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation') unless club_cash_amount.to_i == 0
   end
 
   # Resets member club cash in case the club cash has expired. It calls "add_club_cash" method
   def reset_club_cash
-    add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.') unless club_cash_amount.to_f == 0.0
+    add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.') unless club_cash_amount.to_i == 0
     assign_club_cash!('Renewing club cash.')
   end
 
@@ -494,22 +494,26 @@ class Member < ActiveRecord::Base
   end
   
   # Adds club cash transaction. 
-  def add_club_cash(agent,amount,description = nil)
+  def add_club_cash(agent,amount = 0,description = nil)
     answer = {}
     ClubCashTransaction.transaction do 
       begin
         cct = ClubCashTransaction.new(:amount => amount, :description => description)
         cct.member = self
-        cct.save!
-        self.club_cash_amount = self.club_cash_amount + amount.to_f
-        self.save!
-        message = "Club cash transaction done!. Amount: $#{cct.amount}"
-        Auditory.audit(agent, cct, message, self)
-        answer = { :message => message, :code => Settings.error_codes.success }
+        if cct.valid?
+          cct.save!
+          self.club_cash_amount = self.club_cash_amount + amount.to_f
+          self.save!
+          message = "Club cash transaction done!. Amount: $#{cct.amount}"
+          Auditory.audit(agent, cct, message, self)
+          answer = { :message => message, :code => Settings.error_codes.success }
+        else
+          message = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"
+          answer = { :message => 'message', :code => Settings.error_codes.club_cash_transaction_not_successful  }
+        end
       rescue Exception => e
         message = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"
         Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => message)
-        answer = { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful  }
         raise ActiveRecord::Rollback
       end
     end
