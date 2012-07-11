@@ -476,12 +476,12 @@ class Member < ActiveRecord::Base
 
   # Resets member club cash in case of a cancelation. It calls "add_club_cash" method
   def nillify_club_cash
-    add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation') unless club_cash_amount.to_i == 0
+    add_club_cash(nil, -club_cash_amount.to_i, 'Removing club cash because of member cancellation') unless club_cash_amount.to_f == 0.0
   end
 
   # Resets member club cash in case the club cash has expired. It calls "add_club_cash" method
   def reset_club_cash
-    add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.') unless club_cash_amount.to_i == 0
+    add_club_cash(nil, -club_cash_amount.to_i, 'Removing expired club cash.') unless club_cash_amount.to_i == 0
     assign_club_cash!('Renewing club cash.')
   end
 
