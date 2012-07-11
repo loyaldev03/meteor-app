@@ -27,21 +27,20 @@ $(document).ready( function() {
 
   function agent_index_functions(column_count){
     $('#agents_table').dataTable({
-      "sPaginationType": "full_numbers",
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "bProcessing": true,
+      "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
       "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
       "sAjaxSource": $('#agents_table').data('source'),
     });
-
   }
 
   function partner_index_functions(column_count){
     $('#partners_table').dataTable({
-      "sPaginationType": "full_numbers",
-      "bJQueryUI": true,
+      "sPaginationType": "bootstrap",
+      "bJQueryUI": false,
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
@@ -52,8 +51,8 @@ $(document).ready( function() {
   
   function club_index_functions(column_count){
     $('#clubs_table').dataTable({
-      "sPaginationType": "full_numbers",
-      "bJQueryUI": true,
+      "sPaginationType": "bootstrap",
+      "bJQueryUI": false,
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
@@ -64,8 +63,8 @@ $(document).ready( function() {
 
   function domain_index_functions(column_count){
     $('#domains_table').dataTable({
-      "sPaginationType": "full_numbers",
-      "bJQueryUI": true,
+      "sPaginationType": "bootstrap",
+      "bJQueryUI": false,
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],

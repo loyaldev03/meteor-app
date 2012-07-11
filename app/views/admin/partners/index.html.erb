@@ -2,7 +2,7 @@
 
 <%= render :partial => 'shared/page_header', :locals => { :title_text => t('.title'),:new_path => new_admin_partner_path} %>
 
-<table id="partners_table" class="display" data-source="<%= admin_partners_url(format: "json") %>">
+<table id="partners_table" class="table table-bordered table-condensed dataTable" data-source="<%= admin_partners_url(format: "json") %>">
   <thead>
     <tr>
       <% Partner.datatable_columns.each do |column| %>

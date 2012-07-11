@@ -1,6 +1,6 @@
 <%= render :partial => 'shared/page_header', :locals => { :title_text => t('.title'),:new_path => new_admin_agent_path} %>
 
-<table id="agents_table" class="display" data-source="<%= admin_agents_url(format: "json") %>">
+<table id="agents_table" class="table table-bordered table-condensed dataTable" data-source="<%= admin_agents_url(format: "json") %>">
   <thead>
     <tr>
       <th><%= t('activerecord.attributes.agent.id') %></th>

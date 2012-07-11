@@ -1,7 +1,7 @@
 <%- model_class = Club.new.class -%>
 <h1><%=t '.title', :default => model_class.model_name.human.pluralize %></h1>
 
-<table id="clubs_table" class="display" data-source="<%= clubs_url(format: "json") %>">
+<table id="clubs_table" class="table table-bordered table-condensed dataTable" data-source="<%= clubs_url(format: "json") %>">
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
