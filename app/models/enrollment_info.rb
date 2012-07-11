@@ -15,7 +15,7 @@ class EnrollmentInfo < ActiveRecord::Base
   def update_enrollment_info_by_hash(params)
     self.product_sku = params[:product_sku]
     self.product_description = params[:product_description]
-    self.mega_chanel = params[:mega_chanel]
+    self.mega_channel = params[:mega_channel]
     self.marketing_code = params[:marketing_code]
     self.fulfillment_code = params[:fulfillment_code]
     self.ip_address = params[:ip_address]

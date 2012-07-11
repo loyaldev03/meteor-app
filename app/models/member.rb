@@ -453,12 +453,12 @@ class Member < ActiveRecord::Base
     end
   end
 
-  # Returns mega_chanel related to member's enrollment_info
+  # Returns mega_channel related to member's enrollment_info
   def mega_channel
     EnrollmentInfo.find_by_member_id(self.id).mega_channel
   end
 
-  # Sets mega_chanel related to member's enrollment_info
+  # Sets mega_channel related to member's enrollment_info
   def mega_channel=(value)
     self.enrollment_info.mega_channel ||= {}
     self.enrollment_info.mega_channel = value
@@ -509,7 +509,7 @@ class Member < ActiveRecord::Base
           answer = { :message => message, :code => Settings.error_codes.success }
         else
           message = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"
-          answer = { :message => 'message', :code => Settings.error_codes.club_cash_transaction_not_successful  }
+          answer = { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful  }
         end
       rescue Exception => e
         message = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"

@@ -37,7 +37,7 @@ class Api::MembersController < ApplicationController
   #                     *prospect_id: Id of the prospect the enrollment info is related to.
   #                     *product_sku: Name of the selected product.
   #                     *product_description: Description of the selected product.
-  #                     *mega_chanel: 
+  #                     *mega_channel: 
   #                     *marketing_code: multi-team
   #                     *fulfillment_code: Id of the fulfillment we are sending to our member. (car-flag).
   #                     *ip_address: Ip address from where the enrollment is being submitted.
