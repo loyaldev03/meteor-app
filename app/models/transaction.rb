@@ -197,11 +197,10 @@ class Transaction < ActiveRecord::Base
     end
 
     def credit_card_invalid
-      message = "Credit card not valid: #{@cc.error_to_s}"
       self.response_code = Settings.error_codes.invalid_credit_card 
-      self.response_result = message
+      self.response_result = "Credit card not valid: #{@cc.errors}"
       self.save
-      { :message => message, :code => Settings.error_codes.invalid_credit_card }
+      { :message => self.response_result, :code => self.response_code }
     end
 
     def save_response(answer)
