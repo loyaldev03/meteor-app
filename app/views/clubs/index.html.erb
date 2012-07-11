@@ -1,5 +1,12 @@
 <%- model_class = Club.new.class -%>
-<h1><%=t '.title', :default => model_class.model_name.human.pluralize %></h1>
+<h1></h1>
+
+<div class="page-header">
+  <h1> <%=t '.title', :default => model_class.model_name.human.pluralize %> </h1>
+    <%= link_to(new_club_path, :class => "btn btn-primary btn_on_header") do %> 
+      <i class="icon-plus"></i> New Club
+  <% end %>
+</div>
 
 <table id="clubs_table" class="table table-bordered table-condensed dataTable" data-source="<%= clubs_url(format: "json") %>">
   <thead>
@@ -15,9 +22,6 @@
   </tbody>
 </table>
 
-<%= link_to t(:new),
-            new_club_path,
-            :class => 'btn btn-primary' %>
 <script>
   $(document).ready(club_index_functions(<%= Club.datatable_columns.size %>));
 </script>

@@ -1,5 +1,12 @@
 <%- model_class = Domain.new.class -%>
-<h1><%=t '.title', :default => model_class.model_name.human.pluralize %></h1>
+
+<div class="page-header">
+  <h1> <%=t '.title', :default => model_class.model_name.human.pluralize %> </h1>
+    <%= link_to(new_domain_path, :class => "btn btn-primary btn_on_header") do %> 
+      <i class="icon-plus"></i> New Domain
+  <% end %>
+</div>
+
 <table id="domains_table" class="table table-bordered table-condensed dataTable" data-source="<%= domains_url(format: "json") %>">
   <thead>
     <tr>
@@ -15,8 +22,6 @@
   <tbody>
   </tbody>
 </table>
-
-<%= link_to t(:new), new_domain_path, :class => 'btn btn-primary' %>
 
 <script>
   $(document).ready(domain_index_functions(<%= Domain.datatable_columns.size%>))

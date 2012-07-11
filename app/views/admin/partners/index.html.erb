@@ -1,6 +1,11 @@
 <%- model_class = Partner.new.class -%>
 
-<%= render :partial => 'shared/page_header', :locals => { :title_text => t('.title'),:new_path => new_admin_partner_path} %>
+<div class="page-header">
+  <h1> <%= t('.title') %> </h1>
+    <%= link_to(new_admin_partner_path, :class => "btn btn-primary btn_on_header") do %> 
+      <i class="icon-plus"></i> New Partner
+  <% end %>
+</div>
 
 <table id="partners_table" class="table table-bordered table-condensed dataTable" data-source="<%= admin_partners_url(format: "json") %>">
   <thead>
