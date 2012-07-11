@@ -211,8 +211,16 @@
             </td>  
           </tr>
           <tr>
+            <th> <%= t('activerecord.attributes.member.created_by') %>: </th>
+            <td> <%= @current_member.created_by.username %> </td>
+          </tr>
+          <tr>
             <th><%= t('activerecord.attributes.member.reactivation_times') %>:</th>
             <td><%= @current_member.reactivation_times %></td>  
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.member.recycled_times') %>:</th>
+            <td><%= @current_member.recycled_times %></td>  
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.member_group_type') %>:</th>
@@ -232,7 +240,7 @@
           </tr>
           
           <tr class="ligthgrey">
-            <th><%= t('activerecord.attributes.member.next_retry_bill_date') %></th>
+            <th><%= t('activerecord.attributes.member.next_retry_bill_date') %>:</th>
             <td>
               <%= @current_member.next_retry_bill_date %>&nbsp;&nbsp;&nbsp;
               <% unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
@@ -258,6 +266,14 @@
                 <% end %>
               <% end %>
             </td>  
+          </tr>
+          <tr>
+            <th> <%= t('activerecord.attributes.member.club_cash_expire_date') %>: </th>
+            <td> <%= @current_member.club_cash_expire_date %> </td>
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.member.quota') %>: </th>
+            <td><%= @current_member.quota %></td>  
           </tr>
         </table>
 
