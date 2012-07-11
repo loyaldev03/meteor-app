@@ -54,7 +54,7 @@ class Api::MembersController < ApplicationController
   #                     *campaign_medium
   #                     *campaign_description: The name of the campaign.
   #                     *campaign_medium_version
-  #                     *is_joint
+  #                     *joint
   # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling, or "wrong_address" for update.
   #           * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blanck credit card. It should only be true
   #                       when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following 
