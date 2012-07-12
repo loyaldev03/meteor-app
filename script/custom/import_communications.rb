@@ -1,5 +1,10 @@
 #!/bin/ruby
 
+# litle
+# insert into payment_gateway_configurations (report_group , merchant_key, login, password,  mode ,descriptor_name , descriptor_phone , order_mark , gateway , club_id ,  created_at , updated_at, deleted_at ) values (  'onmc' ,'021410', 'NMP', 'T6Uzs2Qf', 'production', 'NMP*Nascar Members Club Charlotte NC', '18776962722', NULL, 'litle', 1, NOW(), NOW(), NOW() );
+# mes
+# insert into payment_gateway_configurations (report_group , merchant_key, login, password,  mode ,descriptor_name , descriptor_phone , order_mark , gateway , club_id ,  created_at , updated_at ) values (  'ONMC' ,'SAC Inc', '94100011002800000002', 'OMqwczjeoonNkqqBejfHtKLoBfxLqSdi', 'production', 'NMP*ONMC', '342525', 'onmc', 'mes', 1, NOW(), NOW());
+
 # "Email Name ","MLID","Trigger ID","Corresponding Event Name","Recurring","Before or After","Day","Notes"
 
 annual_sloop = [
@@ -126,6 +131,8 @@ end
 
 # "CID ","TOM PROVISIONAL_DAYS","Mega Channel","TOM Membership_amount","Tom Membership_Type","Campaign Description","Campaign Medium","Campaign Medium Version ","Referral Host","Marketing Code","fulfillment_code","Product Description","Product ID ","Landing URL  ","Notes","Joint"
 def get_terms_of_membership_id(campaign_id)
+  return nil
+
   campaign = BillingCampaign.find_by_id(campaign_id)
   if campaign.nil? 
     return nil
