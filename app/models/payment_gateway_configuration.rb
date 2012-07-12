@@ -5,14 +5,15 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   has_many :transactions
 
   acts_as_paranoid
+  validates_as_paranoid
 
   validates :login, :presence => true
   validates :merchant_key, :presence => true
   validates :password, :presence => true
-  validates :mode, :presence => true, :uniqueness => { :message => "There is already one payment gateway configuration with this mode, on this club.", 
-                                                       :scope => :club_id }
+  validates :mode, :presence => true
   validates :gateway, :presence => true
   validates :club, :presence => true
+  validates_uniqueness_of_without_deleted :mode, :scope => :club_id
 
   def mes?
     self.gateway == 'mes'
