@@ -35,7 +35,7 @@ class Member < ActiveRecord::Base
 
   #Validates that there are no invalid charactes in the name. 
 
-  REGEX_FIRST_AND_LAST_NAME = /^[a-zA-Zá]+$/u
+  REGEX_FIRST_AND_LAST_NAME = /^[a-zA-ZàáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
   #Validates numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
   REGEX_PHONE_NUMBER = /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-. ]\(?(x|int)?[0-9]?{1,10}\)?)?$/ 
@@ -44,7 +44,7 @@ class Member < ActiveRecord::Base
   REGEX_EMAIL = /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
 
   #Validates that there are no invalid charactes in the address. 
-  REGEX_ADDRESS = /^[A-Za-z0-9 '-.,#]+$/
+  REGEX_ADDRESS = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
   #Validates that there are no invalid charactes in the country. 
   REGEX_CITY_AND_STATE_AND_COUNTRY = /^[A-Za-z0-9 ',.\s]+$/
