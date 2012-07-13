@@ -33,7 +33,7 @@ class Member < ActiveRecord::Base
   REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_number' ]
 
   #Validates that there are no invalid charactes in the name. 
-  REGEX_FIRST_AND_LAST_NAME = /^[a-zA-Z ]+$/u
+  REGEX_FIRST_AND_LAST_NAME = /^[A-Za-z0-9 '-.,]+$/u
 
   #Validates numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
   REGEX_PHONE_NUMBER = /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-. ]\(?(x|int)?[0-9]?{1,10}\)?)?$/ 
