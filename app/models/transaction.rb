@@ -15,7 +15,8 @@ class Transaction < ActiveRecord::Base
   attr_accessor :refund_response_transaction_id
 
   def to_label
-    I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + ': ' + response_result[0..50]
+    I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
+      ( response_result.nil? ? '' : ' : ' + response_result[0..50])
   end
 
   def self.datatable_columns
