@@ -64,7 +64,8 @@ class Api::MembersController < ApplicationController
   # [code] Code related to the method result.
   # [member_id] ID of the member. This ID is unique for each member. (32 characters string)
   # [v_id] Visible id of the member that was enrolled or recovered, or updated.
-  # [errors] A hash with members errors. This will be use to show errors on members creation page.
+  # [member_errors] A hash with members errors. This will be use to show errors on members creation page.
+  # [credit_card_errors] A hash with credit card errors. This will be use to show errors on members creation page.
   #
   # @param [Hash] member
   # @param [Hash] setter
@@ -72,7 +73,8 @@ class Api::MembersController < ApplicationController
   # @return [Integer] *code*
   # @return [Integer] *member_id*
   # @return [Integer] *v_id*
-  # @return [Hash] *errors*
+  # @return [Hash] *member_errors*
+  # @return [Hash] *credit_card_errors*
   # 
   def create
     response = {}
