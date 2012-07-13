@@ -118,6 +118,7 @@ class Api::MembersController < ApplicationController
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
   # [v_id] Visible id of the member that was updated.
+  # [errors] A hash with members errors. This will be use to show errors on members edit page. 
   #
   # @param [String] id
   # @param [Hash] member
@@ -126,6 +127,7 @@ class Api::MembersController < ApplicationController
   # @return [Integer] *member_id*  
   # @return [Integer] *code*
   # @return [Integer] *v_id*
+  # @return [Hash] *errors*
   # 
   def update
     response = {}
@@ -138,7 +140,7 @@ class Api::MembersController < ApplicationController
       Auditory.audit(current_agent, member, message, member)
       response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
     else
-      response = { :message => "Member data is invalid: #{member.error_to_s}", :code => Settings.error_codes.member_data_invalid }
+      response = { :message => "Member data is invalid.", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
     end
     render json: response
   end

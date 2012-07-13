@@ -131,12 +131,6 @@ $(document).ready( function() {
             window.location.replace('../member/'+data.v_id);
         },
       });
-
-
-        
-
-
-
     });
     today = new Date()
     $('#setter_cc_blank').click(function(){
@@ -163,6 +157,7 @@ $(document).ready( function() {
   };
 
   function edit_member_functions(){
+    $('#error_explanation').hide();
     $('form').submit( function(event) {
       event.preventDefault();
       $.ajax({
@@ -171,6 +166,16 @@ $(document).ready( function() {
         data: $('form').serialize(),
         success: function(data) {
           alert (data.message);
+          $('input').removeClass("red");
+          $('#error_explanation').show();
+          $('#error_explanation ul').empty();
+          $('#error_explanation ul').append("<b>"+data.message+"</b>")
+          for (var key in data.errors){
+            if (data.errors.hasOwnProperty(key)) {
+              $('#member_'+key).addClass("red");
+              $('#error_explanation ul').append("<li>"+key+': '+data.errors[key]+"</li>");
+            }
+          }
           if (data.code == 000)
             window.location.replace('../'+v_id);
         },
