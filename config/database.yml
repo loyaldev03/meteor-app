@@ -15,12 +15,6 @@ test:
   encoding: utf8
   user: root
 
-production:
-  adapter: mysql2
-  database: sac_platform_production
-  host: localhost
-  encoding: utf8
-  user: root
 
 staging:
   adapter: mysql2

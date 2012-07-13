@@ -29,8 +29,8 @@ d = Domain.new :url => "http://test.com.ar/"
 d.club = c
 d.partner = p
 d.save!
-if c.respond_to?(:drupal_domain)
-  c.drupal_domain = d
+if c.respond_to?(:api_domain)
+  c.api_domain = d
   c.save
 end
 d = Domain.new :url => "http://test2.com.ar/"

@@ -25,18 +25,20 @@ require 'uuidtools'
 require 'attr_encrypted'
 require 'settingslogic'
 
-CLUB = 16
-DEFAULT_CREATED_BY = 14
-PAYMENT_GW_CONFIGURATION_LITLE = 4
-PAYMENT_GW_CONFIGURATION_MES = 4
-TERMS_OF_MEMBERSHIP = 11 # TODO: this value will be loaded from campaigns. its temporary here
-TEST = true # if true email will be replaced with a fake one
-USE_PROD_DB = false
+exit
+
+CLUB = 1 # ONMC
+DEFAULT_CREATED_BY = 1 # batch
+PAYMENT_GW_CONFIGURATION_LITLE = 2 
+PAYMENT_GW_CONFIGURATION_MES = 3
+TEST = false # if true email will be replaced with a fake one
+USE_PROD_DB = true
 SITE_ID = 2010001547 # lyris site id
-MEMBER_GROUP_TYPE = 93 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
+MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
 
+CREDIT_CARD_NULL = "0000000000"
 
-@log = Logger.new('import_operations.log', 10, 1024000)
+@log = Logger.new('import_members.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
 if USE_PROD_DB
@@ -80,11 +82,11 @@ else
   # PRODUCTION !!!!!!!!!!!!!!!!
   ActiveRecord::Base.configurations["phoenix"] = { 
     :adapter => "mysql2",
-    :database => "sac_platform_development",
+    :database => "sac_production",
     :host => "127.0.0.1",
     :username => "root",
-    :password => "root911", 
-    :port => 30004 # tunnel 
+    :password => 'pH03n[xk1{{s', 
+    :port => 30013 # tunnel 
   }
 
   ActiveRecord::Base.configurations["billing"] = { 

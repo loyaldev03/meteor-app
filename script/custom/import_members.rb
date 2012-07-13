@@ -81,7 +81,7 @@ def add_enrollment_info(phoenix, member)
   e_info.campaign_medium = campaign.campaign_medium
   e_info.campaign_description = campaign.campaign_description
   e_info.campaign_medium_version = campaign.campaign_medium_version
-  e_info.is_joint = phoenix.joint
+  e_info.joint = phoenix.joint
   e_info.save
 end
 
@@ -135,7 +135,7 @@ def update_members
 
               new_phoenix_cc = PhoenixCreditCard.new 
               new_phoenix_cc.encrypted_number = member.encrypted_cc_number
-              new_phoenix_cc.number = "0000000000" if new_phoenix_cc.number.nil?
+              new_phoenix_cc.number = CREDIT_CARD_NULL if new_phoenix_cc.number.nil?
               new_phoenix_cc.expire_month = member.cc_month_exp
               new_phoenix_cc.expire_year = member.cc_year_exp
               new_phoenix_cc.member_id = phoenix.uuid
@@ -175,7 +175,7 @@ end
 # 2- import new members.
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
- # " and id < 21013775003 " +
+    " and id = 60496098 " +
   " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
   " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
@@ -188,10 +188,10 @@ def add_new_members
           phoenix.terms_of_membership_id = get_terms_of_membership_id(member.campaign_id)
           # do not load member if it does not have TOM set
           if phoenix.terms_of_membership_id.nil?
-            puts "CDId #{member.campaign_id} does not exist or TOM is empty"
+            @log.info "CDId #{member.campaign_id} does not exist or TOM is empty"
+            print "-"
             next
           end
-
           phoenix.visible_id = member.id
           set_member_data(phoenix, member)
           next_bill_date = member.cs_next_bill_date
@@ -225,11 +225,11 @@ def add_new_members
           # create CC
           phoenix_cc = PhoenixCreditCard.new 
           if TEST
-            phoenix_cc.number = "0000000000"
+            phoenix_cc.number = CREDIT_CARD_NULL
           else
             phoenix_cc.encrypted_number = member.encrypted_cc_number
             if phoenix_cc.number.nil?
-              phoenix_cc.number = "0000000000"
+              phoenix_cc.number = CREDIT_CARD_NULL
             end
           end
           phoenix_cc.expire_month = member.cc_month_exp
@@ -242,6 +242,7 @@ def add_new_members
           add_enrollment_info(phoenix, member)
 
           member.update_attribute :imported_at, Time.now.utc
+          print "."
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
