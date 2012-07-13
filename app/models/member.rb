@@ -33,7 +33,7 @@ class Member < ActiveRecord::Base
   REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_number' ]
 
   #Validates that there are no invalid charactes in the name. 
-  REGEX_FIRST_AND_LAST_NAME = /^[A-Za-z '-.]+$/
+  REGEX_FIRST_AND_LAST_NAME = /^[a-zA-Z ]+$/u
 
   #Validates numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
   REGEX_PHONE_NUMBER = /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-. ]\(?(x|int)?[0-9]?{1,10}\)?)?$/ 
@@ -42,7 +42,7 @@ class Member < ActiveRecord::Base
   REGEX_EMAIL = /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
 
   #Validates that there are no invalid charactes in the address. 
-  REGEX_ADDRESS = /^[A-Za-z0-9 -',.\s]+$/
+  REGEX_ADDRESS = /^[A-Za-z0-9 '-.,#]+$/
 
   #Validates that there are no invalid charactes in the country. 
   REGEX_CITY_AND_STATE_AND_COUNTRY = /^[A-Za-z0-9 ',.\s]+$/
@@ -335,7 +335,8 @@ class Member < ActiveRecord::Base
 
         unless member.valid? and credit_card.valid?
           errors = member.error_to_s + credit_card.error_to_s
-          return { :message => "Member data is invalid: \n #{errors}", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
+          return { :message => "Member data is invalid: \n #{errors}", :code => Settings.error_codes.member_data_invalid, 
+                   :member_errors => member.errors, :credit_card_errors => credit_card.errors }
         end
         # enroll allowed
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
@@ -477,6 +478,8 @@ class Member < ActiveRecord::Base
   # Resets member club cash in case of a cancelation. It calls "add_club_cash" method
   def nillify_club_cash
     add_club_cash(nil, -club_cash_amount.to_i, 'Removing club cash because of member cancellation') unless club_cash_amount.to_f == 0.0
+    self.club_cash_expire_date = nil
+    self.save!
   end
 
   # Resets member club cash in case the club cash has expired. It calls "add_club_cash" method

@@ -195,7 +195,7 @@ Validates that there are no invalid charactes in the address.
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[A-Za-z0-9 -',.\s]+$</span><span class='regexp_end'>/</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[A-Za-z0-9 '-.,#]+$</span><span class='regexp_end'>/</span></span></pre></dd>
       
         <dt id="REGEX_CITY_AND_STATE_AND_COUNTRY-constant" class="">REGEX_CITY_AND_STATE_AND_COUNTRY =
           <div class="docstring">
@@ -2527,7 +2527,7 @@ Resets member club cash in case of a cancelation. It calls
       <pre class="code"><span class="info file"># File 'app/models/member.rb', line 478</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_nillify_club_cash'>nillify_club_cash</span>
-  <span class='id identifier rubyid_add_club_cash'>add_club_cash</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>-</span><span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Removing club cash because of member cancellation</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>==</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_add_club_cash'>add_club_cash</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>-</span><span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Removing club cash because of member cancellation</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span> <span class='op'>==</span> <span class='float'>0.0</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2616,7 +2616,7 @@ Resets member club cash in case the club cash has expired. It calls
       <pre class="code"><span class="info file"># File 'app/models/member.rb', line 483</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset_club_cash'>reset_club_cash</span>
-  <span class='id identifier rubyid_add_club_cash'>add_club_cash</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>-</span><span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Removing expired club cash.</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>==</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_add_club_cash'>add_club_cash</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>-</span><span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Removing expired club cash.</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>==</span> <span class='int'>0</span>
   <span class='id identifier rubyid_assign_club_cash!'>assign_club_cash!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Renewing club cash.</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3102,7 +3102,7 @@ Sets join date. It is called when members status is changed from
 </div>
 
     <div id="footer">
-  Generated on Wed Jul 11 12:46:32 2012 by
+  Generated on Thu Jul 12 11:27:57 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
