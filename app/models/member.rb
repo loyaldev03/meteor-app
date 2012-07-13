@@ -337,7 +337,7 @@ class Member < ActiveRecord::Base
 
         unless member.valid? and credit_card.valid?
           errors = member.error_to_s + credit_card.error_to_s
-          return { :message => "Member data is invalid: \n #{errors}", :code => Settings.error_codes.member_data_invalid, 
+          return { :message => "Member data is invalid.", :code => Settings.error_codes.member_data_invalid, 
                    :member_errors => member.errors, :credit_card_errors => credit_card.errors }
         end
         # enroll allowed

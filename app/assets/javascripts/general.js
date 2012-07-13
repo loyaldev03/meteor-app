@@ -114,7 +114,7 @@ $(document).ready( function() {
           $('input').removeClass("red");
           $('#error_explanation').show();
           $('#error_explanation ul').empty();
-
+          $('#error_explanation ul').append("<b>"+data.message+"</b>")
           for (var key in data.member_errors){
             if (data.member_errors.hasOwnProperty(key)) {
               $('#member_'+key).addClass("red");
