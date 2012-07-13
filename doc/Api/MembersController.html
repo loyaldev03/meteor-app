@@ -314,8 +314,13 @@ ID of the member. This ID is unique for each member. (32 characters string)
 Visible id of the member that was enrolled or recovered, or updated.
 </p>
 </dd>
-<dt>errors</dt><dd><p>
+<dt>member_errors</dt><dd><p>
 A hash with members errors. This will be use to show errors on members
+creation page.
+</p>
+</dd>
+<dt>credit_card_errors</dt><dd><p>
+A hash with credit card errors. This will be use to show errors on members
 creation page.
 </p>
 </dd>
@@ -424,7 +429,22 @@ creation page.
       
         &mdash;
         <div class='inline'><p>
-<b>errors</b>
+<b>member_errors</b>
+</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>
+<b>credit_card_errors</b>
 </p>
 </div>
       
@@ -438,8 +458,6 @@ creation page.
       <pre class="lines">
 
 
-77
-78
 79
 80
 81
@@ -455,10 +473,12 @@ creation page.
 91
 92
 93
-94</pre>
+94
+95
+96</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 77</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 79</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -629,8 +649,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-171
-172
 173
 174
 175
@@ -647,10 +665,12 @@ Code related to the method result.
 186
 187
 188
-189</pre>
+189
+190
+191</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 171</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 173</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_shows'>shows</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -850,8 +870,6 @@ Visible id of the member that was updated.
       <pre class="lines">
 
 
-128
-129
 130
 131
 132
@@ -864,10 +882,12 @@ Visible id of the member that was updated.
 139
 140
 141
-142</pre>
+142
+143
+144</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 128</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 130</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -894,7 +914,7 @@ Visible id of the member that was updated.
 </div>
 
     <div id="footer">
-  Generated on Wed Jul 11 12:44:02 2012 by
+  Generated on Fri Jul 13 12:32:20 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
