@@ -36,6 +36,7 @@ USE_PROD_DB = true
 SITE_ID = 2010001547 # lyris site id
 MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
 
+CREDIT_CARD_NULL = "0000000000"
 
 @log = Logger.new('import_members.log', 10, 1024000)
 ActiveRecord::Base.logger = @log

@@ -135,7 +135,7 @@ def update_members
 
               new_phoenix_cc = PhoenixCreditCard.new 
               new_phoenix_cc.encrypted_number = member.encrypted_cc_number
-              new_phoenix_cc.number = "0000000000" if new_phoenix_cc.number.nil?
+              new_phoenix_cc.number = CREDIT_CARD_NULL if new_phoenix_cc.number.nil?
               new_phoenix_cc.expire_month = member.cc_month_exp
               new_phoenix_cc.expire_year = member.cc_year_exp
               new_phoenix_cc.member_id = phoenix.uuid
@@ -225,11 +225,11 @@ def add_new_members
           # create CC
           phoenix_cc = PhoenixCreditCard.new 
           if TEST
-            phoenix_cc.number = "0000000000"
+            phoenix_cc.number = CREDIT_CARD_NULL
           else
             phoenix_cc.encrypted_number = member.encrypted_cc_number
             if phoenix_cc.number.nil?
-              phoenix_cc.number = "0000000000"
+              phoenix_cc.number = CREDIT_CARD_NULL
             end
           end
           phoenix_cc.expire_month = member.cc_month_exp

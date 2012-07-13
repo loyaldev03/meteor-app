@@ -17,10 +17,12 @@ test:
 
 production:
   adapter: mysql2
-  database: sac_platform_production
-  host: localhost
+  database: sac_production
+  host: 127.0.0.1
+  port: 30013
   encoding: utf8
   user: root
+  password: 'pH03n[xk1{{s'
 
 staging:
   adapter: mysql2
