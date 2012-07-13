@@ -102,6 +102,7 @@ $(document).ready( function() {
   };
 
   function new_member_functions(){
+    $('#error_explanation').hide();
     $('#new_member').submit( function(event) {
       event.preventDefault()
       $.ajax({
@@ -110,12 +111,32 @@ $(document).ready( function() {
         data: $("#new_member").serialize(),
         success: function(data) {
           alert (data.message);
+          $('input').removeClass("red");
+          $('#error_explanation').show();
           $('#error_explanation ul').empty();
-          $('.content').append("<div id='error_explanation>'<h2>Errors</h2><ul><li>"+data.message.replace('\n','<br>')+"</li></ul></div>");
+
+          for (var key in data.member_errors){
+            if (data.member_errors.hasOwnProperty(key)) {
+              $('#member_'+key).addClass("red");
+              $('#error_explanation ul').append("<li>"+key+': '+data.member_errors[key]+"</li>");
+            }
+          }
+          for (var key in data.credit_card_errors){
+            if (data.credit_card_errors.hasOwnProperty(key)) {
+              $('#member_credit_card_'+key).addClass("red");
+              $('#error_explanation ul').append("<li>"+key+': '+data.credit_card_errors[key]+"</li>");
+            }
+          }
           if (data.code == 000)
             window.location.replace('../member/'+data.v_id);
         },
       });
+
+
+        
+
+
+
     });
     today = new Date()
     $('#setter_cc_blank').click(function(){
