@@ -13,6 +13,7 @@
     </td>
   </tr> 
   <% end %>
+  
   <tr class="control-group" ><td colspan="4"> <b> Demographic Information </b> </td></tr>
   <tr class="control-group" >  
     <td><%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline' %></td>
@@ -42,7 +43,9 @@
   </tr>
   <tr class="control-group">
     <td> <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline' %> </td>
-    <td colspan="3"> <%= f.country_code_select(:country, [[ 'United States', 'US' ]]) %> </td>
+    <td> <%= f.country_code_select(:country, [[ 'United States', 'US' ]]) %> </td>
+    <td> <%= f.label :birth_date, t('activerecord.attributes.member.birth_date'), :class => 'help-inline' %> </td>
+    <td> <%= f.text_field :birth_date, :class => 'datepicker', :readonly => 'readonly' %> </td>
   </tr>
 
   <tr class="control-group" ><td colspan="4"> <b> Contact Information </b> </td></tr>

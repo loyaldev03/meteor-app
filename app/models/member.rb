@@ -73,6 +73,7 @@ class Member < ActiveRecord::Base
   validates :state, :country, :presence => true, :format => REGEX_CITY_AND_STATE_AND_COUNTRY
   validates :terms_of_membership_id , :presence => true
   validates :zip, :presence => true, :format => REGEX_ZIP
+  validates :birth_date, :presence => true
 
   scope :synced, lambda { |bool=true|
     bool ?
@@ -536,6 +537,7 @@ class Member < ActiveRecord::Base
     self.phone_number = params[:phone_number]
     self.zip = params[:zip]
     self.email = params[:email]
+    self.birth_date = params[:birth_date]
   end
   
   private
