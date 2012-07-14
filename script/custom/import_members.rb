@@ -46,6 +46,7 @@ def set_member_data(phoenix, member)
   phoenix.country = member.country
   phoenix.joint = member.joint
   phoenix.quota = member.quota
+  phoenix.reactivation_times = member.phoenix_reactivations - 1
   phoenix.brith_date = member.brith_date
   phoenix.created_at = member.created_at
   phoenix.updated_at = member.updated_at
@@ -69,10 +70,10 @@ def add_enrollment_info(phoenix, member)
   end
   campaign = BillingCampaign.find_by_id(member.campaign_id)
   e_info.enrollment_amount = member.enrollment_amount_to_import
-  e_info.product_sku = member.product_id
+  e_info.product_sku = campaign.product_sku
   e_info.product_description = campaign.product_description
-  e_info.mega_channel = member.mega_channel
-  e_info.marketing_code = member.reporting_code
+  e_info.mega_channel = campaign.phoenix_mega_channel
+  e_info.marketing_code = campaign.marketing_code
   e_info.fulfillment_code = campaign.fulfillment_code
   e_info.referral_host = campaign.referral_host
   e_info.landing_url = campaign.landing_url
@@ -81,7 +82,7 @@ def add_enrollment_info(phoenix, member)
   e_info.campaign_medium = campaign.campaign_medium
   e_info.campaign_description = campaign.campaign_description
   e_info.campaign_medium_version = campaign.campaign_medium_version
-  e_info.joint = phoenix.joint
+  e_info.joint = ( campaign.joint == 'n' ? false : true )
   e_info.save
 end
 
@@ -174,6 +175,7 @@ end
 
 # 2- import new members.
 def add_new_members
+  puts "new members"
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
     " and id = 60496098 " +
   " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
@@ -189,7 +191,7 @@ def add_new_members
           # do not load member if it does not have TOM set
           if phoenix.terms_of_membership_id.nil?
             @log.info "CDId #{member.campaign_id} does not exist or TOM is empty"
-            print "-"
+            print "-#{member.campaign_id}"
             next
           end
           phoenix.visible_id = member.id
