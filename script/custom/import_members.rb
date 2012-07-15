@@ -67,13 +67,13 @@ def set_member_data(phoenix, member, merge_member = false)
     phoenix.member_since_date = member.member_since_date
   end
 end
-def add_enrollment_info(phoenix, member)
+def add_enrollment_info(phoenix, member, campaign = nil)
   e_info = PhoenixEnrollmentInfo.find_by_member_id(phoenix.id)
   if e_info.nil?
     e_info = PhoenixEnrollmentInfo.new 
     e_info.member_id = phoenix.id
   end
-  campaign = BillingCampaign.find_by_id(member.campaign_id)
+  campaign = BillingCampaign.find_by_id(member.campaign_id) if campaign.nil?
   e_info.enrollment_amount = member.enrollment_amount_to_import
   e_info.product_sku = campaign.product_sku
   e_info.product_description = campaign.product_description
@@ -150,8 +150,8 @@ def update_member_when_duplicated_email(member, phoenix)
 end
 
 # 1- update existing members
-def update_members
-  BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) " + 
+def update_members(cid)
+  BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) and campaign_id = #{cid}" + 
     " and is_prospect = false and phoenix_status IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
@@ -228,8 +228,22 @@ def update_members
 end
 
 # 2- import new members.
-def add_new_members
-  BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0 " + 
+def add_new_members(cid)
+  @campaign = BillingCampaign.find_by_id(cid)
+  next if @campaign.nil?
+
+  if @campaign.phoenix_tom_id.nil?
+    tom_id = get_terms_of_membership_id(cid)
+    @campaign = BillingCampaign.find_by_id(cid)
+  else
+    tom_id = @campaign.phoenix_tom_id
+  end
+  if tom_id.nil?
+    puts "CDId #{cid} does not exist or TOM is empty"
+    next
+  end
+
+  BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0 and campaign_id = #{cid} " + 
   # " and id = 20243929300 " + # uncomment this line if you want to import a single member.
   " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
   " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
@@ -248,13 +262,7 @@ def add_new_members
 
           phoenix = PhoenixMember.new 
           phoenix.club_id = CLUB
-          phoenix.terms_of_membership_id = get_terms_of_membership_id(member.campaign_id)
-          # do not load member if it does not have TOM set
-          if phoenix.terms_of_membership_id.nil?
-            puts "CDId #{member.campaign_id} does not exist or TOM is empty"
-            exit
-            next
-          end
+          phoenix.terms_of_membership_id = tom_id
           phoenix.visible_id = member.id
           set_member_data(phoenix, member)
           next_bill_date = member.cs_next_bill_date
@@ -298,7 +306,7 @@ def add_new_members
 
           add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
           add_product_fulfillment(member.has_fulfillment_product)
-          add_enrollment_info(phoenix, member)
+          add_enrollment_info(phoenix, member, @campaign)
 
           member.update_attribute :imported_at, Time.now.utc
           print "."
@@ -314,12 +322,12 @@ def add_new_members
 end
 
 
-# 2- import new members.
+# 3- load_duplicated_emails
 def load_duplicated_emails
-  BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0 " + 
-  # " and id = 20243929300 " + # uncomment this line if you want to import a single member.
-  " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
-  " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
+  BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0" + 
+    # " and id = 20243929300 " + # uncomment this line if you want to import a single member.
+    " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
+    " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
       tz = Time.now.utc
       PhoenixMember.transaction do 
@@ -348,10 +356,12 @@ def load_duplicated_emails
   end
 end
 
+@cids.each do |cid|
+  # if we use load_duplicated_emails , update_members will override changes.
+  # update_members
 
-# update_members
-
-add_new_members
+  add_new_members(cid)
+end
 
 # => needs test
 # load_duplicated_emails
