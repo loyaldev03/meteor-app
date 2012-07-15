@@ -238,6 +238,9 @@ class BillingCampaign < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "campaigns" 
   self.record_timestamps = false
+  def is_joint
+    joint == 'n' ? false : true
+  end
 end
 class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
   establish_connection "billing" 

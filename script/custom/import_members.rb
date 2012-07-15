@@ -82,7 +82,7 @@ def add_enrollment_info(phoenix, member)
   e_info.campaign_medium = campaign.campaign_medium
   e_info.campaign_description = campaign.campaign_description
   e_info.campaign_medium_version = campaign.campaign_medium_version
-  e_info.joint = ( campaign.joint == 'n' ? false : true )
+  e_info.joint = campaign.is_joint
   e_info.save
 end
 
