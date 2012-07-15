@@ -97,7 +97,11 @@ div.dataTables_filter input {
 }
 
 .box_title {
-  background-color: #B0D3E6;
+  background-color: #DC4713;
+}
+
+.box_title h4 {
+  color: #FFFFFF;
 }
 
 .datepicker_for_search {
