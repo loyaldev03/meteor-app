@@ -7,7 +7,7 @@
 
 # "Email Name ","MLID","Trigger ID","Corresponding Event Name","Recurring","Before or After","Day","Notes"
 
-annual_sloop = [
+@annual_sloop = [
   [ "Welcome E-mail SLOOP",47386,6411,"Join","no","After",0, nil ],
   [ "Activation E-mail", 47386, 9400, nil ,"no", nil ,nil ],
   [ "Trial Comm-Day 7",47386,6417,"Join","no","After",7,],
@@ -28,7 +28,7 @@ annual_sloop = [
 ]
 
 # rename 'Renewal Pre Bill" =>  to "Pre Bill" only on this csv
-annual_join_now = [
+@annual_join_now = [
   [ "Welcome E-mail SLOOP",47386,6411,"Join","no","After",0,],
   [ "Welcome E-mail Canadians",47386,6412,"Join","no","After",0],
   [ "Activation E-mail",47386,9400,nil,"no",nil,nil],
@@ -48,7 +48,7 @@ annual_join_now = [
   [ "Local Chapter Newsletter",116804,"-","Monthly - 2nd Tuesday","yes",nil,nil,nil]
 ]
 
-annual_ptx = [
+@annual_ptx = [
   [ "Welcome E-mail PTX",47386,6414,"Join","no","After",0], 
   [ "Welcome E-mail Canadians",47386,6412,"Join","no","After",0], 
   [ "Activation E-mail",47386,9400,nil,"no",nil,nil ], 
@@ -69,7 +69,7 @@ annual_ptx = [
   [ "Local Chapter Newsletter",116804,"-","Monthly - 2nd Tuesday","yes",nil,nil ]
 ]
 
-monthly_sloops = [
+@monthly_sloops = [
   [ "Welcome E-mail SLOOP",47386,6411,"Join","no","After",0],
   [ "Activation E-mail",47386,9400,nil ,"no",nil,nil ],
   [ "Pillar 1 - Deals & Discounts",47386,6418,"Join","no","After",2],
@@ -88,7 +88,7 @@ monthly_sloops = [
 ]
 
 def add_email_template(name, type, tom_id, trigger_id, mlid, site_id, days_after_join_date = 0)
-  et = EmailTemplate.new 
+  et = PhoenixEmailTemplate.new 
   et.name = name
   et.client = :lyris
   et.days_after_join_date = days_after_join_date.to_i
@@ -165,17 +165,17 @@ def get_terms_of_membership_id(campaign_id)
 
     if campaign.terms_of_membership_id.to_i == 365
       if campaign.phoenix_mega_channel == 'PTX'
-        upload_email_services(annual_ptx, m.id)
+        upload_email_services(@annual_ptx, m.id)
       end
       if campaign.phoenix_mega_channel.include?('SLOOP')
-        upload_email_services(annual_sloop, m.id)
+        upload_email_services(@annual_sloop, m.id)
       end
       if campaign.phoenix_mega_channel.include?('OTHER')
-        upload_email_services(annual_join_now, m.id)
+        upload_email_services(@annual_join_now, m.id)
       end
     else
       if campaign.phoenix_mega_channel.include?('SLOOP')
-        upload_email_services(monthly_sloops, m.id)
+        upload_email_services(@monthly_sloops, m.id)
       end
     end
   end

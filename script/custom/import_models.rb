@@ -207,7 +207,10 @@ class PhoenixTermsOfMembership < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "terms_of_memberships" 
 end
-
+class PhoenixEmailTemplate < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "email_templates" 
+end
 
 
 class Settings < Settingslogic

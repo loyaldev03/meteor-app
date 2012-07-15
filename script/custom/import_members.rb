@@ -47,7 +47,7 @@ def set_member_data(phoenix, member)
   phoenix.joint = member.joint
   phoenix.quota = member.quota
   phoenix.reactivation_times = member.phoenix_reactivations - 1
-  phoenix.brith_date = member.brith_date
+  phoenix.birth_date = member.birth_date
   phoenix.created_at = member.created_at
   phoenix.updated_at = member.updated_at
   phoenix.phone_number = member.phone
@@ -57,9 +57,9 @@ def set_member_data(phoenix, member)
   phoenix.api_id = member.drupal_user_api_id
   phoenix.club_cash_expire_date = member.club_cash_expire_date
   if member.is_chapter_member
-    phoenix.member_group_type = MEMBER_GROUP_TYPE
+    phoenix.member_group_type_id = MEMBER_GROUP_TYPE
   else
-    phoenix.member_group_type = nil
+    phoenix.member_group_type_id = nil
   end
 end
 def add_enrollment_info(phoenix, member)
@@ -176,7 +176,7 @@ end
 # 2- import new members.
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
-    " and id = 20243929300 " + # uncomment this line if you want to import a single member.
+  # " and id = 20243929300 " + # uncomment this line if you want to import a single member.
   " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
   " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
