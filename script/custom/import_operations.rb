@@ -5,10 +5,13 @@ require_relative 'import_models'
 @log = Logger.new('import_operations.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
+USE_MEMBER_LIST = true
+
 def load_save_the_sales
-  CustomerServicesOperations.where(" name like '%Edit Campaign%' and imported_at IS NULL ").find_in_batches do |group|
+  CustomerServicesOperations.where(" name like '%Edit Campaign%' and imported_at IS NULL " +
+    (USE_MEMBER_LIST ? " and contact_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
+    ).find_in_batches do |group|
     group.each do |op|
-      tz = Time.now.utc
       begin
         @member = PhoenixMember.find_by_visible_id_and_club_id  op.contact_id, CLUB
         unless @member.nil?
@@ -27,9 +30,10 @@ def load_save_the_sales
 end
 
 def load_reactivations
-  CustomerServicesOperations.where(" name like '%Customer Services Reactivate%' and imported_at IS NULL ").find_in_batches do |group|
+  CustomerServicesOperations.where(" name like '%Customer Services Reactivate%' and imported_at IS NULL " +
+    (USE_MEMBER_LIST ? " and contact_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
+    ).find_in_batches do |group|
     group.each do |op|
-      tz = Time.now.utc
       begin
         @member = PhoenixMember.find_by_visible_id_and_club_id  op.contact_id, CLUB
         unless @member.nil?

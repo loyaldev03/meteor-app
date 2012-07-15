@@ -38,6 +38,103 @@ CREDIT_CARD_NULL = "0000000000"
 
 
 @cids = %w(
+190
+225
+10
+14
+15
+16
+19
+20
+21
+23
+26
+28
+29
+31
+32
+33
+34
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+298
+299
+321
+322
+323
+1123
+1124
+1141
+1142
+1143
+1144
+1145
+1146
+1147
+1148
+1149
+1150
+1151
+1152
+1153
+1154
+1155
+1156
+1157
+1158
+1159
+1160
+1169
+1170
+1140
+1183
+1184
+1185
+1186
+1187
+1188
+1311
+1312
+1313
+1394
+1395
+1396
+1397
+1400
+1401
+1402
+1403
+1466
+1467
 1468
 1469
 1548
@@ -101,6 +198,7 @@ CREDIT_CARD_NULL = "0000000000"
 1606
 1607
 1677
+1678
 )
 
 
@@ -271,7 +369,7 @@ class PhoenixAgent < ActiveRecord::Base
 end
 class PhoenixFulfillment < ActiveRecord::Base
   establish_connection "phoenix" 
-  self.table_name = "fulfillments" 
+  self.table_name = "fulfillments"
 end
 class PhoenixTermsOfMembership < ActiveRecord::Base
   establish_connection "phoenix" 

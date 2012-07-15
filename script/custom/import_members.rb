@@ -61,7 +61,6 @@ def set_member_data(phoenix, member, merge_member = false)
   end
   unless merge_member
     phoenix.quota = member.quota
-    phoenix.reactivation_times = member.phoenix_reactivations - 1
     phoenix.created_at = member.created_at
     phoenix.updated_at = member.updated_at
     phoenix.member_since_date = member.member_since_date
@@ -117,7 +116,6 @@ def update_member_when_duplicated_email(member, phoenix)
       phoenix.member_since_date = member.member_since_date
     end
     phoenix.quota = member.quota + phoenix.quota
-    phoenix.reactivation_times = member.phoenix_reactivations - 1 + phoenix.reactivation_times
     # TODO: Its hard to add every enrollment info.
     # add_enrollment_info(phoenix, member)
     phoenix.save!
