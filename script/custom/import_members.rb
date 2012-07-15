@@ -106,15 +106,20 @@ def update_member_when_duplicated_email(member, phoenix)
   if phoenix.status == member.phoenix_status
     # not imported member is newer
     if member.id > phoenix.visible_id
+      dont_load_email_duplicated = false
       set_member_data(phoenix, member, true)
       phoenix.updated_at = member.updated_at
       phoenix.visible_id = member.id
       phoenix.cancel_date = member.cancelled_at
       update_fulfillment(member, phoenix)
     else
+      dont_load_email_duplicated = true
       phoenix.created_at = member.created_at
       phoenix.member_since_date = member.member_since_date
     end
+    BillingMember.find(phoenix.visible_id).update_attribute :dont_load_email_duplicated, dont_load_email_duplicated
+    member.dont_load_email_duplicated = !dont_load_email_duplicated
+    member.save
     phoenix.quota = member.quota + phoenix.quota
     # TODO: Its hard to add every enrollment info.
     # add_enrollment_info(phoenix, member)
@@ -152,6 +157,7 @@ def update_members(cid)
   BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) and campaign_id = #{cid}" + 
     " and is_prospect = false and phoenix_status IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
+    puts "cant #{group.count}"
       tz = Time.now.utc
       PhoenixProspect.transaction do 
         @log.info "  * processing member ##{member.id}"
@@ -245,6 +251,7 @@ def add_new_members(cid)
   # " and id = 20243929300 " + # uncomment this line if you want to import a single member.
   " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
   " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
+    puts "cant #{group.count}"
     group.each do |member| 
       tz = Time.now.utc
       PhoenixMember.transaction do 
@@ -276,7 +283,7 @@ def add_new_members(cid)
             phoenix.cancel_date = member.cancelled_at
             phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
           end
-          phoenix.created_by_id = get_agent
+          phoenix.created_by_id = DEFAULT_CREATED_BY
           phoenix.save!
 
           @member = phoenix
@@ -326,6 +333,7 @@ def load_duplicated_emails
     # " and id = 20243929300 " + # uncomment this line if you want to import a single member.
     " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
     " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
+    puts "cant #{group.count}"
     group.each do |member| 
       tz = Time.now.utc
       PhoenixMember.transaction do 
@@ -353,6 +361,13 @@ def load_duplicated_emails
     end
   end
 end
+
+# Para hacer updates falta hacer:
+# 1) procesar emails repetidos y marcar el member + nuevo (por estado o member number) que se actualizaría
+# load_duplicated_emails debe marcar el member considerado como repetido.
+# 
+# 2) avisar a reporting que se agregó este campo en mebers para que los members que tienen email repetido, no se analicen más
+# 3) Agregar esta condición en update_members
 
 @cids.each do |cid|
   # if we use load_duplicated_emails , update_members will override changes.

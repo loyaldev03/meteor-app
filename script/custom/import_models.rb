@@ -35,7 +35,9 @@ SITE_ID = 2010001547 # lyris site id
 MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
 
 CREDIT_CARD_NULL = "0000000000"
+USE_MEMBER_LIST = true
 
+# 999
 
 @cids = %w(
 190
@@ -527,14 +529,15 @@ def get_agent(author = 999)
   if author == 999
     DEFAULT_CREATED_BY
   else
-    u = CustomerServicesUser.find_by_id(author)
-    if u.nil?
+    @users ||= CustomerServicesUser.all
+    u = @users.select {|x| x.id == author }
+    if u.empty?
       DEFAULT_CREATED_BY
     else
-      a = PhoenixAgent.find_by_username(u.login)
+      a = PhoenixAgent.find_by_username(u[0].login)
       if a.nil?
-        a = PhoenixAgent.new :username => u.login, :first_name => u.firstname, :last_name => u.lastname, 
-            :email => u.mail
+        a = PhoenixAgent.new :username => u[0].login, :first_name => u[0].firstname, :last_name => u[0].lastname, 
+            :email => u[0].mail
         a.save!
       end
       a.id

@@ -21,6 +21,7 @@ ActiveRecord::Base.logger = @log
   end
 
   ProspectProspect.where("imported_at IS NULL and campaign_id = #{cid} ").find_in_batches do |group|
+    puts "cant #{group.count}"
     group.each do |prospect| 
       tz = Time.now.utc
       @log.info "  * processing prospect ##{prospect.id}"

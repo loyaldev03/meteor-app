@@ -5,14 +5,16 @@ require_relative 'import_models'
 @log = Logger.new('import_notes.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
+@communication_types = CustomerServicesCommunication.all
+@note_types = CustomerServicesNoteType.all
 
 def get_disposition_type_id(note_type_id, cid)
   return nil if note_type_id.nil?
-  note_type = CustomerServicesNoteType.find(note_type_id)
-  enum = PhoenixEnumeration.find_by_name_and_club_id_and_type(note_type.name, cid,'DispositionType')
+  note_type = @note_types.select {|s| s.id == note_type_id }
+  enum = PhoenixEnumeration.find_by_name_and_club_id_and_type(note_type[0].name, cid,'DispositionType')
   if enum.nil?
     enum = DispositionType.new
-    enum.name = note_type.name
+    enum.name = note_type[0].name
     enum.club_id = cid
     enum.visible = true
     enum.save!
@@ -22,11 +24,11 @@ end
 
 def get_communication_type_id(communication_id)
   return nil if communication_id.nil?
-  note_type = CustomerServicesCommunication.find(communication_id)
-  enum = PhoenixEnumeration.find_by_name_and_type(note_type.name,'CommunicationType')
+  comm_type = @communication_types.select {|s| s.id == communication_id }
+  enum = PhoenixEnumeration.find_by_name_and_type(comm_type[0].name,'CommunicationType')
   if enum.nil?
     enum = CommunicationType.new
-    enum.name = note_type.name
+    enum.name = comm_type[0].name
     enum.visible = true
     enum.save!
   end
@@ -34,9 +36,10 @@ def get_communication_type_id(communication_id)
 end
 
 def import_customer_notes
-  CustomerServicesNotes.where("imported_at IS NULL").find_in_batches do |group|
+  CustomerServicesNotes.where("imported_at IS NULL" +
+    (USE_MEMBER_LIST ? " and source_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
+    ).find_in_batches do |group|
     group.each do |note| 
-      tz = Time.now.utc
       begin
         # load member notes
         member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, note.source_id)
