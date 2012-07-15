@@ -38,7 +38,7 @@ end
 def set_member_data(phoenix, member)
   phoenix.first_name = member.first_name
   phoenix.last_name = member.last_name
-  phoenix.email = (TEST ? "test#{member.id}@xagax.com" : member.email)
+  phoenix.email = member.email_to_import
   phoenix.address = member.address
   phoenix.city = member.city
   phoenix.state = member.state
@@ -46,7 +46,8 @@ def set_member_data(phoenix, member)
   phoenix.country = member.country
   phoenix.joint = member.joint
   phoenix.quota = member.quota
-  phoenix.brith_date = member.brith_date
+  phoenix.reactivation_times = member.phoenix_reactivations - 1
+  phoenix.birth_date = member.birth_date
   phoenix.created_at = member.created_at
   phoenix.updated_at = member.updated_at
   phoenix.phone_number = member.phone
@@ -56,9 +57,9 @@ def set_member_data(phoenix, member)
   phoenix.api_id = member.drupal_user_api_id
   phoenix.club_cash_expire_date = member.club_cash_expire_date
   if member.is_chapter_member
-    phoenix.member_group_type = MEMBER_GROUP_TYPE
+    phoenix.member_group_type_id = MEMBER_GROUP_TYPE
   else
-    phoenix.member_group_type = nil
+    phoenix.member_group_type_id = nil
   end
 end
 def add_enrollment_info(phoenix, member)
@@ -69,10 +70,10 @@ def add_enrollment_info(phoenix, member)
   end
   campaign = BillingCampaign.find_by_id(member.campaign_id)
   e_info.enrollment_amount = member.enrollment_amount_to_import
-  e_info.product_sku = member.product_id
+  e_info.product_sku = campaign.product_sku
   e_info.product_description = campaign.product_description
-  e_info.mega_channel = member.mega_channel
-  e_info.marketing_code = member.reporting_code
+  e_info.mega_channel = campaign.phoenix_mega_channel
+  e_info.marketing_code = campaign.marketing_code
   e_info.fulfillment_code = campaign.fulfillment_code
   e_info.referral_host = campaign.referral_host
   e_info.landing_url = campaign.landing_url
@@ -81,7 +82,7 @@ def add_enrollment_info(phoenix, member)
   e_info.campaign_medium = campaign.campaign_medium
   e_info.campaign_description = campaign.campaign_description
   e_info.campaign_medium_version = campaign.campaign_medium_version
-  e_info.joint = phoenix.joint
+  e_info.joint = campaign.is_joint
   e_info.save
 end
 
@@ -175,7 +176,7 @@ end
 # 2- import new members.
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
-    " and id = 60496098 " +
+  # " and id = 20243929300 " + # uncomment this line if you want to import a single member.
   " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
   " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
@@ -183,13 +184,21 @@ def add_new_members
       PhoenixMember.transaction do 
         @log.info "  * processing member ##{member.id}"
         begin
+          # validate if email already exist
+          phoenix = PhoenixMember.find_by_email member.email_to_import
+          unless phoenix.nil?
+            puts "Email #{member.email_to_import} already exists"
+            exit
+            next
+          end
+
           phoenix = PhoenixMember.new 
           phoenix.club_id = CLUB
           phoenix.terms_of_membership_id = get_terms_of_membership_id(member.campaign_id)
           # do not load member if it does not have TOM set
           if phoenix.terms_of_membership_id.nil?
-            @log.info "CDId #{member.campaign_id} does not exist or TOM is empty"
-            print "-"
+            puts "CDId #{member.campaign_id} does not exist or TOM is empty"
+            exit
             next
           end
           phoenix.visible_id = member.id

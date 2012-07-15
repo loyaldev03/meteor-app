@@ -25,8 +25,6 @@ require 'uuidtools'
 require 'attr_encrypted'
 require 'settingslogic'
 
-exit
-
 CLUB = 1 # ONMC
 DEFAULT_CREATED_BY = 1 # batch
 PAYMENT_GW_CONFIGURATION_LITLE = 2 
@@ -42,8 +40,8 @@ CREDIT_CARD_NULL = "0000000000"
 ActiveRecord::Base.logger = @log
 
 if USE_PROD_DB
-  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
-  exit
+#  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
+#  exit
 end
 
 unless USE_PROD_DB
@@ -124,6 +122,10 @@ class ProspectProspect < ActiveRecord::Base
   self.record_timestamps = false
   serialize :preferences, JSON
   serialize :referral_parameters, JSON
+
+  def email_to_import
+    TEST ? "test#{member.id}@xagax.com" : email
+  end  
 end
 
 
@@ -209,7 +211,10 @@ class PhoenixTermsOfMembership < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "terms_of_memberships" 
 end
-
+class PhoenixEmailTemplate < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "email_templates" 
+end
 
 
 class Settings < Settingslogic
@@ -224,11 +229,18 @@ class BillingMember < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "members"
   self.record_timestamps = false
+
+  def email_to_import
+    TEST ? "test#{member.id}@xagax.com" : email
+  end
 end
 class BillingCampaign < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "campaigns" 
   self.record_timestamps = false
+  def is_joint
+    joint == 'n' ? false : true
+  end
 end
 class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
   establish_connection "billing" 

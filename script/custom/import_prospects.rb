@@ -8,6 +8,13 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
     @log.info "  * processing prospect ##{prospect.id}"
     PhoenixProspect.transaction do 
       begin
+        tom_id = get_terms_of_membership_id(prospect.campaign_id)
+        if tom_id.nil?
+          puts "CDId #{prospect.campaign_id} does not exist or TOM is empty"
+          exit
+          next
+        end
+        campaign = BillingCampaign.find_by_id(prospect.campaign_id)
         phoenix = PhoenixProspect.new 
         phoenix.club_id = CLUB
         phoenix.first_name = prospect.first_name
@@ -17,24 +24,26 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
         phoenix.state = prospect.state
         phoenix.zip = prospect.zip
         phoenix.country = prospect.country
-        phoenix.email = (TEST ? "test#{prospect.id}@xagax.com" : prospect.email)
+        phoenix.email = prospect.email_to_import
         phoenix.phone_number = prospect.phone
         phoenix.created_at = prospect.created_at
-        phoenix.updated_at = prospect.created_at # It has a reason. updated_at is modified by us ^^
+        phoenix.updated_at = prospect.created_at # It has a reason. updated_at was modified by us ^^
         phoenix.birth_date = prospect.birth_date
-        phoenix.joint = prospect.joint
-        phoenix.reporting_code = prospect.reporting_code
-        phoenix.terms_of_membership_id = get_terms_of_membership_id(prospect.campaign_id)
-        phoenix.preferences = { :mega_channel => prospect.mega_channel, :product_id => prospect.product_id }.to_json
+        phoenix.joint = campaign.is_joint
+        phoenix.marketing_code = campaign.marketing_code
+        phoenix.terms_of_membership_id = tom_id
+        phoenix.referral_host = campaign.referral_host
+        phoenix.landing_url = campaign.landing_url
+        phoenix.mega_channel = campaign.phoenix_mega_channel
+        phoenix.product_sku = campaign.product_sku
         phoenix.save!
         prospect.update_attribute :imported_at, Time.now.utc
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        raise ActiveRecord::Rollback
+        exit
       end
     end
     @log.info "    ... took #{Time.now.utc - tz} for prospect ##{prospect.id}"
   end
-  sleep(2) # Make sure it doesn't get too crowded in there!
 end
