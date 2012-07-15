@@ -17,16 +17,16 @@
     <% end %> 
   <% members.each do |member| %>
     <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
-      <th class="<%= menber_status_class(member) %>"> 
+      <td class="<%= menber_status_class(member) %>"> 
       <%= member.status %>
-      </th>
-      <th> <%= member.visible_id %> </th>
-      <th> <%= member.external_id if !member.external_id.nil? %> </th>
-      <th> <%= member.full_name %> </th>
-      <th> <%= member.full_address %> </th>
-      <th><a href="<%= show_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></th>
-      <th><a href="<%= edit_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a></th>
-      <th><%= member_action_drop_menu(member) %></th>
+      </td>
+      <td> <%= member.visible_id %> </td>
+      <td> <%= member.external_id if !member.external_id.nil? %> </td>
+      <td> <%= member.full_name %> </td>
+      <td> <%= member.full_address %> </td>
+      <td><a href="<%= show_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
+      <td><a href="<%= edit_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a></td>
+      <td><%= member_action_drop_menu(member) %></td>
     </tr>
   <% end %>
   </thead>  

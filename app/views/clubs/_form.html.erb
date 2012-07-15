@@ -15,11 +15,11 @@
   <div class="control-group">
     <%= f.label :description, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_area :description, :class => 'text_area' %>
+      <%= f.text_area :description, :cols => 60, :rows =>5, :class => 'text_area input-xxlarge' %>
     </div>
   </div>
   <div class="control-group">
-    <%= f.label :description, :class => 'control-label' %>
+    <%= f.label :theme, :class => 'control-label' %>
     <div class="controls">
       <%= theme_switcher f %>
     </div>
