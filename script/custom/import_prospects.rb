@@ -30,7 +30,7 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
         phoenix.updated_at = prospect.created_at # It has a reason. updated_at was modified by us ^^
         phoenix.birth_date = prospect.birth_date
         phoenix.joint = prospect.joint
-        phoenix.reporting_code = prospect.reporting_code
+        phoenix.marketing_code = prospect.reporting_code
         phoenix.terms_of_membership_id = tom_id
         phoenix.preferences = { :mega_channel => prospect.mega_channel, :product_id => prospect.product_id }.to_json
         phoenix.save!
