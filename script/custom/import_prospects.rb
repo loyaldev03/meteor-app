@@ -8,6 +8,13 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
     @log.info "  * processing prospect ##{prospect.id}"
     PhoenixProspect.transaction do 
       begin
+        tom_id = get_terms_of_membership_id(prospect.campaign_id)
+        if tom_id.nil?
+          puts "CDId #{member.campaign_id} does not exist or TOM is empty"
+          exit
+          next
+        end
+
         phoenix = PhoenixProspect.new 
         phoenix.club_id = CLUB
         phoenix.first_name = prospect.first_name
@@ -17,14 +24,14 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
         phoenix.state = prospect.state
         phoenix.zip = prospect.zip
         phoenix.country = prospect.country
-        phoenix.email = (TEST ? "test#{prospect.id}@xagax.com" : prospect.email)
+        phoenix.email = prospect.email_to_import
         phoenix.phone_number = prospect.phone
         phoenix.created_at = prospect.created_at
-        phoenix.updated_at = prospect.created_at # It has a reason. updated_at is modified by us ^^
+        phoenix.updated_at = prospect.created_at # It has a reason. updated_at was modified by us ^^
         phoenix.birth_date = prospect.birth_date
         phoenix.joint = prospect.joint
         phoenix.reporting_code = prospect.reporting_code
-        phoenix.terms_of_membership_id = get_terms_of_membership_id(prospect.campaign_id)
+        phoenix.terms_of_membership_id = tom_id
         phoenix.preferences = { :mega_channel => prospect.mega_channel, :product_id => prospect.product_id }.to_json
         phoenix.save!
         prospect.update_attribute :imported_at, Time.now.utc
@@ -36,5 +43,4 @@ ProspectProspect.where("imported_at IS NULL").find_in_batches do |group|
     end
     @log.info "    ... took #{Time.now.utc - tz} for prospect ##{prospect.id}"
   end
-  sleep(2) # Make sure it doesn't get too crowded in there!
 end

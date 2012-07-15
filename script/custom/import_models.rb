@@ -122,6 +122,10 @@ class ProspectProspect < ActiveRecord::Base
   self.record_timestamps = false
   serialize :preferences, JSON
   serialize :referral_parameters, JSON
+
+  def email_to_import
+    TEST ? "test#{member.id}@xagax.com" : email
+  end  
 end
 
 
