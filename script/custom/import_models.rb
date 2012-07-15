@@ -222,6 +222,10 @@ class BillingMember < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "members"
   self.record_timestamps = false
+
+  def email_to_import
+    TEST ? "test#{member.id}@xagax.com" : email
+  end
 end
 class BillingCampaign < ActiveRecord::Base
   establish_connection "billing" 

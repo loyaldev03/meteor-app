@@ -154,7 +154,7 @@ def get_terms_of_membership_id(campaign_id)
     m.installment_amount = campaign.phoenix_amount
     m.installment_type = payment_type
     m.needs_enrollment_approval = false
-    m.name = "#{payment_type} - #{campaign.phoenix_mega_channel} - #{amount} - #{campaign.product_description}"
+    m.name = "#{payment_type} - #{campaign.phoenix_mega_channel} - #{campaign.phoenix_amount} - #{campaign.product_description}"
     m.description = m.name
     m.grace_period = grace_period
     m.club_id = CLUB

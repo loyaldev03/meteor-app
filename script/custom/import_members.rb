@@ -38,7 +38,7 @@ end
 def set_member_data(phoenix, member)
   phoenix.first_name = member.first_name
   phoenix.last_name = member.last_name
-  phoenix.email = (TEST ? "test#{member.id}@xagax.com" : member.email)
+  phoenix.email = member.email_to_import
   phoenix.address = member.address
   phoenix.city = member.city
   phoenix.state = member.state
@@ -175,9 +175,8 @@ end
 
 # 2- import new members.
 def add_new_members
-  puts "new members"
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
-    " and id = 60496098 " +
+    " and id = 20243929300 " + # uncomment this line if you want to import a single member.
   " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
   " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     group.each do |member| 
@@ -185,13 +184,21 @@ def add_new_members
       PhoenixMember.transaction do 
         @log.info "  * processing member ##{member.id}"
         begin
+          # validate if email already exist
+          phoenix = PhoenixMember.find_by_email member.email_to_import
+          unless phoenix.nil?
+            puts "Email #{member.email_to_import} already exists"
+            exit
+            next
+          end
+
           phoenix = PhoenixMember.new 
           phoenix.club_id = CLUB
           phoenix.terms_of_membership_id = get_terms_of_membership_id(member.campaign_id)
           # do not load member if it does not have TOM set
           if phoenix.terms_of_membership_id.nil?
-            @log.info "CDId #{member.campaign_id} does not exist or TOM is empty"
-            print "-#{member.campaign_id}"
+            puts "CDId #{member.campaign_id} does not exist or TOM is empty"
+            exit
             next
           end
           phoenix.visible_id = member.id
