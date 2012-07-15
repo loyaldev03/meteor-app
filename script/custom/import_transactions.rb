@@ -2,6 +2,9 @@
 
 require_relative 'import_models'
 
+@log = Logger.new('import_transactions.log', 10, 1024000)
+ActiveRecord::Base.logger = @log
+
 def load_refunds
   BillingChargeback.where("imported_at IS NOT NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
     group.each do |refund|
@@ -35,9 +38,11 @@ def load_refunds
                               Settings.operation_types.credit_error, transaction.created_at, transaction.updated_at)
           end
           refund.update_attribute :imported_at, Time.now.utc
+          print "."
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          exit
         end
         @log.info "    ... took #{Time.now.utc - tz} for Chargeback ##{refund.id}"
       end
@@ -92,10 +97,12 @@ def load_enrollment_transactions
               #              Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
             end
             response.update_attribute :imported_at, Time.now.utc
+            print "."
           end
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          exit
         end
         @log.info "    ... took #{Time.now.utc - tz} for Enrollment Auth response ##{response.id}"
       end
@@ -110,9 +117,9 @@ def load_membership_transactions
       unless response.authorization.nil?
         begin
           tz = Time.now.utc
-          @log.info "  * processing Membership Auth response ##{response.id}"
           @member = response.member
           unless @member.nil?
+            @log.info "  * processing Membership Auth response ##{response.id}"
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
             transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
@@ -155,10 +162,12 @@ def load_membership_transactions
                             Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
             end
             response.update_attribute :imported_at, Time.now.utc
+            print "."
           end
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          exit
         end
         @log.info "    ... took #{Time.now.utc - tz} for Membership Auth response ##{response.id}"
       end

@@ -36,8 +36,6 @@ MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters
 
 CREDIT_CARD_NULL = "0000000000"
 
-@log = Logger.new('import_members.log', 10, 1024000)
-ActiveRecord::Base.logger = @log
 
 if USE_PROD_DB
 #  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
@@ -393,8 +391,8 @@ def add_operation(operation_date, object, description, operation_type, created_a
   o.save!
 end
 
-def load_cancellation
-  add_operation(@member.cancel_date, @member, "Member canceled", Settings.operation_types.cancel, @member.cancel_date, @member.cancel_date) 
+def load_cancellation(cancel_date)
+  add_operation(cancel_date, @member, "Member canceled", Settings.operation_types.cancel, cancel_date, cancel_date) 
 end
 
 require_relative 'import_communications'

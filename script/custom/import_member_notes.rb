@@ -2,6 +2,10 @@
 
 require_relative 'import_models'
 
+@log = Logger.new('import_notes.log', 10, 1024000)
+ActiveRecord::Base.logger = @log
+
+
 def get_disposition_type_id(note_type_id, cid)
   return nil if note_type_id.nil?
   note_type = CustomerServicesNoteType.find(note_type_id)
@@ -48,6 +52,7 @@ def import_customer_notes
           phoenix_note.updated_at = note.updated_on
           phoenix_note.save!
           note.update_attribute :imported_at, Time.now.utc
+          print "."
         end
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
@@ -55,7 +60,6 @@ def import_customer_notes
         exit
       end
     end
-    sleep(2) # Make sure it doesn't get too crowded in there!
   end
 end
 

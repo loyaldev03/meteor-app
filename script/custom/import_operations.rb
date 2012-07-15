@@ -2,6 +2,8 @@
 
 require_relative 'import_models'
 
+@log = Logger.new('import_operations.log', 10, 1024000)
+ActiveRecord::Base.logger = @log
 
 def load_save_the_sales
   CustomerServicesOperations.where(" name like '%Edit Campaign%' and imported_at IS NULL ").find_in_batches do |group|
@@ -13,6 +15,7 @@ def load_save_the_sales
           @log.info "  * processing CS operation ##{op.id}"
           add_operation(op.operation_date, nil, op.name, Settings.operation_types.save_the_sale, op.created_on, op.updated_on, op.author_id)
           op.update_attribute :imported_at, Time.now.utc
+          print "."
         end
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
@@ -34,6 +37,7 @@ def load_reactivations
           add_operation(op.operation_date, nil, op.name, Settings.operation_types.recovery, op.created_on, op.updated_on, op.author_id)
           @member.increment!(:reactivation_times)
           op.update_attribute :imported_at, Time.now.utc
+          print "."
         end
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
