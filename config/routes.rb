@@ -24,6 +24,8 @@ SacPlatform::Application.routes.draw do
     scope '/club/:club_prefix' do
       match '/members/new' => 'members#new', as: 'new_member'
       match '/members' => 'members#index', as: 'members', :via => [:get, :post]
+      match '/members/search_result' => 'members#search_result', as: 'members_search_result', :via => [:get]
+      
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
         match '/operations' => 'operations#index', as: 'operations', :via => [:post, :get]

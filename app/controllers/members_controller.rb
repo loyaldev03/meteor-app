@@ -1,10 +1,13 @@
 class MembersController < ApplicationController
   before_filter :validate_club_presence
-  before_filter :validate_member_presence, :except => [ :index, :new ]
+  before_filter :validate_member_presence, :except => [ :index, :new, :search_result ]
 
   def index
-    if request.post?
-      @members = Member.paginate(:page => params[:page], :per_page => 10)
+ 
+  end
+
+  def search_result
+     @members = Member.paginate(:page => params[:page], :per_page => 10)
                        .with_visible_id(params[:member][:member_id])
                        .with_first_name_like(params[:member][:first_name])
                        .with_last_name_like(params[:member][:last_name])
@@ -18,7 +21,7 @@ class MembersController < ApplicationController
                        .with_credit_card_last_digits(params[:member][:last_digits])
                        .where(:club_id => @current_club)
                        .order(:visible_id)
-    end
+    render 'index'
   end
 
   def show

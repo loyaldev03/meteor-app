@@ -97,7 +97,7 @@
   </thead>
   <tbody>
     <tr>
-      <th>Address</th><th>City</th><th>State</th><th>Country</th><th>Zip</th><th>Actions</th>
+      <th style="width: 20%;">Address</th><th  style="width: 20%;">City</th><th>State</th><th>Country</th><th>Zip</th><th>Actions</th>
     </tr>
     <tr class="<%= (!@current_member.wrong_address.nil? ? "yellow" : "") %>">
       <td><%= @current_member.address %></td>
@@ -105,7 +105,7 @@
       <td><%= @current_member.state %></td>
       <td><%= @current_member.country %></td>
       <td><%= @current_member.zip %></td>
-      <td style="width: 240px;">
+      <td>
         <%= link_to("http://maps.google.com/maps?f=q&q=#{h @current_member.full_address}&ie=UTF8&om=1", :class => "btn btn-info", :target => '_blank') do %> 
           <i class="icon-screenshot"></i> <%= t('show_on_map') %>
         <% end %>        
@@ -129,13 +129,13 @@
   </thead>
   <tbody>
     <tr>
-      <th><%= t('activerecord.attributes.member.phone_number') %></th><th>Email</th><th>Birth date</th><th>Actions</th>
+      <th style="width: 25%;"><%= t('activerecord.attributes.member.phone_number') %></th><th style="width: 25%;">Email</th><th>Birth date</th><th>Actions</th>
     </tr>
     <tr class="<%= (!@current_member.wrong_phone_number.nil? ? "yellow" : "") %>">
       <td><%= @current_member.phone_number %></td>
       <td><a href="mailto:<%= @current_member.email %>"><%= @current_member.email %></a></td>
       <td><%= @current_member.birth_date %></td>
-      <td style="width: 240px;">
+      <td>
         <% if @current_member.wrong_phone_number.nil? %>
           <%= link_to(member_set_unreachable_path, :class => "btn btn-danger") do %> 
             <i class="icon-remove"></i> <%= t('activerecord.attributes.member.set_unreachable') %>
