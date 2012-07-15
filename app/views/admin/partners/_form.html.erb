@@ -45,8 +45,9 @@
   </div>
 
 <% if @partner.new_record? %>
-  <h1> New Domain </h1>
-
+  <div class="page-header">
+    <h1> New Domain </h1>
+  </div>
   <div class="control-group">
     <%= fields_for :domain do |domain_fields| %>
       <div class="control-group">

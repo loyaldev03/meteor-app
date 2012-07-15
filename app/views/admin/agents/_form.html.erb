@@ -39,20 +39,22 @@
   <div class="control-group">
     <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
     <div class="controls">
-      <%= f.fields_for :club_roles, @agent.club_roles do |role| %>
-        <div style='border: 1px solid #ccc; margin-bottom: 0.2em;'>
-          ROLE: <%= role.object.role %>
-          CLUB ID: <%= role.object.club_id %>
-          DELETE ME: <%= label_tag nil, 'DELETE ME', class: 'chckbox' do %>
-            <%= role.check_box '_destroy' %>
-          <% end %>
-        </div>
-      <% end %>
       <%= f.fields_for :club_roles, @agent.club_roles.build do |role| %>
-        <%= role.select :role, Agent::ROLES %>
-        <%= role.text_field :club_id %>
-        <%= role.submit 'add' %>
+        Role name:&nbsp;<%= role.select :role, Agent::ROLES %>
+        Club:&nbsp;<%= role.text_field :club_id %>
+        <%= role.submit 'Add', :class => 'btn' %>
       <% end %>
+      <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;">
+        <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
+      <%= f.fields_for :club_roles, @agent.club_roles do |role| %>
+        <tr>
+          <td><%= role.object.role %></td>
+          <td><%= role.object.club_id %></td>
+          <td>Delete &nbsp;<%= role.check_box '_destroy' %></td>
+        </tr>
+      <% end %>
+      </table>
+     
     </div>
   </div>
 
