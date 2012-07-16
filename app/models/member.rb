@@ -72,7 +72,7 @@ class Member < ActiveRecord::Base
   validates :address, :format => REGEX_ADDRESS
   validates :state, :city, :presence => true, :format => REGEX_CITY_AND_STATE
   validates :terms_of_membership_id , :presence => true
-  valudates :country, :presence => true
+  validates :country, :presence => true
   validates :zip, :presence => true, :format => REGEX_ZIP
   validates :birth_date, :presence => true
 
