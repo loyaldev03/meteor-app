@@ -134,7 +134,7 @@
     <tr class="<%= (!@current_member.wrong_phone_number.nil? ? "yellow" : "") %>">
       <td><%= @current_member.phone_number %></td>
       <td><a href="mailto:<%= @current_member.email %>"><%= @current_member.email %></a></td>
-      <td><%= @current_member.birth_date %></td>
+      <td><%= @current_member.birth_date.nil? ? t('activerecord.attributes.member.not_have_birth_date_set') : @current_member.birth_date %></td>
       <td>
         <% if @current_member.wrong_phone_number.nil? %>
           <%= link_to(member_set_unreachable_path, :class => "btn btn-danger") do %> 

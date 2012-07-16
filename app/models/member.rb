@@ -74,7 +74,6 @@ class Member < ActiveRecord::Base
   validates :terms_of_membership_id , :presence => true
   validates :country, :presence => true
   validates :zip, :presence => true, :format => REGEX_ZIP
-  validates :birth_date, :presence => true
 
   scope :synced, lambda { |bool=true|
     bool ?
