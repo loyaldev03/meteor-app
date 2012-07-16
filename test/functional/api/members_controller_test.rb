@@ -13,7 +13,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "should enroll/create member" do
     @credit_card = FactoryGirl.build :credit_card
-    @member = FactoryGirl.build :member
+    @member = FactoryGirl.build :member_with_api
     @terms_of_membership = FactoryGirl.create :terms_of_membership
     @enrollment_info = FactoryGirl.build :enrollment_info
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns({ :code => "000", :message =>"test"})

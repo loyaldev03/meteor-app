@@ -14,6 +14,8 @@ FactoryGirl.define do
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
+    bill_date { DateTime.now }
+    birth_date { DateTime.now }
     status "none"
     country "US"
     club_cash_amount 0
@@ -28,6 +30,7 @@ FactoryGirl.define do
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
+    birth_date { DateTime.now }
     status "none"
     country "US"
     club_cash_amount 0
@@ -49,6 +52,7 @@ FactoryGirl.define do
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
+    birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
 
@@ -69,6 +73,7 @@ FactoryGirl.define do
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
+    birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
   end
@@ -86,6 +91,7 @@ FactoryGirl.define do
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
+    birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
 
@@ -102,6 +108,7 @@ FactoryGirl.define do
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
+    birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
 
@@ -121,6 +128,7 @@ FactoryGirl.define do
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
+    birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
 
@@ -139,6 +147,7 @@ FactoryGirl.define do
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
     phone_number { Faker::PhoneNumber.phone_number }
+    birth_date { DateTime.now }
     join_date { DateTime.now }
     country "US"
     club_cash_amount 0
