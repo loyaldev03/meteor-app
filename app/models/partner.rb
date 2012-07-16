@@ -8,8 +8,11 @@ class Partner < ActiveRecord::Base
   accepts_nested_attributes_for :domains, :limit => 1
 
   acts_as_paranoid
-  validates :name , :presence => true, :uniqueness => true, :name_is_not_admin => true
-  validates :prefix, :presence => true, :uniqueness => true, :prefix_is_not_admin => true
+  validates_as_paranoid
+  validates_uniqueness_of_without_deleted :name
+  validates_uniqueness_of_without_deleted :prefix
+  validates :name , :presence => true, :name_is_not_admin => true
+  validates :prefix, :presence => true, :prefix_is_not_admin => true
 
   def self.datatable_columns
     ['id', 'prefix', 'name', 'contract_uri', 'website_url' ]

@@ -12,6 +12,7 @@ class Agent < ActiveRecord::Base
   ROLES = %W(admin api representative supervisor)
 
   acts_as_paranoid
+  validates_as_paranoid
 
   has_many :created_members, :class_name => 'Member'
   has_many :operations
@@ -24,7 +25,7 @@ class Agent < ActiveRecord::Base
   attr_accessible :email, :password, :password_confirmation, :remember_me, :username, :login, :first_name, 
     :last_name, :roles, :club_roles_attributes
 
-  validates :username, :uniqueness => true
+  validates_uniqueness_of_without_deleted :username
   validates :username, :presence => true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
   validates :email, :presence => true
 
