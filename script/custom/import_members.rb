@@ -127,6 +127,8 @@ def update_member_when_duplicated_email(member, phoenix)
     @member = phoenix
     load_cancellation(member.cancelled_at)
 
+    # TODO: LOAD member_notes from member model into phoenix member
+
     phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
 
     new_phoenix_cc = PhoenixCreditCard.new 
@@ -234,7 +236,7 @@ end
 # 2- import new members.
 def add_new_members(cid)
   @campaign = BillingCampaign.find_by_id(cid)
-  next if @campaign.nil?
+  return if @campaign.nil?
 
   if @campaign.phoenix_tom_id.nil?
     tom_id = get_terms_of_membership_id(cid)
@@ -244,83 +246,84 @@ def add_new_members(cid)
   end
   if tom_id.nil?
     puts "CDId #{cid} does not exist or TOM is empty"
-    next
+    return
   end
 
   BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0 and campaign_id = #{cid} " + 
-  # " and id = 20243929300 " + # uncomment this line if you want to import a single member.
-  " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
-  " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
+      " and id <= 21771771004 " + # uncomment this line if you want to import a single member.
+      " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
+      " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
       tz = Time.now.utc
-      PhoenixMember.transaction do 
-        @log.info "  * processing member ##{member.id}"
-        begin
-          # validate if email already exist
-          phoenix = PhoenixMember.find_by_email_and_club_id member.email_to_import, CLUB
-          unless phoenix.nil?
-            puts "Email #{member.email_to_import} already exists"
-            exit
-            next
-          end
-
-          phoenix = PhoenixMember.new 
-          phoenix.club_id = CLUB
-          phoenix.terms_of_membership_id = tom_id
-          phoenix.visible_id = member.id
-          set_member_data(phoenix, member)
-          next_bill_date = member.cs_next_bill_date
-          phoenix.status = member.phoenix_status
-          if member.phoenix_status == 'active'
-            phoenix.bill_date = next_bill_date
-            phoenix.next_retry_bill_date = next_bill_date
-          elsif member.phoenix_status == 'provisional'
-            phoenix.bill_date = next_bill_date
-            phoenix.next_retry_bill_date = next_bill_date
-          else
-            phoenix.recycled_times = 0
-            phoenix.cancel_date = member.cancelled_at
-            phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
-          end
-          phoenix.created_by_id = DEFAULT_CREATED_BY
-          phoenix.save!
-
-          @member = phoenix
-          add_operation(Time.now.utc, nil, "Member imported into phoenix!", nil)  
-
-          if phoenix.status == "lapsed"
-            load_cancellation(@member.cancel_date)
-          end
-
-          # create Club cash transaction.
-          if member.club_cash_amount.to_f != 0.0
-            update_club_cash(member.club_cash_amount.to_f)
-          end
-
-          # create CC
-          phoenix_cc = PhoenixCreditCard.new 
-          phoenix_cc.number = CREDIT_CARD_NULL
-          unless TEST
-            phoenix_cc.encrypted_number = member.encrypted_cc_number
-          end
-          phoenix_cc.expire_month = member.cc_month_exp
-          phoenix_cc.expire_year = member.cc_year_exp
-          phoenix_cc.member_id = phoenix.uuid
-          phoenix_cc.save!
-
-          add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
-          add_product_fulfillment(member.has_fulfillment_product)
-          add_enrollment_info(phoenix, member, @campaign)
-
-          member.update_attribute :imported_at, Time.now.utc
-          print "."
-        rescue Exception => e
-          @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          raise ActiveRecord::Rollback
+      # transactions between databases does not work
+      #PhoenixMember.transaction do 
+      @log.info "  * processing member ##{member.id}"
+      begin
+        # validate if email already exist
+        phoenix = PhoenixMember.find_by_email_and_club_id member.email_to_import, CLUB
+        unless phoenix.nil?
+          puts "Email #{member.email_to_import} already exists"
+          #exit
+          next
         end
+
+        phoenix = PhoenixMember.new 
+        phoenix.club_id = CLUB
+        phoenix.terms_of_membership_id = tom_id
+        phoenix.visible_id = member.id
+        set_member_data(phoenix, member)
+        next_bill_date = member.cs_next_bill_date
+        phoenix.status = member.phoenix_status
+        if member.phoenix_status == 'active'
+          phoenix.bill_date = next_bill_date
+          phoenix.next_retry_bill_date = next_bill_date
+        elsif member.phoenix_status == 'provisional'
+          phoenix.bill_date = next_bill_date
+          phoenix.next_retry_bill_date = next_bill_date
+        else
+          phoenix.recycled_times = 0
+          phoenix.cancel_date = member.cancelled_at
+          phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
+        end
+        phoenix.created_by_id = DEFAULT_CREATED_BY
+        phoenix.save!
+
+        @member = phoenix
+        add_operation(Time.now.utc, nil, "Member imported into phoenix!", nil)  
+
+        if phoenix.status == "lapsed"
+          load_cancellation(@member.cancel_date)
+        end
+
+        # create Club cash transaction.
+        if member.club_cash_amount.to_f != 0.0
+          update_club_cash(member.club_cash_amount.to_f)
+        end
+
+        # create CC
+        phoenix_cc = PhoenixCreditCard.new 
+        phoenix_cc.number = CREDIT_CARD_NULL
+        unless TEST
+          phoenix_cc.encrypted_number = member.encrypted_cc_number
+        end
+        phoenix_cc.expire_month = member.cc_month_exp
+        phoenix_cc.expire_year = member.cc_year_exp
+        phoenix_cc.member_id = phoenix.uuid
+        phoenix_cc.save!
+
+        add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
+        add_product_fulfillment(member.has_fulfillment_product)
+        add_enrollment_info(phoenix, member, @campaign)
+
+        member.update_attribute :imported_at, Time.now.utc
+        print "."
+      rescue Exception => e
+        @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        raise ActiveRecord::Rollback
       end
+      #end
       @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
   end

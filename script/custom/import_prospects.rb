@@ -7,7 +7,7 @@ ActiveRecord::Base.logger = @log
 
 @cids.each do |cid|
   @campaign = BillingCampaign.find_by_id(cid)
-  next if @campaign.nil?
+  return if @campaign.nil?
 
   if @campaign.phoenix_tom_id.nil?
     tom_id = get_terms_of_membership_id(cid)
@@ -17,7 +17,7 @@ ActiveRecord::Base.logger = @log
   end
   if tom_id.nil?
     puts "CDId #{cid} does not exist or TOM is empty"
-    next
+    return
   end
 
   ProspectProspect.where("imported_at IS NULL and campaign_id = #{cid} ").find_in_batches do |group|

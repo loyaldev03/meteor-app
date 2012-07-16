@@ -16,7 +16,7 @@ def load_refunds
           transaction = PhoenixTransaction.new
           transaction.member_id = @member.uuid
           transaction.terms_of_membership_id = @member.terms_of_membership_id
-          transaction.gateway = (response.gateway == 'mes' ? response.gateway : 'litle')
+          transaction.gateway = refund.phoenix_gateway
           transaction.set_payment_gateway_configuration(transaction.gateway)
           transaction.recurrent = false
           transaction.transaction_type = "credit" 
@@ -62,7 +62,7 @@ def load_enrollment_transactions
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
             transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
-            transaction.gateway = (response.gateway == 'mes' ? response.gateway : 'litle')
+            transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
             transaction.transaction_type = 'authorization_capture'
@@ -91,10 +91,6 @@ def load_enrollment_transactions
               add_operation(transaction.created_at, transaction, 
                             "Member enrolled successfully $#{transaction.amount} on TOM(#{transaction.terms_of_membership_id}) -#{get_terms_of_membership_name(transaction.terms_of_membership_id)}-",
                             Settings.operation_types.membership_billing, transaction.created_at, transaction.updated_at)
-            else
-              # Today we dont save failed enrollments operations
-              # add_operation(transaction.created_at, transaction, "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
-              #              Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
             end
             response.update_attribute :imported_at, Time.now.utc
             print "."
@@ -123,7 +119,7 @@ def load_membership_transactions
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
             transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
-            transaction.gateway = (response.gateway == 'mes' ? response.gateway : 'litle')
+            transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
             transaction.transaction_type = 'authorization_capture'
@@ -175,12 +171,7 @@ def load_membership_transactions
   end
 end
 
-def set_last_billing_date_on_credit_card(member, transaction_date)
-  cc = PhoenixCreditCard.find_by_active_and_member_id true, member.id
-  if cc and (cc.last_successful_bill_date.nil? or cc.last_successful_bill_date < transaction_date)
-    cc.update_attribute :last_successful_bill_date, transaction_date
-  end
-end
+
 
 
 load_refunds

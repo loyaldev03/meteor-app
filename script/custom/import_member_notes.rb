@@ -39,6 +39,7 @@ def import_customer_notes
   CustomerServicesNotes.where("imported_at IS NULL" +
     (USE_MEMBER_LIST ? " and source_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
     ).find_in_batches do |group|
+    puts "cant #{group.count}"
     group.each do |note| 
       begin
         # load member notes

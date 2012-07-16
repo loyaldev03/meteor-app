@@ -5,14 +5,6 @@ require_relative 'import_models'
 @log = Logger.new('import_operations.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
-
-# UPDATE sac_production.`members` SET `reactivation_times` = 0 WHERE club_id = 1;
-# UPDATE sac_production.`members` SET `reactivation_times` = 1 WHERE `members`.`uuid` = 'e6acfa2c-2286-45ba-86c6-896b04910001'
-# UPDATE sac_production.`members` SET `reactivation_times` = 1 WHERE `members`.`uuid` = '99f274b9-db3e-4ed9-b269-d0597d2ec4b1'
-# UPDATE sac_production.`members` SET `reactivation_times` = 1 WHERE `members`.`uuid` = '0f42512e-111a-4abd-a21f-cd18772b0507'
-
-
-
 def load_save_the_sales
   CustomerServicesOperations.where(" name like '%Edit Campaign%' and imported_at IS NULL " +
     (USE_MEMBER_LIST ? " and contact_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")

@@ -37,7 +37,6 @@ MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters
 CREDIT_CARD_NULL = "0000000000"
 USE_MEMBER_LIST = true
 
-# 999
 
 @cids = %w(
 190
@@ -203,6 +202,7 @@ USE_MEMBER_LIST = true
 1678
 )
 
+@cids = %w( 999 )
 
 
 if USE_PROD_DB
@@ -412,6 +412,9 @@ class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "enrollment_auth_responses" 
   self.record_timestamps = false
+  def phoenix_gateway
+    gateway == 'mes' ? gateway : 'litle'
+  end
   def authorization
     BillingEnrollmentAuthorization.find_by_id(self.authorization_id)
   end
@@ -450,6 +453,9 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "membership_auth_responses" 
   self.record_timestamps = false
+  def phoenix_gateway
+    gateway == 'mes' ? gateway : 'litle'
+  end
   def authorization
     BillingMembershipAuthorization.find_by_id(self.authorization_id)
   end
@@ -488,6 +494,9 @@ class BillingChargeback < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "chargebacks" 
   self.record_timestamps = false
+  def phoenix_gateway
+    gateway == 'mes' ? gateway : 'litle'
+  end
 end
 
 
@@ -562,6 +571,13 @@ end
 
 def load_cancellation(cancel_date)
   add_operation(cancel_date, @member, "Member canceled", Settings.operation_types.cancel, cancel_date, cancel_date) 
+end
+
+def set_last_billing_date_on_credit_card(member, transaction_date)
+  cc = PhoenixCreditCard.find_by_active_and_member_id true, member.id
+  if cc and (cc.last_successful_bill_date.nil? or cc.last_successful_bill_date < transaction_date)
+    cc.update_attribute :last_successful_bill_date, transaction_date
+  end
 end
 
 require_relative 'import_communications'
