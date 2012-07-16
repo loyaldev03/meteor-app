@@ -47,7 +47,7 @@ class Member < ActiveRecord::Base
   REGEX_ADDRESS = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
   #Validates that there are no invalid charactes in the country. 
-  REGEX_CITY_AND_STATE_AND_COUNTRY = /^[A-Za-z0-9 ',.\s]+$/
+  REGEX_CITY_AND_STATE = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-,.\s]+$/
 
   #Only allows zips with the format: xxxxx or xxxxx-xxxx. Only numbers.
   REGEX_ZIP = /^[0-9]{5}(-?[0-9]{4})?$/
@@ -69,9 +69,10 @@ class Member < ActiveRecord::Base
   validates :first_name, :last_name, :presence => true, :format => REGEX_FIRST_AND_LAST_NAME
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, :format => REGEX_EMAIL
   validates :phone_number, :format => REGEX_PHONE_NUMBER
-  validates :address, :city, :format => REGEX_ADDRESS
-  validates :state, :country, :presence => true, :format => REGEX_CITY_AND_STATE_AND_COUNTRY
+  validates :address, :format => REGEX_ADDRESS
+  validates :state, :city, :presence => true, :format => REGEX_CITY_AND_STATE
   validates :terms_of_membership_id , :presence => true
+  valudates :country, :presence => true
   validates :zip, :presence => true, :format => REGEX_ZIP
   validates :birth_date, :presence => true
 
