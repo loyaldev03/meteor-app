@@ -47,7 +47,7 @@ class Member < ActiveRecord::Base
   REGEX_ADDRESS = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
   #Validates that there are no invalid charactes in the country. 
-  REGEX_CITY_AND_STATE = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-,.\s]+$/
+  REGEX_CITY_AND_STATE = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
   #Only allows zips with the format: xxxxx or xxxxx-xxxx. Only numbers.
   REGEX_ZIP = /^[0-9]{5}(-?[0-9]{4})?$/
