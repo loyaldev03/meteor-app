@@ -186,6 +186,6 @@ def get_terms_of_membership_id(campaign_id)
 end
 
 def get_terms_of_membership_name(tom_id)
-  PhoenixTermsOfMembership.find_by_id(tom_id)
+  PhoenixTermsOfMembership.find_by_id(tom_id).name
 end
 

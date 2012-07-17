@@ -19,6 +19,7 @@
 #      (SELECT campaign_id FROM onmc_billing.members WHERE id =  onmc_billing.membership_authorizations.member_id) WHERE
 #       onmc_billing.membership_authorizations campaign_id IS NULL;
 
+require 'rubygems'
 require 'rails'
 require 'active_record'
 require 'uuidtools'
@@ -36,7 +37,6 @@ MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters
 
 CREDIT_CARD_NULL = "0000000000"
 USE_MEMBER_LIST = true
-
 
 @cids = %w(
 190
@@ -200,9 +200,9 @@ USE_MEMBER_LIST = true
 1607
 1677
 1678
+999
 )
 
-@cids = %w( 999 )
 
 
 if USE_PROD_DB
@@ -247,10 +247,10 @@ else
   ActiveRecord::Base.configurations["phoenix"] = { 
     :adapter => "mysql2",
     :database => "sac_production",
-    :host => "127.0.0.1",
+    :host => "10.6.0.58",
     :username => "root",
     :password => 'pH03n[xk1{{s', 
-    :port => 30013 # tunnel 
+    :port => 3306 
   }
 
   ActiveRecord::Base.configurations["billing"] = { 
@@ -384,7 +384,7 @@ end
 
 
 class Settings < Settingslogic
-  source "#{File.expand_path(File.dirname(__FILE__))}/../../config/application.yml"
+  source "application.yml"
   namespace Rails.env
 end
 
@@ -418,17 +418,21 @@ class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
   def authorization
     BillingEnrollmentAuthorization.find_by_id(self.authorization_id)
   end
-  def invoice_number
-    "#{self.created_at.to_date}-#{self.authorization.member_id}"
+  def invoice_number(a)
+    "#{self.created_at.to_date}-#{a.member_id}"
   end
   def member
     PhoenixMember.find_by_visible_id_and_club_id(authorization.member_id, CLUB)
   end
-  def capture 
-    BillingEnrollmentCapture.find_by_member_id_and_litleTxnId(authorization.member_id, authorization.litleTxnId)
+  def capture
+    if authorization.litleTxnId.to_s.size > 2
+     BillingEnrollmentCapture.find_by_member_id_and_litleTxnId(authorization.member_id, authorization.litleTxnId)
+    else
+     nil
+    end
   end
   def capture_response
-    BillingEnrollmentCaptureResponse.find_by_capture_id(capture.id)
+    capture.nil? ? nil : BillingEnrollmentCaptureResponse.find_by_capture_id(capture.id)
   end
   def amount
     phoenix_amount
@@ -465,11 +469,18 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
   def billing_member
     BillingMember.find_by_id(authorization.member_id)
   end
-  def capture 
-    BillingMembershipCapture.find_by_member_id_and_litleTxnId(authorization.member_id, authorization.litleTxnId)
+  def capture
+    if authorization.litleTxnId.to_s.size > 2
+      BillingMembershipCapture.find_by_member_id_and_litleTxnId(authorization.member_id, authorization.litleTxnId)
+    else
+      nil
+    end
+  end
+  def invoice_number(a)
+    "#{self.created_at.to_date}-#{a.member_id}"
   end
   def capture_response
-    BillingMembershipCaptureResponse.find_by_capture_id(capture.id)
+    capture.nil? ? nil : BillingMembershipCaptureResponse.find_by_capture_id(capture.id)
   end
   def amount
     phoenix_amount
@@ -580,4 +591,4 @@ def set_last_billing_date_on_credit_card(member, transaction_date)
   end
 end
 
-require_relative 'import_communications'
+require 'import_communications'

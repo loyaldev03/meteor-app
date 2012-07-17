@@ -1,6 +1,6 @@
 #!/bin/ruby
 
-require_relative 'import_models'
+require 'import_models'
 
 @log = Logger.new('import_prospects.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
@@ -20,7 +20,7 @@ ActiveRecord::Base.logger = @log
     return
   end
 
-  ProspectProspect.where("imported_at IS NULL and campaign_id = #{cid} ").find_in_batches do |group|
+  ProspectProspect.where(" imported_at IS NULL and campaign_id = #{cid} ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |prospect| 
       tz = Time.now.utc
@@ -57,5 +57,6 @@ ActiveRecord::Base.logger = @log
       end
       @log.info "    ... took #{Time.now.utc - tz} for prospect ##{prospect.id}"
     end
+    sleep(1)
   end
 end

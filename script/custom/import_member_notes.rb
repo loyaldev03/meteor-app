@@ -1,6 +1,6 @@
 #!/bin/ruby
 
-require_relative 'import_models'
+require 'import_models'
 
 @log = Logger.new('import_notes.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
@@ -64,6 +64,7 @@ def import_customer_notes
         exit
       end
     end
+    sleep(1)
   end
 end
 

@@ -1,18 +1,22 @@
 #!/bin/ruby
 
-require_relative 'import_models'
+require 'import_models'
 
 @log = Logger.new('import_transactions.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
 def load_refunds
-  BillingChargeback.where("imported_at IS NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
+  BillingChargeback.where(" imported_at IS NULL and phoenix_amount IS NOT NULL "+
+    (USE_MEMBER_LIST ? " and member_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
+  ).find_in_batches do |group|
+    puts "cant #{group.count}"
     group.each do |refund|
       @member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, refund.member_id)
       unless @member.nil?
         tz = Time.now.utc
         @log.info "  * processing Chargeback ##{refund.id}"
         begin
+# TODO: update refunded $$ on transactions
           transaction = PhoenixTransaction.new
           transaction.member_id = @member.uuid
           transaction.terms_of_membership_id = @member.terms_of_membership_id
@@ -51,9 +55,16 @@ def load_refunds
 end
 
 def load_enrollment_transactions
-  BillingEnrollmentAuthorizationResponse.where("imported_at IS NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
+  BillingEnrollmentAuthorizationResponse.
+  joins(' JOIN enrollment_authorizations ON enrollment_authorizations.id = enrollment_auth_responses.authorization_id ').
+  where(" enrollment_authorizations.campaign_id IS NOT NULL and imported_at IS NULL and phoenix_amount IS NOT NULL " +
+#    " and enrollment_auth_responses.id < 6698 " +
+    (USE_MEMBER_LIST ? " and member_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
+  ).find_in_batches do |group|
+    puts "cant #{group.count}"
     group.each do |response|
-      unless response.authorization.nil?
+      authorization = response.authorization
+      if not authorization.nil? 
         begin
           tz = Time.now.utc
           @log.info "  * processing Enrollment Auth response ##{response.id}"
@@ -61,38 +72,35 @@ def load_enrollment_transactions
           unless @member.nil?
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
-            transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
+            transaction.terms_of_membership_id = get_terms_of_membership_id(authorization.campaign_id)
+            next if transaction.terms_of_membership_id.nil?
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
             transaction.transaction_type = 'authorization_capture'
-            transaction.invoice_number = "response.invoice_number"
+            transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
-            transaction.response = { :authorization => response.message, :capture => (response.capture_response.message rescue nil) }
+            transaction.response = { :authorization => response.message }
             transaction.response_code = response.code
-            if response.capture and response.capture_response and response.capture_response.code
-              transaction.response_code = response.capture_response.code
-            end
             transaction.response_result = transaction.response
             if response.code.to_i == 0
-              transaction.response_transaction_id = response.authorization.litleTxnId
+              transaction.response_transaction_id = authorization.litleTxnId
             end
-            transaction.response_auth_code = response.authorization.auth_code
-            if response.capture and response.capture.auth_code
-              transaction.response_auth_code = response.capture.auth_code
-            end
+            transaction.response_auth_code = authorization.auth_code
             transaction.created_at = response.created_at
             transaction.updated_at = response.updated_at
             transaction.refunded_amount = 0
             transaction.save!
 
-            if transaction.response_code.to_i == 0 and (response.authorization.captured == 1 || response.authorization.authorized == 1)
+            if transaction.response_code.to_i == 0 and (authorization.captured == 1 || authorization.authorized == 1)
               set_last_billing_date_on_credit_card(@member, transaction.created_at)
               add_operation(transaction.created_at, transaction, 
                             "Member enrolled successfully $#{transaction.amount} on TOM(#{transaction.terms_of_membership_id}) -#{get_terms_of_membership_name(transaction.terms_of_membership_id)}-",
                             Settings.operation_types.membership_billing, transaction.created_at, transaction.updated_at)
             end
-            response.update_attribute :imported_at, Time.now.utc
+            # This find is need it because find_in_batches has a join and record is readonly
+            r = BillingEnrollmentAuthorizationResponse.find response.id
+            r.update_attribute :imported_at, Time.now.utc
             print "."
           end
         rescue Exception => e
@@ -108,9 +116,15 @@ end
 
 
 def load_membership_transactions
-  BillingMembershipAuthorizationResponse.where("imported_at IS NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
+  BillingMembershipAuthorizationResponse.
+  joins(' JOIN membership_authorizations ON membership_authorizations.id = membership_auth_responses.authorization_id ').
+  where(" membership_authorizations.campaign_id IS NOT NULL and  imported_at IS NULL and phoenix_amount IS NOT NULL " +
+    (USE_MEMBER_LIST ? " and member_id IN (#{PhoenixMember.find_all_by_club_id(CLUB, :limit => 400).map(&:visible_id).join(',')}) " : "")
+  ).find_in_batches do |group|
+    puts "cant #{group.count}"
     group.each do |response|
-      unless response.authorization.nil?
+      authorization = response.authorization
+      unless authorization.nil?
         begin
           tz = Time.now.utc
           @member = response.member
@@ -118,32 +132,27 @@ def load_membership_transactions
             @log.info "  * processing Membership Auth response ##{response.id}"
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
-            transaction.terms_of_membership_id = get_terms_of_membership_id(response.authorization.campaign_id)
+            transaction.terms_of_membership_id = get_terms_of_membership_id(authorization.campaign_id)
+            next if transaction.terms_of_membership_id.nil?
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
             transaction.transaction_type = 'authorization_capture'
-            transaction.invoice_number = response.invoice_number
+            transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
-            transaction.response = { :authorization => response.message, :capture => (response.capture_response.message rescue nil) }
+            capture_response = response.capture_response
+            transaction.response = { :authorization => response.message }
             transaction.response_code = response.code
-            if response.capture and response.capture_response
-              transaction.response_code = response.capture_response.code
-            end
             transaction.response_result = transaction.response
             if response.code.to_i == 0
-              transaction.response_transaction_id = response.authorization.litleTxnId
+              transaction.response_transaction_id = authorization.litleTxnId
             end
-            if response.capture and response.capture.auth_code
-              transaction.response_auth_code = response.capture.auth_code
-            else  
-              transaction.response_auth_code = response.authorization.auth_code
-            end
+            transaction.response_auth_code = authorization.auth_code
             transaction.created_at = response.created_at
             transaction.updated_at = response.updated_at
             transaction.refunded_amount = 0
             transaction.save!
-            if transaction.response_code.to_i == 0 and (response.authorization.captured == 1 || response.authorization.authorized == 1)
+            if transaction.response_code.to_i == 0 and (authorization.captured == 1 || authorization.authorized == 1)
               set_last_billing_date_on_credit_card(@member, transaction.created_at)
               add_operation(transaction.created_at, transaction, 
                             "Member billed successfully $#{transaction.amount} Transaction id: #{transaction.id}", 
@@ -157,7 +166,9 @@ def load_membership_transactions
                             "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
                             Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
             end
-            response.update_attribute :imported_at, Time.now.utc
+            # This find is need it because find_in_batches has a join and record is readonly
+            r = BillingMembershipAuthorizationResponse.find response.id
+            r.update_attribute :imported_at, Time.now.utc
             print "."
           end
         rescue Exception => e

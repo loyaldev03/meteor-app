@@ -1,6 +1,6 @@
 #!/bin/ruby
 
-require_relative 'import_models'
+require 'import_models'
 
 @log = Logger.new('import_operations.log', 10, 1024000)
 ActiveRecord::Base.logger = @log

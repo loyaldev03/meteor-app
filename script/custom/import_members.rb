@@ -1,6 +1,6 @@
 #!/bin/ruby
 
-require_relative 'import_models'
+require 'import_models'
 
 @log = Logger.new('import_members.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
@@ -199,7 +199,7 @@ def add_new_members(cid)
   end
 
   BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0 and campaign_id = #{cid} " + 
-      " and id <= 21771771004 " + # uncomment this line if you want to import a single member.
+      #" and id <= 13771771004 " + # uncomment this line if you want to import a single member.
       " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
       " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
@@ -275,6 +275,7 @@ def add_new_members(cid)
       #end
       @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
+    sleep(1)
   end
 end
 
