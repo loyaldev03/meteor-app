@@ -6,7 +6,7 @@ require_relative 'import_models'
 ActiveRecord::Base.logger = @log
 
 def load_refunds
-  BillingChargeback.where("imported_at IS NOT NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
+  BillingChargeback.where("imported_at IS NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
     group.each do |refund|
       @member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, refund.member_id)
       unless @member.nil?
@@ -51,7 +51,7 @@ def load_refunds
 end
 
 def load_enrollment_transactions
-  BillingEnrollmentAuthorizationResponse.where("imported_at IS NOT NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
+  BillingEnrollmentAuthorizationResponse.where("imported_at IS NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
     group.each do |response|
       unless response.authorization.nil?
         begin
@@ -108,7 +108,7 @@ end
 
 
 def load_membership_transactions
-  BillingMembershipAuthorizationResponse.where("imported_at IS NOT NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
+  BillingMembershipAuthorizationResponse.where("imported_at IS NULL and phoenix_amount IS NOT NULL").find_in_batches do |group|
     group.each do |response|
       unless response.authorization.nil?
         begin

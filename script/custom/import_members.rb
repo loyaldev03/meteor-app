@@ -102,57 +102,6 @@ def update_fulfillment(member, phoenix)
   end
   add_product_fulfillment(member.has_fulfillment_product)
 end
-def update_member_when_duplicated_email(member, phoenix)
-  if phoenix.status == member.phoenix_status
-    # not imported member is newer
-    if member.id > phoenix.visible_id
-      dont_load_email_duplicated = false
-      set_member_data(phoenix, member, true)
-      phoenix.updated_at = member.updated_at
-      phoenix.visible_id = member.id
-      phoenix.cancel_date = member.cancelled_at
-      update_fulfillment(member, phoenix)
-    else
-      dont_load_email_duplicated = true
-      phoenix.created_at = member.created_at
-      phoenix.member_since_date = member.member_since_date
-    end
-    BillingMember.find(phoenix.visible_id).update_attribute :dont_load_email_duplicated, dont_load_email_duplicated
-    member.dont_load_email_duplicated = !dont_load_email_duplicated
-    member.save
-    phoenix.quota = member.quota + phoenix.quota
-    # TODO: Its hard to add every enrollment info.
-    # add_enrollment_info(phoenix, member)
-    phoenix.save!
-    @member = phoenix
-    load_cancellation(member.cancelled_at)
-
-    # TODO: LOAD member_notes from member model into phoenix member
-
-    phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
-
-    new_phoenix_cc = PhoenixCreditCard.new 
-    new_phoenix_cc.encrypted_number = member.encrypted_cc_number
-    new_phoenix_cc.number = CREDIT_CARD_NULL if new_phoenix_cc.number.nil?
-    new_phoenix_cc.expire_month = member.cc_month_exp
-    new_phoenix_cc.expire_year = member.cc_year_exp
-    new_phoenix_cc.member_id = phoenix.uuid
-    new_phoenix_cc.active = (member.id == phoenix.visible_id)
-
-    if phoenix_cc.nil?
-      puts "  * member ##{member.id} does not have Credit Card active"
-      new_phoenix_cc.save!
-      add_operation(Time.zone.now, new_phoenix_cc, "Credit card #{new_phoenix_cc.last_digits} added", nil)
-    elsif phoenix_cc.encrypted_number != member.encrypted_cc_number or 
-          phoenix_cc.expire_month != member.cc_month_exp or 
-          phoenix_cc.expire_year != member.cc_year_exp
-      phoenix_cc.active = (member.id != phoenix.visible_id)
-      new_phoenix_cc.save!
-      phoenix_cc.save!
-      add_operation(Time.zone.now, new_phoenix_cc, "Credit card #{new_phoenix_cc.last_digits} added", nil)
-    end
-  end
-end
 
 # 1- update existing members
 def update_members(cid)
@@ -330,48 +279,6 @@ def add_new_members(cid)
 end
 
 
-# 3- load_duplicated_emails
-def load_duplicated_emails
-  BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0" + 
-    # " and id = 20243929300 " + # uncomment this line if you want to import a single member.
-    " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
-    " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
-    puts "cant #{group.count}"
-    group.each do |member| 
-      tz = Time.now.utc
-      PhoenixMember.transaction do 
-        @log.info "  * processing member ##{member.id}"
-        begin
-          # validate if email already exist
-          phoenix = PhoenixMember.find_by_email_and_club_id member.email_to_import, CLUB
-          if phoenix.nil?
-            puts "Email #{member.email_to_import} does not exists"
-            exit
-            next
-          end
-          if phoenix.status == member.phoenix_status and phoenix.status == 'lapsed'
-            update_member_when_duplicated_email(member, phoenix)
-            member.update_attribute :imported_at, Time.now.utc
-          end
-          print "."
-        rescue Exception => e
-          @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          raise ActiveRecord::Rollback
-        end
-      end
-      @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
-    end
-  end
-end
-
-# Para hacer updates falta hacer:
-# 1) procesar emails repetidos y marcar el member + nuevo (por estado o member number) que se actualizaría
-# load_duplicated_emails debe marcar el member considerado como repetido.
-# 
-# 2) avisar a reporting que se agregó este campo en mebers para que los members que tienen email repetido, no se analicen más
-# 3) Agregar esta condición en update_members
-
 @cids.each do |cid|
   # if we use load_duplicated_emails , update_members will override changes.
   # update_members
@@ -379,5 +286,3 @@ end
   add_new_members(cid)
 end
 
-# => needs test
-# load_duplicated_emails
