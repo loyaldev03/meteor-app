@@ -226,10 +226,12 @@
             <th><%= t('activerecord.attributes.member.member_group_type') %>:</th>
             <td><%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %></td>  
           </tr>
+          <% if @current_member.club.requires_external_id %>
           <tr>
             <th><%= t('activerecord.attributes.member.external_id') %>:</th>
             <td><%= @current_member.external_id %></td>  
           </tr>
+          <% end %>
         </table>
       </td>
       <td style="width: 50%;">
@@ -275,12 +277,6 @@
             <th><%= t('activerecord.attributes.member.quota') %>: </th>
             <td><%= @current_member.quota %></td>  
           </tr>
-          <% if @current_member.club.requires_external_id %>
-          <tr>
-            <th><%= t('activerecord.attributes.club.requires_external_id') %>: </th>
-            <td><%= @current_member.club.requires_external_id %></td>  
-          </tr>
-          <% end %>
         </table>        
       </td>
     </tr>
