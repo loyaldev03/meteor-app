@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'test_helper'
 
 class MemberTest < ActiveSupport::TestCase
@@ -45,7 +46,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Monthly member should be billed if it is active or provisional" do
-    assert_difference('Operation.count', +3) do
+    assert_difference('Operation.count', 4) do
       member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
@@ -178,6 +179,16 @@ class MemberTest < ActiveSupport::TestCase
     member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club, :club_cash_amount => 200)
     member.set_as_canceled
     assert_equal 0, member.club_cash_amount, "The member is #{member.status} with $#{member.club_cash_amount}"
+  end
+
+  test "Member should be saved with first_name and last_name with numbers or acents." do
+    member = FactoryGirl.build(:member)
+    assert !member.save, member.errors.inspect
+    member.club =  @terms_of_membership_with_gateway.club
+    member.terms_of_membership =  @terms_of_membership_with_gateway
+    member.first_name = 'Billy 3ro'
+    member.last_name = 'Sáenz'
+    assert member.save, "member cant be save #{member.errors.inspect}"
   end
 
 end
