@@ -8,12 +8,8 @@
       <th> <%= t('activerecord.attributes.member.external_id') %> </th>
       <th> <%= t('activerecord.attributes.member.full_name') %> </th>
       <th> <%= t('activerecord.attributes.member.full_address') %> </th>
-      <% once = 0 %>
-      <% members.each do |member| %>
-        <% if member.club.requires_external_id and once == 0 %>
-          <th> <%= t('activerecord.attributes.member.external_id') %> </th>
-          <% once = 1 %>
-        <% end %>
+      <% if @current_club.requires_external_id %>
+        <th> <%= t('activerecord.attributes.member.external_id') %> </th>
       <% end %>
       <th style="width: 20px;">View</th>
       <th style="width: 20px;">Edit</th>
@@ -28,7 +24,9 @@
       <%= member.status %>
       </td>
       <td> <%= member.visible_id %> </td>
-      <td> <%= member.external_id if !member.external_id.nil? %> </td>
+      <% if @current_club.requires_external_id %>
+        <td> <%= member.external_id if !member.external_id.nil? %> </td>
+      <% end %>
       <td> <%= member.full_name %> </td>
       <td> <%= member.full_address %> </td>
       <td> <%= member.external_id if member.club.requires_external_id %> </td>
