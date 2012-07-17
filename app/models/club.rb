@@ -13,7 +13,7 @@ class Club < ActiveRecord::Base
     class_name:  'Domain',
     foreign_key: 'drupal_domain_id'
 
-  attr_accessible :description, :name, :logo, :drupal_domain_id, :theme
+  attr_accessible :description, :name, :logo, :drupal_domain_id, :theme, :requires_external_id
 
   acts_as_paranoid
 
