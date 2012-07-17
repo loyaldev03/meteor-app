@@ -246,6 +246,7 @@ list of the regex we are using to validate show.
    *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
     we will set some features such as provisional days or amount of club cash the member will start with.
    *enrollment_amount: Amount of money that takes to enroll.
+   *birth_date: Birth date of the member. This date is stored with format &quot;yyyy-mm-dd&quot;
    *credit_card  [Hash]
    *enrollment_info  [Hash]
 </code></pre>
@@ -458,7 +459,6 @@ creation page.
       <pre class="lines">
 
 
-79
 80
 81
 82
@@ -475,10 +475,11 @@ creation page.
 93
 94
 95
-96</pre>
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 79</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -649,7 +650,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-175
 176
 177
 178
@@ -667,10 +667,11 @@ Code related to the method result.
 190
 191
 192
-193</pre>
+193
+194</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 175</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 176</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_shows'>shows</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -890,7 +891,6 @@ page.
       <pre class="lines">
 
 
-132
 133
 134
 135
@@ -904,10 +904,11 @@ page.
 143
 144
 145
-146</pre>
+146
+147</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 132</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 133</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -934,7 +935,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Fri Jul 13 13:59:12 2012 by
+  Generated on Mon Jul 16 10:32:48 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

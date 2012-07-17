@@ -115,6 +115,7 @@ en:
         reactivation_times: 'Reactivation times'
         member_group_type: 'Group'
         not_group_associated: ' -- '
+        not_have_birth_date_set: 'No birth date set.'
         does_not_have_member_groups: 'It has no groups to be selected.'
         zip_help: 'It supports zips with format xxxxx or xxxxx-xxxx. Only numbers.'
         phone_number_help: 'Formats: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.'

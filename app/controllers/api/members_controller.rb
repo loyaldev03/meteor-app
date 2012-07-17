@@ -26,6 +26,7 @@ class Api::MembersController < ApplicationController
   #             *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
   #              we will set some features such as provisional days or amount of club cash the member will start with.
   #             *enrollment_amount: Amount of money that takes to enroll.
+  #             *birth_date: Birth date of the member. This date is stored with format "yyyy-mm-dd"
   #             *credit_card  [Hash]
   #             *enrollment_info  [Hash]
   # [credit_card] Information related to member's credit card. {CreditCard show}
