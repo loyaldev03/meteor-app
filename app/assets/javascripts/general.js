@@ -103,8 +103,15 @@ $(document).ready( function() {
 
   function new_member_functions(){
     $('#error_explanation').hide();
-    $(".datepicker").datepicker({ constrainInput: true, maxDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
-    
+    $(".datepicker").datepicker({ constrainInput: true, 
+                                  maxDate: 0, 
+                                  dateFormat: "yy-mm-dd", 
+                                  showOn: "both", 
+                                  buttonImage: "/icon-calendar.png", 
+                                  changeMonth: true,
+                                  changeYear: true,
+                                  yearRange: '1900',
+                                  buttonImageOnly: true});
     $('#new_member').submit( function(event) {
       event.preventDefault()
       $.ajax({
@@ -160,6 +167,15 @@ $(document).ready( function() {
 
   function edit_member_functions(){
     $('#error_explanation').hide();
+    $(".datepicker").datepicker({ constrainInput: true, 
+                                  maxDate: 0, 
+                                  dateFormat: "yy-mm-dd", 
+                                  showOn: "both", 
+                                  buttonImage: "/icon-calendar.png", 
+                                  changeMonth: true,
+                                  changeYear: true,
+                                  yearRange: '1900',
+                                  buttonImageOnly: true});
     $('form').submit( function(event) {
       event.preventDefault();
       $.ajax({

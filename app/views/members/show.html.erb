@@ -275,8 +275,13 @@
             <th><%= t('activerecord.attributes.member.quota') %>: </th>
             <td><%= @current_member.quota %></td>  
           </tr>
-        </table>
-
+          <% if @current_member.club.requires_external_id %>
+          <tr>
+            <th><%= t('activerecord.attributes.club.requires_external_id') %>: </th>
+            <td><%= @current_member.club.requires_external_id %></td>  
+          </tr>
+          <% end %>
+        </table>        
       </td>
     </tr>
   </tbody>
