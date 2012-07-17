@@ -244,8 +244,11 @@ list of the regex we are using to validate show.
    *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to
     validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
    *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
-    we will set some features such as provisional days or amount of club cash the member will start with.
-   *enrollment_amount: Amount of money that takes to enroll.
+    we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level. 
+   *enrollment_amount: Amount of money that takes to enroll. It is present at member level.
+   *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
+    informati??n with him. joint=1 means we will share this informati??n. If this value is null, we will automaticaly set it as 0. This is an exclusive value, 
+    it can be seted using 1 or 0, or true or false. It is present at member level.
    *birth_date: Birth date of the member. This date is stored with format &quot;yyyy-mm-dd&quot;
    *credit_card  [Hash]
    *enrollment_info  [Hash]
@@ -288,7 +291,7 @@ information for further reports.
   *campaign_medium_version
   *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
    informati??n with him. joint=1 means we will share this informati??n. If this value is null, we will automaticaly set it as 0. This is an exclusive value, 
-   it can be seted using 1 or 0, or true or false.
+   it can be seted using 1 or 0, or true or false. It is present at member level.
 </code></pre>
 </dd>
 <dt>setter</dt><dd><p>
@@ -463,9 +466,6 @@ creation page.
       <pre class="lines">
 
 
-82
-83
-84
 85
 86
 87
@@ -480,10 +480,13 @@ creation page.
 96
 97
 98
-99</pre>
+99
+100
+101
+102</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 82</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 85</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -654,9 +657,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-178
-179
-180
 181
 182
 183
@@ -672,10 +672,13 @@ Code related to the method result.
 193
 194
 195
-196</pre>
+196
+197
+198
+199</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 178</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 181</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_shows'>shows</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -897,9 +900,6 @@ page.
       <pre class="lines">
 
 
-135
-136
-137
 138
 139
 140
@@ -911,10 +911,13 @@ page.
 146
 147
 148
-149</pre>
+149
+150
+151
+152</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 135</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 138</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -941,7 +944,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Tue Jul 17 15:22:50 2012 by
+  Generated on Tue Jul 17 15:26:00 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

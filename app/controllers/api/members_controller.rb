@@ -24,8 +24,11 @@ class Api::MembersController < ApplicationController
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to
   #              validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   #             *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
-  #              we will set some features such as provisional days or amount of club cash the member will start with.
-  #             *enrollment_amount: Amount of money that takes to enroll.
+  #              we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level. 
+  #             *enrollment_amount: Amount of money that takes to enroll. It is present at member level.
+  #             *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
+  #              informatión with him. joint=1 means we will share this informatión. If this value is null, we will automaticaly set it as 0. This is an exclusive value, 
+  #              it can be seted using 1 or 0, or true or false. It is present at member level.
   #             *birth_date: Birth date of the member. This date is stored with format "yyyy-mm-dd"
   #             *credit_card  [Hash]
   #             *enrollment_info  [Hash]
@@ -57,7 +60,7 @@ class Api::MembersController < ApplicationController
   #                     *campaign_medium_version
   #                     *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
   #                      informatión with him. joint=1 means we will share this informatión. If this value is null, we will automaticaly set it as 0. This is an exclusive value, 
-  #                      it can be seted using 1 or 0, or true or false.
+  #                      it can be seted using 1 or 0, or true or false. It is present at member level.
   # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling, or "wrong_address" for update.
   #           * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. It should only be true
   #                       when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following 
