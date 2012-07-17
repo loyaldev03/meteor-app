@@ -14,15 +14,15 @@ class Api::MembersController < ApplicationController
   # [member] Information related to the member that is sumbitting the enroll. Here is a list of the regex we are using to validate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 
-  #             *address: The address of the member that is being enrolled. 
+  #             *address: The address of the member that is being enrolled.
   #             *city: City from where the member is from.
   #             *state: State from where the member is from. At the moment we are not using any kind of code.
   #             *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
   #             *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
-  #             *phone_number: The member's personal phone number. We are accepting numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
-  #              +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
-  #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
-  #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+  #             *phone_number: The member's personal phone number. We are accepting only numbers, dashes, 'x','int' and '+'. We recommend frontend
+  #              to validate numbers with the following formats: +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123.
+  #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to
+  #              validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   #             *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
   #              we will set some features such as provisional days or amount of club cash the member will start with.
   #             *enrollment_amount: Amount of money that takes to enroll.
@@ -31,12 +31,12 @@ class Api::MembersController < ApplicationController
   #             *enrollment_info  [Hash]
   # [credit_card] Information related to member's credit card. {CreditCard show}
   #                 *number: Number of member's credit card, from where we will charge the membership or any other service.  
-  #                  This number will be stored as a hashed value.
+  #                  This number will be stored as a hashed value. This number can have white-spaces or not ()
   #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   #                 *expire_year: The year (in numbers) in which the credit card will expire.  
   # [enrollment_info] Aditional information submited when the member enrolls. We storage that information for further reports. 
   #                     *prospect_id: Id of the prospect the enrollment info is related to.
-  #                     *product_sku: Name of the selected product.
+  #                     *product_sku: Freeform text that is representative of the SKU.
   #                     *product_description: Description of the selected product.
   #                     *mega_channel: 
   #                     *marketing_code: multi-team
@@ -46,7 +46,7 @@ class Api::MembersController < ApplicationController
   #                     *referral_host:  Link where is being redirect when after subimiting the enroll. (It shows the params in it).
   #                     *referral_parameters
   #                     *referral_path
-  #                     *user_id
+  #                     *user_id: User ID alias UID is an md5 hash of the user's IP address and user-agent information.
   #                     *landing_url: Url from where te submit comes from.
   #                     *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
   #                      This information is selected by the member. 
@@ -55,15 +55,17 @@ class Api::MembersController < ApplicationController
   #                     *campaign_medium
   #                     *campaign_description: The name of the campaign.
   #                     *campaign_medium_version
-  #                     *joint
+  #                     *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
+  #                      informatión with him. joint=1 means we will share this informatión. If this value is null, we will automaticaly set it as 0. This is an exclusive value, 
+  #                      it can be seted using 1 or 0, or true or false.
   # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling, or "wrong_address" for update.
-  #           * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blanck credit card. It should only be true
+  #           * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. It should only be true
   #                       when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following 
   #                       attributes: number=>"0000000000" and expire_month and expired_year setted as today's month and year respectively.
   #
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
-  # [member_id] ID of the member. This ID is unique for each member. (32 characters string)
+  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment.
   # [v_id] Visible id of the member that was enrolled or recovered, or updated.
   # [member_errors] A hash with members errors. This will be use to show errors on members creation page.
   # [credit_card_errors] A hash with credit card errors. This will be use to show errors on members creation page.
@@ -98,7 +100,7 @@ class Api::MembersController < ApplicationController
 
   # Method : PUT
   # Updates member's data.
-  # [member_id] ID of the member. This ID is unique for each member. (32 characters string)
+  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment.
   # [member] Information related to the member that is being updated.. Here is a list of the regex we are using to validate. {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 

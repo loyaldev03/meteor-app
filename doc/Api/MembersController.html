@@ -234,15 +234,15 @@ list of the regex we are using to validate show.
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
    *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;). 
-   *address: The address of the member that is being enrolled. 
+   *address: The address of the member that is being enrolled.
    *city: City from where the member is from.
    *state: State from where the member is from. At the moment we are not using any kind of code.
    *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
    *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
-   *phone_number: The member's personal phone number. We are accepting numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
-    +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
-   *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
-    mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+   *phone_number: The member's personal phone number. We are accepting only numbers, dashes, 'x','int' and '+'. We recommend frontend
+    to validate numbers with the following formats: +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123.
+   *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to
+    validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
    *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
     we will set some features such as provisional days or amount of club cash the member will start with.
    *enrollment_amount: Amount of money that takes to enroll.
@@ -256,7 +256,7 @@ Information related to member&#8217;s credit card. show
 </p>
 <pre class="code ruby"><code>
   *number: Number of member's credit card, from where we will charge the membership or any other service.  
-   This number will be stored as a hashed value.
+   This number will be stored as a hashed value. This number can have white-spaces or not ()
   *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   *expire_year: The year (in numbers) in which the credit card will expire.  
 </code></pre>
@@ -267,7 +267,7 @@ information for further reports.
 </p>
 <pre class="code ruby"><code>
   *prospect_id: Id of the prospect the enrollment info is related to.
-  *product_sku: Name of the selected product.
+  *product_sku: Freeform text that is representative of the SKU.
   *product_description: Description of the selected product.
   *mega_channel: 
   *marketing_code: multi-team
@@ -277,7 +277,7 @@ information for further reports.
   *referral_host:  Link where is being redirect when after subimiting the enroll. (It shows the params in it).
   *referral_parameters
   *referral_path
-  *user_id
+  *user_id: User ID alias UID is an md5 hash of the user's IP address and user-agent information.
   *landing_url: Url from where te submit comes from.
   *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
    This information is selected by the member. 
@@ -286,7 +286,9 @@ information for further reports.
   *campaign_medium
   *campaign_description: The name of the campaign.
   *campaign_medium_version
-  *joint
+  *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
+   informati??n with him. joint=1 means we will share this informati??n. If this value is null, we will automaticaly set it as 0. This is an exclusive value, 
+   it can be seted using 1 or 0, or true or false.
 </code></pre>
 </dd>
 <dt>setter</dt><dd><p>
@@ -294,7 +296,7 @@ Variable used to pass some boolean values as &#8220;cc_blank&#8221; for
 enrolling, or &#8220;wrong_address&#8221; for update.
 </p>
 <pre class="code ruby"><code>
- * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blanck credit card. It should only be true
+ * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. It should only be true
              when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following 
              attributes: number=&gt;&quot;0000000000&quot; and expire_month and expired_year setted as today's month and year respectively.
 </code></pre>
@@ -308,7 +310,9 @@ Code related to the method result.
 </p>
 </dd>
 <dt>member_id</dt><dd><p>
-ID of the member. This ID is unique for each member. (32 characters string)
+ID of the member. This ID is unique for each member. (32 characters
+string). This value is used by platform. API users dont know the member id
+at this moment.
 </p>
 </dd>
 <dt>v_id</dt><dd><p>
@@ -459,8 +463,6 @@ creation page.
       <pre class="lines">
 
 
-80
-81
 82
 83
 84
@@ -476,10 +478,12 @@ creation page.
 94
 95
 96
-97</pre>
+97
+98
+99</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 82</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -650,8 +654,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-176
-177
 178
 179
 180
@@ -668,10 +670,12 @@ Code related to the method result.
 191
 192
 193
-194</pre>
+194
+195
+196</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 176</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 178</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_shows'>shows</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -713,7 +717,9 @@ Method : PUT Updates member&#8217;s data.
 </p>
 <dl>
 <dt>member_id</dt><dd><p>
-ID of the member. This ID is unique for each member. (32 characters string)
+ID of the member. This ID is unique for each member. (32 characters
+string). This value is used by platform. API users dont know the member id
+at this moment.
 </p>
 </dd>
 <dt>member</dt><dd><p>
@@ -891,8 +897,6 @@ page.
       <pre class="lines">
 
 
-133
-134
 135
 136
 137
@@ -905,10 +909,12 @@ page.
 144
 145
 146
-147</pre>
+147
+148
+149</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 133</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 135</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -935,7 +941,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Mon Jul 16 10:32:48 2012 by
+  Generated on Tue Jul 17 15:22:50 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
