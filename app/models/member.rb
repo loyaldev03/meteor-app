@@ -15,12 +15,14 @@ class Member < ActiveRecord::Base
   has_many :club_cash_transactions
   has_many :enrollment_infos
 
+  serialize :preferences, JSON
+
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address,
-      :wrong_phone_number, :api_id, :mega_channel, :credit_cards_attributes, :birth_date
+      :wrong_phone_number, :api_id, :mega_channel, :credit_cards_attributes, :birth_date, :preferences
 
   # accepts_nested_attributes_for :credit_cards, :limit => 1
 
@@ -29,6 +31,7 @@ class Member < ActiveRecord::Base
   after_create :after_create_sync_remote_domain
   after_update :after_update_sync_remote_domain
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
+  after_save :asyn_desnormalize_preferences
   
   # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
   REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_number' ]
@@ -539,6 +542,19 @@ class Member < ActiveRecord::Base
     self.email = params[:email]
     self.birth_date = params[:birth_date]
   end
+
+  def asyn_desnormalize_preferences
+    self.desnormalize_preferences if self.changed.include?('preferences')
+  end
+
+  def desnormalize_preferences
+    self.preferences.each do |key, value|
+      pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
+      pref.value = value
+      pref.save
+    end
+  end
+  handle_asynchronously :desnormalize_preferences    
   
   private
     def set_status_on_enrollment!(agent, trans, amount)
