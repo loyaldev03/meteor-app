@@ -9,7 +9,7 @@ class EnrollmentInfo < ActiveRecord::Base
                   :referral_parameters, :referral_path, :user_id, :landing_url, :terms_of_membership_id,
                   :preferences, :cookie_value, :cookie_set, :campaign_medium, :campaign_description,
                   :campaign_medium_version, :joint
-  
+
   # Method to update every enrollment_info field with the hash of information we recieve when enrolling a member.
   #
   def update_enrollment_info_by_hash(params)
@@ -35,6 +35,7 @@ class EnrollmentInfo < ActiveRecord::Base
       self.is_joint = params[:joint]
     end
   end
+
 
 end
 
