@@ -17,6 +17,15 @@ u.save!
 
 p = Partner.new :prefix => 'NFL', :name => 'NFL'
 p.save!
+p2 = Partner.new :prefix => 'AO', :name => 'American Outdoorsman', :contact_uri => '/south01/contracts/aoac', :website_url => 'http://aohq.com'
+p2.save!
+p3 = Partner.new :prefix => 'TC', :name => 'Tennis', :contact_uri => '/tennis', :website_url => 'http://www.tennischanneladvantage.com/'
+p3.save!
+p4 = Partner.new :prefix => 'ONMC', :name => 'ONMC-Import', :contact_uri => '', :website_url => '', :description => 'Partner to test imports from ONMC.'
+p4.save!
+p5 = Partner.new :prefix => 'pri', :name => 'TEST', :contact_uri => 'www.test.com', :website_url => 'www.test.com', :description => 'Partner to test imports from ONMC.'
+p5.save!
+
 
 c = Club.new :name => "Fans"
 c.partner = p
@@ -24,19 +33,52 @@ c.save!
 c2 = Club.new :name => "Players"
 c2.partner = p
 c2.save!
+c3 = Club.new :name => "Fans"
+c3.partner = p3
+c3.save!
+c4 = Club.new :name => "Players"
+c4.partner = p3
+c4.save!
+c5 = Club.new :name => "Nascar", :api_type => 'Drupal::Member', :theme => 'application'
+c5.partner = p4
+c5.save! 
+c6 = Club.new :name => "AO Adventure Club", :api_type => 'Drupal::Member', :theme => 'application'
+c6.partner = p2
+c6.save!
 
 d = Domain.new :url => "http://test.com.ar/"
 d.club = c
 d.partner = p
 d.save!
+d2 = Domain.new :url => "http://test2.com.ar/"
+d2.partner = p
+d2.club = c
+d2.save!
+d3 = Domain.new :url => "http://affinitystop.com/" 
+d3.partner = p
+d3.club = c4
+d3.save!
+d4 = Domain.new :url => "http://www.aoadventureclub.com"
+d4.partner = p
+d4.save!
+d5 = Domain.new :url => "http://www.tennischanneladvantage.com/"
+d5.partner = p3
+d5.save!
+d6 = Domain.new :url => "http://www.tennischanneladvantage2.com/"
+d6.partner = p3
+d6.save!
 if c.respond_to?(:api_domain)
   c.api_domain = d
   c.save
 end
-d = Domain.new :url => "http://test2.com.ar/"
-d.partner = p
-d.club = c2
-d.save!
+if c2.respond_to?(:api_domain)
+  c2.api_domain = d2
+  c2.save
+end
+if c4.respond_to?(:api_domain)
+  c4.api_domain = d3
+  c4.save
+end
 
 pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
   :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
@@ -56,12 +98,32 @@ tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "
 tom.club = c
 tom.save!
 tom = TermsOfMembership.new :installment_amount => 100.56, :installment_type => "1.year", 
-  :needs_enrollment_approval => false, :name => "test2-year"
+  :needs_enrollment_approval => false, :name => "test2 year"
 tom.club = c
 tom.save!
 tom = TermsOfMembership.new :installment_amount => 45, :installment_type => "1.year", 
   :needs_enrollment_approval => false, :name => "test"
 tom.club = c2
+tom.save!
+tom = TermsOfMembership.new :installment_amount => 25, :installment_type => "30.days", 
+  :needs_enrollment_approval => false, :name => "test paid", :club_cash_amount => 10
+tom.club = c
+tom.save!
+tom = TermsOfMembership.new :installment_amount => 100, :installment_type => "1.year", 
+  :needs_enrollment_approval => false, :name => "test annual"
+tom.club = c
+tom.save!
+tom = TermsOfMembership.new :installment_amount => 50, :installment_type => "30.days", 
+  :needs_enrollment_approval => true, :name => "test approval"
+tom.club = c
+tom.save!
+tom = TermsOfMembership.new :installment_amount => 50, :installment_type => "1.year", 
+  :needs_enrollment_approval => true, :name => "test anual approval"
+tom.club = c
+tom.save!
+tom = TermsOfMembership.new :installment_amount => 0.0, :installment_type => "30.days", 
+  :needs_enrollment_approval => false, :name => "test for drupal", :provisional_days => 30
+tom.club = c
 tom.save!
 
 
