@@ -80,18 +80,18 @@ if c4.respond_to?(:api_domain)
   c4.save
 end
 
-pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
-  :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
-  :mode => "development", :gateway => "mes", :report_group => "SAC_STAGING_TEST"
-pgc.club = c
+[c, c2].each do |c|
+  pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
+    :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
+    :mode => "development", :gateway => "mes", :report_group => "SAC_STAGING_TEST"
+  pgc.club = c
+  pgc.save!
+  pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
+    :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
+    :mode => "production", :gateway => "mes", :report_group => "SAC_STAGING_TEST"
+  pgc.club = c
 pgc.save!
-
-pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
-  :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
-  :mode => "development", :gateway => "mes", :report_group => "SAC_STAGING_TEST"
-pgc.club = c2
-pgc.save!
-
+end
 
 tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "1.month", 
   :needs_enrollment_approval => false, :name => "test2"
