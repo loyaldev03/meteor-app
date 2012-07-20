@@ -50,7 +50,7 @@ class Member < ActiveRecord::Base
   REGEX_CITY_AND_STATE = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
   #Only allows zips with the format: xxxxx or xxxxx-xxxx. Only numbers.
-  REGEX_ZIP = /^[0-9]{5}(-?[0-9]{4})?$/
+  REGEX_ZIP = /(^[0-9]{5}(-?[0-9]{4})?$)|(^[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}[\s]{1}[0-9]{1}[A-Za-z][0-9]{1}$)/
 
   def after_create_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
