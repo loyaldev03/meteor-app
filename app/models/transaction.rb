@@ -206,25 +206,25 @@ class Transaction < ActiveRecord::Base
 
     def save_response(answer)
       self.response = answer
-      if answer.params
+      if answer.params 
         self.response_transaction_id=answer.params['transaction_id']
         self.response_auth_code=answer.params['auth_code']
         self.response_code=answer.params['error_code']
       end
       self.response_result=answer.message
       save
-
-      if response.params and response.params[:duplicate]=="true"
+      debugger;
+      if answer.params and answer.params[:duplicate]=="true"
         # we keep this if, just because it was on Litle version (compatibility).
         # MeS seems to not send this param
         { :message => "Duplicated Transaction: #{response.params[:response]}", :code => Settings.error_codes.duplicate_transaction }
-      elsif response.success?
+      elsif answer.success?
         unless self.credit_card.nil?
           self.credit_card.accepted_on_billing
         end
-        { :message => response.message, :code=> Settings.error_codes.success }
+        { :message => answer.message, :code=> Settings.error_codes.success }
       else
-        { :message=>"Error: " + response.message, :code=>response_code }
+        { :message=>"Error: " + answer.message, :code=>self.response_code }
       end      
     end
 

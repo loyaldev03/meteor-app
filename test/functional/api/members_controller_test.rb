@@ -11,7 +11,6 @@ class Api::MembersControllerTest < ActionController::TestCase
 #    post(:create, {}, :format => :html)
 #    assert_response 406
 #  end
-
   test "should enroll/create member" do
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -19,7 +18,14 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns({ :code => "000", :message =>"test"})
+
+    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
+      Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
+                                      :auth_code => '111', :duplicate => false, 
+                                      :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
+          ) 
+    )
+
     assert_difference('Member.count') do
       post( :create, { member: {:first_name => @member.first_name, 
                                 :last_name => @member.last_name,
