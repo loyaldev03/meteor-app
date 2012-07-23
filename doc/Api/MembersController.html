@@ -228,8 +228,10 @@ The agent&#8217;s ID that will be enrolling the member.
 </p>
 </dd>
 <dt>member</dt><dd><p>
-Information related to the member that is sumbitting the enroll. Here is a
-list of the regex we are using to validate show.
+Information related to the member that is sumbitting the enroll. It also
+contains information related to the enrollment (this will be stored as
+enrollment_info). Here is a list of the regex we are using to validate
+show.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -251,7 +253,29 @@ list of the regex we are using to validate show.
     it can be seted using 1 or 0, or true or false. It is present at member level.
    *birth_date: Birth date of the member. This date is stored with format &quot;yyyy-mm-dd&quot;
    *credit_card  [Hash]
-   *enrollment_info  [Hash]
+   *prospect_id: Id of the prospect the enrollment info is related to.
+   *product_sku: Freeform text that is representative of the SKU.
+   *product_description: Description of the selected product.
+   *mega_channel: 
+   *marketing_code: multi-team
+   *fulfillment_code: Id of the fulfillment we are sending to our member. (car-flag).
+   *ip_address: Ip address from where the enrollment is being submitted.
+   *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
+   *referral_host:  Link where is being redirect when after subimiting the enroll. (It shows the params in it).
+   *referral_parameters
+   *referral_path
+   *user_id: User ID alias UID is an md5 hash of the user's IP address and user-agent information.
+   *landing_url: Url from where te submit comes from.
+   *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
+    this information is selected by the member. 
+   *cookie_value: Cookie from where the enrollment is being submitted.
+   *cookie_set: If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.
+   *campaign_medium
+   *campaign_description: The name of the campaign.
+   *campaign_medium_version
+   *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
+    informati??n with him. joint=1 means we will share this informati??n. If it is null, we will automaticaly set it as 0. 
+    This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level.
 </code></pre>
 </dd>
 <dt>credit_card</dt><dd><p>
@@ -262,36 +286,6 @@ Information related to member&#8217;s credit card. show
    This number will be stored as a hashed value. This number can have white-spaces or not ()
   *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   *expire_year: The year (in numbers) in which the credit card will expire.  
-</code></pre>
-</dd>
-<dt>enrollment_info</dt><dd><p>
-Aditional information submited when the member enrolls. We storage that
-information for further reports. 
-</p>
-<pre class="code ruby"><code>
-  *prospect_id: Id of the prospect the enrollment info is related to.
-  *product_sku: Freeform text that is representative of the SKU.
-  *product_description: Description of the selected product.
-  *mega_channel: 
-  *marketing_code: multi-team
-  *fulfillment_code: Id of the fulfillment we are sending to our member. (car-flag).
-  *ip_address: Ip address from where the enrollment is being submitted.
-  *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
-  *referral_host:  Link where is being redirect when after subimiting the enroll. (It shows the params in it).
-  *referral_parameters
-  *referral_path
-  *user_id: User ID alias UID is an md5 hash of the user's IP address and user-agent information.
-  *landing_url: Url from where te submit comes from.
-  *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
-   This information is selected by the member. 
-  *cookie_value: Cookie from where the enrollment is being submitted.
-  *cookie_set: If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.
-  *campaign_medium
-  *campaign_description: The name of the campaign.
-  *campaign_medium_version
-  *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
-   informati??n with him. joint=1 means we will share this informati??n. If this value is null, we will automaticaly set it as 0. This is an exclusive value, 
-   it can be seted using 1 or 0, or true or false. It is present at member level.
 </code></pre>
 </dd>
 <dt>setter</dt><dd><p>
@@ -482,8 +476,7 @@ creation page.
 98
 99
 100
-101
-102</pre>
+101</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 85</span>
@@ -501,7 +494,6 @@ creation page.
       <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='comma'>,</span> 
       <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:credit_card</span><span class='rbracket'>]</span><span class='comma'>,</span> 
       <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:cc_blank</span><span class='rbracket'>]</span><span class='comma'>,</span> 
-      <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:enrollment_info</span><span class='rbracket'>]</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='id identifier rubyid_response'>response</span> 
@@ -657,6 +649,7 @@ Code related to the method result.
       <pre class="lines">
 
 
+180
 181
 182
 183
@@ -674,11 +667,10 @@ Code related to the method result.
 195
 196
 197
-198
-199</pre>
+198</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 181</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 180</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_shows'>shows</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -900,6 +892,7 @@ page.
       <pre class="lines">
 
 
+137
 138
 139
 140
@@ -913,11 +906,10 @@ page.
 148
 149
 150
-151
-152</pre>
+151</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 138</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 137</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -944,7 +936,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Tue Jul 17 15:26:00 2012 by
+  Generated on Mon Jul 23 11:37:12 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
