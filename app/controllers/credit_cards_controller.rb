@@ -66,7 +66,7 @@ class CreditCardsController < ApplicationController
       if credit_card.unset_blacklisted
         message = "Credit card #{credit_card.last_digits} was unsetted as blacklisted."
         Auditory.audit(@current_agent, credit_card, message, @current_member)
-        format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.last_digits} was blacklisted." }
+        format.html { redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.last_digits} was unsetted as blacklisted." }
       else
         format.html { redirect_to show_member_path(:id => @current_member), error: credit_card.errors }
       end
