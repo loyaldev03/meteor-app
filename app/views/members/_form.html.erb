@@ -21,8 +21,8 @@
   <tbody>
   <tr>
     <td style="width: 50%;">
-      <table class="hidden_table_border">
-        <tr>
+      <table class="hidden_table_border table-nohover">
+        <tr class = "control-group">
           <th>
             <%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline' %>
           </th>
@@ -30,7 +30,7 @@
             <%= f.text_field :first_name, :class => 'text_field' %> 
           </td>  
         </tr>
-        <tr>
+        <tr class = "control-group">
           <th>
             <%= f.label :address, t('activerecord.attributes.member.address'), :class => 'help-inline' %>
           </th>
@@ -38,7 +38,7 @@
             <%= f.text_field :address, :class => 'text_field' %> 
           </td>  
         </tr>
-        <tr>
+        <tr class = "control-group">
           <th>
             <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline' %>
           </th>
@@ -46,19 +46,19 @@
             <%= f.text_field :state, :class => 'text_field' %> 
           </td>  
         </tr>
-        <tr>
+        <tr class = "control-group">
           <th>
             <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline' %>
           </th>
           <td> 
-            <%= f.country_code_select(:country, [[ 'United States', 'US' ]]) %> 
+            <%= f.country_code_select(:country, [[ 'United States', 'US' ], ['Canada', 'CA']]) %> 
           </td>  
         </tr>
       </table>
     </td>
     <td style="width: 50%;">
       <table class="hidden_table_border">
-        <tr>
+        <tr class = "control-group">
           <th>
             <%= f.label :last_name, t('activerecord.attributes.member.last_name'), :class => 'help-inline' %>
           </th>
@@ -66,7 +66,7 @@
             <%= f.text_field :last_name, :class => 'text_field' %> 
           </td>  
         </tr>
-        <tr>
+        <tr class = "control-group">
           <th>
             <%= f.label :city, t('activerecord.attributes.member.city'), :class => 'help-inline' %>
           </th>
@@ -74,7 +74,7 @@
             <%= f.text_field :city, :class => 'text_field' %> 
           </td>  
         </tr>
-        <tr>
+        <tr class = "control-group">
           <th>
             <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline' %>
           </th>
@@ -83,7 +83,7 @@
             <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.member.zip_help')} %> 
           </td>  
         </tr>
-        <tr>
+        <tr class = "control-group">
           <th>
             <%= f.label :birth_date, t('activerecord.attributes.member.birth_date'), :class => 'help-inline' %>
           </th>
@@ -105,7 +105,7 @@
   <tr>
     <td style="width: 50%;">
       <table class="hidden_table_border">
-        <tr>
+        <tr class = "control-group">
           <th>
             <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline' %>
           </th>
@@ -114,7 +114,7 @@
             <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.member.phone_number_help')} %>
           </td>  
         </tr>
-        <tr>
+        <tr class = "control-group">
           <th>
             <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %>
           </th>
@@ -129,7 +129,7 @@
     </td>
     <td style="width: 50%;">
       <table class="hidden_table_border">
-        <tr>
+        <tr class = "control-group">
           <th>
             <%= f.label :email, t('activerecord.attributes.member.email'), :class => 'help-inline' %>
           </th>
@@ -158,10 +158,9 @@
     <tr>
       <td style="width: 50%;">
         <table class="hidden_table_border">
-          <tr>
+          <tr class = "control-group">
             <th>
-              <%= credit_Card.label :encrypted_number, t('activerecord.attributes.credit_card.number'), 
-                    :class => 'help-inline' %>
+              <%= credit_Card.label :encrypted_number, t('activerecord.attributes.credit_card.number'), :class => 'help-inline' %>
             </th>
             <td> 
               <%= credit_Card.text_field :number, :class => 'text_field input-medium', 
@@ -172,7 +171,7 @@
       </td>
       <td style="width: 50%;">
         <table class="hidden_table_border">
-          <tr>
+          <tr class = "control-group">
             <th>
               <%= credit_Card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' %> 
             </th>
@@ -181,7 +180,7 @@
                                   :name => "member[credit_card][expire_month]" %>
             </td>  
           </tr>
-          <tr>
+          <tr class = "control-group">
             <th>
               <%= credit_Card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %>
             </th>
@@ -199,9 +198,9 @@
 <% end %>
 
  <tr class="control-group">
-    <th colspan="4"> <%= f.submit nil, :class => 'btn btn-primary' %>
+    <th colspan="4"> <%= f.submit nil, :class => 'btn btn-primary', :id => 'submit_button' %>
       <% if @member.new_record? %>
-        <%= link_to t(:cancel), :back, :class => 'btn'   %>  
+        <%= link_to t(:cancel), :back, :class => 'btn' %>  
       <% else %>
         <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => 'btn' %> 
       <% end %>

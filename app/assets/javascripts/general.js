@@ -113,6 +113,7 @@ $(document).ready( function() {
                                   yearRange: '1900',
                                   buttonImageOnly: true});
     $('#new_member').submit( function(event) {
+      $('#submit_button').attr('disabled', 'disabled');
       event.preventDefault()
       $.ajax({
         type: 'POST',
@@ -120,24 +121,27 @@ $(document).ready( function() {
         data: $("#new_member").serialize(),
         success: function(data) {
           alert (data.message);
-          $('input').removeClass("red");
+          $('input').parent().parent().removeClass("error");
           $('#error_explanation').show();
           $('#error_explanation ul').empty();
-          $('#error_explanation ul').append("<b>"+data.message+"</b>")
-          for (var key in data.member_errors){
-            if (data.member_errors.hasOwnProperty(key)) {
-              $('#member_'+key).addClass("red");
-              $('#error_explanation ul').append("<li>"+key+': '+data.member_errors[key]+"</li>");
-            }
-          }
-          for (var key in data.credit_card_errors){
-            if (data.credit_card_errors.hasOwnProperty(key)) {
-              $('#member_credit_card_'+key).addClass("red");
-              $('#error_explanation ul').append("<li>"+key+': '+data.credit_card_errors[key]+"</li>");
-            }
-          }
           if (data.code == 000)
             window.location.replace('../member/'+data.v_id);
+          else{
+            $('#submit_button').removeAttr('disabled');
+            $('#error_explanation ul').append("<b>"+data.message+"</b>");
+            for (var key in data.member_errors){
+              if (data.member_errors.hasOwnProperty(key)) {
+                $('#member_'+key).parent().parent().addClass("error");
+                $('#error_explanation ul').append("<li>"+key+': '+data.member_errors[key]+"</li>");
+              }
+            }
+            for (var key in data.credit_card_errors){
+              if (data.credit_card_errors.hasOwnProperty(key)) {
+                $('#member_credit_card_'+key).parent().parent().addClass("error");
+                $('#error_explanation ul').append("<li>"+key+': '+data.credit_card_errors[key]+"</li>");
+              }
+            }
+          }
         },
       });
     });
@@ -177,6 +181,7 @@ $(document).ready( function() {
                                   yearRange: '1900',
                                   buttonImageOnly: true});
     $('form').submit( function(event) {
+      $('#submit_button').attr('disabled', 'disabled');
       event.preventDefault();
       $.ajax({
         type: 'PUT',
@@ -184,18 +189,21 @@ $(document).ready( function() {
         data: $('form').serialize(),
         success: function(data) {
           alert (data.message);
-          $('input').removeClass("red");
-          $('#error_explanation').show();
-          $('#error_explanation ul').empty();
-          $('#error_explanation ul').append("<b>"+data.message+"</b>")
-          for (var key in data.errors){
-            if (data.errors.hasOwnProperty(key)) {
-              $('#member_'+key).addClass("red");
-              $('#error_explanation ul').append("<li>"+key+': '+data.errors[key]+"</li>");
-            }
-          }
+          $('input').parent().parent().removeClass("error");
           if (data.code == 000)
             window.location.replace('../'+v_id);
+          else{
+            $('#submit_button').removeAttr('disabled');
+            $('#error_explanation').show();
+            $('#error_explanation ul').empty();
+            $('#error_explanation ul').append("<b>"+data.message+"</b>");
+            for (var key in data.errors){
+              if (data.errors.hasOwnProperty(key)) {
+                $('#member_'+key).parent().parent().addClass("error");
+                $('#error_explanation ul').append("<li>"+key+': '+data.errors[key]+"</li>");
+              }     
+            }       
+          }
         },
       });
     });
