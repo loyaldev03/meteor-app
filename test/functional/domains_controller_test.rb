@@ -12,7 +12,6 @@ class DomainsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, partner_prefix: @partner_prefix
     assert_response :success
-    assert_not_nil assigns(:domains)
   end
 
   test "should get new" do
@@ -47,9 +46,10 @@ class DomainsControllerTest < ActionController::TestCase
 
   test "should destroy domain" do
     assert_difference('Domain.count', -1) do
-      delete :destroy, id: @domain, partner_prefix: @partner_prefix
+      delete :destroy, id: @domain.id, partner_prefix: @partner_prefix
+      assert_response :success
     end
 
     assert_redirected_to domains_path
   end
-end
+ end

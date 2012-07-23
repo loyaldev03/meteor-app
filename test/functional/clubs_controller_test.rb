@@ -12,7 +12,6 @@ class ClubsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, partner_prefix: @partner_prefix
     assert_response :success
-    assert_not_nil assigns(:clubs)
   end
 
   test "should get new" do

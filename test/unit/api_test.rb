@@ -19,7 +19,7 @@ class ApiTest < ActiveSupport::TestCase
       stub.post('/api/user') { [200, {}, {'uid' => 999}] }
     end
     @member.save
-    assert_equal 999, @member.api_id
+    assert_equal '999', @member.api_id
   end
 
 end

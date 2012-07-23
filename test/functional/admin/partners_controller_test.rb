@@ -11,7 +11,6 @@ class Admin::PartnersControllerTest < ActionController::TestCase
   test "should get index" do
     get :index
     assert_response :success
-    assert_not_nil assigns(:partners)
   end
 
   test "should get new" do
@@ -39,7 +38,9 @@ class Admin::PartnersControllerTest < ActionController::TestCase
   end
 
   test "should update partner" do
-    put :update, id: @partner, partner: { :prefix => @partner_pregix, :name => @partner.name, :contract_uri => @partner.contract_uri, :website_url => @partner.website_url, :description => @partner.description }
+    put :update, id: @partner.id, partner: { :prefix => @partner_prefix, :name => @partner.name, 
+                                          :contract_uri => @partner.contract_uri, :website_url => @partner.website_url, 
+                                          :description => @partner.description }
     assert_redirected_to admin_partner_path(assigns(:partner))
   end
 
