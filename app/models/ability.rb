@@ -6,7 +6,8 @@ class Ability
 
     if agent.has_role? 'admin'
       can :see_credit_card, CreditCard
-      can :enroll_member, Member      
+      can :enroll_member, Member
+      can :undo_credit_card_blacklist, CreditCard
       can :manage, Member
       can :manage, Agent
       can :manage, Partner
