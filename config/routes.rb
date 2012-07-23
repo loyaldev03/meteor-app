@@ -36,6 +36,7 @@ SacPlatform::Application.routes.draw do
         resources :credit_cards, :only => [ :new, :create ] do
           post :activate
           post :set_as_blacklisted
+          post :unset_blacklisted
         end
         match '/recover' => 'members#recover', as: 'member_recover', :via => [:post]
         match '/refund/:transaction_id' => 'members#refund', as: 'member_refund', :via => [:get, :post]

@@ -22,6 +22,10 @@ class CreditCard < ActiveRecord::Base
     update_attribute :blacklisted, true
   end
 
+  def unset_blacklisted
+    update_attribute :blacklisted, false
+  end
+
   def activate
     update_attribute :active, true unless blacklisted
   end
