@@ -20,7 +20,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "Enrollment with approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
     active_merchant_stubs unless @use_active_merchant
-    assert_difference('Operation.count') do
+    assert_difference('Operation.count',2) do
       assert_no_difference('Fulfillment.count') do
         answer = Member.enroll(@tom_approval, @current_agent, 23, 
           { first_name: @member.first_name,
@@ -41,7 +41,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Enrollment without approval" do
     active_merchant_stubs unless @use_active_merchant
-    assert_difference('Operation.count') do
+    assert_difference('Operation.count',2) do
       assert_difference('Fulfillment.count') do
         answer = Member.enroll(@terms_of_membership, @current_agent, 23, 
           { first_name: @member.first_name,
