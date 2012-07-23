@@ -38,7 +38,7 @@ class Member < ActiveRecord::Base
   REGEX_FIRST_AND_LAST_NAME = /^[a-zA-Z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
   #Validates numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
-  REGEX_PHONE_NUMBER = /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-.\s][\(]?(x|int)?[\s][0-9]{1,10}[\)]?)?$/ 
+  REGEX_PHONE_NUMBER = /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-.\s][\(]?(x|int)?[\s]?[0-9]{1,10}[\)]?)?$/ 
 
   #Validates emails with format like: xxxxxx@xxxx.xxx.xx or xxxxx+xxx@xxxx.xxx.xx
   REGEX_EMAIL = /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
@@ -49,8 +49,7 @@ class Member < ActiveRecord::Base
   #Validates that there are no invalid charactes in the country. 
   REGEX_CITY_AND_STATE = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
-  #Only allows zips with the format: xxxxx or xxxxx-xxxx. Only numbers.
-  REGEX_ZIP = /(^[0-9]{5}(-?[0-9]{4})?$)|(^[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}[\s]{1}[0-9]{1}[A-Za-z][0-9]{1}$)/
+
 
   def after_create_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
@@ -73,7 +72,7 @@ class Member < ActiveRecord::Base
   validates :state, :city, :presence => true, :format => REGEX_CITY_AND_STATE
   validates :terms_of_membership_id , :presence => true
   validates :country, :presence => true
-  validates :zip, :presence => true, :format => REGEX_ZIP
+  validates :zip, :presence => true, :zip_code_belongs_to_country => true
 
   scope :synced, lambda { |bool=true|
     bool ?
