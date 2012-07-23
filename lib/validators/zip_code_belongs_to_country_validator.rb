@@ -12,7 +12,7 @@ class ZipCodeBelongsToCountryValidator < ActiveModel::EachValidator
       when "CA"
   	  	return /^[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}[\s]{1}[0-9]{1}[A-Za-z][0-9]{1}$/
   	  else
-  	  	return /^\d{5}([\-]?\d{4})?$/
+  	  	return /^[0-9A-Za-z-]+$/
   	end
   end
 

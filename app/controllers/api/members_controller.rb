@@ -177,7 +177,7 @@ class Api::MembersController < ApplicationController
   # @return [Hash] *credit_card*: Information of member's credit card.
   # @return [Integer] *code*: Code related to the method result.
   #
-  def shows
+  def show
     member = Member.find(params[:id])
     if member.nil?
       render json: { code: Settings.error_codes.not_found, message: 'member not found' }
@@ -190,8 +190,8 @@ class Api::MembersController < ApplicationController
           phone_number: member.phone_number
         }, 
         credit_card: {
-          expire_month: member.active_credit_card.expire_month,
-          expire_year: member.active_credit_card.expire_year
+          expire_month: (member.active_credit_card && member.active_credit_card.expire_month),
+          expire_year: (member.active_credit_card && member.active_credit_card.expire_year)
         } 
       }
     end
