@@ -36,27 +36,30 @@
     </div>
   </div>
 
-  <div class="control-group">
-    <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
-    <div class="controls">
-      <%= f.fields_for :club_roles, @agent.club_roles.build do |role| %>
-        Role name:&nbsp;<%= role.select :role, Agent::ROLES %>
-        Club:&nbsp;<%= role.text_field :club_id %>
-        <%= role.submit 'Add', :class => 'btn' %>
-      <% end %>
-      <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;">
-        <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
-      <%= f.fields_for :club_roles, @agent.club_roles do |role| %>
-        <tr>
-          <td><%= role.object.role %></td>
-          <td><%= role.object.club_id %></td>
-          <td>Delete &nbsp;<%= role.check_box '_destroy' %></td>
-        </tr>
-      <% end %>
-      </table>
-     
+  <% unless f.object.new_record? %>
+    <div class="control-group">
+      <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
+      <div class="controls">
+        <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;">
+          <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
+          <%= f.fields_for :club_roles, @agent.club_roles do |role| %>
+            <tr>
+              <td><%= role.object.role %></td>
+              <td><%= role.object.club_id %></td>
+              <td>Delete &nbsp;<%= role.check_box '_destroy' %></td>
+            </tr>
+          <% end %>
+          <%= f.fields_for :club_roles, @agent.club_roles.build do |role| %>
+            <tr>
+              <td><%= role.select :role, Agent::ROLES, include_blank: true %></td>
+              <td><%= role.text_field :club_id %></td>
+              <td><%= role.submit 'Add', :class => 'btn' %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
     </div>
-  </div>
+  <% end %>
 
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>

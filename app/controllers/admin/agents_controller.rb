@@ -49,17 +49,29 @@ class Admin::AgentsController < ApplicationController
   # PUT /agents/1
   # PUT /agents/1.xml
   def update
-    if params[:agent] && params[:agent][:password].blank?
-      params[:agent].delete(:password)
-      params[:agent].delete(:password_confirmation)
-    end
+    cleanup_for_update!(params[:agent])
+    require 'ruby-debug'; debugger
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
+        debugger
         format.html { redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') }
         format.xml  { head :ok }
       else
+        debugger
         format.html { render :action => "edit" }
         format.xml  { render :xml => @agent.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  def cleanup_for_update!(hash)
+    if hash
+      if hash[:password].blank?
+        hash.delete(:password)
+        hash.delete(:password_confirmation)
+      end
+      if hash[:club_roles_attributes].present?
+        hash[:club_roles_attributes].reject! { |k,v| v[:role].blank? || v[:club_id].blank? }
       end
     end
   end
