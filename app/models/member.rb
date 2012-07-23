@@ -318,7 +318,7 @@ class Member < ActiveRecord::Base
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end
 
-  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0', params_enrollment_info = nil)
+  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0')
     club = tom.club
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
@@ -367,10 +367,10 @@ class Member < ActiveRecord::Base
     end   
 
     member.terms_of_membership = tom
-    member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, params_enrollment_info)
+    member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
   end
 
-  def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, params_enrollment_info = nil)
+  def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, member_params = nil)
     amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
     if recovery_check and not self.new_record? and not self.can_recover?
       return { :message => "Cant recover member. Actual status is not lapsed or Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
@@ -395,7 +395,7 @@ class Member < ActiveRecord::Base
     end
     
     enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => self.terms_of_membership_id
-    enrollment_info.update_enrollment_info_by_hash params_enrollment_info
+    enrollment_info.update_enrollment_info_by_hash member_params
 
     begin
       self.save!

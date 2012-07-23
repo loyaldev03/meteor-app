@@ -11,7 +11,8 @@ class Api::MembersController < ApplicationController
   #
   # [current_agent] The agent's ID that will be enrolling the member.
   #
-  # [member] Information related to the member that is sumbitting the enroll. Here is a list of the regex we are using to validate {Member show}.
+  # [member] Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info).
+  #          Here is a list of the regex we are using to validate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 
   #             *address: The address of the member that is being enrolled.
@@ -31,36 +32,35 @@ class Api::MembersController < ApplicationController
   #              it can be seted using 1 or 0, or true or false. It is present at member level.
   #             *birth_date: Birth date of the member. This date is stored with format "yyyy-mm-dd"
   #             *credit_card  [Hash]
-  #             *enrollment_info  [Hash]
+  #             *prospect_id: Id of the prospect the enrollment info is related to.
+  #             *product_sku: Freeform text that is representative of the SKU.
+  #             *product_description: Description of the selected product.
+  #             *mega_channel: 
+  #             *marketing_code: multi-team
+  #             *fulfillment_code: Id of the fulfillment we are sending to our member. (car-flag).
+  #             *ip_address: Ip address from where the enrollment is being submitted.
+  #             *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
+  #             *referral_host:  Link where is being redirect when after subimiting the enroll. (It shows the params in it).
+  #             *referral_parameters
+  #             *referral_path
+  #             *user_id: User ID alias UID is an md5 hash of the user's IP address and user-agent information.
+  #             *landing_url: Url from where te submit comes from.
+  #             *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
+  #              this information is selected by the member. 
+  #             *cookie_value: Cookie from where the enrollment is being submitted.
+  #             *cookie_set: If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.
+  #             *campaign_medium
+  #             *campaign_description: The name of the campaign.
+  #             *campaign_medium_version
+  #             *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
+  #              informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. 
+  #              This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level.
   # [credit_card] Information related to member's credit card. {CreditCard show}
   #                 *number: Number of member's credit card, from where we will charge the membership or any other service.  
   #                  This number will be stored as a hashed value. This number can have white-spaces or not ()
   #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   #                 *expire_year: The year (in numbers) in which the credit card will expire.  
-  # [enrollment_info] Aditional information submited when the member enrolls. We storage that information for further reports. 
-  #                     *prospect_id: Id of the prospect the enrollment info is related to.
-  #                     *product_sku: Freeform text that is representative of the SKU.
-  #                     *product_description: Description of the selected product.
-  #                     *mega_channel: 
-  #                     *marketing_code: multi-team
-  #                     *fulfillment_code: Id of the fulfillment we are sending to our member. (car-flag).
-  #                     *ip_address: Ip address from where the enrollment is being submitted.
-  #                     *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
-  #                     *referral_host:  Link where is being redirect when after subimiting the enroll. (It shows the params in it).
-  #                     *referral_parameters
-  #                     *referral_path
-  #                     *user_id: User ID alias UID is an md5 hash of the user's IP address and user-agent information.
-  #                     *landing_url: Url from where te submit comes from.
-  #                     *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
-  #                      This information is selected by the member. 
-  #                     *cookie_value: Cookie from where the enrollment is being submitted.
-  #                     *cookie_set: If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.
-  #                     *campaign_medium
-  #                     *campaign_description: The name of the campaign.
-  #                     *campaign_medium_version
-  #                     *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
-  #                      informatión with him. joint=1 means we will share this informatión. If this value is null, we will automaticaly set it as 0. This is an exclusive value, 
-  #                      it can be seted using 1 or 0, or true or false. It is present at member level.
+  #
   # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling, or "wrong_address" for update.
   #           * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. It should only be true
   #                       when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following 
@@ -95,7 +95,6 @@ class Api::MembersController < ApplicationController
         params[:member], 
         params[:member][:credit_card], 
         params[:setter] && params[:setter][:cc_blank], 
-        params[:member][:enrollment_info]
       )
     end
     render json: response 
