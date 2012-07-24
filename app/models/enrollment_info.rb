@@ -32,6 +32,7 @@ class EnrollmentInfo < ActiveRecord::Base
       self.campaign_medium = params[:campaign_medium]
       self.campaign_description = params[:campaign_description]
       self.campaign_medium_version = params[:campaign_medium_version]
+      self.prospect_id = params[:prospect_id]
       self.joint = params[:joint]
     end
   end
