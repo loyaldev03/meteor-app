@@ -61,7 +61,9 @@ class CreditCardsController < ApplicationController
 
   def unset_blacklisted
     credit_card = CreditCard.find(params[:credit_card_id])
-    
+
+    authorize! :undo_credit_card_blacklist, credit_card   
+
     respond_to do |format|
       if credit_card.unset_blacklisted
         message = "Credit card #{credit_card.last_digits} was unsetted as blacklisted."
