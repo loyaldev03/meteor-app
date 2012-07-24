@@ -20,6 +20,7 @@ set :campfire_options, :account => 'stoneacreinc',
 desc "Link config files."
 task :link_config_files do
   run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
+  run "ln -nfs #{release_path}/doc #{release_path}/public/doc"
   run "if [ -e #{release_path}/rake_task_runner ]; then chmod +x #{release_path}/rake_task_runner; fi"
 end
 
@@ -100,4 +101,4 @@ end
 
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
-# before "deploy:assets:precompile", "link_config_files", # "bundle_install", "deploy:migrate" 
+before "deploy:assets:precompile", "link_config_files", # "bundle_install", "deploy:migrate" 
