@@ -538,6 +538,7 @@ class Member < ActiveRecord::Base
     self.zip = params[:zip]
     self.email = params[:email]
     self.birth_date = params[:birth_date]
+    self.joint = params[:joint]
   end
   
   private
