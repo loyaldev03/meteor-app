@@ -4,6 +4,10 @@ class MembersController < ApplicationController
 
   def index
  
+     respond_to do |format|
+      format.html 
+      format.js 
+    end
   end
 
   def search_result
@@ -21,7 +25,12 @@ class MembersController < ApplicationController
                        .with_credit_card_last_digits(params[:member][:last_digits])
                        .where(:club_id => @current_club)
                        .order(:visible_id)
-    render 'index'
+    respond_to do |format|
+      format.html {render 'index'}
+      format.js {render 'index'}
+    end
+
+
   end
 
   def show

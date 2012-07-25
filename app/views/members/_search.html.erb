@@ -1,9 +1,9 @@
+<% if @members %>
 <p> <h1> <%= t('search_result') %> </h1> </p>
 <table class="table table-bordered table-condensed">
-
   <thead>
   	<tr>
-      <th> <%= t('activerecord.attributes.member.status') %> </th>
+      <th style="width: 100px;"> <%= t('activerecord.attributes.member.status') %> </th>
       <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
       <th> <%= t('activerecord.attributes.member.external_id') %> </th>
       <th> <%= t('activerecord.attributes.member.full_name') %> </th>
@@ -15,10 +15,10 @@
       <th style="width: 20px;">Edit</th>
       <th style="width: 80px;">&nbsp;</th>
   	</tr>
-    <% if members.count == 0 %>
+    <% if @members.count == 0 %>
       <tr> <td colspan="8"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
     <% end %> 
-  <% members.each do |member| %>
+    <% @members.each do |member| %>
     <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
       <td class="<%= menber_status_class(member) %>"> 
       <%= member.status %>
@@ -37,6 +37,13 @@
   <% end %>
   </thead>  
 </table>
+
+<% end %>
+
+<%= will_paginate @members if @members %>
+
+
+
 <script type="text/javascript">
   $('.dropdown-toggle').dropdown();
 </script>

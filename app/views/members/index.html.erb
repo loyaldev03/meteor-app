@@ -143,17 +143,19 @@
   </div>
 </section>
 
-  <% if !@members.nil? %>
+
   <div class="tab-pane" id="members">
-    <%= render :partial => 'search', :locals => { :members => @members} %>
+    <%= render :partial => 'search' %>
   </div>  
-  <% end %>
+
 
 
 <% end %>
 
 <script type="text/javascript">
   $(document).ready( member_index_functions() );
+  $(document).ready(function(){
+    $('.pagination a').attr('data-remote', 'true');
+  })
 </script>
 
-<%= will_paginate @members if @members %>

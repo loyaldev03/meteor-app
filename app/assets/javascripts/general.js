@@ -90,12 +90,21 @@ $(document).ready( function() {
       });
       if (!result){ 
         alert ('Compleate at least one field');
-        return result;
-      };
+
+      }else{
+        $.get(this.action, $(this).serialize(), null, 'script'); 
+        result = false
+      }
+      return result;
     });
     $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
                                              showOn: "both", buttonImage: "/icon-calendar.png", 
                                              buttonImageOnly: true});
+    $('#members .pagination a').live('click', function () {  
+      $.getScript(this.href);  
+      return false;  
+    }); 
+
     $("#clear_form").click( function() {
       $("#at_least_one_required input[type=text]").each(function() { $(this).val(''); }); 
     });
