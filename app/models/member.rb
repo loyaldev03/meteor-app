@@ -427,9 +427,9 @@ class Member < ActiveRecord::Base
         trans.save
         credit_card.accepted_on_billing
       end
+      self.reload
       message = set_status_on_enrollment!(agent, trans, amount)
       assign_club_cash! if trans
-      self.reload
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
       
     rescue Exception => e
