@@ -97,10 +97,11 @@ class Member < ActiveRecord::Base
                        :lapsed, # reactivation
                        :active # save the sale
                     ] => :provisional, :do => :schedule_first_membership
-    after_transition :none => :applied, :do => :set_join_date
+    after_transition :none => :applied, :do => [:set_join_date, :send_active_needs_approval_email]
     after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :nillify_club_cash]
     after_transition :provisional => :active, :do => :send_active_email
     after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
+    after_transition :lapsed => :applied, :do => :send_recover_needs_approval_email]
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
 
     event :set_as_provisional do
@@ -138,6 +139,16 @@ class Member < ActiveRecord::Base
   # Sends the activation mail.
   def send_active_email
     Communication.deliver!(:active, self)
+  end
+
+  # Sends the request mail to every representative to accept/reject the member.
+  def send_active_needs_approval_email
+    Communication.deliver!(:active_with_approval, self)
+  end
+
+  # Sends the request mail to every representative to accept/reject the member.
+  def send_recover_needs_approval_email
+    Communication.deliver!(:recover_with_approval, self)
   end
 
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)

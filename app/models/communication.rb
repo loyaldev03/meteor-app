@@ -26,7 +26,7 @@ class Communication < ActiveRecord::Base
       if template.lyris?
         c.deliver_lyris
       elsif template.action_mailer?
-        c.deliver_action_mailer
+        c.deliver_action_mailer(member)
       else
         message = "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
         Airbrake.notify(:error_class => "Communication Client", :error_message => message)
@@ -59,7 +59,7 @@ class Communication < ActiveRecord::Base
   handle_asynchronously :deliver_lyris
 
 
-  def deliver_action_mailer
+  def deliver_action_mailer(member = nil)
     response = case template_type.to_sym
     when :active
       Notifier.active(email).deliver!
@@ -72,6 +72,18 @@ class Communication < ActiveRecord::Base
       Notifier.prebill_renewal(email).deliver!
     when :refund
       Notifier.refund(email).deliver!
+    when :active_with_approval
+      representatives = get_representatives(member)
+      representatives.each do |cr|
+        agent = Agent.find(cr.agent_id)
+        Notifier.active_with_approval(agent,member).deliver!
+      end
+    when :recover_with_approval
+      representatives = get_representatives(member)
+      representatives.each do |cr|
+        agent = Agent.find(cr.agent_id)
+        Notifier.recover_with_approval(agent,member).deliver!
+      end         
     else
       message = "Deliver action could not be done."
       Airbrake.notify(:error_class => "Communication Delivery", :error_message => message)      
@@ -85,5 +97,10 @@ class Communication < ActiveRecord::Base
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_action_mailer
+
+
+  def get_representatives(member)
+    return ClubRole.find_all_by_club_id_and_role(member.club_id,'representative')
+  end
 
 end
