@@ -101,7 +101,7 @@ class Member < ActiveRecord::Base
     after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :nillify_club_cash]
     after_transition :provisional => :active, :do => :send_active_email
     after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
-    after_transition :lapsed => :applied, :do => :send_recover_needs_approval_email]
+    after_transition :lapsed => :applied, :do => :send_recover_needs_approval_email
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
 
     event :set_as_provisional do
