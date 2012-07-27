@@ -47,6 +47,10 @@
           </th>
           <td> 
             <%= f.text_field :address, :class => 'text_field' %> 
+            <% if !@member.new_record? && !@member.wrong_address.nil? %>
+              <%= t('activerecord.attributes.member.unset_wrong_address') %>
+              <%= check_box :setter, :wrong_address %>
+            <% end %>
           </td>  
         </tr>
         <tr class = "control-group">
@@ -123,6 +127,10 @@
           <td> 
             <%= f.text_field :phone_number, :class => 'text_field' %> 
             <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.member.phone_number_help')} %>
+            <% if !@member.new_record? && !@member.wrong_phone_number.nil? %>
+              <%= t('activerecord.attributes.member.unset_wrong_phone_number') %>
+              <%= check_box :setter, :wrong_phone_number %>
+            <% end %>
           </td>  
         </tr>
         <tr class = "control-group">

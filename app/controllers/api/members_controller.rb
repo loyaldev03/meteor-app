@@ -140,6 +140,9 @@ class Api::MembersController < ApplicationController
     # member.skip_api_sync! if XXX
     member.update_attribute(:wrong_address, nil) if params[:setter][:wrong_address] == '1' unless params[:setter].nil?
     member.update_attribute(:wrong_phone_number, nil) if params[:setter][:wrong_phone_number] == '1' unless params[:setter].nil?
+    member.update_attribute(:wrong_phone_number, nil) unless member.phone_number == params[:member][:phone_number]
+      
+  
     if member.update_attributes(params[:member]) 
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member)
