@@ -43,8 +43,9 @@ class DomainsController < ApplicationController
   # POST /domains
   # POST /domains.json
   def create
-    @domain = Domain.new(params[:domain])
+    @domain = Domain.new(:url => params[:domain][:url], :data_rights => params[:domain][:data_rights], :description => params[:domain][:description], :hosted => params[:domain][:hosted])
     @domain.partner = @current_partner
+    @domain.club_id = params[:domain][:club_id]
     @clubs = Club.where(:partner_id => @current_partner)
 
     respond_to do |format|
@@ -65,7 +66,7 @@ class DomainsController < ApplicationController
     @clubs = Club.where(:partner_id => @current_partner)
     
     respond_to do |format|
-      if @domain.update_attributes(params[:domain])
+      if @domain.update_attributes(:url => params[:domain][:url], :data_rights => params[:domain][:data_rights], :description => params[:domain][:description], :hosted => params[:domain][:hosted]) && @domain.update_attribute(:club_id,params[:domain][:club_id])
         format.html { redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully updated." }
         format.json { head :no_content }
       else

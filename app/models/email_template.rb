@@ -1,6 +1,6 @@
 class EmailTemplate < ActiveRecord::Base
-  attr_accessible :name, :client, :template_type, :terms_of_membership_id
-
+  attr_accessible :name, :client, :template_type
+  
   belongs_to :terms_of_membership
   serialize :external_attributes
 
