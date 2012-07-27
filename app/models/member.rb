@@ -18,8 +18,7 @@ class Member < ActiveRecord::Base
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
-      :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
-      :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address,
+      :bill_date, :quota, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
       :wrong_phone_number, :api_id, :mega_channel, :credit_cards_attributes, :birth_date,
       :gender, :type_of_phone_number
 
@@ -552,6 +551,8 @@ class Member < ActiveRecord::Base
     self.email = params[:email]
     self.birth_date = params[:birth_date]
     self.joint = params[:joint]
+    self.gender = params[:gender]
+    self.type_of_phone_number = params[:type_of_phone_number]
   end
   
   private
