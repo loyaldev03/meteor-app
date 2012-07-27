@@ -21,7 +21,7 @@
         </td>
       </tr>
       <tr>
-        <td><%= t('activerecord.attributes.member.member_group_type') %>:</td>
+        <td><%= t('activerecord.attributes.member.member_classification_type') %>:</td>
         <td>
           <input readonly="true" type="text" class="test_field" value="<%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %>" />
         </td>  
@@ -216,12 +216,17 @@
             <td> <%= @current_member.created_by.username %> </td>
           </tr>
           <tr>
-            <th><%= t('activerecord.attributes.member.reactivation_times') %>:</th>
+            <th><%= t('activerecord.attributes.member.recovery_times') %>:</th>
             <td><%= @current_member.reactivation_times %></td>  
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.recycled_times') %>:</th>
-            <td><%= @current_member.recycled_times %></td>  
+            <td>
+              <%= @current_member.recycled_times %>
+              <% if @current_member.recycled_times > 0 %>
+                <%= render :partial => "shared/help", :locals => { :title => t('activerecord.attributes.member.recycled_times'), :content => t('activerecord.attributes.member.recycled_times_explanation')} %> 
+              <% end %>
+            </td>  
           </tr>
           <% if @current_member.club.requires_external_id %>
           <tr>
