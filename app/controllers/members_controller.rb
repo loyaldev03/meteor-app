@@ -249,7 +249,7 @@ class MembersController < ApplicationController
 
   def login_as_member
     if @current_member.api_member
-      redirect_to @member.api_member.login_token.url
+      redirect_to @member.api_member.login_token.url unless @member.api_member.login_token 
     else
       flash[:error] = "There is no api_member."
     end
