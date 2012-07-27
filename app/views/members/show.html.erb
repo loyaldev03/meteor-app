@@ -279,6 +279,14 @@
             <th><%= t('activerecord.attributes.member.quota') %>: </th>
             <td><%= @current_member.quota %></td>  
           </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.member.date_of_primary_cc') %>: </th>
+            <td><%= I18n.l(@current_member.credit_cards.first.created_at, :format => :only_date) %> </td>
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.member.last_successful_bill_date') %>: </th>
+            <td><%= I18n.l(@current_member.active_credit_card.last_successful_bill_date, :format => :only_date) if @current_member.active_credit_card.last_successful_bill_date %> </td>
+          </tr>
         </table>        
       </td>
     </tr>
