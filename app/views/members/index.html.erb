@@ -121,6 +121,13 @@
                                    :value => (params[:member][:last_digits] if params[:member]) %> 
                   </td>
                 </tr>
+                <tr>
+                  <td><%= t('activerecord.notes') %> <%= t('activerecord.attributes.notes') %></td>
+                  <td>
+                    <%= text_field :member, :notes, :class => 'text_field',
+                                   :value => (params[:member][:notes] if params[:member]) %> 
+                  </td>
+                </tr>
               </table>
             </td>
         </tr>

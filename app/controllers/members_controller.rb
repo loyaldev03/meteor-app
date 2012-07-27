@@ -23,6 +23,7 @@ class MembersController < ApplicationController
                        .with_phone_number_like(params[:member][:phone_number])
                        .with_next_retry_bill_date(params[:member][:next_retry_bill_date])
                        .with_credit_card_last_digits(params[:member][:last_digits])
+                       .with_member_notes(params[:member][:notes])
                        .where(:club_id => @current_club)
                        .order(:visible_id)
     respond_to do |format|

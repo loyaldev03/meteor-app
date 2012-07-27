@@ -61,6 +61,7 @@ en:
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
     credit_card: 'CC'
+    notes: 'Notes'
     attributes:
       transaction:
         refundable: 'Refundable'
