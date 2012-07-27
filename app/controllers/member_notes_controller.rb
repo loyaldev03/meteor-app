@@ -9,7 +9,10 @@ class MemberNotesController < ApplicationController
   end
 
   def create 
-    member_note = MemberNote.new(params[:member_note])
+    member_note = MemberNote.new(:description => params[:member_note][:description])
+    member_note.communication_type_id = params[:member_note][:communication_type_id]
+    member_note.disposition_type_id = params[:member_note][:disposition_type_id]
+    member_note.communication_type_id = params[:member_note][:communication_type_id]
     member_note.created_by_id = @current_agent.id
     member_note.member_id = @current_member.id
     message = "Note added."
