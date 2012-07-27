@@ -1,7 +1,7 @@
 class CreditCardsController < ApplicationController
 	before_filter :validate_club_presence
 	before_filter :validate_member_presence
-
+  
   def new
     @credit_card = CreditCard.new
     @actual_credit_card = @current_member.active_credit_card
@@ -46,7 +46,7 @@ class CreditCardsController < ApplicationController
   end
 
   def set_as_blacklisted
-  	credit_card = CreditCard.find(params[:credit_card_id])
+    credit_card = CreditCard.find(params[:credit_card_id])
 
   	respond_to do |format|
       if credit_card.blacklist
