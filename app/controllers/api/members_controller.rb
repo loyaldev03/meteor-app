@@ -24,6 +24,8 @@ class Api::MembersController < ApplicationController
   #              to validate numbers with the following formats: +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123.
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to
   #              validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+  #             *gender: Gender of the member. The values we are recieving are "M" for male or "F" for female.
+  #             *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
   #             *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
   #              we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level. 
   #             *enrollment_amount: Amount of money that takes to enroll. It is present at member level.
@@ -108,11 +110,15 @@ class Api::MembersController < ApplicationController
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 
   #             *address: The address of the member that is being enrolled. 
   #             *city: City from where the member is from.
+  #             *member_group_type_id: Id of the member's group type where he belongs to. Each club can has many classifications for its member's, like 'VIP' or 'Celebrity'.
+  #              This types are stored as 'MemberGroupType'. The id is an integer up to 8 digits.
   #             *state: State from where the member is from. At the moment we are not using any kind of code.
   #             *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
   #             *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
   #             *phone_number: The member's personal phone number. We are accepting numbers with the following formats: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
   #              +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
+  #             *gender: Gender of the member. The values we are recieving are "M" for male or "F" for female.
+  #             *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with the following formats: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling or "wrong_address" for update.
