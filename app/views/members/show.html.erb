@@ -20,6 +20,12 @@
         <td><input readonly="true" type="text" class="test_field" value="<%= @current_member.last_name %>" />
         </td>
       </tr>
+      <tr>
+        <td><%= t('activerecord.attributes.member.member_group_type') %>:</td>
+        <td>
+          <input readonly="true" type="text" class="test_field" value="<%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %>" />
+        </td>  
+      </tr>
     </table>
   </div>
   
@@ -216,10 +222,6 @@
           <tr>
             <th><%= t('activerecord.attributes.member.recycled_times') %>:</th>
             <td><%= @current_member.recycled_times %></td>  
-          </tr>
-          <tr>
-            <th><%= t('activerecord.attributes.member.member_group_type') %>:</th>
-            <td><%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %></td>  
           </tr>
           <% if @current_member.club.requires_external_id %>
           <tr>
