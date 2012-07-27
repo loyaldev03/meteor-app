@@ -26,10 +26,12 @@ class OperationsController < ApplicationController
   # PUT /operations/1.json
   def update
     operation = Operation.find(params[:id])
-
+    @url_helpers = Rails.application.routes.url_helpers
     respond_to do |format|
       if operation.update_attributes(params[:operation])
-        message = "Edited operation note #{operation.id}."
+        message = "Edited operation note <a href=\"/partner/#{@current_partner.prefix}/club/#{@current_club.name}/member/#{@current_member.visible_id}/operations/#{operation.id}\">#{operation.id}</a>.".html_safe
+        operation.description = message
+        operation.save
         Auditory.audit(@current_agent, operation, message, @current_member)
         format.html { redirect_to operation_path(:id => operation), notice: message }
         format.json { head :no_content }

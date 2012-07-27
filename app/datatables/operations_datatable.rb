@@ -16,7 +16,7 @@ private
         operation.id,
         I18n.l(operation.operation_date,:format => :dashed),
         #I couldnt make it work in another way. TODO: fix operation#show url.
-        operation.description.truncate(42), 
+        operation.description.html_safe, 
         operation.notes.to_s.truncate(42),
         operation.created_by.username,
         link_to("<i class='icon-zoom-in'>".html_safe, @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,:id => operation.id), :class => "btn btn-small"),
