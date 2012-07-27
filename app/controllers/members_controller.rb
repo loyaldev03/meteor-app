@@ -246,5 +246,17 @@ class MembersController < ApplicationController
     end
     redirect_to show_member_path  
   end
+
+  def login_as_member
+    if @current_member.api_member
+      @member.api_member.login_token
+      redirect_to "http://localhost:3000/#{@token}"    
+    else
+      flash[:error] = "There is no api_member."
+    end
+    redirect_to show_member_path
+  end
+
+
 end
 

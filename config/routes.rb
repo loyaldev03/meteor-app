@@ -51,6 +51,7 @@ SacPlatform::Application.routes.draw do
         match '/add_club_cash' => 'members#add_club_cash', as: 'member_add_club_cash'
         match '/approve' => 'members#approve', as: 'member_approve', :via => [:post]
         match '/reject' => 'members#reject', as: 'member_reject', :via => [:post]  
+        match '/login_as_member' => 'members#login_as_member', as: 'login_as_member', :via => [:get]  
         match '/' => 'members#show', as: 'show_member', :via => [:get, :post]
       end
     end
