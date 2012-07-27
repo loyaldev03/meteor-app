@@ -21,6 +21,12 @@
         </td>
       </tr>
       <tr>
+        <td><%= t('activerecord.attributes.member.gender') %>:</td>
+        <td>
+          <input readonly="true" type="text" class="test_field" value="<%= @current_member.gender %>" />
+        </td>  
+      </tr>
+      <tr>
         <td><%= t('activerecord.attributes.member.member_classification_type') %>:</td>
         <td>
           <input readonly="true" type="text" class="test_field" value="<%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %>" />
@@ -130,7 +136,7 @@
   </thead>
   <tbody>
     <tr>
-      <th style="width: 25%;"><%= t('activerecord.attributes.member.phone_number') %></th><th style="width: 25%;">Email</th><th>Birth date</th>
+      <th style="width: 25%;"><%= t('activerecord.attributes.member.phone_number') %></th><th><%= t('activerecord.attributes.member.type_of_phone_number') %></th><th style="width: 25%;">Email</th><th>Birth date</th>
     </tr>
     <tr class="<%= (!@current_member.wrong_phone_number.nil? ? "yellow" : "") %>">
       <td>
@@ -143,6 +149,7 @@
           <%= @current_member.wrong_phone_number %>
         <% end %>
       </td>
+      <td> <%= @current_member.type_of_phone_number %></td>
       <td><a href="mailto:<%= @current_member.email %>"><%= @current_member.email %></a></td>
       <td><%= @current_member.birth_date.nil? ? t('activerecord.attributes.member.not_have_birth_date_set') : @current_member.birth_date %></td>
     </tr>

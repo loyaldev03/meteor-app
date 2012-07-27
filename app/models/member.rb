@@ -20,7 +20,8 @@ class Member < ActiveRecord::Base
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :terms_of_membership_id, :zip, 
       :club_id, :partner_id, :member_group_type_id, :blacklisted, :wrong_address,
-      :wrong_phone_number, :api_id, :mega_channel, :credit_cards_attributes, :birth_date
+      :wrong_phone_number, :api_id, :mega_channel, :credit_cards_attributes, :birth_date,
+      :gender, :type_of_phone_number
 
   # accepts_nested_attributes_for :credit_cards, :limit => 1
 
