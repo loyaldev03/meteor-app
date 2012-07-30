@@ -10,7 +10,7 @@ class Domain < ActiveRecord::Base
   # this validation is comented because it does not works the nested form
   # of partner. TODO: can we add this validation without problems?
   # validates :partner, :presence => true 
-  validates :url, :presence => { :message => "Cant be blank." },
+  validates :url, :presence => { :message => "can't be blank." },
                   :format =>  /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
   validates_uniqueness_of_without_deleted :url
 
