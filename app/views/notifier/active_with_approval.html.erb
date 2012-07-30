@@ -1,0 +1,13 @@
+<p>The Member <%= @member.full_name %>, has submited to be enrolled. This member needs to be approved.</p>
+    
+<p>    Information related to the member can be found in the following link: <%= link_to 'show page', show_member_path(:partner_prefix => @member.club.partner.prefix, :club_prefix => @member.club.name ,:member_prefix => @member.visible_id) %> </p>
+    	<p> <b> First name: </b>  <%= @member.first_name %> </p>
+    	<p> <b> Last name: </b> <%= @member.last_name %> </p>
+    	<p> <b> Address: </b> <%= @member.full_address %> </p>
+        <p> <b> Club: </b> <%= @member.club_id %> - <%= @member.club.name %> </p> 
+        <p> <b> Terms of membership: </b> <%= @member.terms_of_membership_id %> - <%= @member.terms_of_membership.name %> </p>
+
+    <p>Select the action to commit: </p>
+        <p><%= link_to("Approve", member_approve_path(:partner_prefix => @member.club.partner.prefix, :club_prefix => @member.club.name ,:member_prefix => @member.visible_id), :method => :post).html_safe %> </p>
+        <p><%= link_to("Reject", member_reject_path(:partner_prefix => @member.club.partner.prefix, :club_prefix => @member.club.name ,:member_prefix => @member.visible_id), :method => :post).html_safe %> </p>
+<p>Regards.</p>
