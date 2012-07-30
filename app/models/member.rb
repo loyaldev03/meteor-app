@@ -526,11 +526,11 @@ class Member < ActiveRecord::Base
       begin
         cct = ClubCashTransaction.new(:amount => amount, :description => description)
         cct.member = self
-        if cct.valid?
+        if cct.valid? 
           cct.save!
           self.club_cash_amount = self.club_cash_amount + amount.to_f
           self.save!
-          amount.to_i >= 0 ? message = "Club cash transaction done!. Amount: $#{cct.amount}" : message = "Club cash was deducted. Amount: $#{cct.amount}"
+          amount.to_i >= 0 ? message = "$#{cct.amount} club cash was successfully added!" : message = "$#{cct.amount} club cash was successfully deducted!"
           Auditory.audit(agent, cct, message, self)
           answer = { :message => message, :code => Settings.error_codes.success }
         else
