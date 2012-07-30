@@ -144,12 +144,20 @@ class Member < ActiveRecord::Base
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_active_needs_approval_email
-    Communication.deliver!(:active_with_approval, self)
+    representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
+    representatives.each do |representative|
+      agent = Agent.find(representative.agent_id)
+      Notifier.active_with_approval(agent,self).deliver!
+    end
   end
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_recover_needs_approval_email
-    Communication.deliver!(:recover_with_approval, self)
+    representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
+    representatives.each do |representative|
+      agent = Agent.find(representative.agent_id)
+      Notifier.recover_with_approval(agent,self).deliver!
+    end
   end
 
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)

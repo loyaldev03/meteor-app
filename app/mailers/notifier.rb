@@ -1,6 +1,6 @@
 class Notifier < ActionMailer::Base
   default from: "platform@xagax.com"
-  default bcc: "platformadmins@xagax.com"
+  #default bcc: "platformadmins@xagax.com"
   
   def prebill_renewal(email)
     email = nil
@@ -30,13 +30,13 @@ class Notifier < ActionMailer::Base
   def active_with_approval(agent,member)
     @agent = agent
     @member = member
-    mail :to => agent.email, :subject => "active with approval"
+    mail :to => agent.email, :subject => "Member activation needs approval"
   end
 
   def recover_with_approval(agent,member)
     @agent = agent
     @member = member
-    mail :to => agent.email, :subject => "recover with approval"
+    mail :to => agent.email, :subject => "Member recovering needs approval"
   end
 
 end
