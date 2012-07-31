@@ -393,7 +393,7 @@ class Member < ActiveRecord::Base
   def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, member_params = nil)
     amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
     if recovery_check and not self.new_record? and not self.can_recover?
-      return { :message => "Cant recover member. Actual status is not lapsed or Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
+      return { :message => "Cant recover member. Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
         return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
     elsif credit_card.blacklisted? or self.blacklisted?
