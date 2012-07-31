@@ -175,7 +175,7 @@ class Api::MembersController < ApplicationController
   #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
   #             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
   #             *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
-   #              +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
+  #              +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   # [credit_card] Information related to member's credit card.

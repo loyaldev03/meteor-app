@@ -29,7 +29,7 @@ class Transaction < ActiveRecord::Base
     self.invoice_number = member.visible_id
     self.first_name = member.first_name
     self.last_name = member.last_name
-    self.phone_number = member.phone_number
+    self.phone_number = member.full_phone_number
     self.email = member.email
     self.address = member.address
     self.city = member.city
