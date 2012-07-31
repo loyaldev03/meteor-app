@@ -16,7 +16,7 @@ class Member < ActiveRecord::Base
   has_many :enrollment_infos
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
-      :email, :external_id, :first_name, :phone_number, 
+      :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
       :wrong_phone_number, :api_id, :mega_channel, :credit_cards_attributes, :birth_date,
@@ -31,14 +31,11 @@ class Member < ActiveRecord::Base
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
   
   # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
-  REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_number' ]
+  REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_country_code', 'phone_local_number', 'phone_local_number' ]
 
   #Validates that there are no invalid charactes in the name. 
 
   REGEX_FIRST_AND_LAST_NAME = /^[a-zA-Z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
-
-  #Validates numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
-  REGEX_PHONE_NUMBER = /^(\([+]?([0-9]{1,3})\))?[-. ]?([0-9]{1,3})?[-. ]?([0-9]{2,3})[-. ]?([0-9]{2,4})?[-. ]?([0-9]{4})([-.\s][\(]?(x|int)?[\s]?[0-9]{1,10}[\)]?)?$/ 
 
   #Validates emails with format like: xxxxxx@xxxx.xxx.xx or xxxxx+xxx@xxxx.xxx.xx
   REGEX_EMAIL = /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
@@ -67,7 +64,7 @@ class Member < ActiveRecord::Base
 
   validates :first_name, :last_name, :presence => true, :format => REGEX_FIRST_AND_LAST_NAME
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, :format => REGEX_EMAIL
-  validates :phone_number, :format => REGEX_PHONE_NUMBER
+  validates :phone_country_code, :phone_area_code, :phone_local_number, :presence => true, :numericality => { :only_integer => true }
   validates :address, :format => REGEX_ADDRESS
   validates :state, :city, :presence => true, :format => REGEX_CITY_AND_STATE
   validates :terms_of_membership_id , :presence => true
@@ -80,7 +77,9 @@ class Member < ActiveRecord::Base
       base.where('last_synced_at IS NULL OR last_synced_at < updated_at')
   }
   scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date = ?', value) unless value.blank? }
-  scope :with_phone_number_like, lambda { |value| where('phone_number like ?', value) unless value.blank? }
+  scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value) unless value.blank? }
+  scope :with_phone_area_code, lambda { |value| where('phone_area_code like ?', value) unless value.blank? }
+  scope :with_phone_local_number, lambda { |value| where('phone_local_number like ?', value) unless value.blank? }
   scope :with_visible_id, lambda { |value| where('visible_id = ?',value) unless value.blank? }
   scope :with_first_name_like, lambda { |value| where('first_name like ?', '%'+value+'%') unless value.blank? }
   scope :with_last_name_like, lambda { |value| where('last_name like ?', '%'+value+'%') unless value.blank? }
@@ -217,6 +216,10 @@ class Member < ActiveRecord::Base
   # Returns a string with address, city and state concatenated. 
   def full_address
     [address, city, state].join(' ')
+  end
+
+  def full_phone_number
+    "(#{self.phone_country_code}) - #{self.phone_area_code} - #{self.phone_local_number}"
   end
 
   ####  METHODS USED TO SHOW OR NOT BUTTONS. 
@@ -554,13 +557,15 @@ class Member < ActiveRecord::Base
     self.state = params[:state]
     self.city = params[:city]
     self.country = params[:country]
-    self.phone_number = params[:phone_number]
     self.zip = params[:zip]
     self.email = params[:email]
     self.birth_date = params[:birth_date]
     self.joint = params[:joint]
     self.gender = params[:gender]
     self.type_of_phone_number = params[:type_of_phone_number]
+    self.phone_country_code = params[:phone_country_code]
+    self.phone_area_code = params[:phone_area_code]
+    self.phone_local_number = params[:phone_local_number]
   end
   
   private

@@ -125,8 +125,9 @@
             <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline' %>
           </th>
           <td> 
-            <%= f.text_field :phone_number, :class => 'text_field' %> 
-            <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.member.phone_number_help')} %>
+            <%= f.text_field :phone_country_code, :class => 'text_field input-mini' %> 
+            <%= f.text_field :phone_area_code, :class => 'text_field input-mini' %> 
+            <%= f.text_field :phone_local_number, :class => 'text_field input-mini' %> 
             <% if !@member.new_record? && !@member.wrong_phone_number.nil? %>
               <%= t('activerecord.attributes.member.unset_wrong_phone_number') %>
               <%= check_box :setter, :wrong_phone_number %>
@@ -145,6 +146,7 @@
             </select>
           </td>  
         </tr>
+        <% if @member.new_record? %>
         <tr class = "control-group">
           <th>
             <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %>
@@ -155,6 +157,7 @@
           </td>  
           <% end %>
         </tr>
+        <% end %>
         <tr>
       </table>
     </td>

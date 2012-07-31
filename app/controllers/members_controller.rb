@@ -20,10 +20,12 @@ class MembersController < ApplicationController
                        .with_state_like(params[:member][:state])
                        .with_zip(params[:member][:zip])
                        .with_email_like(params[:member][:email])
-                       .with_phone_number_like(params[:member][:phone_number])
                        .with_next_retry_bill_date(params[:member][:next_retry_bill_date])
                        .with_credit_card_last_digits(params[:member][:last_digits])
                        .with_member_notes(params[:member][:notes])
+                       .with_phone_country_code(params[:member][:phone_country_code])
+                       .with_phone_area_code(params[:member][:phone_area_code])
+                       .with_phone_local_number(params[:member][:phone_local_number])
                        .where(:club_id => @current_club)
                        .order(:visible_id)
     respond_to do |format|
@@ -187,7 +189,7 @@ class MembersController < ApplicationController
   def set_unreachable
     if request.post?
       if @current_member.update_attribute(:wrong_phone_number, params[:reason])
-        message = "Phone number #{@current_member.phone_number} is  #{params[:reason]}."
+        message = "Phone number #{@current_member.full_phone_number} is  #{params[:reason]}."
         flash[:notice] = message
         Auditory.audit(@current_agent,@current_member,message,@current_member)
         redirect_to show_member_path

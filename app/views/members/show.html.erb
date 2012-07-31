@@ -135,7 +135,7 @@
     </tr>
     <tr class="<%= (!@current_member.wrong_phone_number.nil? ? "yellow" : "") %>">
       <td>
-        <%= @current_member.phone_number %>
+        <%= @current_member.full_phone_number %>
         <% if @current_member.wrong_phone_number.nil? %>
           <%= link_to(member_set_unreachable_path, :class => "btn btn-danger") do %> 
             <i class="icon-remove"></i> <%= t('activerecord.attributes.member.set_unreachable') %>

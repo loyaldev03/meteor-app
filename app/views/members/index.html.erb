@@ -47,8 +47,13 @@
                 </tr>
                 <tr>
                   <td><%= t('activerecord.attributes.member.phone_number') %></td>
-                  <td><%= text_field :member, :phone_number, :class => 'test_field',
-                                   :value => (params[:member][:phone_number] if params[:member]) %>
+                  <td>
+                    <%= text_field :member, :phone_country_code, :class => 'text_field input-mini',
+                                   :value => (params[:member][:phone_country_code] if params[:member]) %> 
+                    <%= text_field :member, :phone_area_code, :class => 'text_field input-mini',
+                                   :value => (params[:member][:phone_area_code] if params[:member]) %> 
+                    <%= text_field :member, :phone_local_number, :class => 'text_field input-mini',
+                                   :value => (params[:member][:phone_local_number] if params[:member]) %> 
                   </td>
                 </tr>
             </table>
