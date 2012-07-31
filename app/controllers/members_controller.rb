@@ -259,8 +259,8 @@ class MembersController < ApplicationController
     else
       flash[:error] = "There is no member in drupal."
     end
+    redirect_to show_member_path
   end
-
 
 end
 
