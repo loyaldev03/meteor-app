@@ -548,6 +548,21 @@ class Member < ActiveRecord::Base
     end
     answer
   end
+
+  def blacklist(agent, reason)
+    response = {}
+    if self.update_attribute(:blacklisted, true)
+      self.credit_cards.each do |cc|
+        cc.blacklist
+      end
+      message = "Blacklisted member and all its credit cards. Reason: #{reason}."
+      Auditory.audit(agent, self, message, self, Settings.operation_types.cancel)
+      response = { :message => message, :success => true }
+    else 
+      message = "Could not blacklisted this member."
+      response = { :message => message, :success => false }
+    end
+  end
   ###################################################################
 
   def update_member_data_by_params(params)
