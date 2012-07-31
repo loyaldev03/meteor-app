@@ -141,19 +141,6 @@ class MemberTest < ActiveSupport::TestCase
     assert_raise(StateMachine::InvalidTransition){ fulfillment.set_as_archived! }
   end
 
-  test "Should let create member with correct format number" do
-    ['(+54) 11-4632-5895', '11-4632-5895', '338.560.1829 (5755)', '338.560.1829 int5755', 
-       '338.560.1829 x5755', '(801)585-5189', '216.463.8898'].each {|phone| phone 
-    member = FactoryGirl.build(:member, phone_number: phone,terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    assert member.save, "member cant be save #{member.errors.inspect}"
-    }
-
-    ['4632-5895()', '()11-4632-5895', '+338.560.1829 (575584964651215465+4)', '+338.560.1829 int5755'].each {|phone| phone 
-    member = FactoryGirl.build(:member, phone_number: phone,terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    assert !member.save, "member cant be save #{member.errors.inspect}"
-    }
-  end
-
   test "Should not let create a member with a wrong format zip" do
     ['12345-1234', '12345'].each {|zip| zip
       member = FactoryGirl.build(:member, zip: zip, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)

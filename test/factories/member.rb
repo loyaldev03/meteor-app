@@ -13,7 +13,9 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number { Faker::PhoneNumber.phone_number }
+    phone_country_code 123
+    phone_area_code 123
+    phone_local_number 1234
     bill_date { DateTime.now }
     birth_date { DateTime.now }
     status "none"
@@ -29,7 +31,9 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number { Faker::PhoneNumber.phone_number }
+    phone_country_code 123
+    phone_area_code 123
+    phone_local_number 1234
     birth_date { DateTime.now }
     status "none"
     country "US"
@@ -48,7 +52,9 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number { Faker::PhoneNumber.phone_number }
+    phone_country_code 123
+    phone_area_code 123
+    phone_local_number 1234
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
@@ -69,7 +75,9 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number { Faker::PhoneNumber.phone_number }
+    phone_country_code 123
+    phone_area_code 123
+    phone_local_number 1234
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
@@ -87,7 +95,9 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number { Faker::PhoneNumber.phone_number }
+    phone_country_code 123
+    phone_area_code 123
+    phone_local_number 1234
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
@@ -107,7 +117,9 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number { Faker::PhoneNumber.phone_number }
+    phone_country_code 123
+    phone_area_code 123
+    phone_local_number 1234
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
@@ -127,7 +139,9 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number { Faker::PhoneNumber.phone_number }
+    phone_country_code 123
+    phone_area_code 123
+    phone_local_number 1234
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
@@ -146,7 +160,9 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
-    phone_number { Faker::PhoneNumber.phone_number }
+    phone_country_code 123
+    phone_area_code 123
+    phone_local_number 1234
     birth_date { DateTime.now }
     join_date { DateTime.now }
     country "US"

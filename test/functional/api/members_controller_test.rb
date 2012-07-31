@@ -2,7 +2,6 @@ require 'test_helper'
 
 class Api::MembersControllerTest < ActionController::TestCase
   setup do
-    require 'ruby-debug'; debugger
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     # request.env["devise.mapping"] = Devise.mappings[:agent]
     sign_in @admin_user
@@ -37,7 +36,9 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 :state => @member.state,
                                 :email => @member.email,
                                 :country => @member.country,
-                                :phone_number => @member.phone_number,
+                                :phone_country_code => @member.phone_country_code,
+                                :phone_area_code => @member.phone_area_code,
+                                :phone_local_number => @member.phone_local_number,
                                 :enrollment_amount => 34.34,
                                 :terms_of_membership_id => @terms_of_membership.id,
                                 :birth_date => @member.birth_date,
