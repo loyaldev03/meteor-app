@@ -159,7 +159,7 @@ Method : POST.
 
   
     <span class="summary_desc"><div class='inline'><p>
-Method : GET Returns information related to member and its credit card.
+*email: Members personal email.
 </p>
 </div></span>
   
@@ -241,8 +241,9 @@ show.
    *state: State from where the member is from. At the moment we are not using any kind of code.
    *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
    *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
-   *phone_number: The member's personal phone number. We are accepting only numbers, dashes, 'x','int' and '+'. We recommend frontend
-    to validate numbers with the following formats: +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123.
+   *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be &quot;011&quot;). 
+   *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
+   *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
    *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to
     validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
    *gender: Gender of the member. The values we are recieving are &quot;M&quot; for male or &quot;F&quot; for female.
@@ -462,7 +463,6 @@ creation page.
       <pre class="lines">
 
 
-87
 88
 89
 90
@@ -478,10 +478,11 @@ creation page.
 100
 101
 102
-103</pre>
+103
+104</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 87</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 88</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -517,31 +518,13 @@ creation page.
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-Method : GET Returns information related to member and its credit card.
-</p>
-<dl>
-<dt>id</dt><dd><p>
-Members ID. This id is a string type ID (lenght 32 characters.). This ID is
-unique for each member.
-</p>
-</dd>
-<dt>member</dt><dd><p>
-Information related to the member that is sumbitting the enroll. Here is a
-list of the regex we are using to validate show.
+*email: Members personal email. This mail will be one of our contact method
+and every mail will be send to this. We are accepting
 </p>
 <pre class="code ruby"><code>
-   *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
-   *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
-   *address: The address of the member that is being enrolled. 
-   *city: City from where the member is from.
-   *state: State from where the member is from. At the moment we are not using any kind of code.
-   *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
-   *phone_number: The member's personal phone number. We are accepting numbers with format like: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
-    +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
-   *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
-    mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+             mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
 </code></pre>
-</dd>
+<dl>
 <dt>credit_card</dt><dd><p>
 Information related to member&#8217;s credit card.
 </p>
@@ -651,10 +634,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-189
-190
-191
-192
 193
 194
 195
@@ -669,10 +648,14 @@ Code related to the method result.
 204
 205
 206
-207</pre>
+207
+208
+209
+210
+211</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 189</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 193</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_show'>show</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -733,8 +716,9 @@ the regex we are using to validate. show.
    *state: State from where the member is from. At the moment we are not using any kind of code.
    *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
    *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
-   *phone_number: The member's personal phone number. We are accepting numbers with the following formats: xxx-xxx-xxxx, xxxx-xxxx(xxxx), 
-    +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
+   *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be &quot;011&quot;). 
+   *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
+   *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
    *gender: Gender of the member. The values we are recieving are &quot;M&quot; for male or &quot;F&quot; for female.
    *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
    *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
@@ -898,8 +882,6 @@ page.
       <pre class="lines">
 
 
-143
-144
 145
 146
 147
@@ -915,10 +897,12 @@ page.
 157
 158
 159
-160</pre>
+160
+161
+162</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 143</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 145</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -948,7 +932,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Fri Jul 27 11:03:47 2012 by
+  Generated on Tue Jul 31 11:58:25 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

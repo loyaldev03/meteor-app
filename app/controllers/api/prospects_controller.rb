@@ -14,7 +14,9 @@ class Api::ProspectsController < ApplicationController
   #                             *state: State registered by the prospect.
   #                             *zip: Zip registered by the prospect.
   #                             *email: Email registered by the prospect.
-  #                             *phone_number: Phone number registered by the prospect.
+  #                             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
+  #                             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
+  #                             *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
   #                             *birth_date: Birth date of the prospect
   #                             *product_sku: Name of the selected product.
   #                             *marketing_code: multi-team

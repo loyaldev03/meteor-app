@@ -178,7 +178,9 @@ Information related to the prospect.
                  *state: State registered by the prospect.
                  *zip: Zip registered by the prospect.
                  *email: Email registered by the prospect.
-                 *phone_number: Phone number registered by the prospect.
+                 *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be &quot;011&quot;). 
+                 *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
+                 *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
                  *birth_date: Birth date of the prospect
                  *product_sku: Name of the selected product.
                  *marketing_code: multi-team
@@ -211,19 +213,7 @@ string)
   </div>
 </div>
 <div class="tags">
-  
-  <div class="examples">
-    <p class="tag_title">Examples:</p>
-    
-      
-      <pre class="example code">{&quot;first_name&quot;:&quot;Martin&quot;,
- &quot;last_name&quot;:&quot;Ferrari&quot;,
- &quot;address&quot;:&quot;1395&quot;,
- &quot;city&quot;:&quot;San Luis&quot;,
- &quot;state&quot;:&quot;AL&quot;,&quot;country&quot;:&quot;US&quot;,&quot;zip&quot;:&quot;12312&quot;,&quot;email&quot;:&quot;dmf1978@yahoo.com.ar&quot;,&quot;phone_number&quot;:&quot;112-312-3123&quot;,&quot;url_landing&quot;:&quot;http:\/\/membertest.onmc.com\/dale-jr-2\/&quot;,&quot;user_id&quot;:&quot;3ede27b319cfda591968ccfde5b73d45&quot;,&quot;product_sku&quot;:&quot;Bracelet&quot;,&quot;mega_channel&quot;:null,&quot;marketing_code&quot;:null,&quot;birth_date&quot;:&quot;2012-07-11&quot;,&quot;ip_address&quot;:&quot;190.224.250.164&quot;,&quot;user_agent&quot;:&quot;Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit\/536.11 (KHTML, like Gecko) Chrome\/20.0.1132.47 Safari\/536.11&quot;,&quot;referral_host&quot;:&quot;http:\/\/co.xagax.com\/onmc\/checkout.php&quot;,&quot;referral_parameters&quot;:&quot;?choose_your_product=Bracelet&amp;first_name=Martin&amp;last_name=Ferrari&amp;email=dmf1978%40yahoo.com.ar&amp;mailing_address=1395&amp;city=San%20Luis&amp;state=Alaska&amp;zip=12312&amp;phone=112-312-3123&amp;birth_date=07%2F11%2F2012&amp;favorite_driver=Busch%2C%20Kurt&quot;,&quot;preferences&quot;:{&quot;favorite_driver&quot;:&quot;Busch, Kurt&quot;}}</pre>
-    
-  </div>
-<p class="tag_title">Parameters:</p>
+  <p class="tag_title">Parameters:</p>
 <ul class="param">
   
     <li>
@@ -295,19 +285,19 @@ string)
       <pre class="lines">
 
 
+39
+40
+41
+42
 43
 44
 45
 46
 47
-48
-49
-50
-51
-52</pre>
+48</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/prospects_controller.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/prospects_controller.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
 	<span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prospect_data_invalid</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>405</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
@@ -329,7 +319,7 @@ string)
 </div>
 
     <div id="footer">
-  Generated on Wed Jul 11 11:12:40 2012 by
+  Generated on Tue Jul 31 11:58:30 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
