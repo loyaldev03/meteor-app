@@ -148,9 +148,9 @@ class Api::MembersController < ApplicationController
     # member.skip_api_sync! if XXX
     member.update_attribute(:wrong_address, nil) if params[:setter][:wrong_address] == '1' unless params[:setter].nil?
     member.update_attribute(:wrong_phone_number, nil) if params[:setter][:wrong_phone_number] == '1' unless params[:setter].nil?
-    member.update_attribute(:wrong_phone_number, nil) unless member.phone_number == params[:member][:phone_number]
-      
-  
+    member.update_attribute(:wrong_phone_number, nil) if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
+                                                          member.phone_area_code != params[:member][:phone_area_code].to_i ||
+                                                          member.phone_local_number != params[:member][:phone_local_number].to_i)
     if member.update_attributes(params[:member]) 
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member)
@@ -193,14 +193,15 @@ class Api::MembersController < ApplicationController
   def show
     member = Member.find(params[:id])
     if member.nil?
-      render json: { code: Settings.error_codes.not_found, message: 'member not found' }
+      render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
     else
       render json: { 
         code: '000', 
         member: {
           first_name: member.first_name, last_name: member.last_name, email: member.email,
           address: member.address, city: member.city, state: member.state, zip: member.zip,
-          phone_number: member.phone_number
+          phone_country_code: member.phone_country_code, phone_area_code: member.phone_area_code,
+          phone_local_number: member.phone_local_number
         }, 
         credit_card: {
           expire_month: (member.active_credit_card && member.active_credit_card.expire_month),
