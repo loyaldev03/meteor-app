@@ -142,7 +142,7 @@ CREATE TABLE `delayed_jobs` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `delayed_jobs_priority` (`priority`,`run_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `domains` (
   `url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -302,6 +302,8 @@ CREATE TABLE `members` (
   `club_cash_expire_date` date DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
   `preferences` text COLLATE utf8_unicode_ci,
+  `gender` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `type_of_phone_number` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`club_id`,`visible_id`),
   UNIQUE KEY `index_members_on_uuid` (`uuid`),
   KEY `index_members_on_email` (`email`),
@@ -592,3 +594,5 @@ INSERT INTO schema_migrations (version) VALUES ('20120712140444');
 INSERT INTO schema_migrations (version) VALUES ('20120717122131');
 
 INSERT INTO schema_migrations (version) VALUES ('20120718115700');
+
+INSERT INTO schema_migrations (version) VALUES ('20120727124711');
