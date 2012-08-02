@@ -26,6 +26,8 @@ en:
   recover: 'Recover'
   resend: 'Resend'
   search: 'Search'
+  activation: 'Activation'
+  blacklisted: 'Blacklisted'
   search_results: 'Search results'
   are_you_sure: 'Are you sure?'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
