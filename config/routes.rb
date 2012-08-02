@@ -1,6 +1,4 @@
 SacPlatform::Application.routes.draw do
-  resources :products
-
   devise_for :agents
 
   namespace :api do
@@ -27,7 +25,7 @@ SacPlatform::Application.routes.draw do
       match '/members/new' => 'members#new', as: 'new_member'
       match '/members' => 'members#index', as: 'members', :via => [:get, :post]
       match '/members/search_result' => 'members#search_result', as: 'members_search_result', :via => [:get]
-      
+
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
         match '/operations' => 'operations#index', as: 'operations', :via => [:post, :get]
@@ -56,7 +54,9 @@ SacPlatform::Application.routes.draw do
         match '/login_as_member' => 'members#login_as_member', as: 'login_as_member', :via => [:get]  
         match '/' => 'members#show', as: 'show_member', :via => [:get, :post]
       end
+      resources :products     
     end
+
     resources :domains
     match 'dashboard' => 'admin/partners#dashboard', as: 'admin_partner_dashboard'
   end

@@ -17,7 +17,7 @@
   <tbody>
     <% @products.each do |product| %>
       <tr>
-        <td><%= link_to product.id, product_path(product) %></td>
+        <td><%= link_to product.id, product_path(@current_partner.prefix, @current_club.name, product) %></td>
         <td><%= product.name %></td>
         <td><%= product.sku %></td>
         <td><%= product.recurrent %></td>
@@ -27,9 +27,9 @@
         <td><%=l product.created_at %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_product_path(product), :class => 'btn btn-mini' %>
+                      edit_product_path(@current_partner.prefix, @current_club.name, product), :class => 'btn btn-mini' %>
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      product_path(product),
+                      product_path(@current_partner.prefix, @current_club.name, product),
                       :method => :delete,
                       :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
                       :class => 'btn btn-mini btn-danger' %>
