@@ -35,6 +35,7 @@ class Transaction < ActiveRecord::Base
     self.city = member.city
     self.state = member.state
     self.zip = member.zip
+    self.terms_of_membership_id = member.terms_of_membership_id
   end
 
   def credit_card=(credit_card)
@@ -57,7 +58,8 @@ class Transaction < ActiveRecord::Base
     self.gateway = pgc.gateway
   end
 
-  def prepare(member, credit_card, amount, payment_gateway_configuration)
+  def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil)
+    self.terms_of_membership_id = terms_of_membership_id || member.terms_of_membership_id
     self.member = member
     self.credit_card = credit_card
     self.amount = amount
@@ -127,7 +129,7 @@ class Transaction < ActiveRecord::Base
     if sale_transaction.amount_available_to_refund < amount
       return { :message => "Cant credit more $ than the original transaction amount", :code => Settings.error_codes.refund_invalid }
     end
-    trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration)
+    trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
     answer = trans.process
     if trans.success?
       sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
