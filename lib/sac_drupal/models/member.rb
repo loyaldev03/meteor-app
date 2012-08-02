@@ -121,7 +121,7 @@ module Drupal
         field_profile_phone: { 
           und: [ 
             { 
-              value: m.phone_number
+              value: m.full_phone_number
             } 
           ] 
         }, 
