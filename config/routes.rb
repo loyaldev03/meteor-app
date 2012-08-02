@@ -1,4 +1,6 @@
 SacPlatform::Application.routes.draw do
+  resources :products
+
   devise_for :agents
 
   namespace :api do
