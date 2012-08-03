@@ -219,7 +219,7 @@ class Member < ActiveRecord::Base
   end
 
   def full_phone_number
-    "(#{self.phone_country_code}) - #{self.phone_area_code} - #{self.phone_local_number}"
+    "(#{self.phone_country_code}) #{self.phone_area_code} - #{self.phone_local_number}"
   end
 
   ####  METHODS USED TO SHOW OR NOT BUTTONS. 
