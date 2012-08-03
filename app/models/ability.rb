@@ -13,6 +13,7 @@ class Ability
       can :manage, Partner
       can :manage, Club
       can :manage, Domain
+      can :manage, Product
     elsif agent.has_role? 'representative'
       can :see_credit_card_last_digits, CreditCard
       can :read, Agent

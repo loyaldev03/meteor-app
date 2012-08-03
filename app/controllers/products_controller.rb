@@ -1,11 +1,11 @@
 class ProductsController < ApplicationController
+  before_filter :check_permissions
   before_filter :validate_club_presence
 
   # GET /products
   # GET /products.json
   def index
     @products = Product.find_all_by_club_id(@current_club.id)
-
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @products }
@@ -46,7 +46,7 @@ class ProductsController < ApplicationController
 
     respond_to do |format|
       if @product.save
-        format.html { redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully created.' }
+        format.html { redirect_to product_path(:id => @product.id), notice: 'Product was successfully created.' }
         format.json { render json: @product, status: :created, location: @product }
       else
         format.html { render action: "new" }
@@ -82,4 +82,10 @@ class ProductsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  def check_permissions
+    authorize! :manage, Product.new     
+  end
+
+
 end
