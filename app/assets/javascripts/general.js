@@ -56,7 +56,7 @@ $(document).ready( function() {
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ], "sWidth": "13%", "aTargets": [ 3 ] }],
       "sAjaxSource": $('#clubs_table').data('source'),
     });
   }
