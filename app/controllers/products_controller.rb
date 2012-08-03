@@ -43,10 +43,10 @@ class ProductsController < ApplicationController
   # POST /products.json
   def create
     @product = Product.new(params[:product])
-
+    @product.club_id = @current_club.id
     respond_to do |format|
       if @product.save
-        format.html { redirect_to product_path(:id => @product.id), notice: 'Product was successfully created.' }
+        format.html { redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully created.' }
         format.json { render json: @product, status: :created, location: @product }
       else
         format.html { render action: "new" }
@@ -62,7 +62,7 @@ class ProductsController < ApplicationController
 
     respond_to do |format|
       if @product.update_attributes(params[:product])
-        format.html { redirect_to products_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully created.' }
+        format.html { redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully created.' }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
