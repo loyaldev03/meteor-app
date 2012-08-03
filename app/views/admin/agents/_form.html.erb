@@ -52,7 +52,7 @@
           <%= f.fields_for :club_roles, @agent.club_roles.build do |role| %>
             <tr>
               <td><%= role.select :role, Agent::ROLES, include_blank: true %></td>
-              <td><%= role.text_field :club_id %></td>
+              <td><%= role.select :club_id, options_from_collection_for_select(@clubs, "id", "name") %></td>
               <td><%= role.submit 'Add', :class => 'btn' %></td>
             </tr>
           <% end %>

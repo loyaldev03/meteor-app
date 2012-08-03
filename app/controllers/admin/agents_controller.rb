@@ -22,6 +22,7 @@ class Admin::AgentsController < ApplicationController
   # GET /agents/new
   # GET /agents/new.xml
   def new
+    @clubs = Club.all
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @agent }
@@ -30,11 +31,13 @@ class Admin::AgentsController < ApplicationController
 
   # GET /agents/1/edit
   def edit
+    @clubs = Club.all
   end
 
   # POST /agents
   # POST /agents.xml
   def create
+    @clubs = Club.all
     respond_to do |format|
       if @agent.save
         format.html { redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') }
@@ -49,6 +52,7 @@ class Admin::AgentsController < ApplicationController
   # PUT /agents/1
   # PUT /agents/1.xml
   def update
+    @clubs = Club.all
     cleanup_for_update!(params[:agent])
     respond_to do |format|
       if @agent.update_attributes(params[:agent])
