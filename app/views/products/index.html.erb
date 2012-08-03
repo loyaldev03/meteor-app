@@ -8,43 +8,24 @@
     <% end %>
   </div>
 
-  <table class="table table-striped">
+  <table id="products_table" class="table table-bordered table-condensed dataTable" data-source="<%= products_url(format: "json") %>">
     <thead>
       <tr>
-        <th> id </th>
-        <th> name </th>
-        <th> sku </th>
-        <th> recurrent </th>
-        <th> stock </th>
-        <th> weight </th>
-        <th> club_id </th>
-        <th> created_at </th>
-        <th><%=t '.actions', :default => t("helpers.actions") %></th>
+        <th> <%= t('activerecord.attributes.product.id') %> </th>
+        <th> <%= t('activerecord.attributes.product.name') %> </th>
+        <th> <%= t('activerecord.attributes.product.recurrent') %> </th>
+        <th> <%= t('activerecord.attributes.product.Stock') %> </th>
+        <th> <%= t('activerecord.attributes.product.weight') %> </th>
+        <th> <%= t('activerecord.attributes.product.created_at') %> </th>
+        <th> <%=t '.actions', :default => t("helpers.actions") %> </th>
       </tr>
     </thead>
     <tbody>
-      <% @products.each do |product| %>
-        <tr>
-          <td><%= link_to product.id, product_path(@current_partner.prefix, @current_club.name, product) %></td>
-          <td><%= product.name %></td>
-          <td><%= product.sku %></td>
-          <td><%= product.recurrent %></td>
-          <td><%= product.stock %></td>
-          <td><%= product.weight %></td>
-          <td><%= product.club_id %></td>
-          <td><%=l product.created_at %></td>
-          <td>
-            <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                        edit_product_path(@current_partner.prefix, @current_club.name, product), :class => 'btn btn-mini' %>
-            <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                        product_path(@current_partner.prefix, @current_club.name, product),
-                        :method => :delete,
-                        :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
-                        :class => 'btn btn-mini btn-danger' %>
-          </td>
-        </tr>
-      <% end %>
     </tbody>
   </table>
-
 </section>
+
+
+<script>
+  $(document).ready(product_index_functions(<%= Product.datatable_columns.size %>));
+</script>

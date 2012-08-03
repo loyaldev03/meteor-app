@@ -73,6 +73,18 @@ $(document).ready( function() {
     });   
   }
 
+  function product_index_functions(column_count){
+    $('#products_table').dataTable({
+      "sPaginationType": "bootstrap",
+      "bJQueryUI": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "aaSorting": [[ 0, "asc" ]],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+      "sAjaxSource": $('#products_table').data('source'),
+    });       
+  }
+
   function new_partner_functions(){
     $('.help').popover({offset: 10});
   }

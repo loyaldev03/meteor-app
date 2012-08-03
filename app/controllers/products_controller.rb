@@ -5,10 +5,10 @@ class ProductsController < ApplicationController
   # GET /products
   # GET /products.json
   def index
-    @products = Product.find_all_by_club_id(@current_club.id)
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @products }
+      format.json { render json: ProductsDatatable.new(view_context,@current_partner,@current_club) }
+
     end
   end
 

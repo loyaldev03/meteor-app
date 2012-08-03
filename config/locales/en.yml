@@ -183,6 +183,13 @@ en:
       club_cash_transaction: 
         amount: 'Amount'
         description: 'Description'
+      product:
+        id: 'ID'
+        name: 'Name'
+        recurrent: 'Recurrent'
+        stock: 'Stock'
+        weight: 'Weight'
+        created_at: 'Created at'
   date:
     formats:
       default: "%d/%m/%Y"

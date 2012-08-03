@@ -7,4 +7,10 @@ class Product < ActiveRecord::Base
   validates :stock, :numericality => { :only_integer => true, :greater_than => 0 }
   validates :sku, :format => /^[a-zA-Z -_]+$/
 
+
+  def self.datatable_columns
+    ['id', 'name', 'recurrent', 'stock', 'weight', 'created_at' ]
+  end
+
+
 end
