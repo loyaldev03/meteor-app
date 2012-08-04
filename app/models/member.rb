@@ -482,6 +482,7 @@ class Member < ActiveRecord::Base
         f = Fulfillment.new :product => product
         f.member_id = self.uuid
         f.assigned_at = Time.zone.now
+        f.tracking_code = product+self.visible_id
         f.save
       end
     end
@@ -655,6 +656,7 @@ class Member < ActiveRecord::Base
       else
         [ Settings.fulfillment_products.kit_card ]
       end
+      self.enrollment_infos.current.split(',')
     end
 
     def record_date
