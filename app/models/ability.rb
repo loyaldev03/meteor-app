@@ -20,6 +20,7 @@ class Ability
       can :read, Partner
       can :read, Club
     elsif agent.has_role? 'supervisor'
+      can :see_credit_card, CreditCard
       can :read, Agent
       can :read, Partner
       can :read, Club
