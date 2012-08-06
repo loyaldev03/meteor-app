@@ -14,7 +14,7 @@ class Fulfillment < ActiveRecord::Base
 
   before_create :set_renewable_at
 
-  scope :open, lambda { where("status = 'open'") }
+  scope :new, lambda { where("status = 'new'") }
 
 
   state_machine :status, :initial => :new do
