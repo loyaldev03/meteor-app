@@ -19,8 +19,6 @@ class ProductsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @product }
-    end
   end
 
   # GET /products/new
@@ -30,7 +28,6 @@ class ProductsController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @product }
     end
   end
 
@@ -47,10 +44,8 @@ class ProductsController < ApplicationController
     respond_to do |format|
       if @product.save
         format.html { redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully created.' }
-        format.json { render json: @product, status: :created, location: @product }
       else
         format.html { render action: "new" }
-        format.json { render json: @product.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -63,10 +58,8 @@ class ProductsController < ApplicationController
     respond_to do |format|
       if @product.update_attributes(params[:product])
         format.html { redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully created.' }
-        format.json { head :no_content }
       else
         format.html { render action: "edit" }
-        format.json { render json: @product.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -79,7 +72,6 @@ class ProductsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to products_url }
-      format.json { head :no_content }
     end
   end
 
