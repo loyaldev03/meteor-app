@@ -1,5 +1,4 @@
 class ClubsController < ApplicationController
-  before_filter :check_permissions
   layout '2-cols'
   authorize_resource :club
 
@@ -83,11 +82,4 @@ class ClubsController < ApplicationController
       format.json { head :no_content }
     end
   end
-
-<<<<<<< HEAD
-=======
-  def check_permissions
-    authorize! :manage, Club.new
-  end 
->>>>>>> Added authorizations on club/domain/partner controllers. Now it only can be manage by admin role.
 end
