@@ -656,7 +656,6 @@ class Member < ActiveRecord::Base
       else
         [ Settings.fulfillment_products.kit_card ]
       end
-      self.enrollment_infos.current.split(',')
     end
 
     def record_date
