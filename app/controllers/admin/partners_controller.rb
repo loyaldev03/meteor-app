@@ -35,6 +35,7 @@ class Admin::PartnersController < ApplicationController
   # GET /partners/1/edit
   def edit
     @partner = Partner.find(params[:id])
+    authorize! :update, @partner
   end
 
   # POST /partners
@@ -80,6 +81,7 @@ class Admin::PartnersController < ApplicationController
 
   def dashboard
     @partner = @current_partner
+    authorize! :read, @partner
     @domains = Domain.where(:partner_id => @current_partner)
   end
 
