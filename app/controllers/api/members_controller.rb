@@ -210,4 +210,18 @@ class Api::MembersController < ApplicationController
       }
     end
   end    
+  # Method : GET
+  # Returns stock of a product. 
+  #
+  # @param [String] *sku*
+  # @param [String] *club_id* 
+  #
+  def get_stock
+    product = Product.find_by_sku_and_club_id(params[:sku],params[:club_id])
+    if product.nil?
+      render json: { code: Settings.error_codes.not_found, message: 'Product not found' }
+    else
+      render json: { code: '000', stock: product.stock }
+    end
+  end
 end
