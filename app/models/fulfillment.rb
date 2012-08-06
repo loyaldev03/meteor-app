@@ -17,15 +17,41 @@ class Fulfillment < ActiveRecord::Base
   scope :open, lambda { where("status = 'open'") }
 
 
-  state_machine :status, :initial => :open do
-    event :set_as_archived do
-      transition :open => :archived
+  state_machine :status, :initial => :new do
+    event :set_as_new do
+      transition [:out_of_stock,:undeliverable] => :new
     end
+    event :set_as_processing do
+      transition :open => :processing
+    end
+    event :set_as_sent do
+      transition :processing => :sent
+    end
+    event :set_as_out_of_stock do
+      transition :new => :out_of_stock
+    end
+    event :set_as_canceled do
+      transition [:new,:processing,:out_of_stock] => :canceled
+    end
+    event :set_as_undeliverable do
+      transition :processing => :undeliverable
+    end
+    
+    #First status. fulfillment is waiting to be processed.
+    state :new
+    #This status will be automatically set after the new fulfillment list is downloaded. Only if magento 
+    #has stock. Stock will be decreased in one.
+    state :processing
+    #Manually set through CS, by selecting all or some fulfillments in processing status.
+    state :sent 
+    #Set automatically using Magento, when a representative or supervisor downloads the file with 
+    #fulfillments in new status
+    state :out_of_stock 
+    #when member gets lapsed status, all new / processing / Out of stock fulfillments gets this status.
+    state :canceled
+    #if delivery fail this status is set and wrong address on member file should be filled with the reason
+    state :undeliverable
 
-    # fulfillments in archived status will be used as history only.
-    state :archived
-    # fulfillments in open status can be re-sended
-    state :open
   end
 
   def renew
