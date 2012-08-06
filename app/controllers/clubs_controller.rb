@@ -1,4 +1,5 @@
 class ClubsController < ApplicationController
+  before_filter :check_permissions
   layout '2-cols'
 
   # GET /clubs
@@ -81,4 +82,8 @@ class ClubsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  def check_permissions
+    authorize! :manage, Club.new
+  end 
 end

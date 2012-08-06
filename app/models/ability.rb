@@ -2,7 +2,7 @@ class Ability
   include CanCan::Ability
 
   def initialize(agent)
-    can :manage, Member
+    
 
     if agent.has_role? 'admin'
       can :see_credit_card, CreditCard
@@ -16,13 +16,13 @@ class Ability
       can :manage, Product
     elsif agent.has_role? 'representative'
       can :see_credit_card_last_digits, CreditCard
-      can :read, Agent
-      can :read, Partner
-      can :read, Club
+      can :read, Member
+      can :update, Member
     elsif agent.has_role? 'supervisor'
-      can :read, Agent
-      can :read, Partner
-      can :read, Club
+      can :enroll_member, Member      
+      can :read, Member
+      can :update, Member
+      can :see_credit_card, CreditCard
       # EXAMPLE
       # can :manage, Partner do |partner|
       #   # agent is enabled to manage a specific partner

@@ -1,4 +1,5 @@
 class DomainsController < ApplicationController
+  before_filter :check_permissions
   layout '2-cols'
 
   # GET /domains
@@ -90,4 +91,9 @@ class DomainsController < ApplicationController
       redirect_to domains_path(:id => @domain), :flash => { error: "The domain #{@domain.url} cannot be destroyed. You must have at least one domain."}
     end
   end
+
+  def check_permissions
+    authorize! :manage, Domain.new
+  end 
+
 end
