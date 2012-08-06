@@ -186,9 +186,9 @@ class Api::MembersController < ApplicationController
   #
   # @param [String] *id*
   # @return [String] *message* 
-  # @return [Hash] *member*: Information of member's profile.
-  # @return [Hash] *credit_card*: Information of member's credit card.
-  # @return [Integer] *code*: Code related to the method result.
+  # @return [Hash] *member*
+  # @return [Hash] *credit_card*
+  # @return [Integer] *code*
   #
   def show
     member = Member.find(params[:id])
@@ -196,7 +196,7 @@ class Api::MembersController < ApplicationController
       render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
     else
       render json: { 
-        code: '000', 
+        code: Settings.error_codes.success, 
         member: {
           first_name: member.first_name, last_name: member.last_name, email: member.email,
           address: member.address, city: member.city, state: member.state, zip: member.zip,
