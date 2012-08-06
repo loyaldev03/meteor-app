@@ -36,8 +36,8 @@
 
           <ul class="nav">
             <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
-            <li><%= link_to t('menu.agents'), admin_agents_path  %></li>
-            <li><%= link_to t('menu.partners'), admin_partners_path  %></li>
+            <li><%= link_to t('menu.agents'), admin_agents_path if can? :read, Agent %></li>
+            <li><%= link_to t('menu.partners'), admin_partners_path if can? :read, Partner %></li>
             <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
             <li>
               <% selected = @current_club ? [ members_path(@current_club.partner.prefix, @current_club.name) ] : nil %>

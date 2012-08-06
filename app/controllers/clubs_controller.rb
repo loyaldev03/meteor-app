@@ -1,6 +1,6 @@
 class ClubsController < ApplicationController
-  before_filter :check_permissions
   layout '2-cols'
+  authorize_resource :club
 
   # GET /clubs
   # GET /clubs.json
@@ -83,7 +83,4 @@ class ClubsController < ApplicationController
     end
   end
 
-  def check_permissions
-    authorize! :manage, Club.new
-  end 
 end
