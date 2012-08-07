@@ -4,7 +4,6 @@
   	<tr>
 	  <th> <%= t('activerecord.attributes.fulfillment.asigned_at') %> </th>
 	  <th> <%= t('activerecord.attributes.fulfillment.product') %> </th>
-	  <th> <%= t('activerecord.attributes.fulfillment.delivered_at') %> </th>
 	  <th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>    
 	  <th> <%= t('actions') %> </th>    
    	</tr>
@@ -20,8 +19,6 @@
        		 <% end %> >
 			<td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
 			<td> <%= fulfillment.product %> </td>
-			<td> <%= I18n.l fulfillment.delivered_at, 
-			         :format => :long unless fulfillment.delivered_at.nil? %> </td>
 			<td> <%= I18n.l fulfillment.renewable_at, 
 			         :format => :long unless fulfillment.renewable_at.nil? %> </td>
 			<td>
