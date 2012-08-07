@@ -66,7 +66,7 @@ class CreditCard < ActiveRecord::Base
   end
 
   def update_last_digits
-    self.last_digits = self.number.last(4) unless self.last_digits.nil?
+    self.last_digits = self.number.last(4) 
   end
   
   # refs #17832 and #19603
