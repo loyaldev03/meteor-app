@@ -101,4 +101,9 @@ class Admin::AgentsController < ApplicationController
     agent.unlock_access!
     redirect_to(admin_agents_path, :notice => "Agent number #{agent.id} - #{agent.username} - was unlocked.")
   end
+
+  def my_clubs
+    @my_roles = @current_agent.club_roles
+  end
+
 end
