@@ -1,5 +1,6 @@
 class ClubsController < ApplicationController
   layout '2-cols'
+  authorize_resource :club
 
   # GET /clubs
   # GET /clubs.json
@@ -81,4 +82,5 @@ class ClubsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
 end

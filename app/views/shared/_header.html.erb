@@ -38,6 +38,7 @@
             <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
             <li><%= link_to t('menu.agents'), admin_agents_path  %></li>
             <li><%= link_to t('menu.partners'), admin_partners_path  %></li>
+            <li><%= link_to "My Clubs", admin_agent_my_clubs_path(@current_agent.id) %></li>
             <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
             <li>
               <% selected = @current_club ? [ members_path(@current_club.partner.prefix, @current_club.name) ] : nil %>

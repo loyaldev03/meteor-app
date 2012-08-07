@@ -1,5 +1,6 @@
 class DomainsController < ApplicationController
   layout '2-cols'
+  authorize_resource :domain
 
   # GET /domains
   # GET /domains.json

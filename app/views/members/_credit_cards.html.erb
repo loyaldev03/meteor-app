@@ -2,7 +2,13 @@
 <table class="table table-bordered table-condensed">
   <thead>
     <tr>
-      <th> <%= t('activerecord.attributes.credit_card.number') %> </th>
+      <th> 
+        <% if can? :see_credit_card, CreditCard %>
+          <%= t('activerecord.attributes.credit_card.number') %> 
+        <% elsif can? :see_credit_card_last_digits, CreditCard %>
+          <%= t('activerecord.attributes.credit_card.last_digits') %> 
+        <% end %> 
+      </th>
       <th> <%= t('activerecord.attributes.credit_card.expire_date') %> </th>
       <th> <%= t('activerecord.attributes.credit_card.last_successful_bill_date') %> </th>
       <th> <%= t('blacklisted') %> </th>
@@ -20,9 +26,12 @@
           class="<%= cycle("odd","even") %>" 
         <% end %>
         >
-      <td
-         > 
-        <%= cc.number %> 
+      <td> 
+        <% if can? :see_credit_card, cc %>
+          <%= cc.number %>
+        <% elsif can? :see_credit_card_last_digits, cc %>
+          <%= cc.last_digits %>
+        <% end %> 
       </td>
       <td> <%= cc.expire_month %> / <%= cc.expire_year %> </td>
       <td> <%= I18n.l cc.last_successful_bill_date, :format => :long if !cc.last_successful_bill_date.nil? %> </td>

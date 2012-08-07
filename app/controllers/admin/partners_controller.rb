@@ -1,11 +1,10 @@
 class Admin::PartnersController < ApplicationController
   layout :set_layout
-  # authorize_resource :partner
+  authorize_resource :partner
 
   # GET /partners
   # GET /partners.json
   def index
-    # authorize! :read, Partner
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: PartnersDatatable.new(view_context) }
@@ -16,7 +15,6 @@ class Admin::PartnersController < ApplicationController
   # GET /partners/1.json
   def show
     @partner = Partner.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @partner }
@@ -28,7 +26,6 @@ class Admin::PartnersController < ApplicationController
   def new
     @partner = Partner.new
     @domain = @partner.domains.build
-
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @partner }
@@ -44,7 +41,6 @@ class Admin::PartnersController < ApplicationController
   # POST /partners.json
   def create
     @partner = Partner.new(params[:partner])
-
     respond_to do |format|
       if @partner.save
         format.html { redirect_to [ :admin, @partner ], notice: "The partner #{@partner.prefix} - #{@partner.name} was successfully created." }
@@ -60,7 +56,6 @@ class Admin::PartnersController < ApplicationController
   # PUT /partners/1.json
   def update
     @partner = Partner.find(params[:id])
-
     respond_to do |format|
       if @partner.update_attributes(params[:partner])
         format.html { redirect_to [ :admin, @partner ], notice: "The partner #{@partner.prefix} - #{@partner.name} was successfully updated." }
@@ -77,7 +72,6 @@ class Admin::PartnersController < ApplicationController
   def destroy
     @partner = Partner.find(params[:id])
     @partner.destroy
-
     respond_to do |format|
       format.html { redirect_to admin_partners_url }
       format.json { head :no_content }
