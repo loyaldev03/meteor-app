@@ -43,6 +43,5 @@ class Fulfillment < ActiveRecord::Base
     # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
     def set_renewable_at
       self.renewable_at = self.assigned_at + 1.year
-      self.delivered_at = Time.zone.now
     end
 end
