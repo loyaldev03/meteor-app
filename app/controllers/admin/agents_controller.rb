@@ -1,6 +1,6 @@
 class Admin::AgentsController < ApplicationController
   load_and_authorize_resource
-
+  skip_authorize_resource :only => :my_clubs
   # GET /agents
   # GET /agents.xml
   def index
