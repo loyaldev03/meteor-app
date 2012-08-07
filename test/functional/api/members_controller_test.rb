@@ -19,14 +19,12 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
       Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
                                       :auth_code => '111', :duplicate => false, 
                                       :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
           ) 
     )
-
     assert_difference('Member.count') do
       post( :create, { member: {:first_name => @member.first_name, 
                                 :last_name => @member.last_name,
@@ -51,4 +49,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
 
+  test "should get stock." do
+    product = FactoryGirl.create(:product, :club_id => 1)
+    get(:get_stock, { :club_id => 1, :sku => 'Bracelet' ,:format => :json })
+    assert_response :success
+  end
 end

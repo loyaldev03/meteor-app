@@ -5,6 +5,7 @@ SacPlatform::Application.routes.draw do
     scope 'v1' do
       resources :tokens,:only => [:create, :destroy]
       resources :members, :only => [:create, :show, :update] do
+        get :get_stock
         resources :club_cash, only: :create
       end
       resources :prospects, :only => [:create]      
