@@ -210,6 +210,4 @@ class Api::MembersController < ApplicationController
       }
     end
   end    
-
-
 end

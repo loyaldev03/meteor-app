@@ -58,9 +58,10 @@ en:
       index:
         title: Partners
   activerecord:
+    model:
+      members: 'Members'
+      products: 'Products'
     member: 'Member'
-    members: 'Members'
-    products: 'Products'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
     credit_card: 'CC'

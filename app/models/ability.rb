@@ -19,10 +19,17 @@ class Ability
       can :read, Member
       can :update, Member
     elsif agent.has_role? 'supervisor'
+<<<<<<< HEAD
       can :enroll_member, Member      
       can :read, Member
       can :update, Member
       can :see_credit_card, CreditCard
+=======
+      can :see_credit_card, CreditCard
+      can :read, Agent
+      can :read, Partner
+      can :read, Club
+>>>>>>> d7f3395ff15ea2b15ff08473475715ed13c395c0
       # EXAMPLE
       # can :manage, Partner do |partner|
       #   # agent is enabled to manage a specific partner
