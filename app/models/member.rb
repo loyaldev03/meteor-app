@@ -651,11 +651,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      if (self.mega_channel || '').include?('sloop')
-        [ Settings.fulfillment_products.sloop, Settings.fulfillment_products.kit_card ]
-      else
-        [ Settings.fulfillment_products.kit_card ]
-      end
+      self.enrollment_infos.current.product_sku.split(',')
     end
 
     def record_date
