@@ -482,7 +482,7 @@ class Member < ActiveRecord::Base
         f = Fulfillment.new :product => product
         f.member_id = self.uuid
         f.assigned_at = Time.zone.now
-        f.tracking_code = product+self.visible_id
+        f.tracking_code = product+self.visible_id.to_s
         f.save
       end
     end
@@ -651,7 +651,8 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      self.enrollment_infos.current.product_sku.split(',')
+      current_enrollment_info = self.enrollment_infos.current
+      current_enrollment_info.product_sku.split(',')
     end
 
     def record_date

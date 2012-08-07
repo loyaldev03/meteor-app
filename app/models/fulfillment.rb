@@ -22,7 +22,7 @@ class Fulfillment < ActiveRecord::Base
       transition [:out_of_stock,:undeliverable] => :new
     end
     event :set_as_processing do
-      transition :open => :processing
+      transition :new => :processing
     end
     event :set_as_sent do
       transition :processing => :sent
@@ -31,7 +31,7 @@ class Fulfillment < ActiveRecord::Base
       transition :new => :out_of_stock
     end
     event :set_as_canceled do
-      transition [:new,:processing,:out_of_stock] => :canceled
+      transition [:new,:processing,:out_of_stock, :undeliverable] => :canceled
     end
     event :set_as_undeliverable do
       transition :processing => :undeliverable
