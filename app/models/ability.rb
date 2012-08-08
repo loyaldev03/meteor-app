@@ -22,7 +22,11 @@ class Ability
       can :enroll_member, Member      
       can :see_credit_card, CreditCard
     elsif agent.has_role? 'api'
-      can :manage_api, Member
+      can :manage_member_api, Member
+      can :manage_product_api, Product
+      can :manage_club_cash_api, ClubCash
+      can :manage_prospects_api, Member
+      can :manage_token_api, Agent
       # EXAMPLE
       # can :manage, Partner do |partner|
       #   # agent is enabled to manage a specific partner

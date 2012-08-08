@@ -214,7 +214,7 @@ class Api::MembersController < ApplicationController
   end    
 
   def check_authentification
-    authorize! :manage_api, Member
+    authorize! :manage_member_api, Member
   end
 
 end

@@ -1,5 +1,6 @@
 class Api::ProspectsController < ApplicationController
   skip_before_filter :verify_authenticity_token
+  before_filter :check_authentification
 
   respond_to :json
 
@@ -47,5 +48,7 @@ class Api::ProspectsController < ApplicationController
     render json: response
   end
 
-
+  def check_authentification
+    authorize! :manage_prospects_api, Member
+  end
 end

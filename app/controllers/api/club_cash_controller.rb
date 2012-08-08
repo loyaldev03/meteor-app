@@ -1,5 +1,5 @@
 class Api::ClubCashController < ApplicationController
-
+  before_filter :check_authentification
   # Method : POST
   #
   # This method adds an specific amount of cash, as club cash to the member.
@@ -28,4 +28,7 @@ class Api::ClubCashController < ApplicationController
     render json: response  
   end
 
+  def check_authentification
+    authorize! :manage_club_cash_api, Member
+  end
 end
