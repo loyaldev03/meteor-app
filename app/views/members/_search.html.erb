@@ -10,7 +10,9 @@
       <% end %>
       <th> <%= t('activerecord.attributes.member.full_name') %> </th>
       <th> <%= t('activerecord.attributes.member.full_address') %> </th>
-      <th> <%= t('activerecord.attributes.member.api_id') %> </th>
+      <% if @current_club.sync? %>
+        <th> <%= t('activerecord.attributes.member.api_id') %> </th>
+      <% end %>
       <th style="width: 20px;">View</th>
       <th style="width: 20px;">Edit</th>
       <th style="width: 80px;">&nbsp;</th>
@@ -29,12 +31,14 @@
       <% end %>
       <td> <%= member.full_name %> </td>
       <td> <%= member.full_address %> </td>
-      <td> 
-        <%= member.api_id || '-' %> 
-        <span class='label label-<%=t member.sync_status, scope: 'activerecord.attributes.member.sync_status_priorities' -%> label-secondary'>
-          <%=t member.sync_status, scope: 'activerecord.attributes.member.sync_status_captions' -%>
-        </span>
-      </td>
+      <% if @current_club.sync? %>
+        <td> 
+          <%= member.api_id || '-' %> 
+          <span class='label label-<%=t member.sync_status, scope: 'activerecord.attributes.member.sync_status_priorities' -%> label-secondary'>
+            <%=t member.sync_status, scope: 'activerecord.attributes.member.sync_status_captions' -%>
+          </span>
+        </td>
+      <% end %>
       <td><a href="<%= show_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
       <td><a href="<%= edit_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a></td>
       <td><%= member_action_drop_menu(member) %></td>

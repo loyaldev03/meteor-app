@@ -487,7 +487,7 @@ class Member < ActiveRecord::Base
   end
 
   def sync?
-    [club.api_type, club.api_username, club.api_password].none?(&:nil?)
+    self.club.sync?
   end
 
   def api_member

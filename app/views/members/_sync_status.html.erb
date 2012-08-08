@@ -2,7 +2,7 @@
   <div class='tab-toolbar'>
     <%= 
       link_to login_as_member_path, 
-        class: 'btn btn-success', 
+        class: "btn btn-success #{"disabled" if @current_member.lapsed? || !@curent_member.api_member}", 
         target: '_blank' do %>
       <i class='icon-signin'></i>
       Login Remotely as Member
@@ -10,13 +10,13 @@
     <%= 
       link_to member_resend_welcome_path, 
         method: :post, 
-        class: "btn #{(@current_member.lapsed? ? "disabled" : "btn-info  disabled")}" do %>
+        class: "btn btn-info #{"disabled" if @current_member.lapsed? || !@curent_member.api_member}" do %>
       <i class='icon-envelope'></i>
       Resend Welcome Email
     <% end %>
     <%= 
       link_to member_sync_path, 
-        method: :post, class: 'btn btn-warning', 
+        method: :post, class: 'btn btn-warning #{"disabled" if @current_member.lapsed?}', 
         confirm: 'Are you sure?' do %>
       <i class='icon-retweet'></i>
       Sync to Remote
@@ -24,7 +24,7 @@
     <%= 
       link_to member_reset_password_path, 
         method: :post, 
-        class: "btn #{(@current_member.lapsed? ? "disabled" : "btn-warning")}", 
+        class: "btn btn-warning #{"disabled" if @current_member.lapsed? || !@curent_member.api_member}", 
         confirm: 'Are you sure?' do %>
       <i class='icon-key'></i>
       Password Reset
@@ -32,7 +32,7 @@
     <%= 
       link_to member_sync_data_path, 
         remote: true, 
-        class: "btn #{(@current_member.lapsed? ? "disabled" : "btn-success")}",
+        class: "btn btn-success #{"disabled" if @current_member.lapsed? || !@curent_member.api_member}",
         style: 'float: right;',
         data: { replace: '#sync-data' } do %>
       <i class='icon-download-alt'></i>
