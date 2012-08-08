@@ -10,7 +10,7 @@
     <%= 
       link_to member_resend_welcome_path, 
         method: :post, 
-        class: "btn btn-info #{"disabled" if @current_member.lapsed? || !@current_member.api_member}" do %>
+        class: "btn btn-info disabled #{"disabled" if @current_member.lapsed? || !@current_member.api_member}" do %>
       <i class='icon-envelope'></i>
       Resend Welcome Email
     <% end %>
