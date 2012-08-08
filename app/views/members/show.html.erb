@@ -23,7 +23,7 @@
       <tr>
         <td><%= t('activerecord.attributes.member.gender') %>:</td>
         <td>
-          <input readonly="true" type="text" class="test_field" value="<%= @current_member.gender %>" />
+          <input readonly="true" type="text" class="test_field" value="<%= @current_member.gender == 'F' ? 'Female' : 'Male' %>" />
         </td>  
       </tr>
       <tr>

@@ -36,8 +36,8 @@
           </th>
           <td> 
             <select id="member_gender" name="member[gender]">
-              <option value="M">Male</option>
               <option value="F">Female</option>
+              <option value="M" <%= 'selected' if @current_member.gender == 'M' if @current_member %> >Male</option>
             </select>
           </td>  
         </tr>        
