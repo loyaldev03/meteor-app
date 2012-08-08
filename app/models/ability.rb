@@ -13,7 +13,11 @@ class Ability
       can :manage, Club
       can :manage, Domain
       can :manage, Product
-      can :manage_api, Member
+      can :manage_member_api, Member
+      can :manage_product_api, Product
+      can :manage_club_cash_api, ClubCashTransaction
+      can :manage_prospects_api, Member
+      can :manage_token_api, Agent
     elsif agent.has_role? 'representative'
       can :manage, Member
       can :see_credit_card_last_digits, CreditCard
@@ -24,7 +28,7 @@ class Ability
     elsif agent.has_role? 'api'
       can :manage_member_api, Member
       can :manage_product_api, Product
-      can :manage_club_cash_api, ClubCash
+      can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Member
       can :manage_token_api, Agent
       # EXAMPLE
