@@ -23,6 +23,25 @@ $(document).ready( function() {
 
   $(".alert").alert();
 
+  // taken fom https://makandracards.com/makandra/1383
+  $(function() {
+    $('[data-remote][data-replace]')
+      .data('type', 'html')
+      .live('ajax:success', function(evt, data) {
+        var self = $(this);
+        $(self.data('replace')).html(data);
+        self.trigger('ajax:replaced');
+      })
+      .live('ajax:beforeSend', function(evt, data) {
+        var self = $(this);
+        $(self.data('replace')).html("<div class='progress progress-striped active'><div class='bar' style='width: 100%;' /></div>");
+      })
+      .live('ajax:error', function(evt, data) {
+        var self = $(this);
+        $(self.data('replace')).find('> .progress').addClass('progress-danger').removeClass('active');
+      });
+  });
+
 });
 
   function agent_index_functions(column_count){
@@ -100,6 +119,13 @@ $(document).ready( function() {
         if ($(this).val() != '')
           result = true;
       });
+      $('#at_least_one_required').find('select').each(function (){
+          var val = $(this).val();
+          if (val && $.trim(val) !== "") {
+            result = true;
+          }
+      });
+
       if (!result){ 
         alert ('Compleate at least one field');
 
@@ -209,7 +235,7 @@ $(document).ready( function() {
         url: "/api/v1/members/"+id,
         data: $('form').serialize(),
         success: function(data) {
-          alert (data.message);
+          alert(data.message);
           $('input').parent().parent().removeClass("error");
           if (data.code == 000)
             window.location.replace('../'+v_id);
@@ -225,8 +251,11 @@ $(document).ready( function() {
               }     
             }       
           }
-        },
+        }
       });
+    });
+    $('body').ajaxError(function () {
+      alert('An unexpected error occurred.');
     });
     $('.help').popover({offset: 10});
   };
@@ -244,6 +273,23 @@ $(document).ready( function() {
               window.location.replace('../'+visible_id);
           },
         });
+    });
+  }
+
+  function sync_status_member_functions(column_count){
+    $('.toggler').each(function() {
+      var self = $(this);
+      var target = $(self.data('target'));
+      target.filter(':not(.default)').hide();
+    });
+    $('.toggler').click(function(evt){
+      evt.preventDefault();
+      var self = $(this);
+      var target = $(self.data('target'));
+      var active = target.filter('.active');
+      var inactive = target.filter(':not(.active)');
+      active.hide().removeClass('active');
+      inactive.show().addClass('active');
     });
   }
 

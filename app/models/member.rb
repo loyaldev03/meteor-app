@@ -19,7 +19,7 @@ class Member < ActiveRecord::Base
       :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
-      :wrong_phone_number, :api_id, :mega_channel, :credit_cards_attributes, :birth_date,
+      :wrong_phone_number, :mega_channel, :credit_cards_attributes, :birth_date,
       :gender, :type_of_phone_number
 
   # accepts_nested_attributes_for :credit_cards, :limit => 1
@@ -73,8 +73,22 @@ class Member < ActiveRecord::Base
 
   scope :synced, lambda { |bool=true|
     bool ?
-      base.where('last_synced_at > updated_at') :
-      base.where('last_synced_at IS NULL OR last_synced_at < updated_at')
+      where('last_synced_at IS NOT NULL AND last_synced_at >= updated_at') :
+      where('last_synced_at IS NULL OR last_synced_at < updated_at')
+  }
+  scope :with_sync_status, lambda { |status=true|
+    case status
+    when nil, ''
+      where('')
+    when true, 'true', 'synced'
+      synced
+    when false, 'false', 'unsynced'
+      synced(false)
+    when 'error'
+      where('last_sync_error_at IS NOT NULL')
+    when 'noerror'
+      where('last_sync_error_at IS NULL')
+    end
   }
   scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date = ?', value) unless value.blank? }
   scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value) unless value.blank? }
@@ -472,8 +486,12 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def sync?
+    [club.api_type, club.api_username, club.api_password].none?(&:nil?)
+  end
+
   def api_member
-    @api_member ||= if [club.api_type, club.api_username, club.api_password].any?(&:nil?)
+    @api_member ||= if !self.sync?
       nil
     else
       club.api_type.constantize.new self
@@ -496,7 +514,23 @@ class Member < ActiveRecord::Base
   end
 
   def synced?
-    self.last_synced_at && self.last_synced_at > self.updated_at
+    self.last_synced_at && self.last_synced_at >= self.updated_at
+  end
+
+  def sync_status
+    if self.last_sync_error_at
+      'error'
+    else
+      if self.synced?
+        'synced'
+      else
+        'unsynced'
+      end
+    end
+  end
+
+  def refresh_autologin_url!
+    self.api_member && self.api_member.login_token rescue nil
   end
 
   ##################### Club cash ####################################

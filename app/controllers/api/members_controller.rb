@@ -156,6 +156,8 @@ class Api::MembersController < ApplicationController
       Auditory.audit(current_agent, member, message, member)
       response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
     else
+      message = "Member could not be updated, #{member.errors.to_s}"
+      Auditory.audit(current_agent, member, message, member)
       response = { :message => "Member data is invalid.", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
     end
     render json: response

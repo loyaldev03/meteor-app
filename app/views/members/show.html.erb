@@ -1,6 +1,5 @@
 <div class="page-header">
   <%= render :partial => "shared/member_information" %>
-  <%= link_to 'Log in as member', login_as_member_path, :class => "btn btn-success btn-large-w" %>
 </div>
 
 <div class="row">
@@ -54,18 +53,6 @@
 
 
     <div class="row-fluid" style="margin-top: 8px;">
-      <div class="span4"><%= link_to "Resend welcome email", "#", :class => "btn btn-large-w #{(@current_member.lapsed? ? "disabled" : "btn-success")}" %>
-      </div>
-      <div class="span4">
-        <%= link_to "Password reset", "#", :class => "btn btn-large-w #{(@current_member.lapsed? ? "disabled" : "btn-info")}" %>
-      </div>
-      <div class="span4">
-        <% disable_cancel = @current_member.can_be_canceled? == false %>
-        <%= link_to("Cancel", (!disable_cancel ? member_cancel_path : "#"), :class => "btn  btn-large-w #{(disable_cancel ? "disabled" : "btn-danger")}")  %>
-      </div>
-    </div>  
-
-    <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
         <%= link_to "Add a note", new_member_note_path, :class => "btn btn-success btn-large-w" %>
       </div>
@@ -79,7 +66,7 @@
         </div>
       <% end %>
     </div>  
-    
+
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
         <%= form_for @current_member, :url => member_recover_path, :method => :post, do |f| %>
@@ -174,16 +161,18 @@
       <% end %>
       </th>
     </tr>
-    <tr class="<%= (@active_credit_card.am_card.expired? ? "card_expired" : "") %>">
-      <td><%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %></td>
-      <td>
-        <% if can? :see_credit_card, @active_credit_card %>
-          <%= @active_credit_card.number %>
-        <% elsif can? :see_credit_card_last_digits, @active_credit_card %>
-          <%= @active_credit_card.last_digits %>
-        <% end %>
-      </td>
-    </tr>
+    <% if @active_credit_card %>
+      <tr class="<%= (@active_credit_card.am_card.expired? ? "card_expired" : "") %>">
+        <td><%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %></td>
+        <td>
+          <% if can? :see_credit_card, @active_credit_card %>
+            <%= @active_credit_card.number %>
+          <% elsif can? :see_credit_card_last_digits, @active_credit_card %>
+            <%= @active_credit_card.last_digits %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
   </tbody>
 </table>
 
@@ -215,7 +204,7 @@
           </tr>
           <tr>
             <th> <%= t('activerecord.attributes.member.created_by') %>: </th>
-            <td> <%= @current_member.created_by.username %> </td>
+            <td> <%= @current_member.created_by.try(:username) %> </td>
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.recovery_times') %>:</th>
@@ -283,11 +272,11 @@
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.date_of_primary_cc') %>: </th>
-            <td><%= I18n.l(@current_member.credit_cards.first.created_at, :format => :only_date) %> </td>
+            <td><%= @current_member.credit_cards.first && I18n.l(@current_member.credit_cards.first.created_at, :format => :only_date) %> </td>
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.last_successful_bill_date') %>: </th>
-            <td><%= I18n.l(@current_member.active_credit_card.last_successful_bill_date, :format => :only_date) if @current_member.active_credit_card.last_successful_bill_date %> </td>
+            <td><%= I18n.l(@current_member.active_credit_card.last_successful_bill_date, :format => :only_date) if @current_member.active_credit_card.try(:last_successful_bill_date) %> </td>
           </tr>
         </table>        
       </td>
@@ -315,6 +304,9 @@
   <li><a href="#transactions" data-toggle="tab">Transactions</a></li>
   <li><a href="#fulfillments" data-toggle="tab">Fulfillments</a></li>
   <li><a href="#communication" data-toggle="tab">Communications</a></li>
+  <% if @current_member.sync? %>
+    <li><a href="#sync_status" data-toggle="tab">Sync Status</a></li>
+  <% end %>
 </ul>
 
 <div class="tab-content">
@@ -345,9 +337,16 @@
   </div>  
   <div class="tab-pane" id="communication">
     <div class="tab_body_padding">
-      <%= render :partial => 'communications', :locals => { :fulfillments => @communications} %>
+      <%= render :partial => 'communications', :locals => { :communications => @communications} %>
     </div>
   </div>
+  <% if @current_member.sync? %>
+    <div class="tab-pane" id="sync_status">
+      <div class="tab_body_padding">
+        <%= render :partial => 'sync_status', :locals => { :member => @current_member} %>
+      </div>
+    </div>
+  <% end %>
 </div>
 
 <script>

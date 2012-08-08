@@ -93,6 +93,7 @@ en:
       domain:
         url_help: 'Formats: http://xxxxx.xxx.xx or https://xxxxx.xxx.xx'
       member:
+        api_id: 'Remote ID'
         member_id: 'Member ID'
         full_name: 'Full name'
         first_name: 'First name'
@@ -139,6 +140,16 @@ en:
         unset_wrong_address: 'Address setted as wrong. Would you like to unset it?'
         unset_wrong_phone_number: 'Phone setted as wrong. Would you like to unset it?'
         has_no_preferences_saved: 'There are no preferences saved.'
+        last_synced_at: 'Last successful sync'
+        last_sync_error: 'Last failed sync'
+        sync_status_priorities:
+          synced: success
+          unsynced: warning
+          error: important
+        sync_status_captions:
+          synced: Synced
+          unsynced: Not Synced
+          error: Sync Error
       credit_card:
         number: 'Credit card number'
         expire_date: 'Expire date'

@@ -48,6 +48,26 @@ namespace :billing do
 end
 
 namespace :members do
+  desc "Refresh autologin_url for ALL members"
+  task :refresh_autologin_url => :environment do
+    tall = Time.zone.now
+    begin
+      Rails.logger.info " *** Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
+      Member.find_each do |member|
+        tz = Time.zone.now
+        begin
+          Rails.logger.info "   * processing member ##{member.uuid}"
+          member.refresh_autologin_url!
+        rescue
+          Airbrake.notify error_class: "Members::Cancel", 
+            error_message: "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}"
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+      end
+    rescue
+    end    
+  end
+
   desc "Cancel members"
   # This task should be run each day at 3 am ?
   task :cancel => :environment do

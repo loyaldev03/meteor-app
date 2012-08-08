@@ -1,0 +1,116 @@
+<div class="">
+  <div class='tab-toolbar'>
+    <%= 
+      link_to login_as_member_path, 
+        class: 'btn btn-success', 
+        target: '_blank' do %>
+      <i class='icon-signin'></i>
+      Login Remotely as Member
+    <% end %>
+    <%= 
+      link_to member_resend_welcome_path, 
+        method: :post, 
+        class: "btn #{(@current_member.lapsed? ? "disabled" : "btn-info  disabled")}" do %>
+      <i class='icon-envelope'></i>
+      Resend Welcome Email
+    <% end %>
+    <%= 
+      link_to member_sync_path, 
+        method: :post, class: 'btn btn-warning', 
+        confirm: 'Are you sure?' do %>
+      <i class='icon-retweet'></i>
+      Sync to Remote
+    <% end %>
+    <%= 
+      link_to member_reset_password_path, 
+        method: :post, 
+        class: "btn #{(@current_member.lapsed? ? "disabled" : "btn-warning")}", 
+        confirm: 'Are you sure?' do %>
+      <i class='icon-key'></i>
+      Password Reset
+    <% end %>
+    <%= 
+      link_to member_sync_data_path, 
+        remote: true, 
+        class: "btn #{(@current_member.lapsed? ? "disabled" : "btn-success")}",
+        style: 'float: right;',
+        data: { replace: '#sync-data' } do %>
+      <i class='icon-download-alt'></i>
+      Show Remote Data
+    <% end %>
+  </div>
+  <table class='hidden_table_border'>
+    <tr>
+      <td><%= t('activerecord.attributes.member.api_id') %>:</td>
+      <td>
+        <span class='toggler-content default active'>
+          <% if @current_member.api_id.present? %>
+            <%= @current_member.api_id %>
+          <% else %>
+            <em>none</em>
+          <% end %>
+          <span class='label label-<%=t @current_member.sync_status, scope: 'activerecord.attributes.member.sync_status_priorities' -%>'>
+            <%=t @current_member.sync_status, scope: 'activerecord.attributes.member.sync_status_captions' -%>
+          </span>
+        </span>
+        <span class='toggler-content'>
+          <%= form_for @current_member, url: member_update_sync_path, html: { class: 'form-inline', style: 'display: inline;' } do |f| %>
+            <%= f.text_field :api_id, :class => 'text_field' %>
+            <%= f.submit 'Update', class: 'btn-danger', confirm: 'Are you sure?' %>
+          <% end %>
+        </span>
+        &nbsp;
+        <%= link_to '#', class: 'btn btn-success toggler', data: { target: '.toggler-content' } do %>
+          <i class='icon-pencil'></i>
+          <span class='toggler-content default active'>Edit</span>
+          <span class='toggler-content'>Stop editing</span>
+        <% end %>
+        <% if @current_member.api_id.present? %>
+          <%= link_to member_update_sync_path(member: { api_id: '' }), method: :put, confirm: 'Are you sure?', class: 'btn btn-warning' do %>
+            <i class='icon-remove'></i>
+            Unset
+          <% end %>
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= t('activerecord.attributes.member.last_synced_at') %>:</td>
+      <td colspan='999'>
+        <%= 
+          @current_member.last_synced_at && 
+          l(@current_member.last_synced_at, format: :dashed) 
+        %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= t('activerecord.attributes.member.last_sync_error') %>:</td>
+      <td colspan='999'>
+        <% if @current_member.last_sync_error_at %>
+          <code><%= @current_member.last_sync_error %></code>
+          on
+          <em>
+            <%=l @current_member.last_sync_error_at, format: :dashed -%>
+          </em>
+        <% else %>
+          <em>none</em>
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= t('activerecord.attributes.member.autologin_url') %>:</td>
+      <td colspan='999'>
+        <% if @current_member.autologin_url %>
+          <%= link_to @current_member.autologin_url, target: '_blank' -%>
+        <% else %>
+          <em>none</em>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div id='sync-data'></div>
+
+<script>
+  $(document).ready(sync_status_member_functions(<%= Operation.datatable_columns.size %>));
+</script>
