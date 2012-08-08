@@ -3,7 +3,8 @@ class MembersController < ApplicationController
 
   before_filter :validate_club_presence
   before_filter :validate_member_presence, :except => [ :index, :new, :search_result ]
-
+  authorize_resource :member
+  
   def index
      respond_to do |format|
       format.html 

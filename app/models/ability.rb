@@ -3,7 +3,6 @@ class Ability
 
   def initialize(agent)
     
-
     if agent.has_role? 'admin'
       can :see_credit_card, CreditCard
       can :enroll_member, Member
@@ -14,15 +13,16 @@ class Ability
       can :manage, Club
       can :manage, Domain
       can :manage, Product
+      can :manage_api, Member
     elsif agent.has_role? 'representative'
+      can :manage, Member
       can :see_credit_card_last_digits, CreditCard
-      can :read, Member
-      can :update, Member
     elsif agent.has_role? 'supervisor'
+      can :manage, Member
       can :enroll_member, Member      
-      can :read, Member
-      can :update, Member
       can :see_credit_card, CreditCard
+    elsif agent.has_role? 'api'
+      can :manage_api, Member
       # EXAMPLE
       # can :manage, Partner do |partner|
       #   # agent is enabled to manage a specific partner

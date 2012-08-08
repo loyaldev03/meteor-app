@@ -1,6 +1,6 @@
 class Api::MembersController < ApplicationController
   skip_before_filter :verify_authenticity_token
-
+  before_filter :check_authentification
   respond_to :json
 
   # Method : POST
@@ -212,4 +212,9 @@ class Api::MembersController < ApplicationController
       }
     end
   end    
+
+  def check_authentification
+    authorize! :manage_api, Member
+  end
+
 end
