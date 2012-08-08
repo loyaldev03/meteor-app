@@ -140,9 +140,9 @@
           </th>
           <td> 
             <select id="type_of_phone_number" name="member[type_of_phone_number]">
-              <option value="Mobile" selected="selected">Mobile</option>             
-              <option value="Home">Home</option>
-              <option value="Other">Other</option>
+              <option value="Mobile" <%= 'selected' if @current_member.type_of_phone_number == 'Mobile' if @current_member %> >Mobile</option>             
+              <option value="Home" <%= 'selected' if @current_member.type_of_phone_number == 'Home' if @current_member %> >Home</option>
+              <option value="Other" <%= 'selected' if @current_member.type_of_phone_number == 'Other' if @current_member %> >Other</option>
             </select>
           </td>  
         </tr>
