@@ -3,6 +3,19 @@ class ApplicationController < ActionController::Base
   before_filter :validate_partner_presence
   protect_from_forgery
 
+  def after_sign_in_path_for(resource)
+    sign_in_url = url_for(:action => 'new', :controller => 'sessions', :only_path => false, :protocol => 'http')    
+    if @current_agent
+      if @current_agent.has_role? 'admin'
+        admin_partners_path
+      else
+        admin_agent_my_clubs_path(@current_agent.id)
+      end
+    else
+      new_agent_session_path
+    end
+  end
+
   rescue_from CanCan::AccessDenied do |exception|
     render :file => "#{Rails.root}/public/401.html", :status => 401, :layout => false
   end
