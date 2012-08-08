@@ -13,6 +13,18 @@
     </div>
   </div>
   <div class="control-group">
+    <%= f.label :api_username, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :api_username, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :api_password, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.password_field :api_password, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
     <%= f.label :description, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_area :description, :cols => 60, :rows =>5, :class => 'text_area input-xxlarge' %>
