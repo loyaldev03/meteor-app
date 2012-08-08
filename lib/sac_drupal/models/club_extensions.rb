@@ -12,7 +12,7 @@ module Drupal
             raise 'no drupal_domain or drupal credentials'
           end
 
-          @drupal_client = Faraday.new(url: self.api_domain.url) do |builder|
+          @drupal_client = Faraday.new(url: self.api_domain.url, open_timeout: 10) do |builder|
             builder.request :json
             builder.request :drupal_auth,
               url: self.api_domain.url,

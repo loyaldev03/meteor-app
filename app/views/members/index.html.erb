@@ -56,23 +56,25 @@
                                    :value => (params[:member][:phone_local_number] if params[:member]) %> 
                   </td>
                 </tr>
-                <tr>
-                  <td><%= t('activerecord.attributes.member.sync_error') %></td>
-                  <td>
-                    <%= 
-                      select :member, 
-                        :sync_status, 
-                        [
-                          ['Indifferent',   nil], 
-                          ['Synced',        'synced'], 
-                          ['Not Synced',    'unsynced'], 
-                          ['With Error',    'error'], 
-                          ['Without Error', 'noerror']
-                        ],
-                        :class => 'select_field'
-                    %>
-                  </td>
-                </tr>
+                <% if @current_club.sync? %>
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.sync_error') %></td>
+                    <td>
+                      <%= 
+                        select :member, 
+                          :sync_status, 
+                          [
+                            ['Indifferent',   nil], 
+                            ['Synced',        'synced'], 
+                            ['Not Synced',    'unsynced'], 
+                            ['With Error',    'error'], 
+                            ['Without Error', 'noerror']
+                          ],
+                          :class => 'select_field'
+                      %>
+                    </td>
+                  </tr>
+                <% end %>
             </table>
           </td>
         </tr>

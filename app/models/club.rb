@@ -35,6 +35,9 @@ class Club < ActiveRecord::Base
     ['id', 'name', 'description' ]
   end
 
+  def sync?
+    [self.api_type, self.api_username, self.api_password].none?(&:nil?)
+  end
 
   private
     def add_default_member_groups

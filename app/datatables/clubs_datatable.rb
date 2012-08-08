@@ -16,7 +16,7 @@ private
         club.name, 
         club.description,
         club.members.count,
-        link_to(I18n.t('activerecord.model.member'), @url_helpers.members_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')+
+        link_to(I18n.t('activerecord.model.members'), @url_helpers.members_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')+
         link_to(I18n.t('activerecord.model.products'), @url_helpers.products_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')+
         link_to(I18n.t(:edit), @url_helpers.edit_club_path(:partner_prefix => @current_partner.prefix,:id => club.id), :class => 'btn btn-mini')+
         link_to(I18n.t(:destroy), @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id), :method => :delete,
