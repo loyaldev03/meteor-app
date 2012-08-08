@@ -10,8 +10,8 @@ module Drupal
         res
     end
 
-    def update!
-      if sync_fields.present? # change tracking
+    def update!(options = {})
+      if options[:force] || sync_fields.present? # change tracking
         begin
           res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }, fieldmap)
         rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
@@ -23,13 +23,14 @@ module Drupal
       end
     end
 
-    def create!
+    def create!(options = {})
       res = conn.post '/api/user', fieldmap
+      debugger
       update_member(res)
     end
 
-    def save!
-      self.new_record? ? self.create! : self.update!
+    def save!(options = {})
+      self.new_record? ? self.create!(options) : self.update!(options)
     end
 
     def destroy!
@@ -46,11 +47,14 @@ module Drupal
     end
 
     def login_token
-      @token ||= Hashie::Mash.new(conn.get('/api/urllogin/%{drupal_id}'% { drupal_id: self.member.api_id }).body) unless self.new_record?
+      @token ||= Hashie::Mash.new(conn.get('/api/urllogin/%{drupal_id}' % { drupal_id: self.member.api_id }).body) unless self.new_record?
+      uri = URI.parse @token.url
+      self.member.update_column :autologin_url, uri.path
     end
 
     def reset_password!
-      conn.post('/api/user/%{drupal_id}/password_reset'% { drupal_id: self.member.api_id })
+      res = conn.post('/api/user/%{drupal_id}/password_reset'% { drupal_id: self.member.api_id })
+      res.success?
     end
 
     def resend_welcome_email!
@@ -72,11 +76,13 @@ module Drupal
           { 
             api_id: res.body['uid'],
             last_synced_at: Time.now,
-            last_sync_error: nil
+            last_sync_error: nil,
+            last_sync_error_at: nil
           }
         else
           {
-            last_sync_error: res.body
+            last_sync_error: res.body.respond_to?(:[]) ? res.body[:message] : res.body,
+            last_sync_error_at: Time.now
           }
         end
         ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
@@ -84,7 +90,7 @@ module Drupal
       end
     end
 
-    def fieldmap(full = false)
+    def fieldmap
       m = self.member
 
       map = { 
@@ -156,7 +162,7 @@ module Drupal
       end
 
       cc = m.active_credit_card
-      if false && cc
+      if cc
         map.merge!({
           field_profile_cc_month: {
             und: {

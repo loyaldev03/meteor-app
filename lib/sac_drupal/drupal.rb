@@ -8,6 +8,7 @@ module Drupal
     require 'sac_drupal/models/club_extensions'
     require 'sac_drupal/faraday_middleware/full_logger'
     require 'sac_drupal/faraday_middleware/drupal_authentication'
+    require 'sac_drupal/faraday_middleware/fix_non_json_body'
 
     logger.info "  * extending Member and Club"
     Club.send :include, Drupal::ClubExtensions
@@ -15,7 +16,10 @@ module Drupal
     if Faraday.respond_to? :register_middleware
       logger.info "  * registering Faraday middleware: DrupalAuthentication"
       Faraday.register_middleware :request,
-        :drupal_auth    => lambda { ::Drupal::FaradayMiddleware::DrupalAuthentication }
+        :drupal_auth       => lambda { ::Drupal::FaradayMiddleware::DrupalAuthentication }
+      logger.info "  * registering Faraday middleware: FixNonJsonBody"
+      Faraday.register_middleware :response,
+        :fix_non_json_body => lambda { ::Drupal::FaradayMiddleware::FixNonJsonBody }
     end
 
     nil

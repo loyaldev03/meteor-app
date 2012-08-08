@@ -93,6 +93,18 @@ div.dataTables_filter input {
   width:33%;
 }
 
+.label.label-secondary {
+  float: right;
+  font-size: 70%;
+  margin-top: 0.1em;
+}
+
+.tab-toolbar {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 0.5em;
+  padding-bottom: 0.5em;
+}
+
 .btn_on_header {
   float: right; 
   margin-top: -25px;

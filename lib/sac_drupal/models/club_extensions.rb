@@ -20,7 +20,8 @@ module Drupal
               password: self.api_password
             builder.headers.merge!({ 'Accept' => 'application/json' })
 
-            builder.response :json
+            builder.response :fix_non_json_body
+            # builder.response :json
             builder.response :mashify
             # builder.response :logger, Drupal.logger
             builder.use Drupal::FaradayMiddleware::FullLogger, Drupal.logger

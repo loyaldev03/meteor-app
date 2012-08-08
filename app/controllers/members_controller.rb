@@ -1,9 +1,10 @@
 class MembersController < ApplicationController
+  layout lambda { |c| c.request.xhr? ? false : "application" }
+
   before_filter :validate_club_presence
   before_filter :validate_member_presence, :except => [ :index, :new, :search_result ]
 
   def index
- 
      respond_to do |format|
       format.html 
       format.js 
@@ -11,7 +12,7 @@ class MembersController < ApplicationController
   end
 
   def search_result
-     @members = Member.paginate(:page => params[:page], :per_page => 10)
+    @members = Member.paginate(:page => params[:page], :per_page => 10)
                        .with_visible_id(params[:member][:member_id])
                        .with_first_name_like(params[:member][:first_name])
                        .with_last_name_like(params[:member][:last_name])
@@ -26,6 +27,7 @@ class MembersController < ApplicationController
                        .with_phone_country_code(params[:member][:phone_country_code])
                        .with_phone_area_code(params[:member][:phone_area_code])
                        .with_phone_local_number(params[:member][:phone_local_number])
+                       .with_sync_status(params[:member][:sync_status])
                        .where(:club_id => @current_club)
                        .order(:visible_id)
     respond_to do |format|
@@ -257,5 +259,60 @@ class MembersController < ApplicationController
     redirect_to show_member_path
   end
 
+  def update_sync
+    old_id = @current_member.api_id
+    if params[:member] && @current_member.update_attribute(:api_id, params[:member][:api_id])
+      message = "Member's api_id changed from #{old_id.inspect} to #{@current_member.api_id.inspect}"
+      Auditory.audit(@current_agent, @current_member, message, @current_member)
+      redirect_to show_member_path, notice: 'Sync data updated'
+    else
+      redirect_to show_member_path, notice: 'Sync data cannot be updated'
+    end
+  end
+
+  def sync
+    am = @current_member.api_member
+    if am
+      am.save!(force: true)
+      if @current_member.last_sync_error_at
+        message = "Synchronization failed: #{@current_member.last_sync_error}"
+        Auditory.audit(@current_agent, @current_member, message, @current_member)
+        redirect_to show_member_path, notice: message
+      else
+        message = "Member synchronized"
+        Auditory.audit(@current_agent, @current_member, message, @current_member)
+        redirect_to show_member_path, notice: message
+      end
+    end
+  rescue
+    message = "Error on members#sync: #{$!}"
+    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    redirect_to show_member_path, notice: message
+  end
+
+  def sync_data
+    @api_member = @current_member.api_member
+    @data = @api_member.get
+    respond_to do |format|
+      format.html 
+    end
+  end
+
+  def reset_password
+    am = @current_member.api_member
+    if am && am.reset_password!
+      message = "Remote password reset successful"
+      Auditory.audit(@current_agent, @current_member, message, @current_member)
+      redirect_to show_member_path, notice: message
+    else
+      message = "Remote password could not be reset"
+      Auditory.audit(@current_agent, @current_member, message, @current_member)
+      redirect_to show_member_path, notice: message
+    end
+  rescue
+    message = "Error on members#sync: #{$!}"
+    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    redirect_to show_member_path, notice: message
+  end
 end
 
