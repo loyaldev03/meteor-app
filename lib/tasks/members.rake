@@ -45,6 +45,28 @@ namespace :billing do
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
   end
+
+  desc "Chargeback"
+  task :chargeback_report => :environment do
+    conn = Faraday.new(:url => Settings.mes_report_service.url, :ssl => {:verify => false})
+    ## GET ##
+    initial_date = (Date.today - 7.days).strftime('%m/%d/%Y')
+    end_date = Date.today.strftime('%m/%d/%Y')
+    merchant_id = 94100011003000000002
+
+    result = conn.get Settings.mes_report_service.path, { 
+      :userId => Settings.mes_report_service.user, 
+      :userPass => Settings.mes_report_service.password, 
+      :reportDateBegin => initial_date, 
+      :reportDateEnd => end_date, 
+      :nodeId => merchant_id, 
+      :reportType => 1, 
+      :includeTridentTranId => true, 
+      :includePurchaseId => true, 
+      :includeClientRefNum => true, 
+      :dsReportId => 5
+    }
+  end  
 end
 
 namespace :members do
