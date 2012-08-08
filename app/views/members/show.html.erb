@@ -118,10 +118,10 @@
   </thead>
   <tbody>
     <tr>
-      <th style="width: 40%;"><%= t('activerecord.attributes.member.phone_number') %></th><th style="width: 30%;"><%= t('activerecord.attributes.member.type_of_phone_number') %></th><th style="width: 15%;">Email</th><th style="width: 15%;">Birth date</th>
+      <th><%= t('activerecord.attributes.member.phone_number') %></th><th><%= t('activerecord.attributes.member.type_of_phone_number') %></th><th>Email</th><th>Birth date</th>
     </tr>
     <tr class="<%= (!@current_member.wrong_phone_number.nil? ? "yellow" : "") %>">
-      <td>
+      <td nowrap="nowrap">
         <%= @current_member.full_phone_number %>
         <% if @current_member.wrong_phone_number.nil? %>
           <%= link_to(member_set_unreachable_path, :class => "btn btn-danger") do %> 
@@ -132,8 +132,8 @@
         <% end %>
       </td>
       <td> <%= @current_member.type_of_phone_number %></td>
-      <td><a href="mailto:<%= @current_member.email %>"><%= @current_member.email %></a></td>
-      <td><%= @current_member.birth_date.nil? ? t('activerecord.attributes.member.not_have_birth_date_set') : @current_member.birth_date %></td>
+      <td nowrap="nowrap"><a href="mailto:<%= @current_member.email %>"><%= @current_member.email %></a></td>
+      <td nowrap="nowrap"><%= @current_member.birth_date.nil? ? t('activerecord.attributes.member.not_have_birth_date_set') : @current_member.birth_date %></td>
     </tr>
   </tbody>
 </table>
