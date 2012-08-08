@@ -66,7 +66,7 @@
       <div class="control-group">
         <%= domain_fields.label :data_rights, :class => 'control-label' %>
         <div class="controls">
-          <%= domain_fields.text_area :data_rights, :class => 'control-label', :name => "partner[domains_attributes][0][data_rights]", :style => 'width: 70%; height: 100px', :value => (params[:partner][:domains_attributes]["0"][:data_rights] if params[:partner]) %>
+          <%= domain_fields.text_area :data_rights, :class => 'text_area', :name => "partner[domains_attributes][0][data_rights]", :style => 'width: 70%; height: 100px', :value => (params[:partner][:domains_attributes]["0"][:data_rights] if params[:partner]) %>
         </div>
       </div>
       <div class="control-group">
