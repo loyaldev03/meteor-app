@@ -180,6 +180,7 @@ class Api::MembersController < ApplicationController
   #              +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+  #             *club_cash_amount: Amount of the club cash the member has at this moment.
   # [credit_card] Information related to member's credit card.
   #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   #                 *expire_year: The year (in numbers) in which the credit card will expire.  
@@ -197,18 +198,18 @@ class Api::MembersController < ApplicationController
     if member.nil?
       render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
     else
-      render json: { 
-        code: Settings.error_codes.success, 
+      render json: {
+        code: Settings.error_codes.success,
         member: {
           first_name: member.first_name, last_name: member.last_name, email: member.email,
           address: member.address, city: member.city, state: member.state, zip: member.zip,
           phone_country_code: member.phone_country_code, phone_area_code: member.phone_area_code,
-          phone_local_number: member.phone_local_number
-        }, 
+          phone_local_number: member.phone_local_number, club_cash_amount: member.club_cash_amount
+        },
         credit_card: {
           expire_month: (member.active_credit_card && member.active_credit_card.expire_month),
           expire_year: (member.active_credit_card && member.active_credit_card.expire_year)
-        } 
+        }
       }
     end
   end    
