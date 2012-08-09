@@ -17,6 +17,7 @@ class Ability
       can :manage_product_api, Product
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Member
+      can :manage_token_api, Agent
     elsif agent.has_role? 'representative'
       can :manage, Member
       can :see_credit_card_last_digits, CreditCard
@@ -29,6 +30,7 @@ class Ability
       can :manage_product_api, Product
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Member
+      can :manage_token_api, Member
       # EXAMPLE
       # can :manage, Partner do |partner|
       #   # agent is enabled to manage a specific partner
