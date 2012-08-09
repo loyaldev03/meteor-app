@@ -8,6 +8,11 @@ defaults: &defaults
     domain: 'www.elabs10.com'
     url: '/API/mailing_list.html'
     password: 'ARcor86'
+  mes_report_service:
+    user: Stoneacrereports
+    password: Letmein123
+    url: https://www.merchante-solutions.com/
+    path: /jsp/reports/report_api.jsp
   operation_types: 
     enrollment_billing: 100
     membership_billing: 101
