@@ -3,7 +3,7 @@
 <section>
   <div class="page-header">
     <h1>Search</h1>
-    <% if can? :enroll_member, Member.new %>
+    <% if can? :enroll_member, Agent %>
       <%= link_to(new_member_path, :class => "btn btn-primary btn_on_header") do %> 
         <i class="icon-plus"></i> New Member
       <% end %>
