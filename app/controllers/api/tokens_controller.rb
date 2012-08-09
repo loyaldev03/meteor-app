@@ -1,7 +1,6 @@
 class Api::TokensController < ApplicationController
   skip_before_filter :verify_authenticity_token 
   skip_before_filter :authenticate_agent!
-  before_filter :check_authentification
 
   respond_to :json
 
@@ -60,8 +59,5 @@ class Api::TokensController < ApplicationController
     end
   end
 
-  def check_authentification
-    authorize! :manage_token_api, Member
-  end
 end
 
