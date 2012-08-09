@@ -57,11 +57,11 @@ namespace :mes do
         :last_name  => member.last_name
       )
       credit_card.valid?
-      account_type = case credit_card.type
-      when 
-        'visa': 'VISA'
-      when 
-        'master': 'MC'
+      account_type = case credit_card.type 
+      when 'visa'
+        'VISA'
+      when 'master'
+        'MC'
       else
         nil
       end

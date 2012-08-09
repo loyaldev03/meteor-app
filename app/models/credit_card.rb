@@ -67,6 +67,9 @@ class CreditCard < ActiveRecord::Base
 
   def update_last_digits
     self.last_digits = self.number.last(4) 
+    am = am_card
+    am.valid?
+    self.cc_type = am.type
   end
   
   # refs #17832 and #19603
