@@ -99,8 +99,9 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Lapsed member can be recovered" do
-    assert_difference('Fulfillment.count') do
+    assert_difference('Fulfillment.count',2) do
       member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+      enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
       answer = member.recover(@terms_of_membership_with_gateway)
       assert answer[:code] == Settings.error_codes.success, answer[:message]
       assert_equal 'provisional', member.status, "Status was not updated."
@@ -137,8 +138,8 @@ class MemberTest < ActiveSupport::TestCase
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
     fulfillment.save
-    fulfillment.set_as_archived!
-    assert_raise(StateMachine::InvalidTransition){ fulfillment.set_as_archived! }
+    fulfillment.set_as_processing!
+    assert_raise(StateMachine::InvalidTransition){ fulfillment.set_as_processing! }
   end
 
   test "Should not let create a member with a wrong format zip" do
@@ -178,4 +179,11 @@ class MemberTest < ActiveSupport::TestCase
     assert member.save, "member cant be save #{member.errors.inspect}"
   end
 
+  test "Should send fulfillments on acepted applied member" do
+    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
+    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
+    assert_difference('Fulfillment.count',2) do
+      member.set_as_provisional!
+    end
+  end
 end

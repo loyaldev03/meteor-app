@@ -51,7 +51,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "should get stock." do
     product = FactoryGirl.create(:product, :club_id => 1)
-    get(:get_stock, { :club_id => 1, :sku => 'Bracelet', :format => :json)}
+    get(:get_stock, { :club_id => 1, :sku => 'Bracelet', :format => :json})
     assert_response :success
   end
 end

@@ -477,13 +477,17 @@ class Member < ActiveRecord::Base
   def send_fulfillment
     # we always send fulfillment to new members or members that do not have 
     # opened fulfillments (meaning that previous fulfillments expired).
-    if self.fulfillments.find_by_status('open').nil?
-      fulfillments_products_to_send.each do |product|
-        f = Fulfillment.new :product => product
-        f.member_id = self.uuid
-        f.assigned_at = Time.zone.now
-        f.tracking_code = product+self.visible_id.to_s
-        f.save
+    if self.fulfillments.find_by_status('not_processed').nil?
+      fulfillments = fulfillments_products_to_send
+      if fulfillments
+        fulfillments.each do |product|
+          f = Fulfillment.new 
+          f.product = product
+          f.member_id = self.uuid
+          f.assigned_at = Time.zone.now
+          f.tracking_code = product+self.visible_id.to_s
+          f.save
+        end
       end
     end
   end
@@ -651,8 +655,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      current_enrollment_info = self.enrollment_infos.current
-      current_enrollment_info.product_sku.split(',')
+      self.enrollment_infos.current.first.product_sku.split(',') if self.enrollment_infos.current.first.product_sku
     end
 
     def record_date

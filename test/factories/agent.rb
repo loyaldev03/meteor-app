@@ -13,6 +13,7 @@ FactoryGirl.define do
     password_confirmation { password }
     sequence(:email) {|n| "carla#{n}@test.no" }
     confirmed_at Date.today-1.month
+    roles ["admin"]
   end
 
 end

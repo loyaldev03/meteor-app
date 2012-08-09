@@ -14,40 +14,40 @@ class Fulfillment < ActiveRecord::Base
 
   before_create :set_renewable_at
 
-  scope :new, lambda { where("status = 'new'") }
+  scope :not_processed, lambda { where("status = 'not_processed'") }
 
 
-  state_machine :status, :initial => :new do
-    event :set_as_new do
-      transition [:out_of_stock,:undeliverable] => :new
+  state_machine :status, :initial => :not_processed do
+    event :set_as_not_processed do
+      transition [:out_of_stock,:undeliverable] => :not_processed
     end
     event :set_as_processing do
-      transition :new => :processing
+      transition :not_processed => :processing
     end
     event :set_as_sent do
       transition :processing => :sent
     end
     event :set_as_out_of_stock do
-      transition :new => :out_of_stock
+      transition :not_processed => :out_of_stock
     end
     event :set_as_canceled do
-      transition [:new,:processing,:out_of_stock, :undeliverable] => :canceled
+      transition [:not_processed,:processing,:out_of_stock, :undeliverable] => :canceled
     end
     event :set_as_undeliverable do
       transition :processing => :undeliverable
     end
     
     #First status. fulfillment is waiting to be processed.
-    state :new
+    state :not_processed
     #This status will be automatically set after the new fulfillment list is downloaded. Only if magento 
     #has stock. Stock will be decreased in one.
     state :processing
     #Manually set through CS, by selecting all or some fulfillments in processing status.
     state :sent 
     #Set automatically using Magento, when a representative or supervisor downloads the file with 
-    #fulfillments in new status
+    #fulfillments in not_processed status
     state :out_of_stock 
-    #when member gets lapsed status, all new / processing / Out of stock fulfillments gets this status.
+    #when member gets lapsed status, all not_processed / processing / Out of stock fulfillments gets this status.
     state :canceled
     #if delivery fail this status is set and wrong address on member file should be filled with the reason
     state :undeliverable
@@ -55,7 +55,7 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def renew
-    self.set_as_archived!
+    self.set_as_processing!
     if member.can_receive_another_fulfillment?
       f = Fulfillment.new 
       f.product = self.product
