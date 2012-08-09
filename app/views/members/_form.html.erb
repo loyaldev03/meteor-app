@@ -35,10 +35,8 @@
             <%= f.label :gender, t('activerecord.attributes.member.gender'), :class => 'help-inline' %>
           </th>
           <td> 
-            <select id="member_gender" name="member[gender]">
-              <option value="F">Female</option>
-              <option value="M" <%= 'selected' if @current_member.gender == 'M' if @current_member %> >Male</option>
-            </select>
+            <% selected = @current_member ? @current_member.gender : nil%>
+            <%= f.select :gender, [['Male', 'M'],['Female', 'F'],], :class => 'select_field' %>
           </td>  
         </tr>        
         <tr class = "control-group">
@@ -139,11 +137,7 @@
             <%= f.label :type_of_phone_number, t('activerecord.attributes.member.type_of_phone_number'), :class => 'help-inline' %>
           </th>
           <td> 
-            <select id="type_of_phone_number" name="member[type_of_phone_number]">
-              <option value="Mobile" <%= 'selected' if @current_member.type_of_phone_number == 'Mobile' if @current_member %> >Mobile</option>             
-              <option value="Home" <%= 'selected' if @current_member.type_of_phone_number == 'Home' if @current_member %> >Home</option>
-              <option value="Other" <%= 'selected' if @current_member.type_of_phone_number == 'Other' if @current_member %> >Other</option>
-            </select>
+            <%= f.select :type_of_phone_number, [['Mobile', 'Mobile'],['Home', 'Home'],['Other','Other']], :class => 'select_field' %>
           </td>  
         </tr>
         <% if @member.new_record? %>

@@ -5,7 +5,7 @@ class Ability
     
     if agent.has_role? 'admin'
       can :see_credit_card, CreditCard
-      can :enroll_member, Member
+      can :enroll_member, Agent
       can :undo_credit_card_blacklist, CreditCard
       can :manage, Member
       can :manage, Agent
@@ -23,7 +23,7 @@ class Ability
       can :see_credit_card_last_digits, CreditCard
     elsif agent.has_role? 'supervisor'
       can :manage, Member
-      can :enroll_member, Member      
+      can :enroll_member, Agent      
       can :see_credit_card, CreditCard
     elsif agent.has_role? 'api'
       can :manage_member_api, Member
