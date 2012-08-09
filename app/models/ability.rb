@@ -30,7 +30,7 @@ class Ability
       can :manage_product_api, Product
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Member
-      can :manage_token_api, Agent
+      can :manage_token_api, Member
       # EXAMPLE
       # can :manage, Partner do |partner|
       #   # agent is enabled to manage a specific partner
