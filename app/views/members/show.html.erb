@@ -52,30 +52,14 @@
     </div>
 
     <div class="row-fluid" style="margin-top: 8px;">
-      <div class="span4"><%= link_to "Resend welcome email", "#", :class => "btn btn-large-w #{(@current_member.lapsed? ? "disabled" : "btn-success")}" %>
-      </div>
       <div class="span4">
-        <%= link_to "Password reset", "#", :class => "btn btn-large-w #{(@current_member.lapsed? ? "disabled" : "btn-info")}" %>
+        <%= link_to "Add a note", new_member_note_path, :class => "btn btn-success btn-large-w" %>
       </div>
+      <div class="span4">&nbsp</div>
       <div class="span4">
         <% disable_cancel = @current_member.can_be_canceled? == false %>
         <%= link_to("Cancel", (!disable_cancel ? member_cancel_path : "#"), :class => "btn  btn-large-w #{(disable_cancel ? "disabled" : "btn-danger")}")  %>
       </div>
-    </div>  
-
-    <div class="row-fluid" style="margin-top: 8px;">
-      <div class="span4">
-        <%= link_to "Add a note", new_member_note_path, :class => "btn btn-success btn-large-w" %>
-      </div>
-      <% disable_applied = @current_member.applied? == false  %>
-      <% unless disable_applied %>
-        <div class="span4">
-          <%= link_to "Approve", member_approve_path, :class => "btn btn-large-w btn-info", :confirm => t('are_you_sure'), :method => :post %>
-        </div>
-        <div class="span4">
-          <%= link_to "Reject", member_reject_path, :class => "btn btn-large-w btn-danger", :confirm => t('are_you_sure'), :method => :post %>
-        </div>
-      <% end %>
     </div>  
 
     <div class="row-fluid" style="margin-top: 8px;">
@@ -88,11 +72,16 @@
             <% end %>
         <% end %>
       </div>
-      <div class="span4"></div>
-      <div class="span4"></div>
-    </div>
-
-  </div>
+      <% disable_applied = @current_member.applied? == false  %>
+      <% unless disable_applied %>
+        <div class="span4">
+          <%= link_to "Approve", member_approve_path, :class => "btn btn-large-w btn-info", :confirm => t('are_you_sure'), :method => :post %>
+        </div>
+        <div class="span4">
+          <%= link_to "Reject", member_reject_path, :class => "btn btn-large-w btn-danger", :confirm => t('are_you_sure'), :method => :post %>
+        </div>
+      <% end %>
+    </div>  
 </div>
 
 
