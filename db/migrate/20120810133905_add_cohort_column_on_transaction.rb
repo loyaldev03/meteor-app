@@ -7,5 +7,7 @@ class AddCohortColumnOnTransaction < ActiveRecord::Migration
 
   def down
   	remove_column :transactions, :cohort
+  	remove_column :transactions, :join_date
+  	remove_column :transactions, :enrollment_info_id
   end
 end
