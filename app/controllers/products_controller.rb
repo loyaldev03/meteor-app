@@ -44,8 +44,8 @@ class ProductsController < ApplicationController
   # PUT /products/1.json
   def update
     @product = Product.find(params[:id])
-
-    if @product.update_attributes(params[:product])
+    @product.update_product_data_by_params params[:product]
+    if @product.save
       redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully created.' 
     else
       render action: "edit"
