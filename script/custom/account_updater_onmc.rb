@@ -1,6 +1,6 @@
 require 'config/environment.rb'
 
-@password = 
+@password = 'do3!lAjo5'
 @merchant = '941000110028'
 @username = '941000110028AUS'
 
