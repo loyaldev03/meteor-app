@@ -66,6 +66,11 @@ class Agent < ActiveRecord::Base
   end
   alias_method_chain :add_role, :club
 
+  def can?(*args)
+    @ability ||= Ability.new(self)
+    @ability.can?(*args)
+  end
+
   protected
 
    # Attempt to find a user by it's email. If a record is found, send new
