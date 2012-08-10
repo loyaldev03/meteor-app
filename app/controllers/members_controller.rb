@@ -248,9 +248,11 @@ class MembersController < ApplicationController
   end
 
   def login_as_member
-    if @current_member.api_member
-      if @current_member.api_member.login_token 
-        redirect_to @current_member.api_member.login_token.url  if @current_member.api_member.login_token.url
+    am = @current_member.api_member
+
+    if am
+      if (lt = am.login_token) && lt.url
+        redirect_to @current_member.autologin_url
       else
         flash[:error] = "There is no url related to the member in drupal."
         redirect_to show_member_path

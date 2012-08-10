@@ -46,14 +46,17 @@ module Drupal
       self.member.api_id.nil?
     end
 
-    def login_token
-      @token ||= Hashie::Mash.new(conn.get('/api/urllogin/%{drupal_id}' % { drupal_id: self.member.api_id }).body) unless self.new_record?
-      uri = URI.parse @token.url
-      self.member.update_column :autologin_url, uri.path
+    def login_token(options = {})
+      if @token.nil? || options[:force]
+        @token = Hashie::Mash.new(conn.get('/api/urllogin/%{drupal_id}' % { drupal_id: self.member.api_id }).body) unless self.new_record?
+      end
+
+      uri = @token.url && URI.parse(@token.url)
+      self.member.update_column :autologin_url, uri.path if uri
     end
 
     def reset_password!
-      res = conn.post('/api/user/%{drupal_id}/password_reset'% { drupal_id: self.member.api_id })
+      res = conn.post('/api/user/%{drupal_id}/password_reset' % { drupal_id: self.member.api_id })
       res.success?
     end
 
