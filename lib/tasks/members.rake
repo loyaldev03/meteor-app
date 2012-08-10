@@ -185,7 +185,7 @@ namespace :members do
   task :process_fulfillments => :environment do
     tall = Time.zone.now
     begin
-      Fulfillment.find_in_batches(:conditions => [" date(renewable_at) <= ? and status = ? ", Date.today, 'open' ]) do |group|
+      Fulfillment.joins(:member).find_in_batches(:conditions => [" date(renewable_at) >= ? and (fulfillments.status = ? OR (fulfillments.status = ? AND members.wrong_address is null) OR recurrent = true)", Date.today, 'sent', 'undeliverable' ]) do |group|
         group.each do |fulfillment| 
           tz = Time.zone.now
           begin
@@ -198,8 +198,27 @@ namespace :members do
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
         end
       end
+      Fulfillment.joins(:member).find_in_batches(:conditions => [" date(renewable_at) >= ? AND (fulfillments.status = ? AND members.wrong_address is not null) AND recurrent = true", Date.today, 'undeliverable' ]) do |group|
+        group.each do |fulfillment| 
+          tz = Time.zone.now
+          begin
+            Rails.logger.info "  * processing member ##{fulfillment.member.uuid} fulfillment ##{fulfillment.id}"
+            fulfillment.renew_with_status_undeliverable
+          rescue Exception => e
+            Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        end
+      end
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
   end
+end
+
+Fulfillment.joins(:member).find_in_batches(:conditions => [" date(renewable_at) >= ? AND (fulfillments.status = ? AND members.wrong_address is not null) AND recurrent = true", Date.today, 'undeliverable' ]) do |group|
+group.each do |fulfillment| 
+  puts fulfillment.product
+end
 end
