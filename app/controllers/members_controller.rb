@@ -253,11 +253,12 @@ class MembersController < ApplicationController
         redirect_to @current_member.api_member.login_token.url  if @current_member.api_member.login_token.url
       else
         flash[:error] = "There is no url related to the member in drupal."
+        redirect_to show_member_path
       end
     else
       flash[:error] = "There is no member in drupal."
+      redirect_to show_member_path
     end
-    redirect_to show_member_path
   end
 
   def update_sync
