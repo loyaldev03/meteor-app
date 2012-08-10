@@ -69,6 +69,11 @@ class Transaction < ActiveRecord::Base
     self.enrollment_info_id = enrollment_info_id
     self.save
   end
+
+  def update_cohort(cohort = nil)
+    self.cohort = cohort || self.cohort = self.member.join_date.year.to_s+'-'+self.member.join_date.month.to_s+'-'+(self.enrollment_info.mega_channel || ' ')+'-'+(self.enrollment_info.campaign_medium ||' ' )
+  end
+
   def success?
     response_code == Settings.error_codes.success
   end
@@ -132,6 +137,7 @@ class Transaction < ActiveRecord::Base
       return { :message => "Cant credit more $ than the original transaction amount", :code => Settings.error_codes.refund_invalid }
     end
     trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.enrollment_info_id)
+    trans.update_cohort(sale_transaction.cohort)
     answer = trans.process
     if trans.success?
       sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount

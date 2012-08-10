@@ -328,7 +328,8 @@ class Member < ActiveRecord::Base
           acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
           trans = Transaction.new
           trans.transaction_type = "sale"
-          trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration,self.enrollment_infos.current.first.id )
+          trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration,nil,self.enrollment_infos.current.first.id)
+          trans.update_cohort
           answer = trans.process
           if trans.success?
             # club_cash_expire_date will be nil if we did not set club cash on enrollment because of a PTX.
@@ -423,7 +424,7 @@ class Member < ActiveRecord::Base
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
-      trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration,self.enrollment_infos.current.first.id)
+      trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration,nil,self.enrollment_infos.current.first.id)
       answer = trans.process
       unless trans.success?
         message = "Transaction was not succesful."
