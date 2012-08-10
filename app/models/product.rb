@@ -12,5 +12,13 @@ class Product < ActiveRecord::Base
     ['id', 'name', 'recurrent', 'stock', 'weight' ]
   end
 
+  def update_product_data_by_params(params)
+  	self.name = params[:name]
+  	self.recurrent = params[:recurrent]
+  	self.sku = params[:sku]
+  	self.stock = params[:stock]
+  	self.weight = params[:weight]
+  end
+
 
 end
