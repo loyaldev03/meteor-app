@@ -10,13 +10,15 @@
     <%= 
       link_to member_resend_welcome_path, 
         method: :post, 
-        class: "btn btn-info disabled #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}" do %>
+        class: "btn btn-info disabled #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}", 
+        confirm: 'Are you sure?' do %>
       <i class='icon-envelope'></i>
       Resend Welcome Email
     <% end %>
     <%= 
       link_to member_sync_path, 
-        method: :post, class: 'btn btn-warning #{"disabled" if @current_member.lapsed? || !@current_member.api_member}', 
+        method: :post, 
+        class: 'btn btn-warning #{"disabled" if @current_member.lapsed? || !@current_member.api_member}', 
         confirm: 'Are you sure?' do %>
       <i class='icon-retweet'></i>
       Sync to Remote

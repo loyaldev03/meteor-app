@@ -253,11 +253,12 @@ class MembersController < ApplicationController
         redirect_to @current_member.api_member.login_token.url  if @current_member.api_member.login_token.url
       else
         flash[:error] = "There is no url related to the member in drupal."
+        redirect_to show_member_path
       end
     else
       flash[:error] = "There is no member in drupal."
+      redirect_to show_member_path
     end
-    redirect_to show_member_path
   end
 
   def update_sync
@@ -277,13 +278,11 @@ class MembersController < ApplicationController
       am.save!(force: true)
       if @current_member.last_sync_error_at
         message = "Synchronization failed: #{@current_member.last_sync_error}"
-        Auditory.audit(@current_agent, @current_member, message, @current_member)
-        redirect_to show_member_path, notice: message
       else
         message = "Member synchronized"
-        Auditory.audit(@current_agent, @current_member, message, @current_member)
-        redirect_to show_member_path, notice: message
       end
+      Auditory.audit(@current_agent, @current_member, message, @current_member)
+      redirect_to show_member_path, notice: message
     end
   rescue
     message = "Error on members#sync: #{$!}"
@@ -303,15 +302,28 @@ class MembersController < ApplicationController
     am = @current_member.api_member
     if am && am.reset_password!
       message = "Remote password reset successful"
-      Auditory.audit(@current_agent, @current_member, message, @current_member)
-      redirect_to show_member_path, notice: message
     else
       message = "Remote password could not be reset"
-      Auditory.audit(@current_agent, @current_member, message, @current_member)
-      redirect_to show_member_path, notice: message
     end
+    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    redirect_to show_member_path, notice: message
   rescue
-    message = "Error on members#sync: #{$!}"
+    message = "Error on members#reset_password: #{$!}"
+    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    redirect_to show_member_path, notice: message
+  end
+
+  def resend_welcome
+    am = @current_member.api_member
+    if am && am.resend_welcome_email!
+      message = "Resend welcome email successful"
+    else
+      message = "Welcome email could not be resent"
+    end
+    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    redirect_to show_member_path, notice: message
+  rescue
+    message = "Error on members#resend_welcome: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
     redirect_to show_member_path, notice: message
   end
