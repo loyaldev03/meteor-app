@@ -1,9 +1,10 @@
 require 'test_helper'
 
 class FulfillmentTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  
+  setup do 
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
+  end
 
   test "active member can receive fulfillments" do 
     member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
@@ -32,7 +33,7 @@ class FulfillmentTest < ActiveSupport::TestCase
   test "Should send fulfillments on acepted applied member" do
     member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
     enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
-    assert_difference('Fulfillment.count',2) do
+    assert_difference('Fulfillment.count') do
       member.set_as_provisional!
     end
   end

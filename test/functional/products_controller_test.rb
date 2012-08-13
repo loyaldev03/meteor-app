@@ -2,13 +2,12 @@ require 'test_helper'
 
 class ProductsControllerTest < ActionController::TestCase
   setup do
-    @product = products(:one)
+    @product = FactoryGirl.create(:product)
   end
 
   test "should get index" do
     get :index
     assert_response :success
-    assert_not_nil assigns(:products)
   end
 
   test "should get new" do
@@ -20,7 +19,6 @@ class ProductsControllerTest < ActionController::TestCase
     assert_difference('Product.count') do
       post :create, product: { club_id: @product.club_id, name: @product.name, recurrent: @product.recurrent, sku: @product.sku, stock: @product.stock, weight: @product.weight }
     end
-
     assert_redirected_to product_path(assigns(:product))
   end
 
