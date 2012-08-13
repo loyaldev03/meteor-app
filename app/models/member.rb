@@ -456,7 +456,7 @@ class Member < ActiveRecord::Base
       end
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount)
-      trans.update_enrollment_info_and_cohort(self.enrollment_infos.current.first.id)
+      trans.update_enrollment_info_and_cohort(self.enrollment_infos.current.first.id) if amount.to_f != 0.0
       assign_club_cash! if trans
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
       

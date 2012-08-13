@@ -41,6 +41,7 @@ class MemberTest < ActiveSupport::TestCase
   test "Insfufficient funds hard decline" do
     active_merchant_stubs unless @use_active_merchant
     active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
     answer = active_member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
   end
@@ -48,6 +49,7 @@ class MemberTest < ActiveSupport::TestCase
   test "Monthly member should be billed if it is active or provisional" do
     assert_difference('Operation.count', 4) do
       member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+      enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
@@ -112,6 +114,7 @@ class MemberTest < ActiveSupport::TestCase
   test "Lapsed member can be recovered unless it needs approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
     member = FactoryGirl.create(:lapsed_member, terms_of_membership: @tom_approval, club: @tom_approval.club)
+    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
     answer = member.recover(@terms_of_membership_with_gateway)
     assert answer[:code] == Settings.error_codes.success, answer[:message]
     assert_equal 'applied', member.status
@@ -132,6 +135,7 @@ class MemberTest < ActiveSupport::TestCase
   test "If member is rejected, when recovering it should increment reactivation_times" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
     member = FactoryGirl.create(:applied_member, terms_of_membership: @tom_approval, club: @tom_approval.club)
+    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)   
     member.set_as_canceled!
     answer = member.recover(@terms_of_membership_with_gateway)
     assert answer[:code] == Settings.error_codes.success, answer[:message]
