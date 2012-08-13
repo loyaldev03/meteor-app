@@ -216,9 +216,4 @@ namespace :members do
     end
   end
 end
-
-Fulfillment.joins(:member).find_in_batches(:conditions => [" date(renewable_at) >= ? AND (fulfillments.status = ? AND members.wrong_address is not null) AND recurrent = true", Date.today, 'undeliverable' ]) do |group|
-group.each do |fulfillment| 
-  puts fulfillment.product
-end
 end
