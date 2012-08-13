@@ -19,7 +19,7 @@ class Fulfillment < ActiveRecord::Base
 
   state_machine :status, :initial => :not_processed do
     event :set_as_not_processed do
-      transition [:out_of_stock,:undeliverable] => :not_processed
+      transition [:sent,:out_of_stock,:undeliverable] => :not_processed
     end
     event :set_as_processing do
       transition :not_processed => :processing
@@ -56,16 +56,20 @@ class Fulfillment < ActiveRecord::Base
 
   def renew
     self.set_as_processing!
-    if member.can_receive_another_fulfillment?
-      f = Fulfillment.new 
-      f.product = self.product
-      f.member_id = self.member_id
-      f.assigned_at = Time.zone.now
-      f.save
-    end
+    self.new_fulfillment
+  end
+
+  def renew_with_status_not_processed
+    self.set_as_not_processed!
+    self.new_fulfillment
   end
 
   def renew_with_status_undeliverable
+    self.set_as_undeliverable!
+    self.new_fulfillment
+  end
+
+  def new_fulfillment
     if member.can_receive_another_fulfillment?
       f = Fulfillment.new 
       f.product = self.product
@@ -80,4 +84,6 @@ class Fulfillment < ActiveRecord::Base
     def set_renewable_at
       self.renewable_at = self.assigned_at + 1.year
     end
+
+
 end
