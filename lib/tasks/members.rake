@@ -156,6 +156,31 @@ namespace :members do
     end
   end
 
+  desc "Set cc_type on each active credit card."
+  task :update_cc_type => :environment do 
+    tall = Time.zone.now
+    begin
+      CreditCard.find_in_batches(:conditions => " cc_type IS NULL and active = true ") do |group|
+        group.each do |credit_card| 
+          tz = Time.zone.now
+          begin
+            am = credit_card.am_card
+            if am.valid?
+              credit_card.cc_type = am.type
+              credit_card.save
+            end
+          rescue Exception => e
+            Airbrake.notify(:error_class => "CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for template ##{credit_card.id}"
+        end
+      end
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}"
+    end
+  end
+
   desc "Process club cash"
   # This task should be run each day at 3 am 
   task :process_club_cash => :environment do
@@ -174,7 +199,6 @@ namespace :members do
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
         end
       end
-
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
