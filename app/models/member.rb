@@ -270,7 +270,7 @@ class Member < ActiveRecord::Base
   end
 
   # Do we need rules on fulfillment renewal?
-  # TODO: confirm we have Stock. If not we have to set the status to out of stock.
+  # Add logic here!!!
   def can_receive_another_fulfillment?
     self.active? or self.provisional?
   end
@@ -328,8 +328,8 @@ class Member < ActiveRecord::Base
           acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
           trans = Transaction.new
           trans.transaction_type = "sale"
-          trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration,nil,self.enrollment_infos.current.first.id)
-          trans.update_cohort
+          trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration,nil)
+          trans.update_enrollment_info_and_cohort(self.enrollment_infos.current.first.id)
           answer = trans.process
           if trans.success?
             # club_cash_expire_date will be nil if we did not set club cash on enrollment because of a PTX.
@@ -424,7 +424,7 @@ class Member < ActiveRecord::Base
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
-      trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration,nil,self.enrollment_infos.current.first.id)
+      trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration,nil)
       answer = trans.process
       unless trans.success?
         message = "Transaction was not succesful."
@@ -456,6 +456,7 @@ class Member < ActiveRecord::Base
       end
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount)
+      trans.update_enrollment_info_and_cohort(self.enrollment_infos.current.first.id)
       assign_club_cash! if trans
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
       
@@ -479,11 +480,15 @@ class Member < ActiveRecord::Base
     # opened fulfillments (meaning that previous fulfillments expired).
     if self.fulfillments.find_by_status('not_processed').nil?
       fulfillments = fulfillments_products_to_send
-      fulfillments.each do |product|
-        f = Fulfillment.new 
-        f.product = product
-        f.member_id = self.uuid
-        f.save
+      if fulfillments
+        fulfillments.each do |product|
+          f = Fulfillment.new 
+          f.product = product
+          f.member_id = self.uuid
+          f.assigned_at = Time.zone.now
+          f.tracking_code = product+self.visible_id.to_s
+          f.save
+        end
       end
     end
   end
@@ -651,7 +656,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      self.enrollment_infos.current.first.product_sku ? self.enrollment_infos.current.first.product_sku.split(',') : []
+      self.enrollment_infos.current.first.product_sku.split(',') if self.enrollment_infos.current.first.product_sku
     end
 
     def record_date
@@ -683,7 +688,6 @@ class Member < ActiveRecord::Base
       Communication.deliver!(:cancellation, self)
       # TODO: Deactivate drupal account
       self.save
-      self.fulfillments.cancellable.each &:set_as_canceled!
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
     end
 
