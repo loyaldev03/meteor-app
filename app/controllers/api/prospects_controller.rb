@@ -8,19 +8,25 @@ class Api::ProspectsController < ApplicationController
   # Creates prospect with data that we recieve. We don't validate this data.
   #
   # [prospect] Information related to the prospect.
+  #                             *terms_of_membership_id: 
   #                             *first_name: Prospect's first name.
   #                             *last_name: Prospect's last name.
+  #                             *gender:
   #                             *address: Address registered by the prospect.
   #                             *city: City registered by the prospect. 
   #                             *state: State registered by the prospect.
   #                             *zip: Zip registered by the prospect.
+  #                             *country:
+  #                             *referral_parameters:
   #                             *email: Email registered by the prospect.
   #                             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
   #                             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
   #                             *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
+  #                             *type_of_phone_number
   #                             *birth_date: Birth date of the prospect
   #                             *product_sku: Name of the selected product.
   #                             *marketing_code: multi-team
+  #                             *mega_channel:
   #                             *ip_address: Ip address from where the enrollment is being submitted.
   #                             *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
   #                             *referral_host: Link where is being redirect when after subimiting the enroll. (It shows the params in it),

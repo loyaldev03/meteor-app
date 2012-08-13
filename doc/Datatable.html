@@ -101,7 +101,7 @@
 
 <div id="subclasses">
   <h2>Direct Known Subclasses</h2>
-  <p class="children"><span class='object_link'><a href="AgentsDatatable.html" title="AgentsDatatable (class)">AgentsDatatable</a></span>, <span class='object_link'><a href="ClubsDatatable.html" title="ClubsDatatable (class)">ClubsDatatable</a></span>, <span class='object_link'><a href="DomainsDatatable.html" title="DomainsDatatable (class)">DomainsDatatable</a></span>, <span class='object_link'><a href="OperationsDatatable.html" title="OperationsDatatable (class)">OperationsDatatable</a></span>, <span class='object_link'><a href="PartnersDatatable.html" title="PartnersDatatable (class)">PartnersDatatable</a></span>, <span class='object_link'><a href="TransactionsDatatable.html" title="TransactionsDatatable (class)">TransactionsDatatable</a></span></p>
+  <p class="children"><span class='object_link'><a href="AgentsDatatable.html" title="AgentsDatatable (class)">AgentsDatatable</a></span>, <span class='object_link'><a href="ClubsDatatable.html" title="ClubsDatatable (class)">ClubsDatatable</a></span>, <span class='object_link'><a href="DomainsDatatable.html" title="DomainsDatatable (class)">DomainsDatatable</a></span>, <span class='object_link'><a href="OperationsDatatable.html" title="OperationsDatatable (class)">OperationsDatatable</a></span>, <span class='object_link'><a href="PartnersDatatable.html" title="PartnersDatatable (class)">PartnersDatatable</a></span>, <span class='object_link'><a href="ProductsDatatable.html" title="ProductsDatatable (class)">ProductsDatatable</a></span>, <span class='object_link'><a href="TransactionsDatatable.html" title="TransactionsDatatable (class)">TransactionsDatatable</a></span></p>
 </div>
 
 
@@ -143,7 +143,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Datatable) <strong>initialize</strong>(view, current_partner = nil, current_club = nil, current_member = nil) </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Datatable) <strong>initialize</strong>(view, current_partner = nil, current_club = nil, current_member = nil, current_agent = nil) </a>
     
 
     
@@ -176,7 +176,7 @@ A new instance of Datatable.
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    - (<tt><span class='object_link'><a href="" title="Datatable (class)">Datatable</a></span></tt>) <strong>initialize</strong>(view, current_partner = nil, current_club = nil, current_member = nil) 
+    - (<tt><span class='object_link'><a href="" title="Datatable (class)">Datatable</a></span></tt>) <strong>initialize</strong>(view, current_partner = nil, current_club = nil, current_member = nil, current_agent = nil) 
   
 
   
@@ -206,16 +206,18 @@ A new instance of Datatable
 7
 8
 9
-10</pre>
+10
+11</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/datatables/datatable.rb', line 4</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_view'>view</span><span class='comma'>,</span><span class='id identifier rubyid_current_partner'>current_partner</span><span class='op'>=</span><span class='kw'>nil</span><span class='comma'>,</span><span class='id identifier rubyid_current_club'>current_club</span> <span class='op'>=</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_current_member'>current_member</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_view'>view</span><span class='comma'>,</span><span class='id identifier rubyid_current_partner'>current_partner</span><span class='op'>=</span><span class='kw'>nil</span><span class='comma'>,</span><span class='id identifier rubyid_current_club'>current_club</span> <span class='op'>=</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_current_member'>current_member</span><span class='op'>=</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_current_agent'>current_agent</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@view</span> <span class='op'>=</span> <span class='id identifier rubyid_view'>view</span>
   <span class='ivar'>@current_partner</span> <span class='op'>=</span> <span class='id identifier rubyid_current_partner'>current_partner</span>
   <span class='ivar'>@current_club</span> <span class='op'>=</span> <span class='id identifier rubyid_current_club'>current_club</span>
   <span class='ivar'>@current_member</span> <span class='op'>=</span> <span class='id identifier rubyid_current_member'>current_member</span>
+  <span class='ivar'>@current_agent</span> <span class='op'>=</span> <span class='id identifier rubyid_current_agent'>current_agent</span>
   <span class='ivar'>@url_helpers</span> <span class='op'>=</span> <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_application'>application</span><span class='period'>.</span><span class='id identifier rubyid_routes'>routes</span><span class='period'>.</span><span class='id identifier rubyid_url_helpers'>url_helpers</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -245,17 +247,17 @@ A new instance of Datatable
       <pre class="lines">
 
 
-12
 13
 14
 15
 16
 17
 18
-19</pre>
+19
+20</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/datatables/datatable.rb', line 12</span>
+      <pre class="code"><span class="info file"># File 'app/datatables/datatable.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_as_json'>as_json</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
@@ -275,7 +277,7 @@ A new instance of Datatable
 </div>
 
     <div id="footer">
-  Generated on Tue Jul 10 12:27:54 2012 by
+  Generated on Mon Aug 13 11:47:20 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

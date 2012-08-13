@@ -119,6 +119,28 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#check_authentification-instance_method" title="#check_authentification (instance method)">- (Object) <strong>check_authentification</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#create-instance_method" title="#create (instance method)">- (String, Integer) <strong>create</strong> </a>
     
 
@@ -152,7 +174,37 @@ Method : POST.
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="create-instance_method">
+  <h3 class="signature first" id="check_authentification-instance_method">
+  
+    - (<tt>Object</tt>) <strong>check_authentification</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/club_cash_controller.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_check_authentification'>check_authentification</span>
+  <span class='id identifier rubyid_authorize!'>authorize!</span> <span class='symbol'>:manage_club_cash_api</span><span class='comma'>,</span> <span class='const'>Member</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="create-instance_method">
   
     - (<tt>String</tt>, <tt>Integer</tt>) <strong>create</strong> 
   
@@ -312,11 +364,7 @@ Code related to the method result.
 </div>
 
     <div id="footer">
-<<<<<<< HEAD
-  Generated on Tue Jul 10 12:51:13 2012 by
-=======
-  Generated on Tue Jul 10 12:27:56 2012 by
->>>>>>> cef621b7fc46bfa91d1a4521d28c15cd5aa66199
+  Generated on Mon Aug 13 11:47:22 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

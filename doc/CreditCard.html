@@ -378,6 +378,28 @@ method commented.
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#unset_blacklisted-instance_method" title="#unset_blacklisted (instance method)">- (Object) <strong>unset_blacklisted</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#update_last_digits-instance_method" title="#update_last_digits (instance method)">- (Object) <strong>update_last_digits</strong> </a>
     
 
@@ -422,19 +444,19 @@ method commented.
       <pre class="lines">
 
 
-49
-50
-51
-52
 53
 54
 55
 56
 57
-58</pre>
+58
+59
+60
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 49</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_year'>expire_year</span><span class='comma'>,</span> <span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span> <span class='id identifier rubyid_last_name'>last_name</span><span class='rparen'>)</span>
   <span class='const'>ActiveMerchant</span><span class='op'>::</span><span class='const'>Billing</span><span class='op'>::</span><span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_require_verification_value'>require_verification_value</span> <span class='op'>=</span> <span class='kw'>false</span>
@@ -480,10 +502,6 @@ Later if not successful = (+2), 3/2013 6 Days Later if not successful =
       <pre class="lines">
 
 
-73
-74
-75
-76
 77
 78
 79
@@ -513,10 +531,14 @@ Later if not successful = (+2), 3/2013 6 Days Later if not successful =
 103
 104
 105
-106</pre>
+106
+107
+108
+109
+110</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 73</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 77</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_recycle_expired_rule'>recycle_expired_rule</span><span class='lparen'>(</span><span class='id identifier rubyid_acc'>acc</span><span class='comma'>,</span> <span class='id identifier rubyid_times'>times</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='period'>.</span><span class='id identifier rubyid_expired?'>expired?</span>
@@ -621,12 +643,12 @@ before_update :not_blacklisted
       <pre class="lines">
 
 
-25
-26
-27</pre>
+29
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 25</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_activate'>activate</span>
   <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:active</span><span class='comma'>,</span> <span class='kw'>true</span> <span class='kw'>unless</span> <span class='id identifier rubyid_blacklisted'>blacklisted</span>
@@ -651,12 +673,12 @@ before_update :not_blacklisted
       <pre class="lines">
 
 
-60
-61
-62</pre>
+64
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 60</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 64</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_am_card'>am_card</span>
   <span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_year'>expire_year</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_last_name'>last_name</span><span class='rparen'>)</span>
@@ -711,12 +733,12 @@ before_update :not_blacklisted
       <pre class="lines">
 
 
-33
-34
-35</pre>
+37
+38
+39</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 37</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_blacklist_active_credit_card'>blacklist_active_credit_card</span>
   <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:blacklisted</span><span class='comma'>,</span> <span class='kw'>true</span>
@@ -763,12 +785,12 @@ before_update :not_blacklisted
       <pre class="lines">
 
 
-45
-46
-47</pre>
+49
+50
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 45</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_can_be_activated?'>can_be_activated?</span>
   <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_active'>active</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_lapsed?'>lapsed?</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_blacklisted'>blacklisted</span>
@@ -815,12 +837,12 @@ before_update :not_blacklisted
       <pre class="lines">
 
 
-41
-42
-43</pre>
+45
+46
+47</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 41</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_can_be_blacklisted?'>can_be_blacklisted?</span>
   <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_lapsed?'>lapsed?</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_blacklisted'>blacklisted</span> 
@@ -845,12 +867,12 @@ before_update :not_blacklisted
       <pre class="lines">
 
 
-29
-30
-31</pre>
+33
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_deactivate'>deactivate</span>
   <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:active</span><span class='comma'>,</span> <span class='kw'>false</span>
@@ -875,15 +897,45 @@ before_update :not_blacklisted
       <pre class="lines">
 
 
-37
-38
-39</pre>
+41
+42
+43</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 37</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 41</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_error_to_s'>error_to_s</span><span class='lparen'>(</span><span class='id identifier rubyid_delimiter'>delimiter</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_collect'>collect</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_attr'>attr</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_attr'>attr</span><span class='rbrace'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_message'>message</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_delimiter'>delimiter</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unset_blacklisted-instance_method">
+  
+    - (<tt>Object</tt>) <strong>unset_blacklisted</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+25
+26
+27</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 25</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unset_blacklisted'>unset_blacklisted</span>
+  <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:blacklisted</span><span class='comma'>,</span> <span class='kw'>false</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -905,15 +957,15 @@ before_update :not_blacklisted
       <pre class="lines">
 
 
-64
-65
-66</pre>
+68
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 64</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_last_digits'>update_last_digits</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_last_digits'>last_digits</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_number'>number</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='lparen'>(</span><span class='int'>4</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_last_digits'>last_digits</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_last_digits'>last_digits</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_number'>number</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='lparen'>(</span><span class='int'>4</span><span class='rparen'>)</span> 
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -925,7 +977,7 @@ before_update :not_blacklisted
 </div>
 
     <div id="footer">
-  Generated on Tue Jul 10 12:27:53 2012 by
+  Generated on Mon Aug 13 11:47:19 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
