@@ -12,10 +12,10 @@ class Fulfillment < ActiveRecord::Base
 
   belongs_to :member
 
-  before_create :set_renewable_at
+  before_create :set_default_values
 
   scope :not_processed, lambda { where("status = 'not_processed'") }
-
+  scope :cancellable, lambda { where("status IN ('not_processed','processing','out_of_stock', 'undeliverable')") }
 
   state_machine :status, :initial => :not_processed do
     event :set_as_not_processed do
@@ -51,38 +51,35 @@ class Fulfillment < ActiveRecord::Base
     state :canceled
     #if delivery fail this status is set and wrong address on member file should be filled with the reason
     state :undeliverable
-
   end
 
-  def renew
-    self.set_as_processing!
-    self.new_fulfillment
+  def renew!(undeliverable = false)
+    if recurrent
+      if undeliverable?
+        self.new_fulfillment('undeliverable')
+      else
+        self.new_fulfillment
+      end
+    end
+    self.set_as_canceled! unless self.sent?
   end
 
-  def renew_with_status_not_processed
-    self.set_as_not_processed!
-    self.new_fulfillment
-  end
-
-  def renew_with_status_undeliverable
-    self.set_as_undeliverable!
-    self.new_fulfillment
-  end
-
-  def new_fulfillment
+  def new_fulfillment(status = nil)
     if member.can_receive_another_fulfillment?
       f = Fulfillment.new 
+      f.status = status if status.nil?
       f.product = self.product
       f.member_id = self.member_id
-      f.assigned_at = Time.zone.now
       f.save
     end
   end
 
   private
-    # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
-    def set_renewable_at
+    def set_default_values
+      # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
       self.renewable_at = self.assigned_at + 1.year
+      self.tracking_code = self.product + self.member.visible_id.to_s
+      self.assigned_at = Time.zone.now
     end
 
 

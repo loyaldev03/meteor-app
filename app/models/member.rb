@@ -270,7 +270,7 @@ class Member < ActiveRecord::Base
   end
 
   # Do we need rules on fulfillment renewal?
-  # Add logic here!!!
+  # TODO: confirm we have Stock. If not we have to set the status to out of stock.
   def can_receive_another_fulfillment?
     self.active? or self.provisional?
   end
@@ -479,15 +479,11 @@ class Member < ActiveRecord::Base
     # opened fulfillments (meaning that previous fulfillments expired).
     if self.fulfillments.find_by_status('not_processed').nil?
       fulfillments = fulfillments_products_to_send
-      if fulfillments
-        fulfillments.each do |product|
-          f = Fulfillment.new 
-          f.product = product
-          f.member_id = self.uuid
-          f.assigned_at = Time.zone.now
-          f.tracking_code = product+self.visible_id.to_s
-          f.save
-        end
+      fulfillments.each do |product|
+        f = Fulfillment.new 
+        f.product = product
+        f.member_id = self.uuid
+        f.save
       end
     end
   end
@@ -655,7 +651,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      self.enrollment_infos.current.first.product_sku.split(',') if self.enrollment_infos.current.first.product_sku
+      self.enrollment_infos.current.first.product_sku ? self.enrollment_infos.current.first.product_sku.split(',') : []
     end
 
     def record_date
@@ -687,6 +683,7 @@ class Member < ActiveRecord::Base
       Communication.deliver!(:cancellation, self)
       # TODO: Deactivate drupal account
       self.save
+      self.fulfillments.cancellable.each &:set_as_canceled!
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
     end
 
