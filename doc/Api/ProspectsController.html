@@ -188,12 +188,12 @@ Method  : POST Creates prospect with data that we recieve.
       <pre class="lines">
 
 
-57
-58
-59</pre>
+64
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/prospects_controller.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/prospects_controller.rb', line 64</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_check_authentification'>check_authentification</span>
   <span class='id identifier rubyid_authorize!'>authorize!</span> <span class='symbol'>:manage_prospects_api</span><span class='comma'>,</span> <span class='const'>Member</span>
@@ -240,14 +240,21 @@ Information related to the prospect.
                  *type_of_phone_number
                  *birth_date: Birth date of the prospect
                  *product_sku: Name of the selected product.
+                 *product_description:
                  *marketing_code: multi-team
+                 *campaign_medium
+                 *campaign_description
+                 *campaign_medium_version
+                 *fulfillment_code
                  *mega_channel:
                  *ip_address: Ip address from where the enrollment is being submitted.
                  *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
                  *referral_host: Link where is being redirect when after subimiting the enroll. (It shows the params in it),
+                 *referral_path
                  *user_id
                  *landing_url: Url from where te submit comes from.
                  *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
+                 *cookie_set
                  *cookie_value: Cookie from where the enrollment is being submitted.
                  *joint
 </code></pre>
@@ -343,19 +350,19 @@ string)
       <pre class="lines">
 
 
-46
-47
-48
-49
-50
-51
-52
 53
 54
-55</pre>
+55
+56
+57
+58
+59
+60
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/prospects_controller.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/prospects_controller.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
 	<span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prospect_data_invalid</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>405</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
@@ -377,7 +384,7 @@ string)
 </div>
 
     <div id="footer">
-  Generated on Mon Aug 13 11:47:22 2012 by
+  Generated on Mon Aug 13 12:36:11 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

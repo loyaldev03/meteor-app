@@ -408,6 +408,13 @@ CREATE TABLE `prospects` (
   `phone_local_number` int(11) DEFAULT NULL,
   `type_of_phone_number` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gender` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cookie_set` tinyint(1) DEFAULT NULL,
+  `referral_path` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `product_description` text COLLATE utf8_unicode_ci,
+  `fulfillment_code` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `campaign_medium` text COLLATE utf8_unicode_ci,
+  `campaign_description` text COLLATE utf8_unicode_ci,
+  `campaign_medium_version` int(11) DEFAULT NULL,
   UNIQUE KEY `index_prospects_on_uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -644,3 +651,5 @@ INSERT INTO schema_migrations (version) VALUES ('20120809211347');
 INSERT INTO schema_migrations (version) VALUES ('20120810133905');
 
 INSERT INTO schema_migrations (version) VALUES ('20120813143725');
+
+INSERT INTO schema_migrations (version) VALUES ('20120813151533');
