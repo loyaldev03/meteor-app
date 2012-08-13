@@ -1,6 +1,5 @@
 #
 # assigned_at => The day this fulfillment is assigned to our member.
-# delivered_at => The day CS or our delivery provider send the fulfillment. 
 #     If fulfillment is resend it is because of a wrong address. 
 #     this value will be updated.
 # renewable_at => This day is assigned_at + 1.year (at first time). 

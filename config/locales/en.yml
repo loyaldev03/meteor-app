@@ -180,7 +180,6 @@ en:
       fulfillment:
         product: 'Product'
         asigned_at: 'Asigned at'
-        delivered_at: 'Delivered at'
         renewable_at: 'Renewable at'
         not_found: 'No fulfillments were found.'
       communication:
