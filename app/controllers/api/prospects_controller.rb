@@ -25,14 +25,21 @@ class Api::ProspectsController < ApplicationController
   #                             *type_of_phone_number
   #                             *birth_date: Birth date of the prospect
   #                             *product_sku: Name of the selected product.
+  #                             *product_description:
   #                             *marketing_code: multi-team
+  #                             *campaign_medium
+  #                             *campaign_description
+  #                             *campaign_medium_version
+  #                             *fulfillment_code
   #                             *mega_channel:
   #                             *ip_address: Ip address from where the enrollment is being submitted.
   #                             *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
   #                             *referral_host: Link where is being redirect when after subimiting the enroll. (It shows the params in it),
+  #                             *referral_path
   #                             *user_id
   #                             *landing_url: Url from where te submit comes from.
   #                             *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
+  #                             *cookie_set
   #                             *cookie_value: Cookie from where the enrollment is being submitted.
   #                             *joint
   # [message] Shows the method results and also informs the errors.
