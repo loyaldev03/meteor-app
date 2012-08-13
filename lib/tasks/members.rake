@@ -216,4 +216,3 @@ namespace :members do
     end
   end
 end
-end

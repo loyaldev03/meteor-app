@@ -231,11 +231,12 @@ CREATE TABLE `fulfillments` (
   `member_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
   `product` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `assigned_at` datetime DEFAULT NULL,
-  `delivered_at` datetime DEFAULT NULL,
   `renewable_at` datetime DEFAULT NULL,
   `status` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
+  `tracking_code` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `recurrent` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3116 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -470,6 +471,9 @@ CREATE TABLE `transactions` (
   `updated_at` datetime NOT NULL,
   `credit_card_id` bigint(20) DEFAULT NULL,
   `refunded_amount` float DEFAULT '0',
+  `enrollment_info_id` int(11) DEFAULT NULL,
+  `join_date` datetime DEFAULT NULL,
+  `cohort` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   UNIQUE KEY `index_transactions_on_uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -627,6 +631,12 @@ INSERT INTO schema_migrations (version) VALUES ('20120802165259');
 
 INSERT INTO schema_migrations (version) VALUES ('20120803164002');
 
+INSERT INTO schema_migrations (version) VALUES ('20120803182303');
+
+INSERT INTO schema_migrations (version) VALUES ('20120803195357');
+
 INSERT INTO schema_migrations (version) VALUES ('20120803223204');
 
 INSERT INTO schema_migrations (version) VALUES ('20120809211347');
+
+INSERT INTO schema_migrations (version) VALUES ('20120810133905');
