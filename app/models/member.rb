@@ -380,7 +380,7 @@ class Member < ActiveRecord::Base
         end
         # enroll allowed
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-        message = "Credit card blacklisted. call support."
+        message = "That credit card is blacklisted, please use another."
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
       elsif not (cc_blank == '1' or credit_card_params[:number].blank?)
