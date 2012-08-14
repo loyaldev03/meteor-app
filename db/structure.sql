@@ -220,11 +220,12 @@ CREATE TABLE `fulfillments` (
   `member_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
   `product` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `assigned_at` datetime DEFAULT NULL,
-  `delivered_at` datetime DEFAULT NULL,
   `renewable_at` datetime DEFAULT NULL,
   `status` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
+  `tracking_code` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `recurrent` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3112 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -394,6 +395,15 @@ CREATE TABLE `prospects` (
   `phone_country_code` int(11) DEFAULT NULL,
   `phone_area_code` int(11) DEFAULT NULL,
   `phone_local_number` int(11) DEFAULT NULL,
+  `type_of_phone_number` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `gender` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cookie_set` tinyint(1) DEFAULT NULL,
+  `referral_path` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `product_description` text COLLATE utf8_unicode_ci,
+  `fulfillment_code` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `campaign_medium` text COLLATE utf8_unicode_ci,
+  `campaign_description` text COLLATE utf8_unicode_ci,
+  `campaign_medium_version` int(11) DEFAULT NULL,
   UNIQUE KEY `index_prospects_on_uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -617,8 +627,16 @@ INSERT INTO schema_migrations (version) VALUES ('20120802165259');
 
 INSERT INTO schema_migrations (version) VALUES ('20120803164002');
 
+INSERT INTO schema_migrations (version) VALUES ('20120803182303');
+
+INSERT INTO schema_migrations (version) VALUES ('20120803195357');
+
 INSERT INTO schema_migrations (version) VALUES ('20120803223204');
 
 INSERT INTO schema_migrations (version) VALUES ('20120809211347');
 
 INSERT INTO schema_migrations (version) VALUES ('20120810133905');
+
+INSERT INTO schema_migrations (version) VALUES ('20120813143725');
+
+INSERT INTO schema_migrations (version) VALUES ('20120813151533');

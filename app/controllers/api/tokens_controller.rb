@@ -1,7 +1,7 @@
 class Api::TokensController < ApplicationController
-  skip_before_filter :verify_authenticity_token
+  skip_before_filter :verify_authenticity_token 
   skip_before_filter :authenticate_agent!
-  before_filter :check_authentification
+  before_filter :check_authentification, :except => :create
 
   respond_to :json
 

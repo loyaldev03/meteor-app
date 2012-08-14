@@ -39,7 +39,5 @@ class EnrollmentInfo < ActiveRecord::Base
       self.joint = params[:joint]
     end
   end
-
-
 end
 

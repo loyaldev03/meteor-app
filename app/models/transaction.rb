@@ -59,19 +59,20 @@ class Transaction < ActiveRecord::Base
     self.gateway = pgc.gateway
   end
 
-  def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil,enrollment_info_id=nil)
+  def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil)
     self.terms_of_membership_id = terms_of_membership_id || member.terms_of_membership_id
     self.member = member
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
     self.join_date = member.join_date
-    self.enrollment_info_id = enrollment_info_id
     self.save
   end
 
-  def update_cohort(cohort = nil)
-    self.cohort = cohort || self.cohort = self.member.join_date.year.to_s+'-'+self.member.join_date.month.to_s+'-'+(self.enrollment_info.mega_channel || ' ')+'-'+(self.enrollment_info.campaign_medium ||' ' )
+  def update_enrollment_info_and_cohort(enrollment_info_id, cohort = nil)
+    self.enrollment_info_id = enrollment_info_id
+    self.cohort = cohort || [ self.member.join_date.year.to_s, self.member.join_date.month.to_s, self.enrollment_info.mega_channel.to_s, self.enrollment_info.campaign_medium ].join('-')
+    self.save
   end
 
   def success?
@@ -136,8 +137,8 @@ class Transaction < ActiveRecord::Base
     if sale_transaction.amount_available_to_refund < amount
       return { :message => "Cant credit more $ than the original transaction amount", :code => Settings.error_codes.refund_invalid }
     end
-    trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.enrollment_info_id)
-    trans.update_cohort(sale_transaction.cohort)
+    trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
+    trans.update_enrollment_info_and_cohort(sale_transaction.enrollment_info_id, sale_transaction.cohort)
     answer = trans.process
     if trans.success?
       sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount

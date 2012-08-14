@@ -46,7 +46,7 @@ class Member < ActiveRecord::Base
   #Validates that there are no invalid charactes in the country. 
   REGEX_CITY_AND_STATE = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
-
+  REGEX_PHONE_COUNTRY_CODE = /^[+?]?[0-9]+$/
 
   def after_create_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
@@ -64,7 +64,9 @@ class Member < ActiveRecord::Base
 
   validates :first_name, :last_name, :presence => true, :format => REGEX_FIRST_AND_LAST_NAME
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, :format => REGEX_EMAIL
-  validates :phone_country_code, :phone_area_code, :phone_local_number, :presence => true, :numericality => { :only_integer => true }
+  validates :phone_country_code, :presence => true, :length => { :minimum => 1, :maximun => 4}, :format => REGEX_PHONE_COUNTRY_CODE
+  validates :phone_area_code, :presence => true, :numericality => { :only_integer => true }, :length => { :minimum => 1, :maximun => 8}
+  validates :phone_local_number, :presence => true, :numericality => { :only_integer => true }, :length => { :minimum => 1, :maximun => 8}
   validates :address, :format => REGEX_ADDRESS
   validates :state, :city, :presence => true, :format => REGEX_CITY_AND_STATE
   validates :terms_of_membership_id , :presence => true
@@ -328,8 +330,8 @@ class Member < ActiveRecord::Base
           acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
           trans = Transaction.new
           trans.transaction_type = "sale"
-          trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration,nil,self.enrollment_infos.current.first.id)
-          trans.update_cohort
+          trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
+          trans.update_enrollment_info_and_cohort(self.enrollment_infos.current.first.id)
           answer = trans.process
           if trans.success?
             # club_cash_expire_date will be nil if we did not set club cash on enrollment because of a PTX.
@@ -380,7 +382,7 @@ class Member < ActiveRecord::Base
         end
         # enroll allowed
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-        message = "Credit card blacklisted. call support."
+        message = "That credit card is blacklisted, please use another."
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
       elsif not (cc_blank == '1' or credit_card_params[:number].blank?)
@@ -424,7 +426,7 @@ class Member < ActiveRecord::Base
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
-      trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration,nil,self.enrollment_infos.current.first.id)
+      trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
       answer = trans.process
       unless trans.success?
         message = "Transaction was not succesful."
@@ -456,6 +458,7 @@ class Member < ActiveRecord::Base
       end
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount)
+      trans.update_enrollment_info_and_cohort(self.enrollment_infos.current.first.id) if amount.to_f != 0.0
       assign_club_cash! if trans
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
       
@@ -477,12 +480,17 @@ class Member < ActiveRecord::Base
   def send_fulfillment
     # we always send fulfillment to new members or members that do not have 
     # opened fulfillments (meaning that previous fulfillments expired).
-    if self.fulfillments.find_by_status('open').nil?
-      fulfillments_products_to_send.each do |product|
-        f = Fulfillment.new :product => product
-        f.member_id = self.uuid
-        f.assigned_at = Time.zone.now
-        f.save
+    if self.fulfillments.find_by_status('not_processed').nil?
+      fulfillments = fulfillments_products_to_send
+      if fulfillments
+        fulfillments.each do |product|
+          f = Fulfillment.new 
+          f.product = product
+          f.member_id = self.uuid
+          f.assigned_at = Time.zone.now
+          f.tracking_code = product+self.visible_id.to_s
+          f.save
+        end
       end
     end
   end
@@ -650,11 +658,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      if (self.mega_channel || '').include?('sloop')
-        [ Settings.fulfillment_products.sloop, Settings.fulfillment_products.kit_card ]
-      else
-        [ Settings.fulfillment_products.kit_card ]
-      end
+      self.enrollment_infos.current.first.product_sku.split(',') if self.enrollment_infos.current.first.product_sku
     end
 
     def record_date

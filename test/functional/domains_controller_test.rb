@@ -44,10 +44,10 @@ class DomainsControllerTest < ActionController::TestCase
     assert_redirected_to domain_path(assigns(:domain), partner_prefix: @partner_prefix)
   end
 
-  test "should destroy domain" do
-    assert_difference('Domain.count', -1) do
-      delete :destroy, id: @domain.id, partner_prefix: @partner_prefix
-    end
-    assert_redirected_to domains_path
-  end
+  # test "should destroy domain" do
+  #   assert_difference('Domain.count', -1) do
+  #     delete :destroy, id: @domain.id, partner_prefix: @partner_prefix
+  #   end
+  #   assert_redirected_to domains_path
+  # end
  end

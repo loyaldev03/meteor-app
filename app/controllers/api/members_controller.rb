@@ -146,9 +146,9 @@ class Api::MembersController < ApplicationController
     response = {}
     member = Member.find(params[:id])
     # member.skip_api_sync! if XXX
-    member.update_attribute(:wrong_address, nil) if params[:setter][:wrong_address] == '1' unless params[:setter].nil?
-    member.update_attribute(:wrong_phone_number, nil) if params[:setter][:wrong_phone_number] == '1' unless params[:setter].nil?
-    member.update_attribute(:wrong_phone_number, nil) if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
+    member.wrong_address = nil if params[:setter][:wrong_address] == '1' unless params[:setter].nil?
+    member.wrong_phone_number = nil if params[:setter][:wrong_phone_number] == '1' unless params[:setter].nil?
+    member.wrong_phone_number = nil if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
                                                           member.phone_area_code != params[:member][:phone_area_code].to_i ||
                                                           member.phone_local_number != params[:member][:phone_local_number].to_i)
     if member.update_attributes(params[:member]) 

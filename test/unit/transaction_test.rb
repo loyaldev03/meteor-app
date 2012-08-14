@@ -49,9 +49,10 @@ class TransactionTest < ActiveSupport::TestCase
             last_name: @member.last_name, address: @member.address, city: @member.city,
             zip: @member.zip, state: @member.state, email: @member.email, 
             phone_country_code: @member.phone_country_code, phone_area_code: @member.phone_area_code,
-            phone_local_number: @member.phone_local_number, country: 'US' }, 
+            phone_local_number: @member.phone_local_number, country: 'US', product_sku: 'Circlet' }, 
           { number: @credit_card.number, 
             expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
+
         assert (answer[:code] == Settings.error_codes.success), answer[:message]
         member = Member.find_by_uuid(answer[:member_id])
         assert_not_nil member
@@ -67,6 +68,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "controlled refund (refund completely a transaction)" do
     active_merchant_stubs unless @use_active_merchant
     active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
     amount = @terms_of_membership.installment_amount
     answer = active_member.bill_membership
     assert_equal active_member.status, 'active'
@@ -98,6 +100,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_difference('Operation.count', +1) do
       assert_difference('Transaction.count') do
         active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+        enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
         nbd = active_member.bill_date
         answer = active_member.bill_membership
         assert !active_member.lapsed?, "member cant be lapsed"
@@ -130,6 +133,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
     assert_difference('Operation.count', +3) do
       active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+      enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
       amount = @terms_of_membership.installment_amount
       active_member.recycled_times = 4
       active_member.save
@@ -147,6 +151,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_difference('Operation.count', +3) do
       assert_difference('Communication.count', +1) do
         active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+        enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
         amount = @terms_of_membership.installment_amount
         answer = active_member.bill_membership
         assert active_member.lapsed?, "member should be lapsed after HD"
@@ -160,6 +165,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "Billing declined, but there is no decline rule. Send email" do 
     active_merchant_stubs("34234", "decline stubbed", false) 
     active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
     amount = @terms_of_membership.installment_amount
     answer = active_member.bill_membership
     assert_equal active_member.next_retry_bill_date.to_date, (Date.today + eval(Settings.next_retry_on_missing_decline)).to_date, "Next retry bill date incorrect"

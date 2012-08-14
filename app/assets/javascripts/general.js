@@ -113,28 +113,11 @@ $(document).ready( function() {
   }
 
   function member_index_functions(){
-    $('#at_least_one_required').submit(function (){
-      result = false;
-      $('#at_least_one_required').find(':text').each(function (){
-        if ($(this).val() != '')
-          result = true;
-      });
-      $('#at_least_one_required').find('select').each(function (){
-          var val = $(this).val();
-          if (val && $.trim(val) !== "") {
-            result = true;
-          }
-      });
-
-      if (!result){ 
-        alert ('Compleate at least one field');
-
-      }else{
-        $.get(this.action, $(this).serialize(), null, 'script'); 
-        result = false
-      }
-      return result;
+    $('#index_search_form').submit(function (){
+      $.get(this.action, $(this).serialize(), null, 'script'); 
+      return false;
     });
+
     $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
                                              showOn: "both", buttonImage: "/icon-calendar.png", 
                                              buttonImageOnly: true});
@@ -144,7 +127,7 @@ $(document).ready( function() {
     }); 
 
     $("#clear_form").click( function() {
-      $("#at_least_one_required input[type=text]").each(function() { $(this).val(''); }); 
+      $("#index_search_form input[type=text]").each(function() { $(this).val(''); }); 
     });
   };
 

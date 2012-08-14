@@ -13,9 +13,7 @@ FactoryGirl.define do
     password_confirmation { password }
     sequence(:email) {|n| "carla#{n}@test.no" }
     confirmed_at Date.today-1.month
-    after_build do |obj|
-      obj.add_role 'admin'
-    end
+    roles ["admin"]
   end
 
 
