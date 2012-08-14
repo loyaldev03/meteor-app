@@ -82,9 +82,9 @@ group :test do
   gem 'factory_girl_rails'
   gem 'faker'
   gem 'mocha'
+  gem 'capybara'
   gem 'brakeman'
   gem 'simplecov'
-  gem 'simplecov-rcov'
 end
 
 gem 'activemerchant', :git => "git://github.com/carlaares/active_merchant"
