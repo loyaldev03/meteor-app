@@ -84,6 +84,7 @@ group :test do
   gem 'mocha'
   gem 'brakeman'
   gem 'simplecov'
+  gem 'simplecov-rcov'
 end
 
 gem 'activemerchant', :git => "git://github.com/carlaares/active_merchant"
