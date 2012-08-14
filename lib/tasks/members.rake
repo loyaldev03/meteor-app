@@ -210,8 +210,8 @@ namespace :members do
     tall = Time.zone.now
     begin
       Fulfillment.joins(:member).find_in_batches(:conditions => [
-          " date(renewable_at) <= ? and (fulfillments.status = ? OR (fulfillments.status = ? AND members.wrong_address IS NULL) AND recurrent = true)", 
-          Date.today, ['sent', 'undeliverable'] ]) do |group|
+          " date(renewable_at) <= ? AND (fulfillments.status = ? OR (fulfillments.status = ? AND members.wrong_address IS NULL)) AND recurrent = true", 
+          Date.today, 'sent', 'undeliverable' ]) do |group|
         group.each do |fulfillment| 
           tz = Time.zone.now
           begin
