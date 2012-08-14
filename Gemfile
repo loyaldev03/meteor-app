@@ -83,7 +83,7 @@ group :test do
   gem 'faker'
   gem 'mocha'
   gem 'brakeman'
-  gem 'metric_fu'
+  gem 'simplecov'
 end
 
 gem 'activemerchant', :git => "git://github.com/carlaares/active_merchant"
