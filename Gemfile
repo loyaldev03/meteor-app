@@ -82,6 +82,8 @@ group :test do
   gem 'factory_girl_rails'
   gem 'faker'
   gem 'mocha'
+  gem 'brakeman'
+  gem 'rcov'
 end
 
 gem 'activemerchant', :git => "git://github.com/carlaares/active_merchant"
