@@ -84,6 +84,9 @@ test:
 production:
   <<: *defaults
 
+prototype:
+  <<: *defaults
+
 staging:
   <<: *defaults
 
