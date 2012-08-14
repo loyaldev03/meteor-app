@@ -19,13 +19,13 @@ class ProductsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should create product" do
-    assert_difference('Product.count') do
-      post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, product: { name: @product.name,
-                     recurrent: @product.recurrent, sku: @product.sku, stock: @product.stock, weight: @product.weight }
-    end
-    assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
-  end
+  # test "should create product" do
+  #   assert_difference('Product.count') do
+  #     post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, product: { name: @product.name,
+  #                    recurrent: @product.recurrent, sku: @product.sku, stock: @product.stock, weight: @product.weight }
+  #   end
+  #   assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  # end
 
   test "should show product" do
     get :show, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
