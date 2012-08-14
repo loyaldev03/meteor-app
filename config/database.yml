@@ -31,4 +31,11 @@ staging:
   encoding: utf8
   user: root
 
+prototype:
+  adapter: mysql2
+  database: sac_platform_prototype
+  host: localhost
+  encoding: utf8
+  user: root
+
 

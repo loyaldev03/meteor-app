@@ -9,7 +9,7 @@
   <div class="control-group">
     <%= f.label :drupal_domain_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.collection_select :drupal_domain_id, @club.domains, :id, :url %>
+      <%= f.collection_select :drupal_domain_id, @club.domains, :id, :url, include_blank: true %>
     </div>
   </div>
   <div class="control-group">

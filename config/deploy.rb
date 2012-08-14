@@ -1,5 +1,5 @@
-set :stages, %w(production staging)
-set :default_stage, "staging"
+set :stages, %w(production prototype staging)
+set :default_stage, "prototype"
 require 'capistrano/ext/multistage'
 
 set :port, 30003
@@ -9,6 +9,7 @@ set :deploy_via, :remote_cache
 set :user, 'www-data'
 set :use_sudo, false
 
+set :branch, ENV['BRANCH'] if ENV['BRANCH']
 
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 # campfire access: stoneacreadmins / xagax2011
@@ -90,6 +91,14 @@ namespace :deploy do
   # task :compile_assets, :roles => :web do 
   #   run "cd #{current_path}; bundle exec rake assets:precompile"
   # end  
+
+  # taken from http://stackoverflow.com/questions/5735656
+  task :tag do
+    user = `git config --get user.name`.chomp
+    email = `git config --get user.email`.chomp
+    puts `git tag #{stage}_#{release_name} #{current_revision} -m "Deployed by #{user} <#{email}>"`
+    puts `git push --tags origin`
+  end
 end
 
 namespace :server_stats do
@@ -101,4 +110,5 @@ end
 
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
-before "deploy:assets:precompile", "link_config_files", # "bundle_install", "deploy:migrate" 
+before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate" 
+after "deploy", "deploy:tag"
