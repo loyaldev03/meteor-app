@@ -217,5 +217,4 @@ class Admin::AgentsControllerTest < ActionController::TestCase
   	assert ability.can?(:see_credit_card_last_digits, CreditCard), "Representative cant see member's credit card's las digits."
   	assert ability.cannot?(:see_credit_card, CreditCard), "Representative can see member's full credit card number."  
   end
-
 end
