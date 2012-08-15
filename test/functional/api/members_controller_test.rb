@@ -5,8 +5,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     @representative_user = FactoryGirl.create(:confirmed_representative_agent)
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
+    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway
     # request.env["devise.mapping"] = Devise.mappings[:agent]
-    
   end
 
 # test "should not accept HTML request" do
@@ -18,7 +18,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
@@ -56,7 +55,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.build :member_with_api
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway
     @enrollment_info = FactoryGirl.build :enrollment_info
     post( :create, { member: {:first_name => @member.first_name, 
                                 :last_name => @member.last_name,
@@ -84,7 +82,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @supervisor_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
