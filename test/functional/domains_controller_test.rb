@@ -59,7 +59,7 @@ class DomainsControllerTest < ActionController::TestCase
 
   test "Representative should not create domain" do
     sign_in @representative_user
-    @club = FactoryGirl.build(:club, :partner_id => @partner.id)
+    domain = FactoryGirl.build(:domain, :partner_id => @partner.id )
     post :create, partner_prefix: @partner_prefix, domain: { data_rights: domain.data_rights, 
         description: domain.description, hosted: domain.hosted, url: domain.url }
     assert_response :unauthorized
@@ -67,7 +67,7 @@ class DomainsControllerTest < ActionController::TestCase
 
   test "Supervisor should not create domain" do
     sign_in @supervisor_user
-    @club = FactoryGirl.build(:club, :partner_id => @partner.id)
+    domain = FactoryGirl.build(:domain, :partner_id => @partner.id )
     post :create, partner_prefix: @partner_prefix, domain: { data_rights: domain.data_rights, 
         description: domain.description, hosted: domain.hosted, url: domain.url } 
     assert_response :unauthorized
