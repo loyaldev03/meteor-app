@@ -5,6 +5,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     @representative_user = FactoryGirl.create(:confirmed_representative_agent)
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
+    @api_user = FactoryGirl.create(:confirmed_api_agent)
     @agent = FactoryGirl.create(:agent)
   end
 
@@ -26,6 +27,12 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
+  test "Api user should not get index" do
+    sign_in @api_user
+    get :index
+    assert_response :unauthorized
+  end
+
   test "Admin should get new" do
     sign_in @admin_user
     get :new
@@ -40,6 +47,12 @@ class Admin::AgentsControllerTest < ActionController::TestCase
 
   test "Supervisor should not get new" do
     sign_in @supervisor_user
+    get :new
+    assert_response :unauthorized
+  end
+
+  test "Api user should not get new" do
+    sign_in @api_user
     get :new
     assert_response :unauthorized
   end
@@ -67,6 +80,13 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
+  test "Api user should not create agent" do
+    sign_in @api_user
+    agent = FactoryGirl.build(:confirmed_admin_agent)
+    post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
+    assert_response :unauthorized
+  end
+
   test "Admin should show agent" do
     sign_in @admin_user
     get :show, id: @agent.id
@@ -81,6 +101,12 @@ class Admin::AgentsControllerTest < ActionController::TestCase
 
   test "Supervisor should not show agent" do
     sign_in @supervisor_user
+    get :show, id: @agent.id
+    assert_response :unauthorized
+  end
+
+  test "Api user should not show agent" do
+    sign_in @api_user
     get :show, id: @agent.id
     assert_response :unauthorized
   end
@@ -103,6 +129,12 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
+  test "Api user should not get edit" do
+    sign_in @api_user
+    get :edit, id: @agent.id
+    assert_response :unauthorized
+  end
+
   test "Admin should update agent" do
     sign_in @admin_user
     put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
@@ -111,13 +143,19 @@ class Admin::AgentsControllerTest < ActionController::TestCase
 
   test "Representative should not update agent" do
     sign_in @representative_user
-put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
+	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
     assert_response :unauthorized
   end
 
   test "Supervisor should not update agent" do
     sign_in @supervisor_user
-put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
+	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
+    assert_response :unauthorized
+  end
+
+  test "Api user should not update agent" do
+    sign_in @api_user
+	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
     assert_response :unauthorized
   end
 
@@ -142,6 +180,11 @@ put :update, id: @agent.id, agent: { :username => @agent.username, :password => 
     assert_response :unauthorized
   end
 
+  test "Api user should not destroy agent" do
+    sign_in @api_user
+    delete :destroy, id: @agent
+    assert_response :unauthorized
+  end
 
 ## Testing abilities related to views ## 
 

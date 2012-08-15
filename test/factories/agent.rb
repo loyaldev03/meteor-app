@@ -34,5 +34,13 @@ FactoryGirl.define do
     roles ["supervisor"]
   end
 
+  factory :confirmed_api_agent, class: Agent do
+    sequence(:username) {|n| "api#{n}" }
+    password "secret"
+    password_confirmation { password }
+    sequence(:email) {|n| "api#{n}@test.no" }
+    confirmed_at Date.today-1.month
+    roles ["api"]
+  end
 
 end

@@ -52,7 +52,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
 
-  test "Representative should enroll/create member" do
+  test "Representative should not enroll/create member" do
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.build :member_with_api
