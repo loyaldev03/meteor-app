@@ -1,6 +1,5 @@
 class Api::MembersController < ApplicationController
   skip_before_filter :verify_authenticity_token
-  before_filter :check_authentification
   respond_to :json
 
   # Method : POST
@@ -86,6 +85,7 @@ class Api::MembersController < ApplicationController
   # @return [Hash] *credit_card_errors*
   # 
   def create
+    authorize! :enroll, Member
     response = {}
     tom = TermsOfMembership.find_by_id(params[:member][:terms_of_membership_id])  
     if tom.nil?
@@ -143,6 +143,7 @@ class Api::MembersController < ApplicationController
   # @return [Hash] *errors*
   # 
   def update
+    authorize! :update, Member
     response = {}
     member = Member.find(params[:id])
     # member.skip_api_sync! if XXX
@@ -194,6 +195,7 @@ class Api::MembersController < ApplicationController
   # @return [Integer] *code*
   #
   def show
+    authorize! :manage_member_api, Member
     member = Member.find(params[:id])
     if member.nil?
       render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
@@ -213,9 +215,4 @@ class Api::MembersController < ApplicationController
       }
     end
   end    
-
-  def check_authentification
-    authorize! :manage_member_api, Member
-  end
-
 end

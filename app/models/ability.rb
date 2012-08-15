@@ -20,10 +20,10 @@ class Ability
       can :manage_token_api, Agent
     elsif agent.has_role? 'representative'
       can :manage, Member
+      cannot :enroll, Member
       can :see_credit_card_last_digits, CreditCard
     elsif agent.has_role? 'supervisor'
       can :manage, Member
-      can :enroll_member, Agent      
       can :see_credit_card, CreditCard
     elsif agent.has_role? 'api'
       can :manage_member_api, Member
