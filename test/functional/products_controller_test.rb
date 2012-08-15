@@ -9,12 +9,12 @@ class ProductsControllerTest < ActionController::TestCase
     @club = FactoryGirl.create(:club, :partner_id => @partner.id)
   end
 
-  test "should get index" do
+  test "Admin should get index" do
     get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
     assert_response :success
   end
 
-  test "should get new" do
+  test "Admin should get new" do
     get :new, :partner_prefix => @partner.prefix, :club_prefix => @club.name
     assert_response :success
   end
@@ -27,23 +27,23 @@ class ProductsControllerTest < ActionController::TestCase
   #   assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
   # end
 
-  test "should show product" do
+  test "Admin should show product" do
     get :show, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
     assert_response :success
   end
 
-  test "should get edit" do
+  test "Admin should get edit" do
     get :edit, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
     assert_response :success
   end
 
-  test "should update product" do
+  test "Admin should update product" do
     put :update, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name, 
                  product: { name: @product.name, recurrent: @product.recurrent, sku: @product.sku, stock: @product.stock, weight: @product.weight }
     assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
   end
 
-  test "should destroy product" do
+  test "Admin should destroy product" do
     assert_difference('Product.count', -1) do
       delete :destroy, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
     end
