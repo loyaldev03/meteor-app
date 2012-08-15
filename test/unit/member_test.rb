@@ -100,16 +100,16 @@ class MemberTest < ActiveSupport::TestCase
     assert answer[:code] == Settings.error_codes.cant_recover_member, answer[:message]
   end
 
-  # test "Lapsed member can be recovered" do
-  #   assert_difference('Fulfillment.count',2) do
-  #     member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-  #     enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
-  #     answer = member.recover(@terms_of_membership_with_gateway)
-  #     assert answer[:code] == Settings.error_codes.success, answer[:message]
-  #     assert_equal 'provisional', member.status, "Status was not updated."
-  #     assert_equal 1, member.reactivation_times, "Reactivation_times was not updated."
-  #   end
-  # end
+  test "Lapsed member can be recovered" do
+    assert_difference('Fulfillment.count',2) do
+      member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+      enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
+      answer = member.recover(@terms_of_membership_with_gateway)
+      assert answer[:code] == Settings.error_codes.success, answer[:message]
+      assert_equal 'provisional', member.status, "Status was not updated."
+      assert_equal 1, member.reactivation_times, "Reactivation_times was not updated."
+    end
+  end
 
   test "Lapsed member can be recovered unless it needs approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
