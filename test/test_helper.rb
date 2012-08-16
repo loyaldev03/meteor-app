@@ -5,6 +5,17 @@ SimpleCov.start 'rails'
 
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
+require 'capybara/rails'
+require 'capybara/dsl'
+require 'database_cleaner'
+
+DatabaseCleaner.strategy = :truncation
+# require 'capybara-webkit'
+
+#Capybara.javascript_driver = :webkit
+# capybara levanta un server por default
+# Capybara.server_port = '8000'
+# apybara.app_host = 'http://localhost:8000'
 
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
@@ -32,8 +43,56 @@ class ActionController::TestCase
   include Devise::TestHelpers
 end
 
+module ActionController
+  class IntegrationTest
+    include Capybara::DSL
+
+    self.use_transactional_fixtures = false # DOES WORK! Damn it!
+  
+    #setup do
+    #  Capybara.current_driver = :selenium
+    #  DatabaseCleaner.start
+    #end
+
+    def init_test_setup
+      DatabaseCleaner.start
+      #Capybara.current_driver = :selenium
+      Capybara.current_driver = :webkit
+      #Capybara.javascript_driver = :webkit
+      Capybara.default_wait_time = 10
+    end
+
+    def sign_in_as(user)
+      visit '/'
+      fill_in 'agent_login', :with => user.email
+      fill_in 'agent_password', :with => user.password
+      click_link_or_button('Sign in')
+    end
+
+    def sign_out
+      #click_link_or_button('Logout')   
+    end
+
+    def confirm_ok_js
+      evaluate_script("window.confirm = function(msg) { return true; }")
+    end
+
+    teardown do
+      DatabaseCleaner.clean
+      Capybara.reset_sessions!
+      Capybara.use_default_driver
+    end
+  end
+end
+
 module Airbrake
   def self.notify(exception, opts = {})
     # do nothing.
   end
 end
+
+
+ # use_transactional_fixtures = false    # DOES NOT WORK!
+   # … think this should be renamed and should definitely get some documentation love.
+    
+ 
