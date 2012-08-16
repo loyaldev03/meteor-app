@@ -7,7 +7,7 @@ SacPlatform::Application.routes.draw do
       resources :members, :only => [:create, :show, :update] do
         resources :club_cash, only: :create
       end
-      match '/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get]
+      match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get]
       resources :prospects, :only => [:create]      
     end
   end
