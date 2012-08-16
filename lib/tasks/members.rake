@@ -164,10 +164,12 @@ namespace :members do
         group.each do |credit_card| 
           tz = Time.zone.now
           begin
-            am = credit_card.am_card
-            if am.valid?
-              credit_card.cc_type = am.type
-              credit_card.save
+            unless credit_card.member.nil?
+              am = credit_card.am_card
+              if am.valid?
+                credit_card.cc_type = am.type
+                credit_card.save
+              end
             end
           rescue Exception => e
             Airbrake.notify(:error_class => "CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")

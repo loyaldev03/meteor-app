@@ -126,15 +126,36 @@ module Drupal
               value: m.city
             } 
           ] 
-        }, 
-        field_profile_phone: { 
+        },
+        field_profile_phone_type: { 
           und: [ 
             { 
-              value: m.full_phone_number
+              value: m.type_of_phone_number
             } 
           ] 
-        }, 
-        field_profile_state_province: { 
+        },
+        field_profile_phone_country_code: { 
+          und: [ 
+            { 
+              value: m.phone_country_code
+            } 
+          ] 
+        },
+        field_profile_phone_area_code: { 
+          und: [ 
+            { 
+              value: m.phone_area_code
+            } 
+          ] 
+        },
+        field_profile_phone_local_number: { 
+          und: [ 
+            { 
+              value: m.phone_local_number
+            } 
+          ] 
+        },
+        field_profile_stateprovince: { 
           und: { 
             value: m.state
           } 
@@ -145,7 +166,14 @@ module Drupal
               value: m.zip
             } 
           ] 
-        } 
+        }, 
+        field_profile_country: { 
+          und: [ 
+            {
+              value: m.country
+            } 
+          ] 
+        }  
       }
 
       if self.new_record?

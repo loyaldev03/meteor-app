@@ -100,16 +100,16 @@ class MemberTest < ActiveSupport::TestCase
     assert answer[:code] == Settings.error_codes.cant_recover_member, answer[:message]
   end
 
-  # test "Lapsed member can be recovered" do
-  #   assert_difference('Fulfillment.count',2) do
-  #     member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-  #     enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
-  #     answer = member.recover(@terms_of_membership_with_gateway)
-  #     assert answer[:code] == Settings.error_codes.success, answer[:message]
-  #     assert_equal 'provisional', member.status, "Status was not updated."
-  #     assert_equal 1, member.reactivation_times, "Reactivation_times was not updated."
-  #   end
-  # end
+  test "Lapsed member can be recovered" do
+    assert_difference('Fulfillment.count',2) do
+      member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+      enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
+      answer = member.recover(@terms_of_membership_with_gateway)
+      assert answer[:code] == Settings.error_codes.success, answer[:message]
+      assert_equal 'provisional', member.status, "Status was not updated."
+      assert_equal 1, member.reactivation_times, "Reactivation_times was not updated."
+    end
+  end
 
   test "Lapsed member can be recovered unless it needs approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
@@ -157,6 +157,12 @@ class MemberTest < ActiveSupport::TestCase
     member.first_name = 'Billy 3ro'
     member.last_name = 'Sáenz'
     assert member.save, "member cant be save #{member.errors.inspect}"
+  end
+
+  test "Should not deduct more club_cash than the member has" do
+    member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club, :club_cash_amount => 200)
+    member.add_club_cash(-300)
+    assert_equal 200, member.club_cash_amount, "The member is #{member.status} with $#{member.club_cash_amount}"
   end
 
 end
