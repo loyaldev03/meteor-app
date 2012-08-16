@@ -7,6 +7,14 @@ FactoryGirl.define do
     sequence(:email) {|n| "carla#{n}@test.no" }
   end
 
+  factory :confirmed_agent, class: Agent do
+    sequence(:username) {|n| "ConAgent#{n}" }
+    password "secret"
+    password_confirmation { password }
+    sequence(:email) {|n| "con_agent#{n}@test.no" }
+    confirmed_at Date.today-1.month
+  end
+
   factory :confirmed_admin_agent, class: Agent do
     sequence(:username) {|n| "Admin#{n}" }
     password "secret"

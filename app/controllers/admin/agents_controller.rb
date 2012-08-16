@@ -83,7 +83,7 @@ class Admin::AgentsController < ApplicationController
     @agent.destroy
 
     respond_to do |format|
-      format.html { redirect_to(admin_agents_url) }
+      format.html { redirect_to(admin_agents_url, :notice => 'Agent was successfully deleted.') }
       format.xml  { head :ok }
     end
   end
