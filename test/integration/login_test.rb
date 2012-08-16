@@ -12,13 +12,13 @@ class LoginTest < ActionController::IntegrationTest
     assert page.has_content?('Signed in successfully')
   end
 
-  test "admin_agent_logout" do
-  	admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    sign_in_as(admin_agent)
-    #evaluate_script("$('.dropdown-menu a').trigger('click')");
-    click_link_or_button "Logout"
-    assert page.has_content?("You need to sign in or sign up before continuing")
-  end
+  # test "admin_agent_logout" do
+  # 	admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+  #   sign_in_as(admin_agent)
+  #   #evaluate_script("$('.dropdown-menu a').trigger('click')");
+  #   click_link_or_button "Logout"
+  #   assert page.has_content?("You need to sign in or sign up before continuing")
+  # end
 
   test "no_login" do
     visit root_path
