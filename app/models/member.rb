@@ -573,7 +573,7 @@ class Member < ActiveRecord::Base
         message = "Cannot add $0 amount. Please add an amount."
         answer =  { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful  }
       else
-        if (amount.to_i < 0 and amount.to_i.abs < self.club_cash_amount.to_i) or amount.to_i > 0
+        if (amount.to_i < 0 and amount.to_i.abs <= self.club_cash_amount.to_i) or amount.to_i > 0
           begin
             cct = ClubCashTransaction.new(:amount => amount, :description => description)
             cct.member = self
