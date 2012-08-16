@@ -56,9 +56,9 @@ module ActionController
 
     def init_test_setup
       DatabaseCleaner.start
-      #Capybara.current_driver = :selenium
-      Capybara.current_driver = :webkit
-      #Capybara.javascript_driver = :webkit
+      Capybara.current_driver = :selenium
+      #Capybara.current_driver = :webkit
+      #Capybara.javascript_driver = nil
       Capybara.default_wait_time = 10
     end
 
