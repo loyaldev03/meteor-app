@@ -1,29 +1,30 @@
-require 'integration_test_helper' 
+require 'test_helper' 
  
 class LoginTest < ActionController::IntegrationTest
  
   setup do
-    
+    init_test_setup
   end
 
   test "admin_agent_login" do
   	admin_user = FactoryGirl.create(:confirmed_admin_agent)
-    visit root_path
-    assert page.has_content?('Sign in')
-    fill_in 'agent_login', :with => admin_user.username
-    fill_in 'agent_password', :with => admin_user.password
-    click_button 'Sign in'
+    sign_in_as(admin_user)
     assert page.has_content?('Signed in successfully')
+  end
+
+  test "admin_agent_logout" do
+  	admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    sign_in_as(admin_agent)
+    #evaluate_script("$('.dropdown-menu a').trigger('click')");
+    click_link_or_button "Logout"
+    assert page.has_content?("You need to sign in or sign up before continuing")
   end
 
   test "no_login" do
     visit root_path
-    assert page.has_content?('Sign in')
-    fill_in 'agent_login', :with => 'no_user_123456789'
-    fill_in 'agent_password', :with => 'no_password_123456789'
-    click_button 'Sign in'
+    user = FactoryGirl.build(:agent)
+    sign_in_as(user)
     assert page.has_content?('Invalid email or password')
   end
 
- 
 end

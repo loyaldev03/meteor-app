@@ -92,6 +92,9 @@ GEM
       rack-test (>= 0.5.4)
       selenium-webdriver (~> 2.0)
       xpath (~> 0.1.4)
+    capybara-webkit (0.12.1)
+      capybara (>= 1.0.0, < 1.2)
+      json
     childprocess (0.3.5)
       ffi (~> 1.0, >= 1.0.6)
     cocaine (0.2.1)
@@ -106,6 +109,7 @@ GEM
     commonjs (0.2.6)
     country_code_select (1.0.0)
       activesupport (>= 3.0)
+    database_cleaner (0.8.0)
     delayed_job (3.0.3)
       activesupport (~> 3.0)
     delayed_job_active_record (0.3.2)
@@ -132,8 +136,8 @@ GEM
       multipart-post (~> 1.1)
     faraday_middleware (0.8.8)
       faraday (>= 0.7.4, < 0.9)
-    ffi (1.1.5)
     fastercsv (1.5.5)
+    ffi (1.1.5)
     haml (3.1.7)
     hashie (1.2.0)
     highline (1.6.13)
@@ -229,9 +233,9 @@ GEM
       sexp_processor (~> 3.0)
     ruby_core_source (0.1.5)
       archive-tar-minitar (>= 0.5.2)
-    rubyzip (0.9.9)
     ruby_parser (2.3.1)
       sexp_processor (~> 3.0)
+    rubyzip (0.9.9)
     sass (3.1.19)
     sass-rails (3.2.5)
       railties (~> 3.2.0)
@@ -290,8 +294,10 @@ DEPENDENCIES
   brakeman
   cancan
   capybara
+  capybara-webkit
   coffee-rails (~> 3.2.1)
   country_code_select (~> 1.0.0)
+  database_cleaner
   delayed_job_active_record
   devise (= 2.0.4)
   easy_roles
