@@ -68,6 +68,14 @@ module ActionController
       fill_in 'agent_password', :with => user.password
       click_link_or_button('Sign in')
     end
+    
+    def do_data_table_search(selector, value)
+      within(selector) do
+        find(:css,"input[type='text']").set("XXXXXXXXXXXXXXXXXXX")
+        sleep(1)
+        find(:css,"input[type='text']").set(value)
+      end
+    end
 
     def sign_out
       #click_link_or_button('Logout')   
