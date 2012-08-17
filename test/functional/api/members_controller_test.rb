@@ -28,7 +28,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                       :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
           ) 
     )
-    assert_difference('MemberPreference.count',2) do 
+    assert_difference('Delayed::Job.count',1) do 
       assert_difference('Member.count') do
         post( :create, { member: {:first_name => @member.first_name, 
                                   :last_name => @member.last_name,
