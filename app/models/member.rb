@@ -14,6 +14,7 @@ class Member < ActiveRecord::Base
   has_many :fulfillments
   has_many :club_cash_transactions
   has_many :enrollment_infos
+  has_many :member_preferences
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
@@ -445,7 +446,13 @@ class Member < ActiveRecord::Base
 
       enrollment_info.member_id = self.id
       enrollment_info.save
-
+      self.preferences.each do |key, value| 
+        preference = MemberPreference.new :param => key, :value => value
+        preference.member_id = self.id
+        preference.enrollment_info_id = enrollment_info.id
+        preference.club_id = self.club_id
+        preference.save
+      end
       if credit_card.member.nil?
         credit_card.member = self
         credit_card.save
