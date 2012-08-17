@@ -43,6 +43,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 :enrollment_amount => 34.34,
                                 :terms_of_membership_id => @terms_of_membership.id,
                                 :birth_date => @member.birth_date,
+                                :preferences => 'preferences',
                                 :credit_card => {:number => @credit_card.number,
                                                  :expire_month => @credit_card.expire_month,
                                                  :expire_year => @credit_card.expire_year },
@@ -50,6 +51,8 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 },:format => :json})
       assert_response :success
     end
+    m = Member.find_by_email(@member.email)
+    assert_equal m.preferences, 'preferences'
   end
 
   test "Representative should not enroll/create member" do
@@ -71,6 +74,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 :enrollment_amount => 34.34,
                                 :terms_of_membership_id => @terms_of_membership.id,
                                 :birth_date => @member.birth_date,
+                                :preferences => 'preferences',
                                 :credit_card => {:number => @credit_card.number,
                                                  :expire_month => @credit_card.expire_month,
                                                  :expire_year => @credit_card.expire_year },
@@ -107,6 +111,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 :enrollment_amount => 34.34,
                                 :terms_of_membership_id => @terms_of_membership.id,
                                 :birth_date => @member.birth_date,
+                                :preferences => 'preferences',
                                 :credit_card => {:number => @credit_card.number,
                                                  :expire_month => @credit_card.expire_month,
                                                  :expire_year => @credit_card.expire_year },
@@ -135,6 +140,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 :enrollment_amount => 34.34,
                                 :terms_of_membership_id => @terms_of_membership.id,
                                 :birth_date => @member.birth_date,
+                                :preferences => 'preferences',
                                 :credit_card => {:number => @credit_card.number,
                                                  :expire_month => @credit_card.expire_month,
                                                  :expire_year => @credit_card.expire_year },
