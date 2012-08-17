@@ -446,12 +446,14 @@ class Member < ActiveRecord::Base
 
       enrollment_info.member_id = self.id
       enrollment_info.save
-      self.preferences.each do |key, value| 
-        preference = MemberPreference.new :param => key, :value => value
-        preference.member_id = self.id
-        preference.enrollment_info_id = enrollment_info.id
-        preference.club_id = self.club_id
-        preference.save
+      if self.preferences 
+        self.preferences.each do |key, value| 
+          preference = MemberPreference.new :param => key, :value => value
+          preference.member_id = self.id
+          preference.enrollment_info_id = enrollment_info.id
+          preference.club_id = self.club_id
+          preference.save
+        end
       end
       if credit_card.member.nil?
         credit_card.member = self
