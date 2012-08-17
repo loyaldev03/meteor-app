@@ -197,22 +197,20 @@ class Api::MembersController < ApplicationController
   def show
     authorize! :manage_member_api, Member
     member = Member.find(params[:id])
-    if member.nil?
-      render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
-    else
-      render json: {
-        code: Settings.error_codes.success,
-        member: {
-          first_name: member.first_name, last_name: member.last_name, email: member.email,
-          address: member.address, city: member.city, state: member.state, zip: member.zip,
-          phone_country_code: member.phone_country_code, phone_area_code: member.phone_area_code,
-          phone_local_number: member.phone_local_number, club_cash_amount: member.club_cash_amount
-        },
-        credit_card: {
-          expire_month: (member.active_credit_card && member.active_credit_card.expire_month),
-          expire_year: (member.active_credit_card && member.active_credit_card.expire_year)
-        }
+    render json: {
+      code: Settings.error_codes.success,
+      member: {
+        first_name: member.first_name, last_name: member.last_name, email: member.email,
+        address: member.address, city: member.city, state: member.state, zip: member.zip,
+        phone_country_code: member.phone_country_code, phone_area_code: member.phone_area_code,
+        phone_local_number: member.phone_local_number, club_cash_amount: member.club_cash_amount
+      },
+      credit_card: {
+        expire_month: (member.active_credit_card && member.active_credit_card.expire_month),
+        expire_year: (member.active_credit_card && member.active_credit_card.expire_year)
       }
-    end
+    }
+    rescue ActiveRecord::RecordNotFound
+      render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
   end    
 end

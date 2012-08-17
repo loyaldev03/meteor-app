@@ -17,15 +17,10 @@ class Api::ClubCashController < ApplicationController
   # @return [Integer] *code*
   #
   def create
-    response = {}
-
     member = Member.find(params[:member_id])
-    if member.nil?
-      response = { :message => "Member not found", :code => Settings.error_codes.not_found }  
-    else
-      response = member.add_club_cash(current_agent,params[:amount],params[:description])
-    end
-    render json: response  
+    render json: member.add_club_cash(current_agent,params[:amount],params[:description])
+    rescue ActiveRecord::RecordNotFound
+      render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end
 
   def check_authentification
