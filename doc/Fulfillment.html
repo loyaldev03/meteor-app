@@ -105,7 +105,6 @@
   <div class="discussion">
     <p>
 assigned_at => The day this fulfillment is assigned to our member.
-delivered_at => The day CS or our delivery provider send the fulfillment. 
 </p>
 <pre class="code ruby"><code>
     If fulfillment is resend it is because of a wrong address. 
@@ -211,6 +210,7 @@ status => open , archived
       <pre class="lines">
 
 
+66
 67
 68
 69
@@ -218,11 +218,10 @@ status => open , archived
 71
 72
 73
-74
-75</pre>
+74</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 66</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_new_fulfillment'>new_fulfillment</span><span class='lparen'>(</span><span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_can_receive_another_fulfillment?'>can_receive_another_fulfillment?</span>
@@ -253,6 +252,7 @@ status => open , archived
       <pre class="lines">
 
 
+55
 56
 57
 58
@@ -261,11 +261,10 @@ status => open , archived
 61
 62
 63
-64
-65</pre>
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 55</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_renew!'>renew!</span><span class='lparen'>(</span><span class='id identifier rubyid_undeliverable'>undeliverable</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_recurrent'>recurrent</span>
@@ -287,7 +286,7 @@ status => open , archived
 </div>
 
     <div id="footer">
-  Generated on Mon Aug 13 12:36:09 2012 by
+  Generated on Fri Aug 17 04:45:44 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
