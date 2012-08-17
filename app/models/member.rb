@@ -376,9 +376,11 @@ class Member < ActiveRecord::Base
         member.terms_of_membership = tom
 
         unless member.valid? and credit_card.valid?
-          errors = member.error_to_s + credit_card.error_to_s
+          # errors = member.error_to_s + credit_card.error_to_s
+          errors = member.errors.to_hash
+          errors.merge!(credit_card: credit_card.errors.to_hash) unless credit_card.errors.empty?
           return { :message => "Member data is invalid.", :code => Settings.error_codes.member_data_invalid, 
-                   :member_errors => member.errors, :credit_card_errors => credit_card.errors }
+                   :errors => errors }
         end
         # enroll allowed
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
