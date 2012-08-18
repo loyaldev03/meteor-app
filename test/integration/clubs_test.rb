@@ -23,7 +23,6 @@ class ClubTest < ActionController::IntegrationTest
     assert_difference('Club.count') do
       click_link_or_button 'Create Club'
     end
-    sleep(20)
     assert page.has_content?("The club #{unsaved_club.name} was successfully created")
   end
 

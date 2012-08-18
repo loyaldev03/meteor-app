@@ -5,7 +5,7 @@ FactoryGirl.define do
   end
 
   factory :simple_club, class: Club do
-    name { Faker::Name.name }
+    sequence(:name) {|n| "club#{n}" }
     description "My description"
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }

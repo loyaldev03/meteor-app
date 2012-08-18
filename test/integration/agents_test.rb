@@ -104,7 +104,7 @@ class AgentsTest < ActionController::IntegrationTest
 
     within("#agents_table") do
       wait_until {
-        page.has_content?(confirmed_agent.email)
+        assert page.has_content?(confirmed_agent.email)
         click_link_or_button 'Edit'
       }    
     end
