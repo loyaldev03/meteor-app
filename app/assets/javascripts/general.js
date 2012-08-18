@@ -159,16 +159,22 @@ $(document).ready( function() {
           else{
             $('#submit_button').removeAttr('disabled');
             $('#error_explanation ul').append("<b>"+data.message+"</b>");
-            for (var key in data.member_errors){
-              if (data.member_errors.hasOwnProperty(key)) {
-                $('#member_'+key).parent().parent().addClass("error");
-                $('#error_explanation ul').append("<li>"+key+': '+data.member_errors[key]+"</li>");
-              }
-            }
-            for (var key in data.credit_card_errors){
-              if (data.credit_card_errors.hasOwnProperty(key)) {
-                $('#member_credit_card_'+key).parent().parent().addClass("error");
-                $('#error_explanation ul').append("<li>"+key+': '+data.credit_card_errors[key]+"</li>");
+            for (var key in data.errors){
+              if (data.errors.hasOwnProperty(key)) {
+                if (key != 'credit_card'){
+                  $('#member_'+key).parent().parent().addClass("error");
+                  $('#error_explanation ul').append("<li>"+key+': '+data.errors[key]+"</li>");
+                }
+                else{
+                  for (var key2 in data.errors[key]){
+                    if (data.errors[key].hasOwnProperty(key2)){
+                      if (key2 != 0){
+                        $('#member_credit_card_'+key2).parent().parent().addClass("error");
+                        $('#error_explanation ul').append("<li>"+key2+': '+data.errors[key][key2]+"</li>");                  
+                      }
+                    }
+                  } 
+                }
               }
             }
           }

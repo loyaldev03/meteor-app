@@ -14,21 +14,25 @@ class Member < ActiveRecord::Base
   has_many :fulfillments
   has_many :club_cash_transactions
   has_many :enrollment_infos
+  has_many :member_preferences
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
       :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
       :wrong_phone_number, :mega_channel, :credit_cards_attributes, :birth_date,
-      :gender, :type_of_phone_number
+      :gender, :type_of_phone_number, :preferences
 
   # accepts_nested_attributes_for :credit_cards, :limit => 1
+
+  serialize :preferences, JSON
 
   before_create :record_date
 
   after_create :after_create_sync_remote_domain
   after_update :after_update_sync_remote_domain
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
+  after_save :asyn_desnormalize_preferences
   
   # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
   REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_country_code', 'phone_local_number', 'phone_local_number' ]
@@ -376,9 +380,11 @@ class Member < ActiveRecord::Base
         member.terms_of_membership = tom
 
         unless member.valid? and credit_card.valid?
-          errors = member.error_to_s + credit_card.error_to_s
+          # errors = member.error_to_s + credit_card.error_to_s
+          errors = member.errors.to_hash
+          errors.merge!(credit_card: credit_card.errors.to_hash) unless credit_card.errors.empty?
           return { :message => "Member data is invalid.", :code => Settings.error_codes.member_data_invalid, 
-                   :member_errors => member.errors, :credit_card_errors => credit_card.errors }
+                   :errors => errors }
         end
         # enroll allowed
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
@@ -634,6 +640,7 @@ class Member < ActiveRecord::Base
     self.phone_country_code = params[:phone_country_code]
     self.phone_area_code = params[:phone_area_code]
     self.phone_local_number = params[:phone_local_number]
+    self.preferences = params[:preferences]
   end
   
   private
@@ -751,5 +758,18 @@ class Member < ActiveRecord::Base
       end
       message
     end
+
+    def asyn_desnormalize_preferences
+      self.desnormalize_preferences if self.changed.include?('preferences') 
+    end
+
+    def desnormalize_preferences
+      self.preferences.each do |key, value|
+        pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
+        pref.value = value
+        pref.save
+      end
+    end
+    handle_asynchronously :desnormalize_preferences   
 
 end

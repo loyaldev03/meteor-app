@@ -72,8 +72,7 @@ class Api::MembersController < ApplicationController
   # [code] Code related to the method result.
   # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment.
   # [v_id] Visible id of the member that was enrolled or recovered, or updated.
-  # [member_errors] A hash with members errors. This will be use to show errors on members creation page.
-  # [credit_card_errors] A hash with credit card errors. This will be use to show errors on members creation page.
+  # [errors] A hash with members errors. This will be use to show errors on members creation page.
   #
   # @param [Hash] member
   # @param [Hash] setter
@@ -81,8 +80,7 @@ class Api::MembersController < ApplicationController
   # @return [Integer] *code*
   # @return [Integer] *member_id*
   # @return [Integer] *v_id*
-  # @return [Hash] *member_errors*
-  # @return [Hash] *credit_card_errors*
+  # @return [Hash] *errors*
   # 
   def create
     authorize! :enroll, Member
