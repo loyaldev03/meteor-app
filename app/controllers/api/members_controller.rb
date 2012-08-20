@@ -84,12 +84,11 @@ class Api::MembersController < ApplicationController
   # 
   def create
     authorize! :enroll, Member
-    response = {}
     tom = TermsOfMembership.find_by_id(params[:member][:terms_of_membership_id])  
     if tom.nil?
-      response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
+      render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
     else
-      response = Member.enroll(
+      render json: Member.enroll(
         tom, 
         current_agent, 
         params[:member][:enrollment_amount], 
@@ -98,7 +97,6 @@ class Api::MembersController < ApplicationController
         params[:setter] && params[:setter][:cc_blank], 
       )
     end
-    render json: response 
   end
 
   # Method : PUT

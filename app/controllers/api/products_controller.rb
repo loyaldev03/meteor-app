@@ -26,7 +26,8 @@ class Api::ProductsController < ApplicationController
     end
   end
 
-  def check_authentification
-    authorize! :manage_product_api, Member
-  end
+  private
+    def check_authentification
+      authorize! :manage_product_api, Member
+    end
 end
