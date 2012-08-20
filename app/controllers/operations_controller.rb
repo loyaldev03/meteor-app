@@ -13,13 +13,8 @@ class OperationsController < ApplicationController
   end
 
   # GET /operations/1
-  # GET /operations/1.json
   def show
     @operation = Operation.find(params[:id])
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @operation }
-    end
   end
 
   # PUT /operations/1
@@ -27,17 +22,12 @@ class OperationsController < ApplicationController
   def update
     operation = Operation.find(params[:id])
     @url_helpers = Rails.application.routes.url_helpers
-    respond_to do |format|
-      if operation.update_attributes(params[:operation])
-        message = "Edited operation note <a href=\"/partner/#{@current_partner.prefix}/club/#{@current_club.name}/member/#{@current_member.visible_id}/operations/#{operation.id}\">#{operation.id}</a>.".html_safe
-        operation.save
-        Auditory.audit(@current_agent, operation, message, @current_member)
-        format.html { redirect_to operation_path(:id => operation), notice: message }
-        format.json { head :no_content }
-      else
-        format.html { render action: "edit" }
-        format.json { render json: operation.errors, status: :unprocessable_entity }
-      end
+    if operation.update_attributes(params[:operation])
+      message = "Edited operation note <a href=\"/partner/#{@current_partner.prefix}/club/#{@current_club.name}/member/#{@current_member.visible_id}/operations/#{operation.id}\">#{operation.id}</a>.".html_safe
+      Auditory.audit(@current_agent, operation, message, @current_member)
+      redirect_to operation_path(:id => operation), notice: message
+    else
+      render action: "edit" 
     end
   end
 

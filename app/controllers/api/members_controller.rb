@@ -160,6 +160,8 @@ class Api::MembersController < ApplicationController
       response = { :message => "Member data is invalid.", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
     end
     render json: response
+  rescue ActiveRecord::RecordNotFound
+    render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end
 
   # Method : GET
@@ -208,7 +210,7 @@ class Api::MembersController < ApplicationController
         expire_year: (member.active_credit_card && member.active_credit_card.expire_year)
       }
     }
-    rescue ActiveRecord::RecordNotFound
-      render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
+  rescue ActiveRecord::RecordNotFound
+    render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
   end    
 end

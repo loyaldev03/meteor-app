@@ -15,15 +15,13 @@ class MemberNotesController < ApplicationController
     member_note.communication_type_id = params[:member_note][:communication_type_id]
     member_note.created_by_id = @current_agent.id
     member_note.member_id = @current_member.id
-    message = "Note added."
     
-    respond_to do |format|
-      if member_note.save
-        Auditory.audit(@current_agent, member_note, message, @current_member)
-        format.html { redirect_to show_member_path, notice: "The note was added successfuly" }
-      else
-        format.html { render action: "new" }
-      end
+    
+    if member_note.save
+      Auditory.audit(@current_agent, member_note, "Note added", @current_member)
+      redirect_to show_member_path, notice: "The note was added successfuly"
+    else
+      render action: "new"
     end
   end
 end
