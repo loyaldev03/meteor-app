@@ -68,7 +68,7 @@ module ActionController
       fill_in 'agent_password', :with => user.password
       click_link_or_button('Sign in')
     end
-    
+
     def do_data_table_search(selector, value)
       within(selector) do
         find(:css,"input[type='text']").set("XXXXXXXXXXXXXXXXXXX")
@@ -84,6 +84,11 @@ module ActionController
     def confirm_ok_js
       evaluate_script("window.confirm = function(msg) { return true; }")
     end
+
+    def alert_ok_js
+      evaluate_script("window.alert = function(msg) { return true; }")
+    end
+
 
     teardown do
       DatabaseCleaner.clean

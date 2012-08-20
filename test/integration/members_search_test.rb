@@ -31,21 +31,21 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
   end
   
-  # test "search member by member id" do
-  #   search_member("member[member_id]", "#{@search_member.visible_id}", @search_member)
-  # end
+  test "search member by member id" do
+    search_member("member[member_id]", "#{@search_member.visible_id}", @search_member)
+  end
 
-  # test "search member by first name" do
-  #   search_member("member[first_name]", "#{@search_member.first_name}", @search_member)
-  # end
+  test "search member by first name" do
+    search_member("member[first_name]", "#{@search_member.first_name}", @search_member)
+  end
 
-  # test "search members by next bill date" do
-  #   page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
-  #   within("#ui-datepicker-div") do
-  #     click_on("#{Time.new.day}")
-  #   end
-  #   search_member("member[next_retry_bill_date]", nil, @search_member)
-  # end
+  test "search members by next bill date" do
+    page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
+    within("#ui-datepicker-div") do
+      click_on("#{Time.new.day}")
+    end
+    search_member("member[next_retry_bill_date]", nil, @search_member)
+  end
   
   test "display member" do
     search_member("member[member_id]", "#{@search_member.visible_id}", @search_member)
