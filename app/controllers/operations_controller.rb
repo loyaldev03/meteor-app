@@ -18,7 +18,6 @@ class OperationsController < ApplicationController
   end
 
   # PUT /operations/1
-  # PUT /operations/1.json
   def update
     operation = Operation.find(params[:id])
     @url_helpers = Rails.application.routes.url_helpers

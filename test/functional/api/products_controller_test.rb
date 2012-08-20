@@ -11,13 +11,13 @@ class Api::ProductsControllerTest < ActionController::TestCase
   test "should get stock." do
     result = get(:get_stock, { :club_id => @product.club_id, :sku => @product.sku, :format => :json} )
     assert_response :success
-    assert result.code, Settings.error_codes.not_found
+    assert_equal Settings.error_codes.success, JSON::parse(result.body)['code']
   end
 
   test "should answer product not found if invalid id is used." do
-    result = get(:get_stock, { :club_id => @product.club_id, :sku => 'Bracelet1', :format => :json} )
+    result = get(:get_stock, { :club_id => @product.club_id, :sku => 'Bracelet34', :format => :json} )
     assert_response :success
-    assert result.code, Settings.error_codes.not_found
+    assert_equal Settings.error_codes.not_found, JSON::parse(result.body)['code']
   end
 
 end
