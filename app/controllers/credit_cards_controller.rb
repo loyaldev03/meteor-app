@@ -17,14 +17,11 @@ class CreditCardsController < ApplicationController
         message = "Credit card #{credit_card.last_digits} added and set active."
         Auditory.audit(@current_agent, credit_card, message, @current_member)
         redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.last_digits} was successfully added and setted as active." 
-      else
-        flash[:error] = "Credit card is invalid or is expired!"
-        render "new"
+        return
       end
-    else
-      flash[:error] = "Credit card is invalid or is expired!"
-      render "new"
     end
+    flash[:error] = "Credit card is invalid or is expired!"
+    render "new"
   end
 
   def activate
