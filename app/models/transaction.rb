@@ -224,7 +224,6 @@ class Transaction < ActiveRecord::Base
       end
       self.response_result=answer.message
       save
-      debugger;
       if answer.params and answer.params[:duplicate]=="true"
         # we keep this if, just because it was on Litle version (compatibility).
         # MeS seems to not send this param
