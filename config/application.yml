@@ -24,6 +24,7 @@ defaults: &defaults
     membership_billing_soft_decline: 107
     credit_error: 108
     membership_billing_without_pgc: 109
+    chargeback: 110
     cancel: 200
     future_cancel: 201
     save_the_sale: 202

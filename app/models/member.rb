@@ -651,9 +651,9 @@ class Member < ActiveRecord::Base
     self.preferences = params[:preferences]
   end
 
-  def chargeback!(reason)
-    # TODO: add new Transaction
-    self.blacklist nil, reason
+  def chargeback!(transaction_chargebacked, args)
+    trans = Transaction.new_chargeback(transaction_chargebacked, args)
+    self.blacklist nil, args[:reason]
     self.cancel! Date.today, "Automatic cancellation because of a chargeback."
     self.set_as_canceled!
   end
