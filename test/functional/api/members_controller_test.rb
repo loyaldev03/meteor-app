@@ -28,7 +28,8 @@ class Api::MembersControllerTest < ActionController::TestCase
                                       :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
           ) 
     )
-    assert_difference('Delayed::Job.count',1) do 
+    preferences = {'color' => 'green','car'=> 'dodge'}
+    assert_difference('MemberPreference.count',preferences.size) do 
       assert_difference('Member.count') do
         post( :create, { member: {:first_name => @member.first_name, 
                                   :last_name => @member.last_name,
@@ -44,7 +45,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                   :enrollment_amount => 34.34,
                                   :terms_of_membership_id => @terms_of_membership.id,
                                   :birth_date => @member.birth_date,
-                                  :preferences => {'color' => 'green','car'=> 'dodge'},
+                                  :preferences => preferences,
                                   :credit_card => {:number => @credit_card.number,
                                                    :expire_month => @credit_card.expire_month,
                                                    :expire_year => @credit_card.expire_year },

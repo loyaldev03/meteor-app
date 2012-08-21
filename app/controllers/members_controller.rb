@@ -35,8 +35,6 @@ class MembersController < ApplicationController
       format.html {render 'index'}
       format.js {render 'index'}
     end
-
-
   end
 
   def show

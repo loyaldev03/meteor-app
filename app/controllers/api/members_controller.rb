@@ -84,12 +84,11 @@ class Api::MembersController < ApplicationController
   # 
   def create
     authorize! :enroll, Member
-    response = {}
     tom = TermsOfMembership.find_by_id(params[:member][:terms_of_membership_id])  
     if tom.nil?
-      response = { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
+      render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
     else
-      response = Member.enroll(
+      render json: Member.enroll(
         tom, 
         current_agent, 
         params[:member][:enrollment_amount], 
@@ -98,7 +97,6 @@ class Api::MembersController < ApplicationController
         params[:setter] && params[:setter][:cc_blank], 
       )
     end
-    render json: response 
   end
 
   # Method : PUT
@@ -160,6 +158,8 @@ class Api::MembersController < ApplicationController
       response = { :message => "Member data is invalid.", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
     end
     render json: response
+  rescue ActiveRecord::RecordNotFound
+    render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end
 
   # Method : GET
@@ -208,7 +208,7 @@ class Api::MembersController < ApplicationController
         expire_year: (member.active_credit_card && member.active_credit_card.expire_year)
       }
     }
-    rescue ActiveRecord::RecordNotFound
-      render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
+  rescue ActiveRecord::RecordNotFound
+    render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
   end    
 end

@@ -496,6 +496,8 @@ class Member < ActiveRecord::Base
           f.assigned_at = Time.zone.now
           f.tracking_code = product+self.visible_id.to_s
           f.save
+          stock_product = Product.find_by_sku_and_club_id(product,self.club.id)
+          f.set_as_out_of_stock if not stock_product and stock_product.stock == 0
         end
       end
     end
@@ -763,6 +765,7 @@ class Member < ActiveRecord::Base
       self.desnormalize_preferences if self.changed.include?('preferences') 
     end
 
+  public 
     def desnormalize_preferences
       self.preferences.each do |key, value|
         pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
@@ -770,6 +773,6 @@ class Member < ActiveRecord::Base
         pref.save
       end
     end
-    handle_asynchronously :desnormalize_preferences   
+    handle_asynchronously :desnormalize_preferences
 
 end

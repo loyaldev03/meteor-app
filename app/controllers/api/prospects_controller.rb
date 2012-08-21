@@ -61,7 +61,8 @@ class Api::ProspectsController < ApplicationController
     render json: response
   end
 
-  def check_authentification
-    authorize! :manage_prospects_api, Member
-  end
+  private
+    def check_authentification
+      authorize! :manage_prospects_api, Member
+    end
 end

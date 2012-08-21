@@ -15,6 +15,7 @@ class ProductsControllerTest < ActionController::TestCase
     get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
     assert_response :success
   end
+  
   test "Representative should not get index" do
     sign_in @representative_user
     get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name

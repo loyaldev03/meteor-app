@@ -19,12 +19,15 @@ class Api::ProductsController < ApplicationController
   #
   def get_stock
     product = Product.find_by_sku_and_club_id(params[:sku],params[:club_id])
-    render json: { code: Settings.error_codes.success, stock: product.stock }
-    rescue ActiveRecord::RecordNotFound
+    if product.nil?
       render json: { code: Settings.error_codes.not_found, message: 'Product not found' }
+    else
+      render json: { code: Settings.error_codes.success, stock: product.stock }
+    end
   end
 
-  def check_authentification
-    authorize! :manage_product_api, Member
-  end
+  private
+    def check_authentification
+      authorize! :manage_product_api, Member
+    end
 end
