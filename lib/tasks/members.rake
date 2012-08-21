@@ -49,7 +49,7 @@ end
 
 namespace :members do
   desc "Refresh autologin_url for ALL members"
-  task :refresh_autologin_url => :environment do
+  task :Members => :environment do
     tall = Time.zone.now
     begin
       Rails.logger.info " *** Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
@@ -59,7 +59,7 @@ namespace :members do
           Rails.logger.info "   * processing member ##{member.uuid}"
           member.refresh_autologin_url!
         rescue
-          Airbrake.notify error_class: "Members::Cancel", 
+          Airbrake.notify error_class: "Members::Members", 
             error_message: "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}"
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
@@ -96,29 +96,27 @@ namespace :members do
   desc "Send Happy birthday email to members"
   # This task should be run each day at 3 am ?
   task :send_happy_birthday => :environment do
-    # TODO: this taks must run from a desnormalized database.
-    # tall = Time.zone.now
-    # begin
-    #   base =  Member.where(" birthday = ? and status IS NOT IN (?) ", Date.today, [ 'lapsed', 'applied' ])
-    #   Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
-    #   base.find_in_batches do |group|
-    #     group.each do |member| 
-    #       tz = Time.zone.now
-    #       begin
-    #         Rails.logger.info "  * processing member ##{member.uuid}"
-    #         Communication.deliver!(:birthday, member)
-    #       rescue Exception => e
-    #         Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
-    #         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-    #       end
-    #       Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
-    #     end
-    #   end
-    # ensure
-    #   Rails.logger.info "It all took #{Time.zone.now - tall}"
-    # end
+    tall = Time.zone.now
+    begin
+      base = Member.where(" birth_date = ? and status IN (?) ", Date.today, [ 'active', 'provisional' ])
+      Rails.logger.info " *** Starting members:send_happy_birthday rake task, processing #{base.count} members"
+      base.find_in_batches do |group|
+        group.each do |member| 
+          tz = Time.zone.now
+          begin
+            Rails.logger.info "  * processing member ##{member.uuid}"
+            Communication.deliver!(:birthday, member)
+          rescue Exception => e
+            Airbrake.notify(:error_class => "Members::send_happy_birthday", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        end
+      end
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}"
+    end
   end
-
 
   desc "Send pillar emails"
   task :send_pillar_emails => :environment do 
@@ -138,14 +136,14 @@ namespace :members do
                   Rails.logger.info "  * processing member ##{member.uuid}"
                   Communication.deliver!(template, member)
                 rescue Exception => e
-                  Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+                  Airbrake.notify(:error_class => "Members::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
                   Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
                 end
                 Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
               end
             end
           rescue Exception => e
-            Airbrake.notify(:error_class => "Member::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for template ##{template.id}"
@@ -172,7 +170,7 @@ namespace :members do
               end
             end
           rescue Exception => e
-            Airbrake.notify(:error_class => "CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Airbrake.notify(:error_class => "Members::CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for template ##{credit_card.id}"
