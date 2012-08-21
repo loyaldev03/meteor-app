@@ -497,7 +497,11 @@ class Member < ActiveRecord::Base
           f.tracking_code = product+self.visible_id.to_s
           f.save
           stock_product = Product.find_by_sku_and_club_id(product,self.club.id)
-          f.set_as_out_of_stock if not stock_product and stock_product.stock == 0
+          if not stock_product
+            f.set_as_out_of_stock
+          else
+            f.set_as_out_of_stock if stock_product.stock = 0 
+          end  
         end
       end
     end
