@@ -609,17 +609,17 @@ class Member < ActiveRecord::Base
   end
 
   def blacklist(agent, reason)
-    response = {}
-    if self.update_attribute(:blacklisted, true)
+    self.blacklisted = true
+    self.cancel_date = Date.today
+    if self.save(:validate => false)
       self.credit_cards.each do |cc|
         cc.blacklist
       end
       message = "Blacklisted member and all its credit cards. Reason: #{reason}."
-      Auditory.audit(agent, self, message, self, Settings.operation_types.cancel)
-      response = { :message => message, :success => true }
+      Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
+      { :message => message, :success => true }
     else 
-      message = "Could not blacklisted this member."
-      response = { :message => message, :success => false }
+      { :message => "Could not blacklisted this member.", :success => false }
     end
   end
   ###################################################################
@@ -641,6 +641,21 @@ class Member < ActiveRecord::Base
     self.phone_area_code = params[:phone_area_code]
     self.phone_local_number = params[:phone_local_number]
     self.preferences = params[:preferences]
+  end
+
+  def chargeback!(reason)
+    # TODO: add new Transaction
+    self.blacklist nil, reason
+    self.cancel! nil, Date.today, "Automatic cancellation because of a chargeback."
+    self.set_as_canceled!
+  end
+
+  def cancel!(current_agent, cancel_date, message)
+    unless can_be_canceled?
+      self.cancel_date = cancel_date
+      self.save!
+      Auditory.audit(current_agent, self, message, self, Settings.operation_types.future_cancel)
+    end
   end
   
   private

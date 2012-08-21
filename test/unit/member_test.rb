@@ -165,4 +165,29 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal 200, member.club_cash_amount, "The member is #{member.status} with $#{member.club_cash_amount}"
   end
 
+  test "if active member is blacklisted, should have cancel date set " do
+    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    cancel_date = member.cancel_date
+    assert_difference('Operation.count', +1) do
+      member.blacklist(nil, "Test")
+    end
+    m = Member.find member.uuid
+    assert_not_nil m.cancel_date 
+    assert_nil cancel_date
+    assert_equal m.blacklisted, true
+  end
+
+  test "if lapsed member is blacklisted, it should not be canceled again" do
+    member = FactoryGirl.create(:lapsed_member, reactivation_times: 5, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    cancel_date = member.cancel_date
+    assert_difference('Operation.count', +1) do
+      member.blacklist(nil, "Test")
+    end
+    m = Member.find member.uuid
+    assert_not_nil m.cancel_date 
+    assert_equal m.cancel_date.to_date, cancel_date.to_date
+    assert_equal m.blacklisted, true
+  end
+
+
 end
