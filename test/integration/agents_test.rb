@@ -53,7 +53,7 @@ class AgentsTest < ActionController::IntegrationTest
     visit admin_agents_path
     within("#agents_table") do
       wait_until {
-        click_link_or_button "#{@admin_agent.id}" #change for view button
+        click_link_or_button "Show" #change for view button
       }
     end
 
