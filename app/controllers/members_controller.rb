@@ -139,7 +139,7 @@ class MembersController < ApplicationController
   end
 
   def blacklist
-      @blacklist_reason = MemberBlacklistReason.all
+    @blacklist_reasons = MemberBlacklistReason.all
     if request.post? 
       response = @current_member.blacklist(@current_agent, params[:reason])
       if response[:success]
