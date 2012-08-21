@@ -3,7 +3,6 @@ class Admin::PartnersController < ApplicationController
   authorize_resource :partner
 
   # GET /partners
-  # GET /partners.json
   def index
     respond_to do |format|
       format.html # index.html.erb
@@ -12,13 +11,11 @@ class Admin::PartnersController < ApplicationController
   end
 
   # GET /partners/1
-  # GET /partners/1.json
   def show
     @partner = Partner.find(params[:id])
   end
 
   # GET /partners/new
-  # GET /partners/new.json
   def new
     @partner = Partner.new
     @domain = @partner.domains.build
@@ -30,7 +27,6 @@ class Admin::PartnersController < ApplicationController
   end
 
   # POST /partners
-  # POST /partners.json
   def create
     @partner = Partner.new(params[:partner])
     if @partner.save
@@ -41,7 +37,6 @@ class Admin::PartnersController < ApplicationController
   end
 
   # PUT /partners/1
-  # PUT /partners/1.json
   def update
     @partner = Partner.find(params[:id])
     if @partner.update_attributes(params[:partner])
@@ -52,7 +47,6 @@ class Admin::PartnersController < ApplicationController
   end
 
   # DELETE /partners/1
-  # DELETE /partners/1.json
   def destroy
     @partner = Partner.find(params[:id])
     @partner.destroy

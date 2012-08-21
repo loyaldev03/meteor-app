@@ -12,13 +12,11 @@ class ClubsController < ApplicationController
   end
 
   # GET /clubs/1
-  # GET /clubs/1.json
   def show
     @club = Club.find(params[:id])
   end
 
   # GET /clubs/new
-  # GET /clubs/new.json
   def new
     @club = Club.new
   end
@@ -29,7 +27,6 @@ class ClubsController < ApplicationController
   end
 
   # POST /clubs
-  # POST /clubs.json
   def create
     @club = Club.new(params[:club])
     @club.partner = @current_partner
@@ -41,7 +38,6 @@ class ClubsController < ApplicationController
   end
 
   # PUT /clubs/1
-  # PUT /clubs/1.json
   def update
     @club = Club.find(params[:id])
     if @club.update_attributes(params[:club])
@@ -52,7 +48,6 @@ class ClubsController < ApplicationController
   end
 
   # DELETE /clubs/1
-  # DELETE /clubs/1.json
   def destroy
     @club = Club.find(params[:id])
     @club.destroy

@@ -55,6 +55,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
+    type_of_phone_number "Home"
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }

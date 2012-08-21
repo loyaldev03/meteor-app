@@ -8,28 +8,28 @@
     <table>
       <tr>
         <td><%= t('activerecord.attributes.member.member_id') %>:</td>
-        <td><input readonly="true" type="text" class="test_field" value="<%= @current_member.visible_id %>" /></td>
+        <td><input id="input_visible_id" readonly="true" type="text" class="test_field" value="<%= @current_member.visible_id %>" /></td>
       </tr>
       <tr>
         <td><%= t('activerecord.attributes.member.first_name') %>:</td>
-        <td><input readonly="true" type="text" class="test_field" value="<%= @current_member.first_name %>" />
+        <td><input id="input_first_name" readonly="true" type="text" class="test_field" value="<%= @current_member.first_name %>" />
         </td>
       </tr>
       <tr>
         <td><%= t('activerecord.attributes.member.last_name') %>:</td>
-        <td><input readonly="true" type="text" class="test_field" value="<%= @current_member.last_name %>" />
+        <td><input id="input_last_name" readonly="true" type="text" class="test_field" value="<%= @current_member.last_name %>" />
         </td>
       </tr>
       <tr>
         <td><%= t('activerecord.attributes.member.gender') %>:</td>
         <td>
-          <input readonly="true" type="text" class="test_field" value="<%= @current_member.gender == 'F' ? 'Female' : 'Male' %>" />
+          <input id="input_gender" readonly="true" type="text" class="test_field" value="<%= @current_member.gender == 'F' ? 'Female' : 'Male' %>" />
         </td>  
       </tr>
       <tr>
         <td><%= t('activerecord.attributes.member.member_classification_type') %>:</td>
         <td>
-          <input readonly="true" type="text" class="test_field" value="<%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %>" />
+          <input id="input_member_group_type" readonly="true" type="text" class="test_field" value="<%= @current_member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : @current_member.member_group_type.name %>" />
         </td>  
       </tr>
     </table>
@@ -85,7 +85,7 @@
 </div>
 
 
-<table class="table table-bordered table-condensed">
+<table id="table_demographic_information" class="table table-bordered table-condensed">
   <thead>
     <tr class="box_title"><th colspan="6"><h4>Demographic Information</h4></th></tr>
   </thead>
@@ -101,7 +101,7 @@
       <td><%= @current_member.zip %></td>
       <td>
         <% if @current_member.wrong_address.nil? %>
-          <%= link_to(member_set_undeliverable_path, :class => "btn btn-danger") do %> 
+          <%= link_to(member_set_undeliverable_path, :class => "btn btn-danger", :id => "link_member_set_undeliverable") do %> 
             <i class="icon-remove"></i> <%= t('activerecord.attributes.member.set_undeliverable') %>
           <% end %>        
         <% else %>
@@ -112,7 +112,7 @@
   </tbody>
 </table>
 
-<table class="table table-bordered table-condensed">
+<table id="table_contact_information" class="table table-bordered table-condensed">
   <thead>
     <tr class="box_title"><th colspan="4"><h4>Contact Information</h4></th></tr>
   </thead>
@@ -124,7 +124,7 @@
       <td nowrap="nowrap">
         <%= @current_member.full_phone_number %>
         <% if @current_member.wrong_phone_number.nil? %>
-          <%= link_to(member_set_unreachable_path, :class => "btn btn-danger") do %> 
+          <%= link_to(member_set_unreachable_path, :class => "btn btn-danger", :id => "link_member_set_unreachable") do %> 
             <i class="icon-remove"></i> <%= t('activerecord.attributes.member.set_unreachable') %>
           <% end %>        
         <% else %>
@@ -139,7 +139,7 @@
 </table>
 
 
-<table class="table table-bordered table-condensed">
+<table id="table_active_credit_card" class="table table-bordered table-condensed">
   <thead>
     <tr class="box_title">
       <th><h4>Active Credit Card</h4></th>
@@ -178,7 +178,7 @@
 
 
 
-<table class="table table-bordered table-condensed table-nohover">
+<table id="table_membership_information" class="table table-bordered table-condensed table-nohover">
   <thead>
     <tr class="box_title"><th colspan="2"><h4>Membership Information</h4></th></tr>
   </thead>
@@ -188,15 +188,15 @@
         <table class="hidden_table_border">
           <tr>
             <th>Status:</th>
-            <td><span style="height: 20px; padding: 4px;" class="<%= menber_status_class(@current_member) %>"><b><%= @current_member.status %></b></span></td>  
+            <td id="td_mi_status"><span style="height: 20px; padding: 4px;" class="<%= menber_status_class(@current_member) %>"><b><%= @current_member.status %></b></span></td>  
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.member_since_date') %>:</th>
-            <td><%= I18n.l @current_member.member_since_date, :format => :only_date %></td>  
+            <td id="td_mi_member_since_date"><%= I18n.l @current_member.member_since_date, :format => :only_date %></td>  
           </tr>
           <tr>
             <th><%= t('menu.activerecord.term_of_membership') %>:</th>
-            <td>
+            <td id="td_mi_terms_of_membership_name">
               <%= link_to(terms_of_membership_path(:id => @current_member.terms_of_membership), :class => "btn btn-small") do %> 
                 <i class="icon-zoom-in"></i> <%= @current_member.terms_of_membership.name %>
               <% end %>
@@ -204,15 +204,15 @@
           </tr>
           <tr>
             <th> <%= t('activerecord.attributes.member.created_by') %>: </th>
-            <td> <%= @current_member.created_by.try(:username) %> </td>
+            <td id="td_mi_created_by"> <%= @current_member.created_by.try(:username) %> </td>
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.recovery_times') %>:</th>
-            <td><%= @current_member.reactivation_times %></td>  
+            <td id="td_mi_reactivation_times"><%= @current_member.reactivation_times %></td>  
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.recycled_times') %>:</th>
-            <td>
+            <td id="td_mi_recycled_times">
               <%= @current_member.recycled_times %>
               <%= render :partial => "shared/help", :locals => { :title => t('activerecord.attributes.member.recycled_times'), :content => t('activerecord.attributes.member.recycled_times_explanation')} %> 
             </td>  
@@ -220,7 +220,7 @@
           <% if @current_member.club.requires_external_id %>
           <tr>
             <th><%= t('activerecord.attributes.member.external_id') %>:</th>
-            <td><%= @current_member.external_id %></td>  
+            <td id="td_mi_external_id"><%= @current_member.external_id %></td>  
           </tr>
           <% end %>
         </table>
@@ -229,15 +229,15 @@
         <table class="hidden_table_border">
           <tr>
             <th><%= t('activerecord.attributes.member.join_date') %>:</th>
-            <td><%= I18n.l @current_member.join_date, :format => :only_date %></td>
+            <td id="td_mi_join_date"><%= I18n.l @current_member.join_date, :format => :only_date %></td>
           </tr>
           
           <tr class="ligthgrey">
             <th><%= t('activerecord.attributes.member.next_retry_bill_date') %>:</th>
-            <td>
+            <td id="td_mi_next_retry_bill_date">
               <%= @current_member.next_retry_bill_date %>&nbsp;&nbsp;&nbsp;
               <% unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
-                <%= link_to(member_change_next_bill_date_path, :class => "btn btn-info") do %> 
+                <%= link_to(member_change_next_bill_date_path, :class => "btn btn-info", :id => "link_member_change_next_bill_date") do %> 
                   <i class="icon-pencil"></i> Change
                 <% end %>
               <% end %>
@@ -251,7 +251,7 @@
   
           <tr class="ligthgrey">
             <th><%= t('activerecord.attributes.member.club_cash_amount') %>:</th>
-            <td>
+            <td id="td_mi_club_cash_amount">
               <%= @current_member.club_cash_amount.to_f %>&nbsp;&nbsp;&nbsp;
               <% unless disable_save_sale %>
                 <%= link_to(member_add_club_cash_path, :class => "btn btn-success") do %> 
@@ -262,15 +262,15 @@
           </tr>
           <tr>
             <th> <%= t('activerecord.attributes.member.club_cash_expire_date') %>: </th>
-            <td> <%= @current_member.club_cash_expire_date %> </td>
+            <td id="td_mi_club_cash_expire_date"> <%= @current_member.club_cash_expire_date %> </td>
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.quota') %>: </th>
-            <td><%= @current_member.quota %></td>  
+            <td id="td_mi_quota"><%= @current_member.quota %></td>  
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.date_of_primary_cc') %>: </th>
-            <td><%= @current_member.credit_cards.first && I18n.l(@current_member.credit_cards.first.created_at, :format => :only_date) %> </td>
+            <td id="td_mi_credit_cards_first_created_at"><%= @current_member.credit_cards.first && I18n.l(@current_member.credit_cards.first.created_at, :format => :only_date) %> </td>
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.last_successful_bill_date') %>: </th>
@@ -283,7 +283,7 @@
 </table>
 
 <% if @enrollment_info and not @enrollment_info.preferences.nil? %>
-  <table class = "table table-bordered table-condensed table-nohover">
+  <table id="table_enrollment_info" class="table table-bordered table-condensed table-nohover">
     <thead>
       <tr class="box_title"><th><h4>Preferences</h4></th></tr>
     </thead>
