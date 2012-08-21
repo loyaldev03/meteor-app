@@ -496,6 +496,12 @@ class Member < ActiveRecord::Base
           f.assigned_at = Time.zone.now
           f.tracking_code = product+self.visible_id.to_s
           f.save
+          stock_product = Product.find_by_sku_and_club_id(product,self.club.id)
+          if not stock_product
+            f.set_as_out_of_stock
+          else
+            f.set_as_out_of_stock if stock_product.stock = 0 
+          end  
         end
       end
     end
