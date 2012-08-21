@@ -62,6 +62,7 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
+    blacklisted false
 
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
@@ -101,11 +102,11 @@ FactoryGirl.define do
     phone_local_number 1234
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
-    bill_date { DateTime.now }
+    cancel_date { DateTime.now - 1.month }
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
-
+    blacklisted false
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
@@ -124,7 +125,6 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
-
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }

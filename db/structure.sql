@@ -176,7 +176,7 @@ CREATE TABLE `enrollment_infos` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `member_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
   `enrollment_amount` float DEFAULT NULL,
-  `product_sku` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `product_sku` text COLLATE utf8_unicode_ci,
   `product_description` text COLLATE utf8_unicode_ci,
   `mega_channel` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `marketing_code` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -224,7 +224,7 @@ CREATE TABLE `enumerations` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `fulfillments` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -330,7 +330,7 @@ CREATE TABLE `operations` (
   `operation_type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_operations_on_member_id` (`member_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15113 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15115 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `partners` (
   `prefix` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -653,3 +653,5 @@ INSERT INTO schema_migrations (version) VALUES ('20120810133905');
 INSERT INTO schema_migrations (version) VALUES ('20120813143725');
 
 INSERT INTO schema_migrations (version) VALUES ('20120813151533');
+
+INSERT INTO schema_migrations (version) VALUES ('20120821132945');
