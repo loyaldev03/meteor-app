@@ -29,11 +29,9 @@
   		<td colspan="4"><%= submit_tag t('buttons.report'), :class => 'btn btn-primary' %></td>
   	</tr>
   </table>
-
 <% end %>
+	<%= render :partial => "report_result" %>
 
 <script type="text/javascript">
   $(document).ready( fulfillments_index_functions() );
 </script>
-
-

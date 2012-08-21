@@ -67,6 +67,7 @@ SacPlatform::Application.routes.draw do
       resources :fulfillments, :only => [:index]
       scope 'fulfillments' do
         match '/report' => 'fulfillments#report', as: 'fulfillment_report', :via => [:post]
+        match '/set_as_not_processed/:fulfillment_id' => 'fulfillments#set_as_not_processed', as: 'fulfillment_set_as_not_processed', :via => [:put]
       end
     end
 

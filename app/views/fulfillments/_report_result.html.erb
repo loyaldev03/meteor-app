@@ -1,0 +1,30 @@
+<% if @fulfillments %>
+
+<table class="table table-bordered table-condensed">
+	<thead>
+		<th>id</th>
+		<th>product</th>
+		<th>trancking_code</th>
+		<th>status</th>
+		<th>actions</th>
+	</thead>
+	<tbody>
+		<% @fulfillments.each do |fulfillment| %>
+		<tr>
+			<td> <%= fulfillment.id %> </td>
+			<td> <%= fulfillment.product %> </td>
+			<td> <%= fulfillment.tracking_code %> </td>
+			<td> <%= fulfillment.status %> </td>
+			<td> 
+				<% if Product.find_by_sku_and_club_id(fulfillment.product,@current_club).stock > 0 %>
+			  	<%= form_for fulfillment, :as => :fulfillment, :url => fulfillment_set_as_not_processed_path(:fulfillment_id => fulfillment.id), do |f|  %> 
+              <%= submit_tag 'Resend', :name => 'resend', :class=> "btn btn-small" %>
+          <% end %>
+				<% end %>
+			</td>
+		</tr>
+		<% end %>
+	</tbody>
+</table>
+
+<% end %>
