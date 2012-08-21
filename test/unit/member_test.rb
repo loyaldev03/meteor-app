@@ -168,7 +168,8 @@ class MemberTest < ActiveSupport::TestCase
   test "if active member is blacklisted, should have cancel date set " do
     member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     cancel_date = member.cancel_date
-    assert_difference('Operation.count', +1) do
+    # 2 operations : cancel and blacklist
+    assert_difference('Operation.count', 2) do
       member.blacklist(nil, "Test")
     end
     m = Member.find member.uuid
@@ -180,7 +181,7 @@ class MemberTest < ActiveSupport::TestCase
   test "if lapsed member is blacklisted, it should not be canceled again" do
     member = FactoryGirl.create(:lapsed_member, reactivation_times: 5, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     cancel_date = member.cancel_date
-    assert_difference('Operation.count', +1) do
+    assert_difference('Operation.count', 1) do
       member.blacklist(nil, "Test")
     end
     m = Member.find member.uuid

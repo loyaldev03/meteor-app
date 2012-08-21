@@ -615,18 +615,20 @@ class Member < ActiveRecord::Base
   end
 
   def blacklist(agent, reason)
-    self.blacklisted = true
-    self.cancel_date = Date.today
-    if self.save(:validate => false)
-      self.credit_cards.each do |cc|
-        cc.blacklist
-      end
+    if self.blacklisted?
+      { :message => "Member already blacklisted!", :success => false }
+    else
+      self.blacklisted = true
+      self.save(:validate => false)
       message = "Blacklisted member and all its credit cards. Reason: #{reason}."
       Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
+      self.cancel! Date.today, "Automatic cancellation"
+      self.credit_cards.each { |cc| cc.blacklist }
       { :message => message, :success => true }
-    else 
-      { :message => "Could not blacklisted this member.", :success => false }
     end
+  rescue Exception => e
+    Airbrake.notify(:error_class => "Member::blacklist", :error_message => e)
+    { :message => "Could not blacklisted this member.", :success => false }
   end
   ###################################################################
 
@@ -652,14 +654,14 @@ class Member < ActiveRecord::Base
   def chargeback!(reason)
     # TODO: add new Transaction
     self.blacklist nil, reason
-    self.cancel! nil, Date.today, "Automatic cancellation because of a chargeback."
+    self.cancel! Date.today, "Automatic cancellation because of a chargeback."
     self.set_as_canceled!
   end
 
-  def cancel!(current_agent, cancel_date, message)
-    unless can_be_canceled?
+  def cancel!(cancel_date, message, current_agent = nil)
+    if can_be_canceled?
       self.cancel_date = cancel_date
-      self.save!
+      self.save(:validate => false)
       Auditory.audit(current_agent, self, message, self, Settings.operation_types.future_cancel)
     end
   end
