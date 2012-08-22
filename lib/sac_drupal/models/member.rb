@@ -25,7 +25,6 @@ module Drupal
 
     def create!(options = {})
       res = conn.post '/api/user', fieldmap
-      debugger
       update_member(res)
     end
 

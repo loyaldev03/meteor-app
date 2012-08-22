@@ -10,6 +10,7 @@ echo "PATH variable => `printenv PATH`"
 COMMON_CONFIG="cd /var/www/backend-sac-platform/current && RAILS_ENV=$1"
 LOG_TO_FILE=" >> $logfile 2>&1"
 `$COMMON_CONFIG rake members:cancel $LOG_TO_FILE`
+# rake mes:chargeback_report needs testing in production mode, because in test we dont have chargebacks.
 `$COMMON_CONFIG rake mes:chargeback_report $LOG_TO_FILE`
 # billing should be executed after cancel jobs finishes
 `$COMMON_CONFIG rake billing:send_prebill $LOG_TO_FILE`
