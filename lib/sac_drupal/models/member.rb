@@ -25,7 +25,6 @@ module Drupal
 
     def create!(options = {})
       res = conn.post '/api/user', fieldmap
-      debugger
       update_member(res)
     end
 
@@ -128,18 +127,10 @@ module Drupal
           ] 
         },
         field_profile_gender: { 
-          und: [ 
-            { 
-              value: m.gender
-            } 
-          ] 
+          und: m.gender 
         },
         field_profile_phone_type: { 
-          und: [ 
-            { 
-              value: m.type_of_phone_number
-            } 
-          ] 
+          und: m.type_of_phone_number
         },
         field_profile_phone_country_code: { 
           und: [ 
@@ -164,7 +155,7 @@ module Drupal
         },
         field_profile_stateprovince: { 
           und: { 
-            value: m.state
+            select: m.state
           } 
         }, 
         field_profile_zip: { 
@@ -175,11 +166,9 @@ module Drupal
           ] 
         }, 
         field_profile_country: { 
-          und: [ 
-            {
-              value: m.country
-            } 
-          ] 
+          und: {
+            select: m.country
+          } 
         }  
       }
 
@@ -203,19 +192,15 @@ module Drupal
       if cc
         map.merge!({
           field_profile_cc_month: {
-            und: {
-              value: cc.expire_month.to_s
-            }
+            und: cc.expire_month.to_s
           },
           field_profile_cc_year: {
-            und: {
-              value: cc.expire_year.to_s
-            }
+            und: cc.expire_year.to_s
           },
           field_profile_cc_number: {
-            und: {
+            und: [{
               value: cc.number.to_s
-            }
+            }]
           }
         })
       end

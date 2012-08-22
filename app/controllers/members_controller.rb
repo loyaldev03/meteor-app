@@ -35,8 +35,6 @@ class MembersController < ApplicationController
       format.html {render 'index'}
       format.js {render 'index'}
     end
-
-
   end
 
   def show
@@ -121,10 +119,8 @@ class MembersController < ApplicationController
       if !params[:reason].blank?
         if params[:cancel_date].to_date > Time.zone.now.to_date
           begin
-            @current_member.cancel_date = params[:cancel_date]
-            @current_member.save!
             message = "Member cancellation scheduled to #{params[:cancel_date]} - Reason: #{params[:reason]}"
-            Auditory.audit(current_agent, @current_member, message, @current_member, Settings.operation_types.future_cancel)
+            @current_member.cancel! current_agent, params[:cancel_date], message
             flash[:notice] = message
             redirect_to show_member_path
           rescue Exception => e
@@ -141,7 +137,7 @@ class MembersController < ApplicationController
   end
 
   def blacklist
-      @blacklist_reason = MemberBlacklistReason.all
+    @blacklist_reasons = MemberBlacklistReason.all
     if request.post? 
       response = @current_member.blacklist(@current_agent, params[:reason])
       if response[:success]
@@ -173,14 +169,13 @@ class MembersController < ApplicationController
 
   def set_undeliverable 
     if request.post?
-      if @current_member.update_attribute(:wrong_address, params[:reason])
-        message = "Address #{@current_member.full_address} is undeliverable. Reason: #{params[:reason]}"
-        flash[:notice] = message
-        Auditory.audit(@current_agent,@current_member,message,@current_member)
-        redirect_to show_member_path
+      answer = @current_member.set_wrong_address(@current_agent, params[:reason])
+      if answer[:success]
+        flash[:notice] = answer[:message]
       else
-        flash[:error] = "Could not set the NBD on this member #{@current_member}.errors.inspect"
+        flash[:error] = answer[:message]
       end
+      redirect_to show_member_path
     end
   end
 

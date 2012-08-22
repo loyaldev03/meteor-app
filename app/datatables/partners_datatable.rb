@@ -21,7 +21,7 @@ private
         link_to(I18n.t(:dashboard), @url_helpers.admin_partner_dashboard_path(partner.prefix), :class => 'btn btn-mini')+
         link_to(I18n.t(:edit), @url_helpers.edit_admin_partner_path(partner), :class => 'btn btn-mini' )+
         link_to(I18n.t(:destroy), @url_helpers.admin_partner_path(partner), :method => :delete,
-                        :confirm => I18n.t('.confirm', :default => I18n.t("helpers.links.confirm", :default => 'Are you sure?')),
+                        :confirm => I18n.t("are_you_sure"),
                         :class => 'btn btn-mini btn-danger')
       ]
     end

@@ -20,7 +20,7 @@ private
         (link_to(I18n.t('activerecord.model.products'), @url_helpers.products_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')if @current_agent.can? :read, Product )+
         (link_to(I18n.t(:edit), @url_helpers.edit_club_path(:partner_prefix => @current_partner.prefix,:id => club.id), :class => 'btn btn-mini')if @current_agent.can? :update, Club)+
         (link_to(I18n.t(:destroy), @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id), :method => :delete,
-                        :confirm => I18n.t('.confirm', :default => I18n.t("helpers.links.confirm", :default => 'Are you sure?')),
+                        :confirm => I18n.t("are_you_sure"),
                         :class => 'btn btn-mini btn-danger')if @current_agent.can? :update, Club)
       ]
     end

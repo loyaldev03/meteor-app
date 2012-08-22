@@ -20,7 +20,7 @@ class Member < ActiveRecord::Base
       :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
-      :wrong_phone_number, :mega_channel, :credit_cards_attributes, :birth_date,
+      :wrong_phone_number, :credit_cards_attributes, :birth_date,
       :gender, :type_of_phone_number, :preferences
 
   # accepts_nested_attributes_for :credit_cards, :limit => 1
@@ -111,7 +111,7 @@ class Member < ActiveRecord::Base
   scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value) unless value.blank? }
   scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value+'%') unless value.blank?}
 
-  state_machine :status, :initial => :none do
+  state_machine :status, :initial => :none, :action => :save_state do
     after_transition [ :none, # enroll
                        :provisional, # save the sale
                        :lapsed, # reactivation
@@ -156,6 +156,10 @@ class Member < ActiveRecord::Base
     state :applied
   end
 
+  def save_state
+    save(:validate => false)
+  end
+
   # Sends the activation mail.
   def send_active_email
     Communication.deliver!(:active, self)
@@ -164,19 +168,13 @@ class Member < ActiveRecord::Base
   # Sends the request mail to every representative to accept/reject the member.
   def send_active_needs_approval_email
     representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
-    representatives.each do |representative|
-      agent = Agent.find(representative.agent_id)
-      Notifier.active_with_approval(agent,self).deliver!
-    end
+    representatives.each { |representative| Notifier.active_with_approval(representative.agent,self).deliver! }
   end
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_recover_needs_approval_email
     representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
-    representatives.each do |representative|
-      agent = Agent.find(representative.agent_id)
-      Notifier.recover_with_approval(agent,self).deliver!
-    end
+    representatives.each { |representative| Notifier.recover_with_approval(representative.agent,self).deliver! }
   end
 
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
@@ -425,8 +423,7 @@ class Member < ActiveRecord::Base
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
     elsif not self.valid? 
-      errors = self.error_to_s
-      return { :message => "Member data is invalid: \n#{errors}", :code => Settings.error_codes.member_data_invalid }
+      return { :message => "Member data is invalid: \n#{error_to_s}", :code => Settings.error_codes.member_data_invalid }
     end
         
     if amount.to_f != 0.0
@@ -435,8 +432,7 @@ class Member < ActiveRecord::Base
       trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
       answer = trans.process
       unless trans.success?
-        message = "Transaction was not succesful."
-        Auditory.audit(agent, self, message, self, answer.code)
+        Auditory.audit(agent, self, "Transaction was not succesful.", self, answer.code)
         return answer 
       end
     end
@@ -469,7 +465,7 @@ class Member < ActiveRecord::Base
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
       
     rescue Exception => e
-      Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
+      Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       message = "Could not save member. #{e}"
       Auditory.audit(agent, self, message, nil, Settings.operation_types.enrollment_billing)
@@ -478,9 +474,7 @@ class Member < ActiveRecord::Base
   end
 
   def send_pre_bill
-    if can_bill_membership?
-      Communication.deliver!(:prebill, self)
-    end
+    Communication.deliver!(:prebill, self) if can_bill_membership?
   end
   
   def send_fulfillment
@@ -488,15 +482,11 @@ class Member < ActiveRecord::Base
     # opened fulfillments (meaning that previous fulfillments expired).
     if self.fulfillments.find_by_status('not_processed').nil?
       fulfillments = fulfillments_products_to_send
-      if fulfillments
-        fulfillments.each do |product|
-          f = Fulfillment.new 
-          f.product = product
-          f.member_id = self.uuid
-          f.assigned_at = Time.zone.now
-          f.tracking_code = product+self.visible_id.to_s
-          f.save
-        end
+      fulfillments.each do |product|
+        f = Fulfillment.new :product => product
+        f.member_id = self.uuid
+        f.save
+        f.validate_stock!
       end
     end
   end
@@ -511,17 +501,6 @@ class Member < ActiveRecord::Base
     else
       club.api_type.constantize.new self
     end
-  end
-
-  # Returns mega_channel related to member's enrollment_info
-  def mega_channel
-    EnrollmentInfo.find_by_member_id(self.id).mega_channel
-  end
-
-  # Sets mega_channel related to member's enrollment_info
-  def mega_channel=(value)
-    self.enrollment_info.mega_channel ||= {}
-    self.enrollment_info.mega_channel = value
   end
 
   def skip_api_sync!
@@ -554,7 +533,7 @@ class Member < ActiveRecord::Base
   def nillify_club_cash
     add_club_cash(nil, -club_cash_amount.to_i, 'Removing club cash because of member cancellation') unless club_cash_amount.to_f == 0.0
     self.club_cash_expire_date = nil
-    self.save!
+    self.save(:validate => false)
   end
 
   # Resets member club cash in case the club cash has expired. It calls "add_club_cash" method
@@ -568,7 +547,7 @@ class Member < ActiveRecord::Base
     amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
     self.add_club_cash(nil, amount, message)
     self.club_cash_expire_date = self.join_date + 1.year
-    self.save!
+    self.save(:validate => false)
   end
   
   # Adds club cash transaction. 
@@ -609,18 +588,20 @@ class Member < ActiveRecord::Base
   end
 
   def blacklist(agent, reason)
-    response = {}
-    if self.update_attribute(:blacklisted, true)
-      self.credit_cards.each do |cc|
-        cc.blacklist
-      end
+    if self.blacklisted?
+      { :message => "Member already blacklisted!", :success => false }
+    else
+      self.blacklisted = true
+      self.save(:validate => false)
       message = "Blacklisted member and all its credit cards. Reason: #{reason}."
-      Auditory.audit(agent, self, message, self, Settings.operation_types.cancel)
-      response = { :message => message, :success => true }
-    else 
-      message = "Could not blacklisted this member."
-      response = { :message => message, :success => false }
+      Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
+      self.cancel! Date.today, "Automatic cancellation"
+      self.credit_cards.each { |cc| cc.blacklist }
+      { :message => message, :success => true }
     end
+  rescue Exception => e
+    Airbrake.notify(:error_class => "Member::blacklist", :error_message => e)
+    { :message => "Could not blacklisted this member.", :success => false }
   end
   ###################################################################
 
@@ -642,7 +623,33 @@ class Member < ActiveRecord::Base
     self.phone_local_number = params[:phone_local_number]
     self.preferences = params[:preferences]
   end
+
+  def chargeback!(transaction_chargebacked, args)
+    trans = Transaction.new_chargeback(transaction_chargebacked, args)
+    self.blacklist nil, args[:reason]
+    self.cancel! Time.zone.now, "Automatic cancellation because of a chargeback."
+    self.set_as_canceled!
+  end
+
+  def cancel!(cancel_date, message, current_agent = nil)
+    if can_be_canceled?
+      self.cancel_date = cancel_date
+      self.save(:validate => false)
+      Auditory.audit(current_agent, self, message, self, Settings.operation_types.future_cancel)
+    end
+  end
   
+  def set_wrong_address(agent,reason)
+    if self.update_attribute(:wrong_address, reason)
+      message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
+      Auditory.audit(@current_agent,self,message,self)
+      return {:message => message, :success => true}
+    else
+      message = "Could not set the NBD on this member #{self}.errors.inspect"
+      return {:message => message, :success => false}
+    end
+  end
+
   private
     def set_status_on_enrollment!(agent, trans, amount)
       operation_type = Settings.operation_types.enrollment_billing
@@ -675,7 +682,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      self.enrollment_infos.current.first.product_sku.split(',') if self.enrollment_infos.current.first.product_sku
+      self.enrollment_infos.current.first.product_sku ? self.enrollment_infos.current.first.product_sku.split(',') : []
     end
 
     def record_date
@@ -763,6 +770,7 @@ class Member < ActiveRecord::Base
       self.desnormalize_preferences if self.changed.include?('preferences') 
     end
 
+  public 
     def desnormalize_preferences
       self.preferences.each do |key, value|
         pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
@@ -770,6 +778,6 @@ class Member < ActiveRecord::Base
         pref.save
       end
     end
-    handle_asynchronously :desnormalize_preferences   
+    handle_asynchronously :desnormalize_preferences
 
 end

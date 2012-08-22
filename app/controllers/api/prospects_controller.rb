@@ -53,7 +53,7 @@ class Api::ProspectsController < ApplicationController
   def create
   	response = { :message => "prospect_data_invalid", :code => '405' }
   	prospect = Prospect.new(params[:prospect])
-  	if prospect.save!
+  	if prospect.save
   	  response[:message] = "Prospect was successfuly saved."
       response[:code] = '000'
       response[:prospect_id] = prospect.id
@@ -61,7 +61,8 @@ class Api::ProspectsController < ApplicationController
     render json: response
   end
 
-  def check_authentification
-    authorize! :manage_prospects_api, Member
-  end
+  private
+    def check_authentification
+      authorize! :manage_prospects_api, Member
+    end
 end

@@ -23,7 +23,7 @@ private
         link_to(I18n.t(:edit),@url_helpers.edit_domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')+' '+
         link_to(I18n.t(:destroy),@url_helpers.domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id),
                       :method => :delete, 
-                      :confirm => I18n.t('.confirm', :default => I18n.t("helpers.links.confirm", :default => "Are you sure?")),
+                      :confirm => I18n.t("are_you_sure"),
                       :class => 'btn btn-mini btn-danger')
       ]
     end

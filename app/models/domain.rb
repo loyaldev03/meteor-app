@@ -22,9 +22,9 @@ class Domain < ActiveRecord::Base
 
   def verify_if_is_last_domain
   	@domains = Domain.where(:partner_id =>partner_id)
-      if @domains.count == 1
-        errors.add :base, :error => "Cannot destroy last domain. Partner must have at least one domain."
-        false
-      end
+    if @domains.count == 1
+      errors.add :base, :error => "Cannot destroy last domain. Partner must have at least one domain."
+      false
+    end
   end
 end

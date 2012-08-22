@@ -4,15 +4,28 @@
 export PATH=$PATH:/usr/local/bin
 
 # 15 0 * * * rake_task_runner
-logfile="/tmp/cron_rake.log"
+LOGFILE="/tmp/cron_rake.log"
 
 echo "PATH variable => `printenv PATH`"
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake members:cancel >> $logfile 2>&1`
+
+COMMON_CONFIG="cd /var/www/backend-sac-platform/current && RAILS_ENV=$1"
+LOG_TO_FILE=" >> $LOGFILE 2>&1"
+
+$COMMON_CONFIG rake members:cancel $LOG_TO_FILE
+# rake mes:chargeback_report needs testing in production mode, because in test we dont have chargebacks.
+$COMMON_CONFIG rake mes:chargeback_report $LOG_TO_FILE
 # billing should be executed after cancel jobs finishes
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake billing:send_prebill >> $logfile 2>&1`
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake members:process_fulfillments >> $logfile 2>&1`
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake members:process_club_cash >> $logfile 2>&1`
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake billing:for_today >> $logfile 2>&1`
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake members:send_pillar_emails >> $logfile 2>&1`
-`cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake members:send_happy_birthday >> $logfile 2>&1`
+$COMMON_CONFIG rake billing:for_today $LOG_TO_FILE
+
+$COMMON_CONFIG rake billing:send_prebill $LOG_TO_FILE &
+$COMMON_CONFIG rake members:send_pillar_emails $LOG_TO_FILE &
+$COMMON_CONFIG rake members:send_happy_birthday $LOG_TO_FILE &
+$COMMON_CONFIG rake members:process_fulfillments $LOG_TO_FILE &
+$COMMON_CONFIG rake members:process_club_cash $LOG_TO_FILE &
+$COMMON_CONFIG rake members:update_cc_type $LOG_TO_FILE &
+
+# after this script we should do the BK and reports
+WAIT_PIDS=`jobs -l | awk '{print $2}'`
+
+wait $WAIT_PIDS
 

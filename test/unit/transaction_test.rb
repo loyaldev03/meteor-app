@@ -168,9 +168,29 @@ class TransactionTest < ActiveSupport::TestCase
     enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
     amount = @terms_of_membership.installment_amount
     answer = active_member.bill_membership
-    assert_equal active_member.next_retry_bill_date.to_date, (Date.today + eval(Settings.next_retry_on_missing_decline)).to_date, "Next retry bill date incorrect"
+    assert_equal active_member.next_retry_bill_date.to_date, (Time.zone.now + eval(Settings.next_retry_on_missing_decline)).to_date, "Next retry bill date incorrect"
   end
   ############################################
+
+  # TODO: how do we stub faraday?
+  test "Chargeback processing should create transaction, blacklist and cancel the member" do
+    active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+    transaction = FactoryGirl.create(:transaction, member: active_member, terms_of_membership: @terms_of_membership)
+    answer = { :body => '"Merchant Id","DBA Name","Control Number","Incoming Date","Card Number","Reference Number",' + 
+      '"Tran Date","Tran Amount","Trident Tran ID","Purchase ID","Client Ref Num","Auth Code","Adj Date",' +
+      '"Adj Ref Num","Reason","First Time","Reason Code","CB Ref Num","Terminal ID"\n' +
+      '"941000110030",""SAC*AO ADVENTURE CLUB"","2890810","07/26/2012","'+active_member.credit_cards.first.number.to_s+
+      '","25247702125003734750438",'+
+      '"05/03/2012","84.0","'+transaction.response_transaction_id+'","'+active_member.visible_id.to_s+'",""'+
+      active_member.visible_id.to_s+'"","00465Z",""07/27/2012-""' +
+      ',""00373475043"",""No Cardholder Authorization"","Y","4837","2206290194",""94100011003000000002""' }
+
+    # assert_difference('Transaction', 1) do 
+    #   PaymentGatewayConfiguration.process_mes_chargebacks('development')
+    #   assert_equal active_member.blacklisted, true
+    #   assert_equal active_member.status, "cancel"
+    # end
+  end
 
 
 end

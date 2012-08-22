@@ -12,13 +12,11 @@ class ProductsController < ApplicationController
   end
 
   # GET /products/1
-  # GET /products/1.json
   def show
     @product = Product.find(params[:id])
   end
 
   # GET /products/new
-  # GET /products/new.json
   def new
     @product = Product.new
   end
@@ -29,7 +27,6 @@ class ProductsController < ApplicationController
   end
 
   # POST /products
-  # POST /products.json
   def create
     @product = Product.new(params[:product])
     @product.club_id = @current_club.id
@@ -41,7 +38,6 @@ class ProductsController < ApplicationController
   end
 
   # PUT /products/1
-  # PUT /products/1.json
   def update
     @product = Product.find(params[:id])
     @product.update_product_data_by_params params[:product]
@@ -53,16 +49,17 @@ class ProductsController < ApplicationController
   end
 
   # DELETE /products/1
-  # DELETE /products/1.json
   def destroy
     @product = Product.find(params[:id])
     @product.destroy
     redirect_to products_url 
   end
 
-  def check_permissions
-    authorize! :manage, Product.new     
-  end
+  private
+
+    def check_permissions
+      authorize! :manage, Product.new     
+    end
 
 
 end

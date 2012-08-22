@@ -19,7 +19,7 @@ private
         product.weight,
         link_to(I18n.t(:edit), @url_helpers.edit_product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini')+
         link_to(I18n.t(:destroy), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :method => :delete,
-                :confirm => I18n.t('.confirm', :default => I18n.t("helpers.links.confirm", :default => 'Are you sure?')),
+                :confirm => I18n.t("are_you_sure"),
                 :class => 'btn btn-mini btn-danger')
       ]
     end

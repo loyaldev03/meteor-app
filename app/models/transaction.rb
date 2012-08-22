@@ -10,7 +10,7 @@ class Transaction < ActiveRecord::Base
   belongs_to :enrollment_info
   has_many :operations, :as => :resource
 
-  serialize :response
+  serialize :response, JSON
 
   attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
   attr_accessor :refund_response_transaction_id
@@ -155,6 +155,21 @@ class Transaction < ActiveRecord::Base
     amount - refunded_amount
   end
 
+  def self.new_chargeback(sale_transaction, args)
+    trans = Transaction.new
+    trans.transaction_type = "chargeback"
+    trans.refund_response_transaction_id = sale_transaction.response_transaction_id
+    trans.prepare(sale_transaction.member, sale_transaction.credit_card, args[:transaction_amount], 
+                  sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
+    trans.update_enrollment_info_and_cohort(sale_transaction.enrollment_info_id, sale_transaction.cohort)
+    trans.response_auth_code=args[:auth_code]
+    trans.response_result=args[:reason]
+    trans.response_code=args[:reason_code]
+    trans.response = args
+    trans.save
+    Auditory.audit(nil, trans, "Chargeback processed $#{trans.amount}", sale_transaction.member, Settings.operation_types.chargeback)
+  end
+
   private
 
     def credit
@@ -224,7 +239,6 @@ class Transaction < ActiveRecord::Base
       end
       self.response_result=answer.message
       save
-      debugger;
       if answer.params and answer.params[:duplicate]=="true"
         # we keep this if, just because it was on Litle version (compatibility).
         # MeS seems to not send this param

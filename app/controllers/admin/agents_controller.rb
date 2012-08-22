@@ -1,8 +1,8 @@
 class Admin::AgentsController < ApplicationController
   load_and_authorize_resource
   skip_authorize_resource :only => :my_clubs
+
   # GET /agents
-  # GET /agents.xml
   def index
     respond_to do |format|
       format.html # index.html.erb
@@ -11,22 +11,12 @@ class Admin::AgentsController < ApplicationController
   end
 
   # GET /agents/1
-  # GET /agents/1.xml
   def show
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @agent }
-    end
   end
 
   # GET /agents/new
-  # GET /agents/new.xml
   def new
     @clubs = Club.all
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @agent }
-    end
   end
 
   # GET /agents/1/edit
@@ -35,33 +25,23 @@ class Admin::AgentsController < ApplicationController
   end
 
   # POST /agents
-  # POST /agents.xml
   def create
     @clubs = Club.all
-    respond_to do |format|
-      if @agent.save
-        format.html { redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') }
-        format.xml  { render :xml => @agent, :status => :created, :location => @agent }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @agent.errors, :status => :unprocessable_entity }
-      end
+    if @agent.save
+      redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
+    else
+      render :action => "new" 
     end
   end
 
   # PUT /agents/1
-  # PUT /agents/1.xml
   def update
     @clubs = Club.all
     cleanup_for_update!(params[:agent])
-    respond_to do |format|
-      if @agent.update_attributes(params[:agent])
-        format.html { redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @agent.errors, :status => :unprocessable_entity }
-      end
+    if @agent.update_attributes(params[:agent])
+      redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') 
+    else
+      render :action => "edit" 
     end
   end
 
@@ -78,14 +58,9 @@ class Admin::AgentsController < ApplicationController
   end
 
   # DELETE /agents/1
-  # DELETE /agents/1.xml
   def destroy
     @agent.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(admin_agents_url, :notice => 'Agent was successfully deleted.') }
-      format.xml  { head :ok }
-    end
+    redirect_to(admin_agents_url, :notice => 'Agent was successfully deleted.')
   end
 
   def lock
