@@ -15,13 +15,21 @@
 			<td> <%= fulfillment.product %> </td>
 			<td> <%= fulfillment.tracking_code %> </td>
 			<td> <%= fulfillment.status %> </td>
-			<td> 
-				<% if Product.find_by_sku_and_club_id(fulfillment.product,@current_club).stock > 0 %>
+				<% if fulfillment.status == 'processing' %>
+			  	<%= form_for fulfillment, :as => :fulfillment, :url => fulfillment_mark_as_sent_path(:fulfillment_id => fulfillment.id),  do |f|  %> 
+              <td><%= submit_tag 'Mark as sent', :name => 'Mark as sent', :class=> "btn btn-small"%></td>
+          <% end %>
+			  	<%= form_for fulfillment, :as => :fulfillment, :url => fulfillment_mark_as_wrong_address_path(:fulfillment_id => fulfillment.id), do |f|  %> 
+              <td>
+              	<%= select_tag "reason", options_for_select([Settings.wrong_address.undeliverable_all, Settings.wrong_address.undeliverable_sloop, Settings.wrong_address.undeliverable_kit_card]) %>
+              	<%= submit_tag 'Mark as wrong address', :name => 'Mark as wrong address', :class=> "btn btn-small" %>
+              </td>
+          <% end %>					
+				<% elsif Product.find_by_sku_and_club_id(fulfillment.product,@current_club).stock > 0 %>
 			  	<%= form_for fulfillment, :as => :fulfillment, :url => fulfillment_set_as_not_processed_path(:fulfillment_id => fulfillment.id), do |f|  %> 
-              <%= submit_tag 'Resend', :name => 'resend', :class=> "btn btn-small" %>
+  		        <td><%= submit_tag 'Resend', :name => 'resend', :class=> "btn btn-small" %></td>
           <% end %>
 				<% end %>
-			</td>
 		</tr>
 		<% end %>
 	</tbody>

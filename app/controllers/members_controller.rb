@@ -169,14 +169,13 @@ class MembersController < ApplicationController
 
   def set_undeliverable 
     if request.post?
-      if @current_member.update_attribute(:wrong_address, params[:reason])
-        message = "Address #{@current_member.full_address} is undeliverable. Reason: #{params[:reason]}"
-        flash[:notice] = message
-        Auditory.audit(@current_agent,@current_member,message,@current_member)
-        redirect_to show_member_path
+      answer = @current_member.set_wrong_address(@current_agent, params[:reason])
+      if answer[:success]
+        flash[:notice] = answer[:message]
       else
-        flash[:error] = "Could not set the NBD on this member #{@current_member}.errors.inspect"
+        flash[:error] = answer[:message]
       end
+      redirect_to show_member_path
     end
   end
 

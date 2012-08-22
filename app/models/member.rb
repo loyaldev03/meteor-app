@@ -665,6 +665,17 @@ class Member < ActiveRecord::Base
     end
   end
   
+  def set_wrong_address(agent,reason)
+    if self.update_attribute(:wrong_address, reason)
+      message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
+      Auditory.audit(@current_agent,self,message,self)
+      return {:message => message, :success => true}
+    else
+      message = "Could not set the NBD on this member #{self}.errors.inspect"
+      return {:message => message, :success => false}
+    end
+  end
+
   private
     def set_status_on_enrollment!(agent, trans, amount)
       operation_type = Settings.operation_types.enrollment_billing
