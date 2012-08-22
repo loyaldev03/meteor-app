@@ -33,6 +33,7 @@ defaults: &defaults
     recovery_needs_approval: 205
     enrollment_needs_approval: 206
     blacklisted: 207
+    fulfillment_mannualy_mark_as_sent: 220
     active_email: 300
     prebill_email: 301
     cancellation_email: 302

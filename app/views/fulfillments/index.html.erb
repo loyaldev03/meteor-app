@@ -21,9 +21,12 @@
 	  	  <%= check_box nil, :all_times %> 
   		</td>
   		<td>
-        <%= select_tag :status,  
-                        options_for_select(Fulfillment.state_machines[:status].states.map &:name) %>	
-  		</td>
+        <%= select_tag :status, options_for_select([['not_processed', 'not_processed'],
+                                ['processing', 'not_processed'],['out_of_stock', 'out_of_stock'], 
+                                ['undeliverable','undeliverable']]),
+                                :class => 'select_field' %>	
+
+      </td>
   	</tr>
   	<tr>
   		<td colspan="4"><%= submit_tag t('buttons.report'), :class => 'btn btn-primary' %></td>
@@ -32,6 +35,9 @@
 <% end %>
 	<%= render :partial => "report_result" %>
 
+
 <script type="text/javascript">
   $(document).ready( fulfillments_index_functions() );
 </script>
+
+
