@@ -4,10 +4,7 @@ class FulfillmentsController < ApplicationController
 
 
   def index
-    respond_to do |format|
-      format.html 
-      format.js 
-    end
+
   end
 
   def report
@@ -24,30 +21,18 @@ class FulfillmentsController < ApplicationController
         member = Member.find(fulfillment.member_id)
         product = Product.find_by_sku_and_club_id(fulfillment.product,member.club_id)
         if product.stock > 0
-          row << fulfillment.tracking_code
-          row << 'Costcenter'
-          row << member.full_name
-          row << member.address
-          row << member.city
-          row << member.state
-          row << member.zip
-          row << 'Return Service Requested'
-          row << 'Irregulars'
-          row << 'Y'
-          row << 'Shipper'
-          row << product.weight
-          row << 'MID'
-          csv << row
-          row = []
+          csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
+                  member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
+                  product.weight, 'MID']
           fulfillment.set_as_processing
           product.decrease_stock(1)
         end
       end
       csv << row
     end
-    send_data csv_string, :filename => "export.csv",
+    send_data csv_string, :filename => "miworkingfile2.csv",
                    :type => 'text/csv; charset=iso-8859-1; header=present',
-                   :disposition => "attachment; filename=export.csv"
+                   :disposition => "attachment; filename=miworkingfile2.csv"
     end
   end
 
@@ -90,9 +75,4 @@ class FulfillmentsController < ApplicationController
       format.html {render 'index'}
     end     
   end
-
-  def generate_csv
-    fulfillments = Fulfillment.where(['status like ? AND assigned_at BETWEEN ? and ?', 'not_processed', params[:initial_date], params[:end_date]])
-
-  end 
 end
