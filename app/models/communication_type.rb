@@ -4,6 +4,4 @@ class CommunicationType < Enumeration
   def to_s
     name
   end
-  
 end
-

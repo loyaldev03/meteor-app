@@ -84,11 +84,10 @@ class Fulfillment < ActiveRecord::Base
 
   private
     def set_default_values
+      self.assigned_at = Time.zone.now
       # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
       self.renewable_at = self.assigned_at + 1.year if self.recurrent
       self.tracking_code = self.product + self.member.visible_id.to_s
-      self.assigned_at = Time.zone.now
     end
-
 
 end

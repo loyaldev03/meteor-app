@@ -77,37 +77,37 @@ class CreditCard < ActiveRecord::Base
   def self.recycle_expired_rule(acc, times)
     if acc.am_card.expired?
       case times
-        when 1
-          new_year_exp=acc.expire_year.to_i + 3
-        when 2
-          new_year_exp=acc.expire_year.to_i + 2
-        when 3
-          new_year_exp=acc.expire_year.to_i + 4
-        when 4
-          new_year_exp=acc.expire_year.to_i + 1
-        else
-          return acc
+      when 1
+        new_year_exp=acc.expire_year.to_i + 3
+      when 2
+        new_year_exp=acc.expire_year.to_i + 2
+      when 3
+        new_year_exp=acc.expire_year.to_i + 4
+      when 4
+        new_year_exp=acc.expire_year.to_i + 1
+      else
+        return acc
       end
       CreditCard.transaction do
         begin
           acc.update_attribute :active , false
-          cc = CreditCard.new 
+          cc = CreditCard.new :number => acc.number, :expire_month => acc.expire_month, :expire_year => new_year_exp
           cc.member = acc.member
-          cc.number = acc.number
-          cc.expire_month = acc.expire_month
-          cc.expire_year = new_year_exp
           cc.active = true
           cc.save!
           Auditory.audit(nil, cc, "Automatic Recycled Expired card", cc.member, Settings.operation_types.automatic_recycle_credit_card)
           return cc
         rescue Exception => e
           logger.error e
+          Airbrake.notify(:error_class => "Communication deliver_lyris", :error_message => e)
           raise ActiveRecord::Rollback
         end
       end
     end
     acc
   end
+
+
   # Custom method to verify if its blacklisted - not using it because it doenst allow to blacklist an active creditcard.
   # def not_blacklisted
   #   if self.blacklisted? && self.active?

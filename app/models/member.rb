@@ -168,19 +168,13 @@ class Member < ActiveRecord::Base
   # Sends the request mail to every representative to accept/reject the member.
   def send_active_needs_approval_email
     representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
-    representatives.each do |representative|
-      agent = Agent.find(representative.agent_id)
-      Notifier.active_with_approval(agent,self).deliver!
-    end
+    representatives.each { |representative| Notifier.active_with_approval(representative.agent,self).deliver! }
   end
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_recover_needs_approval_email
     representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
-    representatives.each do |representative|
-      agent = Agent.find(representative.agent_id)
-      Notifier.recover_with_approval(agent,self).deliver!
-    end
+    representatives.each { |representative| Notifier.recover_with_approval(representative.agent,self).deliver! }
   end
 
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
@@ -429,8 +423,7 @@ class Member < ActiveRecord::Base
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
     elsif not self.valid? 
-      errors = self.error_to_s
-      return { :message => "Member data is invalid: \n#{errors}", :code => Settings.error_codes.member_data_invalid }
+      return { :message => "Member data is invalid: \n#{error_to_s}", :code => Settings.error_codes.member_data_invalid }
     end
         
     if amount.to_f != 0.0
@@ -439,8 +432,7 @@ class Member < ActiveRecord::Base
       trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
       answer = trans.process
       unless trans.success?
-        message = "Transaction was not succesful."
-        Auditory.audit(agent, self, message, self, answer.code)
+        Auditory.audit(agent, self, "Transaction was not succesful.", self, answer.code)
         return answer 
       end
     end
@@ -473,7 +465,7 @@ class Member < ActiveRecord::Base
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
       
     rescue Exception => e
-      Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
+      Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       message = "Could not save member. #{e}"
       Auditory.audit(agent, self, message, nil, Settings.operation_types.enrollment_billing)
@@ -482,9 +474,7 @@ class Member < ActiveRecord::Base
   end
 
   def send_pre_bill
-    if can_bill_membership?
-      Communication.deliver!(:prebill, self)
-    end
+    Communication.deliver!(:prebill, self) if can_bill_membership?
   end
   
   def send_fulfillment
@@ -492,16 +482,11 @@ class Member < ActiveRecord::Base
     # opened fulfillments (meaning that previous fulfillments expired).
     if self.fulfillments.find_by_status('not_processed').nil?
       fulfillments = fulfillments_products_to_send
-      if fulfillments
-        fulfillments.each do |product|
-          f = Fulfillment.new 
-          f.product = product
-          f.member_id = self.uuid
-          f.assigned_at = Time.zone.now
-          f.tracking_code = product+self.visible_id.to_s
-          f.save
-          f.validate_stock!
-        end
+      fulfillments.each do |product|
+        f = Fulfillment.new :product => product
+        f.member_id = self.uuid
+        f.save
+        f.validate_stock!
       end
     end
   end
@@ -708,7 +693,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      self.enrollment_infos.current.first.product_sku.split(',') if self.enrollment_infos.current.first.product_sku
+      self.enrollment_infos.current.first.product_sku ? self.enrollment_infos.current.first.product_sku.split(',') : []
     end
 
     def record_date

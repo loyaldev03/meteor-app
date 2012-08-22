@@ -10,7 +10,7 @@ class Transaction < ActiveRecord::Base
   belongs_to :enrollment_info
   has_many :operations, :as => :resource
 
-  serialize :response
+  serialize :response, JSON
 
   attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
   attr_accessor :refund_response_transaction_id
