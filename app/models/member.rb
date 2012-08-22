@@ -20,7 +20,7 @@ class Member < ActiveRecord::Base
       :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
       :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
       :bill_date, :quota, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
-      :wrong_phone_number, :mega_channel, :credit_cards_attributes, :birth_date,
+      :wrong_phone_number, :credit_cards_attributes, :birth_date,
       :gender, :type_of_phone_number, :preferences
 
   # accepts_nested_attributes_for :credit_cards, :limit => 1
@@ -501,17 +501,6 @@ class Member < ActiveRecord::Base
     else
       club.api_type.constantize.new self
     end
-  end
-
-  # Returns mega_channel related to member's enrollment_info
-  def mega_channel
-    EnrollmentInfo.find_by_member_id(self.id).mega_channel
-  end
-
-  # Sets mega_channel related to member's enrollment_info
-  def mega_channel=(value)
-    self.enrollment_info.mega_channel ||= {}
-    self.enrollment_info.mega_channel = value
   end
 
   def skip_api_sync!
