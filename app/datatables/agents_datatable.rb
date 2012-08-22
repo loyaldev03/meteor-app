@@ -22,7 +22,7 @@ private
         link_to(I18n.t(:show), @url_helpers.admin_agent_path(agent), :class => 'btn btn-mini')+' '+
         link_to(I18n.t(:edit), @url_helpers.edit_admin_agent_path(agent), :class => 'btn btn-mini' )+' '+
         link_to(I18n.t(:destroy), @url_helpers.admin_agent_path(agent), :method => :delete,
-                        :confirm => I18n.t('.confirm', :default => I18n.t("helpers.links.confirm", :default => 'Are you sure?')),
+                        :confirm => I18n.t("are_you_sure"),
                         :class => 'btn btn-mini btn-danger')
       ]
     end
