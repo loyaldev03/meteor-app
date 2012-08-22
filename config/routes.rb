@@ -64,6 +64,11 @@ SacPlatform::Application.routes.draw do
         get  '/login_as_member' => 'members#login_as_member', as: 'login_as_member'
       end
       resources :products     
+      resources :fulfillments, :only => [:index]
+      scope 'fulfillments' do
+        match '/report' => 'fulfillments#report', as: 'fulfillment_report', :via => [:post]
+        match '/set_as_not_processed/:fulfillment_id' => 'fulfillments#set_as_not_processed', as: 'fulfillment_set_as_not_processed', :via => [:put]
+      end
     end
 
     resources :domains

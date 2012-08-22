@@ -1,0 +1,37 @@
+<section>
+  <div class="page-header">
+    <h1>Fulfillments</h1>
+  </div>
+</section>
+
+
+<%= form_tag(fulfillment_report_path) do %>
+  <table class="table table-bordered ">
+  	<tr>
+  		<td>
+	  		<%= label :initial_date, t('initial_date'), :class => 'help-inline' %>
+	  	  <%= text_field :initial_date, nil ,:class => 'datepicker', :readonly => 'readonly' %> 
+  		</td>
+  		<td>
+	  		<%= label :end_date, t('end_date'), :class => 'help-inline' %>
+	  	  <%= text_field :end_date, nil ,:class => 'datepicker', :readonly => 'readonly' %> 
+  		</td>
+  		<td>
+	  		<%= label :all_times, t('all_times'), :class => 'help-inline' %>
+	  	  <%= check_box nil, :all_times %> 
+  		</td>
+  		<td>
+        <%= select_tag :status,  
+                        options_for_select(Fulfillment.state_machines[:status].states.map &:name) %>	
+  		</td>
+  	</tr>
+  	<tr>
+  		<td colspan="4"><%= submit_tag t('buttons.report'), :class => 'btn btn-primary' %></td>
+  	</tr>
+  </table>
+<% end %>
+	<%= render :partial => "report_result" %>
+
+<script type="text/javascript">
+  $(document).ready( fulfillments_index_functions() );
+</script>

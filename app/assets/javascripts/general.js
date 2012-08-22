@@ -361,4 +361,6 @@ $(document).ready( function() {
     })
   };
 
-
+  function fulfillments_index_functions(){
+    $(".datepicker").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+  }

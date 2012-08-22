@@ -30,6 +30,9 @@ en:
   blacklisted: 'Blacklisted'
   search_results: 'Search results'
   are_you_sure: 'Are you sure?'
+  initial_date: 'Initial date'
+  end_date: 'End date'
+  all_times: 'All times'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
   menu: 
@@ -50,6 +53,7 @@ en:
     save_member_note: 'Save note'
     save_operation_note: 'Save operation'
     save_credit_card: 'Save credit card'
+    report: 'Report'
   admin:
     agents:
       index:
