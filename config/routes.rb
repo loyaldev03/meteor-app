@@ -70,7 +70,7 @@ SacPlatform::Application.routes.draw do
         match '/set_as_not_processed/:fulfillment_id' => 'fulfillments#set_as_not_processed', as: 'fulfillment_set_as_not_processed', :via => [:put]
         match '/mark_as_sent/:fulfillment_id' => 'fulfillments#mark_as_sent', as: 'fulfillment_mark_as_sent', :via => [:put]
         match '/mark_as_wrong_address/:fulfillment_id' => 'fulfillments#mark_as_wrong_address', as: 'fulfillment_mark_as_wrong_address', :via => [:put]
-      
+        match '/generate_csv' => 'fulfillments#generate_csv', as: 'fulfillment_generate_csv', :via => [:post]
       end
     end
 

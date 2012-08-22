@@ -1,5 +1,7 @@
 class FulfillmentsController < ApplicationController
+  require 'csv'
   before_filter :validate_club_presence
+
 
   def index
     respond_to do |format|
@@ -11,10 +13,41 @@ class FulfillmentsController < ApplicationController
   def report
   	if params[:all_times] == '1'
   		@fulfillments = Fulfillment.joins(:member).where('fulfillments.status like ? and club_id = ?', params[:status],@current_club.id)
-  	end
-    respond_to do |format|
-      format.html {render 'index'}
-      format.js {render 'index'}
+  	  render 'index'
+    elsif params[:status] == 'not_processed'
+      fulfillments = Fulfillment.where(['status like ? AND assigned_at BETWEEN ? and ?', 'not_processed', params[:initial_date], params[:end_date]])
+      row = []
+      csv_string = CSV.generate do |csv| 
+        csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
+              'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
+        fulfillments.each do |fulfillment|
+        member = Member.find(fulfillment.member_id)
+        product = Product.find_by_sku_and_club_id(fulfillment.product,member.club_id)
+        if product.stock > 0
+          row << fulfillment.tracking_code
+          row << 'Costcenter'
+          row << member.full_name
+          row << member.address
+          row << member.city
+          row << member.state
+          row << member.zip
+          row << 'Return Service Requested'
+          row << 'Irregulars'
+          row << 'Y'
+          row << 'Shipper'
+          row << product.weight
+          row << 'MID'
+          csv << row
+          row = []
+          fulfillment.set_as_processing
+          product.decrease_stock(1)
+        end
+      end
+      csv << row
+    end
+    send_data csv_string, :filename => "export.csv",
+                   :type => 'text/csv; charset=iso-8859-1; header=present',
+                   :disposition => "attachment; filename=export.csv"
     end
   end
 
@@ -58,4 +91,8 @@ class FulfillmentsController < ApplicationController
     end     
   end
 
+  def generate_csv
+    fulfillments = Fulfillment.where(['status like ? AND assigned_at BETWEEN ? and ?', 'not_processed', params[:initial_date], params[:end_date]])
+
+  end 
 end
