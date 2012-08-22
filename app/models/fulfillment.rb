@@ -16,6 +16,8 @@ class Fulfillment < ActiveRecord::Base
   scope :not_processed, lambda { where("status = 'not_processed'") }
   scope :cancellable, lambda { where("status IN ('not_processed','processing','out_of_stock', 'undeliverable')") }
 
+  delegate :club, :to => :member
+
   state_machine :status, :initial => :not_processed do
     event :set_as_not_processed do
       transition [:sent,:out_of_stock,:undeliverable] => :not_processed
@@ -71,6 +73,13 @@ class Fulfillment < ActiveRecord::Base
       f.member_id = self.member_id
       f.save
     end
+  end
+
+  def validate_stock!
+    stock_product = Product.find_by_sku_and_club_id(product, club.id)
+    if stock_product.nil? or stock_product.stock == 0 
+      set_as_out_of_stock!
+    end  
   end
 
   private
