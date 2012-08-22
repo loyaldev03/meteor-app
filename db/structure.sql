@@ -200,7 +200,7 @@ CREATE TABLE `enrollment_infos` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `enrollment_preferences` (
   `uuid` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -330,7 +330,7 @@ CREATE TABLE `operations` (
   `operation_type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_operations_on_member_id` (`member_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15115 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15117 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `partners` (
   `prefix` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,

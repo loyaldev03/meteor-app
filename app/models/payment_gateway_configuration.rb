@@ -30,13 +30,13 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
 
   def process_mes_chargebacks
     conn = Faraday.new(:url => Settings.mes_report_service.url, :ssl => {:verify => false})
-    day = (Date.today - 1.days).strftime('%m/%d/%Y')
+    initial_date, end_date = (Date.today - 1.days).strftime('%m/%d/%Y'), (Date.today - 1.days).strftime('%m/%d/%Y')
     merchant_id = self.login[0..11]
     result = conn.get Settings.mes_report_service.path, { 
       :userId => Settings.mes_report_service.user, 
       :userPass => Settings.mes_report_service.password, 
-      :reportDateBegin => day, 
-      :reportDateEnd => day, 
+      :reportDateBegin => initial_date, 
+      :reportDateEnd => end_date, 
       :nodeId => merchant_id, 
       :reportType => 1, 
       :includeTridentTranId => true, 
@@ -68,7 +68,7 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
           :reason_code => columns[16], :cb_ref_number => columns[17]
         }
         begin
-          transaction_chargebacked = Transaction.find_by_payment_gateway_id_and_response_transaction_id self.id, args[:trident_transaction_id]
+          transaction_chargebacked = Transaction.find_by_payment_gateway_configuration_id_and_response_transaction_id self.id, args[:trident_transaction_id]
           member = Member.find_by_visible_id_and_club_id(args[:client_reference_number], self.club_id)
           if transaction_chargebacked.member_id == member.id
             member.chargeback! transaction_chargebacked, args

@@ -111,7 +111,7 @@ class Member < ActiveRecord::Base
   scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value) unless value.blank? }
   scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value+'%') unless value.blank?}
 
-  state_machine :status, :initial => :none do
+  state_machine :status, :initial => :none, :action => :save_state do
     after_transition [ :none, # enroll
                        :provisional, # save the sale
                        :lapsed, # reactivation
@@ -154,6 +154,10 @@ class Member < ActiveRecord::Base
     # COF and is in provisional status who needs to be approved to join the NFLA, (Approvals are 
     # done through NFLA and managed by Stoneacre)
     state :applied
+  end
+
+  def save_state
+    save(:validate => false)
   end
 
   # Sends the activation mail.
@@ -560,7 +564,7 @@ class Member < ActiveRecord::Base
   def nillify_club_cash
     add_club_cash(nil, -club_cash_amount.to_i, 'Removing club cash because of member cancellation') unless club_cash_amount.to_f == 0.0
     self.club_cash_expire_date = nil
-    self.save!
+    self.save(:validate => false)
   end
 
   # Resets member club cash in case the club cash has expired. It calls "add_club_cash" method
@@ -574,7 +578,7 @@ class Member < ActiveRecord::Base
     amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
     self.add_club_cash(nil, amount, message)
     self.club_cash_expire_date = self.join_date + 1.year
-    self.save!
+    self.save(:validate => false)
   end
   
   # Adds club cash transaction. 
