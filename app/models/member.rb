@@ -658,7 +658,7 @@ class Member < ActiveRecord::Base
   def chargeback!(transaction_chargebacked, args)
     trans = Transaction.new_chargeback(transaction_chargebacked, args)
     self.blacklist nil, args[:reason]
-    self.cancel! Date.today, "Automatic cancellation because of a chargeback."
+    self.cancel! Time.zone.now, "Automatic cancellation because of a chargeback."
     self.set_as_canceled!
   end
 
