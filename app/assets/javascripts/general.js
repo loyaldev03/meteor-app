@@ -283,7 +283,7 @@ $(document).ready( function() {
   }
 
   function operation_member_functions(column_count){
-    oTable = $('#operations_table').dataTable({
+    oTable2 = $('#operations_table').dataTable({
       "oLanguage": {"sSearch": "Filtered by:"},
       "bJQueryUI": false,
       "bProcessing": true,
@@ -298,7 +298,7 @@ $(document).ready( function() {
 
     $('.dataTables_filter').hide();
     $(".dataselect").change( function () {
-        oTable.fnFilter( $(this).val() );
+        oTable2.fnFilter( $(this).val() );
     });
   };
 
