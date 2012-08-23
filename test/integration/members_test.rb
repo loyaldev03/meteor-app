@@ -228,7 +228,7 @@ class MembersTest < ActionController::IntegrationTest
 
   end
 
-	def create_new_member(unsaved_member)
+	def create_new_member(unsaved_member, cc_blank = false)
 		visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
 
 		click_on 'New Member'
@@ -258,12 +258,17 @@ class MembersTest < ActionController::IntegrationTest
 			select(@terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
 		}
 
-		within("#table_credit_card") {	
-			fill_in 'member[credit_card][number]', :with => "#{unsaved_member.active_credit_card.number}"
-			fill_in 'member[credit_card][expire_month]', :with => "#{unsaved_member.active_credit_card.expire_month}"
-			fill_in 'member[credit_card][expire_year]', :with => "#{unsaved_member.active_credit_card.expire_year}"
-		}
+    if cc_blank
+      check('setter[cc_blank]')
+    else
+      within("#table_credit_card") {	
+  			fill_in 'member[credit_card][number]', :with => "#{unsaved_member.active_credit_card.number}"
+  			fill_in 'member[credit_card][expire_month]', :with => "#{unsaved_member.active_credit_card.expire_month}"
+  			fill_in 'member[credit_card][expire_year]', :with => "#{unsaved_member.active_credit_card.expire_year}"
+  		}
+    end
     
+      
     unless unsaved_member.external_id.nil?
     	fill_in 'member[external_id]', :with => unsaved_member.external_id
     end 
@@ -287,6 +292,37 @@ class MembersTest < ActionController::IntegrationTest
       :created_by => @admin_agent)
 
  		create_new_member(unsaved_member)
+    created_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
+    
+    validate_view_member_base(created_member)
+
+    within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
+
+    active_credit_card = created_member.active_credit_card
+    within("#credit_cards") { 
+      assert page.has_content?("#{active_credit_card.number}") 
+      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
+    }
+
+    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
+
+    within("#fulfillments") { assert page.has_content?(fulfillments_table_empty_text) }
+
+    within("#communication") { assert page.has_content?(communication_table_empty_text) }
+
+
+  end
+
+   test "Create a member with CC blank" do
+    setup_member(false)
+
+    unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id, 
+      :terms_of_membership => @terms_of_membership_with_gateway,
+      :created_by => @admin_agent)
+
+    create_new_member(unsaved_member, true)
+    
     created_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
     
     validate_view_member_base(created_member)
@@ -399,6 +435,22 @@ class MembersTest < ActionController::IntegrationTest
       
   end
 
+	test "new member for with external_id not requiered" do
+  	setup_member(false)
+  	@club.requires_external_id = true
+  	@club.save!
+
+  	unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id, 
+      :terms_of_membership => @terms_of_membership_with_gateway,
+      :created_by => @admin_agent)
+
+  	visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_on 'New Member'
+    create_new_member(unsaved_member)
+
+  end
+
   test "display external_id at member search" do
   	setup_member(false)
   	@club.requires_external_id = true
@@ -419,7 +471,10 @@ class MembersTest < ActionController::IntegrationTest
     search_member("member[member_id]", "#{member.visible_id}", member)
 
   end
-   
+  
+
+
+
    
 
 
