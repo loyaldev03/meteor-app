@@ -363,4 +363,65 @@ $(document).ready( function() {
 
   function fulfillments_index_functions(){
     $(".datepicker").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
-  }
+  
+    $('*#resend').click( function(event){
+      button = $(this)
+      button.attr('disabled', 'disabled');
+      event.preventDefault();
+      $.ajax({
+        type: 'PUT',
+        url: "resend/"+button.attr("name"),
+        data: { fulfillment_id : button.attr("name") },
+        success: function(data) {
+          if (data.code == "000"){
+            button.hide();
+            alert(data.message);
+          }else{
+            button.removeAttr('disabled');
+            alert(data.message);
+          };
+        },
+      });
+    });
+
+    $('*#mark_as_sent').click( function(event){
+      button = $(this)
+      button.attr('disabled', 'disabled');
+      event.preventDefault();
+      $.ajax({
+        type: 'PUT',
+        url: "mark_as_sent/"+button.attr("name"),
+        data: { fulfillment_id : button.attr("name") },
+        success: function(data) {
+          if (data.code == "000"){
+            button.hide();
+            alert(data.message);
+          }else{
+            button.removeAttr('disabled');
+            alert(data.message);
+          };
+        },
+      });
+    });
+
+    $('*#mark_as_wrong_address').click( function(event){
+      button = $(this)
+      button.attr('disabled', 'disabled');
+      event.preventDefault();
+      $.ajax({
+        type: 'PUT',
+        url: "mark_as_wrong_address/"+button.attr("name"),
+        data: { fulfillment_id : button.attr("name"), reason : $("#reason_"+button.attr("name")).val() },
+        success: function(data) {
+          if (data.code == "000"){
+            button.hide();
+            alert(data.message);
+          }else{
+            button.removeAttr('disabled');
+            alert(data.message);
+          };
+        },
+      });
+    });
+  };
+

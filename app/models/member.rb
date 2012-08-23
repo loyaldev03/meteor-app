@@ -640,13 +640,18 @@ class Member < ActiveRecord::Base
   end
   
   def set_wrong_address(agent,reason)
-    if self.update_attribute(:wrong_address, reason)
-      message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
-      Auditory.audit(@current_agent,self,message,self)
-      return {:message => message, :success => true}
+    if self.wrong_address.nil?
+      if self.update_attribute(:wrong_address, reason)
+        message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
+        Auditory.audit(agent,self,message,self)
+        return {:message => message, :code => Settings.error_codes.success }
+      else
+        message = "Could not set the NBD on this member #{self}.errors.inspect"
+        return {:message => message, :code => Settings.error_codes.member_data_invalid}
+      end
     else
-      message = "Could not set the NBD on this member #{self}.errors.inspect"
-      return {:message => message, :success => false}
+        message = "Member's address already set as wrong address."
+        return {:message => message, :code => Settings.error_codes.member_already_set_wrong_address}      
     end
   end
 

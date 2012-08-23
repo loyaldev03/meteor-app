@@ -82,6 +82,53 @@ class Fulfillment < ActiveRecord::Base
     end  
   end
 
+  def resend(agent)
+    member = Member.find(self.member_id)
+    product = Product.find_by_sku_and_club_id(self.product,member.club_id)
+    if self.set_as_not_processed
+      product.stock = product.stock-1 
+      product.save
+      message = "Fulfillment #{self.product} was resent."
+      Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_resend)
+      return { :message => message, :code => Settings.error_codes.success }
+    else
+      message = "Fulfillment was not resent. #{self}.errors"
+      return { :message => message, :code => Settings.error_codes.fulfillment_error }
+    end    
+  end
+
+  def mark_as_sent(agent)
+    if self.set_as_sent
+      message = "Fulfillment #{self.product} was set as sent."
+      Auditory.audit(agent, self, message, Member.find(self.member_id), Settings.operation_types.fulfillment_mannualy_mark_as_sent)
+      return { :message => message, :code => Settings.error_codes.success }
+    else
+      message = "Could not mark as sent."
+      return { :message => message, :code => Settings.error_codes.fulfillment_error }
+    end
+  end
+
+  def self.generateCSV(fulfillments)
+    row = []
+    csv_string = CSV.generate do |csv| 
+        csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
+              'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
+        fulfillments.each do |fulfillment|
+        member = Member.find(fulfillment.member_id)
+        product = Product.find_by_sku_and_club_id(fulfillment.product,member.club_id)
+        if product.stock > 0
+          csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
+                  member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
+                  product.weight, 'MID']
+          fulfillment.set_as_processing
+          product.decrease_stock(1)
+        end
+      end
+      csv << row
+    end
+    return csv_string
+  end
+
   private
     def set_default_values
       self.assigned_at = Time.zone.now
