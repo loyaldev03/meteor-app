@@ -552,36 +552,31 @@ class Member < ActiveRecord::Base
   
   # Adds club cash transaction. 
   def add_club_cash(agent,amount = 0,description = nil)
-    answer = {}
+    answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
     ClubCashTransaction.transaction do 
       if amount.to_i == 0
-        message = "Cannot add $0 amount. Please add an amount."
-        answer =  { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful  }
-      else
-        if (amount.to_i < 0 and amount.to_i.abs <= self.club_cash_amount.to_i) or amount.to_i > 0
-          begin
-            cct = ClubCashTransaction.new(:amount => amount, :description => description)
-            cct.member = self
-            if cct.valid? 
-              cct.save!
-              self.club_cash_amount = self.club_cash_amount + amount.to_f
-              self.save!
-              amount.to_i >= 0 ? message = "$#{cct.amount} club cash was successfully added!" : message = "$#{cct.amount.to_i.abs} club cash was successfully deducted!"
-              Auditory.audit(agent, cct, message, self)
-              answer = { :message => message, :code => Settings.error_codes.success }
-            else
-              message = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"
-              answer = { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful  }
-            end
-          rescue Exception => e
-            message = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"
-            Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => message)
-            raise ActiveRecord::Rollback
+        answer[:message] = "Cannot add $0 amount. Please add an amount."
+      elsif (amount.to_i < 0 and amount.to_i.abs <= self.club_cash_amount.to_i) or amount.to_i > 0
+        begin
+          cct = ClubCashTransaction.new(:amount => amount, :description => description)
+          cct.member = self
+          if cct.valid? 
+            cct.save!
+            self.club_cash_amount = self.club_cash_amount + amount.to_f
+            self.save!
+            message = (amount.to_i >= 0 ? "$#{cct.amount} club cash was successfully added!" : "$#{cct.amount.to_i.abs} club cash was successfully deducted!")
+            Auditory.audit(agent, cct, message, self)
+            answer = { :message => message, :code => Settings.error_codes.success }
+          else
+            answer[:message] = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"
           end
-        else
-          message = "You can not deduct $#{amount.to_i.abs} because you only have $#{self.club_cash_amount} club cash."
-          answer =  { :message => message, :code => Settings.error_codes.club_cash_transaction_not_successful  }
+        rescue Exception => e
+          answer[:message] = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"
+          Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => answer[:message])
+          raise ActiveRecord::Rollback
         end
+      else
+        answer[:message] = "You can not deduct $#{amount.to_i.abs} because you only have $#{self.club_cash_amount} club cash."
       end
     end
     answer
@@ -643,10 +638,9 @@ class Member < ActiveRecord::Base
     if self.update_attribute(:wrong_address, reason)
       message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
       Auditory.audit(@current_agent,self,message,self)
-      return {:message => message, :success => true}
+      {:message => message, :success => true}
     else
-      message = "Could not set the NBD on this member #{self}.errors.inspect"
-      return {:message => message, :success => false}
+      {:message => "Could not set the NBD on this member #{self}.errors.inspect", :success => false}
     end
   end
 

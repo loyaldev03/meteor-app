@@ -9,7 +9,7 @@ class Prospect < ActiveRecord::Base
   attr_accessible :first_name, :last_name, :address, :city, :state, :zip, :email,:phone_country_code, 
    				  :phone_area_code ,:phone_local_number, :birth_date, :preferences, :mega_channel, 
    				  :ip_address, :referral_host, :referral_parameters, :cookie_value,:marketing_code, 
-                  :product_sku, :user_id, :landing_url, :mega_channel, :user_agent, :joint
+            :product_sku, :user_id, :landing_url, :mega_channel, :user_agent, :joint
 
 
 end
