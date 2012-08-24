@@ -69,7 +69,7 @@ class Fulfillment < ActiveRecord::Base
     if member.can_receive_another_fulfillment?
       f = Fulfillment.new 
       f.status = status if status.nil?
-      f.product = self.product
+      f.product_sku = self.product_sku
       f.member_id = self.member_id
       f.save
     end
@@ -99,7 +99,7 @@ class Fulfillment < ActiveRecord::Base
 
   def mark_as_sent(agent)
     if self.set_as_sent
-      message = "Fulfillment #{self.product} was set as sent."
+      message = "Fulfillment #{self.product_sku} was set as sent."
       Auditory.audit(agent, self, message, Member.find(self.member_id), Settings.operation_types.fulfillment_mannualy_mark_as_sent)
       return { :message => message, :code => Settings.error_codes.success }
     else
@@ -114,7 +114,7 @@ class Fulfillment < ActiveRecord::Base
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
         fulfillments.each do |fulfillment|
         member = Member.find(fulfillment.member_id)
-        product = Product.find_by_sku_and_club_id(fulfillment.product,member.club_id)
+        product = Product.find_by_sku_and_club_id(fulfillment.product_sku,member.club_id)
         if product.stock > 0
           csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
                   member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
@@ -132,7 +132,7 @@ class Fulfillment < ActiveRecord::Base
       self.assigned_at = Time.zone.now
       # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
       self.renewable_at = self.assigned_at + 1.year if self.recurrent
-      self.tracking_code = self.product + self.member.visible_id.to_s
+      self.tracking_code = self.product_sku + self.member.visible_id.to_s
     end
 
 end

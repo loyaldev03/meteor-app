@@ -12,7 +12,7 @@
 		<% @fulfillments.each do |fulfillment| %>
 		<tr>
 			<td> <%= fulfillment.id %> </td>
-			<td> <%= fulfillment.product %> </td>
+			<td> <%= fulfillment.product_sku %> </td>
 			<td> <%= fulfillment.tracking_code %> </td>
 			<td> <%= fulfillment.status %> </td>
 			<% if fulfillment.processing? %>
@@ -27,7 +27,7 @@
         		<%= t('activerecord.attributes.member.undeliverable') %>
         	<% end %>
         </td>
-			<% elsif Product.find_by_sku_and_club_id(fulfillment.product,@current_club).stock > 0 %>
+			<% elsif  %>
         <td><%= link_to 'Resend','#', :id => 'resend', :name => "#{fulfillment.id}" ,:class=> "btn btn-small" %></td>
      	<% end %>
 		</tr>

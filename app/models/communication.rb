@@ -4,34 +4,38 @@ class Communication < ActiveRecord::Base
   serialize :external_attributes
 
   def self.deliver!(template_type, member)
-    if template_type.class == EmailTemplate
-      template = template_type
-    else
-      template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
-    end
-    if template.nil?
-      message = "Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
-      Airbrake.notify(:error_class => "Communication Template", :error_message => message)
-      logger.error "* * * * * Template does not exist"
-    else
-      c = Communication.new :email => member.email
-      c.member_id = member.id
-      c.template_name = template.name
-      c.client = template.client
-      c.external_attributes = template.external_attributes
-      c.template_type = template.template_type
-      c.scheduled_at = Time.zone.now
-      c.save
-
-      if template.lyris?
-        c.deliver_lyris
-      elsif template.action_mailer?
-        c.deliver_action_mailer
+    unless member.email.include?("@noemail.com")
+      if template_type.class == EmailTemplate
+        template = template_type
       else
-        message = "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
-        Airbrake.notify(:error_class => "Communication Client", :error_message => message)
-        logger.error "* * * * * Client not supported"
+        template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
       end
+      if template.nil?
+        message = "Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
+        Airbrake.notify(:error_class => "Communication Template", :error_message => message)
+        logger.error "* * * * * Template does not exist"
+      else
+        c = Communication.new :email => member.email
+        c.member_id = member.id
+        c.template_name = template.name
+        c.client = template.client
+        c.external_attributes = template.external_attributes
+        c.template_type = template.template_type
+        c.scheduled_at = Time.zone.now
+        c.save
+
+        if template.lyris?
+          c.deliver_lyris
+        elsif template.action_mailer?
+          c.deliver_action_mailer
+        else
+          message = "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
+          Airbrake.notify(:error_class => "Communication Client", :error_message => message)
+          logger.error "* * * * * Client not supported"
+        end
+      end
+    else
+      Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
     end
   end
 
