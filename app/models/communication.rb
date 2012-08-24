@@ -4,7 +4,10 @@ class Communication < ActiveRecord::Base
   serialize :external_attributes
 
   def self.deliver!(template_type, member)
-    unless member.email.include?("@noemail.com")
+    if member.email.include?("@noemail.com")
+      message = "The email contains '@noemail.com' which is an empty email. The email won't be sent."
+      Auditory.audit(nil, self, message, member, Settings.operation_types["#{template_type}_email"])
+    else
       if template_type.class == EmailTemplate
         template = template_type
       else
@@ -34,8 +37,6 @@ class Communication < ActiveRecord::Base
           logger.error "* * * * * Client not supported"
         end
       end
-    else
-      Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
     end
   end
 
