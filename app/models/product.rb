@@ -25,13 +25,8 @@ class Product < ActiveRecord::Base
     self.save 
   end
 
-<<<<<<< HEAD
   def has_stock?
     stock > 0
-=======
-  def check_if_there_is_stock_left
-    self.stock>0 ? true : false
->>>>>>> 95202cdf785a010ac70c32f67cc73d7b560a1bc2
   end
 
 end
