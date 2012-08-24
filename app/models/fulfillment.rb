@@ -124,7 +124,7 @@ class Fulfillment < ActiveRecord::Base
           fulfillment.set_as_processing
           csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
                   member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
-                  product.weight, 'MID']
+                  fulfillment.product.weight, 'MID']
         end
       end
     end
