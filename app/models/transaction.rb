@@ -71,7 +71,7 @@ class Transaction < ActiveRecord::Base
 
   def update_enrollment_info_and_cohort(enrollment_info_id, cohort = nil)
     self.enrollment_info_id = enrollment_info_id
-    self.cohort = cohort || [ self.member.join_date.year.to_s, self.member.join_date.month.to_s, self.enrollment_info.mega_channel.to_s, self.enrollment_info.campaign_medium ].join('-')
+    self.cohort = cohort || [ self.member.join_date.year.to_s, self.member.join_date.month.to_s, self.enrollment_info.mega_channel.to_s, self.enrollment_info.campaign_medium.to_s ].join('-')
     self.save
   end
 

@@ -404,6 +404,7 @@ CREATE TABLE `prospects` (
   `campaign_medium` text COLLATE utf8_unicode_ci,
   `campaign_description` text COLLATE utf8_unicode_ci,
   `campaign_medium_version` int(11) DEFAULT NULL,
+  `cohort` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   UNIQUE KEY `index_prospects_on_uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -642,3 +643,5 @@ INSERT INTO schema_migrations (version) VALUES ('20120813143725');
 INSERT INTO schema_migrations (version) VALUES ('20120813151533');
 
 INSERT INTO schema_migrations (version) VALUES ('20120821132945');
+
+INSERT INTO schema_migrations (version) VALUES ('20120823223945');
