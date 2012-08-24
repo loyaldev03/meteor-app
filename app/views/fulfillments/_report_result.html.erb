@@ -4,7 +4,7 @@
 	<thead>
 	  <th> <%= t('activerecord.attributes.fulfillment.id') %> </th>
 	  <th> <%= t('activerecord.attributes.fulfillment.product') %> </th>
-	  <th> <%= t('activerecord.attributes.fulfillment.trancking_code') %> </th>    
+	  <th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th>    
     <th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
 	  <th> <%= t('actions') %> </th>    
 	</thead>
@@ -18,7 +18,7 @@
 			<% if fulfillment.processing? %>
         <td NOWRAP><%= link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id,
       		      :class=> "btn btn-small"%>
-        	<% unless Member.find(fulfillment.member_id).wrong_address %>
+        	<% unless fulfillment.member.wrong_address %>
         		<%= select_tag "reason", options_for_select([Settings.wrong_address.undeliverable_all, Settings.wrong_address.undeliverable_sloop, Settings.wrong_address.undeliverable_kit_card]), :id => "reason_#{fulfillment.id}" %>
       			<%= link_to 'Mark as wrong address','#', :id => "mark_as_wrong_address", 
         	    :name => fulfillment.id, :class=> "btn btn-small" %>

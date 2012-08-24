@@ -111,7 +111,6 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def self.generateCSV(fulfillments)
-    row = []
     csv_string = CSV.generate do |csv| 
       csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
@@ -127,7 +126,6 @@ class Fulfillment < ActiveRecord::Base
           fulfillment.set_as_out_of_stock
         end
       end
-      csv << row
     end
     return csv_string
   end
