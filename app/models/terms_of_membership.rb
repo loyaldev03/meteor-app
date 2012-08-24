@@ -5,6 +5,7 @@ class TermsOfMembership < ActiveRecord::Base
   belongs_to :club
   has_many :transactions
   has_many :members
+  has_many :prospects
   has_many :email_templates
 
   acts_as_paranoid

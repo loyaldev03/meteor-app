@@ -1,33 +1,30 @@
 
 <table class="table table-condensed table-bordered">
   <thead>
-  	<tr>
-	  <th> <%= t('activerecord.attributes.fulfillment.asigned_at') %> </th>
-	  <th> <%= t('activerecord.attributes.fulfillment.product') %> </th>
-	  <th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>    
-	  <th> <%= t('actions') %> </th>    
+    <tr>
+      <th> <%= t('activerecord.attributes.fulfillment.asigned_at') %> </th>
+  	  <th> <%= t('activerecord.attributes.fulfillment.product') %> </th>
+  	  <th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>    
+  	  <th> <%= t('actions') %> </th>    
    	</tr>
-   </thead>
-   <tbody>
-   	  <% unless @fulfillments.nil? %>
-   	  <% if @fulfillments.count == 0 %>
-        <tr> <td colspan="5"> <%= t('activerecord.attributes.fulfillment.not_found') %> </td> </tr>
-      <% end %> 
-      <% @fulfillments.each do |fulfillment| %>
-   		 <tr <% if fulfillment.processing? %> 
+  </thead>
+  <tbody>
+ 	  <% if @fulfillments.count == 0 %>
+      <tr> <td colspan="5"> <%= t('activerecord.attributes.fulfillment.not_found') %> </td> </tr>
+    <% end %> 
+    <% @fulfillments.each do |fulfillment| %>
+  		<tr <% if fulfillment.processing? %> 
         	  class="ligthgreen" 
        		 <% end %> >
-			<td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
-			<td> <%= fulfillment.product %> </td>
-			<td> <%= I18n.l fulfillment.renewable_at, 
-			         :format => :long unless fulfillment.renewable_at.nil? %> </td>
-			<td>
-			  <%= form_for @fulfillment, :as => :fulfillment, :url => member_resend_fulfillment_path(:fulfillment_id => fulfillment.id), do |f| %>
-			  	<%= f.submit t('resend'), :name => 'resend', :class => "btn btn-warning confirm" if fulfillment.processing? %>
-			  <% end %>
-			</td>
-		</tr>
-      <% end %>	
-      <% end %>	
-   </tbody>
+        <td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
+        <td> <%= fulfillment.product %> </td>
+        <td> <%= I18n.l fulfillment.renewable_at, :format => :long unless fulfillment.renewable_at.nil? %> </td>
+        <td>
+          <%= form_for @fulfillment, :as => :fulfillment, :url => member_resend_fulfillment_path(:fulfillment_id => fulfillment.id), do |f| %>
+          	<%= f.submit t('resend'), :name => 'resend', :class => "btn btn-warning confirm" if fulfillment.processing? %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>	
+  </tbody>
 </table>
