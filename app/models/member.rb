@@ -30,12 +30,6 @@ class Member < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
 
-  def wrong_address_logic
-    if self.changed?(:wrong_address) and self.wrong_address.nil?
-      self.fulfillments.undeliverable.each { |s| s.set_as_not_processed }
-    end
-  end
-
   after_create :after_create_sync_remote_domain
   after_update :after_update_sync_remote_domain
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
@@ -777,6 +771,12 @@ class Member < ActiveRecord::Base
 
     def asyn_desnormalize_preferences
       self.desnormalize_preferences if self.changed.include?('preferences') 
+    end
+
+    def wrong_address_logic
+      if self.changed.include?(:wrong_address) and self.wrong_address.nil?
+        self.fulfillments.undeliverable.each { |s| s.set_as_not_processed }
+      end
     end
 
   public 
