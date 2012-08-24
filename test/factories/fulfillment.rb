@@ -1,7 +1,7 @@
 FactoryGirl.define do
 
   factory :fulfillment do
-    product "kit-card"
+    product_sku "kit-card"
     assigned_at DateTime.now
   end
 
