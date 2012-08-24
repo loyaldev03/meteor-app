@@ -17,7 +17,7 @@
         	  class="ligthgreen" 
        		 <% end %> >
         <td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
-        <td> <%= fulfillment.product %> </td>
+        <td> <%= fulfillment.product_sku %> </td>
         <td> <%= I18n.l fulfillment.renewable_at, :format => :long unless fulfillment.renewable_at.nil? %> </td>
         <td> <%= fulfillment.status %> </td>
         <td>

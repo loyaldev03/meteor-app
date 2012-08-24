@@ -644,8 +644,13 @@ class Member < ActiveRecord::Base
         Auditory.audit(agent,self,message,self)
         { :message => message, :code => Settings.error_codes.success }
       else
+<<<<<<< HEAD
         message = "Could not set the NBD on this member #{self}.errors.inspect"
         { :message => message, :code => Settings.error_codes.member_data_invalid }
+=======
+        message = "Could not set member's address as undeliverable. #{self}.errors.inspect"
+        {:message => message, :code => Settings.error_codes.member_set_wrong_address_error}
+>>>>>>> 95202cdf785a010ac70c32f67cc73d7b560a1bc2
       end
     else
       message = "Member's address already set as wrong address."
