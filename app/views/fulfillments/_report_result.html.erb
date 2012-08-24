@@ -2,6 +2,9 @@
   <table class="table table-bordered table-condensed">
   	<thead>
   	  <th> <%= t('activerecord.attributes.fulfillment.id') %> </th>
+      <th> <%= t('activerecord.attributes.fulfillment.member') %> </th>
+      <th> <%= t('activerecord.attributes.fulfillment.assigned_at') %> </th>
+      <th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>   
   	  <th> <%= t('activerecord.attributes.fulfillment.product_sku') %> </th>
   	  <th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th>    
       <th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
@@ -11,11 +14,14 @@
   		<% @fulfillments.each do |fulfillment| %>
     		<tr>
     			<td> <%= fulfillment.id %> </td>
+          <td> <%= fulfillment.member.full_name %> </td>
+          <td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
+          <td> <%= I18n.l fulfillment.renewable_at, :format => :long unless fulfillment.renewable_at.nil? %> </td>
     			<td> <%= fulfillment.product_sku %> </td>
     			<td> <%= fulfillment.tracking_code %> </td>
     			<td> <%= fulfillment.status %> </td>
-    			<% if fulfillment.processing? %>
-            <td NOWRAP>
+          <td NOWRAP>
+      			<% if fulfillment.processing? %>
               <% unless fulfillment.member.wrong_address %>
                 <%= link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id, :class=> "btn btn-small" %>
                 -----
@@ -25,10 +31,10 @@
             	<% else %>
             		<%= t('activerecord.attributes.member.undeliverable') %>
             	<% end %>
-            </td>
-    			<% elsif fulfillment.out_of_stock? or fulfillment.undeliverable? %>
-            <td>Actual stock: <%= fulfillment.product.stock %>. <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small" %></td>
-         	<% end %>
+      			<% elsif fulfillment.out_of_stock? %>
+              Actual stock: <%= fulfillment.product.stock unless fulfillment.product.nil? %>. <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small" %>
+           	<% end %>
+          </td>
     		</tr>
   		<% end %>
   	</tbody>

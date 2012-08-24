@@ -1,5 +1,4 @@
 class FulfillmentsController < ApplicationController
-  require 'csv'
   before_filter :validate_club_presence
 
 

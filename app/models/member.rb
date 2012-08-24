@@ -487,7 +487,7 @@ class Member < ActiveRecord::Base
         f = Fulfillment.new :product_sku => product
         f.member_id = self.uuid
         f.save
-        f.validate_stock!
+        f.validate_stock
       end
     end
   end
