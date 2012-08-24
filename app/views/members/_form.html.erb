@@ -223,8 +223,33 @@
   <% end %>
   </tbody>
 </table>
+
+  <% if @current_club.requires_external_id %>
+    <table id="external_id" class="table table-bordered table-condensed table-nohover">
+      <thead>
+        <tr class="box_title">
+          <th colspan="3"><h4>Additional Information</h4> </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class = "control-group">
+          <td>
+            <table class="hidden_table_border">
+            <th>
+            <%= f.label :external_id, t('activerecord.attributes.credit_card.external_id'), :class => 'help-inline' %>
+            </th>
+            <td> 
+              <%= f.text_field :external_id, :class => 'text_field input-small' %>
+            </td>
+            </table>
+          </td>  
+        </tr>
+      </tbody>
+    </table>
+  <% end %>
 <% end %>
 
+<table>
  <tr class="control-group">
     <th colspan="4"> <%= f.submit nil, :class => 'btn btn-primary', :id => 'submit_button' %>
       <% if @member.new_record? %>
