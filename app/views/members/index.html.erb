@@ -152,6 +152,13 @@
                                    :value => (params[:member][:notes] if params[:member]) %> 
                   </td>
                 </tr>
+                  <tr>
+                    <td> <%= t('activerecord.attributes.member.needs_approval') %></td>
+                    <td>
+                      <%= check_box :member, :needs_approval, :checked => (params[:member][:needs_approval] if params[:member]) %> 
+                          
+                    </td>
+                  </tr>
               </table>
             </td>
         </tr>
