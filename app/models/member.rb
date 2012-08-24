@@ -28,6 +28,13 @@ class Member < ActiveRecord::Base
   serialize :preferences, JSON
 
   before_create :record_date
+  before_save :wrong_address_logic
+
+  def wrong_address_logic
+    if self.changed?(:wrong_address) and self.wrong_address.nil?
+      self.fulfillments.undeliverable.each { |s| s.set_as_not_processed }
+    end
+  end
 
   after_create :after_create_sync_remote_domain
   after_update :after_update_sync_remote_domain
@@ -635,19 +642,20 @@ class Member < ActiveRecord::Base
     end
   end
   
-  def set_wrong_address(agent,reason)
+  def set_wrong_address(agent, reason)
     if self.wrong_address.nil?
       if self.update_attribute(:wrong_address, reason)
+        self.fulfillments.processing.each { |s| s.set_as_undeliverable }
         message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
         Auditory.audit(agent,self,message,self)
-        {:message => message, :code => Settings.error_codes.success }
+        { :message => message, :code => Settings.error_codes.success }
       else
         message = "Could not set the NBD on this member #{self}.errors.inspect"
-        {:message => message, :code => Settings.error_codes.member_data_invalid}
+        { :message => message, :code => Settings.error_codes.member_data_invalid }
       end
     else
       message = "Member's address already set as wrong address."
-      {:message => message, :code => Settings.error_codes.member_already_set_wrong_address}      
+      { :message => message, :code => Settings.error_codes.member_already_set_wrong_address }
     end
   end
 

@@ -29,16 +29,8 @@ class FulfillmentsController < ApplicationController
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
   end
 
-  def mark_as_sent
-    fulfillment = Fulfillment.find(params[:id])
-    render json: fulfillment.mark_as_sent(@current_agent)
-  rescue ActiveRecord::RecordNotFound
-    render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
-  end
-
   def mark_as_wrong_address
-    member = Member.find(Fulfillment.find(params[:id]).member_id)
-    render json: member.set_wrong_address(@current_agent, params[:reason])
+    render json: Fulfillment.find(params[:id]).member.set_wrong_address(@current_agent, params[:reason])
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
   end

@@ -13,6 +13,8 @@ class Fulfillment < ActiveRecord::Base
 
   before_create :set_default_values
 
+  scope :undeliverable, lambda { where("status = 'undeliverable'") }
+  scope :processing, lambda { where("status = 'processing'") }
   scope :not_processed, lambda { where("status = 'not_processed'") }
   scope :cancellable, lambda { where("status IN ('not_processed','processing','out_of_stock', 'undeliverable')") }
 
