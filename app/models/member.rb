@@ -483,7 +483,7 @@ class Member < ActiveRecord::Base
     if self.fulfillments.find_by_status('not_processed').nil?
       fulfillments = fulfillments_products_to_send
       fulfillments.each do |product|
-        f = Fulfillment.new :product => product
+        f = Fulfillment.new :product_sku => product
         f.member_id = self.uuid
         f.save
         f.validate_stock!

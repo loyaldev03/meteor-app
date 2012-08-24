@@ -370,7 +370,7 @@ $(document).ready( function() {
       event.preventDefault();
       $.ajax({
         type: 'PUT',
-        url: button.attr("name")+"/resend",
+        url: "fulfillments/"+button.attr("name")+"/resend",
         success: function(data) {
           if (data.code == "000"){
             button.hide();
@@ -389,7 +389,7 @@ $(document).ready( function() {
       event.preventDefault();
       $.ajax({
         type: 'PUT',
-        url: button.attr("name")+"/mark_as_sent",
+        url: "fulfillments/"+button.attr("name")+"/mark_as_sent",
         success: function(data) {
           if (data.code == "000"){
             button.hide();
@@ -408,7 +408,7 @@ $(document).ready( function() {
       event.preventDefault();
       $.ajax({
         type: 'PUT',
-        url: button.attr("name")+"/mark_as_wrong_address",
+        url: "fulfillments/"+button.attr("name")+"/mark_as_wrong_address",
         data: { reason : $("#reason_"+button.attr("name")).val() },
         success: function(data) {
           if (data.code == "000"){
