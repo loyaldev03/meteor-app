@@ -35,6 +35,7 @@ class Transaction < ActiveRecord::Base
     self.address = member.address
     self.city = member.city
     self.state = member.state
+    self.country = member.country
     self.zip = member.zip
     self.terms_of_membership_id = member.terms_of_membership_id
   end
