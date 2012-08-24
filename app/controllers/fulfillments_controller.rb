@@ -20,18 +20,24 @@ class FulfillmentsController < ApplicationController
   def resend
   	fulfillment = Fulfillment.find(params[:id])
     render json: fulfillment.resend(@current_agent)
-  # TODO: =>  Agregar rescue NotFoud.... 
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Could not found the fulfillment."
+      render 'index'
   end
 
   def mark_as_sent
     fulfillment = Fulfillment.find(params[:id])
     render json: fulfillment.mark_as_sent(@current_agent)
-  # TODO: =>  Agregar rescue NotFoud.... 
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Could not found the fulfillment."
+      render 'index'
   end
 
   def mark_as_wrong_address
     member = Member.find(Fulfillment.find(params[:id]).member_id)
     render json: member.set_wrong_address(@current_agent, params[:reason])
-  # TODO: =>  Agregar rescue NotFoud.... 
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Could not found the fulfillment."
+      render 'index'
   end
 end
