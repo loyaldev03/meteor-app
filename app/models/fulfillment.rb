@@ -80,22 +80,27 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def validate_stock!
-    if product.nil? or product.stock == 0 
-      set_as_out_of_stock!
-    end  
+    raise "out of stock" unless validate_stock
+  end
+
+  def validate_stock
+    if product.nil? or not product.has_stock?
+      set_as_out_of_stock
+      false
+    else
+      true
+    end
   end
 
   def resend(agent)
     validate_stock!
-    if out_of_stock?
-      # TODO: add operation, replate fulfillment_error for fulfillment_out_of_stock
-      { :message => "Product does not have stock.", :code => Settings.error_codes.fulfillment_error }
-    else      
-      fulfillment.set_as_not_processed
-      message = "Fulfillment #{self.product_sku} was marked to be delivered next time."
-      Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_resend)
-      { :message => message, :code => Settings.error_codes.success }
-    end    
+    set_as_not_processed!
+    message = "Fulfillment #{self.product_sku} was marked to be delivered next time."
+    Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_resend)
+    { :message => message, :code => Settings.error_codes.success }
+  rescue 
+    # TODO: add operation, replate fulfillment_error for fulfillment_out_of_stock
+    { :message => "Product does not have stock.", :code => Settings.error_codes.fulfillment_error }
   end
 
   def mark_as_sent(agent)
@@ -114,8 +119,7 @@ class Fulfillment < ActiveRecord::Base
       csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
       fulfillments.each do |fulfillment|
-        validate_stock!
-        unless out_of_stock?
+        if validate_stock
           member = fulfillment.member
           fulfillment.set_as_processing
           csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
