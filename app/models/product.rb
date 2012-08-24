@@ -20,10 +20,13 @@ class Product < ActiveRecord::Base
   	self.weight = params[:weight]
   end
 
-  def decrease_stock(quantity)
+  def decrease_stock(quantity=1)
     self.stock = self.stock-quantity
     self.save 
   end
 
+  def has_stock?
+    stock > 0
+  end
 
 end

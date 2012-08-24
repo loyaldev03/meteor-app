@@ -7,7 +7,7 @@
 # status => open , archived
 #
 class Fulfillment < ActiveRecord::Base
-  attr_accessible :product
+  attr_accessible :product_sku
 
   belongs_to :member
 
@@ -19,6 +19,8 @@ class Fulfillment < ActiveRecord::Base
   delegate :club, :to => :member
 
   state_machine :status, :initial => :not_processed do
+    after_transition :all => :processing, :do => :decrease_stock
+
     event :set_as_not_processed do
       transition [:sent,:out_of_stock,:undeliverable] => :not_processed
     end
@@ -111,17 +113,18 @@ class Fulfillment < ActiveRecord::Base
   def self.generateCSV(fulfillments)
     row = []
     csv_string = CSV.generate do |csv| 
-        csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
+      csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
-        fulfillments.each do |fulfillment|
-        member = Member.find(fulfillment.member_id)
-        product = Product.find_by_sku_and_club_id(fulfillment.product,member.club_id)
-        if product.stock > 0
+      fulfillments.each do |fulfillment|
+        member = fulfillment.member
+        product = 
+        if product and product.has_stock?
+          fulfillment.set_as_processing
           csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
                   member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
                   product.weight, 'MID']
-          fulfillment.set_as_processing
-          product.decrease_stock(1)
+        else
+          fulfillment.set_as_out_of_stock
         end
       end
       csv << row
@@ -129,7 +132,15 @@ class Fulfillment < ActiveRecord::Base
     return csv_string
   end
 
+  def product
+    Product.find_by_sku_and_club_id(fulfillment.product_sku, member.club_id)
+  end
+
   private
+    def decrease_stock
+      product.decrease_stock
+    end
+
     def set_default_values
       self.assigned_at = Time.zone.now
       # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
