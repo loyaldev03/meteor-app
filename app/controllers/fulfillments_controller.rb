@@ -18,17 +18,20 @@ class FulfillmentsController < ApplicationController
   end
 
   def resend
-  	fulfillment = Fulfillment.find(params[:fulfillment_id])
+  	fulfillment = Fulfillment.find(params[:id])
     render json: fulfillment.resend(@current_agent)
+  # TODO: =>  Agregar rescue NotFoud.... 
   end
 
   def mark_as_sent
-    fulfillment = Fulfillment.find(params[:fulfillment_id])
+    fulfillment = Fulfillment.find(params[:id])
     render json: fulfillment.mark_as_sent(@current_agent)
+  # TODO: =>  Agregar rescue NotFoud.... 
   end
 
   def mark_as_wrong_address
-    member = Member.find(Fulfillment.find(params[:fulfillment_id]).member_id)
+    member = Member.find(Fulfillment.find(params[:id]).member_id)
     render json: member.set_wrong_address(@current_agent, params[:reason])
+  # TODO: =>  Agregar rescue NotFoud.... 
   end
 end
