@@ -66,7 +66,6 @@ SacPlatform::Application.routes.draw do
       resources :products     
       resources :fulfillments, :only => [:index]
       scope 'fulfillments' do
-        match '/report' => 'fulfillments#report', as: 'fulfillment_report', :via => [:post]
         match '/resend/:fulfillment_id' => 'fulfillments#resend', as: 'fulfillment_resend', :via => [:put]
         match '/mark_as_sent/:fulfillment_id' => 'fulfillments#mark_as_sent', as: 'fulfillment_mark_as_sent', :via => [:put]
         match '/mark_as_wrong_address/:fulfillment_id' => 'fulfillments#mark_as_wrong_address', as: 'fulfillment_mark_as_wrong_address', :via => [:put]

@@ -4,18 +4,16 @@ class FulfillmentsController < ApplicationController
 
 
   def index
-  end
-
-  def report
-  	if params[:all_times] == '1'
-  		@fulfillments = Fulfillment.joins(:member).where('fulfillments.status like ? and club_id = ?', params[:status],@current_club.id)
-  	  render 'index'
-    elsif params[:status] == 'not_processed'
-      fulfillments = Fulfillment.where(['status like ? AND assigned_at BETWEEN ? and ?', 'not_processed', params[:initial_date], params[:end_date]])
-      csv_string = Fulfillment.generateCSV(fulfillments)
-      send_data csv_string, :filename => "miworkingfile2.csv",
-                   :type => 'text/csv; charset=iso-8859-1; header=present',
-                   :disposition => "attachment; filename=miworkingfile2.csv"
+    if request.post?
+    	if params[:all_times] == '1'
+    		@fulfillments = Fulfillment.joins(:member).where('fulfillments.status like ? and club_id = ?', params[:status],@current_club.id)
+      elsif params[:status] == 'not_processed'
+        fulfillments = Fulfillment.where(['status like ? AND assigned_at BETWEEN ? and ?', 'not_processed', params[:initial_date], params[:end_date]])
+        csv_string = Fulfillment.generateCSV(fulfillments)
+        send_data csv_string, :filename => "miworkingfile2.csv",
+                     :type => 'text/csv; charset=iso-8859-1; header=present',
+                     :disposition => "attachment; filename=miworkingfile2.csv"
+      end  
     end
   end
 
