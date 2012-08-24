@@ -119,7 +119,7 @@ class Fulfillment < ActiveRecord::Base
       csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
       fulfillments.each do |fulfillment|
-        if validate_stock
+        if fulfillment.validate_stock
           member = fulfillment.member
           fulfillment.set_as_processing
           csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
