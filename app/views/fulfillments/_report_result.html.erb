@@ -1,37 +1,35 @@
 <% if @fulfillments %>
-
-<table class="table table-bordered table-condensed">
-	<thead>
-	  <th> <%= t('activerecord.attributes.fulfillment.id') %> </th>
-	  <th> <%= t('activerecord.attributes.fulfillment.product') %> </th>
-	  <th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th>    
-    <th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
-	  <th> <%= t('actions') %> </th>    
-	</thead>
-	<tbody>
-		<% @fulfillments.each do |fulfillment| %>
-		<tr>
-			<td> <%= fulfillment.id %> </td>
-			<td> <%= fulfillment.product %> </td>
-			<td> <%= fulfillment.tracking_code %> </td>
-			<td> <%= fulfillment.status %> </td>
-			<% if fulfillment.processing? %>
-        <td NOWRAP><%= link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id,
-      		      :class=> "btn btn-small"%>
-        	<% unless fulfillment.member.wrong_address %>
-        		<%= select_tag "reason", options_for_select([Settings.wrong_address.undeliverable_all, Settings.wrong_address.undeliverable_sloop, Settings.wrong_address.undeliverable_kit_card]), :id => "reason_#{fulfillment.id}" %>
-      			<%= link_to 'Mark as wrong address','#', :id => "mark_as_wrong_address", 
-        	    :name => fulfillment.id, :class=> "btn btn-small" %>
-        	<% else %>
-        		<%= t('activerecord.attributes.member.undeliverable') %>
-        	<% end %>
-        </td>
-			<% elsif Product.find_by_sku_and_club_id(fulfillment.product,@current_club).stock > 0 %>
-        <td><%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small" %></td>
-     	<% end %>
-		</tr>
-		<% end %>
-	</tbody>
-</table>
-
+  <table class="table table-bordered table-condensed">
+  	<thead>
+  	  <th> <%= t('activerecord.attributes.fulfillment.id') %> </th>
+  	  <th> <%= t('activerecord.attributes.fulfillment.product') %> </th>
+  	  <th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th>    
+      <th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
+  	  <th> <%= t('actions') %> </th>    
+  	</thead>
+  	<tbody>
+  		<% @fulfillments.each do |fulfillment| %>
+    		<tr>
+    			<td> <%= fulfillment.id %> </td>
+    			<td> <%= fulfillment.product %> </td>
+    			<td> <%= fulfillment.tracking_code %> </td>
+    			<td> <%= fulfillment.status %> </td>
+    			<% if fulfillment.processing? %>
+            <td NOWRAP><%= link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id,
+          		      :class=> "btn btn-small"%>
+            	<% unless fulfillment.member.wrong_address %>
+            		<%= select_tag "reason", options_for_select([Settings.wrong_address.undeliverable_all, Settings.wrong_address.undeliverable_sloop, Settings.wrong_address.undeliverable_kit_card]), :id => "reason_#{fulfillment.id}" %>
+          			<%= link_to 'Mark as wrong address','#', :id => "mark_as_wrong_address", 
+            	    :name => fulfillment.id, :class=> "btn btn-small" %>
+            	<% else %>
+            		<%= t('activerecord.attributes.member.undeliverable') %>
+            	<% end %>
+            </td>
+    			<% else fulfillment.out_of_stock? %>
+            <td>Actual stock: <%= fulfillment.product.stock %>. <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small" %></td>
+         	<% end %>
+    		</tr>
+  		<% end %>
+  	</tbody>
+  </table>
 <% end %>

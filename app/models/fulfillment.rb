@@ -78,24 +78,21 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def validate_stock!
-    stock_product = Product.find_by_sku_and_club_id(product, club.id)
-    if stock_product.nil? or stock_product.stock == 0 
+    if product.nil? or product.stock == 0 
       set_as_out_of_stock!
     end  
   end
 
   def resend(agent)
-    member = Member.find(self.member_id)
-    product = Product.find_by_sku_and_club_id(self.product,member.club_id)
-    if self.set_as_not_processed
-      product.stock = product.stock-1 
-      product.save
-      message = "Fulfillment #{self.product} was resent."
+    validate_stock!
+    if out_of_stock?
+      # TODO: add operation, replate fulfillment_error for fulfillment_out_of_stock
+      { :message => "Product does not have stock.", :code => Settings.error_codes.fulfillment_error }
+    else      
+      fulfillment.set_as_not_processed
+      message = "Fulfillment #{self.product_sku} was marked to be delivered next time."
       Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_resend)
-      return { :message => message, :code => Settings.error_codes.success }
-    else
-      message = "Fulfillment was not resent. #{self}.errors"
-      return { :message => message, :code => Settings.error_codes.fulfillment_error }
+      { :message => message, :code => Settings.error_codes.success }
     end    
   end
 
@@ -111,27 +108,24 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def self.generateCSV(fulfillments)
-    csv_string = CSV.generate do |csv| 
+    CSV.generate do |csv| 
       csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
       fulfillments.each do |fulfillment|
-        member = fulfillment.member
-        product = 
-        if product and product.has_stock?
+        validate_stock!
+        unless out_of_stock?
+          member = fulfillment.member
           fulfillment.set_as_processing
           csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
                   member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
                   product.weight, 'MID']
-        else
-          fulfillment.set_as_out_of_stock
         end
       end
     end
-    return csv_string
   end
 
   def product
-    Product.find_by_sku_and_club_id(fulfillment.product_sku, member.club_id)
+    @product ||= Product.find_by_sku_and_club_id(fulfillment.product_sku, member.club_id)
   end
 
   private
