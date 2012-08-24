@@ -4,7 +4,7 @@ class Product < ActiveRecord::Base
   attr_accessible :name, :recurrent, :sku, :stock, :weight
 
   validates :sku, :uniqueness => true, :presence => true
-  validates :stock, :numericality => { :only_integer => true, :greater_than => 0 }
+  validates :stock, :numericality => { :only_integer => true, :greater_than_or_equal_to => 0, :less_than => 1999999}
   validates :sku, :format => /^[a-zA-Z\-_]+$/
 
 

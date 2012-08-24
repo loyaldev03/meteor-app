@@ -30,7 +30,7 @@
   <%= link_to t('.back', :default => t("helpers.links.back")),
               products_path, :class => 'btn'  %>
   <%= link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_product_path(@product), :class => 'btn' %>
+              edit_product_path(@current_partner.prefix, @current_club.name, @product), :class => 'btn' %>
   <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
               product_path(@current_partner.prefix, @current_club.name, @product),
               :method => 'delete',
