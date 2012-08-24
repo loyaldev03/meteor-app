@@ -5,6 +5,7 @@
 	  <th> <%= t('activerecord.attributes.fulfillment.asigned_at') %> </th>
 	  <th> <%= t('activerecord.attributes.fulfillment.product') %> </th>
 	  <th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>    
+    <th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
 	  <th> <%= t('actions') %> </th>    
    	</tr>
    </thead>
@@ -26,6 +27,7 @@
 			  	<%= f.submit t('resend'), :name => 'resend', :class => "btn btn-warning confirm" if fulfillment.processing? %>
 			  <% end %>
 			</td>
+      <td> <%= fulfillment.status %> </td>
 		</tr>
       <% end %>	
       <% end %>	

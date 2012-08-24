@@ -65,6 +65,7 @@ en:
     model:
       members: 'Members'
       products: 'Products'
+      fulfillments: 'Fulfillments'
     member: 'Member'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
@@ -94,6 +95,7 @@ en:
         username: 'Username'
         locked_at: 'Locked ad'
         created_at: 'Created at'
+        role: 'Role'
       domain:
         url_help: 'Formats: http://xxxxx.xxx.xx or https://xxxxx.xxx.xx'
       member:
@@ -154,6 +156,11 @@ en:
           synced: Synced
           unsynced: Not Synced
           error: Sync Error
+      club:
+        id: 'ID'
+        name: 'Name'
+        description: 'Description'
+        members_count: 'Members count'
       credit_card:
         number: 'Credit card number'
         expire_date: 'Expire date'
@@ -182,10 +189,13 @@ en:
         type: 'Type'
         client: 'Client'
       fulfillment:
+        id: 'ID'
+        tracking_code: 'Tracking code'
         product: 'Product'
         asigned_at: 'Asigned at'
         renewable_at: 'Renewable at'
         not_found: 'No fulfillments were found.'
+        status: 'Status'
       communication:
         response: 'Response'
         template_name: 'Template name'

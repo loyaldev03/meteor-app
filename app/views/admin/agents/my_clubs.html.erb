@@ -7,11 +7,12 @@
 <table id="clubs_table" class="table table-bordered table-condensed" >
   <thead>
     <tr>
-      <th><%= model_class.human_attribute_name(:id) %></th>
-      <th><%= model_class.human_attribute_name(:role) %></th>
-      <th><%= model_class.human_attribute_name(:name) %></th>
-      <th><%= model_class.human_attribute_name(:description) %></th>
-      <th><%= model_class.human_attribute_name(:members_count) %></th>
+      <th><%= t('activerecord.attributes.club.id') %></th>
+      <th><%= t('activerecord.attributes.agent.role')  %></th>
+      <th><%= t('activerecord.attributes.club.name') %></th>
+      <th><%= t('activerecord.attributes.club.description') %></th>
+      <th><%= t('activerecord.attributes.club.members_count') %></th>
+      <th> <%= t('actions') %> </th>
     </tr>
   </thead>
   <tbody>
@@ -22,6 +23,11 @@
       <td><%= role.club.name %></td>
       <td><%= role.club.description %></td>
       <td><%= role.club.members.count %></td>   	
+      <td>
+        <% if role.agent.has_role? 'admin' %>
+          <%= link_to t('activerecord.model.fulfillments'), fulfillments_path(role.club.partner.prefix,role.club.name), :class => 'btn btn-mini'%>
+        <% end %>
+      </td> 
   	</tr>
     <% end %>
   </tbody>
