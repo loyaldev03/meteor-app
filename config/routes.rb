@@ -63,14 +63,13 @@ SacPlatform::Application.routes.draw do
         post '/resend_welcome' => 'members#resend_welcome', as: 'member_resend_welcome'
         get  '/login_as_member' => 'members#login_as_member', as: 'login_as_member'
       end
-      resources :products     
-      resources :fulfillments, :only => [:index]
-      scope 'fulfillments' do
-        match '/report' => 'fulfillments#report', as: 'fulfillment_report', :via => [:post]
-        match '/resend/:fulfillment_id' => 'fulfillments#resend', as: 'fulfillment_resend', :via => [:put]
-        match '/mark_as_sent/:fulfillment_id' => 'fulfillments#mark_as_sent', as: 'fulfillment_mark_as_sent', :via => [:put]
-        match '/mark_as_wrong_address/:fulfillment_id' => 'fulfillments#mark_as_wrong_address', as: 'fulfillment_mark_as_wrong_address', :via => [:put]
-        match '/generate_csv' => 'fulfillments#generate_csv', as: 'fulfillment_generate_csv', :via => [:post]
+
+      resources :products
+      match '/fulfillments' => 'fulfillments#index', as: 'fulfillments_index', :via => [:post, :get]
+      scope '/fulfillments/:id' do
+        put '/resend' => 'fulfillments#resend', as: 'resend_fulfillment'
+        put '/mark_as_sent' => 'fulfillments#mark_as_sent', as: 'mark_as_sent_fulfillment'
+        put '/mark_as_wrong_address' => 'fulfillments#mark_as_wrong_address', as: 'mark_as_wrong_address_fulfillment'
       end
     end
 

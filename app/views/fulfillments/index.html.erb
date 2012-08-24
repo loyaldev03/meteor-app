@@ -4,7 +4,7 @@
   </div>
 </section>
 
-  <%= form_tag(fulfillment_report_path) do %>
+<%= form_tag(fulfillments_index_path) do %>
   <table class="table table-bordered ">
   	<tr>
   		<td>
@@ -31,7 +31,8 @@
   	</tr>
   </table>
 <% end %>
-	<%= render :partial => "report_result" %>
+	
+<%= render :partial => "report_result" %>
 
 
 <script type="text/javascript">

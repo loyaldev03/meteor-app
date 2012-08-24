@@ -4,7 +4,7 @@
 	<thead>
 	  <th> <%= t('activerecord.attributes.fulfillment.id') %> </th>
 	  <th> <%= t('activerecord.attributes.fulfillment.product') %> </th>
-	  <th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th>    
+	  <th> <%= t('activerecord.attributes.fulfillment.trancking_code') %> </th>    
     <th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
 	  <th> <%= t('actions') %> </th>    
 	</thead>
@@ -16,7 +16,7 @@
 			<td> <%= fulfillment.tracking_code %> </td>
 			<td> <%= fulfillment.status %> </td>
 			<% if fulfillment.processing? %>
-        <td><%= link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => "#{fulfillment.id}",
+        <td><%= link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id,
       		      :class=> "btn btn-small"%></td>
         <td>
         	<% unless Member.find(fulfillment.member_id).wrong_address %>
