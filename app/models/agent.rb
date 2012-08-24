@@ -27,7 +27,7 @@ class Agent < ActiveRecord::Base
 
   validates_uniqueness_of_without_deleted :username
   validates :username, :presence => true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
-  validates :email, :presence => true
+
 
   before_save :ensure_authentication_token
 

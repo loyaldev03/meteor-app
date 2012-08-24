@@ -62,8 +62,8 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
+    gender "M"
     blacklisted false
-
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 

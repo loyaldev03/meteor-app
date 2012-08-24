@@ -4,8 +4,7 @@
   </div>
 </section>
 
-
-<%= form_tag(fulfillment_report_path) do %>
+  <%= form_tag(fulfillment_report_path) do %>
   <table class="table table-bordered ">
   	<tr>
   		<td>
@@ -22,10 +21,9 @@
   		</td>
   		<td>
         <%= select_tag :status, options_for_select([['not_processed', 'not_processed'],
-                                ['processing', 'not_processed'],['out_of_stock', 'out_of_stock'], 
+                                ['processing', 'processing'],['out_of_stock', 'out_of_stock'], 
                                 ['undeliverable','undeliverable']]),
                                 :class => 'select_field' %>	
-
       </td>
   	</tr>
   	<tr>

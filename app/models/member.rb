@@ -42,7 +42,7 @@ class Member < ActiveRecord::Base
   REGEX_FIRST_AND_LAST_NAME = /^[a-zA-Z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
   #Validates emails with format like: xxxxxx@xxxx.xxx.xx or xxxxx+xxx@xxxx.xxx.xx
-  REGEX_EMAIL = /^([0-9a-zA-Z]([-\.\w]*[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
+  REGEX_EMAIL = /^([0-9a-zA-Z]([-_\.]?[+?]?[0-9a-zA-Z])*@([0-9a-zA-Z][-_\.]?[0-9a-zA-Z]*\.)+[a-zA-Z]{2,9})$/
 
   #Validates that there are no invalid charactes in the address. 
   REGEX_ADDRESS = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,#]+$/u
@@ -635,12 +635,18 @@ class Member < ActiveRecord::Base
   end
   
   def set_wrong_address(agent,reason)
-    if self.update_attribute(:wrong_address, reason)
-      message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
-      Auditory.audit(@current_agent,self,message,self)
-      {:message => message, :success => true}
+    if self.wrong_address.nil?
+      if self.update_attribute(:wrong_address, reason)
+        message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
+        Auditory.audit(agent,self,message,self)
+        return {:message => message, :code => Settings.error_codes.success }
+      else
+        message = "Could not set the NBD on this member #{self}.errors.inspect"
+        return {:message => message, :code => Settings.error_codes.member_data_invalid}
+      end
     else
-      {:message => "Could not set the NBD on this member #{self}.errors.inspect", :success => false}
+        message = "Member's address already set as wrong address."
+        return {:message => message, :code => Settings.error_codes.member_already_set_wrong_address}      
     end
   end
 
