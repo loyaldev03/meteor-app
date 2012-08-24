@@ -127,7 +127,7 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def product
-    @product ||= Product.find_by_sku_and_club_id(fulfillment.product_sku, member.club_id)
+    @product ||= Product.find_by_sku_and_club_id(product_sku, member.club_id)
   end
 
   private
