@@ -99,11 +99,11 @@ class Fulfillment < ActiveRecord::Base
   def mark_as_sent(agent)
     if self.set_as_sent
       message = "Fulfillment #{self.product} was set as sent."
-      Auditory.audit(agent, self, message, Member.find(self.member_id), Settings.operation_types.fulfillment_mannualy_mark_as_sent)
-      return { :message => message, :code => Settings.error_codes.success }
+      Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_mannualy_mark_as_sent)
+      { :message => message, :code => Settings.error_codes.success }
     else
-      message = "Could not mark as sent."
-      return { :message => message, :code => Settings.error_codes.fulfillment_error }
+      message = "Could not be marked as sent."
+      { :message => message, :code => Settings.error_codes.fulfillment_error }
     end
   end
 
