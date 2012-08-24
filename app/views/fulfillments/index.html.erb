@@ -9,20 +9,22 @@
   	<tr>
   		<td>
 	  		<%= label :initial_date, t('initial_date'), :class => 'help-inline' %>
-	  	  <%= text_field :initial_date, nil ,:class => 'datepicker', :readonly => 'readonly' %> 
+	  	  <%= text_field :initial_date, nil ,:class => 'datepicker', :readonly => 'readonly',
+                       :value => (params[:initial_date].first if params[:initial_date]) %> 
   		</td>
   		<td>
 	  		<%= label :end_date, t('end_date'), :class => 'help-inline' %>
-	  	  <%= text_field :end_date, nil ,:class => 'datepicker', :readonly => 'readonly' %> 
+	  	  <%= text_field :end_date, nil ,:class => 'datepicker', :readonly => 'readonly',
+                       :value => (params[:end_date].first if params[:end_date]) %> 
   		</td>
   		<td>
 	  		<%= label :all_times, t('all_times'), :class => 'help-inline' %>
-	  	  <%= check_box nil, :all_times %> 
+	  	  <%= check_box nil, :all_times, :checked => (true if params[:all_times]=='1') %> 
   		</td>
   		<td>
         <%= select_tag :status, options_for_select([['not_processed', 'not_processed'],
                                 ['processing', 'processing'],['out_of_stock', 'out_of_stock'], 
-                                ['undeliverable','undeliverable']]),
+                                ['undeliverable','undeliverable']], :selected => params[:status]),
                                 :class => 'select_field' %>	
       </td>
   	</tr>
@@ -34,9 +36,12 @@
 	
 <%= render :partial => "report_result" %>
 
-
 <script type="text/javascript">
   $(document).ready( fulfillments_index_functions() );
 </script>
+
+<div id="result"></div>
+
+
 
 

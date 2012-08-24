@@ -1,0 +1,15 @@
+<%= form_for(member_set_undeliverable_path) do %>
+  <table class="table table-bordered">
+    <thead>
+    <tr>
+      <th>
+        <%= label :reason, t('reason'), :class => 'help-inline' %> 
+        <%= select_tag "reason", options_for_select([Settings.wrong_address.undeliverable_all, Settings.wrong_address.undeliverable_sloop,
+        Settings.wrong_address.undeliverable_kit_card]) %>
+        <%= submit_tag t('buttons.set_wrong_addres'), :class => 'btn btn-primary', 
+                               :confirm => t('are_you_sure') %> 
+      </th>
+    </tr>
+    </thead>
+  </table>
+<% end %>
