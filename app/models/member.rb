@@ -622,6 +622,7 @@ class Member < ActiveRecord::Base
     self.phone_area_code = params[:phone_area_code]
     self.phone_local_number = params[:phone_local_number]
     self.preferences = params[:preferences]
+    self.external_id = params[:external_id] if params[:external_id]
   end
 
   def chargeback!(transaction_chargebacked, args)
