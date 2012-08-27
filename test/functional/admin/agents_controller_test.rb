@@ -192,13 +192,13 @@ class Admin::AgentsControllerTest < ActionController::TestCase
   	[@admin_user,@supervisor_user].each do |agent|
 	  	sign_in agent
 	  	assert agent.can?(:enroll, Member), "#{agent.roles} cant see member's enroll button on member#index."
-	end
+    end
   end
 
   test "Representative and Api users should not see the enroll button on member#index." do
   	sign_in @representative_user
   	[@representative_user,@api_user].each do |agent|
- 	  ability = Ability.new(agent)
+ 	    ability = Ability.new(agent)
       assert ability.cannot?(:enroll, Member), "#{agent.roles} can see member's enroll button on member#index."
   	end
   end
