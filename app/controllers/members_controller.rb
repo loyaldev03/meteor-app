@@ -121,7 +121,7 @@ class MembersController < ApplicationController
         if params[:cancel_date].to_date > Time.zone.now.to_date
           begin
             message = "Member cancellation scheduled to #{params[:cancel_date]} - Reason: #{params[:reason]}"
-            @current_member.cancel! current_agent, params[:cancel_date], message
+            @current_member.cancel! params[:cancel_date], message, current_agent
             flash[:notice] = message
             redirect_to show_member_path
           rescue Exception => e
