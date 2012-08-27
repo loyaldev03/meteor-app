@@ -14,7 +14,8 @@ class Prospect < ActiveRecord::Base
    				  :phone_area_code ,:phone_local_number, :birth_date, :preferences, :gender, 
    				  :ip_address, :referral_host, :referral_parameters, :cookie_value,:marketing_code, 
             :product_sku, :user_id, :landing_url, :mega_channel, :user_agent, :joint,
-            :campaign_medium, :campaign_description, :campaign_medium_version
+            :campaign_medium, :campaign_description, :campaign_medium_version, :terms_of_membership_id, 
+            :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set
 
   private 
     def set_cohort
