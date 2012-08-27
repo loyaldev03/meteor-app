@@ -78,7 +78,11 @@ class Admin::AgentsController < ApplicationController
   end
 
   def my_clubs
-    @my_roles = @current_agent.club_roles
+    if current_agent.has_role? 'admin'
+      @clubs = Club.all
+    else
+      @my_roles = @current_agent.club_roles
+    end
   end
 
 end
