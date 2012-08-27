@@ -363,6 +363,7 @@ class Member < ActiveRecord::Base
   end
 
   def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0')
+    credit_card_params = {} if credit_card_params.blank? # might be [], we expect a Hash
     club = tom.club
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
