@@ -23,7 +23,12 @@
         <%= delimiter %><li class="active">Search</li>
       <% end %>
     <% end %>
+
     <% if @current_member %>
+      <%= delimiter %>
+      <li>
+        <a href="<%= members_path %>">Members</a>
+      </li>
       <%= delimiter %>
       <li>
         <a href="<%= show_member_path %>">Member</a>

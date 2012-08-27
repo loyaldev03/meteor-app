@@ -219,9 +219,9 @@ class MembersController < ApplicationController
     end
   end
 
+  # TODO: show message in flash
   def approve
     if @current_member.can_be_approved?
-      @current_member.applied?
       @current_member.set_as_provisional!
       message = "Member was approved."
       Auditory.audit(@current_agent, @current_member, message, @current_member)
@@ -231,6 +231,7 @@ class MembersController < ApplicationController
     redirect_to show_member_path
   end
 
+  # TODO: show message in flash
   def reject
     if @current_member.can_be_rejected?
       @current_member.set_as_canceled!
