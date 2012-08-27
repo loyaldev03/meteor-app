@@ -190,5 +190,12 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal m.blacklisted, true
   end
 
+  test "If member's email contains '@noemail.com' it should not send emails." do
+    member = FactoryGirl.create(:lapsed_member, reactivation_times: 5, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club, email: "testing@noemail.com")
+    assert_difference('Operation.count', 1) do
+      Communication.deliver!(:active,member)
+    end
+    assert_equal member.operations.last.description, "The email contains '@noemail.com' which is an empty email. The email won't be sent."
+  end
 
 end
