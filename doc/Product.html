@@ -150,6 +150,50 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#decrease_stock-instance_method" title="#decrease_stock (instance method)">- (Object) <strong>decrease_stock</strong>(quantity = 1) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#has_stock%3F-instance_method" title="#has_stock? (instance method)">- (Boolean) <strong>has_stock?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#update_product_data_by_params-instance_method" title="#update_product_data_by_params (instance method)">- (Object) <strong>update_product_data_by_params</strong>(params) </a>
     
 
@@ -216,7 +260,91 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="update_product_data_by_params-instance_method">
+  <h3 class="signature first" id="decrease_stock-instance_method">
+  
+    - (<tt>Object</tt>) <strong>decrease_stock</strong>(quantity = 1) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+23
+24
+25
+26</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/product.rb', line 23</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_decrease_stock'>decrease_stock</span><span class='lparen'>(</span><span class='id identifier rubyid_quantity'>quantity</span><span class='op'>=</span><span class='int'>1</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_stock'>stock</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_stock'>stock</span><span class='op'>-</span><span class='id identifier rubyid_quantity'>quantity</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_save'>save</span> 
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="has_stock?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>has_stock?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+28
+29
+30</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/product.rb', line 28</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_has_stock?'>has_stock?</span>
+  <span class='id identifier rubyid_stock'>stock</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="update_product_data_by_params-instance_method">
   
     - (<tt>Object</tt>) <strong>update_product_data_by_params</strong>(params) 
   
@@ -258,7 +386,7 @@
 </div>
 
     <div id="footer">
-  Generated on Fri Aug 17 04:45:44 2012 by
+  Generated on Tue Aug 28 09:39:11 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

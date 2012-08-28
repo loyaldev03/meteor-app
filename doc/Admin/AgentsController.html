@@ -156,7 +156,7 @@
 
   
     <span class="summary_desc"><div class='inline'><p>
-POST /agents POST /agents.xml.
+POST /agents.
 </p>
 </div></span>
   
@@ -181,7 +181,7 @@ POST /agents POST /agents.xml.
 
   
     <span class="summary_desc"><div class='inline'><p>
-DELETE /agents/1 DELETE /agents/1.xml.
+DELETE /agents/1.
 </p>
 </div></span>
   
@@ -231,7 +231,7 @@ GET /agents/1/edit.
 
   
     <span class="summary_desc"><div class='inline'><p>
-GET /agents GET /agents.xml.
+GET /agents.
 </p>
 </div></span>
   
@@ -300,7 +300,7 @@ GET /agents GET /agents.xml.
 
   
     <span class="summary_desc"><div class='inline'><p>
-GET /agents/new GET /agents/new.xml.
+GET /agents/new.
 </p>
 </div></span>
   
@@ -325,7 +325,7 @@ GET /agents/new GET /agents/new.xml.
 
   
     <span class="summary_desc"><div class='inline'><p>
-GET /agents/1 GET /agents/1.xml.
+GET /agents/1.
 </p>
 </div></span>
   
@@ -372,7 +372,7 @@ GET /agents/1 GET /agents/1.xml.
 
   
     <span class="summary_desc"><div class='inline'><p>
-PUT /agents/1 PUT /agents/1.xml.
+PUT /agents/1.
 </p>
 </div></span>
   
@@ -404,20 +404,20 @@ PUT /agents/1 PUT /agents/1.xml.
       <pre class="lines">
 
 
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78</pre>
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 68</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_cleanup_for_update!'>cleanup_for_update!</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_hash'>hash</span>
@@ -447,7 +447,7 @@ PUT /agents/1 PUT /agents/1.xml.
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-POST /agents POST /agents.xml
+POST /agents
 </p>
 
 
@@ -462,32 +462,24 @@ POST /agents POST /agents.xml
       <pre class="lines">
 
 
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50</pre>
+28
+29
+30
+31
+32
+33
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 39</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='ivar'>@clubs</span> <span class='op'>=</span> <span class='const'>Club</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span>
-  <span class='id identifier rubyid_respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_format'>format</span><span class='op'>|</span>
-    <span class='kw'>if</span> <span class='ivar'>@agent</span><span class='period'>.</span><span class='id identifier rubyid_save'>save</span>
-      <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_html'>html</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='lbracket'>[</span> <span class='symbol'>:admin</span><span class='comma'>,</span> <span class='ivar'>@agent</span> <span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:notice</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Agent was successfully created.</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-      <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_xml'>xml</span>  <span class='lbrace'>{</span> <span class='id identifier rubyid_render'>render</span> <span class='symbol'>:xml</span> <span class='op'>=&gt;</span> <span class='ivar'>@agent</span><span class='comma'>,</span> <span class='symbol'>:status</span> <span class='op'>=&gt;</span> <span class='symbol'>:created</span><span class='comma'>,</span> <span class='symbol'>:location</span> <span class='op'>=&gt;</span> <span class='ivar'>@agent</span> <span class='rbrace'>}</span>
-    <span class='kw'>else</span>
-      <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_html'>html</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_render'>render</span> <span class='symbol'>:action</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>new</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
-      <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_xml'>xml</span>  <span class='lbrace'>{</span> <span class='id identifier rubyid_render'>render</span> <span class='symbol'>:xml</span> <span class='op'>=&gt;</span> <span class='ivar'>@agent</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='comma'>,</span> <span class='symbol'>:status</span> <span class='op'>=&gt;</span> <span class='symbol'>:unprocessable_entity</span> <span class='rbrace'>}</span>
-    <span class='kw'>end</span>
+  <span class='kw'>if</span> <span class='ivar'>@agent</span><span class='period'>.</span><span class='id identifier rubyid_save'>save</span>
+    <span class='id identifier rubyid_redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='lbracket'>[</span> <span class='symbol'>:admin</span><span class='comma'>,</span> <span class='ivar'>@agent</span> <span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:notice</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Agent was successfully created.</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> 
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_render'>render</span> <span class='symbol'>:action</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>new</span><span class='tstring_end'>&quot;</span></span> 
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -507,7 +499,7 @@ POST /agents POST /agents.xml
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-DELETE /agents/1 DELETE /agents/1.xml
+DELETE /agents/1
 </p>
 
 
@@ -522,25 +514,17 @@ DELETE /agents/1 DELETE /agents/1.xml
       <pre class="lines">
 
 
-82
-83
-84
-85
-86
-87
-88
-89</pre>
+61
+62
+63
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 82</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 61</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroy'>destroy</span>
   <span class='ivar'>@agent</span><span class='period'>.</span><span class='id identifier rubyid_destroy'>destroy</span>
-
-  <span class='id identifier rubyid_respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_format'>format</span><span class='op'>|</span>
-    <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_html'>html</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='id identifier rubyid_admin_agents_url'>admin_agents_url</span><span class='comma'>,</span> <span class='symbol'>:notice</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Agent was successfully deleted.</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-    <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_xml'>xml</span>  <span class='lbrace'>{</span> <span class='id identifier rubyid_head'>head</span> <span class='symbol'>:ok</span> <span class='rbrace'>}</span>
-  <span class='kw'>end</span>
+  <span class='id identifier rubyid_redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='id identifier rubyid_admin_agents_url'>admin_agents_url</span><span class='comma'>,</span> <span class='symbol'>:notice</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Agent was successfully deleted.</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -574,12 +558,12 @@ GET /agents/1/edit
       <pre class="lines">
 
 
-33
-34
-35</pre>
+23
+24
+25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_edit'>edit</span>
   <span class='ivar'>@clubs</span> <span class='op'>=</span> <span class='const'>Club</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span>
@@ -601,7 +585,7 @@ GET /agents/1/edit
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-GET /agents GET /agents.xml
+GET /agents
 </p>
 
 
@@ -652,15 +636,15 @@ GET /agents GET /agents.xml
       <pre class="lines">
 
 
-91
-92
-93
-94
-95
-96</pre>
+66
+67
+68
+69
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 91</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 66</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lock'>lock</span>
   <span class='id identifier rubyid_agent'>agent</span> <span class='op'>=</span> <span class='const'>Agent</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:agent_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -688,15 +672,21 @@ GET /agents GET /agents.xml
       <pre class="lines">
 
 
-105
-106
-107</pre>
+80
+81
+82
+83
+84
+85</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 105</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_my_clubs'>my_clubs</span>
-  <span class='ivar'>@my_roles</span> <span class='op'>=</span> <span class='ivar'>@current_agent</span><span class='period'>.</span><span class='id identifier rubyid_club_roles'>club_roles</span>
+  <span class='id identifier rubyid_respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_format'>format</span><span class='op'>|</span>
+    <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_html'>html</span> <span class='comment'># index.html.erb
+</span>    <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_json'>json</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='const'>MyClubsDatatable</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_view_context'>view_context</span><span class='comma'>,</span><span class='kw'>nil</span><span class='comma'>,</span><span class='kw'>nil</span><span class='comma'>,</span><span class='kw'>nil</span><span class='comma'>,</span><span class='ivar'>@current_agent</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -715,7 +705,7 @@ GET /agents GET /agents.xml
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-GET /agents/new GET /agents/new.xml
+GET /agents/new
 </p>
 
 
@@ -730,23 +720,15 @@ GET /agents/new GET /agents/new.xml
       <pre class="lines">
 
 
-24
-25
-26
-27
-28
-29
-30</pre>
+18
+19
+20</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 18</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_new'>new</span>
   <span class='ivar'>@clubs</span> <span class='op'>=</span> <span class='const'>Club</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span>
-  <span class='id identifier rubyid_respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_format'>format</span><span class='op'>|</span>
-    <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_html'>html</span> <span class='comment'># new.html.erb
-</span>    <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_xml'>xml</span>  <span class='lbrace'>{</span> <span class='id identifier rubyid_render'>render</span> <span class='symbol'>:xml</span> <span class='op'>=&gt;</span> <span class='ivar'>@agent</span> <span class='rbrace'>}</span>
-  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -765,7 +747,7 @@ GET /agents/new GET /agents/new.xml
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-GET /agents/1 GET /agents/1.xml
+GET /agents/1
 </p>
 
 
@@ -780,21 +762,13 @@ GET /agents/1 GET /agents/1.xml
       <pre class="lines">
 
 
-15
-16
-17
-18
-19
-20</pre>
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 14</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_show'>show</span>
-  <span class='id identifier rubyid_respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_format'>format</span><span class='op'>|</span>
-    <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_html'>html</span> <span class='comment'># show.html.erb
-</span>    <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_xml'>xml</span>  <span class='lbrace'>{</span> <span class='id identifier rubyid_render'>render</span> <span class='symbol'>:xml</span> <span class='op'>=&gt;</span> <span class='ivar'>@agent</span> <span class='rbrace'>}</span>
-  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -816,15 +790,15 @@ GET /agents/1 GET /agents/1.xml
       <pre class="lines">
 
 
-98
-99
-100
-101
-102
-103</pre>
+73
+74
+75
+76
+77
+78</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 98</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unlock'>unlock</span>
   <span class='id identifier rubyid_agent'>agent</span> <span class='op'>=</span> <span class='const'>Agent</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:agent_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -849,7 +823,7 @@ GET /agents/1 GET /agents/1.xml
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-PUT /agents/1 PUT /agents/1.xml
+PUT /agents/1
 </p>
 
 
@@ -864,34 +838,26 @@ PUT /agents/1 PUT /agents/1.xml
       <pre class="lines">
 
 
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66</pre>
+38
+39
+40
+41
+42
+43
+44
+45
+46</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/agents_controller.rb', line 38</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='ivar'>@clubs</span> <span class='op'>=</span> <span class='const'>Club</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span>
   <span class='id identifier rubyid_cleanup_for_update!'>cleanup_for_update!</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:agent</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_format'>format</span><span class='op'>|</span>
-    <span class='kw'>if</span> <span class='ivar'>@agent</span><span class='period'>.</span><span class='id identifier rubyid_update_attributes'>update_attributes</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:agent</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_html'>html</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='lbracket'>[</span> <span class='symbol'>:admin</span><span class='comma'>,</span> <span class='ivar'>@agent</span> <span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:notice</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Agent was successfully updated.</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-      <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_xml'>xml</span>  <span class='lbrace'>{</span> <span class='id identifier rubyid_head'>head</span> <span class='symbol'>:ok</span> <span class='rbrace'>}</span>
-    <span class='kw'>else</span>
-      <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_html'>html</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_render'>render</span> <span class='symbol'>:action</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>edit</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
-      <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_xml'>xml</span>  <span class='lbrace'>{</span> <span class='id identifier rubyid_render'>render</span> <span class='symbol'>:xml</span> <span class='op'>=&gt;</span> <span class='ivar'>@agent</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='comma'>,</span> <span class='symbol'>:status</span> <span class='op'>=&gt;</span> <span class='symbol'>:unprocessable_entity</span> <span class='rbrace'>}</span>
-    <span class='kw'>end</span>
+  <span class='kw'>if</span> <span class='ivar'>@agent</span><span class='period'>.</span><span class='id identifier rubyid_update_attributes'>update_attributes</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:agent</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='lbracket'>[</span> <span class='symbol'>:admin</span><span class='comma'>,</span> <span class='ivar'>@agent</span> <span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:notice</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Agent was successfully updated.</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> 
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_render'>render</span> <span class='symbol'>:action</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>edit</span><span class='tstring_end'>&quot;</span></span> 
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -904,7 +870,7 @@ PUT /agents/1 PUT /agents/1.xml
 </div>
 
     <div id="footer">
-  Generated on Fri Aug 17 04:45:46 2012 by
+  Generated on Tue Aug 28 09:39:14 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

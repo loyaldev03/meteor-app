@@ -134,7 +134,7 @@
 
   
     <span class="summary_desc"><div class='inline'><p>
-POST /partners POST /partners.json.
+POST /partners.
 </p>
 </div></span>
   
@@ -181,7 +181,7 @@ POST /partners POST /partners.json.
 
   
     <span class="summary_desc"><div class='inline'><p>
-DELETE /partners/1 DELETE /partners/1.json.
+DELETE /partners/1.
 </p>
 </div></span>
   
@@ -231,7 +231,7 @@ GET /partners/1/edit.
 
   
     <span class="summary_desc"><div class='inline'><p>
-GET /partners GET /partners.json.
+GET /partners.
 </p>
 </div></span>
   
@@ -256,7 +256,7 @@ GET /partners GET /partners.json.
 
   
     <span class="summary_desc"><div class='inline'><p>
-GET /partners/new GET /partners/new.json.
+GET /partners/new.
 </p>
 </div></span>
   
@@ -281,7 +281,7 @@ GET /partners/new GET /partners/new.json.
 
   
     <span class="summary_desc"><div class='inline'><p>
-GET /partners/1 GET /partners/1.json.
+GET /partners/1.
 </p>
 </div></span>
   
@@ -306,7 +306,7 @@ GET /partners/1 GET /partners/1.json.
 
   
     <span class="summary_desc"><div class='inline'><p>
-PUT /partners/1 PUT /partners/1.json.
+PUT /partners/1.
 </p>
 </div></span>
   
@@ -335,7 +335,7 @@ PUT /partners/1 PUT /partners/1.json.
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-POST /partners POST /partners.json
+POST /partners
 </p>
 
 
@@ -350,17 +350,17 @@ POST /partners POST /partners.json
       <pre class="lines">
 
 
+30
+31
+32
+33
 34
 35
 36
-37
-38
-39
-40
-41</pre>
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 34</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 30</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='ivar'>@partner</span> <span class='op'>=</span> <span class='const'>Partner</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:partner</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -390,13 +390,13 @@ POST /partners POST /partners.json
       <pre class="lines">
 
 
-62
-63
-64
-65</pre>
+56
+57
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 62</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 56</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_dashboard'>dashboard</span>
   <span class='ivar'>@partner</span> <span class='op'>=</span> <span class='ivar'>@current_partner</span>
@@ -419,7 +419,7 @@ POST /partners POST /partners.json
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-DELETE /partners/1 DELETE /partners/1.json
+DELETE /partners/1
 </p>
 
 
@@ -434,14 +434,14 @@ DELETE /partners/1 DELETE /partners/1.json
       <pre class="lines">
 
 
-56
-57
-58
-59
-60</pre>
+50
+51
+52
+53
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroy'>destroy</span>
   <span class='ivar'>@partner</span> <span class='op'>=</span> <span class='const'>Partner</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -480,12 +480,12 @@ GET /partners/1/edit
       <pre class="lines">
 
 
-28
-29
-30</pre>
+25
+26
+27</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 25</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_edit'>edit</span>
   <span class='ivar'>@partner</span> <span class='op'>=</span> <span class='const'>Partner</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -507,7 +507,7 @@ GET /partners/1/edit
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-GET /partners GET /partners.json
+GET /partners
 </p>
 
 
@@ -522,15 +522,15 @@ GET /partners GET /partners.json
       <pre class="lines">
 
 
+6
 7
 8
 9
 10
-11
-12</pre>
+11</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 7</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 6</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_index'>index</span>
   <span class='id identifier rubyid_respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_format'>format</span><span class='op'>|</span>
@@ -555,7 +555,7 @@ GET /partners GET /partners.json
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-GET /partners/new GET /partners/new.json
+GET /partners/new
 </p>
 
 
@@ -570,13 +570,13 @@ GET /partners/new GET /partners/new.json
       <pre class="lines">
 
 
-22
-23
-24
-25</pre>
+19
+20
+21
+22</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 22</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_new'>new</span>
   <span class='ivar'>@partner</span> <span class='op'>=</span> <span class='const'>Partner</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -599,7 +599,7 @@ GET /partners/new GET /partners/new.json
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-GET /partners/1 GET /partners/1.json
+GET /partners/1
 </p>
 
 
@@ -614,12 +614,12 @@ GET /partners/1 GET /partners/1.json
       <pre class="lines">
 
 
-16
-17
-18</pre>
+14
+15
+16</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 14</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_show'>show</span>
   <span class='ivar'>@partner</span> <span class='op'>=</span> <span class='const'>Partner</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -641,7 +641,7 @@ GET /partners/1 GET /partners/1.json
 </h3><div class="docstring">
   <div class="discussion">
     <p>
-PUT /partners/1 PUT /partners/1.json
+PUT /partners/1
 </p>
 
 
@@ -656,17 +656,17 @@ PUT /partners/1 PUT /partners/1.json
       <pre class="lines">
 
 
+40
+41
+42
+43
+44
 45
 46
-47
-48
-49
-50
-51
-52</pre>
+47</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 45</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 40</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='ivar'>@partner</span> <span class='op'>=</span> <span class='const'>Partner</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -686,7 +686,7 @@ PUT /partners/1 PUT /partners/1.json
 </div>
 
     <div id="footer">
-  Generated on Fri Aug 17 04:45:47 2012 by
+  Generated on Tue Aug 28 09:39:14 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
