@@ -1,49 +1,19 @@
 <%- model_class = Club.new.class -%>
 
-<div class="page-header">
-  <h1> <%=t '.title', :default => model_class.model_name.human.pluralize %> </h1>
-</div>
-
-<table id="clubs_table" class="table table-bordered table-condensed" >
+<table id="my_clubs_table" class="table table-bordered table-condensed dataTable" data-source="<%= admin_agent_my_clubs_path(format: "json") %>">
   <thead>
     <tr>
-      <th><%= t('activerecord.attributes.club.id') %></th>
-      <th><%= t('activerecord.attributes.agent.role')  %></th>
-      <th><%= t('activerecord.attributes.club.name') %></th>
-      <th><%= t('activerecord.attributes.club.description') %></th>
-      <th><%= t('activerecord.attributes.club.members_count') %></th>
-      <th> <%= t('actions') %> </th>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:name) %></th>
+      <th><%= model_class.human_attribute_name(:description) %></th>
+      <th><%= model_class.human_attribute_name(:members_count) %></th>
+      <th><%= t(:actions) %></th>
     </tr>
   </thead>
-  <tbody
-    <% if @clubs %>
-      <% @clubs.each do |club| %>
-      <tr>
-        <td><%= link_to club.id, club_path(club.partner.prefix,club.id) %></td>
-        <td><%= 'admin' %></td>   
-        <td><%= club.name %></td>
-        <td><%= club.description %></td>
-        <td><%= club.members.count %></td>     
-        <td>
-          <%= link_to t('activerecord.model.fulfillments'), fulfillments_index_path(club.partner.prefix,club.name), :class => 'btn btn-mini'%>
-        </td> 
-      </tr>
-      <% end %>
-    <% else %> 
-      <% @my_roles.each do |role| %>
-      <tr>
-        <td><%= link_to role.club_id, club_path(role.club.partner.prefix,role.club) %></td>
-        <td><%= role.role %></td>   
-        <td><%= role.club.name %></td>
-        <td><%= role.club.description %></td>
-        <td><%= role.club.members.count %></td>     
-        <td>
-          <% if role.agent.has_role? 'admin' %>
-            <%= link_to t('activerecord.model.fulfillments'), fulfillments_index_path(role.club.partner.prefix,role.club.name), :class => 'btn btn-mini'%>
-          <% end %>
-        </td> 
-      </tr>
-      <% end %>
-    <% end %>
+  <tbody>
   </tbody>
 </table>
+
+<script>
+  $(document).ready(my_club_index_functions(<%= Club.datatable_columns.size %>));
+</script>
