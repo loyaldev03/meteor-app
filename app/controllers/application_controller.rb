@@ -58,6 +58,8 @@ class ApplicationController < ActionController::Base
             flash[:error] = "No club was selected."
             redirect_to clubs_path
             false
+          else
+            Time.zone = @current_club.time_zone
           end
         end
       end
