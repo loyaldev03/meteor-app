@@ -183,6 +183,27 @@ class Api::MembersController < ApplicationController
   # [credit_card] Information related to member's credit card.
   #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   #                 *expire_year: The year (in numbers) in which the credit card will expire.  
+  # [enrollment_info] Information obtained from the member's enrollment
+  #              *enrollment_amount
+  #              *product_sku 
+  #              *product_description 
+  #              *mega_channel 
+  #              *marketing_code 
+  #              *fulfillment_code 
+  #              *ip_address 
+  #              *user_agent 
+  #              *referral_host 
+  #              *referral_parameters 
+  #              *referral_path 
+  #              *user_id 
+  #              *landing_url 
+  #              *cookie_value 
+  #              *cookie_set 
+  #              *campaign_medium 
+  #              *campaign_description
+  #              *campaign_medium_version 
+  #              *joint 
+  #              *prospect_id
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
   #
@@ -195,18 +216,56 @@ class Api::MembersController < ApplicationController
   def show
     authorize! :manage_member_api, Member
     member = Member.find(params[:id])
+    ei = member.enrollment_infos[0]
+    ei = if ei.blank? 
+      {} 
+    else
+      ei.attributes.symbolize_keys.slice(
+        :enrollment_amount, 
+        :product_sku, 
+        :product_description, 
+        :mega_channel, 
+        :marketing_code, 
+        :fulfillment_code, 
+        :ip_address, 
+        :user_agent, 
+        :referral_host, 
+        :referral_parameters, 
+        :referral_path, 
+        :user_id, 
+        :landing_url, 
+        :cookie_value, 
+        :cookie_set, 
+        :campaign_medium, 
+        :campaign_description,
+        :campaign_medium_version, 
+        :joint, 
+        :prospect_id
+      )
+    end
     render json: {
       code: Settings.error_codes.success,
       member: {
-        first_name: member.first_name, last_name: member.last_name, email: member.email,
-        address: member.address, city: member.city, state: member.state, zip: member.zip,
-        phone_country_code: member.phone_country_code, phone_area_code: member.phone_area_code,
-        phone_local_number: member.phone_local_number, club_cash_amount: member.club_cash_amount
+        first_name: member.first_name, 
+        last_name: member.last_name, 
+        email: member.email,
+        address: member.address, 
+        city: member.city, 
+        state: member.state, 
+        zip: member.zip,
+        phone_country_code: member.phone_country_code, 
+        phone_area_code: member.phone_area_code,
+        phone_local_number: member.phone_local_number, 
+        club_cash_amount: member.club_cash_amount,
+        enrollment_info: {
+
+        }
       },
       credit_card: {
         expire_month: (member.active_credit_card && member.active_credit_card.expire_month),
         expire_year: (member.active_credit_card && member.active_credit_card.expire_year)
-      }
+      },
+      enrollment_info: ei
     }
   rescue ActiveRecord::RecordNotFound
     render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
