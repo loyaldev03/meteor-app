@@ -22,10 +22,6 @@ class CreditCard < ActiveRecord::Base
     update_attribute :blacklisted, true
   end
 
-  def unset_blacklisted
-    update_attribute :blacklisted, false
-  end
-
   def activate
     update_attribute :active, true unless blacklisted
   end
@@ -34,10 +30,6 @@ class CreditCard < ActiveRecord::Base
     update_attribute :active, false
   end
 
-  def blacklist_active_credit_card
-    update_attribute :blacklisted, true
-  end
-  
   def error_to_s(delimiter = "\n")
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end
@@ -106,14 +98,4 @@ class CreditCard < ActiveRecord::Base
     end
     acc
   end
-
-
-  # Custom method to verify if its blacklisted - not using it because it doenst allow to blacklist an active creditcard.
-  # def not_blacklisted
-  #   if self.blacklisted? && self.active?
-  #     errors.add(:active, "Cannot be activated. Its blacklisted") 
-  #     false
-  #   end
-  # end
-
 end
