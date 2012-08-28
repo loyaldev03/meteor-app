@@ -78,11 +78,9 @@ class Admin::AgentsController < ApplicationController
   end
 
   def my_clubs
-    if current_agent.has_role? 'admin'
-      @clubs = Club.all
-    else
-      @my_roles = @current_agent.club_roles
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: MyClubsDatatable.new(view_context,nil,nil,nil,@current_agent) }
     end
   end
-
 end

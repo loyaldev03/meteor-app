@@ -13,6 +13,7 @@ class Ability
       can :manage, Club
       can :manage, Domain
       can :manage, Product
+      can :manage, Fulfillment
       can :manage_member_api, Member
       can :manage_product_api, Product
       can :manage_club_cash_api, ClubCashTransaction

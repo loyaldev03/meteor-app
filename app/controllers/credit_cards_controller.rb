@@ -38,30 +38,4 @@ class CreditCardsController < ApplicationController
     end
   end
 
-  def set_as_blacklisted
-    credit_card = CreditCard.find(params[:credit_card_id])
-
-    if credit_card.blacklist
-      message = "Credit card #{credit_card.last_digits} blacklisted."
-      Auditory.audit(@current_agent, credit_card, message, @current_member)
-      redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.last_digits} was blacklisted." 
-    else
-      redirect_to show_member_path(:id => @current_member), error: credit_card.errors 
-  	end
-  end
-
-  def unset_blacklisted
-    credit_card = CreditCard.find(params[:credit_card_id])
-
-    authorize! :undo_credit_card_blacklist, credit_card   
-
-    if credit_card.unset_blacklisted
-      message = "Credit card #{credit_card.last_digits} was unsetted as blacklisted."
-      Auditory.audit(@current_agent, credit_card, message, @current_member)
-      redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.last_digits} was unsetted as blacklisted." 
-    else
-      redirect_to show_member_path(:id => @current_member), error: credit_card.errors 
-    end
-  end
-
 end

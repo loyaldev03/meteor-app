@@ -36,13 +36,7 @@
       <td> <%= I18n.l cc.last_successful_bill_date, :format => :long if !cc.last_successful_bill_date.nil? %> </td>
       <td>
         <% if cc.blacklisted %>
-          <% if can? :undo_credit_card_blacklist, cc %>
-            <%= form_for @cc, :as => :credit_card, :url => credit_card_unset_blacklisted_path(:credit_card_id => cc.id), do |f|  %> 
-              <%= submit_tag 'UnsetBlacklist', :name => 'blacklist', :class=> "btn btn-warning confirm" %>
-            <% end %>
-          <% else %>
-            <%= t('activerecord.attributes.credit_card.blacklisted') %>
-          <% end %>    
+          <%= t('activerecord.attributes.credit_card.blacklisted') %>
         <% end %>
         <%= t('activerecord.attributes.credit_card.active') if cc.active %>
         <% if cc.can_be_activated? %>

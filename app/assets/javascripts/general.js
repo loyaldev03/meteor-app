@@ -80,6 +80,17 @@ $(document).ready( function() {
     });
   }
 
+  function my_club_index_functions(column_count){
+    $('#my_clubs_table').dataTable({
+      "sPaginationType": "bootstrap",
+      "bJQueryUI": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "aaSorting": [[ 0, "asc" ]],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ], "sWidth": "13%", "aTargets": [ 3 ] }],
+      "sAjaxSource": $('#my_clubs_table').data('source'),
+    });
+  }
   function domain_index_functions(column_count){
     $('#domains_table').dataTable({
       "sPaginationType": "bootstrap",
