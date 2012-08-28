@@ -19,7 +19,7 @@ class Club < ActiveRecord::Base
 
   acts_as_paranoid
 
-  after_create :add_default_member_groups
+  after_create :add_default_member_groups, :add_default_product
 
   validates :partner_id, :presence => true
   validates :name, :presence => true, :uniqueness => true
@@ -50,4 +50,12 @@ class Club < ActiveRecord::Base
       end
     end
 
+    def add_default_product
+      p = Product.new 
+      p.sku = "kit-card"
+      p.name = "Kit card"
+      p.stock = 100
+      p.club_id = self.id
+      p.save
+    end
 end
