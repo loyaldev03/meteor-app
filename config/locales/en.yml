@@ -111,6 +111,7 @@ en:
         country: 'Country'
         zip: 'Zip'
         gender: 'Gender'
+        member_notes: 'Member Notes'
         phone_number: 'Phone Number'
         type_of_phone_number: 'Type of phone number'
         id: 'Member id'

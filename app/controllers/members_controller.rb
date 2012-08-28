@@ -33,6 +33,7 @@ class MembersController < ApplicationController
                        .where(:club_id => @current_club)
                        .needs_approval(params[:member][:needs_approval])
                        .order(:visible_id)
+                       .uniq
     respond_to do |format|
       format.html {render 'index'}
       format.js {render 'index'}
