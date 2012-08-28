@@ -1,6 +1,6 @@
 require 'test_helper'
  
-class MembersTest < ActionController::IntegrationTest
+class MembersEnrollmentTest < ActionController::IntegrationTest
 
 	transactions_table_empty_text = "No data available in table"
 	operations_table_empty_text = "No data available in table"
@@ -20,6 +20,9 @@ class MembersTest < ActionController::IntegrationTest
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @communication_type = FactoryGirl.create(:communication_type)
+    @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
+    FactoryGirl.create(:batch_agent)
     
     if create_new_member
 	    @saved_member = FactoryGirl.create(:active_member, 
@@ -138,6 +141,16 @@ class MembersTest < ActionController::IntegrationTest
   # TESTS
   ############################################################
 
+
+  test "search members by next bill date" do
+    setup_search
+    page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
+    within("#ui-datepicker-div") do
+      click_on("#{Time.zone.now.day}")
+    end
+    search_member("member[next_retry_bill_date]", nil, @search_member)
+  end
+
   test "search member by member id" do
     setup_search
     search_member("member[member_id]", "#{@search_member.visible_id}", @search_member)
@@ -148,14 +161,6 @@ class MembersTest < ActionController::IntegrationTest
 	 	search_member("member[first_name]", "#{@search_member.first_name}", @search_member)
 	end
 
-  test "search members by next bill date" do
-    setup_search
-    page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
-    within("#ui-datepicker-div") do
-      click_on("#{Time.new.day}")
-    end
-    search_member("member[next_retry_bill_date]", nil, @search_member)
-  end
 
   test "search member with empty form" do
     setup_search
@@ -234,8 +239,8 @@ class MembersTest < ActionController::IntegrationTest
 		click_on 'New Member'
 
   	within("#table_demographic_information") {
-		fill_in 'member[first_name]', :with => unsaved_member.first_name
-	 	fill_in 'member[last_name]', :with => unsaved_member.last_name
+		  fill_in 'member[first_name]', :with => unsaved_member.first_name
+	 	  fill_in 'member[last_name]', :with => unsaved_member.last_name
 	  	fill_in 'member[city]', :with => unsaved_member.city
 	  	fill_in 'member[address]', :with => unsaved_member.address
 	  	fill_in 'member[zip]', :with => unsaved_member.zip
@@ -313,7 +318,7 @@ class MembersTest < ActionController::IntegrationTest
 
   end
 
-   test "Create a member with CC blank" do
+  test "Create a member with CC blank" do
     setup_member(false)
 
     unsaved_member = FactoryGirl.build(:active_member, 
@@ -473,9 +478,92 @@ class MembersTest < ActionController::IntegrationTest
   end
   
 
+  test "add new CC and active old CC" do
+    setup_member
+    
+    actual_member = Member.find(@saved_member.id)
+    old_active_credit_card = actual_member.active_credit_card
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Add a credit card'
+    
+    cc_number = "378282246310005"
+    cc_month = Time.new.month.to_s
+    cc_year = (Time.new.year + 10).to_s
+
+    fill_in 'credit_card[number]', :with => cc_number
+    fill_in 'credit_card[expire_month]', :with => cc_month
+    fill_in 'credit_card[expire_year]', :with => cc_year
+    
+    click_on 'Save credit card'
+
+    assert page.has_content?("The Credit Card #{cc_number[-4,4]} was successfully added and setted as active")
+    
+    within("#table_active_credit_card") do
+      assert page.has_content?(cc_number)
+      assert page.has_content?("#{cc_month} / #{cc_year}")
+    end
+
+    wait_until {
+      within("#operations_table") {
+          assert page.has_content?("Credit card #{cc_number[-4,4]} added and set active") 
+      }
+    }
+
+    wait_until {
+      within("#credit_cards") {
+        within(".ligthgreen") {
+          assert page.has_content?(cc_number) 
+          assert page.has_content?("#{cc_month} / #{cc_year}")
+          assert page.has_content?("active")
+        }
+      }
+    }
+
+    confirm_ok_js
+
+    within("#credit_cards") {
+      page.execute_script("window.jQuery('#new_credit_card').submit()")
+    }
+
+    assert page.has_content?("The Credit Card #{old_active_credit_card.number.to_s[-4,4]} was activated")
+    
+    within("#credit_cards") { 
+      assert page.has_content?("#{old_active_credit_card.number}") 
+      assert page.has_content?("#{old_active_credit_card.expire_month} / #{old_active_credit_card.expire_year}")
+    }
+    
+  end
 
 
-   
+  test "add new note" do
+    setup_member
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Add a note'
+    
+    text_note = "text note 123456789"
 
+    select(@communication_type.name, :from => 'member_note[communication_type_id]')
+    select(@disposition_type.name, :from => 'member_note[disposition_type_id]')
+    fill_in 'member_note[description]', :with => text_note
+
+    click_on 'Save note'
+
+    assert page.has_content?("The note was added successfuly")
+
+    wait_until {
+      within("#operations_table") {
+          assert page.has_content?("Note added") 
+      }
+    }
+
+    wait_until {
+      within("#notes") {
+        assert page.has_content?(text_note) 
+      }
+    }
+
+  end
 
 end

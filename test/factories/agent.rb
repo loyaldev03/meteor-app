@@ -51,4 +51,11 @@ FactoryGirl.define do
     roles ["api"]
   end
 
+  factory :batch_agent, class: Agent do
+    email "batch@xagax.com"
+    username "batch@xagax.com"
+    password  "batch@xagax.com"
+    password_confirmation  "batch@xagax.com"
+  end
+
 end

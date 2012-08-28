@@ -149,6 +149,15 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal 0, member.club_cash_amount, "The member is #{member.status} with $#{member.club_cash_amount}"
   end
 
+  test "Canceled member should have cancel date set " do
+    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    cancel_date = member.cancel_date
+    member.cancel! Time.zone.now, "Cancel from Unit Test"
+    m = Member.find member.uuid
+    assert_not_nil m.cancel_date 
+    assert_nil cancel_date
+  end
+
   test "Member should be saved with first_name and last_name with numbers or acents." do
     member = FactoryGirl.build(:member)
     assert !member.save, member.errors.inspect
