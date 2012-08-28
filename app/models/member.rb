@@ -110,8 +110,9 @@ class Member < ActiveRecord::Base
   scope :with_zip, lambda { |value| where('zip = ?', value) unless value.blank? }
   scope :with_email_like, lambda { |value| where('email like ?', '%'+value+'%') unless value.blank? }
   scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value) unless value.blank? }
-  scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value+'%') unless value.blank?}
-  scope :needs_approval, lambda{ |value| where('status like ?', '%applied%') unless value == '0'}
+  scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value+'%') unless value.blank? }
+  scope :with_external_id, lambda{ |value| where("external_id = ?",value) unless value.blank? }
+  scope :needs_approval, lambda{ |value| where('status like ?', '%applied%') unless value == '0' }
 
   state_machine :status, :initial => :none, :action => :save_state do
     after_transition [ :none, # enroll

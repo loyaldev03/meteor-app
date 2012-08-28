@@ -116,6 +116,7 @@ en:
         id: 'Member id'
         status: 'Current Status'
         email: 'Email'
+        external_id: 'External ID'
         member_since_date: 'Member since date'
         join_date: 'Join date'
         club_cash_expire_date: 'Club cash expire date'

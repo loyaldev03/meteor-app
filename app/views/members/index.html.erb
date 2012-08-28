@@ -159,6 +159,16 @@
                           
                     </td>
                   </tr>
+                  <% if @current_club.requires_external_id %>
+                  <tr>
+                    <td> <%= t('activerecord.attributes.member.external_id') %></td>
+                    <td>
+                      <%= text_field :member, :external_id, :class => 'text-field',
+                                     :value => (params[:member][:external_id] if params[:member]) %> 
+                          
+                    </td>
+                  </tr>
+                  <% end %>
               </table>
             </td>
         </tr>
