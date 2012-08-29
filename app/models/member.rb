@@ -464,10 +464,10 @@ class Member < ActiveRecord::Base
         credit_card.accepted_on_billing
       end
       self.reload
-      message = set_status_on_enrollment!(agent, trans, amount)
+      message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
       assign_club_cash! if trans
+
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
-      
     rescue Exception => e
       Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
@@ -658,7 +658,7 @@ class Member < ActiveRecord::Base
   end
 
   private
-    def set_status_on_enrollment!(agent, trans, amount)
+    def set_status_on_enrollment!(agent, trans, amount, info)
       operation_type = Settings.operation_types.enrollment_billing
       description = 'enrolled'
 
@@ -681,7 +681,8 @@ class Member < ActiveRecord::Base
         self.set_as_provisional! # set join_date
       end
 
-      self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, self.club.time_zone)
+      self.cohort = Member.cohort_formula(self.join_date, info, self.club.time_zone)
+      info.update_attribute(:cohort, self.cohort)
       trans.update_attribute(:cohort, self.cohort) unless trans.nil?
 
       message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"

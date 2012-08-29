@@ -200,6 +200,7 @@ CREATE TABLE `enrollment_infos` (
   `prospect_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
+  `cohort` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -669,3 +670,5 @@ INSERT INTO schema_migrations (version) VALUES ('20120828185516');
 INSERT INTO schema_migrations (version) VALUES ('20120829131605');
 
 INSERT INTO schema_migrations (version) VALUES ('20120829172557');
+
+INSERT INTO schema_migrations (version) VALUES ('20120829195850');
