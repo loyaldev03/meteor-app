@@ -32,7 +32,7 @@ class Member < ActiveRecord::Base
 
   after_create :after_create_sync_remote_domain
   after_update :after_update_sync_remote_domain
-  after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
+  after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil? || api_id.nil?'
   after_save :asyn_desnormalize_preferences
   
   # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
@@ -445,15 +445,10 @@ class Member < ActiveRecord::Base
     enrollment_info.update_enrollment_info_by_hash member_params
 
     begin
+      self.credit_cards << credit_card
+      self.enrollment_infos << enrollment_info
       self.save!
 
-      enrollment_info.member_id = self.id
-      enrollment_info.save
-
-      if credit_card.member.nil?
-        credit_card.member = self
-        credit_card.save
-      end
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
         # is completed succesfully
