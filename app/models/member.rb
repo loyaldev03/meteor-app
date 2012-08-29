@@ -487,11 +487,12 @@ class Member < ActiveRecord::Base
     if self.fulfillments.find_by_status('not_processed').nil?
       fulfillments = fulfillments_products_to_send
       fulfillments.each do |product|
+        stock_product = Product.find_by_sku_and_club_id(product,self.club_id)
         f = Fulfillment.new :product_sku => product
         f.member_id = self.uuid
-        f.recurrent = product.recurrent
+        f.recurrent = stock_product.recurrent if stock_product
         f.save
-        f.validate_stock
+        stock_product.decrease_stock(1) if f.validate_stock
       end
     end
   end
