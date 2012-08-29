@@ -484,6 +484,7 @@ class Member < ActiveRecord::Base
       fulfillments.each do |product|
         f = Fulfillment.new :product_sku => product
         f.member_id = self.uuid
+        f.recurrent = product.recurrent
         f.save
         f.validate_stock
       end
