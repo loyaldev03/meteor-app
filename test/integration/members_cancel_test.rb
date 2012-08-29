@@ -47,10 +47,10 @@ class MembersCancelTest < ActionController::IntegrationTest
     confirm_ok_js
     click_on 'Cancel member'
 
-    m = Member.first
+    m = @saved_member.reload
 
     within("#td_mi_cancel_date") do
-      assert page.has_content?("#{m.cancel_date}")
+      assert page.has_content?(I18n.l(m.cancel_date, :format => :only_date))
     end
     
     within("#operations_table") do
@@ -59,7 +59,7 @@ class MembersCancelTest < ActionController::IntegrationTest
       }
     end
 
-    m = Member.first
+    m = @saved_member.reload
     m.set_as_canceled!
     
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => m.visible_id)
@@ -67,8 +67,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     within("#table_membership_information") do
       assert page.has_content?("lapsed")
     end
-  
-    
+      
     within("#communication") do
       wait_until {
         assert page.has_content?("Test cancellation")

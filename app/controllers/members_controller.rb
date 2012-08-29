@@ -119,7 +119,7 @@ class MembersController < ApplicationController
   def cancel
     @member_cancel_reason = MemberCancelReason.all
     if request.post?
-      if !params[:reason].blank?
+      unless params[:reason].blank?
         if params[:cancel_date].to_date > Time.zone.now.to_date
           begin
             message = "Member cancellation scheduled to #{params[:cancel_date]} - Reason: #{params[:reason]}"

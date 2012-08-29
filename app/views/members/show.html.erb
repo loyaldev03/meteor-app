@@ -235,7 +235,7 @@
           <tr class="ligthgrey">
             <th><%= t('activerecord.attributes.member.next_retry_bill_date') %>:</th>
             <td id="td_mi_next_retry_bill_date">
-              <%= I18n.l @current_member.next_retry_bill_date, :format => :only_date %>&nbsp;&nbsp;&nbsp;
+              <%= I18n.l(@current_member.next_retry_bill_date, :format => :only_date) unless @current_member.next_retry_bill_date.nil? %>&nbsp;&nbsp;&nbsp;
               <% unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
                 <%= link_to(member_change_next_bill_date_path, :class => "btn btn-info", :id => "link_member_change_next_bill_date") do %> 
                   <i class="icon-pencil"></i> Change
@@ -246,7 +246,7 @@
 
           <tr>
             <th><%= t('activerecord.attributes.member.cancel_date') %>:</th>
-            <td id="td_mi_cancel_date"><%= I18n.l @current_member.cancel_date, :format => :only_date unless @current_member.cancel_date.nil? %></td>  
+            <td id="td_mi_cancel_date"><%= I18n.l(@current_member.cancel_date, :format => :only_date) unless @current_member.cancel_date.nil? %></td>  
           </tr>
   
           <tr class="ligthgrey">
