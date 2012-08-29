@@ -1,10 +1,27 @@
+Corro esto a las 
+6pm Hawaii 04/05
+3am EST => 05/05
+4am Bs as 05/05
+UTC 7am => 05/05
+8am Londres => 05/05
+
+
+Hawaii => 28
+EST => 28
+BS => 28
+UTC => 29
+Londred => 29
+
+Time.zone.now.to_date 
+
+
 namespace :billing do
   desc "Find members that have NBD for today. and bill them all!"
   # This task should be run each day at 3 am ?
   task :for_today => :environment do
     tall = Time.zone.now
     begin
-      Member.find_in_batches(:conditions => [" date(next_retry_bill_date) <= ? ", Date.today]) do |group|
+      Member.find_in_batches(:conditions => [" date(next_retry_bill_date) <= ? ", Time.zone.now.to_date]) do |group|
         group.each do |member| 
           tz = Time.zone.now
           begin
@@ -28,7 +45,7 @@ namespace :billing do
     tall = Time.zone.now
     begin
       # We use bill_date because we will only send this email once!
-      Member.find_in_batches(:conditions => [" date(bill_date) = ? ", Date.today + 7.days ]) do |group|
+      Member.find_in_batches(:conditions => [" date(bill_date) = ? ", Time.zone.now.to_date + 7.days ]) do |group|
         group.each do |member| 
           tz = Time.zone.now
           begin
@@ -54,7 +71,6 @@ namespace :members do
     begin
       Rails.logger.info " *** Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
       Member.find_each do |member|
-        tz = Time.zone.now
         begin
           Rails.logger.info "   * processing member ##{member.uuid}"
           member.refresh_autologin_url!
@@ -73,7 +89,7 @@ namespace :members do
   task :cancel => :environment do
     tall = Time.zone.now
     begin
-      base =  Member.where(" date(cancel_date) <= ? AND status != ? ", Date.today, 'lapsed')
+      base =  Member.where(" date(cancel_date) <= ? AND status != ? ", Time.zone.now.to_date, 'lapsed')
       Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
       base.find_in_batches do |group|
         group.each do |member| 
@@ -98,7 +114,7 @@ namespace :members do
   task :send_happy_birthday => :environment do
     tall = Time.zone.now
     begin
-      base = Member.where(" birth_date = ? and status IN (?) ", Date.today, [ 'active', 'provisional' ])
+      base = Member.where(" birth_date = ? and status IN (?) ", Time.zone.now.to_date, [ 'active', 'provisional' ])
       Rails.logger.info " *** Starting members:send_happy_birthday rake task, processing #{base.count} members"
       base.find_in_batches do |group|
         group.each do |member| 
@@ -128,7 +144,7 @@ namespace :members do
           begin
             Rails.logger.info "  * processing template ##{template.id}"
             Member.find_in_batches(:conditions => 
-                [ " join_date = ? AND terms_of_membership_id = ? ", Date.today - template.days_after_join_date.days, 
+                [ " join_date = ? AND terms_of_membership_id = ? ", Time.zone.now.to_date - template.days_after_join_date.days, 
                   template.terms_of_membership_id ]) do |group1|
               group1.each do |member| 
                 tz = Time.zone.now
@@ -186,7 +202,7 @@ namespace :members do
   task :process_club_cash => :environment do
     tall = Time.zone.now
     begin
-      Member.find_in_batches(:conditions => [" date(club_cash_expire_date) <= ? ", Date.today ]) do |group|
+      Member.find_in_batches(:conditions => [" date(club_cash_expire_date) <= ? ", Time.zone.now.to_date ]) do |group|
         group.each do |member| 
           tz = Time.zone.now
           begin
@@ -211,7 +227,7 @@ namespace :members do
     begin
       Fulfillment.joins(:member).find_in_batches(:conditions => [
           " date(renewable_at) <= ? AND (fulfillments.status = ? OR (fulfillments.status = ? AND members.wrong_address IS NULL)) AND recurrent = true", 
-          Date.today, 'sent', 'undeliverable' ]) do |group|
+          Time.zone.now.to_date, 'sent', 'undeliverable' ]) do |group|
         group.each do |fulfillment| 
           tz = Time.zone.now
           begin
@@ -226,7 +242,7 @@ namespace :members do
       end
       Fulfillment.joins(:member).find_in_batches(:conditions => [
           " date(renewable_at) <= ? AND (fulfillments.status = ? AND members.wrong_address IS NOT NULL) AND recurrent = true", 
-          Date.today, 'undeliverable' ]) do |group|
+          Time.zone.now.to_date, 'undeliverable' ]) do |group|
         group.each do |fulfillment| 
           tz = Time.zone.now
           begin
