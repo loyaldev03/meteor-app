@@ -21,8 +21,8 @@ class Prospect < ActiveRecord::Base
     def set_cohort
       self.club = self.terms_of_membership.club
       today = Time.zone.now    
-      self.cohort = [ today.in_time_zone(time_zone).year.to_s, 
-        "%02d" % today.in_time_zone(time_zone).month.to_s, 
+      self.cohort = [ today.in_time_zone(self.club.time_zone).year.to_s, 
+        "%02d" % today.in_time_zone(self.club.time_zone).month.to_s, 
         mega_channel.to_s, 
         campaign_medium.to_s ].join('-')
     end
