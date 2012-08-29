@@ -66,7 +66,6 @@ class Transaction < ActiveRecord::Base
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
-    self.join_date = member.join_date
     self.save
   end
 
