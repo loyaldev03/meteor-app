@@ -12,6 +12,13 @@ FactoryGirl.define do
     api_password { Faker::Internet.user_name }
   end
 
+  factory :simple_club_with_gateway, class: Club do
+    sequence(:name) {|n| "club#{n}" }
+    description "My description"
+    association :partner
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
+  end  
+
   factory :club_with_api, class: Club do
     name { Faker::Name.name }
     description "My description"
