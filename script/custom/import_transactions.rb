@@ -77,6 +77,7 @@ def load_enrollment_transactions
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
+            transaction.cohort = @member.cohort
             transaction.transaction_type = 'authorization_capture'
             transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
@@ -136,6 +137,7 @@ def load_membership_transactions
             next if transaction.terms_of_membership_id.nil?
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
+            transaction.cohort = @member.cohort
             transaction.recurrent = false
             transaction.transaction_type = 'authorization_capture'
             transaction.invoice_number = response.invoice_number(authorization)
