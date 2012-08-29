@@ -594,7 +594,7 @@ class Member < ActiveRecord::Base
       self.save(:validate => false)
       message = "Blacklisted member and all its credit cards. Reason: #{reason}."
       Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
-      self.cancel! Date.today, "Automatic cancellation"
+      self.cancel! Time.zone.now, "Automatic cancellation"
       self.credit_cards.each { |cc| cc.blacklist }
       { :message => message, :success => true }
     end
