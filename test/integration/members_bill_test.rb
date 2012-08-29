@@ -37,7 +37,7 @@ class MembersBillTest < ActionController::IntegrationTest
   # UTILS
   ############################################################
   def validate_cohort(member, enrollment_info, transaction)
-    assert transaction.cohort == Member.cohort_formula(member.join_date, enrollment_info, member.club.time_zone), "validate_cohort error"
+    assert_equal transaction.cohort , Member.cohort_formula(member.join_date, enrollment_info, member.club.time_zone), "validate_cohort error"
   end
 
   ############################################################
