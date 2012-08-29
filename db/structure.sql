@@ -483,7 +483,6 @@ CREATE TABLE `transactions` (
   `updated_at` datetime NOT NULL,
   `credit_card_id` bigint(20) DEFAULT NULL,
   `refunded_amount` float DEFAULT '0',
-  `join_date` datetime DEFAULT NULL,
   `cohort` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `country` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   UNIQUE KEY `index_transactions_on_uuid` (`uuid`)
@@ -668,3 +667,5 @@ INSERT INTO schema_migrations (version) VALUES ('20120824192612');
 INSERT INTO schema_migrations (version) VALUES ('20120828185516');
 
 INSERT INTO schema_migrations (version) VALUES ('20120829131605');
+
+INSERT INTO schema_migrations (version) VALUES ('20120829172557');
