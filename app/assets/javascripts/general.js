@@ -404,7 +404,7 @@ $(document).ready( function() {
         success: function(data) {
           if (data.code == "000"){
             button.hide();
-            alert(data.message);
+            button.parent().append("<p>"+data.message+"</p>");   
           }else{
             button.removeAttr('disabled');
             alert(data.message);
@@ -413,25 +413,6 @@ $(document).ready( function() {
       });
     });
 
-    // $('*#mark_as_wrong_address').click( function(event){
-    //   button = $(this)
-    //   button.attr('disabled', 'disabled');
-    //   event.preventDefault();
-    //   $.ajax({
-    //     type: 'PUT',
-    //     url: "fulfillments/"+button.attr("name")+"/mark_as_wrong_address",
-    //     data: { reason : $("#reason_"+button.attr("name")).val() },
-    //     success: function(data) {
-    //       if (data.code == "000"){
-    //         button.hide();
-    //         alert(data.message);
-    //       }else{
-    //         button.removeAttr('disabled');
-    //         alert(data.message);
-    //       };
-    //     },
-    //   });
-    // });
     $('*#set_as_wrong_address').click( function(event){
       append = $(this).parent();
       $.get(this.action, {member_prefix:$(this).attr("name")}, null, 'script'); 
@@ -448,7 +429,7 @@ $(document).ready( function() {
         dataType: 'json',
         success: function(data) {
           if (data.code == "000"){
-            $("[id='set_as_wrong_address'][name='1']").hide();
+            $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").hide();
             this_form.hide();
             this_form.parent().append("<p>"+data.message+"</p>");
           }else{
@@ -457,5 +438,6 @@ $(document).ready( function() {
         },
       });      
     });
+
   };
 

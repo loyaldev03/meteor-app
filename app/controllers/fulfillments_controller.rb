@@ -6,6 +6,7 @@ class FulfillmentsController < ApplicationController
     if request.post?
     	if params[:all_times] == '1'
     		@fulfillments = Fulfillment.joins(:member).where('fulfillments.status like ? and club_id = ?', params[:status],@current_club.id)
+        @status = params[:status]
       elsif params[:status] == 'not_processed'
         fulfillments = Fulfillment.where(['status like ? AND assigned_at BETWEEN ? and ?', 'not_processed', params[:initial_date], params[:end_date]])
         csv_string = Fulfillment.generateCSV(fulfillments)
@@ -13,10 +14,6 @@ class FulfillmentsController < ApplicationController
                      :type => 'text/csv; charset=iso-8859-1; header=present',
                      :disposition => "attachment; filename=miworkingfile2.csv"
       end  
-    end
-    respond_to do |format|
-      format.html 
-      format.js 
     end
   end
 
@@ -36,5 +33,13 @@ class FulfillmentsController < ApplicationController
     render json: Fulfillment.find(params[:id]).member.set_wrong_address(@current_agent, params[:reason])
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
+  end
+
+  def generate_csv
+    fulfillments = Fulfillment.joins(:member).where('fulfillments.status like ? and club_id = ?', params[:status],@current_club.id)
+    csv_string = Fulfillment.generateCSV(fulfillments)
+    send_data csv_string, :filename => "miworkingfile2.csv",
+                 :type => 'text/csv; charset=iso-8859-1; header=present',
+                 :disposition => "attachment; filename=miworkingfile2.csv"
   end
 end
