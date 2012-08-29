@@ -1,20 +1,3 @@
-Corro esto a las 
-6pm Hawaii 04/05
-3am EST => 05/05
-4am Bs as 05/05
-UTC 7am => 05/05
-8am Londres => 05/05
-
-
-Hawaii => 28
-EST => 28
-BS => 28
-UTC => 29
-Londred => 29
-
-Time.zone.now.to_date 
-
-
 namespace :billing do
   desc "Find members that have NBD for today. and bill them all!"
   # This task should be run each day at 3 am ?
