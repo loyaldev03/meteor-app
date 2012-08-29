@@ -59,6 +59,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   def search_member(field_selector, value, validate_obj)
     fill_in field_selector, :with => value unless value.nil?
     click_on 'Search'
+
     within("#members") do
       wait_until {
         assert page.has_content?(validate_obj.status)
@@ -568,10 +569,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
 
   def validate_timezone_dates(timezone)
-    @club.update_attribute :time_zone, timezone
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    puts I18n.l(@saved_member.member_since_date, :format => :only_date)
-    within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(@saved_member.member_since_date, :format => :only_date)); require 'ruby-debug'; debugger }
+    Time.zone = timezone
+#    puts I18n.l(@saved_member.member_since_date, :format => :only_date)
+#    puts page.body
+    within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(@saved_member.member_since_date, :format => :only_date)) }
     within("#td_mi_join_date") { assert page.has_content?(I18n.l(@saved_member.join_date, :format => :only_date)) }    
     within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(@saved_member.next_retry_bill_date, :format => :only_date)) }    
     within("#td_mi_credit_cards_first_created_at") { assert page.has_content?(I18n.l(@saved_member.credit_cards.first.created_at, :format => :only_date)) }    
