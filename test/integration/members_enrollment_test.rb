@@ -569,10 +569,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
 
   def validate_timezone_dates(timezone)
+    @club.time_zone = timezone
+    @club.save
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    Time.zone = timezone
-#    puts I18n.l(@saved_member.member_since_date, :format => :only_date)
-#    puts page.body
     within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(@saved_member.member_since_date, :format => :only_date)) }
     within("#td_mi_join_date") { assert page.has_content?(I18n.l(@saved_member.join_date, :format => :only_date)) }    
     within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(@saved_member.next_retry_bill_date, :format => :only_date)) }    
