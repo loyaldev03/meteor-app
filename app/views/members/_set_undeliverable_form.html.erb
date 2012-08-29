@@ -1,15 +1,9 @@
-<%= form_for(member_set_undeliverable_path) do %>
-  <table class="table table-bordered">
-    <thead>
-    <tr>
-      <th>
+<% @current_member = Member.find_by_visible_id_and_club_id(params[:member_prefix], @current_club.id) if @current_member.nil? %>
+
+<%= form_for(member_set_undeliverable_path(@current_partner.prefix,@current_club.name,@current_member), 
+    :html => {:id => "set_undeliverable", :name => @current_member.visible_id} ) do %>
         <%= label :reason, t('reason'), :class => 'help-inline' %> 
-        <%= select_tag "reason", options_for_select([Settings.wrong_address.undeliverable_all, Settings.wrong_address.undeliverable_sloop,
-        Settings.wrong_address.undeliverable_kit_card]) %>
+        <%= text_field_tag "reason",nil ,:class => 'text_field input-medium' %>
         <%= submit_tag t('buttons.set_wrong_addres'), :class => 'btn btn-primary', 
                                :confirm => t('are_you_sure') %> 
-      </th>
-    </tr>
-    </thead>
-  </table>
 <% end %>
