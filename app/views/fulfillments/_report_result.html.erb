@@ -1,13 +1,11 @@
 <% if @fulfillments %>
   
   <% if @status == 'processing' %>
-    <%= form_for(generate_csv_fulfillments_path() ) do %>
-      <%= hidden_field :status, nil ,:value => @status %>
+    <%= form_tag("/partner/NFL/club/Fans/fulfillments/generate_csv " ) do %>
+      <%= hidden_field :status, nil ,:value => 'processing' %>
       <%= submit_tag t('buttons.generate_csv'), :class => 'btn btn-primary' %> 
     <% end %>
   <% end %>
-
-
 
   <table class="table table-bordered table-condensed">
   	<thead>
