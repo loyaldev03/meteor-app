@@ -48,14 +48,14 @@ class MembersCancelTest < ActionController::IntegrationTest
     click_on 'Cancel member'
 
     m = Member.first
-    
+
     within("#td_mi_cancel_date") do
       assert page.has_content?("#{m.cancel_date}")
     end
     
     within("#operations_table") do
       wait_until {
-        assert page.has_content?("Member cancellation scheduled to #{m.cancel_date} - Reason: #{@member_cancel_reason.name}")
+        assert page.has_content?("Member cancellation scheduled to #{date_time.to_date} - Reason: #{@member_cancel_reason.name}")
       }
     end
 

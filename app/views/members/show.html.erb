@@ -246,7 +246,7 @@
 
           <tr>
             <th><%= t('activerecord.attributes.member.cancel_date') %>:</th>
-            <td id="td_mi_cancel_date"><%= @current_member.cancel_date unless @current_member.cancel_date.nil? %></td>  
+            <td id="td_mi_cancel_date"><%= I18n.l @current_member.cancel_date, :format => :only_date unless @current_member.cancel_date.nil? %></td>  
           </tr>
   
           <tr class="ligthgrey">
