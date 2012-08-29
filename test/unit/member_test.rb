@@ -207,4 +207,22 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal member.operations.last.description, "The email contains '@noemail.com' which is an empty email. The email won't be sent."
   end
 
+
+  test "show dates according to club timezones" do
+    @club = @terms_of_membership_with_gateway.club
+    @saved_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @club)
+    @saved_member.member_since_date = "Wed, 02 May 2012 19:10:51 UTC 00:00"
+    @saved_member.join_date = "Wed, 03 May 2012 13:10:51 UTC 00:00"
+    @saved_member.next_retry_bill_date = "Wed, 03 May 2012 00:10:51 UTC 00:00"
+    Time.zone = "Eastern Time (US & Canada)"
+    assert_equal I18n.l(Time.zone.at(@saved_member.member_since_date)), "02/05/2012"
+    assert_equal I18n.l(Time.zone.at(@saved_member.next_retry_bill_date)), "02/05/2012"
+    assert_equal I18n.l(Time.zone.at(@saved_member.join_date)), "03/05/2012"
+    Time.zone = "Ekaterinburg"
+    assert_equal I18n.l(Time.zone.at(@saved_member.member_since_date)), "03/05/2012"
+    assert_equal I18n.l(Time.zone.at(@saved_member.next_retry_bill_date)), "03/05/2012"
+    assert_equal I18n.l(Time.zone.at(@saved_member.join_date)), "03/05/2012"
+  end
+
+
 end

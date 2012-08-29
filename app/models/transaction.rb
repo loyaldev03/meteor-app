@@ -84,7 +84,6 @@ class Transaction < ActiveRecord::Base
     [ 'sale', 'capture' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted?
   end
 
-
   def process
     case transaction_type
       when "sale"

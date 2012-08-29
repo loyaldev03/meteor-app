@@ -15,14 +15,14 @@ class Club < ActiveRecord::Base
     foreign_key: 'drupal_domain_id'
 
   attr_accessible :description, :name, :logo, :drupal_domain_id, :theme, :requires_external_id,
-    :api_username, :api_password
+    :api_type, :api_username, :api_password, :time_zone
 
   acts_as_paranoid
 
   after_create :add_default_member_groups, :add_default_product
 
   validates :partner_id, :presence => true
-  validates :name, :presence => true, :uniqueness => true
+  validates :name, :presence => true, :uniqueness => { scope: :partner_id }
 
   has_attached_file :logo, :path => ":rails_root/public/system/:attachment/:id/:style/:filename", 
                            :url => "/system/:attachment/:id/:style/:filename",

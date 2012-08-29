@@ -256,10 +256,7 @@ class Api::MembersController < ApplicationController
         phone_country_code: member.phone_country_code, 
         phone_area_code: member.phone_area_code,
         phone_local_number: member.phone_local_number, 
-        club_cash_amount: member.club_cash_amount,
-        enrollment_info: {
-
-        }
+        club_cash_amount: member.club_cash_amount
       },
       credit_card: {
         expire_month: (member.active_credit_card && member.active_credit_card.expire_month),

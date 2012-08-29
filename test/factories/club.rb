@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :club do
     name { Faker::Name.name }
+    time_zone { TZInfo::Timezone.all.sample.name }
     description "My description"
     association :partner
   end
@@ -8,13 +9,23 @@ FactoryGirl.define do
   factory :simple_club, class: Club do
     sequence(:name) {|n| "club#{n}" }
     description "My description"
+    time_zone { TZInfo::Timezone.all.sample.name }
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }
   end
 
+  factory :simple_club_with_gateway, class: Club do
+    sequence(:name) {|n| "club#{n}" }
+    description "My description"
+    time_zone { TZInfo::Timezone.all.sample.name }
+    association :partner
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
+  end  
+
   factory :club_with_api, class: Club do
     name { Faker::Name.name }
     description "My description"
+    time_zone { TZInfo::Timezone.all.sample.name }
     association :partner
     api_type 'Drupal::Member'
     association :api_domain, factory: :domain
@@ -24,6 +35,7 @@ FactoryGirl.define do
 
   factory :club_with_gateway, class: Club do
     name { Faker::Name.name }
+    time_zone { TZInfo::Timezone.all.sample.name }
     description "My description"
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }

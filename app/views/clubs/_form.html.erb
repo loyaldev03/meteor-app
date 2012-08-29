@@ -13,6 +13,12 @@
     </div>
   </div>
   <div class="control-group">
+    <%= f.label :api_type, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select :api_type, [['Drupal', 'Drupal::Member']], include_blank: true %>
+    </div>
+  </div>
+  <div class="control-group">
     <%= f.label :api_username, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :api_username, :class => 'text_field' %>
@@ -46,6 +52,12 @@
     <%= f.label :requires_external_id, :class => 'control-label' %>
     <div class="controls">
       <%= f.check_box :requires_external_id, :class => 'check_box' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :time_zone, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.time_zone_select(:time_zone) %>
     </div>
   </div>
 

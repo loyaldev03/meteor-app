@@ -119,7 +119,7 @@ class MembersController < ApplicationController
   def cancel
     @member_cancel_reason = MemberCancelReason.all
     if request.post?
-      if !params[:reason].blank?
+      unless params[:reason].blank?
         if params[:cancel_date].to_date > Time.zone.now.to_date
           begin
             message = "Member cancellation scheduled to #{params[:cancel_date]} - Reason: #{params[:reason]}"
@@ -127,14 +127,14 @@ class MembersController < ApplicationController
             flash[:notice] = message
             redirect_to show_member_path
           rescue Exception => e
-            flash[:error] = "Could not cancel member. Ticket sent to IT"
+            flash.now[:error] = "Could not cancel member. Ticket sent to IT"
             Airbrake.notify(:error_class => "Member:cancel", :error_message => e)
           end
         else
-          flash[:error] = "Cancellation date cant be less or equal than today."
+          flash.now[:error] = "Cancellation date cant be less or equal than today."
         end
       else
-        flash[:error] = "Reason cant be blank."
+        flash.now[:error] = "Reason cant be blank."
       end
     end    
   end

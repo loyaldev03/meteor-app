@@ -32,7 +32,7 @@ class Member < ActiveRecord::Base
 
   after_create :after_create_sync_remote_domain
   after_update :after_update_sync_remote_domain
-  after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
+  after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil? || api_id.nil?'
   after_save :asyn_desnormalize_preferences
   
   # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
@@ -97,7 +97,7 @@ class Member < ActiveRecord::Base
       where('last_sync_error_at IS NULL')
     end
   }
-  scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date = ?', value) unless value.blank? }
+  scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
   scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value) unless value.blank? }
   scope :with_phone_area_code, lambda { |value| where('phone_area_code like ?', value) unless value.blank? }
   scope :with_phone_local_number, lambda { |value| where('phone_local_number like ?', value) unless value.blank? }
@@ -445,15 +445,10 @@ class Member < ActiveRecord::Base
     enrollment_info.update_enrollment_info_by_hash member_params
 
     begin
+      self.credit_cards << credit_card
+      self.enrollment_infos << enrollment_info
       self.save!
 
-      enrollment_info.member_id = self.id
-      enrollment_info.save
-
-      if credit_card.member.nil?
-        credit_card.member = self
-        credit_card.save
-      end
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
         # is completed succesfully
@@ -594,7 +589,7 @@ class Member < ActiveRecord::Base
       self.save(:validate => false)
       message = "Blacklisted member and all its credit cards. Reason: #{reason}."
       Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
-      self.cancel! Date.today, "Automatic cancellation"
+      self.cancel! Time.zone.now, "Automatic cancellation"
       self.credit_cards.each { |cc| cc.blacklist }
       { :message => message, :success => true }
     end
