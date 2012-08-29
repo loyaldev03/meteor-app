@@ -14,6 +14,10 @@ class FulfillmentsController < ApplicationController
                      :disposition => "attachment; filename=miworkingfile2.csv"
       end  
     end
+    respond_to do |format|
+      format.html 
+      format.js 
+    end
   end
 
   def resend

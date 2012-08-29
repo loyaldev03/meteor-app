@@ -20,14 +20,12 @@
     			<td> <%= fulfillment.product_sku %> </td>
     			<td> <%= fulfillment.tracking_code %> </td>
     			<td> <%= fulfillment.status %> </td>
-          <td NOWRAP>
+          <td NOWRAP id="td_<%= fulfillment.member.id %>"> 
       			<% if fulfillment.processing? %>
               <% unless fulfillment.member.wrong_address %>
                 <%= link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id, :class=> "btn btn-small" %>
-                -----
-            		<%= select_tag "reason", options_for_select([Settings.wrong_address.undeliverable_all, Settings.wrong_address.undeliverable_sloop, Settings.wrong_address.undeliverable_kit_card]), :id => "reason_#{fulfillment.id}" %>
-          			<%= link_to 'Mark as wrong address','#', :id => "mark_as_wrong_address", 
-            	    :name => fulfillment.id, :class=> "btn btn-small" %>
+              <%= link_to 'Set as wrong address','#', :id => "set_as_wrong_address", 
+                  :name => fulfillment.member.visible_id, :class=> "btn btn-small", :remote => true %>
             	<% else %>
             		<%= t('activerecord.attributes.member.undeliverable') %>
             	<% end %>
