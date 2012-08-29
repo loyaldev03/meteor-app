@@ -7,7 +7,6 @@ class Transaction < ActiveRecord::Base
   belongs_to :credit_card
   # This value will be not nil only if we are billing 
   belongs_to :terms_of_membership 
-  belongs_to :enrollment_info
   has_many :operations, :as => :resource
 
   serialize :response, JSON
@@ -37,6 +36,7 @@ class Transaction < ActiveRecord::Base
     self.state = member.state
     self.country = member.country
     self.zip = member.zip
+    self.cohort = member.cohort
     self.terms_of_membership_id = member.terms_of_membership_id
   end
 
@@ -67,12 +67,6 @@ class Transaction < ActiveRecord::Base
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
     self.join_date = member.join_date
-    self.save
-  end
-
-  def update_enrollment_info_and_cohort(enrollment_info_id, cohort = nil)
-    self.enrollment_info_id = enrollment_info_id
-    self.cohort = cohort || [ self.member.join_date.year.to_s, self.member.join_date.month.to_s, self.enrollment_info.mega_channel.to_s, self.enrollment_info.campaign_medium.to_s ].join('-')
     self.save
   end
 
@@ -138,7 +132,7 @@ class Transaction < ActiveRecord::Base
       return { :message => "Cant credit more $ than the original transaction amount", :code => Settings.error_codes.refund_invalid }
     end
     trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
-    trans.update_enrollment_info_and_cohort(sale_transaction.enrollment_info_id, sale_transaction.cohort)
+    trans.cohort = sale_transaction.cohort
     answer = trans.process
     if trans.success?
       sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
@@ -161,7 +155,7 @@ class Transaction < ActiveRecord::Base
     trans.refund_response_transaction_id = sale_transaction.response_transaction_id
     trans.prepare(sale_transaction.member, sale_transaction.credit_card, args[:transaction_amount], 
                   sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
-    trans.update_enrollment_info_and_cohort(sale_transaction.enrollment_info_id, sale_transaction.cohort)
+    trans.cohort = sale_transaction.cohort
     trans.response_auth_code=args[:auth_code]
     trans.response_result=args[:reason]
     trans.response_code=args[:reason_code]

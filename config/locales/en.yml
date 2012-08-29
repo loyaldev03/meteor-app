@@ -100,6 +100,7 @@ en:
       domain:
         url_help: 'Formats: http://xxxxx.xxx.xx or https://xxxxx.xxx.xx'
       member:
+        cohort: Cohort
         api_id: 'Remote ID'
         member_id: 'Member ID'
         full_name: 'Full name'

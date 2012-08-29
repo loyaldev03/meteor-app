@@ -42,6 +42,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     20.times{ FactoryGirl.create(:active_member, 
       :club_id => @club.id, 

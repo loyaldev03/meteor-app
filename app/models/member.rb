@@ -13,7 +13,7 @@ class Member < ActiveRecord::Base
   has_many :communications
   has_many :fulfillments
   has_many :club_cash_transactions
-  has_many :enrollment_infos
+  has_many :enrollment_infos, :order => "created_at DESC"
   has_many :member_preferences
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
@@ -336,7 +336,6 @@ class Member < ActiveRecord::Base
           trans = Transaction.new
           trans.transaction_type = "sale"
           trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
-          trans.update_enrollment_info_and_cohort(self.enrollment_infos.current.first.id)
           answer = trans.process
           if trans.success?
             # club_cash_expire_date will be nil if we did not set club cash on enrollment because of a PTX.
@@ -418,6 +417,13 @@ class Member < ActiveRecord::Base
     member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
   end
 
+  def self.cohort_formula(join_date, enrollment_info, time_zone)
+    [ join_date.in_time_zone(time_zone).year.to_s, 
+      "%02d" % join_date.in_time_zone(time_zone).month.to_s, 
+      enrollment_info.mega_channel.to_s, 
+      enrollment_info.campaign_medium.to_s ].join('-')
+  end
+
   def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, member_params = nil)
     amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
     if recovery_check and not self.new_record? and not self.can_recover?
@@ -430,6 +436,9 @@ class Member < ActiveRecord::Base
       return { :message => "Member data is invalid: \n#{error_to_s}", :code => Settings.error_codes.member_data_invalid }
     end
         
+    enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => self.terms_of_membership_id
+    enrollment_info.update_enrollment_info_by_hash member_params
+
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
@@ -441,9 +450,6 @@ class Member < ActiveRecord::Base
       end
     end
     
-    enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => self.terms_of_membership_id
-    enrollment_info.update_enrollment_info_by_hash member_params
-
     begin
       self.credit_cards << credit_card
       self.enrollment_infos << enrollment_info
@@ -459,7 +465,6 @@ class Member < ActiveRecord::Base
       end
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount)
-      trans.update_enrollment_info_and_cohort(self.enrollment_infos.current.first.id) if amount.to_f != 0.0
       assign_club_cash! if trans
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
       
@@ -676,6 +681,9 @@ class Member < ActiveRecord::Base
         self.set_as_provisional! # set join_date
       end
 
+      self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, self.club.time_zone)
+      trans.update_attribute(:cohort, self.cohort) unless trans.nil?
+
       message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
       Auditory.audit(agent, 
         (trans.nil? ? terms_of_membership : trans), 
@@ -684,7 +692,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      self.enrollment_infos.current.first.product_sku ? self.enrollment_infos.current.first.product_sku.split(',') : []
+      self.enrollment_infos.first.product_sku ? self.enrollment_infos.first.product_sku.split(',') : []
     end
 
     def record_date

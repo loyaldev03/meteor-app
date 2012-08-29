@@ -311,6 +311,7 @@ CREATE TABLE `members` (
   `phone_local_number` int(11) DEFAULT NULL,
   `last_sync_error_at` datetime DEFAULT NULL,
   `autologin_url` text COLLATE utf8_unicode_ci,
+  `cohort` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`club_id`,`visible_id`),
   UNIQUE KEY `index_members_on_uuid` (`uuid`),
   KEY `index_members_on_email` (`email`),
@@ -482,7 +483,6 @@ CREATE TABLE `transactions` (
   `updated_at` datetime NOT NULL,
   `credit_card_id` bigint(20) DEFAULT NULL,
   `refunded_amount` float DEFAULT '0',
-  `enrollment_info_id` int(11) DEFAULT NULL,
   `join_date` datetime DEFAULT NULL,
   `cohort` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `country` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -666,3 +666,5 @@ INSERT INTO schema_migrations (version) VALUES ('20120824153347');
 INSERT INTO schema_migrations (version) VALUES ('20120824192612');
 
 INSERT INTO schema_migrations (version) VALUES ('20120828185516');
+
+INSERT INTO schema_migrations (version) VALUES ('20120829131605');
