@@ -10,6 +10,13 @@ data = 'batch@xagax.com'
 u = Agent.new :email => data, :username => data, :password => data, :password_confirmation => data
 u.save!
 
+data = 'platform@xagax.com'
+admin = Agent.new :email => data, 
+  :roles    => ['admin'],
+  :username => 'admin', 
+  :password => 'xagax2012', 
+  :password_confirmation => 'xagax2012'
+admin.save!
 
 data = 'test@test.com.ar'
 u = Agent.new :email => data, :username => data, :password => data, :password_confirmation => data, :roles => ['admin']
@@ -17,13 +24,13 @@ u.save!
 
 p = Partner.new :prefix => 'NFL', :name => 'NFL'
 p.save!
-p2 = Partner.new :prefix => 'AO', :name => 'American Outdoorsman', :contact_uri => '/south01/contracts/aoac', :website_url => 'http://aohq.com'
+p2 = Partner.new :prefix => 'AO', :name => 'American Outdoorsman', :contract_uri => '/south01/contracts/aoac', :website_url => 'http://aohq.com'
 p2.save!
-p3 = Partner.new :prefix => 'TC', :name => 'Tennis', :contact_uri => '/tennis', :website_url => 'http://www.tennischanneladvantage.com/'
+p3 = Partner.new :prefix => 'TC', :name => 'Tennis', :contract_uri => '/tennis', :website_url => 'http://www.tennischanneladvantage.com/'
 p3.save!
-p4 = Partner.new :prefix => 'ONMC', :name => 'ONMC-Import', :contact_uri => '', :website_url => '', :description => 'Partner to test imports from ONMC.'
+p4 = Partner.new :prefix => 'ONMC', :name => 'ONMC-Import', :contract_uri => '', :website_url => '', :description => 'Partner to test imports from ONMC.'
 p4.save!
-p5 = Partner.new :prefix => 'pri', :name => 'TEST', :contact_uri => 'www.test.com', :website_url => 'www.test.com', :description => 'Partner to test imports from ONMC.'
+p5 = Partner.new :prefix => 'pri', :name => 'TEST', :contract_uri => 'www.test.com', :website_url => 'www.test.com', :description => 'Partner to test imports from ONMC.'
 p5.save!
 
 
