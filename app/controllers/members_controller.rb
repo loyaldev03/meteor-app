@@ -162,10 +162,10 @@ class MembersController < ApplicationController
           flash[:notice] = message
           redirect_to show_member_path
         rescue Exception => e
-          flash[:error] = "Could not set the NBD on this member. #{e}"
+          flash.now[:error] = "Could not set the NBD on this member. #{e}"
         end
       else
-        flash[:error] = "Next bill date should be older that actual date."
+        flash.now[:error] = "Next bill date should be older that actual date."
       end
     end
   end
@@ -174,9 +174,9 @@ class MembersController < ApplicationController
     if request.post?
       answer = @current_member.set_wrong_address(@current_agent, params[:reason])
       if answer[:code] == "000"
-        flash[:notice] = answer[:message]
+        flash.now[:notice] = answer[:message]
       else
-        flash[:error] = answer[:message]
+        flash.now[:error] = answer[:message]
       end
       respond_to do |format|
         format.html { redirect_to show_member_path }
@@ -194,7 +194,7 @@ class MembersController < ApplicationController
         Auditory.audit(@current_agent,@current_member,message,@current_member)
         redirect_to show_member_path
       else
-        flash[:error] = "Could not set the NBD on this member"
+        flash.now[:error] = "Could not set the NBD on this member"
       end
     end
   end
@@ -220,7 +220,7 @@ class MembersController < ApplicationController
         flash[:notice] = message
         redirect_to show_member_path
       else
-        flash[:error] = "Could not saved club cash transactions: #{cct.error_to_s}"
+        flash.now[:error] = "Could not saved club cash transactions: #{cct.error_to_s}"
       end
     end
   end
