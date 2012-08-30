@@ -2,6 +2,8 @@
 class Member < ActiveRecord::Base
   include Extensions::UUID
 
+  has_paper_trail :only => [:join_date, :cancel_date, :status]
+
   belongs_to :terms_of_membership
   belongs_to :club
   belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
@@ -124,7 +126,7 @@ class Member < ActiveRecord::Base
     after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :nillify_club_cash]
     after_transition :provisional => :active, :do => :send_active_email
     after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
-    after_transition :lapsed => :applied, :do => :send_recover_needs_approval_email
+    after_transition :lapsed => :applied, :do => [ :set_join_date, :send_recover_needs_approval_email ]
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
 
     event :set_as_provisional do
@@ -188,6 +190,7 @@ class Member < ActiveRecord::Base
   # Sets join date. It is called when members status is changed from 'none' to 'applied'
   def set_join_date
     self.join_date = Time.zone.now
+    self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, self.club.time_zone, self.terms_of_membership.installment_type)
     self.save
   end
 
@@ -201,6 +204,7 @@ class Member < ActiveRecord::Base
       self.quota = (terms_of_membership.monthly? ? 1 :  0)
     end
     self.join_date = Time.zone.now
+    self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, self.club.time_zone, self.terms_of_membership.installment_type)
     self.cancel_date = nil
     self.save
   end
@@ -289,7 +293,7 @@ class Member < ActiveRecord::Base
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
         self.terms_of_membership_id = new_tom_id
-        res = enroll(self.active_credit_card, 0.0, agent, false)
+        res = enroll(self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
         if res[:code] == Settings.error_codes.success
           message = "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}"
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), message, self, Settings.operation_types.save_the_sale)
@@ -473,7 +477,7 @@ class Member < ActiveRecord::Base
       Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       message = "Could not save member. #{e}"
-      Auditory.audit(agent, self, message, nil, Settings.operation_types.enrollment_billing)
+      Auditory.audit(agent, self, message, nil, Settings.operation_types.error_on_enrollment_billing)
       { :message => message, :code => Settings.error_codes.member_not_saved }
     end
   end
@@ -682,7 +686,7 @@ class Member < ActiveRecord::Base
         self.set_as_provisional! # set join_date
       end
 
-      self.cohort = Member.cohort_formula(self.join_date, info, self.club.time_zone, self.terms_of_membership.installment_type)
+      # cohort is set on status change
       info.update_attribute(:cohort, self.cohort)
       trans.update_attribute(:cohort, self.cohort) unless trans.nil?
 
@@ -736,6 +740,7 @@ class Member < ActiveRecord::Base
                   trans.response_code, type, trans.credit_card_type) || 
                 DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
                   trans.response_code, type, "all")
+      cancel_member = false
 
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
@@ -748,13 +753,12 @@ class Member < ActiveRecord::Base
                 "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.")
         end
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
-        set_as_canceled = true if self.recycled_times >= Settings.number_of_retries_on_missing_decline
+        cancel_member = true if self.recycled_times >= Settings.number_of_retries_on_missing_decline
       else
-        set_as_canceled = false
         trans.update_attribute :decline_strategy_id, decline.id
         if decline.hard_decline?
           message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-          set_as_canceled = true
+          cancel_member = true
         else
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           if trans.response_code == Settings.error_codes.credit_card_blank_with_grace
@@ -764,11 +768,11 @@ class Member < ActiveRecord::Base
           end
           if self.recycled_times > (decline.limit-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-            set_as_canceled = true
+            cancel_member = true
           end
         end
       end
-      if set_as_canceled
+      if cancel_member
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_hard_decline)
         set_as_canceled!
       else

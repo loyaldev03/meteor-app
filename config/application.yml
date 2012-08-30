@@ -25,6 +25,7 @@ defaults: &defaults
     credit_error: 108
     membership_billing_without_pgc: 109
     chargeback: 110
+    error_on_enrollment_billing: 111
     cancel: 200
     future_cancel: 201
     save_the_sale: 202

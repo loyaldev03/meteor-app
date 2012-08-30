@@ -13,7 +13,7 @@ gem "paperclip", "~> 3.0"
 gem 'attr_encrypted'
 
 gem 'acts_as_list'
-
+gem 'paper_trail', '~> 2'
 gem 'delayed_job_active_record'
 
 # Gems used only for assets and not required
