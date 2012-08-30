@@ -20,7 +20,7 @@ class CreditCardsController < ApplicationController
         return
       end
     end
-    flash[:error] = "Credit card is invalid or is expired!"
+    flash.now[:error] = "Credit card is invalid or is expired!"
     render "new"
   end
 
