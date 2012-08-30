@@ -2,6 +2,8 @@
 class Member < ActiveRecord::Base
   include Extensions::UUID
 
+  has_paper_trail :only => [:join_date, :cancel_date]
+
   belongs_to :terms_of_membership
   belongs_to :club
   belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
@@ -473,7 +475,7 @@ class Member < ActiveRecord::Base
       Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       message = "Could not save member. #{e}"
-      Auditory.audit(agent, self, message, nil, Settings.operation_types.enrollment_billing)
+      Auditory.audit(agent, self, message, nil, Settings.operation_types.error_on_enrollment_billing)
       { :message => message, :code => Settings.error_codes.member_not_saved }
     end
   end
@@ -736,6 +738,7 @@ class Member < ActiveRecord::Base
                   trans.response_code, type, trans.credit_card_type) || 
                 DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
                   trans.response_code, type, "all")
+      cancel_member = false
 
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
@@ -748,13 +751,12 @@ class Member < ActiveRecord::Base
                 "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.")
         end
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
-        set_as_canceled = true if self.recycled_times >= Settings.number_of_retries_on_missing_decline
+        cancel_member = true if self.recycled_times >= Settings.number_of_retries_on_missing_decline
       else
-        set_as_canceled = false
         trans.update_attribute :decline_strategy_id, decline.id
         if decline.hard_decline?
           message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-          set_as_canceled = true
+          cancel_member = true
         else
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           if trans.response_code == Settings.error_codes.credit_card_blank_with_grace
@@ -764,11 +766,11 @@ class Member < ActiveRecord::Base
           end
           if self.recycled_times > (decline.limit-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-            set_as_canceled = true
+            cancel_member = true
           end
         end
       end
-      if set_as_canceled
+      if cancel_member
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_hard_decline)
         set_as_canceled!
       else
