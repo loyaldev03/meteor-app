@@ -11,6 +11,7 @@ class Auditory
         :resource => object, :description => description, :operation_type => operation_type
       o.created_by_id = (current_agent.nil? ? nil : current_agent.id)
       o.member = member
+      o.cohort = member.cohort unless member.nil?
       o.save!
     rescue Exception => e
       Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
