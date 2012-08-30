@@ -13,15 +13,15 @@ class Fulfillment < ActiveRecord::Base
 
   before_create :set_default_values
 
-  scope :undeliverable, lambda { where("status = 'undeliverable'") }
-  scope :processing, lambda { where("status = 'processing'") }
-  scope :not_processed, lambda { where("status = 'not_processed'") }
-  scope :cancellable, lambda { where("status IN ('not_processed','processing','out_of_stock', 'undeliverable')") }
+  scope :where_undeliverable, lambda { where("status = 'undeliverable'") }
+  scope :where_processing, lambda { where("status = 'processing'") }
+  scope :where_not_processed, lambda { where("status = 'not_processed'") }
+  scope :where_cancellable, lambda { where("status IN ('not_processed','processing','out_of_stock', 'undeliverable')") }
 
   delegate :club, :to => :member
 
   state_machine :status, :initial => :not_processed do
-    after_transition :all => :not_processed, :do => :decrease_stock
+    after_transition all => :not_processed, :do => :decrease_stock
 
     event :set_as_not_processed do
       transition [:sent, :out_of_stock, :undeliverable, :not_processed] => :not_processed
@@ -79,10 +79,6 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def validate_stock!
-    raise "out of stock" unless validate_stock
-  end
-
   def validate_stock
     if product.nil? or not product.has_stock?
       set_as_out_of_stock
@@ -131,7 +127,7 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def product
-    @product ||= Product.find_by_sku_and_club_id(product_sku, member.club_id)
+    @product ||= Product.find_by_sku_and_club_id(self.product_sku, self.member.club_id)
   end
 
   private

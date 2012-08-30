@@ -485,7 +485,7 @@ class Member < ActiveRecord::Base
   def send_fulfillment
     # we always send fulfillment to new members or members that do not have 
     # opened fulfillments (meaning that previous fulfillments expired).
-    if self.fulfillments.find_by_status('not_processed').nil?
+    if self.fulfillments.where_not_processed.nil?
       fulfillments = fulfillments_products_to_send
       fulfillments.each do |product|
         f = Fulfillment.new :product_sku => product
@@ -644,7 +644,7 @@ class Member < ActiveRecord::Base
   def set_wrong_address(agent, reason)
     if self.wrong_address.nil?
       if self.update_attribute(:wrong_address, reason)
-        self.fulfillments.processing.each { |s| s.set_as_undeliverable }
+        self.fulfillments.where_processing.each { |s| s.set_as_undeliverable }
         message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
         Auditory.audit(agent,self,message,self)
         { :message => message, :code => Settings.error_codes.success }
@@ -783,8 +783,8 @@ class Member < ActiveRecord::Base
     end
 
     def wrong_address_logic
-      if self.changed.include?(:wrong_address) and self.wrong_address.nil?
-        self.fulfillments.undeliverable.each { |s| s.set_as_not_processed }
+      if self.changed.include?('wrong_address') and self.wrong_address.nil?
+        self.fulfillments.where_undeliverable.each { |s| s.set_as_not_processed }
       end
     end
 

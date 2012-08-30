@@ -384,8 +384,8 @@ $(document).ready( function() {
         url: "fulfillments/"+button.attr("name")+"/resend",
         success: function(data) {
           if (data.code == "000"){
-            button.hide();
-            alert(data.message);
+            button.parent().children().hide();
+            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>")
           }else{
             button.removeAttr('disabled');
             alert(data.message);
@@ -403,8 +403,8 @@ $(document).ready( function() {
         url: "fulfillments/"+button.attr("name")+"/mark_as_sent",
         success: function(data) {
           if (data.code == "000"){
-            button.hide();
-            button.parent().append("<p>"+data.message+"</p>");   
+            button.parent().children().hide();
+            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>")
           }else{
             button.removeAttr('disabled');
             alert(data.message);
@@ -431,8 +431,7 @@ $(document).ready( function() {
         success: function(data) {
           if (data.code == "000"){
             $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().children().hide();
-            this_form.hide();
-            this_form.parent().append("<p>"+data.message+"</p>");
+            $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().append("<div class='alert-info alert'>"+data.message+"</div>")
           }else{
             alert(data.message);
           };

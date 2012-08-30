@@ -9,7 +9,7 @@
 
   <table class="table table-bordered table-condensed">
   	<thead>
-  	  <th> <%= t('activerecord.attributes.fulfillment.id') %> </th>
+  	  <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
       <th> <%= t('activerecord.attributes.fulfillment.member') %> </th>
       <th> <%= t('activerecord.attributes.fulfillment.assigned_at') %> </th>
       <th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>   
@@ -21,7 +21,7 @@
   	<tbody>
   		<% @fulfillments.each do |fulfillment| %>
     		<tr>
-    			<td> <%= fulfillment.id %> </td>
+    			<td> <%= fulfillment.member.visible_id %> </td>
           <td> <%= fulfillment.member.full_name %> </td>
           <td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
           <td> <%= I18n.l fulfillment.renewable_at, :format => :long unless fulfillment.renewable_at.nil? %> </td>
@@ -42,7 +42,7 @@
                 <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.visible_id) %>
            	  <% else %>
                   <% unless fulfillment.product.nil? %>
-                    Actual stock: <%= fulfillment.product.stock %>.
+                    <p style = 'float:left;'> Actual stock: <%= fulfillment.product.stock %>. </p> &nbsp
                     <% if fulfillment.product.stock > 0 %>
                       <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small" %>
                     <% end %>
