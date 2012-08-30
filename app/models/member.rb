@@ -492,7 +492,6 @@ class Member < ActiveRecord::Base
     if self.fulfillments.where_not_processed == []
       fulfillments = fulfillments_products_to_send
       fulfillments.each do |product|
-        puts 'hello'
         f = Fulfillment.new :product_sku => product
         f.member_id = self.uuid
         f.recurrent = Product.find_by_sku_and_club_id(product,self.club_id).recurrent rescue false
