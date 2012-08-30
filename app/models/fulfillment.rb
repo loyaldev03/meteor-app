@@ -95,12 +95,14 @@ class Fulfillment < ActiveRecord::Base
 
   def resend(agent)
     set_as_not_processed!
+    self.assigned_at = Time.zone.now
+    self.save
     message = "Fulfillment #{self.product_sku} was marked to be delivered next time."
     Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_resend)
     { :message => message, :code => Settings.error_codes.success }
   rescue 
-    # TODO: add operation, replate fulfillment_error for fulfillment_out_of_stock
-    { :message => "Product does not have stock.", :code => Settings.error_codes.fulfillment_error }
+    Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_out_of_stock )
+    { :message => "Product does not have stock.", :code => Settings.error_codes.fulfillment_out_of_stock }
   end
 
   def mark_as_sent(agent)

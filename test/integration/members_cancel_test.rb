@@ -49,10 +49,10 @@ class MembersCancelTest < ActionController::IntegrationTest
     confirm_ok_js
     click_on 'Cancel member'
 
-    m = @saved_member.reload
+    @saved_member.reload
 
     within("#td_mi_cancel_date") do
-      assert page.has_content?(I18n.l(m.cancel_date, :format => :only_date))
+      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
     end
     
     within("#operations_table") do
@@ -61,10 +61,10 @@ class MembersCancelTest < ActionController::IntegrationTest
       }
     end
 
-    m = @saved_member.reload
-    m.set_as_canceled!
+    @saved_member.reload
+    @saved_member.set_as_canceled!
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => m.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     
     within("#table_membership_information") do
       assert page.has_content?("lapsed")

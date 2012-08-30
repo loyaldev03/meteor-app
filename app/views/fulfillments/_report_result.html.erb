@@ -1,7 +1,7 @@
 <% if @fulfillments %>
   
   <% if @status == 'processing' %>
-    <%= form_tag("/partner/NFL/club/Fans/fulfillments/generate_csv " ) do %>
+    <%= form_tag(generate_csv_fulfillments_path) do %>
       <%= hidden_field :status, nil ,:value => 'processing' %>
       <%= submit_tag t('buttons.generate_csv'), :class => 'btn btn-primary' %> 
     <% end %>
@@ -37,9 +37,18 @@
             	<% else %>
             		<%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.visible_id) %>
             	<% end %>
-      			<% elsif fulfillment.out_of_stock? %>
-              Actual stock: <%= fulfillment.product.stock unless fulfillment.product.nil? %>. <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small" %>
-           	<% end %>
+      			<% elsif fulfillment.out_of_stock? or fulfillment.undeliverable? %>
+              <% if fulfillment.member.wrong_address %>
+                <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.visible_id) %>
+           	  <% else %>
+                  <% unless fulfillment.product.nil? %>
+                    Actual stock: <%= fulfillment.product.stock %>.
+                    <% if fulfillment.product.stock > 0 %>
+                      <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small" %>
+                    <% end %>
+                  <% end %>
+              <% end %>
+            <% end %>
           </td>
     		</tr>
   		<% end %>

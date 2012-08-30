@@ -140,9 +140,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     
   end
   
-  ############################################################
+  ###########################################################
   # TESTS
-  ############################################################
+  ###########################################################
 
 
   test "search members by next bill date" do
@@ -569,7 +569,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   end
 
 
-
   def validate_timezone_dates(timezone)
     @club.time_zone = timezone
     @club.save
@@ -587,5 +586,82 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     validate_timezone_dates("Eastern Time (US & Canada)")
     validate_timezone_dates("Ekaterinburg")
   end
+
+
+
+  test "edit a note at operations tab" do
+    setup_member
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    
+    click_link_or_button 'Set undeliverable'
+    confirm_ok_js
+    click_link_or_button 'Set wrong address'
+    
+    
+    within("#operations_table") {
+      wait_until {
+        assert page.has_content?("undeliverable")
+        find('.icon-zoom-in').click
+      }
+    }
+    
+    text_note = "text note 123456789"
+
+    fill_in "operation_notes", :with => text_note
+    
+    assert_difference ['Operation.count'] do 
+      click_on 'Save operation'
+    end
+    
+    assert page.has_content?("Edited operation note")
+    click_on 'Return to member show'
+
+    within("#operations_table") {
+      wait_until {
+        assert page.has_content?("Edited operation note")
+        assert page.has_content?(text_note) 
+      }
+    }
+    
+
+  end
+
+  test "edit a note and click on link" do
+    setup_member
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    
+    click_link_or_button 'Set undeliverable'
+    confirm_ok_js
+    click_link_or_button 'Set wrong address'
+    
+    
+    within("#operations_table") {
+      wait_until {
+        assert page.has_content?("undeliverable")
+        find('.icon-zoom-in').click
+      }
+    }
+    
+    text_note = "text note 123456789"
+
+    fill_in "operation_notes", :with => text_note
+    
+    assert_difference ['Operation.count'] do 
+      click_on 'Save operation'
+    end
+    
+    assert page.has_content?("Edited operation note")
+    within(".alert") {
+      within("p") {
+        find("a").click    
+      }
+    }
+    
+    assert find_field("operation_notes").value == text_note
+  
+  end
+
 
 end
