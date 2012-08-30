@@ -2,7 +2,7 @@
 class Member < ActiveRecord::Base
   include Extensions::UUID
 
-  has_paper_trail :only => [:join_date, :cancel_date]
+  has_paper_trail :only => [:join_date, :cancel_date, :status]
 
   belongs_to :terms_of_membership
   belongs_to :club
@@ -126,7 +126,7 @@ class Member < ActiveRecord::Base
     after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :nillify_club_cash]
     after_transition :provisional => :active, :do => :send_active_email
     after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
-    after_transition :lapsed => :applied, :do => :send_recover_needs_approval_email
+    after_transition :lapsed => :applied, :do => [ :set_join_date, :send_recover_needs_approval_email ]
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
 
     event :set_as_provisional do
@@ -190,6 +190,7 @@ class Member < ActiveRecord::Base
   # Sets join date. It is called when members status is changed from 'none' to 'applied'
   def set_join_date
     self.join_date = Time.zone.now
+    self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, self.club.time_zone, self.terms_of_membership.installment_type)
     self.save
   end
 
@@ -203,6 +204,7 @@ class Member < ActiveRecord::Base
       self.quota = (terms_of_membership.monthly? ? 1 :  0)
     end
     self.join_date = Time.zone.now
+    self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, self.club.time_zone, self.terms_of_membership.installment_type)
     self.cancel_date = nil
     self.save
   end
@@ -291,7 +293,7 @@ class Member < ActiveRecord::Base
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
         self.terms_of_membership_id = new_tom_id
-        res = enroll(self.active_credit_card, 0.0, agent, false)
+        res = enroll(self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
         if res[:code] == Settings.error_codes.success
           message = "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}"
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), message, self, Settings.operation_types.save_the_sale)
@@ -684,7 +686,7 @@ class Member < ActiveRecord::Base
         self.set_as_provisional! # set join_date
       end
 
-      self.cohort = Member.cohort_formula(self.join_date, info, self.club.time_zone, self.terms_of_membership.installment_type)
+      # cohort is set on status change
       info.update_attribute(:cohort, self.cohort)
       trans.update_attribute(:cohort, self.cohort) unless trans.nil?
 
