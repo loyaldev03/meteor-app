@@ -417,11 +417,12 @@ class Member < ActiveRecord::Base
     member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
   end
 
-  def self.cohort_formula(join_date, enrollment_info, time_zone)
+  def self.cohort_formula(join_date, enrollment_info, time_zone, installment_type)
     [ join_date.in_time_zone(time_zone).year.to_s, 
       "%02d" % join_date.in_time_zone(time_zone).month.to_s, 
       enrollment_info.mega_channel.to_s, 
-      enrollment_info.campaign_medium.to_s ].join('-')
+      enrollment_info.campaign_medium.to_s,
+      installment_type ].join('-').downcase
   end
 
   def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, member_params = nil)
@@ -681,7 +682,7 @@ class Member < ActiveRecord::Base
         self.set_as_provisional! # set join_date
       end
 
-      self.cohort = Member.cohort_formula(self.join_date, info, self.club.time_zone)
+      self.cohort = Member.cohort_formula(self.join_date, info, self.club.time_zone, self.terms_of_membership.installment_type)
       info.update_attribute(:cohort, self.cohort)
       trans.update_attribute(:cohort, self.cohort) unless trans.nil?
 
