@@ -489,9 +489,10 @@ class Member < ActiveRecord::Base
   def send_fulfillment
     # we always send fulfillment to new members or members that do not have 
     # opened fulfillments (meaning that previous fulfillments expired).
-    if self.fulfillments.where_not_processed.nil?
+    if self.fulfillments.where_not_processed == []
       fulfillments = fulfillments_products_to_send
       fulfillments.each do |product|
+        puts 'hello'
         f = Fulfillment.new :product_sku => product
         f.member_id = self.uuid
         f.recurrent = Product.find_by_sku_and_club_id(product,self.club_id).recurrent rescue false
