@@ -54,6 +54,7 @@ en:
     save_operation_note: 'Save operation'
     save_credit_card: 'Save credit card'
     report: 'Report'
+    generate_csv: 'Generate csv'
   admin:
     agents:
       index:
@@ -99,6 +100,7 @@ en:
       domain:
         url_help: 'Formats: http://xxxxx.xxx.xx or https://xxxxx.xxx.xx'
       member:
+        cohort: Cohort
         api_id: 'Remote ID'
         member_id: 'Member ID'
         full_name: 'Full name'

@@ -14,6 +14,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
     FactoryGirl.create(:batch_agent)
@@ -38,6 +39,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     click_on 'Cancel'
 
     date_time = Time.zone.now + 1.days
+
     page.execute_script("window.jQuery('#cancel_date').next().click()")
     within("#ui-datepicker-div") do
       click_on("#{date_time.day}")

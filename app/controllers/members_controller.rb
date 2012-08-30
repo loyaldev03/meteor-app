@@ -47,7 +47,7 @@ class MembersController < ApplicationController
     @active_credit_card = @current_member.active_credit_card
     @fulfillments = @current_member.fulfillments.all
     @communications = @current_member.communications.all
-    @enrollment_info = EnrollmentInfo.find_by_member_id(@current_member, :order => "created_at DESC")
+    @enrollment_info = @current_member.enrollment_infos.first
   end
 
   def new
@@ -173,12 +173,15 @@ class MembersController < ApplicationController
   def set_undeliverable 
     if request.post?
       answer = @current_member.set_wrong_address(@current_agent, params[:reason])
-      if answer[:success]
+      if answer[:code] == "000"
         flash[:notice] = answer[:message]
       else
         flash[:error] = answer[:message]
       end
-      redirect_to show_member_path
+    end
+    respond_to do |format|
+      format.html 
+      format.json { render json: { :message => answer[:message], :code => answer[:code] }} 
     end
   end
 

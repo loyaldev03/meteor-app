@@ -1,4 +1,12 @@
 <% if @fulfillments %>
+  
+  <% if @status == 'processing' %>
+    <%= form_tag("/partner/NFL/club/Fans/fulfillments/generate_csv " ) do %>
+      <%= hidden_field :status, nil ,:value => 'processing' %>
+      <%= submit_tag t('buttons.generate_csv'), :class => 'btn btn-primary' %> 
+    <% end %>
+  <% end %>
+
   <table class="table table-bordered table-condensed">
   	<thead>
   	  <th> <%= t('activerecord.attributes.fulfillment.id') %> </th>
@@ -20,16 +28,14 @@
     			<td> <%= fulfillment.product_sku %> </td>
     			<td> <%= fulfillment.tracking_code %> </td>
     			<td> <%= fulfillment.status %> </td>
-          <td NOWRAP>
+          <td NOWRAP> 
       			<% if fulfillment.processing? %>
               <% unless fulfillment.member.wrong_address %>
                 <%= link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id, :class=> "btn btn-small" %>
-                -----
-            		<%= select_tag "reason", options_for_select([Settings.wrong_address.undeliverable_all, Settings.wrong_address.undeliverable_sloop, Settings.wrong_address.undeliverable_kit_card]), :id => "reason_#{fulfillment.id}" %>
-          			<%= link_to 'Mark as wrong address','#', :id => "mark_as_wrong_address", 
-            	    :name => fulfillment.id, :class=> "btn btn-small" %>
+              <%= link_to 'Set as wrong address','#', :id => "set_as_wrong_address", 
+                  :name => fulfillment.member.visible_id, :class=> "btn btn-small", :remote => true %>
             	<% else %>
-            		<%= t('activerecord.attributes.member.undeliverable') %>
+            		<%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.visible_id) %>
             	<% end %>
       			<% elsif fulfillment.out_of_stock? %>
               Actual stock: <%= fulfillment.product.stock unless fulfillment.product.nil? %>. <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small" %>

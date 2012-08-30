@@ -13,7 +13,7 @@ class Member < ActiveRecord::Base
   has_many :communications
   has_many :fulfillments
   has_many :club_cash_transactions
-  has_many :enrollment_infos
+  has_many :enrollment_infos, :order => "created_at DESC"
   has_many :member_preferences
 
   attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
@@ -32,7 +32,7 @@ class Member < ActiveRecord::Base
 
   after_create :after_create_sync_remote_domain
   after_update :after_update_sync_remote_domain
-  after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil?'
+  after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil? || api_id.nil?'
   after_save :asyn_desnormalize_preferences
   
   # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
@@ -97,7 +97,7 @@ class Member < ActiveRecord::Base
       where('last_sync_error_at IS NULL')
     end
   }
-  scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date = ?', value) unless value.blank? }
+  scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
   scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value) unless value.blank? }
   scope :with_phone_area_code, lambda { |value| where('phone_area_code like ?', value) unless value.blank? }
   scope :with_phone_local_number, lambda { |value| where('phone_local_number like ?', value) unless value.blank? }
@@ -336,7 +336,6 @@ class Member < ActiveRecord::Base
           trans = Transaction.new
           trans.transaction_type = "sale"
           trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
-          trans.update_enrollment_info_and_cohort(self.enrollment_infos.current.first.id)
           answer = trans.process
           if trans.success?
             # club_cash_expire_date will be nil if we did not set club cash on enrollment because of a PTX.
@@ -418,6 +417,13 @@ class Member < ActiveRecord::Base
     member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
   end
 
+  def self.cohort_formula(join_date, enrollment_info, time_zone)
+    [ join_date.in_time_zone(time_zone).year.to_s, 
+      "%02d" % join_date.in_time_zone(time_zone).month.to_s, 
+      enrollment_info.mega_channel.to_s, 
+      enrollment_info.campaign_medium.to_s ].join('-')
+  end
+
   def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, member_params = nil)
     amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
     if recovery_check and not self.new_record? and not self.can_recover?
@@ -430,6 +436,9 @@ class Member < ActiveRecord::Base
       return { :message => "Member data is invalid: \n#{error_to_s}", :code => Settings.error_codes.member_data_invalid }
     end
         
+    enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => self.terms_of_membership_id
+    enrollment_info.update_enrollment_info_by_hash member_params
+
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
@@ -441,19 +450,11 @@ class Member < ActiveRecord::Base
       end
     end
     
-    enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => self.terms_of_membership_id
-    enrollment_info.update_enrollment_info_by_hash member_params
-
     begin
+      self.credit_cards << credit_card
+      self.enrollment_infos << enrollment_info
       self.save!
 
-      enrollment_info.member_id = self.id
-      enrollment_info.save
-
-      if credit_card.member.nil?
-        credit_card.member = self
-        credit_card.save
-      end
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
         # is completed succesfully
@@ -463,11 +464,10 @@ class Member < ActiveRecord::Base
         credit_card.accepted_on_billing
       end
       self.reload
-      message = set_status_on_enrollment!(agent, trans, amount)
-      trans.update_enrollment_info_and_cohort(self.enrollment_infos.current.first.id) if amount.to_f != 0.0
+      message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
       assign_club_cash! if trans
+
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
-      
     rescue Exception => e
       Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e)
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
@@ -489,8 +489,9 @@ class Member < ActiveRecord::Base
       fulfillments.each do |product|
         f = Fulfillment.new :product_sku => product
         f.member_id = self.uuid
+        f.recurrent = Product.find_by_sku_and_club_id(product,self.club_id).recurrent rescue false
         f.save
-        f.validate_stock
+        f.set_as_not_processed!
       end
     end
   end
@@ -657,7 +658,7 @@ class Member < ActiveRecord::Base
   end
 
   private
-    def set_status_on_enrollment!(agent, trans, amount)
+    def set_status_on_enrollment!(agent, trans, amount, info)
       operation_type = Settings.operation_types.enrollment_billing
       description = 'enrolled'
 
@@ -680,6 +681,10 @@ class Member < ActiveRecord::Base
         self.set_as_provisional! # set join_date
       end
 
+      self.cohort = Member.cohort_formula(self.join_date, info, self.club.time_zone)
+      info.update_attribute(:cohort, self.cohort)
+      trans.update_attribute(:cohort, self.cohort) unless trans.nil?
+
       message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
       Auditory.audit(agent, 
         (trans.nil? ? terms_of_membership : trans), 
@@ -688,7 +693,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      self.enrollment_infos.current.first.product_sku ? self.enrollment_infos.current.first.product_sku.split(',') : []
+      self.enrollment_infos.first.product_sku ? self.enrollment_infos.first.product_sku.split(',') : []
     end
 
     def record_date

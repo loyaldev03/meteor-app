@@ -21,10 +21,10 @@ class Fulfillment < ActiveRecord::Base
   delegate :club, :to => :member
 
   state_machine :status, :initial => :not_processed do
-    after_transition :all => :processing, :do => :decrease_stock
+    after_transition :all => :not_processed, :do => :decrease_stock
 
     event :set_as_not_processed do
-      transition [:sent,:out_of_stock,:undeliverable] => :not_processed
+      transition [:sent, :out_of_stock, :undeliverable, :not_processed] => :not_processed
     end
     event :set_as_processing do
       transition :not_processed => :processing
@@ -88,12 +88,12 @@ class Fulfillment < ActiveRecord::Base
       set_as_out_of_stock
       false
     else
+      product.decrease_stock
       true
     end
   end
 
   def resend(agent)
-    validate_stock!
     set_as_not_processed!
     message = "Fulfillment #{self.product_sku} was marked to be delivered next time."
     Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_resend)
@@ -119,13 +119,11 @@ class Fulfillment < ActiveRecord::Base
       csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
       fulfillments.each do |fulfillment|
-        if fulfillment.validate_stock
-          member = fulfillment.member
-          fulfillment.set_as_processing
-          csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
-                  member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
-                  fulfillment.product.weight, 'MID']
-        end
+        fulfillment.set_as_processing unless fulfillment.processing?
+        member = fulfillment.member
+        csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
+                member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
+                fulfillment.product.weight, 'MID']
       end
     end
   end
@@ -136,7 +134,7 @@ class Fulfillment < ActiveRecord::Base
 
   private
     def decrease_stock
-      product.decrease_stock
+      validate_stock
     end
 
     def set_default_values

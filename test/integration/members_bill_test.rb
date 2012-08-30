@@ -15,6 +15,7 @@ class MembersBillTest < ActionController::IntegrationTest
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership_with_gateway.provisional_days = provisional_days unless provisional_days.nil?
     @communication_type = FactoryGirl.create(:communication_type)
@@ -37,8 +38,7 @@ class MembersBillTest < ActionController::IntegrationTest
   # UTILS
   ############################################################
   def validate_cohort(member, enrollment_info, transaction)
-    str = "#{member.join_date.year}-#{member.join_date.month}-#{enrollment_info.mega_channel}-#{enrollment_info.campaign_medium}"
-    assert transaction.cohort == str, "validate_cohort error"
+    assert_equal transaction.cohort , Member.cohort_formula(member.join_date, enrollment_info, member.club.time_zone), "validate_cohort error"
   end
 
   def bill_member(enrollment_info, member)

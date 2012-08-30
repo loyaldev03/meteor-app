@@ -111,7 +111,7 @@ CREATE TABLE `credit_cards` (
   `cc_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_credit_cards_on_member_id` (`member_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=269368 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=269369 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `decline_strategies` (
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -200,8 +200,9 @@ CREATE TABLE `enrollment_infos` (
   `prospect_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
+  `cohort` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `enumerations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -300,6 +301,7 @@ CREATE TABLE `members` (
   `phone_area_code` int(11) DEFAULT NULL,
   `phone_local_number` int(11) DEFAULT NULL,
   `autologin_url` text COLLATE utf8_unicode_ci,
+  `cohort` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`club_id`,`visible_id`),
   UNIQUE KEY `index_members_on_uuid` (`uuid`),
   KEY `index_members_on_email` (`email`),
@@ -320,7 +322,7 @@ CREATE TABLE `operations` (
   `operation_type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_operations_on_member_id` (`member_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18680 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18691 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `partners` (
   `prefix` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -471,8 +473,6 @@ CREATE TABLE `transactions` (
   `updated_at` datetime NOT NULL,
   `credit_card_id` bigint(20) DEFAULT NULL,
   `refunded_amount` float DEFAULT '0',
-  `enrollment_info_id` int(11) DEFAULT NULL,
-  `join_date` datetime DEFAULT NULL,
   `cohort` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `country` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   UNIQUE KEY `index_transactions_on_uuid` (`uuid`)
@@ -653,3 +653,9 @@ INSERT INTO schema_migrations (version) VALUES ('20120824153347');
 INSERT INTO schema_migrations (version) VALUES ('20120824192612');
 
 INSERT INTO schema_migrations (version) VALUES ('20120828185516');
+
+INSERT INTO schema_migrations (version) VALUES ('20120829131605');
+
+INSERT INTO schema_migrations (version) VALUES ('20120829172557');
+
+INSERT INTO schema_migrations (version) VALUES ('20120829195850');

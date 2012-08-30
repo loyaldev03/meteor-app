@@ -21,6 +21,7 @@ FactoryGirl.define do
     status "none"
     country "US"
     club_cash_amount 0
+    cohort "2012-08-super channel-xyz123456"
   end
 
   factory :member_with_api, class: Member do
@@ -38,6 +39,7 @@ FactoryGirl.define do
     status "none"
     country "US"
     club_cash_amount 0
+    cohort "2012-08-super channel-xyz123456"
 
     association :club, factory: :club_with_api
     terms_of_membership
@@ -62,6 +64,7 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
+    cohort "2012-08-super channel-xyz123456"
     gender "M"
     blacklisted false
     credit_cards {|ccs| [ccs.association(:credit_card)]}
@@ -86,6 +89,7 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
+    cohort "2012-08-super channel-xyz123456"
   end
 
   factory :lapsed_member, class: Member do
@@ -107,6 +111,7 @@ FactoryGirl.define do
     country "US"
     club_cash_amount 0
     blacklisted false
+    cohort "2012-08-super channel-xyz123456"
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
@@ -128,6 +133,7 @@ FactoryGirl.define do
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
+    cohort "2012-08-super channel-xyz123456"
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
@@ -146,6 +152,7 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
+    cohort "2012-08-super channel-xyz123456"
 
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
@@ -168,6 +175,7 @@ FactoryGirl.define do
     join_date { DateTime.now }
     country "US"
     club_cash_amount 0
+    cohort "2012-08-super channel-xyz123456"
 
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end

@@ -14,7 +14,7 @@ module Drupal
 
           @drupal_client = Faraday.new(
             url: self.api_domain.url, 
-            request: { open_timeout: 10, timeout: 10 }
+            request: { open_timeout: 20, timeout: 20 }
           ) do |builder|
             builder.request :json
             builder.request :drupal_auth,

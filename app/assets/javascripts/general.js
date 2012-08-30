@@ -404,7 +404,7 @@ $(document).ready( function() {
         success: function(data) {
           if (data.code == "000"){
             button.hide();
-            alert(data.message);
+            button.parent().append("<p>"+data.message+"</p>");   
           }else{
             button.removeAttr('disabled');
             alert(data.message);
@@ -413,24 +413,31 @@ $(document).ready( function() {
       });
     });
 
-    $('*#mark_as_wrong_address').click( function(event){
-      button = $(this)
-      button.attr('disabled', 'disabled');
+    $('*#set_as_wrong_address').click( function(event){
+      append = $(this).parent();
+      $.get(this.action, {member_prefix:$(this).attr("name")}, null, 'script'); 
+      return false;
+    });
+
+    $("#set_undeliverable").live("submit", function(event){
       event.preventDefault();
+      this_form = $(this);
       $.ajax({
-        type: 'PUT',
-        url: "fulfillments/"+button.attr("name")+"/mark_as_wrong_address",
-        data: { reason : $("#reason_"+button.attr("name")).val() },
+        type: 'POST',
+        url: "member/"+$(this).attr("name")+"/set_undeliverable",
+        data: $(this).serialize(),
+        dataType: 'json',
         success: function(data) {
           if (data.code == "000"){
-            button.hide();
-            alert(data.message);
+            $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").hide();
+            this_form.hide();
+            this_form.parent().append("<p>"+data.message+"</p>");
           }else{
-            button.removeAttr('disabled');
             alert(data.message);
           };
         },
-      });
+      });      
     });
+
   };
 

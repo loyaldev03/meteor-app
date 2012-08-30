@@ -1,6 +1,12 @@
 <%= render :partial => "shared/member_information" %>
 
-
-<%= render :partial => "set_undeliverable_form" %>
-
+<table class="table table-bordered">
+  <thead>
+  	<tr>
+      <th>
+				<%= render :partial => "set_undeliverable_form" %>
+      </th>
+  	</tr>
+  </thead>
+</table>
 <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => 'btn' %> 
