@@ -430,14 +430,14 @@ $(document).ready( function() {
         dataType: 'json',
         success: function(data) {
           if (data.code == "000"){
-            $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").hide();
+            $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().children().hide();
             this_form.hide();
             this_form.parent().append("<p>"+data.message+"</p>");
           }else{
             alert(data.message);
           };
         },
-      });      
+      });  
     });
 
   };

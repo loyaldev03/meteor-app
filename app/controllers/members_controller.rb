@@ -178,11 +178,12 @@ class MembersController < ApplicationController
       else
         flash[:error] = answer[:message]
       end
+      respond_to do |format|
+        format.html { redirect_to show_member_path }
+        format.json { render json: { :message => answer[:message], :code => answer[:code] }} 
+      end
     end
-    respond_to do |format|
-      format.html 
-      format.json { render json: { :message => answer[:message], :code => answer[:code] }} 
-    end
+
   end
 
   def set_unreachable
