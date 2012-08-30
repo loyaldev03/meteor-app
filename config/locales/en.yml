@@ -48,7 +48,7 @@ en:
     refund_member: 'Refund'
     full_save: 'Full save'
     save_te_sale: 'Save the sale'
-    set_wrong_addres: 'Set wrong address'
+    set_wrong_address: 'Set wrong address'
     set_wrong_phone_number: 'Set wrong phone number'
     save_member_note: 'Save note'
     save_operation_note: 'Save operation'

@@ -414,6 +414,7 @@ $(document).ready( function() {
     });
 
     $('*#set_as_wrong_address').click( function(event){
+      $(this).hide();
       append = $(this).parent();
       $.get(this.action, {member_prefix:$(this).attr("name")}, null, 'script'); 
       return false;
