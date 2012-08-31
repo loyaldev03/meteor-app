@@ -160,6 +160,7 @@
         <%= t("activerecord.attributes.credit_card.last_digits") %>
       <% end %>
       </th>
+      <th></th>
     </tr>
     <% if @active_credit_card %>
       <tr class="<%= (@active_credit_card.am_card.expired? ? "card_expired" : "") %>">
@@ -273,8 +274,8 @@
             <td id="td_mi_quota"><%= @current_member.quota %></td>  
           </tr>
           <tr>
-            <th><%= t('activerecord.attributes.member.date_of_primary_cc') %>: </th>
-            <td id="td_mi_credit_cards_first_created_at"><%= @current_member.credit_cards.first && I18n.l(@current_member.credit_cards.first.created_at, :format => :only_date) %> </td>
+            <th><%= t('activerecord.attributes.member.date_of_active_credit_card') %>: </th>
+            <td id="td_mi_credit_cards_first_created_at"><%= @current_member.credit_cards.first && I18n.l(@current_member.active_credit_card.created_at, :format => :only_date) %> </td>
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.last_successful_bill_date') %>: </th>
