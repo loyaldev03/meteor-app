@@ -1,4 +1,5 @@
-require '../../config/environment.rb'
+require 'config/environment.rb'
+require 'faraday'
 
 ## ONMC version
 
@@ -6,9 +7,9 @@ require '../../config/environment.rb'
 @merchant = '941000110028'
 @username = '941000110028AUS'
 @url = 'https://www.merchante-solutions.com/'
-@folder = "#{RAILS_ROOT rescue Rails.root}/files/mes_account_updater"
+@folder = "#{RAILS_ROOT rescue Rails.root}/mes_account_updater_files"
 
-def send_file_to_mes
+def store_file
   ################################################
   ########## new file!
   ################################################
@@ -19,14 +20,31 @@ def send_file_to_mes
   record_type, version_id, merchant_id = 'H1', '100000', "%-32s" % @merchant
   file.write [ record_type, version_id, merchant_id ].join + "\n"
 
+  ids = %w(11333354007
+11333360007
+11337019007
+11347655001
+11354598009
+12050909005
+12051026009
+20010350003
+20085625003
+20085847001
+20086837002
+20086870000
+20186641001
+20186648006
+20186702004
+20186716003
+20243903513
+20243903516
+20243903561
+)
+
   count = 0
   # members with expired credit card and active
-  Member.find(:all, 
-    :conditions => [ 
-      " (active = 1 or trial = 1) and ((cc_month_exp <= ? and cc_year_exp = ?) or cc_year_exp < ?) ", 
-      Date.today.month, Date.today.year, Date.today.year 
-    ] , :limit => 10
-  ).each do |member|
+  members = Member.find(ids)
+  members.each do |member|
     
     ActiveMerchant::Billing::CreditCard.require_verification_value = false
     credit_card = ActiveMerchant::Billing::CreditCard.new(
@@ -41,7 +59,7 @@ def send_file_to_mes
     when 'visa'
       'VISA'
     when 'master'
-      'MC'
+      'MC  '
     else
       nil
     end
@@ -50,7 +68,7 @@ def send_file_to_mes
 
     # add cc line
     record_type, account_number, expiration_date, descretionary_data = 'D1', "%-32s" % member.cc_number, 
-      member.cc_year_exp.to_s[2..3]+("%02d" % member.cc_month_exp), member.id
+      member.cc_year_exp.to_s[2..3]+("%02d" % member.cc_month_exp), "M%-31s"% member.id
 
     file.write [ record_type, account_type, account_number, expiration_date, descretionary_data ].join + "\n"
     count += 1
@@ -63,6 +81,16 @@ def send_file_to_mes
   ################################################
   ########## new file!
   ################################################
+
+  puts local_filename
+
+end
+
+def send_file_to_mes(filename)
+  if filename.nil?
+    puts "Filename must be valid" 
+    exit
+  end
 
   conn = Faraday.new(:url => @url, :ssl => {:verify => false}) do |builder|
     builder.request :multipart
@@ -151,22 +179,25 @@ def account_updater_file_status
   }    
   answer = Rack::Utils.parse_nested_query(result.body)
   puts answer.inspect
-  0..answer['statusCount'].to_i do |i|
-    request_file_by_id answer["reqfId_#{i}"], answer["reqfName_#{i}"]
-  end
+#  0..answer['statusCount'].to_i do |i|
+#    request_file_by_id answer["reqfId_#{i}"], answer["reqfName_#{i}"]
+#  end
 end
 
 def log(text)
   Rails.logger.info "AUS Updater: #{text}"
 end
 
-if ARGV[0] == 'send'
-  send_file_to_mes
+if ARGV[0] == 'store_file'
+  store_file
+elsif ARGV[0] == 'send'
+  send_file_to_mes ARGV[1]
 elsif ARGV[0] == 'download_all'
   account_updater_file_status
 elsif ARGV[0] == 'download'
-  request_file_by_id ARGV[1], ARGV[2]
+  #request_file_by_id ARGV[1], ARGV[2]
 else
   puts "Arguments need: send - download_all - download"
 end
+
 
