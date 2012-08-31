@@ -5,7 +5,7 @@
 </section>
 
 <%= form_tag(fulfillments_index_path) do %>
-  <table class="table table-bordered ">
+  <table class="table table-bordered" id ="fulfillments_table">
   	<tr>
   		<td>
 	  		<%= label :initial_date, t('initial_date'), :class => 'help-inline' %>
@@ -25,7 +25,7 @@
         <%= select_tag :status, options_for_select([['not_processed', 'not_processed'],
                                 ['processing', 'processing'],['out_of_stock', 'out_of_stock'], 
                                 ['undeliverable','undeliverable']], :selected => params[:status]),
-                                :class => 'select_field' %>	
+                                :class => 'select_field', :name => '[status]' %>	
       </td>
   	</tr>
   	<tr>

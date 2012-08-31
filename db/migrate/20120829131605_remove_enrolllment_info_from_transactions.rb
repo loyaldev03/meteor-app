@@ -5,7 +5,7 @@ class RemoveEnrolllmentInfoFromTransactions < ActiveRecord::Migration
     Club.all.each do |c|
       c.members.each do |m|
         next if m.join_date.nil? or m.enrollment_infos.first.nil?
-        m.update_attribute :cohort , Member.cohort_formula(m.join_date, m.enrollment_infos.first, c.time_zone)
+        m.update_attribute :cohort , Member.cohort_formula(m.join_date, m.enrollment_infos.first, c.time_zone, m.terms_of_membership.installment_type)
         m.transactions.each { |t| t.update_attribute :cohort, m.cohort }
       end
     end
