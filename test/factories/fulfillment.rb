@@ -36,4 +36,9 @@ FactoryGirl.define do
     status 'processing'
   end
 
+  factory :fulfillment_processing_without_stock, class: Fulfillment do
+    product_sku "circlet"
+    assigned_at DateTime.now
+    status 'processing'
+  end
 end
