@@ -40,10 +40,10 @@ c.save!
 c2 = Club.new :name => "Players"
 c2.partner = p
 c2.save!
-c3 = Club.new :name => "Fans"
+c3 = Club.new :name => "TC Fans"
 c3.partner = p3
 c3.save!
-c4 = Club.new :name => "Players"
+c4 = Club.new :name => "TC Players"
 c4.partner = p3
 c4.save!
 c5 = Club.new :name => "Nascar", :api_type => 'Drupal::Member', :theme => 'application'

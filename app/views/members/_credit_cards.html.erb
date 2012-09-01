@@ -9,6 +9,7 @@
           <%= t('activerecord.attributes.credit_card.last_digits') %> 
         <% end %> 
       </th>
+      <th> <%= t('activerecord.attributes.credit_card.added_at') %> </th>
       <th> <%= t('activerecord.attributes.credit_card.expire_date') %> </th>
       <th> <%= t('activerecord.attributes.credit_card.last_successful_bill_date') %> </th>
       <th> <%= t('actions') %> </th>
@@ -32,6 +33,7 @@
           <%= cc.last_digits %>
         <% end %> 
       </td>
+      <td> <%= I18n.l cc.created_at, :format => :only_date %></td>
       <td> <%= cc.expire_month %> / <%= cc.expire_year %> </td>
       <td> <%= I18n.l cc.last_successful_bill_date, :format => :long if !cc.last_successful_bill_date.nil? %> </td>
       <td>

@@ -53,7 +53,7 @@ class ApplicationController < ActionController::Base
           redirect_to clubs_path
           false
         else
-          @current_club = Club.find_by_name(params[:club_prefix])
+          @current_club = @current_partner.clubs.find_by_name(params[:club_prefix])
           if @current_club.nil?
             flash[:error] = "No club was selected."
             redirect_to clubs_path
