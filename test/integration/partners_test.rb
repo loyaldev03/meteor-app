@@ -49,4 +49,57 @@ class PartnersTest < ActionController::IntegrationTest
     assert page.has_content?(I18n.t('activerecord.errors.messages.taken'))
   end
 
+  test "create a partner with invalid characters" do
+    visit new_admin_partner_path
+    fill_in 'partner[name]', :with => '!"#$%&/()'
+    fill_in 'partner[prefix]', :with => '!"#$%&/()'
+
+    assert_difference('Partner.count', 0) do
+      click_link_or_button 'Create Partner'
+    end
+    assert page.has_content?('Name is invalid')
+    assert page.has_content?('Prefix is invalid')
+  end
+
+  test "Should display partner" do
+    saved_partner = FactoryGirl.create(:partner)
+    visit admin_partners_path
+    within("#partners_table") do
+      wait_until{
+        click_link_or_button 'Dashboard'
+      }
+    end
+    assert page.has_content?(saved_partner.prefix)
+    assert page.has_content?(saved_partner.name)
+    assert page.has_content?('Back')
+    assert page.has_content?('Edit')  
+    assert page.has_content?('Destroy')   
+  end
+
+  test "Should update partner" do
+    saved_partner = FactoryGirl.create(:partner)
+    visit admin_partners_path
+    within("#partners_table") do
+      wait_until{
+        click_link_or_button 'Edit'
+      }
+    end
+    fill_in 'partner[name]', :with => 'My new name'
+    click_link_or_button 'Update Partner'
+    saved_partner.reload
+    assert page.has_content?("The partner #{saved_partner.prefix} - #{saved_partner.name} was successfully updated.")
+  end
+
+  test "Should delete partner" do
+    saved_partner = FactoryGirl.create(:partner)
+    visit admin_partners_path
+    confirm_ok_js
+    within("#partners_table") do
+      wait_until{
+        click_link_or_button 'Destroy'
+      }
+    end
+    assert !page.has_content?(saved_partner.prefix)
+    assert Partner.with_deleted.where(:id => saved_partner.id).first
+  end
 end

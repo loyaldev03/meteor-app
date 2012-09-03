@@ -26,5 +26,23 @@ class ClubTest < ActionController::IntegrationTest
     assert page.has_content?("The club #{unsaved_club.name} was successfully created")
   end
 
+  test "create blank club" do
+    visit clubs_path(@partner.prefix)
+    click_link_or_button 'New Club'
+    click_link_or_button 'Create Club'
+    assert page.has_content?("can't be blank")
+  end
 
+  test "should read club" do
+    saved_club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    visit clubs_path(@partner.prefix)
+    within("#clubs_table") do
+      wait_until{
+        assert page.has_content?(saved_club.id.to_s)
+        assert page.has_content?(saved_club.name)
+        assert page.has_content?(saved_club.description)
+      }
+    end
+  end
+ 
 end
