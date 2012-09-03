@@ -96,7 +96,7 @@ module Drupal
       m = self.member
 
       map = { 
-        name: m.full_name,
+        # name: m.full_name,
         mail: m.email,
         field_profile_address: { 
           und: [ 
