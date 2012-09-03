@@ -20,25 +20,8 @@ def store_file
   record_type, version_id, merchant_id = 'H1', '100000', "%-32s" % @merchant
   file.write [ record_type, version_id, merchant_id ].join + "\n"
 
-  ids = %w(11333354007
-11333360007
-11337019007
-11347655001
-11354598009
-12050909005
-12051026009
-20010350003
-20085625003
-20085847001
-20086837002
-20086870000
-20186641001
-20186648006
-20186702004
-20186716003
-20243903513
-20243903516
-20243903561
+  ids = %w(
+
 )
 
   count = 0
@@ -61,13 +44,14 @@ def store_file
     when 'master'
       'MC  '
     else
+      puts credit_card.type
       nil
     end
     # only master and visa allowed
     next if account_type.nil?
 
     # add cc line
-    record_type, account_number, expiration_date, descretionary_data = 'D1', "%-32s" % member.cc_number, 
+    record_type, account_number, expiration_date, descretionary_data = 'D1', "%-32s" % member.cc_number.strip, 
       member.cc_year_exp.to_s[2..3]+("%02d" % member.cc_month_exp), "M%-31s"% member.id
 
     file.write [ record_type, account_type, account_number, expiration_date, descretionary_data ].join + "\n"
@@ -123,9 +107,9 @@ def request_file_by_id(file_id, filename)
   if answer['rspCode'].to_i == 0
     full_filename = "#{@folder}/#{filename}"
     file = File.open(full_filename, 'w')
-    file.write answer['rspMessage']
+    file.write answer
     file.close
-    parse_file full_filename
+    #parse_file full_filename
   end
 end
 
@@ -179,6 +163,7 @@ def account_updater_file_status
   }    
   answer = Rack::Utils.parse_nested_query(result.body)
   puts answer.inspect
+  # TODO: following lines not tested.
 #  0..answer['statusCount'].to_i do |i|
 #    request_file_by_id answer["reqfId_#{i}"], answer["reqfName_#{i}"]
 #  end
@@ -195,9 +180,10 @@ elsif ARGV[0] == 'send'
 elsif ARGV[0] == 'download_all'
   account_updater_file_status
 elsif ARGV[0] == 'download'
-  #request_file_by_id ARGV[1], ARGV[2]
+  request_file_by_id ARGV[1], ARGV[2]
+elsif ARGV[0] == 'parse_file'
+  parse_file ARGV[1]
 else
   puts "Arguments need: send - download_all - download"
 end
-
 
