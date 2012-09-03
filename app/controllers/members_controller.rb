@@ -254,7 +254,7 @@ class MembersController < ApplicationController
 
     if am
       if (lt = am.login_token) && lt.url
-        redirect_to @current_member.autologin_url
+        redirect_to @current_member.full_autologin_url
       else
         flash[:error] = "There is no url related to the member in drupal."
         redirect_to show_member_path
