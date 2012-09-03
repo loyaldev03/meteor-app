@@ -537,6 +537,17 @@ class Member < ActiveRecord::Base
     self.api_member && self.api_member.login_token rescue nil
   end
 
+  def full_autologin_url
+    c = self.club
+    d = c.api_domain if c
+
+    if d 
+      URI.parse(d.url) + self.autologin_url
+    else
+      nil
+    end
+  end
+
   ##################### Club cash ####################################
 
   # Resets member club cash in case of a cancelation. It calls "add_club_cash" method
