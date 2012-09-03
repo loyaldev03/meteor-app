@@ -13,12 +13,13 @@ private
   def data
     domains.map do |domain|
       [
-        link_to(domain.id, @url_helpers.domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id)),
+        domain.id,
         domain.url,
         domain.description,
         domain.data_rights,
         domain.hosted,
         I18n.l(domain.created_at,:format=>:long),
+        link_to(I18n.t(:show), @url_helpers.domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')+' '+
         link_to(I18n.t(:edit),@url_helpers.edit_domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')+' '+
         link_to(I18n.t(:destroy),@url_helpers.domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id),
                       :method => :delete, 
