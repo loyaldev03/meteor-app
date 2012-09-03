@@ -62,9 +62,15 @@ class DomainTest < ActionController::IntegrationTest
       }
     end
     fill_in 'domain[url]', :with => 'http://test.com.ar'
+    fill_in 'domain[description]', :with => 'new description'
+    fill_in 'domain[data_rights]', :with => 'new data rights'
+    check('domain[hosted]')
     click_link_or_button 'Update Domain'
     saved_domain.reload
     assert page.has_content?("The domain #{saved_domain.url} was successfully updated.")
+    assert_equal saved_domain.url, 'http://test.com.ar'
+    assert_equal saved_domain.description, 'new description'
+    assert_equal saved_domain.data_rights, 'new data rights'
   end
 
   test "should delete domain" do
@@ -81,4 +87,8 @@ class DomainTest < ActionController::IntegrationTest
     assert Domain.with_deleted.where(:id => saved_domain.id).first
   end
 
+  test "should see all clubs as admin on my clubs section" do
+    10.times{ FactoryGirl.create(:simple_domain) }
+
+  end
 end
