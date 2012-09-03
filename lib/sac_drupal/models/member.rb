@@ -62,7 +62,8 @@ module Drupal
     end
 
     def resend_welcome_email!
-      raise 'tbd -- once drupal sends welcome email we can trigger it'
+      res = conn.post('/api/user/%{drupal_id}/resend_welcome_email' % { drupal_id: self.member.api_id })
+      res.success?
     end
 
   private
