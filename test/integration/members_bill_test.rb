@@ -88,9 +88,6 @@ class MembersBillTest < ActionController::IntegrationTest
 
   def bill_member(member, do_refund = true)
 
-    EnrollmentInfo.last.update_attribute(:product_sku, 'kit-card')
-    member.send_fulfillment
-
     answer = member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
@@ -155,26 +152,41 @@ class MembersBillTest < ActionController::IntegrationTest
   # TEST
   ############################################################
 
-  # test "create a member billing enroll > 0" do
-  #   active_merchant_stubs
-  #   setup_member
-  #   bill_member(enrollment_info, @saved_member)
-  # end 
+  test "create a member billing enroll > 0" do
+    active_merchant_stubs
+    setup_member
+    bill_member(@saved_member, false)
+  end 
 
-  # test "create a member billing enroll = 0 provisional_days = 0 installment amount > 0" do
-  #   active_merchant_stubs
-  #   setup_member(0)
-  #  enrollment_info = EnrollmentInfo.last
-  #  enrollment_info.enrollment_amount = 0.0
-  #  enrollment_info.save!
-  #   bill_member(enrollment_info, @saved_member)
-  # end 
+  test "create a member billing enroll > 0 + refund" do
+    active_merchant_stubs
+    setup_member
+    bill_member(@saved_member, true)
+  end 
+
+  test "create a member billing enroll = 0 provisional_days = 0 installment amount > 0" do
+    active_merchant_stubs
+    setup_member(0)
+    EnrollmentInfo.last.update_attribute(:enrollment_amount, 0.0)
+    bill_member(@saved_member, false)
+  end 
 
   test "create a member + bill + check fultillment" do
     active_merchant_stubs
     setup_member
+
+    EnrollmentInfo.last.update_attribute(:product_sku, "kit-card")
+    @saved_member.send_fulfillment
+
     bill_member(@saved_member, false)
-    sleep(5555555)
+    
+    within("#fulfillments") do 
+      wait_until {
+        assert page.has_content?("not_processed")
+        assert page.has_content?("kit-card")
+      }
+    end
+    
   end
 
     
