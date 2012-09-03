@@ -88,7 +88,7 @@ def add_enrollment_info(phoenix, member, campaign = nil)
   e_info.campaign_medium_version = campaign.campaign_medium_version
   e_info.joint = campaign.is_joint
   e_info.save
-  member.cohort = Member.cohort_formula(member.join_date, e_info.first, member.club.time_zone)
+  member.cohort = PhoenixMember.cohort_formula(member.join_date, e_info.first, member.club.time_zone, member.terms_of_membership.installment_type)
   member.cohort.save
 end
 def update_fulfillment(member, phoenix)

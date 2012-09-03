@@ -301,12 +301,32 @@ class PhoenixMember < ActiveRecord::Base
   self.table_name = "members" 
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
+
+  def self.cohort_formula(join_date, enrollment_info, time_zone, installment_type)
+    [ join_date.in_time_zone(time_zone).year.to_s, 
+      "%02d" % join_date.in_time_zone(time_zone).month.to_s, 
+      enrollment_info.mega_channel.to_s, 
+      enrollment_info.campaign_medium.to_s,
+      installment_type ].join('-').downcase
+  end  
 end
 class PhoenixProspect < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "prospects" 
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
+  before_create set_cohort
+  private
+  def set_cohort
+    if self.terms_of_membership
+      self.club = self.terms_of_membership.club
+      today = Time.zone.now    
+      self.cohort = [ today.in_time_zone(self.club.time_zone).year.to_s, 
+        "%02d" % today.in_time_zone(self.club.time_zone).month.to_s, 
+        mega_channel.to_s, 
+        campaign_medium.to_s, self.terms_of_membership.installment_type ].join('-').downcase
+    end
+  end  
 end
 class PhoenixCreditCard < ActiveRecord::Base
   establish_connection "phoenix" 
