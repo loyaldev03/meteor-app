@@ -6,6 +6,12 @@ class FulfillmentTest < ActiveSupport::TestCase
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
   end
 
+  def setup_products 
+    @product_with_stock = FactoryGirl.create(:product, club_id: @terms_of_membership_with_gateway.club.id)
+    @product_without_stock = FactoryGirl.create(:product_without_stock, club_id: @terms_of_membership_with_gateway.club.id)
+    @product_recurrent = FactoryGirl.create(:product_with_recurrent, club_id: @terms_of_membership_with_gateway.club.id)
+  end
+
   test "active member can receive fulfillments" do 
     member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     assert member.can_receive_another_fulfillment?
@@ -37,4 +43,50 @@ class FulfillmentTest < ActiveSupport::TestCase
       member.set_as_provisional!
     end
   end
+
+  test "Should send fulfillments on acepted applied member and set correct status on fulfillments" do
+    setup_products
+
+    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
+    enrollment_info = FactoryGirl.create(:enrollment_info_with_product_without_stock, :member_id => member.id)
+    assert_difference('Fulfillment.count',2) do
+      member.set_as_provisional!
+    end
+    fulfillment_out_of_stock = Fulfillment.find_by_product_sku('circlet')
+    assert_equal fulfillment_out_of_stock.status, 'out_of_stock', "Status is #{fulfillment_out_of_stock.status} should be 'out_of_stock'"
+    fulfillment_with_stock = Fulfillment.find_by_product_sku('Bracelet')
+    assert_equal fulfillment_with_stock.status, 'not_processed', "Status is #{fulfillment_out_of_stock.status} should be 'out_of_stock'"          
+  end
+
+  test "Should create new fulfillment with recurrent and renewable_date" do
+    setup_products
+    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
+    enrollment_info = FactoryGirl.create(:enrollment_info_with_product_recurrent, :member_id => member.id)
+    assert_difference('Fulfillment.count') do
+      member.set_as_provisional!
+    end
+    fulfillment_out_of_stock = Fulfillment.find_by_product_sku('kit-kard')
+    assert_equal fulfillment_out_of_stock.recurrent, true, "Recurrent on fulfillment is not recurrent when it should be."
+    assert_equal fulfillment_out_of_stock.renewable_at, fulfillment_out_of_stock.assigned_at + 1.year, "Renewable date was not set properly."
+  end
+
+  test "When resending fulfillment is out of stock, it should be set as out_of_stock" do
+    setup_products
+    agent = FactoryGirl.create(:confirmed_admin_agent)
+    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
+    fulfillment = FactoryGirl.create(:fulfillment_undeliverable_without_stock, :member_id => member.id)
+    fulfillment.resend(agent)
+    assert_equal fulfillment.status, 'out_of_stock', "Status should be set 'out_of_stock' when resending because product does not have stock."
+  end 
+
+  test "When resending fulfillment has stock, it should be set as not_processed" do
+    setup_products
+    agent = FactoryGirl.create(:confirmed_admin_agent)
+    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
+    fulfillment = FactoryGirl.create(:fulfillment_undeliverable_with_stock, :member_id => member.id)
+    stock = fulfillment.product.stock
+    fulfillment.resend(agent)
+    assert_equal fulfillment.product.stock, stock-1, "Stock was not decreased."
+    assert_equal fulfillment.status, 'not_processed', "Status should be set 'out_of_stock' when resending because product does not have stock."
+  end 
 end
