@@ -565,7 +565,7 @@ class Member < ActiveRecord::Base
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
     ClubCashTransaction.transaction do 
       if amount.to_i == 0
-        answer[:message] = "Cannot add $0 amount. Please add an amount."
+        answer[:message] = "Cannot add 0 amount. Please add an amount."
       elsif (amount.to_i < 0 and amount.to_i.abs <= self.club_cash_amount.to_i) or amount.to_i > 0
         begin
           cct = ClubCashTransaction.new(:amount => amount, :description => description)
@@ -574,7 +574,7 @@ class Member < ActiveRecord::Base
             cct.save!
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save!
-            message = (amount.to_i >= 0 ? "$#{cct.amount} club cash was successfully added!" : "$#{cct.amount.to_i.abs} club cash was successfully deducted!")
+            message = (amount.to_i >= 0 ? "#{cct.amount} club cash was successfully added!" : "#{cct.amount.to_i.abs} club cash was successfully deducted!")
             Auditory.audit(agent, cct, message, self)
             answer = { :message => message, :code => Settings.error_codes.success }
           else
@@ -586,7 +586,7 @@ class Member < ActiveRecord::Base
           raise ActiveRecord::Rollback
         end
       else
-        answer[:message] = "You can not deduct $#{amount.to_i.abs} because you only have $#{self.club_cash_amount} club cash."
+        answer[:message] = "You can not deduct #{amount.to_i.abs} because the member only has #{self.club_cash_amount} club cash."
       end
     end
     answer

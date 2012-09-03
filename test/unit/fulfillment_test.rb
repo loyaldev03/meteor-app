@@ -70,5 +70,23 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert_equal fulfillment_out_of_stock.renewable_at, fulfillment_out_of_stock.assigned_at + 1.year, "Renewable date was not set properly."
   end
 
+  test "When resending fulfillment is out of stock, it should be set as out_of_stock" do
+    setup_products
+    agent = FactoryGirl.create(:confirmed_admin_agent)
+    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
+    fulfillment = FactoryGirl.create(:fulfillment_undeliverable_without_stock, :member_id => member.id)
+    fulfillment.resend(agent)
+    assert_equal fulfillment.status, 'out_of_stock', "Status should be set 'out_of_stock' when resending because product does not have stock."
+  end 
 
+  test "When resending fulfillment has stock, it should be set as not_processed" do
+    setup_products
+    agent = FactoryGirl.create(:confirmed_admin_agent)
+    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
+    fulfillment = FactoryGirl.create(:fulfillment_undeliverable_with_stock, :member_id => member.id)
+    stock = fulfillment.product.stock
+    fulfillment.resend(agent)
+    assert_equal fulfillment.product.stock, stock-1, "Stock was not decreased."
+    assert_equal fulfillment.status, 'not_processed', "Status should be set 'out_of_stock' when resending because product does not have stock."
+  end 
 end

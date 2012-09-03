@@ -52,6 +52,8 @@ module Drupal
 
       uri = @token.url && URI.parse(@token.url)
       self.member.update_column :autologin_url, uri.path if uri
+
+      @token
     end
 
     def reset_password!
@@ -60,7 +62,8 @@ module Drupal
     end
 
     def resend_welcome_email!
-      raise 'tbd -- once drupal sends welcome email we can trigger it'
+      res = conn.post('/api/user/%{drupal_id}/resend_welcome_email' % { drupal_id: self.member.api_id })
+      res.success?
     end
 
   private
@@ -96,7 +99,7 @@ module Drupal
       m = self.member
 
       map = { 
-        name: m.full_name,
+        # name: m.full_name,
         mail: m.email,
         field_profile_address: { 
           und: [ 
