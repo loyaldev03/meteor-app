@@ -77,6 +77,10 @@ class CreditCard < ActiveRecord::Base
         new_year_exp=acc.expire_year.to_i + 4
       when 4
         new_year_exp=acc.expire_year.to_i + 1
+      when 5
+        new_year_exp=acc.expire_year.to_i + 6
+      when 6
+        new_year_exp=acc.expire_year.to_i + 5
       else
         return acc
       end
