@@ -42,6 +42,9 @@ class Agent < ActiveRecord::Base
   end
 
   has_many :club_roles
+  has_many :clubs, 
+    through: :club_roles,
+    uniq: true
   accepts_nested_attributes_for :club_roles,
     allow_destroy: true
 

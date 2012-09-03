@@ -5,7 +5,7 @@ private
     if @current_agent.has_role? 'admin'
       Club.where("deleted_at is null").count
     else
-      Club.joins(:club_roles).where("agent_id = ?",@current_agent).count
+      @current_agent.clubs.count
     end
   end
 
@@ -33,8 +33,7 @@ private
     if @current_agent.has_role? 'admin'
       clubs = Club.where("deleted_at is null").order("#{sort_column} #{sort_direction}")
     else
-      clubs = Club.joins(:club_roles).where("agent_id = ?",@current_agent).order("#{sort_column} #{sort_direction}")
-      clubs = clubs.uniq
+      clubs = @current_agent.clubs.order("#{sort_column} #{sort_direction}")
     end
     clubs = clubs.page(page).per_page(per_page)
     if params[:sSearch].present?

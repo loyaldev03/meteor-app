@@ -9,6 +9,10 @@ class Club < ActiveRecord::Base
   has_many :payment_gateway_configurations
   has_many :member_group_types
   has_many :products
+  has_many :club_roles
+  has_many :agents,
+    through: :club_roles,
+    uniq: true
 
   belongs_to :api_domain,
     class_name:  'Domain',
