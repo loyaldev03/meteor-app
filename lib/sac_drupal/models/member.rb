@@ -52,6 +52,8 @@ module Drupal
 
       uri = @token.url && URI.parse(@token.url)
       self.member.update_column :autologin_url, uri.path if uri
+
+      @token
     end
 
     def reset_password!
