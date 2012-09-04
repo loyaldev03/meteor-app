@@ -27,19 +27,19 @@ class PartnerTest < ActiveSupport::TestCase
 
   test "Should not let you save partner with random characters" do
     partner_random = FactoryGirl.build(:partner, :prefix => 'prefix$%$%%#')
-    assert partner_random.valid?
+    assert !partner_random.valid?
     assert_not_nil partner_random.errors, "Saved with prefix with characters like '$%#%#'"
   end
 
   test "Should not let you save partner with prefix like 'admin'" do
     partner_admin = FactoryGirl.build(:partner, :prefix => 'billy_admin_2012')
-    partner_admin.valid?
+    assert !partner_admin.valid?
     assert_not_nil partner_admin.errors
   end
 
   test "Should not let you save partner with name like 'admin'" do
     partner_admin = FactoryGirl.build(:partner, :name => 'billy_admin_2012')
-    partner_admin.valid?
+    assert !partner_admin.valid?
     assert_not_nil partner_admin.errors
   end
 

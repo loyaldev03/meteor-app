@@ -63,7 +63,7 @@ class DomainsControllerTest < ActionController::TestCase
     sign_in @admin_user
     domain = FactoryGirl.build(:domain, :partner_id => @partner.id )
     assert_difference('Domain.count',1) do
-      post :create, partner_prefix: 'testing_another_prefix', domain: { data_rights: domain.data_rights, 
+      post :create, partner_prefix: @partner_prefix, domain: { data_rights: domain.data_rights, 
         description: domain.description, hosted: domain.hosted, url: domain.url }
     end
     assert_redirected_to domain_path(assigns(:domain), partner_prefix: @partner_prefix)
