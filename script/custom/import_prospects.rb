@@ -19,6 +19,7 @@ ActiveRecord::Base.logger = @log
     puts "CDId #{cid} does not exist or TOM is empty"
     return
   end
+  tom = PhoenixTermsOfMembership.find(tom_id)
 
   ProspectProspect.where(" imported_at IS NULL and campaign_id = #{cid} ").find_in_batches do |group|
     puts "cant #{group.count}"
@@ -47,6 +48,16 @@ ActiveRecord::Base.logger = @log
         phoenix.landing_url = @campaign.landing_url
         phoenix.mega_channel = @campaign.phoenix_mega_channel
         phoenix.product_sku = @campaign.product_sku
+
+        today = phoenix.created_at
+        phoenix.cohort = [ today.in_time_zone(TIMEZONE).year.to_s, 
+          "%02d" % today.in_time_zone(TIMEZONE).month.to_s, 
+          phoenix.mega_channel.to_s, 
+          phoenix.campaign_medium.to_s, tom.installment_type ].join('-').downcase
+
+        # TODO: 
+        # phoenix.preferences = { :fav_driver => prospect.fav_driver }
+        # phoenix.gender = @campaign.product_sku
         phoenix.save!
         prospect.update_attribute :imported_at, Time.now.utc
         print "."
@@ -57,6 +68,6 @@ ActiveRecord::Base.logger = @log
       end
       @log.info "    ... took #{Time.now.utc - tz} for prospect ##{prospect.id}"
     end
-    sleep(1)
   end
 end
+

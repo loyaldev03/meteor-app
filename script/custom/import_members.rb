@@ -83,12 +83,18 @@ def add_enrollment_info(phoenix, member, campaign = nil)
   e_info.landing_url = campaign.landing_url
   e_info.terms_of_membership_id = phoenix.terms_of_membership_id
   # e_info.preferences
+  # e_info.preferences.each do |key, value|
+  #   pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(phoenix.id, phoenix.club_id, key)
+  #   pref.value = value
+  #   pref.save
+  # end
+
   e_info.campaign_medium = campaign.campaign_medium
   e_info.campaign_description = campaign.campaign_description
   e_info.campaign_medium_version = campaign.campaign_medium_version
   e_info.joint = campaign.is_joint
   e_info.save
-  member.cohort = Member.cohort_formula(member.join_date, e_info.first, member.club.time_zone)
+  member.cohort = PhoenixMember.cohort_formula(member.join_date, e_info.first, member.club.time_zone, member.terms_of_membership.installment_type)
   member.cohort.save
 end
 def update_fulfillment(member, phoenix)
