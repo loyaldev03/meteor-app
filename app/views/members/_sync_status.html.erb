@@ -102,7 +102,7 @@
       <td><%= t('activerecord.attributes.member.autologin_url') %>:</td>
       <td colspan='999'>
         <% if @current_member.autologin_url %>
-          <%= link_to @current_member.full_autologin_url, target: '_blank' -%>
+          <%= link_to @current_member.full_autologin_url.to_s, target: '_blank' -%>
         <% else %>
           <em>none</em>
         <% end %>

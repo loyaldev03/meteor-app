@@ -13,11 +13,12 @@ private
   def data
     partners.map do |partner|
       [
-        link_to(partner.id, @url_helpers.admin_partner_path(partner)),
+        partner.id,
         partner.prefix, 
         partner.name,
         partner.contract_uri,
         partner.website_url,
+        link_to(I18n.t(:show), @url_helpers.admin_partner_path(partner), :class => 'btn btn-mini')+
         link_to(I18n.t(:dashboard), @url_helpers.admin_partner_dashboard_path(partner.prefix), :class => 'btn btn-mini')+
         link_to(I18n.t(:edit), @url_helpers.edit_admin_partner_path(partner), :class => 'btn btn-mini' )+
         link_to(I18n.t(:destroy), @url_helpers.admin_partner_path(partner), :method => :delete,
