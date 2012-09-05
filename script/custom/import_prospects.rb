@@ -57,8 +57,8 @@ ActiveRecord::Base.logger = @log
         today = phoenix.created_at
         phoenix.cohort = [ today.in_time_zone(TIMEZONE).year.to_s, 
           "%02d" % today.in_time_zone(TIMEZONE).month.to_s, 
-          phoenix.mega_channel.to_s, 
-          phoenix.campaign_medium.to_s, tom.installment_type ].join('-').downcase
+          phoenix.mega_channel.to_s.strip, 
+          phoenix.campaign_medium.to_s.strip, tom.installment_type ].join('-').downcase
 
         # TODO: 
         # phoenix.preferences = { :fav_driver => prospect.fav_driver }
