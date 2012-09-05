@@ -643,7 +643,7 @@ class PhoenixMember < ActiveRecord::Base
 
   def phone_number=(phone)
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.+]/, '')
-    if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil?
+    if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
     elsif p.size == 7  || p.size == 8 || p.size == 6
       phone_country_code = '1'
       phone_local_number = p
@@ -686,7 +686,7 @@ class PhoenixProspect < ActiveRecord::Base
 
   def phone_number=(phone)
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.+]/, '')
-    if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil?
+    if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
     elsif p.size == 7  || p.size == 8 || p.size == 6
       phone_country_code = '1'
       phone_local_number = p
