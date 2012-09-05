@@ -48,7 +48,7 @@ class Api::MembersController < ApplicationController
   #             *user_id: User ID alias UID is an md5 hash of the user's IP address and user-agent information.
   #             *landing_url: Url from where te submit comes from.
   #             *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
-  #              this information is selected by the member. 
+  #              this information is selected by the member. This information is stored with format as hash encoded with json.
   #             *cookie_value: Cookie from where the enrollment is being submitted.
   #             *cookie_set: If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.
   #             *campaign_medium

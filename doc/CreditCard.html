@@ -489,7 +489,11 @@ Later if not successful = (+2), 3/2013 6 Days Later if not successful =
 97
 98
 99
-100</pre>
+100
+101
+102
+103
+104</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 69</span>
@@ -497,16 +501,20 @@ Later if not successful = (+2), 3/2013 6 Days Later if not successful =
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_recycle_expired_rule'>recycle_expired_rule</span><span class='lparen'>(</span><span class='id identifier rubyid_acc'>acc</span><span class='comma'>,</span> <span class='id identifier rubyid_times'>times</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='period'>.</span><span class='id identifier rubyid_expired?'>expired?</span>
     <span class='kw'>case</span> <span class='id identifier rubyid_times'>times</span>
-    <span class='kw'>when</span> <span class='int'>1</span>
+    <span class='kw'>when</span> <span class='int'>0</span>
       <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>+</span> <span class='int'>3</span>
-    <span class='kw'>when</span> <span class='int'>2</span>
+    <span class='kw'>when</span> <span class='int'>1</span>
       <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>+</span> <span class='int'>2</span>
-    <span class='kw'>when</span> <span class='int'>3</span>
+    <span class='kw'>when</span> <span class='int'>2</span>
       <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>+</span> <span class='int'>4</span>
-    <span class='kw'>when</span> <span class='int'>4</span>
+    <span class='kw'>when</span> <span class='int'>3</span>
       <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>+</span> <span class='int'>1</span>
+    <span class='kw'>when</span> <span class='int'>4</span>
+      <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>+</span> <span class='int'>6</span>
+    <span class='kw'>when</span> <span class='int'>5</span>
+      <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='id identifier rubyid_acc'>acc</span><span class='period'>.</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>+</span> <span class='int'>5</span>
     <span class='kw'>else</span>
-      <span class='kw'>return</span> <span class='id identifier rubyid_acc'>acc</span>
+      <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_year'>year</span>
     <span class='kw'>end</span>
     <span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
       <span class='kw'>begin</span>
@@ -869,7 +877,7 @@ before_update :not_blacklisted
 </div>
 
     <div id="footer">
-  Generated on Tue Aug 28 09:39:11 2012 by
+  Generated on Wed Sep  5 12:12:47 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
