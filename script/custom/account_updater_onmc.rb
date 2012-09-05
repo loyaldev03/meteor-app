@@ -116,35 +116,46 @@ end
 def parse_file(filename)
   File.open(filename).each do |line|
     # do not parse header or trailers.
-    next if line[0] == 'H' or line[0] == 'T'
+    next if line[0..0] == 'H' or line[0..0] == 'T'
     # TODO: IMPROVEMENT: we can add a flag on each credit card to know if it was or nor processed
     record_type = line[0..1]
     old_account_type = line[2..5]
-    old_account_number = line[6..37]
+    old_account_number = line[6..37].strip
     old_expiration_date = line[38..41]
     new_account_type = line[42..45]
-    new_account_number = line[46..77]
+    new_account_number = line[46..77].strip
     new_expiration_date = line[78..81]
-    response_code = line[82..89]
+    response_code = line[82..89].strip
     response_source = line[90..91]
     discretionary_data = line[92..123]
 
-    member = Member.find discretionary_data
+[ record_type, old_account_type , old_account_number, old_expiration_date, new_account_type, new_account_number, new_expiration_date, response_code, response_source, discretionary_data ].each do |f|
+puts "-#{f}-"
+end
+
+    member = Member.find discretionary_data[1..32].strip
     if member.nil?
       log "Member id not found ##{discretionary_data} while parsing. #{line}"
     else
+      update_cs = false
+      member.aus_status = response_code
       case response_code
       when 'NEWACCT'
+        update_cs = true
         member.cc_number = new_account_number
         member.cc_year_exp = new_expiration_date[0..1].to_i+2000
         member.cc_month_exp = new_expiration_date[2..3]
-        member.save
       when 'NEWEXP'
+        update_cs = true
         member.cc_year_exp = new_expiration_date[0..1].to_i+2000
         member.cc_month_exp = new_expiration_date[2..3]
-        member.save
       else
         log "Member id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
+      end
+      member.save
+      if update_cs
+        Delayed::Job.enqueue(UpdateJob.new(@member.id))
+        # TODO: notify CS
       end
     end
   end

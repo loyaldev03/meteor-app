@@ -48,6 +48,11 @@ ActiveRecord::Base.logger = @log
         phoenix.landing_url = @campaign.landing_url
         phoenix.mega_channel = @campaign.phoenix_mega_channel
         phoenix.product_sku = @campaign.product_sku
+        phoenix.fulfillment_code = @campaign.fulfillment_code
+        phoenix.product_description = @campaign.product_description
+        phoenix.campaign_medium = @campaign.campaign_medium
+        phoenix.campaign_description = @campaign.campaign_description
+        phoenix.campaign_medium_version = @campaign.campaign_medium_version
 
         today = phoenix.created_at
         phoenix.cohort = [ today.in_time_zone(TIMEZONE).year.to_s, 
@@ -64,7 +69,6 @@ ActiveRecord::Base.logger = @log
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        exit
       end
       @log.info "    ... took #{Time.now.utc - tz} for prospect ##{prospect.id}"
     end
