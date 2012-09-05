@@ -61,9 +61,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   end
 
-  ############################################################
-  # UTILS
-  ############################################################
+ #  ############################################################
+ #  # UTILS
+ #  ############################################################
 
   def search_member(field_selector, value, validate_obj)
     fill_in field_selector, :with => value unless value.nil?
@@ -687,7 +687,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{
         assert page.has_content?(active_member.full_name)
         assert page.has_content?(active_member.status)
-        page.has_css?('tr td.ligthgreen')
+        assert page.has_css?('tr td.ligthgreen')
       }
     end
 
@@ -701,7 +701,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{
         assert page.has_content?(provisional_member.full_name)
         assert page.has_content?(provisional_member.status)
-        page.has_css?('tr td.yellow')
+        assert page.has_css?('tr td.yellow')
       }
     end
 
@@ -715,7 +715,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{
         assert page.has_content?(lapsed_member.full_name)
         assert page.has_content?(lapsed_member.status)
-        page.has_css?('tr td.red')
+        assert page.has_css?('tr td.red')
       }
     end
   end
@@ -1057,5 +1057,188 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("email: is invalid"), "Failure on email validation message"
       }
     end    
+  end
+
+  test "change unreachable phone number to reachable by check" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button "Set Unreachable"
+    within("#unreachable_table"){
+      select('Unreachable', :from => 'reason')
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong phone number'
+   
+   within("#table_contact_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, 'Unreachable'
+
+    click_link_or_button "Edit"
+    within("#table_contact_information")do
+      wait_until{
+        check('setter[wrong_phone_number]')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    within("#table_contact_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+
+  test "change unreachable address to undeliverable by check" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button "Set undeliverable"
+    within("#undeliverable_table"){
+      fill_in 'reason', :with => 'Undeliverable'
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong address'
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, 'Undeliverable'
+
+    click_link_or_button "Edit"
+    within("#table_demographic_information")do
+      wait_until{
+        check('setter[wrong_address]')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    within("#table_demographic_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+  test "change unreachable phone number to reachable by changeing phone" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    #By changing phone_country_number
+    click_link_or_button "Set Unreachable"
+    within("#unreachable_table"){
+      select('Unreachable', :from => 'reason')
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong phone number'
+   
+    within("#table_contact_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, 'Unreachable'
+
+    click_link_or_button "Edit"
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => '9876'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    within("#table_contact_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+
+    #By changing phone_area_code
+    click_link_or_button "Set Unreachable"
+    within("#unreachable_table"){
+      select('Unreachable', :from => 'reason')
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong phone number'
+   
+    within("#table_contact_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, 'Unreachable'
+
+    click_link_or_button "Edit"
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_area_code]', :with => '9876'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    within("#table_contact_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+    #By changing phone_local_number
+    click_link_or_button "Set Unreachable"
+    within("#unreachable_table"){
+      select('Unreachable', :from => 'reason')
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong phone number'
+   
+    within("#table_contact_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, 'Unreachable'
+
+    click_link_or_button "Edit"
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_local_number]', :with => '9876'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    within("#table_contact_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+  test "change unreachable address to undeliverable by changing address" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button "Set undeliverable"
+    within("#undeliverable_table"){
+      fill_in 'reason', :with => 'Undeliverable'
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong address'
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, 'Undeliverable'
+
+    click_link_or_button "Edit"
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[address]', :with => 'New address name'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    within("#table_demographic_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, nil
   end
 end
