@@ -17,7 +17,7 @@ ActiveRecord::Base.logger = @log
   end
   if tom_id.nil?
     puts "CDId #{cid} does not exist or TOM is empty"
-    return
+    next
   end
   tom = PhoenixTermsOfMembership.find(tom_id)
 

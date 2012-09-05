@@ -387,9 +387,156 @@ USE_MEMBER_LIST = true
 1611
 1612
 1206
+
+
+1380
+998
+996
+993
+997
+991
+984
+995
+994
+35
+315
+316
+317
+318
+344
+345
+999
+1000
+990
+992
+3
+4
+5
+340
+342
+343
+346
+347
+348
+349
+350
+351
+1770
+1771
+1772
+1773
+1774
+1775
+1776
+1777
+1778
+1779
+1780
+1781
+1782
+1204
+1205
+7
+8
+9
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+1010
+1011
+1012
+1013
+1014
+1015
+
 )
 
-
+@cids = %w( 
+  888
+  1380
+998
+996
+993
+997
+991
+984
+995
+994
+35
+315
+316
+317
+318
+344
+345
+999
+1000
+990
+992
+3
+4
+5
+340
+342
+343
+346
+347
+348
+349
+350
+351
+1770
+1771
+1772
+1773
+1774
+1775
+1776
+1777
+1778
+1779
+1780
+1781
+1782
+1204
+1205
+7
+8
+9
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+1010
+1011
+1012
+1013
+1014
+1015 
+)
 
 if USE_PROD_DB
 #  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
@@ -496,11 +643,11 @@ class PhoenixMember < ActiveRecord::Base
 
   def phone_number=(phone)
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.+]/, '')
-    if p.size < 5 || p.include?('@') || !p.match(/^[a-z]/i).nil?
+    if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil?
     elsif p.size == 7  || p.size == 8 || p.size == 6
       phone_country_code = '1'
       phone_local_number = p
-    elsif p.size == 20
+    elsif p.size >= 20
       phone_country_code = '1'
       phone_area_code = p[0..2]
       phone_local_number = p[3..9]
@@ -539,7 +686,7 @@ class PhoenixProspect < ActiveRecord::Base
 
   def phone_number=(phone)
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.+]/, '')
-    if p.size < 5 || p.include?('@') || !p.match(/^[a-z]/i).nil?
+    if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil?
     elsif p.size == 7  || p.size == 8 || p.size == 6
       phone_country_code = '1'
       phone_local_number = p
