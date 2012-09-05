@@ -373,7 +373,7 @@ class PhoenixMember < ActiveRecord::Base
       phone_country_code = p[0..1]
       phone_area_code = p[2..5]
       phone_local_number = p[6..-1]
-    elsif p.size < 5 || p.include?('@') || not p.match(/^[a-z]/i).nil?
+    elsif p.size < 5 || p.include?('@') || !p.match(/^[a-z]/i).nil?
     else
       raise "Dont know how to parse -#{p}-"
     end
@@ -412,7 +412,7 @@ class PhoenixProspect < ActiveRecord::Base
       phone_country_code = p[0..1]
       phone_area_code = p[2..5]
       phone_local_number = p[6..-1]
-    elsif p.size < 5 || p.include?('@') || not p.match(/^[a-z]/i).nil?
+    elsif p.size < 5 || p.include?('@') || !p.match(/^[a-z]/i).nil?
     else
       raise "Dont know how to parse -#{p}-"
     end
