@@ -8,7 +8,7 @@ class FulfillmentsController < ApplicationController
     		@fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id)
         @status = params[:status]
       elsif params[:status] == 'not_processed'
-        fulfillments = Fulfillment.where(['status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+        fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
             'not_processed', params[:initial_date], params[:end_date], @current_club.id])
         csv_string = Fulfillment.generateCSV(fulfillments)
         send_data csv_string, :filename => "miworkingfile2.csv",
