@@ -21,7 +21,8 @@ ActiveRecord::Base.logger = @log
   end
   tom = PhoenixTermsOfMembership.find(tom_id)
 
-  ProspectProspect.where(" imported_at IS NULL and campaign_id = #{cid} AND phone REGEXP '^[a-zA-Z]' ").find_in_batches do |group|
+  #ProspectProspect.where(" imported_at IS NULL and campaign_id = #{cid} AND phone REGEXP '^[a-zA-Z]{4,}' ").find_in_batches do |group|
+  ProspectProspect.where(" imported_at IS NULL and campaign_id = #{cid} ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |prospect| 
       tz = Time.now.utc
