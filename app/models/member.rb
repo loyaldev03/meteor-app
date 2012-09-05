@@ -53,7 +53,6 @@ class Member < ActiveRecord::Base
   #Validates that there are no invalid charactes in the country. 
   REGEX_CITY_AND_STATE = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
 
-  REGEX_PHONE_COUNTRY_CODE = /^[+?]?[0-9]+$/
 
   def after_create_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
@@ -71,7 +70,7 @@ class Member < ActiveRecord::Base
 
   validates :first_name, :last_name, :presence => true, :format => REGEX_FIRST_AND_LAST_NAME
   validates :email, :presence => true, :uniqueness => { :scope => :club_id }, :format => REGEX_EMAIL
-  validates :phone_country_code, :presence => true, :length => { :minimum => 1, :maximun => 4}, :format => REGEX_PHONE_COUNTRY_CODE
+  validates :phone_country_code, :presence => true, :numericality => { :only_integer => true }, :length => { :minimum => 1, :maximun => 4}
   validates :phone_area_code, :presence => true, :numericality => { :only_integer => true }, :length => { :minimum => 1, :maximun => 8}
   validates :phone_local_number, :presence => true, :numericality => { :only_integer => true }, :length => { :minimum => 1, :maximun => 8}
   validates :address, :format => REGEX_ADDRESS
