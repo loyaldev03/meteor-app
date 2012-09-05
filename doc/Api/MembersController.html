@@ -270,7 +270,7 @@ enrollment_info). Here is a list of the regex we are using to validate
    *user_id: User ID alias UID is an md5 hash of the user's IP address and user-agent information.
    *landing_url: Url from where te submit comes from.
    *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
-    this information is selected by the member. 
+    this information is selected by the member. This information is stored with format as hash encoded with json.
    *cookie_value: Cookie from where the enrollment is being submitted.
    *cookie_set: If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.
    *campaign_medium
@@ -714,10 +714,7 @@ Code related to the method result.
 266
 267
 268
-269
-270
-271
-272</pre>
+269</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 216</span>
@@ -765,10 +762,7 @@ Code related to the method result.
       <span class='label'>phone_country_code:</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_phone_country_code'>phone_country_code</span><span class='comma'>,</span> 
       <span class='label'>phone_area_code:</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_phone_area_code'>phone_area_code</span><span class='comma'>,</span>
       <span class='label'>phone_local_number:</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_phone_local_number'>phone_local_number</span><span class='comma'>,</span> 
-      <span class='label'>club_cash_amount:</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='comma'>,</span>
-      <span class='label'>enrollment_info:</span> <span class='lbrace'>{</span>
-
-      <span class='rbrace'>}</span>
+      <span class='label'>club_cash_amount:</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span>
     <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>credit_card:</span> <span class='lbrace'>{</span>
       <span class='label'>expire_month:</span> <span class='lparen'>(</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_active_credit_card'>active_credit_card</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_active_credit_card'>active_credit_card</span><span class='period'>.</span><span class='id identifier rubyid_expire_month'>expire_month</span><span class='rparen'>)</span><span class='comma'>,</span>
@@ -1045,7 +1039,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Tue Aug 28 09:39:13 2012 by
+  Generated on Wed Sep  5 12:12:49 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
