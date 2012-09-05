@@ -12,11 +12,12 @@ private
   def data
     products.map do |product|
       [
-        link_to(product.id, @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id)),
+        product.id,
         product.name,
         product.recurrent,
         product.stock,
         product.weight,
+        link_to(I18n.t(:show), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini')+
         link_to(I18n.t(:edit), @url_helpers.edit_product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini')+
         link_to(I18n.t(:destroy), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :method => :delete,
                 :confirm => I18n.t("are_you_sure"),

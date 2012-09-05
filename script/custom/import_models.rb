@@ -34,6 +34,7 @@ TEST = false # if true email will be replaced with a fake one
 USE_PROD_DB = true
 SITE_ID = 2010001547 # lyris site id
 MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
+TIMEZONE = 'Eastern Time (US & Canada)'
 
 CREDIT_CARD_NULL = "0000000000"
 USE_MEMBER_LIST = true
@@ -201,6 +202,47 @@ USE_MEMBER_LIST = true
 1677
 1678
 999
+1221
+1222
+1223
+1224
+1225
+1226
+1227
+1228
+1229
+1230
+1231
+1232
+1233
+1235
+1236
+1237
+1238
+1239
+1234
+1246
+1247
+1248
+1249
+1250
+1251
+1252
+1253
+1254
+1256
+1257
+1258
+1285
+1286
+1287
+1288
+1289
+1290
+1291
+1292
+1293
+
 )
 
 
@@ -301,12 +343,80 @@ class PhoenixMember < ActiveRecord::Base
   self.table_name = "members" 
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
+
+  def self.cohort_formula(join_date, enrollment_info, time_zone, installment_type)
+    [ join_date.in_time_zone(time_zone).year.to_s, 
+      "%02d" % join_date.in_time_zone(time_zone).month.to_s, 
+      enrollment_info.mega_channel.to_s.strip, 
+      enrollment_info.campaign_medium.to_s.strip,
+      installment_type ].join('-').downcase
+  end 
+
+  def phone_number=(phone)
+    p = phone.gsub(/[\s~\(\/\-=\)"\_\.+]/, '')
+    if p.size == 7 
+      phone_country_code = '1'
+      phone_local_number = p
+    elsif p.size == 10 || p.size == 9
+      phone_country_code = '1'
+      phone_area_code = p[0..2]
+      phone_local_number = p[3..-1]
+    elsif p.size == 11
+      phone_country_code = p[0..0]
+      phone_area_code = p[1..3]
+      phone_local_number = p[4..-1]
+    elsif p.size == 12
+      phone_country_code = p[0..1]
+      phone_area_code = p[2..4]
+      phone_local_number = p[5..-1]
+    elsif p.size == 13
+      phone_country_code = p[0..1]
+      phone_area_code = p[2..5]
+      phone_local_number = p[6..-1]
+    elsif p.size < 5 || p.include?('@') || !p.match(/^[a-z]/i).nil?
+    else
+      raise "Dont know how to parse -#{p}-"
+    end
+  end
 end
+
 class PhoenixProspect < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "prospects" 
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
+
+  serialize :preferences, JSON
+  serialize :referral_parameters, JSON
+
+# 3304940833ext412
+
+  def phone_number=(phone)
+    p = phone.gsub(/[\s~\(\/\-=\)"\_\.+]/, '')
+    if p.size == 7 
+      phone_country_code = '1'
+      phone_local_number = p
+    elsif p.size == 10 || p.size == 9
+      phone_country_code = '1'
+      phone_area_code = p[0..2]
+      phone_local_number = p[3..-1]
+    elsif p.size == 11
+      phone_country_code = p[0..0]
+      phone_area_code = p[1..3]
+      phone_local_number = p[4..-1]
+    elsif p.size == 12
+      phone_country_code = p[0..1]
+      phone_area_code = p[2..4]
+      phone_local_number = p[5..-1]
+    elsif p.size == 13
+      phone_country_code = p[0..1]
+      phone_area_code = p[2..5]
+      phone_local_number = p[6..-1]
+    elsif p.size < 5 || p.include?('@') || !p.match(/^[a-z]/i).nil?
+    else
+      raise "Dont know how to parse -#{p}-"
+    end
+  end
 end
 class PhoenixCreditCard < ActiveRecord::Base
   establish_connection "phoenix" 

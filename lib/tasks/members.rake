@@ -121,6 +121,7 @@ namespace :members do
   task :send_pillar_emails => :environment do 
     tall = Time.zone.now
     begin
+      # TODO: join EmailTemplate and Member querys
       EmailTemplate.find_in_batches(:conditions => " template_type = 'pillar' ") do |group|
         group.each do |template| 
           tz = Time.zone.now

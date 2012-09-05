@@ -19,8 +19,9 @@ ActiveRecord::Base.logger = @log
     puts "CDId #{cid} does not exist or TOM is empty"
     return
   end
+  tom = PhoenixTermsOfMembership.find(tom_id)
 
-  ProspectProspect.where(" imported_at IS NULL and campaign_id = #{cid} ").find_in_batches do |group|
+  ProspectProspect.where(" imported_at IS NULL and campaign_id = #{cid} AND phone REGEXP '^[a-zA-Z]' ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |prospect| 
       tz = Time.now.utc
@@ -47,16 +48,30 @@ ActiveRecord::Base.logger = @log
         phoenix.landing_url = @campaign.landing_url
         phoenix.mega_channel = @campaign.phoenix_mega_channel
         phoenix.product_sku = @campaign.product_sku
+        phoenix.fulfillment_code = @campaign.fulfillment_code
+        phoenix.product_description = @campaign.product_description
+        phoenix.campaign_medium = @campaign.campaign_medium
+        phoenix.campaign_description = @campaign.campaign_description
+        phoenix.campaign_medium_version = @campaign.campaign_medium_version
+
+        today = phoenix.created_at
+        phoenix.cohort = [ today.in_time_zone(TIMEZONE).year.to_s, 
+          "%02d" % today.in_time_zone(TIMEZONE).month.to_s, 
+          phoenix.mega_channel.to_s.strip, 
+          phoenix.campaign_medium.to_s.strip, tom.installment_type ].join('-').downcase
+
+        # TODO: 
+        # phoenix.preferences = { :fav_driver => prospect.fav_driver }
+        # phoenix.gender = @campaign.product_sku
         phoenix.save!
         prospect.update_attribute :imported_at, Time.now.utc
         print "."
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        exit
       end
       @log.info "    ... took #{Time.now.utc - tz} for prospect ##{prospect.id}"
     end
-    sleep(1)
   end
 end
+

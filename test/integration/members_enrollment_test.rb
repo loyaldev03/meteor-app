@@ -48,15 +48,22 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       :club_id => @club.id, 
       :terms_of_membership => @terms_of_membership_with_gateway,
       :created_by => @admin_agent) }
-
+    10.times{ FactoryGirl.create(:lapsed_member, 
+      :club_id => @club.id, 
+      :terms_of_membership => @terms_of_membership_with_gateway,
+      :created_by => @admin_agent) }
+    10.times{ FactoryGirl.create(:provisional_member, 
+      :club_id => @club.id, 
+      :terms_of_membership => @terms_of_membership_with_gateway,
+      :created_by => @admin_agent) }
     @search_member = Member.first
     sign_in_as(@admin_agent)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   end
 
-  ############################################################
-  # UTILS
-  ############################################################
+ #  ############################################################
+ #  # UTILS
+ #  ############################################################
 
   def search_member(field_selector, value, validate_obj)
     fill_in field_selector, :with => value unless value.nil?
@@ -668,4 +675,574 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   end
 
 
+  test "search by last name" do
+    setup_search
+    active_member = Member.where(:status => 'active').first
+    provisional_member = Member.where(:status => 'provisional').first
+    lapsed_member = Member.where(:status => 'lapsed').first
+
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[last_name]", :with => active_member.last_name
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(active_member.full_name)
+        assert page.has_content?(active_member.status)
+        assert page.has_css?('tr td.ligthgreen')
+      }
+    end
+
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[last_name]", :with => provisional_member.last_name
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(provisional_member.full_name)
+        assert page.has_content?(provisional_member.status)
+        assert page.has_css?('tr td.yellow')
+      }
+    end
+
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[last_name]", :with => lapsed_member.last_name
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(lapsed_member.full_name)
+        assert page.has_content?(lapsed_member.status)
+        assert page.has_css?('tr td.red')
+      }
+    end
+  end
+
+  test "search by email" do
+    setup_search
+    member_to_seach = Member.first
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[email]", :with => member_to_seach.email
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(member_to_seach.full_name)
+      }
+    end
+  end
+
+  test "search by phone number" do
+    setup_search
+    member_to_seach = Member.first
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[phone_country_code]", :with => member_to_seach.phone_country_code
+        fill_in "member[phone_area_code]", :with => member_to_seach.phone_area_code
+        fill_in "member[phone_local_number]", :with => member_to_seach.phone_local_number
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(member_to_seach.full_name)
+      }
+    end
+  end
+
+  test "search by address" do
+    setup_search
+    member_to_seach = Member.first
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[address]", :with => member_to_seach.address
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(member_to_seach.full_name)
+      }
+    end
+  end
+
+  test "search by city" do
+    setup_search
+    member_to_seach = Member.first
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[city]", :with => member_to_seach.city
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(member_to_seach.full_name)
+      }
+    end
+  end
+
+  test "search by state" do
+    setup_search
+    member_to_seach = Member.first
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[state]", :with => member_to_seach.state
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(member_to_seach.full_name)
+      }
+    end
+  end
+
+  test "search by zip" do
+    setup_search
+    member_to_seach = Member.first
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[zip]", :with => member_to_seach.zip
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(member_to_seach.full_name)
+      }
+    end
+  end
+
+  test "search by last digits" do
+    setup_search
+    member_to_seach = Member.first
+    within("#payment_details")do
+      wait_until{
+        fill_in "member[last_digits]", :with => member_to_seach.active_credit_card.last_digits
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(member_to_seach.full_name)
+      }
+    end
+  end
+
+  test "search by notes" do
+    setup_member
+    member_note = FactoryGirl.create(:member_note, :member_id => @saved_member.id, 
+                                     :created_by_id => @admin_agent.id,
+                                     :communication_type_id => @communication_type.id,
+                                     :disposition_type_id => @disposition_type.id)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#payment_details")do
+      wait_until{
+        fill_in "member[notes]", :with => @saved_member.member_notes.first.description
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(@saved_member.full_name)
+      }
+    end
+  end
+
+  test "search by multiple values" do
+    setup_member
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    member_note = FactoryGirl.create(:member_note, :member_id => @saved_member.id, 
+                                     :created_by_id => @admin_agent.id,
+                                     :communication_type_id => @communication_type.id,
+                                     :disposition_type_id => @disposition_type.id)
+    member_to_seach = Member.first
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[member_id]", :with => @saved_member.visible_id
+        fill_in "member[first_name]", :with => @saved_member.first_name
+        fill_in "member[last_name]", :with => @saved_member.last_name
+        fill_in "member[email]", :with => @saved_member.email
+        fill_in "member[phone_country_code]", :with => @saved_member.phone_country_code
+        fill_in "member[phone_area_code]", :with => @saved_member.phone_area_code
+        fill_in "member[phone_local_number]", :with => @saved_member.phone_local_number
+      }
+    end
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[city]", :with => @saved_member.city
+        fill_in "member[state]", :with => @saved_member.state
+        fill_in "member[address]", :with => @saved_member.address
+        fill_in "member[zip]", :with => @saved_member.zip
+      }
+    end
+    page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
+    within("#ui-datepicker-div") do
+      click_on("#{Time.zone.now.day}")
+    end
+    within("#payment_details")do
+      wait_until{
+        fill_in "member[last_digits]", :with => @saved_member.active_credit_card.last_digits
+        fill_in "member[notes]", :with => @saved_member.member_notes.first.description
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(@saved_member.full_name)
+      }
+    end
+  end
+
+  test "search by external_id" do
+    setup_member(false)
+    @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
+    @member_with_external_id = FactoryGirl.create(:active_member_with_external_id, 
+                                                  :club_id => @club_external_id.id, 
+                                                  :terms_of_membership => @terms_of_membership_with_gateway,
+                                                  :created_by => @admin_agent)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club_external_id.name)
+    assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
+    within("#payment_details")do
+      wait_until{
+        fill_in "member[external_id]", :with => @member_with_external_id.external_id
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(@member_with_external_id.status)
+        assert page.has_content?(@member_with_external_id.visible_id.to_s)
+        assert page.has_content?(@member_with_external_id.external_id.to_s)
+        assert page.has_content?(@member_with_external_id.full_name)
+        assert page.has_content?(@member_with_external_id.full_address)
+      }
+    end
+  end
+
+  test "search member by invalid characters" do
+    setup_member
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    member_note = FactoryGirl.create(:member_note, :member_id => @saved_member.id, 
+                                     :created_by_id => @admin_agent.id,
+                                     :communication_type_id => @communication_type.id,
+                                     :disposition_type_id => @disposition_type.id)
+    member_to_seach = Member.first
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[member_id]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in "member[first_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in "member[last_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in "member[email]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+      }
+    end
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[city]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in "member[state]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in "member[address]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in "member[zip]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?('No records were found.')
+      }
+    end
+  end
+
+  test "create member without information" do
+    setup_member
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+    alert_ok_js
+    click_link_or_button 'Create Member'
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?("first_name: can't be blank,is invalid"), "Failure on first_name validation message"
+        assert page.has_content?("last_name: can't be blank,is invalid"), "Failure on last_name validation message"
+        assert page.has_content?("email: can't be blank,is invalid"), "Failure on email validation message"
+        assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_country_code validation message"
+        assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
+        assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_local_number validation message"
+        assert page.has_content?("address: is invalid"), "Failure on address validation message"
+        assert page.has_content?("state: can't be blank,is invalid"), "Failure on state validation message"
+        assert page.has_content?("city: can't be blank,is invalid"), "Failure on city validation message"
+        assert page.has_content?("zip: can't be blank,The zip code is not valid for the selected country."), "Failure on zip validation message"
+      }
+    end
+  end
+
+  test "create member with invalid characters" do
+    setup_member
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+    within("#table_demographic_information"){
+      wait_until{
+        fill_in 'member[first_name]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in 'member[address]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in 'member[state]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in 'member[city]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in 'member[last_name]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in 'member[zip]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+      }
+    }
+    within("#table_contact_information"){
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in 'member[phone_area_code]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in 'member[phone_local_number]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in 'member[email]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+      }
+    }
+    alert_ok_js
+    click_link_or_button 'Create Member'
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?("first_name: is invalid"), "Failure on first_name validation message"
+        assert page.has_content?("last_name: is invalid"), "Failure on last_name validation message"
+        assert page.has_content?("email: is invalid"), "Failure on email validation message"
+        assert page.has_content?("phone_country_code: is not a number"), "Failure on phone_country_code validation message"
+        assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
+        assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
+        assert page.has_content?("address: is invalid"), "Failure on address validation message"
+        assert page.has_content?("state: is invalid"), "Failure on state validation message"
+        assert page.has_content?("city: is invalid"), "Failure on city validation message"
+        assert page.has_content?("zip: The zip code is not valid for the selected country."), "Failure on zip validation message"
+      }
+    end
+  end
+
+  test "create member with letter in phone field" do
+    setup_member(false)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+    within("#table_contact_information"){
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => 'werqwr'
+        fill_in 'member[phone_area_code]', :with => 'werqwr'
+        fill_in 'member[phone_local_number]', :with => 'werqwr'
+      }
+    }
+    alert_ok_js
+    click_link_or_button 'Create Member'
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?("phone_country_code: is not a number"), "Failure on phone_country_code validation message"
+        assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
+        assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
+      }
+    end
+  end
+
+  test "create member with invalid email" do
+    setup_member(false)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+    within("#table_contact_information"){
+      wait_until{
+        fill_in 'member[email]', :with => 'asdfhomail.com'
+      }
+    }
+    alert_ok_js
+    click_link_or_button 'Create Member'
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?("email: is invalid"), "Failure on email validation message"
+      }
+    end    
+  end
+
+  test "change unreachable phone number to reachable by check" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button "Set Unreachable"
+    within("#unreachable_table"){
+      select('Unreachable', :from => 'reason')
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong phone number'
+   
+   within("#table_contact_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, 'Unreachable'
+
+    click_link_or_button "Edit"
+    within("#table_contact_information")do
+      wait_until{
+        check('setter[wrong_phone_number]')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    within("#table_contact_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+
+  test "change unreachable address to undeliverable by check" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button "Set undeliverable"
+    within("#undeliverable_table"){
+      fill_in 'reason', :with => 'Undeliverable'
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong address'
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, 'Undeliverable'
+
+    click_link_or_button "Edit"
+    within("#table_demographic_information")do
+      wait_until{
+        check('setter[wrong_address]')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    within("#table_demographic_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+  test "change unreachable phone number to reachable by changeing phone" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    #By changing phone_country_number
+    click_link_or_button "Set Unreachable"
+    within("#unreachable_table"){
+      select('Unreachable', :from => 'reason')
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong phone number'
+   
+    within("#table_contact_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, 'Unreachable'
+
+    click_link_or_button "Edit"
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => '9876'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    within("#table_contact_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+
+    #By changing phone_area_code
+    click_link_or_button "Set Unreachable"
+    within("#unreachable_table"){
+      select('Unreachable', :from => 'reason')
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong phone number'
+   
+    within("#table_contact_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, 'Unreachable'
+
+    click_link_or_button "Edit"
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_area_code]', :with => '9876'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    within("#table_contact_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+    #By changing phone_local_number
+    click_link_or_button "Set Unreachable"
+    within("#unreachable_table"){
+      select('Unreachable', :from => 'reason')
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong phone number'
+   
+    within("#table_contact_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, 'Unreachable'
+
+    click_link_or_button "Edit"
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_local_number]', :with => '9876'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    within("#table_contact_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+  test "change unreachable address to undeliverable by changing address" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button "Set undeliverable"
+    within("#undeliverable_table"){
+      fill_in 'reason', :with => 'Undeliverable'
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong address'
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, 'Undeliverable'
+
+    click_link_or_button "Edit"
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[address]', :with => 'New address name'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    within("#table_demographic_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, nil
+  end
 end

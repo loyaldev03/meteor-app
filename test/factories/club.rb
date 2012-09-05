@@ -40,4 +40,13 @@ FactoryGirl.define do
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end  
+
+  factory :simple_club_with_require_external_id, class: Club do
+    sequence(:name) {|n| "club_with_external_id#{n}" }
+    description "My description"
+    time_zone { TZInfo::Timezone.all.sample.name }
+    api_username { Faker::Internet.user_name }
+    api_password { Faker::Internet.user_name }
+    requires_external_id true
+  end
 end

@@ -69,16 +69,20 @@ class CreditCard < ActiveRecord::Base
   def self.recycle_expired_rule(acc, times)
     if acc.am_card.expired?
       case times
-      when 1
+      when 0
         new_year_exp=acc.expire_year.to_i + 3
-      when 2
+      when 1
         new_year_exp=acc.expire_year.to_i + 2
-      when 3
+      when 2
         new_year_exp=acc.expire_year.to_i + 4
-      when 4
+      when 3
         new_year_exp=acc.expire_year.to_i + 1
+      when 4
+        new_year_exp=acc.expire_year.to_i + 6
+      when 5
+        new_year_exp=acc.expire_year.to_i + 5
       else
-        return acc
+        new_year_exp=Time.zone.now.year
       end
       CreditCard.transaction do
         begin

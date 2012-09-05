@@ -1,4 +1,5 @@
-require '../../config/environment.rb'
+require 'config/environment.rb'
+require 'faraday'
 
 ## ONMC version
 
@@ -6,9 +7,9 @@ require '../../config/environment.rb'
 @merchant = '941000110028'
 @username = '941000110028AUS'
 @url = 'https://www.merchante-solutions.com/'
-@folder = "#{RAILS_ROOT rescue Rails.root}/files/mes_account_updater"
+@folder = "#{RAILS_ROOT rescue Rails.root}/mes_account_updater_files"
 
-def send_file_to_mes
+def store_file
   ################################################
   ########## new file!
   ################################################
@@ -19,14 +20,14 @@ def send_file_to_mes
   record_type, version_id, merchant_id = 'H1', '100000', "%-32s" % @merchant
   file.write [ record_type, version_id, merchant_id ].join + "\n"
 
+  ids = %w(
+
+)
+
   count = 0
   # members with expired credit card and active
-  Member.find(:all, 
-    :conditions => [ 
-      " (active = 1 or trial = 1) and ((cc_month_exp <= ? and cc_year_exp = ?) or cc_year_exp < ?) ", 
-      Date.today.month, Date.today.year, Date.today.year 
-    ] , :limit => 10
-  ).each do |member|
+  members = Member.find(ids)
+  members.each do |member|
     
     ActiveMerchant::Billing::CreditCard.require_verification_value = false
     credit_card = ActiveMerchant::Billing::CreditCard.new(
@@ -41,16 +42,17 @@ def send_file_to_mes
     when 'visa'
       'VISA'
     when 'master'
-      'MC'
+      'MC  '
     else
+      puts credit_card.type
       nil
     end
     # only master and visa allowed
     next if account_type.nil?
 
     # add cc line
-    record_type, account_number, expiration_date, descretionary_data = 'D1', "%-32s" % member.cc_number, 
-      member.cc_year_exp.to_s[2..3]+("%02d" % member.cc_month_exp), member.id
+    record_type, account_number, expiration_date, descretionary_data = 'D1', "%-32s" % member.cc_number.strip, 
+      member.cc_year_exp.to_s[2..3]+("%02d" % member.cc_month_exp), "M%-31s"% member.id
 
     file.write [ record_type, account_type, account_number, expiration_date, descretionary_data ].join + "\n"
     count += 1
@@ -63,6 +65,16 @@ def send_file_to_mes
   ################################################
   ########## new file!
   ################################################
+
+  puts local_filename
+
+end
+
+def send_file_to_mes(filename)
+  if filename.nil?
+    puts "Filename must be valid" 
+    exit
+  end
 
   conn = Faraday.new(:url => @url, :ssl => {:verify => false}) do |builder|
     builder.request :multipart
@@ -95,44 +107,55 @@ def request_file_by_id(file_id, filename)
   if answer['rspCode'].to_i == 0
     full_filename = "#{@folder}/#{filename}"
     file = File.open(full_filename, 'w')
-    file.write answer['rspMessage']
+    file.write answer
     file.close
-    parse_file full_filename
+    #parse_file full_filename
   end
 end
 
 def parse_file(filename)
   File.open(filename).each do |line|
     # do not parse header or trailers.
-    next if line[0] == 'H' or line[0] == 'T'
+    next if line[0..0] == 'H' or line[0..0] == 'T'
     # TODO: IMPROVEMENT: we can add a flag on each credit card to know if it was or nor processed
     record_type = line[0..1]
     old_account_type = line[2..5]
-    old_account_number = line[6..37]
+    old_account_number = line[6..37].strip
     old_expiration_date = line[38..41]
     new_account_type = line[42..45]
-    new_account_number = line[46..77]
+    new_account_number = line[46..77].strip
     new_expiration_date = line[78..81]
-    response_code = line[82..89]
+    response_code = line[82..89].strip
     response_source = line[90..91]
     discretionary_data = line[92..123]
 
-    member = Member.find discretionary_data
+[ record_type, old_account_type , old_account_number, old_expiration_date, new_account_type, new_account_number, new_expiration_date, response_code, response_source, discretionary_data ].each do |f|
+puts "-#{f}-"
+end
+
+    member = Member.find discretionary_data[1..32].strip
     if member.nil?
       log "Member id not found ##{discretionary_data} while parsing. #{line}"
     else
+      update_cs = false
+      member.aus_status = response_code
       case response_code
       when 'NEWACCT'
+        update_cs = true
         member.cc_number = new_account_number
         member.cc_year_exp = new_expiration_date[0..1].to_i+2000
         member.cc_month_exp = new_expiration_date[2..3]
-        member.save
       when 'NEWEXP'
+        update_cs = true
         member.cc_year_exp = new_expiration_date[0..1].to_i+2000
         member.cc_month_exp = new_expiration_date[2..3]
-        member.save
       else
         log "Member id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
+      end
+      member.save
+      if update_cs
+        Delayed::Job.enqueue(UpdateJob.new(@member.id))
+        # TODO: notify CS
       end
     end
   end
@@ -151,21 +174,26 @@ def account_updater_file_status
   }    
   answer = Rack::Utils.parse_nested_query(result.body)
   puts answer.inspect
-  0..answer['statusCount'].to_i do |i|
-    request_file_by_id answer["reqfId_#{i}"], answer["reqfName_#{i}"]
-  end
+  # TODO: following lines not tested.
+#  0..answer['statusCount'].to_i do |i|
+#    request_file_by_id answer["reqfId_#{i}"], answer["reqfName_#{i}"]
+#  end
 end
 
 def log(text)
   Rails.logger.info "AUS Updater: #{text}"
 end
 
-if ARGV[0] == 'send'
-  send_file_to_mes
+if ARGV[0] == 'store_file'
+  store_file
+elsif ARGV[0] == 'send'
+  send_file_to_mes ARGV[1]
 elsif ARGV[0] == 'download_all'
   account_updater_file_status
 elsif ARGV[0] == 'download'
   request_file_by_id ARGV[1], ARGV[2]
+elsif ARGV[0] == 'parse_file'
+  parse_file ARGV[1]
 else
   puts "Arguments need: send - download_all - download"
 end
