@@ -347,8 +347,8 @@ class PhoenixMember < ActiveRecord::Base
   def self.cohort_formula(join_date, enrollment_info, time_zone, installment_type)
     [ join_date.in_time_zone(time_zone).year.to_s, 
       "%02d" % join_date.in_time_zone(time_zone).month.to_s, 
-      enrollment_info.mega_channel.to_s, 
-      enrollment_info.campaign_medium.to_s,
+      enrollment_info.mega_channel.to_s.strip, 
+      enrollment_info.campaign_medium.to_s.strip,
       installment_type ].join('-').downcase
   end 
 
