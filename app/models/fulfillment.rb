@@ -117,7 +117,7 @@ class Fulfillment < ActiveRecord::Base
       csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
       fulfillments.each do |fulfillment|
-        fulfillment.set_as_processing unless fulfillment.processing? or fulfillment.not_processed?
+        fulfillment.set_as_processing unless fulfillment.processing?
         member = fulfillment.member
         csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
                 member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
