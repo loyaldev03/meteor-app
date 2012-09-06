@@ -94,8 +94,8 @@ def add_enrollment_info(phoenix, member, campaign = nil)
   e_info.campaign_medium_version = campaign.campaign_medium_version
   e_info.joint = campaign.is_joint
   e_info.save
-  member.cohort = PhoenixMember.cohort_formula(member.join_date, e_info.first, member.club.time_zone, member.terms_of_membership.installment_type)
-  member.cohort.save
+  phoenix.cohort = PhoenixMember.cohort_formula(member.join_date, e_info, TIMEZONE, PhoenixTermsOfMembership.find(phoenix.terms_of_membership_id).installment_type)
+  phoenix.save
 end
 def update_fulfillment(member, phoenix)
   phoenix_f = PhoenixFulfillment.find_by_member_id_and_product(phoenix.uuid, member.fulfillment_kit)
@@ -207,8 +207,8 @@ def add_new_members(cid)
   end
 
   BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0 and campaign_id = #{cid} " + 
-      #" and id <= 13771771004 " + # uncomment this line if you want to import a single member.
-      " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed' and phoenix_status IS NOT NULL)) " +
+     # " and id <= 13771771004 " + # uncomment this line if you want to import a single member.
+      " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed')) " +
       " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
@@ -247,6 +247,7 @@ def add_new_members(cid)
         phoenix.save!
 
         @member = phoenix
+        add_enrollment_info(phoenix, member, @campaign)
         add_operation(Time.now.utc, nil, "Member imported into phoenix!", nil)  
 
         if phoenix.status == "lapsed"
@@ -271,7 +272,6 @@ def add_new_members(cid)
 
         add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
         add_product_fulfillment(member.has_fulfillment_product)
-        add_enrollment_info(phoenix, member, @campaign)
 
         member.update_attribute :imported_at, Time.now.utc
         print "."

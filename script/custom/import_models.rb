@@ -462,6 +462,19 @@ USE_MEMBER_LIST = true
 
 )
 
+@cids = %w(
+999
+190
+225
+10
+14
+15
+16
+19
+20
+21
+23
+)
 
 if USE_PROD_DB
 #  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
@@ -559,8 +572,8 @@ class PhoenixMember < ActiveRecord::Base
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 
   def self.cohort_formula(join_date, enrollment_info, time_zone, installment_type)
-    [ join_date.in_time_zone(time_zone).year.to_s, 
-      "%02d" % join_date.in_time_zone(time_zone).month.to_s, 
+    [ join_date.to_time.in_time_zone(time_zone).year.to_s, 
+      "%02d" % join_date.to_time.in_time_zone(time_zone).month.to_s, 
       enrollment_info.mega_channel.to_s.strip, 
       enrollment_info.campaign_medium.to_s.strip,
       installment_type ].join('-').downcase
@@ -902,10 +915,10 @@ def add_operation(operation_date, object, description, operation_type, created_a
       :operation_type => (operation_type || Settings.operation_types.others)
   o.created_by_id = get_agent
   o.created_at = created_at
-  if object.nil?
-    o.resource_type = nil
-    # TODO => 
-    # o.resource_id = 0
+  o.cohort = @member.cohort
+  unless object.nil?
+    o.resource_type = object.class
+    o.resource_id = object.id
   end
   o.updated_at = updated_at
   o.member_id = @member.uuid
