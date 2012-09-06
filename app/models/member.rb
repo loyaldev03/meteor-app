@@ -738,6 +738,7 @@ class Member < ActiveRecord::Base
       self.bill_date = nil
       self.recycled_times = 0
       Communication.deliver!(:cancellation, self)
+      self.fulfillments.where_cancellable.each &:set_as_canceled
       # TODO: Deactivate drupal account
       self.save
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
