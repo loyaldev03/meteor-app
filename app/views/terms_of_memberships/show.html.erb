@@ -1,5 +1,5 @@
 <%= render :partial => "shared/member_information" %>
-<table class="table table-bordered table-condensed">
+<table class="table table-bordered table-condensed" id="table_information">
   <thead>
   <tr> <th> <%= t('activerecord.term_of_membership') %> </th> </tr>
   </thead>
@@ -23,7 +23,7 @@
   </tr>
 </table>
 
-  <table class="table table-bordered table-condensed">
+  <table class="table table-bordered table-condensed" id="table_payment_gateway_configuration">
     <thead>
     <tr
       <% if @payment_gateway_configuration_development.nil? %>
@@ -42,7 +42,7 @@
     </thead>
   </table>
 
-<table class="table table-bordered table-condensed">
+<table class="table table-bordered table-condensed" id="table_email_template">
   <thead>
     <tr> <th colspan="3"> <%= t('activerecord.email_template') %> </th> </tr>
     <tr>

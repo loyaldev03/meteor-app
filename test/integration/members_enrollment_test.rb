@@ -143,8 +143,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
       within("#td_mi_quota") { assert page.has_content?("#{member.quota}") }
       
-    end    
-    
+    end  
+
   end
   
   ###########################################################
@@ -1212,33 +1212,124 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert_equal @saved_member.wrong_phone_number, nil
   end
 
-  test "change unreachable address to undeliverable by changing address" do
+  test "show terms of memberhip" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_link_or_button "Set undeliverable"
-    within("#undeliverable_table"){
-      fill_in 'reason', :with => 'Undeliverable'
-    }
-    confirm_ok_js
-    click_link_or_button 'Set wrong address'
-    within("#table_demographic_information")do
-      assert page.has_css?('tr.yellow')
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_address, 'Undeliverable'
+    click_link_or_button("#{@saved_member.terms_of_membership.name}")
+    within("#table_information")do
+      wait_until{
+        assert page.has_content?(@terms_of_membership_with_gateway.name) if @terms_of_membership_with_gateway.name
+        assert page.has_content?(@terms_of_membership_with_gateway.description) if @terms_of_membership_with_gateway.description
+        assert page.has_content?(@terms_of_membership_with_gateway.provisional_days.to_s) if @terms_of_membership_with_gateway.provisional_days
+        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s) if @terms_of_membership_with_gateway.installment_amount
+        assert page.has_content?(@terms_of_membership_with_gateway.installment_type) if @terms_of_membership_with_gateway.installment_type
+        assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
+      }
+    end
+    within("#table_email_template")do
+      wait_until{
+        assert page.has_content?('Test welcome')
+        assert page.has_content?('Test active')
+        assert page.has_content?('Test cancellation')
+        assert page.has_content?('Test prebill ')
+        assert page.has_content?('Test prebill_renewal')
+        assert page.has_content?('Test refund')
+        assert page.has_content?('Test birthday')
+        assert page.has_content?('Test pillar')
+      }
+    end
+  end
 
-    click_link_or_button "Edit"
+  test "return to member's profile from terms of membership" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button("#{@saved_member.terms_of_membership.name}")
+    within("#table_information")do
+      wait_until{
+        assert page.has_content?(@terms_of_membership_with_gateway.name) if @terms_of_membership_with_gateway.name
+        assert page.has_content?(@terms_of_membership_with_gateway.description) if @terms_of_membership_with_gateway.description
+        assert page.has_content?(@terms_of_membership_with_gateway.provisional_days.to_s) if @terms_of_membership_with_gateway.provisional_days
+        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s) if @terms_of_membership_with_gateway.installment_amount
+        assert page.has_content?(@terms_of_membership_with_gateway.installment_type) if @terms_of_membership_with_gateway.installment_type
+        assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
+      }
+    end
+    within("#table_email_template")do
+      wait_until{
+        assert page.has_content?('Test welcome')
+        assert page.has_content?('Test active')
+        assert page.has_content?('Test cancellation')
+        assert page.has_content?('Test prebill ')
+        assert page.has_content?('Test prebill_renewal')
+        assert page.has_content?('Test refund')
+        assert page.has_content?('Test birthday')
+        assert page.has_content?('Test pillar')
+      }
+    end
+    click_link_or_button('Return to member show')
+    wait_until{
+      assert page.has_content?("Member: #{@saved_member.visible_id} - #{@saved_member.full_name}")
+    }
+  end
+
+  test "create member with gender male and change it to female" do
+    setup_member
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
+    within("#table_demographic_information"){
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select(unsaved_member.gender, :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        fill_in 'member[state]', :with => unsaved_member.state
+        select('US', :from => 'member[country]')
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    }
+    within("#table_contact_information"){
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        fill_in 'member[email]', :with => unsaved_member.email
+      }
+    }
+    within("#table_credit_card"){
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+      }
+    }
+    alert_ok_js
+    click_link_or_button 'Create Member'
+    puts unsaved_member.gender
+    assert find_field('input_gender').value == (unsaved_member.gender == 'F' ? 'Female' : 'Male')
+    assert_equal unsaved_member.gender, 'M'
+
+    click_link_or_button 'Edit'
     within("#table_demographic_information")do
       wait_until{
-        fill_in 'member[address]', :with => 'New address name'
+        select('F', :from => 'member[gender]')
       }
     end
     alert_ok_js
     click_link_or_button 'Update Member'
-    within("#table_demographic_information")do
-      assert !page.has_css?('tr.yellow')
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_address, nil
+
+    assert find_field('input_gender').value == (unsaved_member.gender == 'F' ? 'Female' : 'Male')
+    unsaved_member.reload
+    assert_equal member.gender, 'F'
   end
+
 end
+
+
