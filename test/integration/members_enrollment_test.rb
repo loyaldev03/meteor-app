@@ -114,7 +114,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
 
     within("#table_membership_information") do
-      assert page.has_content?(member.status)
+      
+      within("#td_mi_status") { assert page.has_content?(member.status) }
+      
       within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(member.member_since_date, :format => :only_date)) }
       
       assert page.has_content?(member.terms_of_membership.name)
@@ -311,6 +313,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     
     validate_view_member_base(created_member)
 
+    within("#td_mi_status") { assert page.has_content?("provisional") }
+      
     within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
 
     active_credit_card = created_member.active_credit_card

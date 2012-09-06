@@ -201,7 +201,9 @@ USE_MEMBER_LIST = true
 1607
 1677
 1678
+
 999
+
 1221
 1222
 1223
@@ -243,8 +245,222 @@ USE_MEMBER_LIST = true
 1292
 1293
 
-)
+1294
+1295
+1296
+1297
+1298
+1299
+1300
+1301
+1302
+1303
+1304
+1305
+1306
+1307
+1308
+1309
+1310
+1317
+1318
+1319
+1320
+1321
+1322
+1336
+1337
+1338
+1339
+1340
+1341
+1492
+1493
+1494
+1495
+1496
+1497
 
+1498
+1499
+1500
+1501
+1502
+1503
+1504
+1505
+1520
+1521
+1522
+1523
+1524
+1525
+1526
+1323
+1324
+1325
+1326
+1327
+1328
+1329
+1330
+1331
+1332
+1333
+1334
+1335
+1342
+1343
+1344
+1345
+1346
+1347
+1506
+1507
+1508
+1509
+1510
+1511
+1512
+1513
+1514
+1515
+1516
+1517
+1518
+1519
+1527
+1528
+1529
+1530
+1531
+1532
+1533
+1018
+
+
+888
+1200
+1698
+1870
+1034
+1192
+1202
+1699
+324
+1002
+1193
+1203
+2
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+1001
+1003
+1004
+1201
+1608
+1609
+1610
+1611
+1612
+1206
+
+
+1380
+998
+996
+993
+997
+991
+984
+995
+994
+35
+315
+316
+317
+318
+344
+345
+1000
+990
+992
+3
+4
+5
+340
+342
+343
+346
+347
+348
+349
+350
+351
+1770
+1771
+1772
+1773
+1774
+1775
+1776
+1777
+1778
+1779
+1780
+1781
+1782
+1204
+1205
+7
+8
+9
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+1010
+1011
+1012
+1013
+1014
+1015
+
+)
 
 
 if USE_PROD_DB
@@ -336,8 +552,6 @@ class ProspectProspect < ActiveRecord::Base
   end  
 end
 
-
-
 class PhoenixMember < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
@@ -354,9 +568,14 @@ class PhoenixMember < ActiveRecord::Base
 
   def phone_number=(phone)
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.+]/, '')
-    if p.size == 7 
+    if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
+    elsif p.size == 7  || p.size == 8 || p.size == 6
       phone_country_code = '1'
       phone_local_number = p
+    elsif p.size >= 20
+      phone_country_code = '1'
+      phone_area_code = p[0..2]
+      phone_local_number = p[3..9]
     elsif p.size == 10 || p.size == 9
       phone_country_code = '1'
       phone_area_code = p[0..2]
@@ -373,7 +592,6 @@ class PhoenixMember < ActiveRecord::Base
       phone_country_code = p[0..1]
       phone_area_code = p[2..5]
       phone_local_number = p[6..-1]
-    elsif p.size < 5 || p.include?('@') || !p.match(/^[a-z]/i).nil?
     else
       raise "Dont know how to parse -#{p}-"
     end
@@ -393,9 +611,14 @@ class PhoenixProspect < ActiveRecord::Base
 
   def phone_number=(phone)
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.+]/, '')
-    if p.size == 7 
+    if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
+    elsif p.size == 7  || p.size == 8 || p.size == 6
       phone_country_code = '1'
       phone_local_number = p
+    elsif p.size >= 20
+      phone_country_code = '1'
+      phone_area_code = p[0..2]
+      phone_local_number = p[3..9]
     elsif p.size == 10 || p.size == 9
       phone_country_code = '1'
       phone_area_code = p[0..2]
@@ -412,7 +635,6 @@ class PhoenixProspect < ActiveRecord::Base
       phone_country_code = p[0..1]
       phone_area_code = p[2..5]
       phone_local_number = p[6..-1]
-    elsif p.size < 5 || p.include?('@') || !p.match(/^[a-z]/i).nil?
     else
       raise "Dont know how to parse -#{p}-"
     end
