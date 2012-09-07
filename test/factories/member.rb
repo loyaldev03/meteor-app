@@ -18,6 +18,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
+    type_of_phone_number 'Mobile'
     bill_date { DateTime.now }
     birth_date { DateTime.now }
     status "none"
@@ -38,6 +39,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
+    type_of_phone_number 'Mobile'
     birth_date { DateTime.now }
     status "none"
     country "US"
@@ -59,6 +61,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
+    type_of_phone_number 'Mobile'
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
@@ -134,6 +137,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
+    type_of_phone_number "Home"
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
@@ -156,6 +160,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
+    type_of_phone_number "Home"
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     cancel_date { DateTime.now - 1.month }
@@ -181,6 +186,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
+    type_of_phone_number "Home"
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
@@ -204,6 +210,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
+    type_of_phone_number "Home"
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
@@ -226,6 +233,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
+    type_of_phone_number "Home"
     birth_date { DateTime.now }
     join_date { DateTime.now }
     country "US"
