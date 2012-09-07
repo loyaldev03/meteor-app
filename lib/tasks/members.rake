@@ -209,13 +209,13 @@ namespace :members do
   task :process_fulfillments => :environment do
     tall = Time.zone.now
     begin
-      Fulfillment.joins(:member).find_in_batches(:conditions => [
+      Fulfillment.find_in_batches(:conditions => [
           " date(renewable_at) <= ? AND fulfillments.status IN (?) AND recurrent = true", 
           Time.zone.now.to_date, ['sent', 'undeliverable'] ]) do |group|
         group.each do |fulfillment| 
           tz = Time.zone.now
           begin
-            Rails.logger.info "  * processing member ##{fulfillment.member.uuid} fulfillment ##{fulfillment.id}"
+            Rails.logger.info "  * processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
             fulfillment.renew!
           rescue Exception => e
             Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
