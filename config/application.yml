@@ -37,11 +37,11 @@ defaults: &defaults
     enrollment_needs_approval: 206
     blacklisted: 207
     fulfillment_mannualy_mark_as_sent: 208
-    credit_card_already_in_use: 209
-    credit_card_blacklisted: 210
-    member_email_blacklisted: 211
-    automatic_recycle_credit_card: 212
-    reset_club_cash: 213
+    credit_card_already_in_use: 401
+    credit_card_blacklisted: 402
+    member_email_blacklisted: 403
+    automatic_recycle_credit_card: 404
+    reset_club_cash: 405
     #communication
     active_email: 300     
     prebill_email: 301    
