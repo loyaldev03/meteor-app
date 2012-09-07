@@ -58,7 +58,7 @@ class Fulfillment < ActiveRecord::Base
     state :undeliverable
   end
 
-  def renew!(undeliverable = false)
+  def renew!
     if recurrent
       if undeliverable?
         self.new_fulfillment('undeliverable')
