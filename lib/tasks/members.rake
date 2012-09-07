@@ -216,7 +216,7 @@ namespace :members do
           tz = Time.zone.now
           begin
             Rails.logger.info "  * processing member ##{fulfillment.member.uuid} fulfillment ##{fulfillment.id}"
-            fulfillment.renew
+            fulfillment.renew!
           rescue Exception => e
             Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
