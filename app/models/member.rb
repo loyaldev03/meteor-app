@@ -68,16 +68,42 @@ class Member < ActiveRecord::Base
     end
   end
 
-  validates :first_name, :last_name, :presence => true, :format => REGEX_FIRST_AND_LAST_NAME
-  validates :email, :presence => true, :uniqueness => { :scope => :club_id }, :format => REGEX_EMAIL
-  validates :phone_country_code, :presence => true, :numericality => { :only_integer => true }, :length => { :minimum => 1, :maximun => 4}
-  validates :phone_area_code, :presence => true, :numericality => { :only_integer => true }, :length => { :minimum => 1, :maximun => 8}
-  validates :phone_local_number, :presence => true, :numericality => { :only_integer => true }, :length => { :minimum => 1, :maximun => 8}
-  validates :address, :format => REGEX_ADDRESS
-  validates :state, :city, :presence => true, :format => REGEX_CITY_AND_STATE
-  validates :terms_of_membership_id , :presence => true
-  validates :country, :presence => true
-  validates :zip, :presence => true, :zip_code_belongs_to_country => true
+  validates :first_name, :last_name, 
+    presence:                    true, 
+    format:                      REGEX_FIRST_AND_LAST_NAME
+  validates :email, 
+    presence:                    true, 
+    uniqueness:                  { scope: :club_id }, 
+    format:                      REGEX_EMAIL
+  validates :type_of_phone_number,
+    presence:                    true,
+    inclusion:                   { within: %w(Home Mobile Other), allow_nil: true }
+  validates :phone_country_code, 
+    presence:                    true, 
+    length:                      { minimum: 1, maximum: 4 },
+    numericality:                { :only_integer => true }
+  validates :phone_area_code, 
+    presence:                    true, 
+    numericality:                { only_integer: true }, 
+    length:                      { minimum: 1, maximum: 8 }
+  validates :phone_local_number, 
+    presence:                    true, 
+    numericality:                { only_integer: true }, 
+    length:                      { minimum: 1, maximum: 8 }
+  validates :address, 
+    format:                      REGEX_ADDRESS
+  validates :state, :city, 
+    presence:                    true, 
+    format:                      REGEX_CITY_AND_STATE
+  validates :terms_of_membership_id, 
+    presence:                    true
+  validates :country, 
+    presence:                    true, 
+    length:                      { is: 2, allow_nil: true }
+  validates :zip, 
+    presence:                    true, 
+    zip_code_belongs_to_country: true
+>>>>>>> 0e09e58... Update member validations
 
   scope :synced, lambda { |bool=true|
     bool ?
