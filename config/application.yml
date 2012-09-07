@@ -14,10 +14,11 @@ defaults: &defaults
     url: https://www.merchante-solutions.com/
     path: /jsp/reports/report_api.jsp
   operation_types: 
-    enrollment_billing: 100
-    membership_billing: 101
-    full_save: 102
-    change_next_bill_date: 103
+    #billing
+    enrollment_billing: 100     
+    membership_billing: 101   
+    full_save: 102      
+    change_next_bill_date: 103    
     credit: 104
     membership_billing_without_decline_strategy: 105
     membership_billing_hard_decline: 106
@@ -26,7 +27,8 @@ defaults: &defaults
     membership_billing_without_pgc: 109
     chargeback: 110
     error_on_enrollment_billing: 111
-    cancel: 200
+    #profile
+    cancel: 200 
     future_cancel: 201
     save_the_sale: 202
     recovery: 203
@@ -34,17 +36,18 @@ defaults: &defaults
     recovery_needs_approval: 205
     enrollment_needs_approval: 206
     blacklisted: 207
-    fulfillment_mannualy_mark_as_sent: 220
-    fulfillment_resend: 221
-    active_email: 300
-    prebill_email: 301
-    cancellation_email: 302
-    refund_email: 303
-    credit_card_already_in_use: 401
-    credit_card_blacklisted: 402
-    member_email_blacklisted: 403
-    automatic_recycle_credit_card: 404
-    reset_club_cash: 405
+    fulfillment_mannualy_mark_as_sent: 208
+    credit_card_already_in_use: 209
+    credit_card_blacklisted: 210
+    member_email_blacklisted: 211
+    automatic_recycle_credit_card: 212
+    reset_club_cash: 213
+    #communication
+    active_email: 300     
+    prebill_email: 301    
+    cancellation_email: 302 
+    refund_email: 303 
+    #other
     others: 1000
   error_codes:
     success: '000'
@@ -98,4 +101,5 @@ prototype:
 
 staging:
   <<: *defaults
+
 

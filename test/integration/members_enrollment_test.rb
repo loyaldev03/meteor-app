@@ -146,12 +146,67 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       within("#td_mi_quota") { assert page.has_content?("#{member.quota}") }
       
     end  
-
   end
-  
-  ###########################################################
-  # TESTS
-  ###########################################################
+
+  def fill_in_member(unsaved_member, credit_card)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select(unsaved_member.gender, :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        fill_in 'member[state]', :with => unsaved_member.state
+        select(unsaved_member.country, :from => 'member[country]')
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(unsaved_member.type_of_phone_number, :from => 'member[type_of_phone_number]')
+        fill_in 'member[email]', :with => unsaved_member.email
+      }
+    end
+    within("#table_credit_card")do
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Create Member'  	
+  end
+
+  def generate_operations(member)
+  	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
+  										 :member_id => member.id, :operation_type => 100, :description => 'Member was enrolled' )
+  	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
+  										 :member_id => member.id, :operation_type => 200, :description => 'Blacklisted member. Reason: Too much spam' )
+  	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
+  										 :member_id => member.id, :operation_type => 201, :description => 'Blacklisted member. Reason: dont like it' )
+  	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
+  										 :member_id => member.id, :operation_type => 202, :description => 'Blacklisted member. Reason: testing' )
+  	FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'Member',
+  										 :member_id => member.id, :operation_type => 300, :description => 'Communication sent successfully' )
+  	FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'Member',
+  										 :member_id => member.id, :operation_type => 301, :description => 'Communication was not sent' )
+ 		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
+  										 :member_id => member.id, :operation_type => 1000, :description => 'Member updated successfully' )
+ 		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
+  										 :member_id => member.id, :operation_type => 1000, :description => 'Member was recovered' )  
+  end
+
+
+ #  ###########################################################
+ #  # TESTS
+ #  ###########################################################
 
 
   test "search members by next bill date" do
@@ -1276,7 +1331,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
   end
 
-  test "create member with gender male and change it to female" do
+  test "create member with gender male" do
     setup_member
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id, 
@@ -1287,10 +1342,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
 
-    within("#table_demographic_information"){
+    within("#table_demographic_information")do
       wait_until{
         fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select(unsaved_member.gender, :from => 'member[gender]')
+        select('M', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
         fill_in 'member[state]', :with => unsaved_member.state
         select('US', :from => 'member[country]')
@@ -1298,42 +1353,609 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
       }
-    }
-    within("#table_contact_information"){
+    end
+    within("#table_contact_information")do
       wait_until{
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
         fill_in 'member[email]', :with => unsaved_member.email
       }
-    }
-    within("#table_credit_card"){
+    end
+    within("#table_credit_card")do
       wait_until{
         fill_in 'member[credit_card][number]', :with => credit_card.number
         fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
         fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
       }
-    }
+    end
     alert_ok_js
     click_link_or_button 'Create Member'
-    puts unsaved_member.gender
-    assert find_field('input_gender').value == (unsaved_member.gender == 'F' ? 'Female' : 'Male')
-    assert_equal unsaved_member.gender, 'M'
 
-    click_link_or_button 'Edit'
+    assert find_field('input_gender').value == (unsaved_member.gender == 'F' ? 'Female' : 'Male')
+  end
+
+  test "create member with gender female" do
+    setup_member
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
     within("#table_demographic_information")do
       wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
         select('F', :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        fill_in 'member[state]', :with => unsaved_member.state
+        select('US', :from => 'member[country]')
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        fill_in 'member[email]', :with => unsaved_member.email
+      }
+    end
+    within("#table_credit_card")do
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Create Member'
+
+    assert find_field('input_gender').value == ('Female')
+  end
+ 
+  test "change type of phone number" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(@saved_member.type_of_phone_number)
+      }
+    end
+
+    click_link_or_button 'Edit'
+
+    within("#table_contact_information")do
+      wait_until{
+        select('Mobile', :from => 'member[type_of_phone_number]')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+  
+    @saved_member.reload
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(@saved_member.type_of_phone_number)
+      }
+    end
+  end
+
+  test "create member with phone number" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select('M', :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        fill_in 'member[state]', :with => unsaved_member.state
+        select('US', :from => 'member[country]')
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        fill_in 'member[email]', :with => unsaved_member.email
+      }
+    end
+    within("#table_credit_card")do
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Create Member'
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?("#{unsaved_member.full_phone_number}")
+      }
+    end
+  end
+
+  test "create member without phone number" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select('M', :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        fill_in 'member[state]', :with => unsaved_member.state
+        select('US', :from => 'member[country]')
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[email]', :with => unsaved_member.email
+      }
+    end
+    within("#table_credit_card")do
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Create Member'
+
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_country_code validation message"
+        assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
+        assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
+      }
+    end
+  end
+
+  test "should create member and display type of phone number" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select('M', :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        fill_in 'member[state]', :with => unsaved_member.state
+        select('US', :from => 'member[country]')
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        fill_in 'member[email]', :with => unsaved_member.email
+      }
+    end
+    within("#table_credit_card")do
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Create Member'
+
+    member = Member.find_by_email(unsaved_member.email)
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(unsaved_member.type_of_phone_number)
+      }
+    end
+  end
+
+  test "edit member's type of phone number" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(@saved_member.type_of_phone_number)
+      }
+    end
+    click_link_or_button 'Edit'
+    
+    within("#table_contact_information")do
+      wait_until{
+        select('Mobile', :from => 'member[type_of_phone_number]')
+      }
+    end
+
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?('Mobile')
+      }
+    end
+    assert_equal Member.last.type_of_phone_number, 'Mobile'
+  end
+
+  test "create member with 'home' telephone type" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select('M', :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        fill_in 'member[state]', :with => unsaved_member.state
+        select('US', :from => 'member[country]')
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select('Home', :from => 'member[type_of_phone_number]')
+        fill_in 'member[email]', :with => unsaved_member.email
+      }
+    end
+    within("#table_credit_card")do
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Create Member'
+
+    member = Member.find_by_email(unsaved_member.email)
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(unsaved_member.full_phone_number)
+        assert page.has_content?('Home')
+      }
+    end
+  end
+
+  test "go from member index to edit member's phone number to a wrong phone number" do
+    setup_member
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#personal_details")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        find(".icon-pencil").click
+      }
+    end   
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => 'TYUIYTRTYUYT'
+        fill_in 'member[phone_area_code]', :with => 'TYUIYTRTYUYT'
+        fill_in 'member[phone_local_number]', :with => 'TYUIYTRTYUYT'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?('phone_country_code: is not a number')
+        assert page.has_content?('phone_area_code: is not a number')
+        assert page.has_content?('phone_local_number: is not a number')
+      }
+    end
+  end
+
+  test "go from member index to edit member's type of phone number to home type" do
+    setup_member
+    @saved_member.type_of_phone_number = 'Mobile'
+    @saved_member.save
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#personal_details")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        find(".icon-pencil").click
+      }
+    end   
+    within("#table_contact_information")do
+      wait_until{
+        assert find_field('member[type_of_phone_number]').value == @saved_member.type_of_phone_number
+        assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
+        assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
+        assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
+        select('Home', :from => 'member[type_of_phone_number]' )
       }
     end
     alert_ok_js
     click_link_or_button 'Update Member'
 
-    assert find_field('input_gender').value == (unsaved_member.gender == 'F' ? 'Female' : 'Male')
-    unsaved_member.reload
-    assert_equal member.gender, 'F'
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(@saved_member.full_phone_number)
+        assert page.has_content?(@saved_member.type_of_phone_number)
+      }
+    end
+  end
+
+  test "go from member index to edit member's type of phone number to other type" do
+    setup_member
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#personal_details")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        find(".icon-pencil").click
+      }
+    end   
+    within("#table_contact_information")do
+      wait_until{
+        assert find_field('member[type_of_phone_number]').value == @saved_member.type_of_phone_number
+        assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
+        assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
+        assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
+        select('Other', :from => 'member[type_of_phone_number]' )
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(@saved_member.full_phone_number)
+        assert page.has_content?('Other')
+      }
+    end
+  end
+
+  test "create member with canadian zip" do
+  	setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent,
+                                         :address => '1455 De Maisonneuve Blvd. W. Montreal',
+                                         :state => 'Quebec',
+                                         :zip => 'H3G 1M8',
+                                         :country => 'Canada')
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    fill_in_member(unsaved_member,credit_card)
+    saved_member = Member.find_by_email(unsaved_member.email)
+
+    assert find_field('input_visible_id').value == "#{saved_member.visible_id}"
+    assert find_field('input_first_name').value == saved_member.first_name
+    assert find_field('input_last_name').value == saved_member.last_name
+    assert find_field('input_gender').value == (saved_member.gender == 'F' ? 'Female' : 'Male')
+    assert find_field('input_member_group_type').value == (saved_member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : saved_member.member_group_type.name)
+  end
+
+  test "create member with invalid canadian zip" do
+  	setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent,
+                                         :address => '1455 De Maisonneuve Blvd. W. Montreal',
+                                         :state => 'Quebec',
+                                         :zip => '%^tYU2123',
+                                         :country => 'Canada')
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    fill_in_member(unsaved_member,credit_card)
+
+    within('#error_explanation')do
+    	wait_until{
+    		assert page.has_content?('zip: The zip code is not valid for the selected country.')
+    	}
+  	end
+  end
+
+ test "go from member index to edit member's classification to VIP" do
+    setup_member
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#personal_details")do
+      wait_until{
+        fill_in 'member[member_id]', :with => @saved_member.visible_id
+        fill_in 'member[first_name]', :with => @saved_member.first_name
+        fill_in 'member[last_name]', :with => @saved_member.last_name
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        find(".icon-pencil").click
+      }
+    end   
+    select('VIP', :from => 'member[member_group_type_id]')
+
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    assert find_field('input_member_group_type').value == 'VIP'
+  end
+
+  test "go from member index to edit member's classification to celebrity" do
+    setup_member
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#personal_details")do
+      wait_until{
+        fill_in 'member[member_id]', :with => @saved_member.visible_id
+        fill_in 'member[first_name]', :with => @saved_member.first_name
+        fill_in 'member[last_name]', :with => @saved_member.last_name
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        find(".icon-pencil").click
+      }
+    end   
+    select('Celebrity', :from => 'member[member_group_type_id]')
+
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    
+    assert find_field('input_member_group_type').value == 'Celebrity'
+  end
+
+  test "Update external id" do
+    setup_member(false)
+    @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
+    @member_with_external_id = FactoryGirl.create(:active_member_with_external_id, 
+                                                  :club_id => @club_external_id.id, 
+                                                  :terms_of_membership => @terms_of_membership_with_gateway,
+                                                  :created_by => @admin_agent)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club_external_id.name)
+    assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
+    
+    within("#payment_details")do
+      wait_until{
+        fill_in "member[external_id]", :with => @member_with_external_id.external_id
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        find(".icon-pencil").click
+      }
+    end   
+
+    within("#external_id"){
+    	wait_until{
+    		fill_in 'member[external_id]', :with => '987654321'
+    	}
+    }
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    @member_with_external_id.reload
+    assert_equal @member_with_external_id.external_id, '987654321'
+    within("#td_mi_external_id"){
+    	assert page.has_content?(@member_with_external_id.external_id)
+    }
+  end
+
+  test "should not let bill date to be edited" do
+  	setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button 'Edit'
+
+    assert page.has_no_selector?('member[bill_date]')
+    within("#table_demographic_information")do
+    	wait_until{
+    		assert page.has_no_selector?('member[bill_date]')
+    	}
+  	end
+    within("#table_contact_information")do
+    	wait_until{
+    		assert page.has_no_selector?('member[bill_date]')
+    	}
+  	end
+  end
+
+  test "display all operations on member profile" do
+  	setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent,
+                                         :address => '1455 De Maisonneuve Blvd. W. Montreal',
+                                         :state => 'Quebec',
+                                         :zip => 'H3G 1M8',
+                                         :country => 'Canada')
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    fill_in_member(unsaved_member,credit_card)
+    saved_member = Member.find_by_email(unsaved_member.email)
+    generate_operations(saved_member)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.visible_id)
+
+    sleep(500)
+
+    within("#operations_table")do
+
+   	end
+
   end
 
 end
+
+
 
 

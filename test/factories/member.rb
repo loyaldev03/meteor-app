@@ -14,6 +14,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
+    type_of_phone_number "Home"
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -33,6 +34,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
+    type_of_phone_number "Home"
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -53,6 +55,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
+    type_of_phone_number "Home"
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -127,6 +130,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
+    type_of_phone_number "Home"
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -148,6 +152,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member_lased#{n}@test.no" }
+    type_of_phone_number "Home"
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -172,6 +177,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member_provisional#{n}@test.no" }
+    type_of_phone_number "Home"
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -194,6 +200,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
+    type_of_phone_number "Home"
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -215,6 +222,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member#{n}@test.no" }
+    type_of_phone_number "Home"
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234

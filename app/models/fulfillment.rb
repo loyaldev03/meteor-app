@@ -94,7 +94,7 @@ class Fulfillment < ActiveRecord::Base
     self.assigned_at = Time.zone.now
     self.save
     message = "Fulfillment #{self.product_sku} was marked to be delivered next time."
-    Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_resend)
+    Auditory.audit(agent, self, message, member, Settings.operation_types.resend_fulfillment)
     { :message => message, :code => Settings.error_codes.success }
   rescue 
     Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_out_of_stock )
