@@ -36,7 +36,7 @@
           </th>
           <td> 
             <% selected = @current_member ? @current_member.gender : nil%>
-            <%= f.select :gender, [['Male', 'M'],['Female', 'F'],], :class => 'select_field' %>
+            <%= f.select :gender, [['Male', 'M'],['Female', 'F'],], :class => 'select_field', :include_blank => true %>
           </td>  
         </tr>        
         <tr class = "control-group">
@@ -137,7 +137,7 @@
             <%= f.label :type_of_phone_number, t('activerecord.attributes.member.type_of_phone_number'), :class => 'help-inline' %>
           </th>
           <td> 
-            <%= f.select :type_of_phone_number, [['Mobile', 'Mobile'],['Home', 'Home'],['Other','Other']], :class => 'select_field' %>
+            <%= f.select :type_of_phone_number, [['Mobile', 'Mobile'],['Home', 'Home'],['Other','Other']], :class => 'select_field', :include_blank => true %>
           </td>  
         </tr>
         <% if @member.new_record? %>
