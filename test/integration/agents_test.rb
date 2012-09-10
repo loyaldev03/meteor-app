@@ -146,25 +146,84 @@ class AgentsTest < ActionController::IntegrationTest
   #   assert page.has_content?("doesn't match confirmation")
   # end 
 
-  test "should display agents in order" do
-    10.times{ FactoryGirl.create(:confirmed_agent) }
-    visit admin_agents_path
+  # test "should display agents in order" do
+  #   10.times{ FactoryGirl.create(:confirmed_agent) }
+  #   visit admin_agents_path
   
-    within("#agents_table")do
-      wait_until{
-        assert page.has_content?(Agent.first.username)
-      }
-      wait_until{
-        find("#th_created_at").click
-        find("#th_created_at").click
-      }
-      wait_until{
-        assert page.has_content?(Agent.last.username)
-      }
+  #   within("#agents_table")do
+  #     wait_until{
+  #       assert page.has_content?(Agent.first.username)
+  #     }
+  #     wait_until{
+  #       find("#th_created_at").click
+  #       find("#th_created_at").click
+  #     }
+  #     wait_until{
+  #       assert page.has_content?(Agent.last.username)
+  #     }
+  #   end
+  # end
+
+  test "create agent with supervisor role" do
+    visit new_admin_agent_path
+    unsaved_agent = FactoryGirl.build(:agent)
+    fill_in 'agent[email]', :with => unsaved_agent.email
+    fill_in 'agent[username]', :with => unsaved_agent.username
+    fill_in 'agent[password]', :with => unsaved_agent.password
+    fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
+    check('agent_roles_supervisor')
+
+    assert_difference('Agent.count') do
+      click_link_or_button 'Create Agent'
     end
+    
+    assert page.has_content?("Agent was successfully created")
+    
+    saved_agent = Agent.last
+    puts saved_agent.roles
+    assert_equal saved_agent.email, unsaved_agent.email
+    assert_equal saved_agent.roles, ['supervisor']
   end
 
+  test "create agent with representative role" do
+    visit new_admin_agent_path
+    unsaved_agent = FactoryGirl.build(:agent)
+    fill_in 'agent[email]', :with => unsaved_agent.email
+    fill_in 'agent[username]', :with => unsaved_agent.username
+    fill_in 'agent[password]', :with => unsaved_agent.password
+    fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
+    check('agent_roles_representative')
 
+    assert_difference('Agent.count') do
+      click_link_or_button 'Create Agent'
+    end
+    
+    assert page.has_content?("Agent was successfully created")
+    
+    saved_agent = Agent.last
+    puts saved_agent.roles
+    assert_equal saved_agent.email, unsaved_agent.email
+    assert_equal saved_agent.roles, ['representative']
+  end
 
+  test "create agent with api role" do
+    visit new_admin_agent_path
+    unsaved_agent = FactoryGirl.build(:agent)
+    fill_in 'agent[email]', :with => unsaved_agent.email
+    fill_in 'agent[username]', :with => unsaved_agent.username
+    fill_in 'agent[password]', :with => unsaved_agent.password
+    fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
+    check('agent_roles_api')
 
+    assert_difference('Agent.count') do
+      click_link_or_button 'Create Agent'
+    end
+    
+    assert page.has_content?("Agent was successfully created")
+    
+    saved_agent = Agent.last
+    puts saved_agent.roles
+    assert_equal saved_agent.email, unsaved_agent.email
+    assert_equal saved_agent.roles, ['api']
+  end
 end
