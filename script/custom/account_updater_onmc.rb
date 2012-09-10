@@ -13,20 +13,19 @@ def store_file
   ################################################
   ########## new file!
   ################################################
-  local_filename = "#{@folder}/onmc_account_updater_#{Date.today}.txt"
+  local_filename = "#{@folder}/onmc_account_updater_#{Time.zone.now}.txt"
   file = File.open(local_filename, 'w')
 
   # add header
   record_type, version_id, merchant_id = 'H1', '100000', "%-32s" % @merchant
   file.write [ record_type, version_id, merchant_id ].join + "\n"
 
-  ids = %w(
-
-)
-
   count = 0
   # members with expired credit card and active
-  members = Member.find(ids)
+  members = Member.scoped(:conditions => [ 'cs_next_bill_date = ? and renewable = 1 and (trial = 1 or active = 1) ' + 
+                ' AND (aus_sent_at IS NULL OR (aus_sent_at < ? AND aus_status IS NULL) )', 
+    (Time.zone.now+7.days).to_date,
+    (Time.zone.now-1.days).to_date ]).all
   members.each do |member|
     
     ActiveMerchant::Billing::CreditCard.require_verification_value = false
@@ -50,6 +49,9 @@ def store_file
     # only master and visa allowed
     next if account_type.nil?
 
+    member.aus_sent_at = Time.zone.now
+    member.save
+
     # add cc line
     record_type, account_number, expiration_date, descretionary_data = 'D1', "%-32s" % member.cc_number.strip, 
       member.cc_year_exp.to_s[2..3]+("%02d" % member.cc_month_exp), "M%-31s"% member.id
@@ -66,12 +68,11 @@ def store_file
   ########## new file!
   ################################################
 
-  puts local_filename
-
+  local_filename
 end
 
-def send_file_to_mes(filename)
-  if filename.nil?
+def send_file_to_mes(local_filename)
+  if local_filename.nil?
     puts "Filename must be valid" 
     exit
   end
@@ -109,7 +110,7 @@ def request_file_by_id(file_id, filename)
     file = File.open(full_filename, 'w')
     file.write answer
     file.close
-    #parse_file full_filename
+    parse_file full_filename
   end
 end
 
@@ -137,8 +138,9 @@ end
     if member.nil?
       log "Member id not found ##{discretionary_data} while parsing. #{line}"
     else
-      update_cs = false
+      member.aus_answered_at = Time.zone.now
       member.aus_status = response_code
+      update_cs = false
       case response_code
       when 'NEWACCT'
         update_cs = true
@@ -154,8 +156,7 @@ end
       end
       member.save
       if update_cs
-        Delayed::Job.enqueue(UpdateJob.new(@member.id))
-        # TODO: notify CS
+        Delayed::Job.enqueue(UpdateJob.new(member.id))
       end
     end
   end
@@ -174,18 +175,23 @@ def account_updater_file_status
   }    
   answer = Rack::Utils.parse_nested_query(result.body)
   puts answer.inspect
-  # TODO: following lines not tested.
-#  0..answer['statusCount'].to_i do |i|
-#    request_file_by_id answer["reqfId_#{i}"], answer["reqfName_#{i}"]
-#  end
+  0.upto(answer['statusCount'].to_i-1) do |i|
+    request_file_by_id answer["rspfId_#{i}"], "rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt"
+  end
 end
 
 def log(text)
   Rails.logger.info "AUS Updater: #{text}"
+  puts text
 end
 
 if ARGV[0] == 'store_file'
-  store_file
+  local_filename = store_file
+  puts local_filename
+elsif ARGV[0] == 'store_and_send'
+  local_filename = store_file
+  puts local_filename
+  send_file_to_mes local_filename
 elsif ARGV[0] == 'send'
   send_file_to_mes ARGV[1]
 elsif ARGV[0] == 'download_all'
@@ -197,4 +203,3 @@ elsif ARGV[0] == 'parse_file'
 else
   puts "Arguments need: send - download_all - download"
 end
-
