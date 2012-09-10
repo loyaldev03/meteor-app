@@ -128,12 +128,12 @@ class AgentsTest < ActionController::IntegrationTest
     assert page.has_content?("Agent was successfully created")
   end
 
-  # test "do not allow to create new agent with special characters" do
-  #   visit new_admin_agent_path
-  #   fill_in 'agent[email]', :with => "&%$"
-  #   click_link_or_button 'Create Agent'
-  #   assert page.has_content?("Please enter an email address.")
-  # end
+  test "do not allow to create new agent with special characters" do
+    visit new_admin_agent_path
+    fill_in 'agent[email]', :with => "&%$"
+    click_link_or_button 'Create Agent'
+    assert page.has_content?("is invalid")
+  end
   
   test "create an agent with different password confirmation" do
     visit new_admin_agent_path
