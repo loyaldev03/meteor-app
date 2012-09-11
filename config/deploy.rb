@@ -138,7 +138,6 @@ namespace :foreman do
 end
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
-after "deploy:update", 'envfile', "foreman:export", "foreman:restart"
-after "deploy:update_code", "link_config_files", "bundle_install", "deploy:migrate"
-# before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate"
+after "deploy:update", 'envfile', "foreman:restart"
+before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate"
 after "deploy", "deploy:tag"
