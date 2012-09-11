@@ -1315,6 +1315,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
     end
     click_link_or_button('Return to member show')
+    sleep(1)
     wait_until{
       assert page.has_content?("Member: #{@saved_member.visible_id.to_s} - #{@saved_member.full_name}")
     }
@@ -1348,6 +1349,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(unsaved_member.type_of_phone_number,:from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -1360,8 +1362,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Create Member'
-
-    assert find_field('input_gender').value == (unsaved_member.gender == 'F' ? 'Female' : 'Male')
+    wait_until{
+      assert find_field('input_gender').value == ('Male')
+    }
   end
 
   test "create member with gender female" do
@@ -1392,6 +1395,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(unsaved_member.type_of_phone_number,:from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -1404,8 +1408,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Create Member'
-
-    assert find_field('input_gender').value == ('Female')
+    sleep(1)
+    wait_until{
+      assert find_field('input_gender').value == ('Female')
+    }
   end
 
   test "change type of phone number" do
@@ -1466,6 +1472,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(unsaved_member.type_of_phone_number,:from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -1478,6 +1485,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Create Member'
+    sleep(1)
     within("#table_contact_information")do
       wait_until{
         assert page.has_content?("#{unsaved_member.full_phone_number}")
@@ -1785,6 +1793,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)
+    sleep(1)
     saved_member = Member.find_by_email(unsaved_member.email)
 
     assert find_field('input_visible_id').value == "#{saved_member.visible_id}"
@@ -1894,6 +1903,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
     alert_ok_js
     click_link_or_button 'Update Member'
+    sleep(1)
     @member_with_external_id.reload
     assert_equal @member_with_external_id.external_id, '987654321'
     within("#td_mi_external_id"){
@@ -2113,6 +2123,109 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
+  test "search member that does not exist" do
+    setup_member
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    member_note = FactoryGirl.create(:member_note, :member_id => @saved_member.id, 
+                                     :created_by_id => @admin_agent.id,
+                                     :communication_type_id => @communication_type.id,
+                                     :disposition_type_id => @disposition_type.id)
+    member_to_seach = Member.first
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[first_name]", :with => 'Random text'
+      }
+    end
+
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?('No records were found.')
+      }
+    end
+  end
+
+  test "create a member with an expired credit card" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent,
+                                         :address => '1455 De Maisonneuve Blvd. W. Montreal',
+                                         :state => 'Quebec',
+                                         :zip => 'H3G 1M8',
+                                         :country => 'Canada')
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => 2011)
+    
+    fill_in_member(unsaved_member,credit_card)
+
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?('Credit card is invalid or is expired!')
+      }
+    end
+  end
+
+  test "change member gender from male to female" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
+
+    click_link_or_button 'Edit'
+
+    within("#table_demographic_information")do
+      wait_until{
+        select('Female', :from => 'member[gender]')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    sleep(1)
+    @saved_member.reload
+    wait_until{
+      assert find_field('input_gender').value == ('Female')
+    }
+    assert_equal @saved_member.gender, 'F'
+  
+  end
+
+  test "change member gender from female to male" do
+    setup_member
+    @saved_member.gender = 'F'
+    @saved_member.save
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
+
+    click_link_or_button 'Edit'
+
+    within("#table_demographic_information")do
+      wait_until{
+        select('Male', :from => 'member[gender]')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    sleep(1)
+    @saved_member.reload
+    wait_until{
+      assert find_field('input_gender').value == ('Male')
+    }
+    assert_equal @saved_member.gender, 'M'
+  end
+
+  test "create blank member note" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button 'Add a note'
+    click_link_or_button 'Save note'
+    within("#member_notes_table") do
+      wait_until{
+        assert page.has_content?("Can't be blank.")
+      }
+    end
+  end
 
 
 end

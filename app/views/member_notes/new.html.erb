@@ -1,7 +1,7 @@
 <%= render :partial => "shared/member_information" %>
 
  <%= form_for @member_note, :as => :member_note, :url => member_notes_path(:id => @member_notes) do |f|%>
-  <table class="table table-bordered">    
+  <table class="table table-bordered" id="member_notes_table">    
     <tr>
       <td> 
         <%= f.select :disposition_type_id, options_from_collection_for_select(@disposition_types, "id", "name") if !@disposition_types.nil? %> 
