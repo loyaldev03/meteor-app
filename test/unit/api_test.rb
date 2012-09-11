@@ -18,6 +18,7 @@ class ApiTest < ActiveSupport::TestCase
     @club.stub! do |stub|
       stub.post('/api/user') { [200, {}, {'uid' => 999}] }
     end
+    assert @member.valid?
     @member.save
     assert_equal '999', @member.api_id
   end

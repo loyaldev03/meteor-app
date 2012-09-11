@@ -1315,9 +1315,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
     end
     click_link_or_button('Return to member show')
-    sleep(1)
     wait_until{
-      assert page.has_content?("Member: #{@saved_member.visible_id.to_s} - #{@saved_member.full_name}")
+      assert find_field('input_visible_id').value == "#{@saved_member.visible_id}"
+      assert find_field('input_first_name').value == @saved_member.first_name
+      assert find_field('input_last_name').value == @saved_member.last_name
+      assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
+      assert find_field('input_member_group_type').value == (@saved_member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : @saved_member.member_group_type.name)
     }
   end
 
@@ -1408,7 +1411,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Create Member'
-    sleep(1)
+    wait_until{
+      assert find_field('input_first_name').value == unsaved_member.first_name
+    }
     wait_until{
       assert find_field('input_gender').value == ('Female')
     }
@@ -1433,8 +1438,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Update Member'
-    sleep(1)   
-    @saved_member.reload
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+      @saved_member.reload  
+    }
     within("#table_contact_information")do
       wait_until{
         assert page.has_content?(@saved_member.type_of_phone_number)
@@ -1485,7 +1492,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Create Member'
-    sleep(1)
+    wait_until{
+      assert find_field('input_first_name').value == unsaved_member.first_name
+    }
     within("#table_contact_information")do
       wait_until{
         assert page.has_content?("#{unsaved_member.full_phone_number}")
@@ -1793,10 +1802,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)
-    sleep(1)
+    wait_until{
+      assert find_field('input_first_name').value == unsaved_member.first_name
+    }
     saved_member = Member.find_by_email(unsaved_member.email)
 
-    assert find_field('input_visible_id').value == "#{saved_member.visible_id}"
+    assert find_field('input_visible_id').value == saved_member.visible_id.to_s
     assert find_field('input_first_name').value == saved_member.first_name
     assert find_field('input_last_name').value == saved_member.last_name
     assert find_field('input_gender').value == (saved_member.gender == 'F' ? 'Female' : 'Male')
@@ -1903,8 +1914,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
     alert_ok_js
     click_link_or_button 'Update Member'
-    sleep(1)
-    @member_with_external_id.reload
+     wait_until{
+      assert find_field('input_first_name').value == @member_with_external_id.first_name
+      @member_with_external_id.reload
+    }
     assert_equal @member_with_external_id.external_id, '987654321'
     within("#td_mi_external_id"){
       assert page.has_content?(@member_with_external_id.external_id)
@@ -1934,11 +1947,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id, 
                                          :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent,
-                                         :address => '1455 De Maisonneuve Blvd. W. Montreal',
-                                         :state => 'Quebec',
-                                         :zip => 'H3G 1M8',
-                                         :country => 'Canada')
+                                         :created_by => @admin_agent)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)
@@ -2001,12 +2010,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :operation_type => 104,
                                 :description => 'Member enrolled - 103')
     }
-    sleep(1)
     within("#dataTableSelect")do
       wait_until{
         select('billing', :from => 'operation[operation_type]')
       }
-      sleep(1)
     end
 
     within("#operations_table")do
@@ -2047,7 +2054,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{
         select('profile', :from => 'operation[operation_type]')
       }
-      sleep(1)
     end
 
     within("#operations_table")do
@@ -2088,7 +2094,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{
         select('communications', :from => 'operation[operation_type]')
       }
-      sleep(1)
     end
     within("#operations_table")do
       wait_until{
@@ -2114,7 +2119,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{
         select('others', :from => 'operation[operation_type]')
       }
-      sleep(1)
     end
     within("#operations_table")do
       wait_until{
@@ -2150,11 +2154,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id, 
                                          :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent,
-                                         :address => '1455 De Maisonneuve Blvd. W. Montreal',
-                                         :state => 'Quebec',
-                                         :zip => 'H3G 1M8',
-                                         :country => 'Canada')
+                                         :created_by => @admin_agent)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => 2011)
     
     fill_in_member(unsaved_member,credit_card)
@@ -2181,8 +2181,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Update Member'
-    sleep(1)
-    @saved_member.reload
+
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+      @saved_member.reload
+    }
     wait_until{
       assert find_field('input_gender').value == ('Female')
     }
@@ -2207,8 +2210,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Update Member'
-    sleep(1)
-    @saved_member.reload
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+      @saved_member.reload
+    }
     wait_until{
       assert find_field('input_gender').value == ('Male')
     }
@@ -2227,5 +2232,42 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
+  test "create member without gender" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent,
+                                         :gender => '')
+
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => 2011)
+    
+    fill_in_member(unsaved_member,credit_card)
+
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?("gender: can't be blank")
+      }
+    end
+  end
+
+  test "create member without type of type_of_phone_number" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent,
+                                         :type_of_phone_number => '')
+
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => 2011)
+    
+    fill_in_member(unsaved_member,credit_card)
+
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?("type_of_phone_number: can't be blank,is not included in the list")
+      }
+    end
+  end
 
 end

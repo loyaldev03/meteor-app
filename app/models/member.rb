@@ -15,7 +15,7 @@ class Member < ActiveRecord::Base
     end
 
     def supported_countries
-      Settings.validations.supported_countries
+      Settings.validations.supported_countries.map &:upcase
     end
 
     def country_specific_validations!
@@ -66,9 +66,6 @@ class Member < ActiveRecord::Base
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil? || api_id.nil?'
   after_save :asyn_desnormalize_preferences
   
-  # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
-  # REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_country_code', 'phone_local_number', 'phone_local_number' ]
-
   def after_create_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
   rescue Exception => e
@@ -78,9 +75,7 @@ class Member < ActiveRecord::Base
     Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
   end
   def after_update_sync_remote_domain
-    unless (self.changed & REMOTE_API_FIELDS_TO_REPORT).empty?
-      api_member.save! unless @skip_api_sync || api_member.nil?
-    end
+    api_member.save! unless @skip_api_sync || api_member.nil?
   end
 
   validates :country, 

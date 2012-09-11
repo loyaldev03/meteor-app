@@ -84,7 +84,7 @@ end
 group :test do
   gem 'factory_girl_rails'
   gem 'faker'
-  gem 'mocha'
+  gem 'mocha', require: false
   gem 'capybara'
   #gem 'capybara-webkit' #, :git => "git://github.com/thoughtbot/capybara-webkit.git"
   gem 'selenium-webdriver'
