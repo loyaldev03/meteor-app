@@ -37,7 +37,7 @@ end
 
 desc "Restart delayed jobs"
 task :restart_delayed_jobs do
-  run "/opt/ruby-enterprise-1.8.7-2011.03/bin/god restart #{application}-dj" 
+  run "bundle exec god restart -c /var/www/god_files/delayed_jobs.god #{application}-dj" 
   campfire_room.speak "#{cplatform} #{application} (#{scm_username}): deployed branch "
 end
 
@@ -138,6 +138,7 @@ namespace :foreman do
 end
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
-after "deploy:update", 'envfile', "foreman:restart"
+# after "deploy:update", 'envfile', "foreman:restart"
+after 'deploy:update', 'restart_delayed_jobs'
 before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate"
 after "deploy", "deploy:tag"
