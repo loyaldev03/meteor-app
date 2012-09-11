@@ -113,7 +113,30 @@ namespace :server_stats do
   end
 end
 
+# taken from https://gist.github.com/1027117
+namespace :foreman do
+  desc "Export the Procfile to Ubuntu's upstart scripts"
+  task :export, :roles => :web do
+    run "cd #{release_path} && sudo bundle exec foreman export upstart /etc/init -a #{application} -u www-data -l #{release_path}/log"
+  end
+  
+  desc "Start the application services"
+  task :start, :roles => :web do
+    sudo "start #{application}"
+  end
+
+  desc "Stop the application services"
+  task :stop, :roles => :web do
+    sudo "stop #{application}"
+  end
+
+  desc "Restart the application services"
+  task :restart, :roles => :web do
+    run "sudo start #{application} || sudo restart #{application}"
+  end
+end
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
-before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate", 'envfile'
+after "deploy:update", 'envfile', "foreman:export", "foreman:restart"
+before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate"
 after "deploy", "deploy:tag"
