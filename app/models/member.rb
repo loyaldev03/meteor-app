@@ -75,6 +75,8 @@ class Member < ActiveRecord::Base
     presence:                    true, 
     uniqueness:                  { scope: :club_id }, 
     format:                      REGEX_EMAIL
+  validates :gender,
+    presence:                    true
   validates :type_of_phone_number,
     presence:                    true,
     inclusion:                   { within: %w(Home Mobile Other), allow_nil: true }

@@ -24,7 +24,7 @@ class TransactionTest < ActiveSupport::TestCase
       assert_no_difference('Fulfillment.count') do
         answer = Member.enroll(@tom_approval, @current_agent, 23, 
           { first_name: @member.first_name,
-            last_name: @member.last_name, address: @member.address, city: @member.city,
+            last_name: @member.last_name, address: @member.address, city: @member.city, gender: 'M',
             zip: @member.zip, state: @member.state, email: @member.email, type_of_phone_number: @member.type_of_phone_number,
             phone_country_code: @member.phone_country_code, phone_area_code: @member.phone_area_code,
             type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US' }, 
@@ -46,7 +46,7 @@ class TransactionTest < ActiveSupport::TestCase
       assert_difference('Fulfillment.count') do
         answer = Member.enroll(@terms_of_membership, @current_agent, 23, 
           { first_name: @member.first_name,
-            last_name: @member.last_name, address: @member.address, city: @member.city,
+            last_name: @member.last_name, address: @member.address, city: @member.city, gender: 'M',
             zip: @member.zip, state: @member.state, email: @member.email, type_of_phone_number: @member.type_of_phone_number,
             phone_country_code: @member.phone_country_code, phone_area_code: @member.phone_area_code,
             type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US', 
