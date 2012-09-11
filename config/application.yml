@@ -13,6 +13,13 @@ defaults: &defaults
     password: Letmein123
     url: https://www.merchante-solutions.com/
     path: /jsp/reports/report_api.jsp
+  mes_aus_service:
+    folder: "#{Rails.root}/mes_account_updater_files"
+    url: https://www.merchante-solutions.com/
+    # AUS username is diff accross titles. We will use the same to speed up development
+    merchant_id: 
+    user: 
+    password: 
   operation_types: 
     #billing
     enrollment_billing: 100     
@@ -186,6 +193,18 @@ test:
 
 production:
   <<: *defaults
+  mes_report_service:
+    user: Stoneacrereports
+    password: Letmein123
+    url: https://www.merchante-solutions.com/
+    path: /jsp/reports/report_api.jsp
+  mes_aus_service:
+    folder: "#{Rails.root}/mes_account_updater_files"
+    url: https://www.merchante-solutions.com/
+    # AUS username is diff accross titles. We will use the same to speed up development
+    user: '941000110028AUS'
+    password: do3!lAjo5
+    merchant_id: '941000110028'
 
 prototype:
   <<: *defaults

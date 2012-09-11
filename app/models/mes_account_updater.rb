@@ -28,7 +28,76 @@ class MesAccountUpdater
     end
   end
 
+  def self.account_updater_send_file_to_process(gateway)
+    local_filename = "#{Settings.mes_aus_service.folder}/#{gateway.club_id}_account_updater_#{Time.zone.now}.txt"
+    store_file local_filename
+    send_file_to_mes local_filename
+  end
+
   private
+    def self.send_file_to_mes(local_filename)
+      conn = Faraday.new(:url => Settings.mes_aus_service.url, :ssl => {:verify => false}) do |builder|
+        builder.request :multipart
+        builder.adapter Faraday.default_adapter  # make requests with Net::HTTP  
+      end
+
+      payload = {}
+      payload[:file] = Faraday::UploadIO.new(local_filename, 'multipart/form-data')
+      payload[:userId] = Settings.mes_aus_service.user
+      payload[:userPass] = Settings.mes_aus_service.password
+      payload[:merchId] = Settings.mes_aus_service.merchant_id
+
+      result = conn.post '/srv/api/ausUpload', payload
+      answer = Rack::Utils.parse_nested_query(result.body)
+
+      Rails.logger.info answer.inspect
+    end
+
+    def self.store_file(local_filename)
+      file = File.open(local_filename, 'w')
+
+      # add header
+      record_type, version_id, merchant_id = 'H1', '100000', "%-32s" % Settings.mes_aus_service.merchant_id
+      file.write [ record_type, version_id, merchant_id ].join + "\n"
+
+      count = 0
+      # members with expired credit card and active
+      members = Member.joins(:credit_cards).where([ ' date(members.bill_date) = ? AND credit_cards.active = 1 ' + 
+                    ' AND (credit_cards.aus_sent_at IS NULL OR (credit_cards.aus_sent_at < ? AND credit_cards.aus_status IS NULL) )', 
+                    (Time.zone.now+7.days).to_date,
+                    (Time.zone.now-1.days).to_date ])
+      members.each do |member|
+        cc = member.active_credit_card
+        credit_card = cc.am_card
+        credit_card.valid?
+        account_type = case credit_card.type
+        when 'visa'
+          'VISA'
+        when 'master'
+          'MC  '
+        else
+          nil
+        end
+        # only master and visa allowed
+        next if account_type.nil?
+
+        cc.aus_sent_at = Time.zone.now
+        cc.save
+
+        # add cc line
+        record_type, account_number, expiration_date, descretionary_data = 'D1', "%-32s" % cc.number.strip, 
+            cc.expire_year.to_s[2..3]+("%02d" % cc.expire_month), "CC%-30s"% cc.id
+
+        file.write [ record_type, account_type, account_number, expiration_date, descretionary_data ].join + "\n"
+        count += 1
+      end
+
+      # add trailer
+      record_type, record_count = 'T1', "%06d" % count
+      file.write [ record_type, record_count ].join
+      file.close
+    end
+
     def self.prepare_connection(path, options = {})
       conn = Faraday.new(:url => Settings.mes_aus_service.url, :ssl => {:verify => false})
       result = conn.get path, { 
@@ -64,24 +133,27 @@ class MesAccountUpdater
         new_expiration_date = line[78..81]
         response_code = line[82..89].strip
         response_source = line[90..91]
-        discretionary_data = line[92..123].strip
+        discretionary_data = line[92..123]
 
-        member = Member.find_by_visible_id_and_club_id discretionary_data[1..32], club_id
-        if member.nil?
-          Rails.logger.info "Member id not found ##{discretionary_data} while parsing. #{line}"
+        credit_card = CreditCard.find(discretionary_data[2..32].strip)
+        
+        if credit_card.nil?
+          Rails.logger.info "CreditCard id not found ##{discretionary_data} while parsing. #{line}"
         else
-          member.aus_answered_at = Time.zone.now
-          member.aus_status = response_code
+          credit_card.aus_answered_at = Time.zone.now
+          credit_card.aus_status = response_code
           case response_code
           when 'NEWACCT'
-            member.cc_number = new_account_number
-            member.cc_year_exp = new_expiration_date[0..1].to_i+2000
-            member.cc_month_exp = new_expiration_date[2..3]
+            # TODO: add new credit card!!!
+            credit_card.number = new_account_number
+            credit_card.expire_year = new_expiration_date[0..1].to_i+2000
+            credit_card.expire_month = new_expiration_date[2..3]
           when 'NEWEXP'
-            member.cc_year_exp = new_expiration_date[0..1].to_i+2000
-            member.cc_month_exp = new_expiration_date[2..3]
+            # TODO: add new credit card!!!
+            credit_card.expire_year = new_expiration_date[0..1].to_i+2000
+            credit_card.expire_month = new_expiration_date[2..3]
           else
-            Rails.logger.info "Member id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
+            Rails.logger.info "CreditCard id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
           end
           member.save
         end
