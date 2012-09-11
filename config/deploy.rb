@@ -1,5 +1,6 @@
 set :stages, %w(production prototype staging)
 set :default_stage, "prototype"
+default_run_options[:pty] = true
 require 'capistrano/ext/multistage'
 
 set :port, 30003
@@ -117,7 +118,7 @@ end
 namespace :foreman do
   desc "Export the Procfile to Ubuntu's upstart scripts"
   task :export, :roles => :web do
-    run "cd #{release_path} && sudo bundle exec foreman export upstart /etc/init -a #{application} -u www-data -l #{release_path}/log"
+    run "cd #{release_path} && #{sudo} bundle exec foreman export upstart /etc/init -a #{application} -u www-data -l #{release_path}/log"
   end
   
   desc "Start the application services"
@@ -132,11 +133,12 @@ namespace :foreman do
 
   desc "Restart the application services"
   task :restart, :roles => :web do
-    run "sudo start #{application} || sudo restart #{application}"
+    run "#{sudo} start #{application} || #{sudo} restart #{application}"
   end
 end
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
 after "deploy:update", 'envfile', "foreman:export", "foreman:restart"
-before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate"
+after "deploy:update_code", "link_config_files", "bundle_install", "deploy:migrate"
+# before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate"
 after "deploy", "deploy:tag"
