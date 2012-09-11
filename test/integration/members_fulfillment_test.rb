@@ -89,4 +89,34 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     fulfillment.reload
     assert_equal fulfillment.status, 'canceled'
   end
+
+  test "cancel member and check if out_of_stock fulfillments were updated to canceled" do
+    setup_member
+    fulfillment = FactoryGirl.create(:fulfillment, :member_id => @saved_member.id)
+    fulfillment.set_as_out_of_stock
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?('out_of_stock')
+      }
+    end
+
+    @saved_member.set_as_canceled!
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?('canceled')
+      }
+    end
+    fulfillment.reload
+    assert_equal fulfillment.status, 'canceled'
+  end
 end
