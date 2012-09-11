@@ -200,7 +200,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
  		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
   										 :member_id => member.id, :operation_type => 1000, :description => 'Member updated successfully' )
  		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => 1000, :description => 'Member was recovered' )  
+  										 :member_id => member.id, :operation_type => 1000, :description => 'Member was recovered' )
   end
 
 
@@ -243,28 +243,47 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
 	end
 
-  # FIXME
-  # test "search member by pagination" do
-  #   setup_search
-  #   click_on 'Search'
+  test "search member by pagination" do
+    setup_search
+    click_on 'Search'
     
-  #   wait_until {
-  #     assert page.has_selector?(".pagination")
-  #     assert page.has_content?(Member.first.full_name)
-  #   }
+    wait_until {
+      assert page.has_selector?(".pagination")
+      assert page.has_content?(Member.first.full_name)
+    }
 
-  #   within(".pagination") do
-  #     assert page.has_content?("1")
-  #     assert page.has_content?("2")
-  #     assert page.has_content?("Next")
-  #     click_on("2")
-  #   end
-
-  #   wait_until {
-		# 	assert page.has_content?(Member.last.full_name)
-  #   }
-    
-  # end
+    within(".pagination") do
+      assert page.has_content?("1")
+      assert page.has_content?("2")
+      assert page.has_content?("3")
+      assert page.has_content?("4")      
+      assert page.has_content?("Next")
+    end
+    within("#members")do
+      wait_until {
+        if page.has_content?(Member.last.full_name)
+          assert true
+        else
+          click_on("2")
+          if page.has_content?(Member.last.full_name)
+            assert true
+          else
+            click_on("3")
+            if page.has_content?(Member.last.full_name)
+              assert true
+            else
+              click_on("4")
+              if page.has_content?(Member.last.full_name)
+                assert true
+              else
+                assert false, "The last member was not found"
+              end
+            end
+          end
+        end
+      }
+    end
+  end
 
   test "search a member with next bill date in past" do
     setup_search
@@ -605,38 +624,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     
   end
 
-
-  # FIXME page.has_content?("note was added") returns false incorrectly...
-  # test "add new note" do
-  #   setup_member
-    
-  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-  #   click_on 'Add a note'
-    
-  #   text_note = "text note 123456789"
-
-  #   select(@communication_type.name, :from => 'member_note[communication_type_id]')
-  #   select(@disposition_type.name, :from => 'member_note[disposition_type_id]')
-  #   fill_in 'member_note[description]', :with => text_note
-
-  #   click_on 'Save note'
-
-  #   assert page.has_content?("The note was added successfuly")
-
-  #   wait_until {
-  #     within("#operations_table") {
-  #       assert page.has_content?("note was added")
-  #     }
-  #   }
-
-  #   wait_until {
-  #     within("#notes") {
-  #       assert page.has_content?(text_note) 
-  #     }
-  #   }
-  # end
-
-
   def validate_timezone_dates(timezone)
     @club.time_zone = timezone
     @club.save
@@ -915,51 +902,50 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  # FIXME
-  # test "search by multiple values" do
-  #   setup_member
-  #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-  #   member_note = FactoryGirl.create(:member_note, :member_id => @saved_member.id, 
-  #                                    :created_by_id => @admin_agent.id,
-  #                                    :communication_type_id => @communication_type.id,
-  #                                    :disposition_type_id => @disposition_type.id)
-  #   member_to_seach = Member.first
-  #   within("#personal_details")do
-  #     wait_until{
-  #       fill_in "member[member_id]", :with => @saved_member.visible_id
-  #       fill_in "member[first_name]", :with => @saved_member.first_name
-  #       fill_in "member[last_name]", :with => @saved_member.last_name
-  #       fill_in "member[email]", :with => @saved_member.email
-  #       fill_in "member[phone_country_code]", :with => @saved_member.phone_country_code
-  #       fill_in "member[phone_area_code]", :with => @saved_member.phone_area_code
-  #       fill_in "member[phone_local_number]", :with => @saved_member.phone_local_number
-  #     }
-  #   end
-  #   within("#contact_details")do
-  #     wait_until{
-  #       fill_in "member[city]", :with => @saved_member.city
-  #       fill_in "member[state]", :with => @saved_member.state
-  #       fill_in "member[address]", :with => @saved_member.address
-  #       fill_in "member[zip]", :with => @saved_member.zip
-  #     }
-  #   end
-  #   page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
-  #   within("#ui-datepicker-div") do
-  #     click_on("#{Time.zone.now.day}")
-  #   end
-  #   within("#payment_details")do
-  #     wait_until{
-  #       fill_in "member[last_digits]", :with => @saved_member.active_credit_card.last_digits
-  #       fill_in "member[notes]", :with => @saved_member.member_notes.first.description
-  #     }
-  #   end
-  #   click_link_or_button 'Search'
-  #   within("#members")do
-  #     wait_until{
-  #       assert page.has_content?(@saved_member.full_name)
-  #     }
-  #   end
-  # end
+  test "search by multiple values" do
+    setup_member
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    member_note = FactoryGirl.create(:member_note, :member_id => @saved_member.id, 
+                                     :created_by_id => @admin_agent.id,
+                                     :communication_type_id => @communication_type.id,
+                                     :disposition_type_id => @disposition_type.id)
+    member_to_seach = Member.first
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[member_id]", :with => @saved_member.visible_id
+        fill_in "member[first_name]", :with => @saved_member.first_name
+        fill_in "member[last_name]", :with => @saved_member.last_name
+        fill_in "member[email]", :with => @saved_member.email
+        fill_in "member[phone_country_code]", :with => @saved_member.phone_country_code
+        fill_in "member[phone_area_code]", :with => @saved_member.phone_area_code
+        fill_in "member[phone_local_number]", :with => @saved_member.phone_local_number
+      }
+    end
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[city]", :with => @saved_member.city
+        fill_in "member[state]", :with => @saved_member.state
+        fill_in "member[address]", :with => @saved_member.address
+        fill_in "member[zip]", :with => @saved_member.zip
+      }
+    end
+    page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
+    within("#ui-datepicker-div") do
+      click_on("#{Time.zone.now.day}")
+    end
+    within("#payment_details")do
+      wait_until{
+        fill_in "member[last_digits]", :with => @saved_member.active_credit_card.last_digits
+        fill_in "member[notes]", :with => @saved_member.member_notes.first.description
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(@saved_member.full_name)
+      }
+    end
+  end
 
   test "search by external_id" do
     setup_member(false)
@@ -1302,38 +1288,38 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  # FIXME
-  # test "return to member's profile from terms of membership" do
-  #   setup_member
-  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-  #   click_link_or_button("#{@saved_member.terms_of_membership.name}")
-  #   within("#table_information")do
-  #     wait_until{
-  #       assert page.has_content?(@terms_of_membership_with_gateway.name) if @terms_of_membership_with_gateway.name
-  #       assert page.has_content?(@terms_of_membership_with_gateway.description) if @terms_of_membership_with_gateway.description
-  #       assert page.has_content?(@terms_of_membership_with_gateway.provisional_days.to_s) if @terms_of_membership_with_gateway.provisional_days
-  #       assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s) if @terms_of_membership_with_gateway.installment_amount
-  #       assert page.has_content?(@terms_of_membership_with_gateway.installment_type) if @terms_of_membership_with_gateway.installment_type
-  #       assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
-  #     }
-  #   end
-  #   within("#table_email_template")do
-  #     wait_until{
-  #       assert page.has_content?('Test welcome')
-  #       assert page.has_content?('Test active')
-  #       assert page.has_content?('Test cancellation')
-  #       assert page.has_content?('Test prebill ')
-  #       assert page.has_content?('Test prebill_renewal')
-  #       assert page.has_content?('Test refund')
-  #       assert page.has_content?('Test birthday')
-  #       assert page.has_content?('Test pillar')
-  #     }
-  #   end
-  #   click_link_or_button('Return to member show')
-  #   wait_until{
-  #     assert page.has_content?("Member: #{@saved_member.visible_id} - #{@saved_member.full_name}")
-  #   }
-  # end
+  test "return to member's profile from terms of membership" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button("#{@saved_member.terms_of_membership.name}")
+    within("#table_information")do
+      wait_until{
+        assert page.has_content?(@terms_of_membership_with_gateway.name) if @terms_of_membership_with_gateway.name
+        assert page.has_content?(@terms_of_membership_with_gateway.description) if @terms_of_membership_with_gateway.description
+        assert page.has_content?(@terms_of_membership_with_gateway.provisional_days.to_s) if @terms_of_membership_with_gateway.provisional_days
+        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s) if @terms_of_membership_with_gateway.installment_amount
+        assert page.has_content?(@terms_of_membership_with_gateway.installment_type) if @terms_of_membership_with_gateway.installment_type
+        assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
+      }
+    end
+    within("#table_email_template")do
+      wait_until{
+        assert page.has_content?('Test welcome')
+        assert page.has_content?('Test active')
+        assert page.has_content?('Test cancellation')
+        assert page.has_content?('Test prebill ')
+        assert page.has_content?('Test prebill_renewal')
+        assert page.has_content?('Test refund')
+        assert page.has_content?('Test birthday')
+        assert page.has_content?('Test pillar')
+      }
+    end
+    click_link_or_button('Return to member show')
+    sleep(1)
+    wait_until{
+      assert page.has_content?("Member: #{@saved_member.visible_id.to_s} - #{@saved_member.full_name}")
+    }
+  end
 
   test "create member with gender male" do
     setup_member
@@ -1363,6 +1349,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(unsaved_member.type_of_phone_number,:from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -1375,8 +1362,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Create Member'
-
-    assert find_field('input_gender').value == (unsaved_member.gender == 'F' ? 'Female' : 'Male')
+    wait_until{
+      assert find_field('input_gender').value == ('Male')
+    }
   end
 
   test "create member with gender female" do
@@ -1407,6 +1395,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(unsaved_member.type_of_phone_number,:from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -1419,38 +1408,39 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Create Member'
-
-    assert find_field('input_gender').value == ('Female')
+    sleep(1)
+    wait_until{
+      assert find_field('input_gender').value == ('Female')
+    }
   end
 
-  # FIXME 
-  # test "change type of phone number" do
-  #   setup_member
-  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+  test "change type of phone number" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
 
-  #   within("#table_contact_information")do
-  #     wait_until{
-  #       assert page.has_content?(@saved_member.type_of_phone_number)
-  #     }
-  #   end
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(@saved_member.type_of_phone_number)
+      }
+    end
 
-  #   click_link_or_button 'Edit'
+    click_link_or_button 'Edit'
 
-  #   within("#table_contact_information")do
-  #     wait_until{
-  #       select('Mobile', :from => 'member[type_of_phone_number]')
-  #     }
-  #   end
-  #   alert_ok_js
-  #   click_link_or_button 'Update Member'
-  
-  #   @saved_member.reload
-  #   within("#table_contact_information")do
-  #     wait_until{
-  #       assert page.has_content?(@saved_member.type_of_phone_number)
-  #     }
-  #   end
-  # end
+    within("#table_contact_information")do
+      wait_until{
+        select('Mobile', :from => 'member[type_of_phone_number]')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    sleep(1)   
+    @saved_member.reload
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(@saved_member.type_of_phone_number)
+      }
+    end
+  end
 
   test "create member with phone number" do
     setup_member(false)
@@ -1482,6 +1472,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(unsaved_member.type_of_phone_number,:from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -1494,6 +1485,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Create Member'
+    sleep(1)
     within("#table_contact_information")do
       wait_until{
         assert page.has_content?("#{unsaved_member.full_phone_number}")
@@ -1548,56 +1540,55 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  # FIXME
-  # test "should create member and display type of phone number" do
-  #   setup_member(false)
-  #   unsaved_member =  FactoryGirl.build(:active_member, 
-  #                                        :club_id => @club.id, 
-  #                                        :terms_of_membership => @terms_of_membership_with_gateway,
-  #                                        :created_by => @admin_agent)
-  #   credit_card = FactoryGirl.build(:credit_card_master_card)
+  test "should create member and display type of phone number" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
     
-  #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-  #   click_link_or_button 'New Member'
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
 
-  #   within("#table_demographic_information")do
-  #     wait_until{
-  #       fill_in 'member[first_name]', :with => unsaved_member.first_name
-  #       select('M', :from => 'member[gender]')
-  #       fill_in 'member[address]', :with => unsaved_member.address
-  #       fill_in 'member[state]', :with => unsaved_member.state
-  #       select('US', :from => 'member[country]')
-  #       fill_in 'member[city]', :with => unsaved_member.city
-  #       fill_in 'member[last_name]', :with => unsaved_member.last_name
-  #       fill_in 'member[zip]', :with => unsaved_member.zip
-  #     }
-  #   end
-  #   within("#table_contact_information")do
-  #     wait_until{
-  #       fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-  #       fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-  #       fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-  #       fill_in 'member[email]', :with => unsaved_member.email
-  #     }
-  #   end
-  #   within("#table_credit_card")do
-  #     wait_until{
-  #       fill_in 'member[credit_card][number]', :with => credit_card.number
-  #       fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
-  #       fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
-  #     }
-  #   end
-  #   alert_ok_js
-  #   click_link_or_button 'Create Member'
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select('M', :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        fill_in 'member[state]', :with => unsaved_member.state
+        select('US', :from => 'member[country]')
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        fill_in 'member[email]', :with => unsaved_member.email
+      }
+    end
+    within("#table_credit_card")do
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Create Member'
 
-  #   member = Member.find_by_email(unsaved_member.email)
-  #   within("#table_contact_information")do
-  #     wait_until{
-  #       assert page.has_content?(unsaved_member.type_of_phone_number)
-  #     }
-  #   end
+    member = Member.find_by_email(unsaved_member.email)
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(unsaved_member.type_of_phone_number)
+      }
+    end
 
-  # end
+  end
 
   test "edit member's type of phone number" do
     setup_member
@@ -1712,45 +1703,45 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  # FIXME
-  # test "go from member index to edit member's type of phone number to home type" do
-  #   setup_member
-  #   @saved_member.type_of_phone_number = 'Mobile'
-  #   @saved_member.save
+  test "go from member index to edit member's type of phone number to home type" do
+    setup_member
+    @saved_member.type_of_phone_number = 'Mobile'
+    @saved_member.save
 
-  #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-  #   within("#personal_details")do
-  #     wait_until{
-  #       fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
-  #       fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
-  #       fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
-  #     }
-  #   end
-  #   click_link_or_button 'Search'
-  #   within("#members")do
-  #     wait_until{
-  #       find(".icon-pencil").click
-  #     }
-  #   end   
-  #   within("#table_contact_information")do
-  #     wait_until{
-  #       assert find_field('member[type_of_phone_number]').value == @saved_member.type_of_phone_number
-  #       assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
-  #       assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
-  #       assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
-  #       select('Home', :from => 'member[type_of_phone_number]' )
-  #     }
-  #   end
-  #   alert_ok_js
-  #   click_link_or_button 'Update Member'
-
-  #   within("#table_contact_information")do
-  #     wait_until{
-  #       assert page.has_content?(@saved_member.full_phone_number)
-  #       assert page.has_content?(@saved_member.type_of_phone_number)
-  #     }
-  #   end
-  # end
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#personal_details")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        find(".icon-pencil").click
+      }
+    end   
+    within("#table_contact_information")do
+      wait_until{
+        assert find_field('member[type_of_phone_number]').value == @saved_member.type_of_phone_number
+        assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
+        assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
+        assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
+        select('Home', :from => 'member[type_of_phone_number]' )
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    sleep(3)
+    @saved_member.reload
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?(@saved_member.full_phone_number)
+        assert page.has_content?(@saved_member.type_of_phone_number)
+      }
+    end
+  end
 
   test "go from member index to edit member's type of phone number to other type" do
     setup_member
@@ -1802,6 +1793,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)
+    sleep(1)
     saved_member = Member.find_by_email(unsaved_member.email)
 
     assert find_field('input_visible_id').value == "#{saved_member.visible_id}"
@@ -1882,42 +1874,42 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert find_field('input_member_group_type').value == 'Celebrity'
   end
 
-  # FIXME timing issue?
-  # test "Update external id" do
-  #   setup_member(false)
-  #   @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
-  #   @member_with_external_id = FactoryGirl.create(:active_member_with_external_id, 
-  #                                                 :club_id => @club_external_id.id, 
-  #                                                 :terms_of_membership => @terms_of_membership_with_gateway,
-  #                                                 :created_by => @admin_agent)
-  #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club_external_id.name)
-  #   assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
+  test "Update external id" do
+    setup_member(false)
+    @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
+    @member_with_external_id = FactoryGirl.create(:active_member_with_external_id, 
+                                                  :club_id => @club_external_id.id, 
+                                                  :terms_of_membership => @terms_of_membership_with_gateway,
+                                                  :created_by => @admin_agent)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club_external_id.name)
+    assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
     
-  #   within("#payment_details")do
-  #     wait_until{
-  #       fill_in "member[external_id]", :with => @member_with_external_id.external_id
-  #     }
-  #   end
-  #   click_link_or_button 'Search'
-  #   within("#members")do
-  #     wait_until{
-  #       find(".icon-pencil").click
-  #     }
-  #   end   
+    within("#payment_details")do
+      wait_until{
+        fill_in "member[external_id]", :with => @member_with_external_id.external_id
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        find(".icon-pencil").click
+      }
+    end   
 
-  #   within("#external_id"){
-  #   	wait_until{
-  #   		fill_in 'member[external_id]', :with => '987654321'
-  #   	}
-  #   }
-  #   alert_ok_js
-  #   click_link_or_button 'Update Member'
-  #   @member_with_external_id.reload
-  #   assert_equal @member_with_external_id.external_id, '987654321'
-  #   within("#td_mi_external_id"){
-  #     assert page.has_content?(@member_with_external_id.external_id)
-  #   }
-  # end
+    within("#external_id"){
+    	wait_until{
+    		fill_in 'member[external_id]', :with => '987654321'
+    	}
+    }
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    sleep(1)
+    @member_with_external_id.reload
+    assert_equal @member_with_external_id.external_id, '987654321'
+    within("#td_mi_external_id"){
+      assert page.has_content?(@member_with_external_id.external_id)
+    }
+  end
 
   test "should not let bill date to be edited" do
   	setup_member
@@ -1967,5 +1959,273 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     	}
    	end
   end
+
+  test "see operation history from lastest to newest" do
+    setup_member
+    generate_operations(@saved_member)
+    sleep(5) #Wait for chronological difference
+    10.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, 
+                                :resource_type => 'Member', :member_id => @saved_member.id, 
+                                :description => 'Member updated succesfully last' )
+    }
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    sleep(2) #Wait to the profile.
+    within("#operations_table")do
+      wait_until{
+        assert page.has_content?('Member updated succesfully last')
+      }
+    end
+  end
+
+  test "see operations grouped by billing from lastest to newest" do
+    setup_member
+    generate_operations(@saved_member)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 100,
+                                :description => 'Member enrolled - 100')
+    }
+    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 101,
+                                :description => 'Member enrolled - 101')
+    }
+    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 103,
+                                :description => 'Member enrolled - 102')
+    }
+    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 104,
+                                :description => 'Member enrolled - 103')
+    }
+    sleep(1)
+    within("#dataTableSelect")do
+      wait_until{
+        select('billing', :from => 'operation[operation_type]')
+      }
+      sleep(1)
+    end
+
+    within("#operations_table")do
+      wait_until{
+        assert page.has_content?('Member enrolled - 100')
+        assert page.has_content?('Member enrolled - 101')
+        assert page.has_content?('Member enrolled - 102')
+        assert page.has_content?('Member enrolled - 103')
+      }
+    end
+  end
+
+  test "see operations grouped by profile from lastest to newest" do
+    setup_member
+    generate_operations(@saved_member)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 200,
+                                :description => 'Blacklisted member. Reason: Too much spam - 200')
+    }
+    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 201,
+                                :description => 'Blacklisted member. Reason: Too much spam - 201')
+    }
+    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 202,
+                                :description => 'Blacklisted member. Reason: Too much spam - 202')
+    }
+    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 203,
+                                :description => 'Blacklisted member. Reason: Too much spam - 203')
+    }
+    within("#dataTableSelect")do
+      wait_until{
+        select('profile', :from => 'operation[operation_type]')
+      }
+      sleep(1)
+    end
+
+    within("#operations_table")do
+      wait_until{
+        assert page.has_content?('Blacklisted member. Reason: Too much spam - 200')
+        assert page.has_content?('Blacklisted member. Reason: Too much spam - 201')
+        assert page.has_content?('Blacklisted member. Reason: Too much spam - 202')
+        assert page.has_content?('Blacklisted member. Reason: Too much spam - 203')
+      }
+    end
+  end
+
+  test "see operations grouped by communication from lastest to newest" do
+    setup_member
+    generate_operations(@saved_member)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 300,
+                                :description => 'Communication sent - 300')
+    }
+    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 301,
+                                :description => 'Communication sent - 301')
+    }
+    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 302,
+                                :description => 'Communication sent - 302')
+    }
+    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 303,
+                                :description => 'Communication sent - 303')
+    }
+    within("#dataTableSelect")do
+      wait_until{
+        select('communications', :from => 'operation[operation_type]')
+      }
+      sleep(1)
+    end
+    within("#operations_table")do
+      wait_until{
+        assert page.has_content?('Communication sent - 300')
+        assert page.has_content?('Communication sent - 301')
+        assert page.has_content?('Communication sent - 302')
+        assert page.has_content?('Communication sent - 303')
+      }
+    end
+  end
+
+  test "see operations grouped by others from lastest to newest" do
+    setup_member
+    generate_operations(@saved_member)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    10.times{FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 1000,
+                                :description => 'Member was updated successfully - 1000')
+    }
+
+    within("#dataTableSelect")do
+      wait_until{
+        select('others', :from => 'operation[operation_type]')
+      }
+      sleep(1)
+    end
+    within("#operations_table")do
+      wait_until{
+        assert page.has_content?('Member was updated successfully - 1000')
+      }
+    end
+  end
+
+  test "search member that does not exist" do
+    setup_member
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    member_note = FactoryGirl.create(:member_note, :member_id => @saved_member.id, 
+                                     :created_by_id => @admin_agent.id,
+                                     :communication_type_id => @communication_type.id,
+                                     :disposition_type_id => @disposition_type.id)
+    member_to_seach = Member.first
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[first_name]", :with => 'Random text'
+      }
+    end
+
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?('No records were found.')
+      }
+    end
+  end
+
+  test "create a member with an expired credit card" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_gateway,
+                                         :created_by => @admin_agent,
+                                         :address => '1455 De Maisonneuve Blvd. W. Montreal',
+                                         :state => 'Quebec',
+                                         :zip => 'H3G 1M8',
+                                         :country => 'Canada')
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => 2011)
+    
+    fill_in_member(unsaved_member,credit_card)
+
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?('Credit card is invalid or is expired!')
+      }
+    end
+  end
+
+  test "change member gender from male to female" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
+
+    click_link_or_button 'Edit'
+
+    within("#table_demographic_information")do
+      wait_until{
+        select('Female', :from => 'member[gender]')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    sleep(1)
+    @saved_member.reload
+    wait_until{
+      assert find_field('input_gender').value == ('Female')
+    }
+    assert_equal @saved_member.gender, 'F'
+  
+  end
+
+  test "change member gender from female to male" do
+    setup_member
+    @saved_member.gender = 'F'
+    @saved_member.save
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
+
+    click_link_or_button 'Edit'
+
+    within("#table_demographic_information")do
+      wait_until{
+        select('Male', :from => 'member[gender]')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    sleep(1)
+    @saved_member.reload
+    wait_until{
+      assert find_field('input_gender').value == ('Male')
+    }
+    assert_equal @saved_member.gender, 'M'
+  end
+
+  test "create blank member note" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_link_or_button 'Add a note'
+    click_link_or_button 'Save note'
+    within("#member_notes_table") do
+      wait_until{
+        assert page.has_content?("Can't be blank.")
+      }
+    end
+  end
+
 
 end

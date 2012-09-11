@@ -15,6 +15,9 @@ gem 'attr_encrypted'
 gem 'acts_as_list'
 gem 'paper_trail', '~> 2'
 gem 'delayed_job_active_record'
+gem 'daemons'
+gem 'foreman'
+gem 'god'
 
 # Gems used only for assets and not required
 # in production environments by default.

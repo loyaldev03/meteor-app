@@ -1,5 +1,6 @@
 set :stages, %w(production prototype staging)
 set :default_stage, "prototype"
+default_run_options[:pty] = true
 require 'capistrano/ext/multistage'
 
 set :port, 30003
@@ -25,14 +26,23 @@ task :link_config_files do
   run "if [ -e #{release_path}/rake_task_runner ]; then chmod +x #{release_path}/rake_task_runner; fi"
 end
 
+desc "Creates a proper .env file."
+task :envfile do
+  run "echo RAILS_ENV=#{rails_env} >> #{release_path}/.env"
+end
+
 task :bundle_install do
   run "cd #{release_path}; bundle install"
 end
 
 desc "Restart delayed jobs"
 task :restart_delayed_jobs do
-  run "/opt/ruby-enterprise-1.8.7-2011.03/bin/god restart #{application}-dj" 
-  campfire_room.speak "#{cplatform} #{application} (#{scm_username}): deployed branch "
+  run "cd #{release_path} && bundle exec god restart -c /var/www/god_files/delayed_jobs.god #{application}-dj" 
+end
+
+desc "Notify Campfire room"
+task :notify_campfire do
+  campfire_room.speak "#{cplatform} #{application}: env #{rails_env}"
 end
 
 namespace :deploy do
@@ -108,7 +118,31 @@ namespace :server_stats do
   end
 end
 
+# taken from https://gist.github.com/1027117
+namespace :foreman do
+  desc "Export the Procfile to Ubuntu's upstart scripts"
+  task :export, :roles => :web do
+    run "cd #{release_path} && #{sudo} bundle exec foreman export upstart /etc/init -a #{application} -u www-data -l #{release_path}/log"
+  end
+  
+  desc "Start the application services"
+  task :start, :roles => :web do
+    sudo "start #{application}"
+  end
+
+  desc "Stop the application services"
+  task :stop, :roles => :web do
+    sudo "stop #{application}"
+  end
+
+  desc "Restart the application services"
+  task :restart, :roles => :web do
+    run "#{sudo} start #{application} || #{sudo} restart #{application}"
+  end
+end
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
-before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate" 
+# after "deploy:update", 'envfile', "foreman:restart"
+after 'deploy:update', 'restart_delayed_jobs', 'notify_campfire'
+before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate"
 after "deploy", "deploy:tag"

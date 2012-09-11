@@ -20,6 +20,7 @@ FactoryGirl.define do
     phone_local_number 1234
     bill_date { DateTime.now }
     birth_date { DateTime.now }
+    gender "M"
     status "none"
     country "US"
     club_cash_amount 0
@@ -39,6 +40,7 @@ FactoryGirl.define do
     phone_area_code 123
     phone_local_number 1234
     birth_date { DateTime.now }
+    gender "M"
     status "none"
     country "US"
     club_cash_amount 0
@@ -60,6 +62,7 @@ FactoryGirl.define do
     phone_area_code 123
     phone_local_number 1234
     birth_date { DateTime.now }
+    gender "M"
     country "US"
     club_cash_amount 0
     join_date { DateTime.now }
@@ -122,6 +125,7 @@ FactoryGirl.define do
   end
 
   factory :active_member_without_cc, class: Member do
+    gender "M"
     status "active"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
@@ -144,6 +148,7 @@ FactoryGirl.define do
   end
 
   factory :lapsed_member, class: Member do
+    gender "M"
     status "lapsed"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
@@ -169,6 +174,7 @@ FactoryGirl.define do
 
 
   factory :provisional_member_with_cc, class: Member do
+    gender "M"
     status "provisional"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
@@ -192,6 +198,7 @@ FactoryGirl.define do
   end
 
   factory :provisional_member, class: Member do
+    gender "M"
     status "provisional"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
@@ -214,6 +221,7 @@ FactoryGirl.define do
   end
 
   factory :applied_member, class: Member do
+    gender "M"
     status "applied"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
