@@ -25,6 +25,11 @@ task :link_config_files do
   run "if [ -e #{release_path}/rake_task_runner ]; then chmod +x #{release_path}/rake_task_runner; fi"
 end
 
+desc "Creates a proper .env file."
+task :envfile do
+  run "echo RAILS_ENV=#{rails_env} >> #{release_path}/.env"
+end
+
 task :bundle_install do
   run "cd #{release_path}; bundle install"
 end
@@ -110,5 +115,5 @@ end
 
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
-before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate" 
+before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate", 'envfile'
 after "deploy", "deploy:tag"
