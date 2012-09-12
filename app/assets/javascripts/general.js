@@ -346,6 +346,25 @@ $(document).ready( function() {
         },
       });
     });
+
+    $('*#resend').click( function(event){
+      button = $(this)
+      button.attr('disabled', 'disabled');
+      event.preventDefault();
+      $.ajax({
+        type: 'PUT',
+        url: "../fulfillments/"+button.attr("name")+"/resend",
+        success: function(data) {
+          if (data.code == "000"){
+            button.parent().children().hide();
+            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>")
+          }else{
+            button.removeAttr('disabled');
+            alert(data.message);
+          };
+        },
+      });
+    });
   };
 
   function member_cancellation_functions(){

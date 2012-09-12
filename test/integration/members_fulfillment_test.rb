@@ -188,4 +188,29 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     @fulfillment.reload
     assert_equal @fulfillment.status,'sent'
   end
+
+  test "display 'resend' when fulfillment is out_of_stock on memebr's profile." do
+    setup_member
+    @fulfillment.set_as_out_of_stock    
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_selector?('#resend')     
+      }
+    end
+
+    click_link_or_button('Resend')
+
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?("Fulfillment #{@fulfillment.product_sku} was marked to be delivered next time.")    
+      }
+    end
+    @fulfillment.reload
+    assert_equal @fulfillment.status,'not_processed'
+  end
 end

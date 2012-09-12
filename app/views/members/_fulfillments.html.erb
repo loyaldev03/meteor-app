@@ -27,6 +27,11 @@
             <% else %>
               <%= 'activerecord.attributes.member.undeliverable' %>
             <% end %>
+          <% elsif fulfillment.out_of_stock? %>
+            <p style = 'float:left;'> Actual stock: <%= fulfillment.product.stock %>. </p> &nbsp
+            <% if fulfillment.product.stock > 0 %>
+              <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small"%>
+            <% end %>
           <% end %>
         </td>
       </tr>
