@@ -1951,6 +1951,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)
+
+    wait_until{
+      assert find_field('input_first_name').value == unsaved_member.first_name
+    }
+
     saved_member = Member.find_by_email(unsaved_member.email)
     generate_operations(saved_member)
 
