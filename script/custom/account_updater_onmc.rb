@@ -9,6 +9,29 @@ require 'faraday'
 @url = 'https://www.merchante-solutions.com/'
 @folder = "#{RAILS_ROOT rescue Rails.root}/mes_account_updater_files"
 
+ActionMailer::Base.smtp_settings = {
+  :enable_starttls_auto => true,
+  :address        => 'smtp.gmail.com',
+  :port           => 587,
+  :domain         => 'xagax.com',
+  :authentication => :login,
+  :user_name      => 'platform@xagax.com',
+  :password       => 'a4my0fm3'
+}
+
+class Notifier < ActionMailer::Base
+  def call_these_members(csv)
+    subject    "AUS answered CALL to these members #{Date.today}"
+    bcc        'platformadmins@xagax.com'
+    recipients 'jelwood@stoneacreinc.com,jsmith@stoneacreinc.com'
+    from       'platform@xagax.com'
+    attachment :content_type => "text/csv", :filename => "call_members_#{Date.today}.csv" do |a|
+      a.body = csv
+    end
+  end
+end
+
+
 def store_file
   ################################################
   ########## new file!
@@ -22,10 +45,10 @@ def store_file
 
   count = 0
   # members with expired credit card and active
-  members = Member.scoped(:conditions => [ 'cs_next_bill_date = ? and renewable = 1 and (trial = 1 or active = 1) ' + 
-                ' AND (aus_sent_at IS NULL OR (aus_sent_at < ? AND aus_status IS NULL) )', 
-    (Time.zone.now+7.days).to_date,
-    (Time.zone.now-1.days).to_date ]).all
+  members = Member.find(:all, :select => "DISTINCT(encrypted_cc_number), members.*",
+      :conditions => [ 'cs_next_bill_date = ? and renewable = 1 and (trial = 1 or active = 1) ' + 
+          ' AND (aus_sent_at IS NULL OR (aus_sent_at < ? AND aus_status IS NULL) ) AND is_prospect != 1', 
+          (Time.zone.now+7.days).to_date, (Time.zone.now-1.days).to_date ])
   members.each do |member|
     
     ActiveMerchant::Billing::CreditCard.require_verification_value = false
@@ -53,7 +76,7 @@ def store_file
     member.save
 
     # add cc line
-    record_type, account_number, expiration_date, descretionary_data = 'D1', "%-32s" % member.cc_number.strip, 
+    record_type, account_number, expiration_date, descretionary_data = 'D1', "%-32s" % member.cc_number.strip.gsub(' ', ''), 
       member.cc_year_exp.to_s[2..3]+("%02d" % member.cc_month_exp), "M%-31s"% member.id
 
     file.write [ record_type, account_type, account_number, expiration_date, descretionary_data ].join + "\n"
@@ -115,6 +138,7 @@ def request_file_by_id(file_id, filename)
 end
 
 def parse_file(filename)
+  ids = []
   File.open(filename).each do |line|
     # do not parse header or trailers.
     next if line[0..0] == 'H' or line[0..0] == 'T'
@@ -130,35 +154,66 @@ def parse_file(filename)
     response_source = line[90..91]
     discretionary_data = line[92..123]
 
-[ record_type, old_account_type , old_account_number, old_expiration_date, new_account_type, new_account_number, new_expiration_date, response_code, response_source, discretionary_data ].each do |f|
-puts "-#{f}-"
-end
+    [ record_type, old_account_type , old_account_number, old_expiration_date, new_account_type, new_account_number, new_expiration_date, response_code, response_source, discretionary_data ].each do |f|
+      puts "-#{f}-"
+    end
 
-    member = Member.find discretionary_data[1..32].strip
-    if member.nil?
-      log "Member id not found ##{discretionary_data} while parsing. #{line}"
+    members = Member.find_all_by_encrypted_cc_number Member.new(:cc_number => old_account_number).encrypted_cc_number
+    if members.size > 4
+      log "There are more than 4 members with the same CC number. Afraid of update all of them???"
     else
-      member.aus_answered_at = Time.zone.now
-      member.aus_status = response_code
-      update_cs = false
-      case response_code
-      when 'NEWACCT'
-        update_cs = true
-        member.cc_number = new_account_number
-        member.cc_year_exp = new_expiration_date[0..1].to_i+2000
-        member.cc_month_exp = new_expiration_date[2..3]
-      when 'NEWEXP'
-        update_cs = true
-        member.cc_year_exp = new_expiration_date[0..1].to_i+2000
-        member.cc_month_exp = new_expiration_date[2..3]
-      else
-        log "Member id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
-      end
-      member.save
-      if update_cs
-        Delayed::Job.enqueue(UpdateJob.new(member.id))
+      members.each do |member|
+        update_member member, response_code, new_account_number, new_expiration_date, line
       end
     end
+
+    #member = Member.find discretionary_data[1..32].strip
+    #if member.nil?
+    #  log "Member id not found ##{discretionary_data} while parsing. #{line}"
+    #else
+    #  update_member member, response_code, new_account_number, new_expiration_date
+    #end
+
+    ids << discretionary_data[1..32].strip if response_code == "CALL"
+  end
+
+  send_email_with_call_members(ids)
+end
+
+def send_email_with_call_members(ids)
+  unless ids.empty?
+    members = Member.find(ids)
+    csv = "id,first_name,last_name,trial,active,cs_next_bill_date\n"
+    csv += members.collect {|m| [ m.id, m.first_name, m.last_name, m.trial, m.active, m.cs_next_bill_date ].join(',') }.join("\n")
+    Notifier.deliver_call_these_members(csv)
+  end
+end
+
+def update_member(member, response_code, new_account_number, new_expiration_date, line)
+  member.aus_answered_at = Time.zone.now
+  member.aus_status = response_code
+  update_cs = false
+  case response_code
+  when 'NEWACCT'
+    update_cs = true
+    member.cc_number = new_account_number
+    member.cc_year_exp = new_expiration_date[0..1].to_i+2000
+    member.cc_month_exp = new_expiration_date[2..3]
+  when 'NEWEXP'
+    update_cs = true
+    member.cc_year_exp = new_expiration_date[0..1].to_i+2000
+    member.cc_month_exp = new_expiration_date[2..3]
+  when 'CLOSED'
+    if member.active == 1 or member.trial == 1
+      DeactivationJob.new(member.id, 'Hard decline. AUS answered account CLOSED wont be able to bill').perform
+      member.cs_next_bill_date = nil
+    end
+  else
+    log "Member id ##{member.id} with response #{response_code} ask for an action. #{line}"
+  end
+  member.save
+  if update_cs
+    Delayed::Job.enqueue(UpdateJob.new(member.id))
   end
 end
 

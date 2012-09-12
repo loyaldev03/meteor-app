@@ -26,6 +26,7 @@ class MesAccountUpdater
     0.upto(answer['statusCount'].to_i-1) do |i|
       request_file_by_id answer["rspfId_#{i}"], "rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway.club_id
     end
+    send_email_with_call_members
   end
 
   def self.account_updater_send_file_to_process(gateway)
@@ -35,6 +36,13 @@ class MesAccountUpdater
   end
 
   private
+    def self.send_email_with_call_members
+      ccs = CreditCard.where([" aus_status = 'CALL' AND date(aus_answered_at) = ? ", Time.zone.now.to_date ])
+      csv = "id,first_name,last_name,trial,active,cs_next_bill_date\n"
+      csv += ccs.collect {|cc| [ cc.member_id, cc.member.first_name, cc.member.last_name, cc.member.status, cc.member.next_retry_bill_date ].join(',') }.join("\n")
+      Notifier.call_these_members(csv).deliver
+    end
+
     def self.send_file_to_mes(local_filename)
       conn = Faraday.new(:url => Settings.mes_aus_service.url, :ssl => {:verify => false}) do |builder|
         builder.request :multipart

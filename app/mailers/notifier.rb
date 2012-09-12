@@ -39,4 +39,13 @@ class Notifier < ActionMailer::Base
     mail :to => agent.email, :subject => "Member recovering needs approval"
   end
 
+  def call_these_members(csv)
+    subject    "AUS answered CALL to these members #{Date.today}"
+    bcc        'platformadmins@xagax.com'
+    recipients Settings.call_these_members_recipients
+    attachment :content_type => "text/csv", :filename => "call_members_#{Date.today}.csv" do |a|
+      a.body = csv
+    end
+  end
+
 end
