@@ -51,11 +51,11 @@ class Api::ProspectsController < ApplicationController
   # @return [Integer] *code*
   # @return [String] *prospect_id*
   def create
-  	response = { :message => "prospect_data_invalid", :code => '405' }
+  	response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
   	prospect = Prospect.new(params[:prospect])
   	if prospect.save
   	  response[:message] = "Prospect was successfuly saved."
-      response[:code] = '000'
+      response[:code] = Settings.error_codes.success
       response[:prospect_id] = prospect.id
     end   
     render json: response
