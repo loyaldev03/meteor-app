@@ -1,7 +1,6 @@
 class FulfillmentsController < ApplicationController
   before_filter :validate_club_presence
 
-
   def index
     if request.post?
     	if params[:all_times] == '1'

@@ -162,7 +162,8 @@ class MembersController < ApplicationController
           flash[:notice] = message
           redirect_to show_member_path
         rescue Exception => e
-          flash.now[:error] = "Could not set the NBD on this member. #{e}"
+          flash.now[:error] = "Could not set the NBD on this member. Ticket sent to IT"
+          Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e)
         end
       else
         flash.now[:error] = "Next bill date should be older that actual date."
@@ -173,7 +174,7 @@ class MembersController < ApplicationController
   def set_undeliverable 
     if request.post?
       answer = @current_member.set_wrong_address(@current_agent, params[:reason])
-      if answer[:code] == "000"
+      if answer[:code] == Settings.error_codes.success
         flash.now[:notice] = answer[:message]
       else
         flash.now[:error] = answer[:message]
@@ -189,12 +190,12 @@ class MembersController < ApplicationController
   def set_unreachable
     if request.post?
       if @current_member.update_attribute(:wrong_phone_number, params[:reason])
-        message = "Phone number #{@current_member.full_phone_number} is  #{params[:reason]}."
+        message = "Phone number #{@current_member.full_phone_number} is #{params[:reason]}."
         flash[:notice] = message
         Auditory.audit(@current_agent,@current_member,message,@current_member)
         redirect_to show_member_path
       else
-        flash.now[:error] = "Could not set the NBD on this member"
+        flash.now[:error] = "Could not set phone number as unreachable."
       end
     end
   end
