@@ -331,6 +331,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#resend_welcome: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Airbrake.notify(:error_class => "Member:resend_welcome")
     redirect_to show_member_path, notice: message
   end
 end
