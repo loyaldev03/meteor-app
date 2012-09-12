@@ -59,6 +59,25 @@ class CreditCard < ActiveRecord::Base
     self.last_digits = self.number.last(4) 
   end
   
+  def self.new_expiration_on_active_credit_card(actual, new_year_exp, new_month_exp = nil, new_cc_number = nil)
+    CreditCard.transaction do
+      begin
+        actual.update_attribute :active , false
+        cc = CreditCard.new :number => (new_cc_number || actual.number), :expire_month => (new_month_exp || actual.expire_month), :expire_year => new_year_exp
+        cc.member = actual.member
+        cc.active = true
+        cc.save!
+        Auditory.audit(nil, cc, "Automatic Recycled Expired card", cc.member, Settings.operation_types.automatic_recycle_credit_card)
+        return cc
+      rescue Exception => e
+        logger.error e
+        Airbrake.notify(:error_class => "CreditCard::new_active_credit_card_year_change", :error_message => e)
+        raise ActiveRecord::Rollback
+      end
+    end
+    nil
+  end
+
   # refs #17832 and #19603
   # 6 Days Later if not successful = (+3), 3/2014
   # 6 Days Later if not successful = (+2), 3/2013
@@ -82,21 +101,7 @@ class CreditCard < ActiveRecord::Base
       else
         new_year_exp=Time.zone.now.year
       end
-      CreditCard.transaction do
-        begin
-          acc.update_attribute :active , false
-          cc = CreditCard.new :number => acc.number, :expire_month => acc.expire_month, :expire_year => new_year_exp
-          cc.member = acc.member
-          cc.active = true
-          cc.save!
-          Auditory.audit(nil, cc, "Automatic Recycled Expired card", cc.member, Settings.operation_types.automatic_recycle_credit_card)
-          return cc
-        rescue Exception => e
-          logger.error e
-          Airbrake.notify(:error_class => "Communication deliver_lyris", :error_message => e)
-          raise ActiveRecord::Rollback
-        end
-      end
+      return new_active_credit_card(acc, new_year_exp) || acc
     end
     acc
   end

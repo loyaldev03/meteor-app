@@ -151,20 +151,17 @@ class MesAccountUpdater
         else
           credit_card.aus_answered_at = Time.zone.now
           credit_card.aus_status = response_code
+          credit_card.save
           case response_code
           when 'NEWACCT'
-            # TODO: add new credit card!!!
-            credit_card.number = new_account_number
-            credit_card.expire_year = new_expiration_date[0..1].to_i+2000
-            credit_card.expire_month = new_expiration_date[2..3]
+            CreditCard.new_active_credit_card(credit_card, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3], new_account_number)
           when 'NEWEXP'
-            # TODO: add new credit card!!!
-            credit_card.expire_year = new_expiration_date[0..1].to_i+2000
-            credit_card.expire_month = new_expiration_date[2..3]
+            CreditCard.new_active_credit_card(credit_card, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3])
+          when 'CLOSED'
+            credit_card.member.cancel! Time.zone.now, "Automatic cancellation. AUS answered account CLOSED wont be able to bill"
           else
             Rails.logger.info "CreditCard id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
           end
-          member.save
         end
       end
     end    
