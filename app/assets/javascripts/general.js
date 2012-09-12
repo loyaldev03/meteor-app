@@ -373,8 +373,14 @@ $(document).ready( function() {
   };
 
   function fulfillments_index_functions(){
-    $(".datepicker").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
-  
+    $(".datepicker").datepicker({ constrainInput: true, 
+                                  dateFormat: "yy-mm-dd", 
+                                  showOn: "both", 
+                                  buttonImage: "/icon-calendar.png", 
+                                  buttonImageOnly: true });
+    $("#initial_date_").datepicker( "setDate", '-1w' );
+    $("#end_date_").datepicker( "setDate", '0' );
+
     $('*#resend').click( function(event){
       button = $(this)
       button.attr('disabled', 'disabled');
