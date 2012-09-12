@@ -94,8 +94,10 @@ defaults: &defaults
       email:
         presence: true
         uniqueness:
-          scope: :club_id
+          :scope: :club_id
         format: !ruby/regexp /^([0-9a-zA-Z\-_]([-_\.]?[+?]?[0-9a-zA-Z\-_])*@([0-9a-zA-Z]+[-_\.]?[0-9a-zA-Z]*\.)+[a-zA-Z]{2,9})$/
+      club_id:
+        presence: true
       gender:
         presence: true
       terms_of_membership_id:
@@ -107,7 +109,7 @@ defaults: &defaults
           - Home 
           - Mobile
           - Other
-          allow_nil: true
+          :allow_nil: true
       phone_country_code:
         presence: true
         length:
@@ -128,9 +130,6 @@ defaults: &defaults
           :minimum: 1
           :maximum: 8
     sets:
-      eastern:
-        testing:
-          saras: true
       western:
         first_name:
           presence: true
@@ -164,13 +163,17 @@ defaults: &defaults
         - western
         zip:
           presence: true
-          format: !ruby/regexp /^\d{5}([\-]?\d{4})?$/
+          format: 
+            :with: !ruby/regexp /^\d{5}([\-]?\d{4})?$/
+            :message: 'The zip code is not valid for the selected country.'
       ca:
         sets:
         - western
         zip:
           presence: true
-          format: !ruby/regexp /^[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}[\s]{1}[0-9]{1}[A-Za-z][0-9]{1}$/
+          format: 
+            :with: !ruby/regexp /^[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}[\s]{1}[0-9]{1}[A-Za-z][0-9]{1}$/
+            :message: 'The zip code is not valid for the selected country.'
 
 development:
   <<: *defaults
