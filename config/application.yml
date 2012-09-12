@@ -4,6 +4,7 @@ defaults: &defaults
   next_retry_on_missing_decline: 20.days
   number_of_retries_on_missing_decline: 4
   club_cash_for_members_who_belongs_to_group: 200
+  call_these_members_recipients: platformadmins@xagax.com
   lyris_service:
     domain: 'www.elabs10.com'
     url: '/API/mailing_list.html'
@@ -193,6 +194,7 @@ test:
 
 production:
   <<: *defaults
+  call_these_members_recipients: 'jelwood@stoneacreinc.com,jsmith@stoneacreinc.com'
   mes_report_service:
     user: Stoneacrereports
     password: Letmein123
