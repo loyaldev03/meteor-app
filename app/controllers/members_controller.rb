@@ -214,14 +214,13 @@ class MembersController < ApplicationController
     if request.post?
       cct = ClubCashTransaction.new(params[:club_cash_transaction])
       cct.member_id = @current_member
-      
       if cct.save
-        message = "Club cash transaction done!. Amount: $#{cct.amount}"
+        message = "Club cash transaction done!. Amount: #{cct.amount}"
         Auditory.audit(@current_agent, cct, message, @current_member)
         flash[:notice] = message
         redirect_to show_member_path
       else
-        flash.now[:error] = "Could not saved club cash transactions: #{cct.error_to_s}"
+        flash.now[:error] = "Could not save club cash transaction: #{cct.error_to_s}"
       end
     end
   end
@@ -230,7 +229,7 @@ class MembersController < ApplicationController
   def approve
     if @current_member.can_be_approved?
       @current_member.set_as_provisional!
-      message = "Member was approved."
+      message = "Member approved"
       Auditory.audit(@current_agent, @current_member, message, @current_member)
     else
       message = "Member cannot be approved. It must be applied."
@@ -242,7 +241,7 @@ class MembersController < ApplicationController
   def reject
     if @current_member.can_be_rejected?
       @current_member.set_as_canceled!
-      message = "Member was rejected and setted as canceled."
+      message = "Member was rejected and now its lapsed."
       Auditory.audit(@current_agent, @current_member, message, @current_member)
     else
       message = "Member cannot be rejected. It must be applied."
@@ -292,6 +291,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#sync: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Airbrake.notify(:error_class => "Member:sync")
     redirect_to show_member_path, notice: message
   end
 
@@ -315,6 +315,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#reset_password: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Airbrake.notify(:error_class => "Member:reset_password")
     redirect_to show_member_path, notice: message
   end
 
