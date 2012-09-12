@@ -1964,6 +1964,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)
+
+    wait_until{
+      assert find_field('input_first_name').value == unsaved_member.first_name
+    }
+
     saved_member = Member.find_by_email(unsaved_member.email)
     generate_operations(saved_member)
 
@@ -2281,6 +2286,21 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("type_of_phone_number: can't be blank,is not included in the list")
       }
     end
+  end
+
+  test "display member with blank product_sku." do
+    setup_member
+    enrollment_info = FactoryGirl.create(:enrollment_info, :product_sku => '', :member_id => @saved_member.id)
+    @saved_member.set_as_canceled!
+    @saved_member.recovered
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+      assert find_field('input_last_name').value == @saved_member.last_name
+      assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
+      assert find_field('input_member_group_type').value == (@saved_member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : @saved_member.member_group_type.name)
+    }
   end
 
 end
