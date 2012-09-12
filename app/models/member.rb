@@ -1,35 +1,7 @@
 # encoding: utf-8
 class Member < ActiveRecord::Base
-  module CountrySpecificValidations
-    def validations_for(country)
-      country     = country.downcase
-      all         = Settings.validations
-      defaults    = all.defaults
-      allsets     = all.sets
-      countries   = all.countries.dup
-      raise ArgumentInvalid unless countries.key?(country)
-
-      validations = countries[country]
-      sets = validations.delete('sets').inject({}) { |sum,elem| sum.merge allsets[elem] } # no #slice on SettingsLogic
-      defaults.merge(sets).merge(validations)
-    end
-
-    def supported_countries
-      Settings.validations.supported_countries.map &:upcase
-    end
-
-    def country_specific_validations!
-      self.supported_countries.each do |cc|
-        logger.info "Member validations for country: #{cc}"
-        self.validations_for(cc).each do |attr,opts|
-          opts = opts.merge if: lambda { |m| m.country.present? && (m.country.downcase == cc) }
-          self.validates attr, opts
-        end
-      end
-    end
-  end
-  extend CountrySpecificValidations
   include Extensions::UUID
+  extend Extensions::Member::CountrySpecificValidations
 
   has_paper_trail :only => [:join_date, :cancel_date, :status]
 
@@ -82,11 +54,7 @@ class Member < ActiveRecord::Base
     presence:                    true, 
     length:                      { is: 2, allow_nil: true },
     inclusion:                   { within: self.supported_countries }
-  self.country_specific_validations!
-  # validates :gender,
-  #   presence:                    true
-  # validates :terms_of_membership_id, 
-  #   presence:                    true
+  country_specific_validations!
 
   scope :synced, lambda { |bool=true|
     bool ?
@@ -239,6 +207,10 @@ class Member < ActiveRecord::Base
   # Returns a string with first and last name concatenated. 
   def full_name
     [ first_name, last_name].join(' ').squeeze
+  end
+
+  def country_name
+    self.class.country_name(self.country.downcase)
   end
 
   # Returns the active credit card that the member is using at the moment.

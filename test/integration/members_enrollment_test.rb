@@ -158,7 +158,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         select(unsaved_member.gender, :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
         fill_in 'member[state]', :with => unsaved_member.state
-        select(unsaved_member.country, :from => 'member[country]')
+        select(unsaved_member.country_name, :from => 'member[country]')
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -326,14 +326,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 		click_on 'New Member'
 
   	within("#table_demographic_information") {
-		  fill_in 'member[first_name]', :with => unsaved_member.first_name
-	 	  fill_in 'member[last_name]', :with => unsaved_member.last_name
-	  	fill_in 'member[city]', :with => unsaved_member.city
-	  	fill_in 'member[address]', :with => unsaved_member.address
-	  	fill_in 'member[zip]', :with => unsaved_member.zip
-	  	fill_in 'member[state]', :with => unsaved_member.state
-	  	select('M', :from => 'member[gender]')
-	  	select('US', :from => 'member[country]')
+      fill_in 'member[first_name]', :with => unsaved_member.first_name
+      fill_in 'member[last_name]', :with => unsaved_member.last_name
+      fill_in 'member[city]', :with => unsaved_member.city
+      fill_in 'member[address]', :with => unsaved_member.address
+      fill_in 'member[zip]', :with => unsaved_member.zip
+      fill_in 'member[state]', :with => unsaved_member.state
+      select('M', :from => 'member[gender]')
+	  	select('United States', :from => 'member[country]')
 		}
 
 		page.execute_script("window.jQuery('#member_birth_date').next().click()")
@@ -987,6 +987,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in "member[first_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in "member[last_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in "member[email]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        select('United States', :from => 'member[country]')
       }
     end
     within("#contact_details")do
@@ -1031,6 +1032,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
+    require 'ruby-debug'; debugger
     within("#table_demographic_information"){
       wait_until{
         fill_in 'member[first_name]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
@@ -1040,6 +1042,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[last_name]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in 'member[zip]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
       }
+    }
+    within("#table_demographic_information") {
+      select('United States', :from => 'member[country]')
     }
     within("#table_contact_information"){
       wait_until{
@@ -1071,12 +1076,16 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
+    require 'ruby-debug'; debugger
     within("#table_contact_information"){
       wait_until{
         fill_in 'member[phone_country_code]', :with => 'werqwr'
         fill_in 'member[phone_area_code]', :with => 'werqwr'
         fill_in 'member[phone_local_number]', :with => 'werqwr'
       }
+    }
+    within("#table_demographic_information") {
+      select('United States', :from => 'member[country]')
     }
     alert_ok_js
     click_link_or_button 'Create Member'
@@ -1093,10 +1102,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
+    require 'ruby-debug'; debugger
     within("#table_contact_information"){
       wait_until{
         fill_in 'member[email]', :with => 'asdfhomail.com'
       }
+    }
+    within("#table_demographic_information") {
+      select('United States', :from => 'member[country]')
     }
     alert_ok_js
     click_link_or_button 'Create Member'
@@ -1341,7 +1354,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         select('M', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
         fill_in 'member[state]', :with => unsaved_member.state
-        select('US', :from => 'member[country]')
+        select('United States', :from => 'member[country]')
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -1387,7 +1400,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         select('F', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
         fill_in 'member[state]', :with => unsaved_member.state
-        select('US', :from => 'member[country]')
+        select('United States', :from => 'member[country]')
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -1468,7 +1481,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         select('M', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
         fill_in 'member[state]', :with => unsaved_member.state
-        select('US', :from => 'member[country]')
+        select('United States', :from => 'member[country]')
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -1519,7 +1532,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         select('M', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
         fill_in 'member[state]', :with => unsaved_member.state
-        select('US', :from => 'member[country]')
+        select('United States', :from => 'member[country]')
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -1566,7 +1579,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         select('M', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
         fill_in 'member[state]', :with => unsaved_member.state
-        select('US', :from => 'member[country]')
+        select('United States', :from => 'member[country]')
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -1644,7 +1657,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         select('M', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
         fill_in 'member[state]', :with => unsaved_member.state
-        select('US', :from => 'member[country]')
+        select('United States', :from => 'member[country]')
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -1798,7 +1811,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                          :address => '1455 De Maisonneuve Blvd. W. Montreal',
                                          :state => 'Quebec',
                                          :zip => 'H3G 1M8',
-                                         :country => 'Canada')
+                                         :country => 'CA')
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)
@@ -1823,7 +1836,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                          :address => '1455 De Maisonneuve Blvd. W. Montreal',
                                          :state => 'Quebec',
                                          :zip => '%^tYU2123',
-                                         :country => 'Canada')
+                                         :country => 'CA')
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)

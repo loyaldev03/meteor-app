@@ -64,7 +64,7 @@
             <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline' %>
           </th>
           <td> 
-            <%= f.country_code_select(:country, [[ 'United States', 'US' ], ['Canada', 'CA']]) %> 
+            <%= f.country_code_select(:country, [['', '']] + Member.supported_countries.map { |cc| [Member.country_name(cc), cc]}) %> 
           </td>  
         </tr>
       </table>
