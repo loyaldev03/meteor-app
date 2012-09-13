@@ -159,7 +159,6 @@ def update_members(cid)
           phoenix.status = member.phoenix_status
           if member.phoenix_status == 'lapsed'
             phoenix.recycled_times = 0
-            phoenix.club_cash_amount = 0
             phoenix.cancel_date = convert_from_date_to_time(member.cancelled_at)
             phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
           end
