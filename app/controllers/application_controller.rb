@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from CanCan::AccessDenied do |exception|
-    render :file => "#{Rails.root}/public/401.html", :status => 401, :layout => false
+    render :file => "#{Rails.root}/public/401", :status => 401, :layout => false, :formats => [:html]
   end
 
   private
