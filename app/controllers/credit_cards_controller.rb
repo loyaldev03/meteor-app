@@ -14,9 +14,9 @@ class CreditCardsController < ApplicationController
 
     if credit_card.am_card.valid?
       if credit_card.save && actual_credit_card.deactivate
-        message = "Credit card #{credit_card.last_digits} added and set active."
+        message = "Credit card #{credit_card.last_digits} added and activated."
         Auditory.audit(@current_agent, credit_card, message, @current_member)
-        redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{credit_card.last_digits} was successfully added and setted as active." 
+        redirect_to show_member_path(:id => @current_member), notice: message
         return
       end
     end
@@ -30,9 +30,9 @@ class CreditCardsController < ApplicationController
 
     # TODO: we NEED transactions!!!    
     if new_credit_card.activate && former_credit_card.deactivate
-      message = "Credit card #{new_credit_card.last_digits} set as active."
+      message = "Credit card #{new_credit_card.last_digits} activated."
       Auditory.audit(@current_agent, new_credit_card, message, @current_member)
-      redirect_to show_member_path(:id => @current_member), notice: "The Credit Card #{new_credit_card.last_digits} was activated."
+      redirect_to show_member_path(:id => @current_member), notice: message
     else
       redirect_to show_member_path(:id => @current_member), error: new_credit_card.errors
     end

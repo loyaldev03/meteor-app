@@ -11,8 +11,6 @@ class CreditCard < ActiveRecord::Base
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }, :allow_blank => true
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }, :allow_blank => true
   validates :number, :numericality => { :only_integer => true }, :allow_blank => true
-  #method commented. It doesnt allow to blacklist an active credit card.  
-  #before_update :not_blacklisted
 
   def accepted_on_billing
     update_attribute :last_successful_bill_date, Time.zone.now

@@ -76,7 +76,130 @@ USE_MEMBER_LIST = true
 54
 55
 56
+1125
+1126
+1127
+1128
+1129
+1130
+1131
+1132
+1133
+1134
+1135
+1136
+1137
+1138
+1139
 57
+1348
+1349
+1350
+1404
+1405
+1406
+1407
+1408
+1409
+1410
+1411
+1412
+1413
+1414
+1415
+1416
+1417
+1418
+1419
+1420
+1421
+1422
+1423
+1424
+1425
+1426
+1427
+1428
+1429
+1430
+1431
+1432
+1433
+1434
+1435
+1436
+1437
+1438
+1439
+1440
+1441
+1442
+1443
+1444
+1445
+1446
+1447
+1448
+1449
+1450
+1451
+1452
+1453
+1454
+1455
+1456
+1457
+1458
+1459
+1460
+1461
+1462
+1463
+1464
+1465
+1351
+1352
+1353
+1354
+1355
+1356
+1357
+1358
+1359
+1360
+1361
+1362
+1363
+1364
+1365
+1366
+1367
+1368
+1369
+1370
+1371
+1372
+1373
+1374
+1375
+1376
+1377
+1378
+1379
+1109
+1110
+1111
+1112
+1113
+1114
+1115
+1116
+1117
+1118
+1119
+1120
+1121
+1122
 58
 59
 60
@@ -580,7 +703,8 @@ class PhoenixMember < ActiveRecord::Base
   end 
 
   def phone_number=(phone)
-    p = phone.gsub(/[\s~\(\/\-=\)"\_\.+]/, '')
+    return nil if phone.nil?
+    p = phone.gsub(/[\s~\(\/\-=\)"\_\.\[\]+]/, '')
     if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
     elsif p.size == 7  || p.size == 8 || p.size == 6
       phone_country_code = '1'
@@ -623,7 +747,10 @@ class PhoenixProspect < ActiveRecord::Base
 # 3304940833ext412
 
   def phone_number=(phone)
-    p = phone.gsub(/[\s~\(\/\-=\)"\_\.+]/, '')
+    return nil if phone.nil?
+    p = phone.gsub(/[\s~\(\/\-=\)"\_\.\[\]+]/, '')
+    p = p.split('ext')[0] if p.split('ext').size == 2
+
     if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
     elsif p.size == 7  || p.size == 8 || p.size == 6
       phone_country_code = '1'
@@ -645,6 +772,11 @@ class PhoenixProspect < ActiveRecord::Base
       phone_area_code = p[2..4]
       phone_local_number = p[5..-1]
     elsif p.size == 13
+      phone_country_code = p[0..1]
+      phone_area_code = p[2..5]
+      phone_local_number = p[6..-1]
+    elsif 
+      num = p.split('ext')[0]
       phone_country_code = p[0..1]
       phone_area_code = p[2..5]
       phone_local_number = p[6..-1]

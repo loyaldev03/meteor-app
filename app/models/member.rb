@@ -321,8 +321,8 @@ class Member < ActiveRecord::Base
         self.terms_of_membership_id = new_tom_id
         res = enroll(self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
         if res[:code] == Settings.error_codes.success
-          message = "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}"
-          Auditory.audit(agent, TermsOfMembership.find(new_tom_id), message, self, Settings.operation_types.save_the_sale)
+          Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
+            "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}", self, Settings.operation_types.save_the_sale)
         end
         res
       end
@@ -348,7 +348,7 @@ class Member < ActiveRecord::Base
         #        limit = 0 
         #        days  = campaign.grace_period
         if active_credit_card.nil?
-          answer = if terms_of_membership.grace_period > 0
+          if terms_of_membership.grace_period > 0
             { :code => Settings.error_codes.credit_card_blank_with_grace, 
               :message => "Credit card is blank. Allowing grace period" }
           else
@@ -360,24 +360,25 @@ class Member < ActiveRecord::Base
             message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
             Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
             Airbrake.notify(:error_class => "Billing", :error_message => message)
-            return { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
-          end
-          acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
-          trans = Transaction.new
-          trans.transaction_type = "sale"
-          trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
-          answer = trans.process
-          if trans.success?
-            # club_cash_expire_date will be nil if we did not set club cash on enrollment because of a PTX.
-            assign_club_cash! if self.club_cash_expire_date.nil?
-            set_as_active!
-            schedule_renewal
-            message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
-            Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
-            { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
+            { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
           else
-            message = set_decline_strategy(trans)
-            answer # TODO: should we answer set_decline_strategy message too?
+            acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
+            trans = Transaction.new
+            trans.transaction_type = "sale"
+            trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
+            answer = trans.process
+            if trans.success?
+              # club_cash_expire_date will be nil if we did not set club cash on enrollment because of a PTX.
+              assign_club_cash! if self.club_cash_expire_date.nil?
+              set_as_active!
+              schedule_renewal
+              message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
+              Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
+              { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
+            else
+              message = set_decline_strategy(trans)
+              answer # TODO: should we answer set_decline_strategy message too?
+            end
           end
         end
       else
@@ -600,10 +601,10 @@ class Member < ActiveRecord::Base
   # Adds club cash transaction. 
   def add_club_cash(agent,amount = 0,description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
-    ClubCashTransaction.transaction do 
-      if amount.to_i == 0
-        answer[:message] = "Cannot add 0 amount. Please add an amount."
-      elsif (amount.to_i < 0 and amount.to_i.abs <= self.club_cash_amount.to_i) or amount.to_i > 0
+    if amount.to_i == 0
+      answer[:message] = "Cannot add 0 amount. Please add an amount."
+    elsif (amount.to_i < 0 and amount.to_i.abs <= self.club_cash_amount.to_i) or amount.to_i > 0
+      ClubCashTransaction.transaction do 
         begin
           cct = ClubCashTransaction.new(:amount => amount, :description => description)
           cct.member = self
@@ -611,20 +612,20 @@ class Member < ActiveRecord::Base
             cct.save!
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save!
-            message = (amount.to_i >= 0 ? "#{cct.amount} club cash was successfully added!" : "#{cct.amount.to_i.abs} club cash was successfully deducted!")
+            message = "#{cct.amount.to_i.abs} club cash was successfully #{ amount.to_i >= 0 ? 'added' : 'deducted' }!"
             Auditory.audit(agent, cct, message, self)
             answer = { :message => message, :code => Settings.error_codes.success }
           else
-            answer[:message] = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"
+            answer[:message] = "Could not saved club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
           end
         rescue Exception => e
-          answer[:message] = "Could not saved club cash transactions: #{cct.error_to_s} #{self.error_to_s}"
+          answer[:message] = "Could not saved club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
           Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => answer[:message])
           raise ActiveRecord::Rollback
         end
-      else
-        answer[:message] = "You can not deduct #{amount.to_i.abs} because the member only has #{self.club_cash_amount} club cash."
       end
+    else
+      answer[:message] = "You can not deduct #{amount.to_i.abs} because the member only has #{self.club_cash_amount} club cash."
     end
     answer
   end

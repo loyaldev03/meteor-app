@@ -162,7 +162,8 @@ class MembersController < ApplicationController
           flash[:notice] = message
           redirect_to show_member_path
         rescue Exception => e
-          flash.now[:error] = "Could not set the NBD on this member. #{e}"
+          flash.now[:error] = "Could not set the NBD on this member. Ticket sent to IT"
+          Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e)
         end
       else
         flash.now[:error] = "Next bill date should be older that actual date."
@@ -173,7 +174,7 @@ class MembersController < ApplicationController
   def set_undeliverable 
     if request.post?
       answer = @current_member.set_wrong_address(@current_agent, params[:reason])
-      if answer[:code] == "000"
+      if answer[:code] == Settings.error_codes.success
         flash.now[:notice] = answer[:message]
       else
         flash.now[:error] = answer[:message]
@@ -189,12 +190,12 @@ class MembersController < ApplicationController
   def set_unreachable
     if request.post?
       if @current_member.update_attribute(:wrong_phone_number, params[:reason])
-        message = "Phone number #{@current_member.full_phone_number} is  #{params[:reason]}."
+        message = "Phone number #{@current_member.full_phone_number} is #{params[:reason]}."
         flash[:notice] = message
         Auditory.audit(@current_agent,@current_member,message,@current_member)
         redirect_to show_member_path
       else
-        flash.now[:error] = "Could not set the NBD on this member"
+        flash.now[:error] = "Could not set phone number as unreachable."
       end
     end
   end
@@ -213,14 +214,13 @@ class MembersController < ApplicationController
     if request.post?
       cct = ClubCashTransaction.new(params[:club_cash_transaction])
       cct.member_id = @current_member
-      
       if cct.save
-        message = "Club cash transaction done!. Amount: $#{cct.amount}"
+        message = "Club cash transaction done!. Amount: #{cct.amount}"
         Auditory.audit(@current_agent, cct, message, @current_member)
         flash[:notice] = message
         redirect_to show_member_path
       else
-        flash.now[:error] = "Could not saved club cash transactions: #{cct.error_to_s}"
+        flash.now[:error] = "Could not save club cash transaction: #{cct.error_to_s}"
       end
     end
   end
@@ -229,7 +229,7 @@ class MembersController < ApplicationController
   def approve
     if @current_member.can_be_approved?
       @current_member.set_as_provisional!
-      message = "Member was approved."
+      message = "Member approved"
       Auditory.audit(@current_agent, @current_member, message, @current_member)
     else
       message = "Member cannot be approved. It must be applied."
@@ -241,7 +241,7 @@ class MembersController < ApplicationController
   def reject
     if @current_member.can_be_rejected?
       @current_member.set_as_canceled!
-      message = "Member was rejected and setted as canceled."
+      message = "Member was rejected and now its lapsed."
       Auditory.audit(@current_agent, @current_member, message, @current_member)
     else
       message = "Member cannot be rejected. It must be applied."
@@ -291,6 +291,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#sync: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Airbrake.notify(:error_class => "Member:sync")
     redirect_to show_member_path, notice: message
   end
 
@@ -314,6 +315,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#reset_password: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Airbrake.notify(:error_class => "Member:reset_password")
     redirect_to show_member_path, notice: message
   end
 
@@ -329,6 +331,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#resend_welcome: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Airbrake.notify(:error_class => "Member:resend_welcome")
     redirect_to show_member_path, notice: message
   end
 end

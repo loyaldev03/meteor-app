@@ -1,13 +1,5 @@
 class TransactionsDatatable < Datatable
 
-  def initialize(view,current_partner,current_club,current_member)
-    @view = view
-    @url_helpers = Rails.application.routes.url_helpers
-    @current_partner = current_partner
-    @current_member = current_member
-    @current_club = current_club
-  end
-
 private
   def total_records
     @current_member.transactions.count
