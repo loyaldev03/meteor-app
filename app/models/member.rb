@@ -1,6 +1,7 @@
 # encoding: utf-8
 class Member < ActiveRecord::Base
   include Extensions::UUID
+  extend Extensions::Member::CountrySpecificValidations
 
   has_paper_trail :only => [:join_date, :cancel_date, :status]
 
@@ -37,23 +38,6 @@ class Member < ActiveRecord::Base
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil? || api_id.nil?'
   after_save :asyn_desnormalize_preferences
   
-  # TBD diff with Drupal::Member::OBSERVED_FIELDS ? which one should we keep?
-  REMOTE_API_FIELDS_TO_REPORT = [ 'first_name', 'last_name', 'email', 'address', 'city', 'state', 'zip', 'country', 'phone_country_code', 'phone_local_number', 'phone_local_number' ]
-
-  #Validates that there are no invalid charactes in the name. 
-
-  REGEX_FIRST_AND_LAST_NAME = /^[a-zA-Z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
-
-  #Validates emails with format like: xxxxxx@xxxx.xxx.xx or xxxxx+xxx@xxxx.xxx.xx
-  REGEX_EMAIL = /^([0-9a-zA-Z\-_]([-_\.]?[+?]?[0-9a-zA-Z\-_])*@([0-9a-zA-Z]+[-_\.]?[0-9a-zA-Z]*\.)+[a-zA-Z]{2,9})$/
-
-  #Validates that there are no invalid charactes in the address. 
-  REGEX_ADDRESS = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,#]+$/u
-
-  #Validates that there are no invalid charactes in the country. 
-  REGEX_CITY_AND_STATE = /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
-
-
   def after_create_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
   rescue Exception => e
@@ -63,48 +47,14 @@ class Member < ActiveRecord::Base
     Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
   end
   def after_update_sync_remote_domain
-    unless (self.changed & REMOTE_API_FIELDS_TO_REPORT).empty?
-      api_member.save! unless @skip_api_sync || api_member.nil?
-    end
+    api_member.save! unless @skip_api_sync || api_member.nil?
   end
 
-  validates :first_name, :last_name, 
-    presence:                    true, 
-    format:                      REGEX_FIRST_AND_LAST_NAME
-  validates :email, 
-    presence:                    true, 
-    uniqueness:                  { scope: :club_id }, 
-    format:                      REGEX_EMAIL
-  validates :gender,
-    presence:                    true
-  validates :type_of_phone_number,
-    presence:                    true,
-    inclusion:                   { within: %w(Home Mobile Other), allow_nil: true }
-  validates :phone_country_code, 
-    presence:                    true, 
-    length:                      { minimum: 1, maximum: 4 },
-    numericality:                { :only_integer => true }
-  validates :phone_area_code, 
-    presence:                    true, 
-    numericality:                { only_integer: true }, 
-    length:                      { minimum: 1, maximum: 8 }
-  validates :phone_local_number, 
-    presence:                    true, 
-    numericality:                { only_integer: true }, 
-    length:                      { minimum: 1, maximum: 8 }
-  validates :address, 
-    format:                      REGEX_ADDRESS
-  validates :state, :city, 
-    presence:                    true, 
-    format:                      REGEX_CITY_AND_STATE
-  validates :terms_of_membership_id, 
-    presence:                    true
   validates :country, 
     presence:                    true, 
-    length:                      { is: 2, allow_nil: true }
-  validates :zip, 
-    presence:                    true, 
-    zip_code_belongs_to_country: true
+    length:                      { is: 2, allow_nil: true },
+    inclusion:                   { within: self.supported_countries }
+  country_specific_validations!
 
   scope :synced, lambda { |bool=true|
     bool ?
@@ -257,6 +207,10 @@ class Member < ActiveRecord::Base
   # Returns a string with first and last name concatenated. 
   def full_name
     [ first_name, last_name].join(' ').squeeze
+  end
+
+  def country_name
+    self.class.country_name(self.country.downcase)
   end
 
   # Returns the active credit card that the member is using at the moment.

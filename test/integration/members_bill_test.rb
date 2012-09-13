@@ -12,7 +12,6 @@ class MembersBillTest < ActionController::IntegrationTest
   end
 
   def setup_member(provisional_days = nil)
-    
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
@@ -56,7 +55,7 @@ class MembersBillTest < ActionController::IntegrationTest
       fill_in 'member[zip]', :with => unsaved_member.zip
       fill_in 'member[state]', :with => unsaved_member.state
       select('M', :from => 'member[gender]')
-      select('US', :from => 'member[country]')
+      select('United States', :from => 'member[country]')
     }
 
     page.execute_script("window.jQuery('#member_birth_date').next().click()")
@@ -152,24 +151,24 @@ class MembersBillTest < ActionController::IntegrationTest
   # TEST
   ############################################################
 
-  test "create a member billing enroll > 0" do
-    active_merchant_stubs
-    setup_member
-    bill_member(@saved_member, false)
-  end 
+  # test "create a member billing enroll > 0" do
+  #   active_merchant_stubs
+  #   setup_member
+  #   bill_member(@saved_member, false)
+  # end 
 
-  test "create a member billing enroll > 0 + refund" do
-    active_merchant_stubs
-    setup_member
-    bill_member(@saved_member, true)
-  end 
+  # test "create a member billing enroll > 0 + refund" do
+  #   active_merchant_stubs
+  #   setup_member
+  #   bill_member(@saved_member, true)
+  # end 
 
-  test "create a member billing enroll = 0 provisional_days = 0 installment amount > 0" do
-    active_merchant_stubs
-    setup_member(0)
-    EnrollmentInfo.last.update_attribute(:enrollment_amount, 0.0)
-    bill_member(@saved_member, false)
-  end 
+  # test "create a member billing enroll = 0 provisional_days = 0 installment amount > 0" do
+  #   active_merchant_stubs
+  #   setup_member(0)
+  #   EnrollmentInfo.last.update_attribute(:enrollment_amount, 0.0)
+  #   bill_member(@saved_member, false)
+  # end 
 
   test "create a member + bill + check fultillment" do
     active_merchant_stubs

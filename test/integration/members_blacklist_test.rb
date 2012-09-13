@@ -211,7 +211,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
       fill_in 'member[zip]', :with => unsaved_member.zip
       fill_in 'member[state]', :with => unsaved_member.state
       select('M', :from => 'member[gender]')
-      select('US', :from => 'member[country]')
+      select('United States', :from => 'member[country]')
     }
 
     page.execute_script("window.jQuery('#member_birth_date').next().click()")

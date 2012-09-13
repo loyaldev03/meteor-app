@@ -111,6 +111,9 @@ en:
         city: 'City'
         state: 'State'
         country: 'Country'
+        supported_countries:
+          us: United States
+          ca: Canada
         zip: 'Zip'
         gender: 'Gender'
         member_notes: 'Member Notes'
