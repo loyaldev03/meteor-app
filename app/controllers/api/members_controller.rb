@@ -214,7 +214,7 @@ class Api::MembersController < ApplicationController
   # @return [Integer] *code*
   #
   def show
-    authorize! :manage_member_api, Member
+    authorize! :show_profile, Member
     member = Member.find(params[:id])
     ei = member.enrollment_infos[0]
     ei = if ei.blank? 

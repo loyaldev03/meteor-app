@@ -63,6 +63,6 @@ class Api::ProspectsController < ApplicationController
 
   private
     def check_authentification
-      authorize! :manage_prospects_api, Member
+      authorize! :manage_prospects_api, Prospect
     end
 end
