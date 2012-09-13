@@ -112,13 +112,15 @@ defaults: &defaults
           :allow_nil: true
       phone_country_code:
         presence: true
+        numericality: 
+          :only_integer: true
         length:
           :minimum: 1
           :maximum: 4
       phone_area_code:
         presence: true
         numericality: 
-          only_integer: true
+          :only_integer: true
         length: 
           :minimum: 1
           :maximum: 8

@@ -987,7 +987,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in "member[first_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in "member[last_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in "member[email]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-        select('United States', :from => 'member[country]')
       }
     end
     within("#contact_details")do
@@ -1010,6 +1009,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
+    within("#table_demographic_information") {
+      select('United States', :from => 'member[country]')
+    }
     alert_ok_js
     click_link_or_button 'Create Member'
     within("#error_explanation")do
@@ -1017,7 +1019,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("first_name: can't be blank,is invalid"), "Failure on first_name validation message"
         assert page.has_content?("last_name: can't be blank,is invalid"), "Failure on last_name validation message"
         assert page.has_content?("email: can't be blank,is invalid"), "Failure on email validation message"
-        assert page.has_content?("phone_country_code: can't be blank,is too short (minimum is 1 characters),is not a number"), "Failure on phone_country_code validation message"
+        assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_country_code validation message"
         assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
         assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_local_number validation message"
         assert page.has_content?("address: is invalid"), "Failure on address validation message"
@@ -1032,7 +1034,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
-    require 'ruby-debug'; debugger
     within("#table_demographic_information"){
       wait_until{
         fill_in 'member[first_name]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
@@ -1041,10 +1042,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[city]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in 'member[last_name]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in 'member[zip]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        select('United States', :from => 'member[country]')
       }
-    }
-    within("#table_demographic_information") {
-      select('United States', :from => 'member[country]')
     }
     within("#table_contact_information"){
       wait_until{
@@ -1076,7 +1075,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
-    require 'ruby-debug'; debugger
     within("#table_contact_information"){
       wait_until{
         fill_in 'member[phone_country_code]', :with => 'werqwr'
@@ -1102,7 +1100,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
-    require 'ruby-debug'; debugger
     within("#table_contact_information"){
       wait_until{
         fill_in 'member[email]', :with => 'asdfhomail.com'
@@ -1526,7 +1523,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
 
-    within("#table_demographic_information")do
+    within("#table_demographic_information") do
       wait_until{
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select('M', :from => 'member[gender]')
@@ -1555,7 +1552,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     within("#error_explanation")do
       wait_until{
-        assert page.has_content?("phone_country_code: can't be blank,is too short (minimum is 1 characters),is not a number"), "Failure on phone_country_code validation message"
+        assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_country_code validation message"
         assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
         assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
       }
