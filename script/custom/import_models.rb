@@ -586,7 +586,6 @@ USE_MEMBER_LIST = true
 )
 
 @cids = %w(
-999
 190
 225
 10
@@ -705,6 +704,8 @@ class PhoenixMember < ActiveRecord::Base
   def phone_number=(phone)
     return nil if phone.nil?
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.\[\]+]/, '')
+    p = p.split('ext')[0] if p.split('ext').size == 2
+
     if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
     elsif p.size == 7  || p.size == 8 || p.size == 6
       phone_country_code = '1'
@@ -1065,6 +1066,15 @@ def set_last_billing_date_on_credit_card(member, transaction_date)
   cc = PhoenixCreditCard.find_by_active_and_member_id true, member.id
   if cc and (cc.last_successful_bill_date.nil? or cc.last_successful_bill_date < transaction_date)
     cc.update_attribute :last_successful_bill_date, transaction_date
+  end
+end
+
+# If we store data in UTC, dates are converted to time using 00:00 am. So in CLT it will be the day before
+def convert_from_date_to_time(x)
+  if x.class == Date
+    x.to_time + 12.hours
+  elsif x.class == DateTime || x.class == Time
+    x
   end
 end
 
