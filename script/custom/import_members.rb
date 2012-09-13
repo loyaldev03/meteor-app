@@ -6,15 +6,16 @@ require 'import_models'
 ActiveRecord::Base.logger = @log
 
 
+# club cash import could it be modify
+# def update_club_cash(amount)
+#   cct = PhoenixClubCashTransaction.new 
+#   cct.amount = amount
+#   cct.description = "Imported club cash"
+#   cct.member_id = @member.uuid
+#   cct.save!
+#   add_operation(Time.now.utc, cct, "Imported club cash transaction!. Amount: #{cct.amount}", nil)  
+# end
 
-def update_club_cash(amount)
-  cct = PhoenixClubCashTransaction.new 
-  cct.amount = amount
-  cct.description = "Imported club cash"
-  cct.member_id = @member.uuid
-  cct.save!
-  add_operation(Time.now.utc, cct, "Imported club cash transaction!. Amount: $#{cct.amount}", nil)  
-end
 # fulfillment load should be review.
 # def add_fulfillment(fulfillment_kit, fulfillment_since_date, fulfillment_expire_date)
 #   if not fulfillment_kit.nil? and not fulfillment_expire_date.nil? and not fulfillment_since_date.nil?
@@ -113,6 +114,12 @@ def add_enrollment_info(phoenix, member, campaign = nil)
   phoenix.save
 end
 
+def fill_aus_attributes(cc, member)
+  cc.aus_status = member.aus_status
+  cc.aus_answered_at = member.aus_answered_at
+  cc.aus_sent_at = member.aus_sent_at
+end
+
 # 1- update existing members
 def update_members(cid)
   BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) and campaign_id = #{cid}" + 
@@ -148,10 +155,10 @@ def update_members(cid)
 
           phoenix.save!
 
-          if phoenix.club_cash_amount.to_f != member.club_cash_amount.to_f
-            # create Club cash transaction.
-            update_club_cash(member.club_cash_amount - phoenix.club_cash_amount)
-          end
+          # if phoenix.club_cash_amount.to_f != member.club_cash_amount.to_f
+          #   # create Club cash transaction.
+          #   update_club_cash(member.club_cash_amount - phoenix.club_cash_amount)
+          # end
 
           unless TEST
             phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
@@ -162,6 +169,7 @@ def update_members(cid)
             new_phoenix_cc.expire_month = member.cc_month_exp
             new_phoenix_cc.expire_year = member.cc_year_exp
             new_phoenix_cc.member_id = phoenix.uuid
+            # fill_aus_attributes(new_phoenix_cc, member)
 
             if phoenix_cc.nil?
               @log.info "  * member ##{member.id} does not have Credit Card active"
@@ -174,6 +182,9 @@ def update_members(cid)
               new_phoenix_cc.save!
               phoenix_cc.save!
               add_operation(Time.zone.now, new_phoenix_cc, "Credit card #{new_phoenix_cc.last_digits} added and set active.", nil)
+            else
+              # fill_aus_attributes(phoenix_cc, member)
+              # phoenix_cc.save!
             end
           end
 
@@ -257,9 +268,9 @@ def add_new_members(cid)
         end
 
         # create Club cash transaction.
-        if member.club_cash_amount.to_f != 0.0
-          update_club_cash(member.club_cash_amount.to_f)
-        end
+        # if member.club_cash_amount.to_f != 0.0
+        #   update_club_cash(member.club_cash_amount.to_f)
+        # end
 
         # create CC
         phoenix_cc = PhoenixCreditCard.new 
@@ -269,6 +280,7 @@ def add_new_members(cid)
         end
         phoenix_cc.expire_month = member.cc_month_exp
         phoenix_cc.expire_year = member.cc_year_exp
+        # fill_aus_attributes(phoenix_cc, member)
         phoenix_cc.member_id = phoenix.uuid
         phoenix_cc.save!
 
@@ -285,7 +297,6 @@ def add_new_members(cid)
       #end
       @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
-    sleep(1)
   end
 end
 
