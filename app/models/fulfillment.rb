@@ -59,14 +59,14 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def renew!
-    if recurrent
+    if recurrent and membership_billed_recently?
       if undeliverable?
         self.new_fulfillment('undeliverable')
       else
         self.new_fulfillment
       end
+      self.set_as_canceled! unless self.sent?
     end
-    self.set_as_canceled! unless self.sent?
   end
 
   def new_fulfillment(status = nil)
@@ -131,6 +131,10 @@ class Fulfillment < ActiveRecord::Base
   end
 
   private
+    def membership_billed_recently?
+      true
+    end
+
     def decrease_stock
       validate_stock
     end
