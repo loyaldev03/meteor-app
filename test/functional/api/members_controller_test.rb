@@ -127,7 +127,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
 
-  test "Api user should not enroll/create member" do
+  test "Api user should enroll/create member" do
     sign_in @api_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.build :member_with_api
@@ -152,7 +152,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                                  :expire_year => @credit_card.expire_year },
                                 enrollment_info: @enrollment_info.attributes
                                 },:format => :json})
-    assert_response :unauthorized
+    assert_response :success
   end
 
 end
