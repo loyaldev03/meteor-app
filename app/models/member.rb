@@ -36,7 +36,8 @@ class Member < ActiveRecord::Base
   after_create :after_create_sync_remote_domain
   after_update :after_update_sync_remote_domain
   after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil? || api_id.nil?'
-  after_save :asyn_desnormalize_preferences
+  after_create 'asyn_desnormalize_preferences(force: true)'
+  after_update :asyn_desnormalize_preferences
   
   def after_create_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
@@ -775,8 +776,8 @@ class Member < ActiveRecord::Base
       message
     end
 
-    def asyn_desnormalize_preferences
-      self.desnormalize_preferences if self.changed.include?('preferences') 
+    def asyn_desnormalize_preferences(opts = {})
+      self.desnormalize_preferences if opts[:force] || self.changed.include?('preferences') 
     end
 
     def wrong_address_logic
@@ -787,10 +788,12 @@ class Member < ActiveRecord::Base
 
   public 
     def desnormalize_preferences
-      self.preferences.each do |key, value|
-        pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
-        pref.value = value
-        pref.save
+      if self.preferences.present?
+        self.preferences.each do |key, value|
+          pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
+          pref.value = value
+          pref.save
+        end
       end
     end
     handle_asynchronously :desnormalize_preferences

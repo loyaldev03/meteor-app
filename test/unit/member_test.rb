@@ -13,7 +13,11 @@ class MemberTest < ActiveSupport::TestCase
     assert !member.save, member.errors.inspect
     member.club =  @terms_of_membership_with_gateway.club
     member.terms_of_membership =  @terms_of_membership_with_gateway
-    assert member.save, "member cant be save #{member.errors.inspect}"
+    Delayed::Worker.delay_jobs = true
+    assert_difference('Delayed::Job.count', 1, 'should ceate job for #desnormalize_preferences') do
+      assert member.save, "member cant be save #{member.errors.inspect}"
+    end
+    Delayed::Worker.delay_jobs = false
   end
 
   test "Should not create a member without first name" do
