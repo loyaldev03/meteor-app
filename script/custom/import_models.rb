@@ -790,6 +790,10 @@ class PhoenixCreditCard < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "credit_cards"
   attr_encrypted :number, :key => 'reibel3y5estrada8', :encode => true, :algorithm => 'bf' 
+  before_create :update_last_digits
+  def update_last_digits
+    self.last_digits = self.number.last(4) 
+  end  
 end
 class PhoenixOperation < ActiveRecord::Base
   establish_connection "phoenix" 

@@ -568,6 +568,7 @@ class Member < ActiveRecord::Base
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save!
             message = "#{cct.amount.to_i.abs} club cash was successfully #{ amount.to_i >= 0 ? 'added' : 'deducted' }!"
+            # TODO: club cash amount tiene que tener un tipo de operación.
             Auditory.audit(agent, cct, message, self)
             answer = { :message => message, :code => Settings.error_codes.success }
           else

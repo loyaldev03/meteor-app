@@ -7,14 +7,22 @@ ActiveRecord::Base.logger = @log
 
 
 # club cash import could it be modify
-# def update_club_cash(amount)
-#   cct = PhoenixClubCashTransaction.new 
-#   cct.amount = amount
-#   cct.description = "Imported club cash"
-#   cct.member_id = @member.uuid
-#   cct.save!
-#   add_operation(Time.now.utc, cct, "Imported club cash transaction!. Amount: #{cct.amount}", nil)  
-# end
+def update_club_cash(member)
+  @member.club_cash_expire_date = @member.join_date + (Date.today.year - @member.join_date.year + 1).years
+  if @member.phoenix_status == 'lapsed' 
+    @member.club_cash_amount = 0
+    @member.club_cash_expire_date = nil
+  elsif member.is_chapter_member
+    @member.club_cash_amount = 200
+  else
+    @member.club_cash_amount = 150 # TODO: creo que esto sale del TOM
+  end
+  cct = PhoenixClubCashTransaction.find_or_create_by_member_id @member.uuid
+  cct.amount = @member.club_cash_amount
+  cct.description = "Imported club cash"
+  cct.save!
+  @member.save
+end
 
 # fulfillment load should be review.
 # def add_fulfillment(fulfillment_kit, fulfillment_since_date, fulfillment_expire_date)
@@ -112,6 +120,8 @@ def add_enrollment_info(phoenix, member, campaign = nil)
   phoenix.cohort = PhoenixMember.cohort_formula(phoenix.join_date, e_info, TIMEZONE, 
       PhoenixTermsOfMembership.find(phoenix.terms_of_membership_id).installment_type)
   phoenix.save
+  e_info.cohort = phoenix.cohort
+  e_info.save
 end
 
 def fill_aus_attributes(cc, member)
@@ -149,27 +159,21 @@ def update_members(cid)
           phoenix.status = member.phoenix_status
           if member.phoenix_status == 'lapsed'
             phoenix.recycled_times = 0
+            phoenix.club_cash_amount = 0
             phoenix.cancel_date = convert_from_date_to_time(member.cancelled_at)
             phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
           end
 
           phoenix.save!
 
-          # if phoenix.club_cash_amount.to_f != member.club_cash_amount.to_f
-          #   # create Club cash transaction.
-          #   update_club_cash(member.club_cash_amount - phoenix.club_cash_amount)
-          # end
+          # create Club cash transaction.
+          update_club_cash(member)
 
           unless TEST
             phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
 
             new_phoenix_cc = PhoenixCreditCard.new 
-            new_phoenix_cc.encrypted_number = member.encrypted_cc_number
-            new_phoenix_cc.number = CREDIT_CARD_NULL if new_phoenix_cc.number.nil?
-            new_phoenix_cc.expire_month = member.cc_month_exp
-            new_phoenix_cc.expire_year = member.cc_year_exp
-            new_phoenix_cc.member_id = phoenix.uuid
-            # fill_aus_attributes(new_phoenix_cc, member)
+            fill_credit_card(new_phoenix_cc, member, phoenix)
 
             if phoenix_cc.nil?
               @log.info "  * member ##{member.id} does not have Credit Card active"
@@ -268,20 +272,11 @@ def add_new_members(cid)
         end
 
         # create Club cash transaction.
-        # if member.club_cash_amount.to_f != 0.0
-        #   update_club_cash(member.club_cash_amount.to_f)
-        # end
+        update_club_cash(member)
 
         # create CC
         phoenix_cc = PhoenixCreditCard.new 
-        phoenix_cc.number = CREDIT_CARD_NULL
-        unless TEST
-          phoenix_cc.encrypted_number = member.encrypted_cc_number
-        end
-        phoenix_cc.expire_month = member.cc_month_exp
-        phoenix_cc.expire_year = member.cc_year_exp
-        # fill_aus_attributes(phoenix_cc, member)
-        phoenix_cc.member_id = phoenix.uuid
+        fill_credit_card(phoenix_cc, member, phoenix)
         phoenix_cc.save!
 
         # add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
@@ -297,6 +292,29 @@ def add_new_members(cid)
       #end
       @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
+  end
+end
+
+def fill_credit_card(phoenix_cc, member, phoenix)
+  phoenix_cc.number = CREDIT_CARD_NULL
+  if not TEST and not member.encrypted_cc_number.nil?
+    phoenix_cc.encrypted_number = member.encrypted_cc_number
+  end
+  phoenix_cc.expire_month = member.cc_month_exp
+  phoenix_cc.expire_year = member.cc_year_exp
+  # fill_aus_attributes(phoenix_cc, member)
+  phoenix_cc.member_id = phoenix.uuid
+
+  ActiveMerchant::Billing::CreditCard.require_verification_value = false
+  am = ActiveMerchant::Billing::CreditCard.new(
+    :number     => phoenix_cc.number,
+    :month      => member.cc_month_exp,
+    :year       => member.cc_year_exp,
+    :first_name => member.first_name,
+    :last_name  => member.last_name
+  )
+  if am.valid?
+    phoenix_cc.cc_type = am.type
   end
 end
 
