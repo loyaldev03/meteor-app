@@ -4,11 +4,25 @@ class FulfillmentsController < ApplicationController
   def index
     if request.post?
     	if params[:all_times] == '1'
-    		@fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id)
+        if params[:product_type] == 'KIT'
+    		  @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_kit
+        elsif params[:product_type] == 'CARD'
+          @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_card
+        else
+          @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_others
+        end
         @status = params[:status]
       elsif params[:status] == 'not_processed'
-        fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
-            'not_processed', params[:initial_date], params[:end_date], @current_club.id])
+        if params[:product_type] == 'KIT'
+          fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+            'not_processed', params[:initial_date], params[:end_date], @current_club.id]).type_kit
+        elsif params[:product_type] == 'CARD'        
+          fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+            'not_processed', params[:initial_date], params[:end_date], @current_club.id]).type_card
+        else
+          fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+            'not_processed', params[:initial_date], params[:end_date], @current_club.id]).type_others
+        end
         csv_string = Fulfillment.generateCSV(fulfillments)
         send_data csv_string, :filename => "miworkingfile2.csv",
                      :type => 'text/csv; charset=iso-8859-1; header=present',

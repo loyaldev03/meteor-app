@@ -17,6 +17,9 @@ class Fulfillment < ActiveRecord::Base
   scope :where_processing, lambda { where("status = 'processing'") }
   scope :where_not_processed, lambda { where("status = 'not_processed'") }
   scope :where_cancellable, lambda { where("status IN ('not_processed','processing','out_of_stock', 'undeliverable')") }
+  scope :type_card, lambda{ where("product_sku = 'CARD'")}
+  scope :type_kit, lambda{ where("product_sku = 'KIT'")}
+  scope :type_others, lambda{ where("product_sku NOT IN ('KIT','CARD')")}
 
   delegate :club, :to => :member
 

@@ -9,12 +9,12 @@
   	<tr>
   		<td>
 	  		<%= label :initial_date, t('initial_date'), :class => 'help-inline' %>
-	  	  <%= text_field :initial_date, nil ,:class => 'datepicker', :readonly => 'readonly',
+	  	  <%= text_field :initial_date, nil ,:class => 'datepicker input-medium', :readonly => 'readonly',
                        :value => (params[:initial_date].first if params[:initial_date]) %> 
   		</td>
   		<td>
 	  		<%= label :end_date, t('end_date'), :class => 'help-inline' %>
-	  	  <%= text_field :end_date, nil ,:class => 'datepicker', :readonly => 'readonly',
+	  	  <%= text_field :end_date, nil ,:class => 'datepicker input-medium', :readonly => 'readonly',
                        :value => (params[:end_date].first if params[:end_date]) %> 
   		</td>
   		<td>
@@ -23,14 +23,20 @@
   		</td>
   		<td>
         <%= label :status, t('activerecord.attributes.fulfillment.status'), :class => 'help-inline' %>
-        <%= select_tag :status, options_for_select([['not_processed', 'not_processed'],
-                                ['processing', 'processing'],['out_of_stock', 'out_of_stock'], 
+        <%= select_tag :status, options_for_select([['Not processed', 'not_processed'],
+                                ['Processing', 'processing'],['Out of stock', 'out_of_stock'], 
                                 ['undeliverable','undeliverable']], :selected => params[:status]),
-                                :class => 'select_field', :name => '[status]' %>	
+                                :class => 'select_field input-medium', :name => '[status]' %>	
+      </td>
+      <td>
+        <%= label :product_type, t('activerecord.attributes.fulfillment.product_type'), :class => 'help-inline' %>
+        <%= select_tag :product_type, options_for_select([['Kit', 'KIT'], ['Card', 'CARD'],
+                                ['Others', 'others']], :selected => params[:product_type]),
+                                :class => 'select_field input-medium', :name => '[product_type]' %>  
       </td>
   	</tr>
   	<tr>
-  		<td colspan="4"><%= submit_tag t('buttons.report'), :class => 'btn btn-primary' %></td>
+  		<td colspan="5"><%= submit_tag t('buttons.report'), :class => 'btn btn-primary' %></td>
   	</tr>
   </table>
 <% end %>
