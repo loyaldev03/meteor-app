@@ -31,7 +31,7 @@
       <td>
         <%= label :product_type, t('activerecord.attributes.fulfillment.product_type'), :class => 'help-inline' %>
         <%= select_tag :product_type, options_for_select([['Kit', 'KIT'], ['Card', 'CARD'],
-                                ['Others', 'others']], :selected => params[:product_type]),
+                                ['Others', 'OTHERS']], :selected => params[:product_type]),
                                 :class => 'select_field input-medium', :name => '[product_type]' %>  
       </td>
   	</tr>

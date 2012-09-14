@@ -239,3 +239,4 @@ en:
       long: "%B %d, %Y"
       dashed: "%Y-%m-%d %H:%M"
       only_date: "%Y-%m-%d"
+      only_date_short: "%m/%y"

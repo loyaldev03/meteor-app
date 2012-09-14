@@ -2,7 +2,8 @@
   
   <% if @status == 'processing' %>
     <%= form_tag(generate_csv_fulfillments_path) do %>
-      <%= hidden_field :status, nil ,:value => 'processing' %>
+      <%= hidden_field :status, nil, :value => 'processing' %>
+      <%= hidden_field :product_type, nil, :value => "#{params[:product_type]}" %>
       <%= submit_tag t('buttons.generate_csv'), :class => 'btn btn-primary' %> 
     <% end %>
   <% end %>

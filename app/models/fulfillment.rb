@@ -115,16 +115,28 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def self.generateCSV(fulfillments)
+  def self.generateCSV(fulfillments, type_others = true)
     CSV.generate do |csv| 
-      csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
+      if type_others
+        csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
+      else
+        csv << ['Member Number','First Name','Member Last Name','Member Since Date','Member Expiration Date',
+                'ADDRESS','CITY','ZIP','Product','Charter Member Status' ]
+      end
+
       fulfillments.each do |fulfillment|
         Fulfillment.find(fulfillment.id).set_as_processing unless fulfillment.processing?
         member = fulfillment.member
-        csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
+        if type_others
+          csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
                 member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
                 fulfillment.product.weight, 'MID']
+        else
+          csv << [member.visible_id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
+                  (I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at), member.address, member.city,
+                  member.zip, fulfillment.product_sku, ('C' if member.member_group_type_id) ]
+        end
       end
     end
   end
