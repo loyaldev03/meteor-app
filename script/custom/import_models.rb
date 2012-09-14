@@ -583,21 +583,169 @@ USE_MEMBER_LIST = true
 1014
 1015
 
+1016
+1019
+1020
+1021
+1022
+1023
+1024
+1025
+1026
+1027
+1028
+1029
+1030
+1031
+1032
+1033
+1035
+1036
+1037
+1038
+1039
+1040
+1041
+1042
+1043
+1044
+1045
+1046
+1047
+1048
+1049
+1050
+1051
+1052
+1053
+1054
+1055
+1056
+1057
+1058
+1059
+1060
+1061
+1062
+1063
+1064
+1065
+1066
+1067
+1068
+1069
+1070
+1071
+1072
+1073
+1074
+1075
+1076
+1077
+1078
+1079
+1080
+1081
+1082
+1083
+1084
+1085
+1086
+1087
+1088
+1089
+1090
+1091
+1092
+1093
+1094
+1095
+1096
+1097
+1098
+1099
+1100
+1101
+1102
+1103
+1104
+1105
+1106
+1107
+1108
+1165
+1166
+1167
+1168
+1171
+1172
+1173
+1174
+1175
+1176
+1177
+1178
+1179
+1180
+1181
+1182
+1208
+1209
+1210
+1211
+1212
+1213
+1214
+1215
+1216
+1217
+1218
+1219
+1220
+1240
+1241
+1242
+1243
+1244
+1245
+1259
+1260
+1261
+1262
+1263
+1264
+1265
+1266
+1267
+1268
+1269
+1270
+1271
+1272
+1273
+1274
+1275
+1276
+1277
+1278
+1279
+1280
+1281
+1282
+1283
+1284
+1387
+1388
+1389
+1390
+1391
+1392
+1393
+1398
+1399
+
 )
 
-@cids = %w(
-999
-190
-225
-10
-14
-15
-16
-19
-20
-21
-23
-)
 
 if USE_PROD_DB
 #  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
@@ -705,6 +853,8 @@ class PhoenixMember < ActiveRecord::Base
   def phone_number=(phone)
     return nil if phone.nil?
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.\[\]+]/, '')
+    p = p.split('ext')[0] if p.split('ext').size == 2
+
     if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
     elsif p.size == 7  || p.size == 8 || p.size == 6
       phone_country_code = '1'
@@ -789,6 +939,10 @@ class PhoenixCreditCard < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "credit_cards"
   attr_encrypted :number, :key => 'reibel3y5estrada8', :encode => true, :algorithm => 'bf' 
+  before_create :update_last_digits
+  def update_last_digits
+    self.last_digits = self.number.last(4) 
+  end  
 end
 class PhoenixOperation < ActiveRecord::Base
   establish_connection "phoenix" 
@@ -1065,6 +1219,15 @@ def set_last_billing_date_on_credit_card(member, transaction_date)
   cc = PhoenixCreditCard.find_by_active_and_member_id true, member.id
   if cc and (cc.last_successful_bill_date.nil? or cc.last_successful_bill_date < transaction_date)
     cc.update_attribute :last_successful_bill_date, transaction_date
+  end
+end
+
+# If we store data in UTC, dates are converted to time using 00:00 am. So in CLT it will be the day before
+def convert_from_date_to_time(x)
+  if x.class == Date
+    x.to_time + 12.hours
+  elsif x.class == DateTime || x.class == Time
+    x
   end
 end
 

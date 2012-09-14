@@ -4,6 +4,7 @@ defaults: &defaults
   next_retry_on_missing_decline: 20.days
   number_of_retries_on_missing_decline: 4
   club_cash_for_members_who_belongs_to_group: 200
+  call_these_members_recipients: platformadmins@xagax.com
   lyris_service:
     domain: 'www.elabs10.com'
     url: '/API/mailing_list.html'
@@ -13,6 +14,13 @@ defaults: &defaults
     password: Letmein123
     url: https://www.merchante-solutions.com/
     path: /jsp/reports/report_api.jsp
+  mes_aus_service:
+    folder: "#{Rails.root}/mes_account_updater_files"
+    url: https://www.merchante-solutions.com/
+    # AUS username is diff accross titles. We will use the same to speed up development
+    merchant_id: 
+    user: 
+    password: 
   operation_types: 
     #billing
     enrollment_billing: 100     
@@ -186,6 +194,19 @@ test:
 
 production:
   <<: *defaults
+  call_these_members_recipients: 'jelwood@stoneacreinc.com,jsmith@stoneacreinc.com'
+  mes_report_service:
+    user: Stoneacrereports
+    password: Letmein123
+    url: https://www.merchante-solutions.com/
+    path: /jsp/reports/report_api.jsp
+  mes_aus_service:
+    folder: "#{Rails.root}/mes_account_updater_files"
+    url: https://www.merchante-solutions.com/
+    # AUS username is diff accross titles. We will use the same to speed up development
+    user: '941000110028AUS'
+    password: do3!lAjo5
+    merchant_id: '941000110028'
 
 prototype:
   <<: *defaults

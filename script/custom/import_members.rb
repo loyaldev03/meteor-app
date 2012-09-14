@@ -6,38 +6,61 @@ require 'import_models'
 ActiveRecord::Base.logger = @log
 
 
-def update_club_cash(amount)
-  cct = PhoenixClubCashTransaction.new 
-  cct.amount = amount
+# club cash import could it be modify
+def update_club_cash(member)
+  @member.club_cash_expire_date = @member.join_date + (Date.today.year - @member.join_date.year + 1).years
+  if @member.phoenix_status == 'lapsed' 
+    @member.club_cash_amount = 0
+    @member.club_cash_expire_date = nil
+  elsif member.is_chapter_member
+    @member.club_cash_amount = 200
+  else
+    @member.club_cash_amount = 150 # TODO: creo que esto sale del TOM
+  end
+  cct = PhoenixClubCashTransaction.find_or_create_by_member_id @member.uuid
+  cct.amount = @member.club_cash_amount
   cct.description = "Imported club cash"
-  cct.member_id = @member.uuid
   cct.save!
-  add_operation(Time.now.utc, cct, "Imported club cash transaction!. Amount: $#{cct.amount}", nil)  
+  @member.save
 end
-def add_fulfillment(fulfillment_kit, fulfillment_since_date, fulfillment_expire_date)
-  if not fulfillment_kit.nil? and not fulfillment_expire_date.nil? and not fulfillment_since_date.nil?
-    phoenix_f = PhoenixFulfillment.new :product => fulfillment_kit
-    phoenix_f.member_id = @member.uuid
-    phoenix_f.assigned_at = fulfillment_since_date
-    phoenix_f.delivered_at = fulfillment_since_date
-    phoenix_f.renewable_at = fulfillment_expire_date
-    phoenix_f.save!  
-  end
-end
-def add_product_fulfillment(has_fulfillment_product)
-  product = "Sloop"
-  if has_fulfillment_product
-    if PhoenixFulfillment.find_by_member_id_and_product(@member.uuid, product).nil?
-      phoenix_f = PhoenixFulfillment.new 
-      phoenix_f.product = product
-      phoenix_f.member_id = @member.uuid
-      phoenix_f.assigned_at = @member.join_date
-      phoenix_f.delivered_at = @member.join_date
-      phoenix_f.renewable_at = nil
-      phoenix_f.save!  
-    end
-  end
-end
+
+# fulfillment load should be review.
+# def add_fulfillment(fulfillment_kit, fulfillment_since_date, fulfillment_expire_date)
+#   if not fulfillment_kit.nil? and not fulfillment_expire_date.nil? and not fulfillment_since_date.nil?
+#     phoenix_f = PhoenixFulfillment.new :product => fulfillment_kit
+#     phoenix_f.member_id = @member.uuid
+#     phoenix_f.assigned_at = convert_from_date_to_time(fulfillment_since_date)
+#     phoenix_f.renewable_at = convert_from_date_to_time(fulfillment_expire_date)
+#     phoenix_f.save!  
+#   end
+# end
+# def add_product_fulfillment(has_fulfillment_product)
+#   product = "Sloop"
+#   if has_fulfillment_product
+#     if PhoenixFulfillment.find_by_member_id_and_product(@member.uuid, product).nil?
+#       phoenix_f = PhoenixFulfillment.new 
+#       phoenix_f.product = product
+#       phoenix_f.member_id = @member.uuid
+#       phoenix_f.assigned_at = @member.join_date 
+#       phoenix_f.renewable_at = nil
+#       phoenix_f.save!  
+#     end
+#   end
+# end
+# def update_fulfillment(member, phoenix)
+#   phoenix_f = PhoenixFulfillment.find_by_member_id_and_product(phoenix.uuid, member.fulfillment_kit)
+#   if phoenix_f.nil?
+#     add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
+#   else
+#     phoenix_f.product = member.fulfillment_kit
+#     phoenix_f.assigned_at = convert_from_date_to_time(member.fulfillment_since_date)
+#     phoenix_f.delivered_at = convert_from_date_to_time(member.fulfillment_since_date)
+#     phoenix_f.renewable_at = convert_from_date_to_time(member.fulfillment_expire_date)
+#     phoenix_f.save! 
+#   end
+#   add_product_fulfillment(member.has_fulfillment_product)
+# end
+
 def set_member_data(phoenix, member, merge_member = false)
   phoenix.first_name = member.first_name
   phoenix.last_name = member.last_name
@@ -51,9 +74,9 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.birth_date = member.birth_date
   phoenix.phone_number = member.phone
   phoenix.blacklisted = member.blacklisted
-  phoenix.join_date = member.phoenix_join_date
+  phoenix.join_date = convert_from_date_to_time(member.phoenix_join_date)
   phoenix.api_id = member.drupal_user_api_id
-  phoenix.club_cash_expire_date = member.club_cash_expire_date
+  phoenix.club_cash_expire_date = convert_from_date_to_time(member.club_cash_expire_date)
   if member.is_chapter_member
     phoenix.member_group_type_id = MEMBER_GROUP_TYPE
   else
@@ -63,7 +86,7 @@ def set_member_data(phoenix, member, merge_member = false)
     phoenix.quota = member.quota
     phoenix.created_at = member.created_at
     phoenix.updated_at = member.updated_at
-    phoenix.member_since_date = member.member_since_date
+    phoenix.member_since_date = convert_from_date_to_time(member.member_since_date)
   end
 end
 def add_enrollment_info(phoenix, member, campaign = nil)
@@ -94,21 +117,17 @@ def add_enrollment_info(phoenix, member, campaign = nil)
   e_info.campaign_medium_version = campaign.campaign_medium_version
   e_info.joint = campaign.is_joint
   e_info.save
-  phoenix.cohort = PhoenixMember.cohort_formula(member.join_date, e_info, TIMEZONE, PhoenixTermsOfMembership.find(phoenix.terms_of_membership_id).installment_type)
+  phoenix.cohort = PhoenixMember.cohort_formula(phoenix.join_date, e_info, TIMEZONE, 
+      PhoenixTermsOfMembership.find(phoenix.terms_of_membership_id).installment_type)
   phoenix.save
+  e_info.cohort = phoenix.cohort
+  e_info.save
 end
-def update_fulfillment(member, phoenix)
-  phoenix_f = PhoenixFulfillment.find_by_member_id_and_product(phoenix.uuid, member.fulfillment_kit)
-  if phoenix_f.nil?
-    add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
-  else
-    phoenix_f.product = member.fulfillment_kit
-    phoenix_f.assigned_at = member.fulfillment_since_date
-    phoenix_f.delivered_at = member.fulfillment_since_date
-    phoenix_f.renewable_at = member.fulfillment_expire_date
-    phoenix_f.save! 
-  end
-  add_product_fulfillment(member.has_fulfillment_product)
+
+def fill_aus_attributes(cc, member)
+  cc.aus_status = member.aus_status
+  cc.aus_answered_at = member.aus_answered_at
+  cc.aus_sent_at = member.aus_sent_at
 end
 
 # 1- update existing members
@@ -132,34 +151,28 @@ def update_members(cid)
           add_enrollment_info(phoenix, member)
           #TODO: puede haber cambio de TOM  en ONMC production ?
 
-          phoenix.bill_date = member.cs_next_bill_date
-          phoenix.next_retry_bill_date = member.cs_next_bill_date
+          phoenix.bill_date = convert_from_date_to_time(member.cs_next_bill_date)
+          phoenix.next_retry_bill_date = convert_from_date_to_time(member.cs_next_bill_date)
           if phoenix.status != "lapsed" and member.phoenix_status == "lapsed"
             load_cancellation(@member.cancel_date)
           end        
           phoenix.status = member.phoenix_status
           if member.phoenix_status == 'lapsed'
             phoenix.recycled_times = 0
-            phoenix.cancel_date = member.cancelled_at
+            phoenix.cancel_date = convert_from_date_to_time(member.cancelled_at)
             phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
           end
 
           phoenix.save!
 
-          if phoenix.club_cash_amount.to_f != member.club_cash_amount.to_f
-            # create Club cash transaction.
-            update_club_cash(member.club_cash_amount - phoenix.club_cash_amount)
-          end
+          # create Club cash transaction.
+          update_club_cash(member)
 
           unless TEST
             phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
 
             new_phoenix_cc = PhoenixCreditCard.new 
-            new_phoenix_cc.encrypted_number = member.encrypted_cc_number
-            new_phoenix_cc.number = CREDIT_CARD_NULL if new_phoenix_cc.number.nil?
-            new_phoenix_cc.expire_month = member.cc_month_exp
-            new_phoenix_cc.expire_year = member.cc_year_exp
-            new_phoenix_cc.member_id = phoenix.uuid
+            fill_credit_card(new_phoenix_cc, member, phoenix)
 
             if phoenix_cc.nil?
               @log.info "  * member ##{member.id} does not have Credit Card active"
@@ -172,10 +185,13 @@ def update_members(cid)
               new_phoenix_cc.save!
               phoenix_cc.save!
               add_operation(Time.zone.now, new_phoenix_cc, "Credit card #{new_phoenix_cc.last_digits} added and set active.", nil)
+            else
+              # fill_aus_attributes(phoenix_cc, member)
+              # phoenix_cc.save!
             end
           end
 
-          update_fulfillment(member, phoenix)
+          # update_fulfillment(member, phoenix)
 
           member.update_attribute :imported_at, Time.now.utc
 
@@ -230,14 +246,14 @@ def add_new_members(cid)
         phoenix.terms_of_membership_id = tom_id
         phoenix.visible_id = member.id
         set_member_data(phoenix, member)
-        next_bill_date = member.cs_next_bill_date
+        next_bill_date = convert_from_date_to_time(member.cs_next_bill_date)
         phoenix.status = member.phoenix_status
         if member.phoenix_status == 'active'
-          phoenix.bill_date = next_bill_date
-          phoenix.next_retry_bill_date = next_bill_date
+          phoenix.bill_date = next_bill_date 
+          phoenix.next_retry_bill_date = next_bill_date 
         elsif member.phoenix_status == 'provisional'
-          phoenix.bill_date = next_bill_date
-          phoenix.next_retry_bill_date = next_bill_date
+          phoenix.bill_date = next_bill_date 
+          phoenix.next_retry_bill_date = next_bill_date 
         else
           phoenix.recycled_times = 0
           phoenix.cancel_date = member.cancelled_at
@@ -255,23 +271,15 @@ def add_new_members(cid)
         end
 
         # create Club cash transaction.
-        if member.club_cash_amount.to_f != 0.0
-          update_club_cash(member.club_cash_amount.to_f)
-        end
+        update_club_cash(member)
 
         # create CC
         phoenix_cc = PhoenixCreditCard.new 
-        phoenix_cc.number = CREDIT_CARD_NULL
-        unless TEST
-          phoenix_cc.encrypted_number = member.encrypted_cc_number
-        end
-        phoenix_cc.expire_month = member.cc_month_exp
-        phoenix_cc.expire_year = member.cc_year_exp
-        phoenix_cc.member_id = phoenix.uuid
+        fill_credit_card(phoenix_cc, member, phoenix)
         phoenix_cc.save!
 
-        add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
-        add_product_fulfillment(member.has_fulfillment_product)
+        # add_fulfillment(member.fulfillment_kit, member.fulfillment_since_date, member.fulfillment_expire_date)
+        # add_product_fulfillment(member.has_fulfillment_product)
 
         member.update_attribute :imported_at, Time.now.utc
         print "."
@@ -283,7 +291,29 @@ def add_new_members(cid)
       #end
       @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
-    sleep(1)
+  end
+end
+
+def fill_credit_card(phoenix_cc, member, phoenix)
+  phoenix_cc.number = CREDIT_CARD_NULL
+  if not TEST and not member.encrypted_cc_number.nil?
+    phoenix_cc.encrypted_number = member.encrypted_cc_number
+  end
+  phoenix_cc.expire_month = member.cc_month_exp
+  phoenix_cc.expire_year = member.cc_year_exp
+  # fill_aus_attributes(phoenix_cc, member)
+  phoenix_cc.member_id = phoenix.uuid
+
+  ActiveMerchant::Billing::CreditCard.require_verification_value = false
+  am = ActiveMerchant::Billing::CreditCard.new(
+    :number     => phoenix_cc.number,
+    :month      => member.cc_month_exp,
+    :year       => member.cc_year_exp,
+    :first_name => member.first_name,
+    :last_name  => member.last_name
+  )
+  if am.valid?
+    phoenix_cc.cc_type = am.type
   end
 end
 

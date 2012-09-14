@@ -11,8 +11,15 @@ echo "PATH variable => `printenv PATH`"
 cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake members:cancel  >> $LOGFILE 2>&1
 # rake mes:chargeback_report needs testing in production mode, because in test we dont have chargebacks.
 cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake mes:chargeback_report  >> $LOGFILE 2>&1
+
+# rake mes:account_updater_process_answers update members accounts before billing
+# cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake mes:account_updater_process_answers  >> $LOGFILE 2>&1
+
 # billing should be executed after cancel jobs finishes
 cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake billing:for_today  >> $LOGFILE 2>&1
+
+# rake mes:account_updater_send_file_to_process
+# cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake mes:account_updater_send_file_to_process  >> $LOGFILE 2>&1 &
 
 cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake billing:send_prebill  >> $LOGFILE 2>&1 &
 cd /var/www/backend-sac-platform/current && RAILS_ENV=$1 rake members:send_pillar_emails  >> $LOGFILE 2>&1 &
