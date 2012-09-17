@@ -34,6 +34,7 @@ class FulfillmentsTest < ActionController::IntegrationTest
   	within ("#fulfillments_table") do
 			select('out_of_stock', :from => '[status]')
 			check('[all_times]')
+      select('Others', :from => '[product_type]')
 	    click_link_or_button 'Report'
 
   	end

@@ -30,26 +30,7 @@
     			<td> <%= fulfillment.tracking_code %> </td>
     			<td> <%= fulfillment.status %> </td>
           <td NOWRAP> 
-      			<% if fulfillment.processing? %>
-              <% unless fulfillment.member.wrong_address %>
-                <%= link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id, :class=> "btn btn-small" %>
-              <%= link_to 'Set as wrong address','#', :id => "set_as_wrong_address", 
-                  :name => fulfillment.member.visible_id, :class=> "btn btn-small", :remote => true %>
-            	<% else %>
-            		<%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.visible_id) %>
-            	<% end %>
-      			<% elsif fulfillment.out_of_stock? or fulfillment.undeliverable? %>
-              <% if fulfillment.member.wrong_address %>
-                <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.visible_id) %>
-           	  <% else %>
-                  <% unless fulfillment.product.nil? %>
-                    <p style = 'float:left;'> Actual stock: <%= fulfillment.product.stock %>. </p> &nbsp
-                    <% if fulfillment.product.stock > 0 %>
-                      <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small" %>
-                    <% end %>
-                  <% end %>
-              <% end %>
-            <% end %>
+            <%= render :partial => "shared/fulfillment_actions", :locals => {:fulfillment => fulfillment, :member_show => false } %>
           </td>
     		</tr>
   		<% end %>

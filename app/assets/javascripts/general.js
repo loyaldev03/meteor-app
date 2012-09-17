@@ -328,43 +328,8 @@ $(document).ready( function() {
 
   function show_member_functions(){
     $('.help').popover();
-    $('*#mark_as_sent').click( function(event){
-      button = $(this)
-      button.attr('disabled', 'disabled');
-      event.preventDefault();
-      $.ajax({
-        type: 'PUT',
-        url: "../fulfillments/"+button.attr("name")+"/mark_as_sent",
-        success: function(data) {
-          if (data.code == "000"){
-            button.parent().children().hide();
-            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>");
-          }else{
-            button.removeAttr('disabled');
-            alert(data.message);
-          };
-        },
-      });
-    });
-
-    $('*#resend').click( function(event){
-      button = $(this)
-      button.attr('disabled', 'disabled');
-      event.preventDefault();
-      $.ajax({
-        type: 'PUT',
-        url: "../fulfillments/"+button.attr("name")+"/resend",
-        success: function(data) {
-          if (data.code == "000"){
-            button.parent().children().hide();
-            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>")
-          }else{
-            button.removeAttr('disabled');
-            alert(data.message);
-          };
-        },
-      });
-    });
+    mark_as_sent_fulfillment("../fulfillments/");
+    resend_fulfillment("../fulfillments/");
   };
 
   function member_cancellation_functions(){
@@ -418,43 +383,9 @@ $(document).ready( function() {
     $("#initial_date_").datepicker( "setDate", '-1w' );
     $("#end_date_").datepicker( "setDate", '0' );
 
-    $('*#resend').click( function(event){
-      button = $(this)
-      button.attr('disabled', 'disabled');
-      event.preventDefault();
-      $.ajax({
-        type: 'PUT',
-        url: "fulfillments/"+button.attr("name")+"/resend",
-        success: function(data) {
-          if (data.code == "000"){
-            button.parent().children().hide();
-            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>")
-          }else{
-            button.removeAttr('disabled');
-            alert(data.message);
-          };
-        },
-      });
-    });
-
-    $('*#mark_as_sent').click( function(event){
-      button = $(this)
-      button.attr('disabled', 'disabled');
-      event.preventDefault();
-      $.ajax({
-        type: 'PUT',
-        url: "fulfillments/"+button.attr("name")+"/mark_as_sent",
-        success: function(data) {
-          if (data.code == "000"){
-            button.parent().children().hide();
-            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>")
-          }else{
-            button.removeAttr('disabled');
-            alert(data.message);
-          };
-        },
-      });
-    });
+    resend_fulfillment("fulfillments/");
+    
+    mark_as_sent_fulfillment("fulfillments/");
 
     $('*#set_as_wrong_address').click( function(event){
       $(this).hide();
@@ -484,3 +415,44 @@ $(document).ready( function() {
 
   };
 
+  function mark_as_sent_fulfillment(url){
+    $('*#mark_as_sent').click( function(event){
+      button = $(this)
+      button.attr('disabled', 'disabled');
+      event.preventDefault();
+      $.ajax({
+        type: 'PUT',
+        url: url+button.attr("name")+"/mark_as_sent",
+        success: function(data) {
+          if (data.code == "000"){
+            button.parent().children().hide();
+            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>");
+          }else{
+            button.removeAttr('disabled');
+            alert(data.message);
+          };
+        },
+      });
+    });
+  }
+
+  function resend_fulfillment(url){
+    $('*#resend').click( function(event){
+      button = $(this)
+      button.attr('disabled', 'disabled');
+      event.preventDefault();
+      $.ajax({
+        type: 'PUT',
+        url: url+button.attr("name")+"/resend",
+        success: function(data) {
+          if (data.code == "000"){
+            button.parent().children().hide();
+            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>")
+          }else{
+            button.removeAttr('disabled');
+            alert(data.message);
+          };
+        },
+      });
+    });
+  }

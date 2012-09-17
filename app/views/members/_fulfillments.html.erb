@@ -20,19 +20,8 @@
         <td> <%= fulfillment.product_sku %> </td>
         <td> <%= I18n.l fulfillment.renewable_at, :format => :long unless fulfillment.renewable_at.nil? %> </td>
         <td> <%= fulfillment.status %> </td>
-        <td>
-          <% if fulfillment.processing? %>
-            <% unless @current_member.wrong_address %>
-              <%= link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id, :class=> "btn btn-small" %>
-            <% else %>
-              <%= 'activerecord.attributes.member.undeliverable' %>
-            <% end %>
-          <% elsif fulfillment.out_of_stock? %>
-            <p style = 'float:left;'> Actual stock: <%= fulfillment.product.stock %>. </p> &nbsp
-            <% if fulfillment.product.stock > 0 %>
-              <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small"%>
-            <% end %>
-          <% end %>
+        <td NOWRAP>
+          <%= render :partial => "shared/fulfillment_actions", :locals => {:fulfillment => fulfillment, :member_show => true} %>
         </td>
       </tr>
     <% end %>	
