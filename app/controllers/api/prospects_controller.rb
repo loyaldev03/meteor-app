@@ -24,7 +24,7 @@ class Api::ProspectsController < ApplicationController
   #                             *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
   #                             *type_of_phone_number
   #                             *birth_date: Birth date of the prospect
-  #                             *product_sku: Name of the selected product.
+  #                             *product_sku: Name of the selected product. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet")
   #                             *product_description:
   #                             *marketing_code: multi-team
   #                             *campaign_medium
@@ -39,6 +39,7 @@ class Api::ProspectsController < ApplicationController
   #                             *user_id
   #                             *landing_url: Url from where te submit comes from.
   #                             *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
+  #                              this information is selected by the member. This information is stored with format as hash encoded with json.
   #                             *cookie_set
   #                             *cookie_value: Cookie from where the enrollment is being submitted.
   #                             *joint
