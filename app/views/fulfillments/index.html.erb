@@ -23,8 +23,8 @@
   		</td>
   		<td>
         <%= label :status, t('activerecord.attributes.fulfillment.status'), :class => 'help-inline' %>
-        <%= select_tag :status, options_for_select([['Not processed', 'not_processed'],
-                                ['Processing', 'processing'],['Out of stock', 'out_of_stock'], 
+        <%= select_tag :status, options_for_select([['not_processed', 'not_processed'],
+                                ['processing', 'processing'],['out_of_stock', 'out_of_stock'], 
                                 ['undeliverable','undeliverable']], :selected => params[:status]),
                                 :class => 'select_field input-medium', :name => '[status]' %>	
       </td>

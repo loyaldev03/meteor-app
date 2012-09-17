@@ -88,7 +88,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
-  test "Supervisor should enroll/create member" do
+  test "Supervisor should not enroll/create member" do
     sign_in @supervisor_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -101,7 +101,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                       :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
           ) 
     )
-    assert_difference('Member.count') do
+    assert_difference('Member.count',0) do
       post( :create, { member: {:first_name => @member.first_name, 
                                 :last_name => @member.last_name,
                                 :address => @member.address,
@@ -123,7 +123,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                                  :expire_year => @credit_card.expire_year },
                                 enrollment_info: @enrollment_info.attributes
                                 },:format => :json})
-      assert_response :success
+      assert_response :unauthorized
     end
   end
 
@@ -155,4 +155,95 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  # test "admin user should update member" do
+  #   sign_in @admin_user
+  #   @credit_card = FactoryGirl.build :credit_card    
+  #   @member = FactoryGirl.build :member_with_api
+  #   @enrollment_info = FactoryGirl.build :enrollment_info
+  #   put( :update, { member: {:first_name => @member.first_name, 
+  #                               :last_name => @member.last_name,
+  #                               :address => @member.address,
+  #                               :gender => 'M',
+  #                               :city => @member.city, 
+  #                               :zip => @member.zip,
+  #                               :state => @member.state,
+  #                               :email => @member.email,
+  #                               :country => @member.country,
+  #                               :type_of_phone_number => @member.type_of_phone_number,
+  #                               :phone_country_code => @member.phone_country_code,
+  #                               :phone_area_code => @member.phone_area_code,
+  #                               :phone_local_number => @member.phone_local_number,
+  #                               :birth_date => @member.birth_date,
+  #                               },:format => :json})
+  #   assert_response :success
+  # end
+
+  # test "representative user should not update member" do
+  #   sign_in @representative_user
+  #   @credit_card = FactoryGirl.build :credit_card    
+  #   @member = FactoryGirl.build :member_with_api
+  #   @enrollment_info = FactoryGirl.build :enrollment_info
+  #   put( :update, { member: {:first_name => @member.first_name, 
+  #                               :last_name => @member.last_name,
+  #                               :address => @member.address,
+  #                               :gender => 'M',
+  #                               :city => @member.city, 
+  #                               :zip => @member.zip,
+  #                               :state => @member.state,
+  #                               :email => @member.email,
+  #                               :country => @member.country,
+  #                               :type_of_phone_number => @member.type_of_phone_number,
+  #                               :phone_country_code => @member.phone_country_code,
+  #                               :phone_area_code => @member.phone_area_code,
+  #                               :phone_local_number => @member.phone_local_number,
+  #                               :birth_date => @member.birth_date,
+  #                               },:format => :json})
+  #   assert_response :unauthorized
+  # end
+
+  # test "supervisor user should not update member" do
+  #   sign_in @supervisor_user
+  #   @credit_card = FactoryGirl.build :credit_card    
+  #   @member = FactoryGirl.build :member_with_api
+  #   @enrollment_info = FactoryGirl.build :enrollment_info
+  #   put( :update, { member: {:first_name => @member.first_name, 
+  #                               :last_name => @member.last_name,
+  #                               :address => @member.address,
+  #                               :gender => 'M',
+  #                               :city => @member.city, 
+  #                               :zip => @member.zip,
+  #                               :state => @member.state,
+  #                               :email => @member.email,
+  #                               :country => @member.country,
+  #                               :type_of_phone_number => @member.type_of_phone_number,
+  #                               :phone_country_code => @member.phone_country_code,
+  #                               :phone_area_code => @member.phone_area_code,
+  #                               :phone_local_number => @member.phone_local_number,
+  #                               :birth_date => @member.birth_date,
+  #                               },:format => :json})
+  #   assert_response :unauthorized
+  # end
+
+  # test "api user should update member" do
+  #   sign_in @api_user
+  #   @credit_card = FactoryGirl.build :credit_card    
+  #   @member = FactoryGirl.build :member_with_api
+  #   @enrollment_info = FactoryGirl.build :enrollment_info
+  #   put( :update, { member: {:first_name => @member.first_name, 
+  #                               :last_name => @member.last_name,
+  #                               :address => @member.address,
+  #                               :gender => 'M',
+  #                               :city => @member.city, 
+  #                               :zip => @member.zip,
+  #                               :state => @member.state,
+  #                               :email => @member.email,
+  #                               :country => @member.country,
+  #                               :type_of_phone_number => @member.type_of_phone_number,
+  #                               :phone_country_code => @member.phone_country_code,
+  #                               :phone_area_code => @member.phone_area_code,
+  #                               :phone_local_number => @member.phone_local_number,
+  #                               :birth_date => @member.birth_date,
+  #                               },:format => :json})
+  #   assert_response :success
+  # end
 end

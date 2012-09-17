@@ -14,6 +14,9 @@ class Ability
       can :manage, Domain
       can :manage, Product
       can :manage, Fulfillment
+      can :api_enroll, Member
+      can :api_update, Member
+      can :api_profile, Member
       can :manage_product_api, Product
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
@@ -21,14 +24,20 @@ class Ability
     elsif agent.has_role? 'representative'
       can :manage, Member
       cannot :enroll, Member
+      cannot :api_enroll, Member
+      cannot :api_update, Member
+      cannot :api_profile, Member
       can :see_credit_card_last_digits, CreditCard
     elsif agent.has_role? 'supervisor'
       can :manage, Member
+      cannot :api_enroll, Member
+      cannot :api_update, Member
+      cannot :api_profile, Member
       can :see_credit_card, CreditCard
     elsif agent.has_role? 'api'
-      can :enroll, Member
-      can :update, Member
-      can :show_profile, Member
+      can :api_enroll, Member
+      can :api_update, Member
+      can :api_profile, Member
       can :manage_product_api, Product
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect

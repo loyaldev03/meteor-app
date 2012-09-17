@@ -94,9 +94,9 @@ class MembersBillTest < ActionController::IntegrationTest
     next_bill_date = member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
     
     validate_cohort(member, EnrollmentInfo.last, Transaction.last)
-
-    within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
-
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
+    end
     within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
 
     #sleep(5)
@@ -173,7 +173,7 @@ class MembersBillTest < ActionController::IntegrationTest
   test "create a member + bill + check fultillment" do
     active_merchant_stubs
     setup_member
-
+    @product = FactoryGirl.create(:product, :club_id => @club.id, :sku => 'kit-card')
     EnrollmentInfo.last.update_attribute(:product_sku, "kit-card")
     @saved_member.send_fulfillment
 

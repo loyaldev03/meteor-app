@@ -16,8 +16,8 @@ class ClubTest < ActiveSupport::TestCase
   	assert !@club.save, "Club was saved without a partner_id"
   end
   
-  test "After creating a club, it should add a product to that club" do
-    assert_difference('Product.count') do
+  test "After creating a club, it should addtwo product to that club" do
+    assert_difference('Product.count',2) do
       @club.save
     end
   end

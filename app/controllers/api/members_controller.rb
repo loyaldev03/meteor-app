@@ -83,7 +83,7 @@ class Api::MembersController < ApplicationController
   # @return [Hash] *errors*
   # 
   def create
-    authorize! :enroll, Member
+    authorize! :api_enroll, Member
     tom = TermsOfMembership.find_by_id(params[:member][:terms_of_membership_id])  
     if tom.nil?
       render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
@@ -139,7 +139,7 @@ class Api::MembersController < ApplicationController
   # @return [Hash] *errors*
   # 
   def update
-    authorize! :update, Member
+    authorize! :api_update, Member
     response = {}
     member = Member.find(params[:id])
     # member.skip_api_sync! if XXX
@@ -214,7 +214,7 @@ class Api::MembersController < ApplicationController
   # @return [Integer] *code*
   #
   def show
-    authorize! :show_profile, Member
+    authorize! :api_profile, Member
     member = Member.find(params[:id])
     ei = member.enrollment_infos[0]
     ei = if ei.blank? 

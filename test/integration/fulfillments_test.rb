@@ -40,9 +40,10 @@ class FulfillmentsTest < ActionController::IntegrationTest
 
   	within ("#report_results") do
   		click_link_or_button 'Resend'
- 	    sleep(2) #waiting for response.
-  		assert page.has_content?("Fulfillment #{@fulfillment_without_stock.product_sku} was marked to be delivered next time.")
-  	end
+ 	    wait_until{
+  		  assert page.has_content?("Fulfillment #{@fulfillment_without_stock.product_sku} was marked to be delivered next time.")
+  	  }
+    end
   end
 
   test "Should show response when setting undeliverable member's address" do
@@ -51,6 +52,7 @@ class FulfillmentsTest < ActionController::IntegrationTest
   	visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   	within ("#fulfillments_table") do
 			select('processing', :from => '[status]')
+      select('Others', :from => '[product_type]')
 			check('[all_times]')
 	    click_link_or_button 'Report'
   	end
@@ -61,9 +63,10 @@ class FulfillmentsTest < ActionController::IntegrationTest
   		confirm_ok_js
   		click_link_or_button 'Set wrong address'
 
- 	    sleep(2) #waiting for response.
-  		assert page.has_content?("#{@fulfillment_processing.member.full_address} is undeliverable. Reason: #{reason}")
-  	end
+ 	    wait_until{
+  		  assert page.has_content?("#{@fulfillment_processing.member.full_address} is undeliverable. Reason: #{reason}")
+  	  }
+    end
   end
 
 

@@ -26,15 +26,16 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 	      :created_by => @admin_agent)
 
 			@saved_member.reload
-      @fulfillment = FactoryGirl.create(:fulfillment, :member_id => @saved_member.id)
+      @product = FactoryGirl.create(:product, :club_id => @club.id, :sku => 'kit-card')
+      @fulfillment = FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'kit-card')
 		end
 
     sign_in_as(@admin_agent)
   end
 
- #  ###########################################################
- #  # TESTS
- #  ###########################################################
+  ###########################################################
+  # TESTS
+  ###########################################################
 
   test "cancel member and check if not_processed fulfillments were updated to canceled" do
     setup_member
@@ -192,7 +193,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
   test "display 'resend' when fulfillment is out_of_stock on memebr's profile." do
     setup_member
     @fulfillment.set_as_out_of_stock    
-
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     within(".nav-tabs") do
       click_on("Fulfillments")
@@ -213,4 +213,5 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     @fulfillment.reload
     assert_equal @fulfillment.status,'not_processed'
   end
+
 end

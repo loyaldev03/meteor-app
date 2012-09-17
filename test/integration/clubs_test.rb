@@ -105,9 +105,8 @@ class ClubTest < ActionController::IntegrationTest
     end
     within("#products_table") do
       wait_until{
-        assert page.has_content?('Kit card')
-        assert page.has_content?('false')
-        assert page.has_content?('100')
+        assert page.has_content?('KIT')
+        assert page.has_content?('CARD')
       }
     end
   end
