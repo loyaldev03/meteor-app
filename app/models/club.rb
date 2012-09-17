@@ -58,7 +58,7 @@ class Club < ActiveRecord::Base
       ['KIT','CARD'].each do |sku|
         p = Product.new 
         p.sku = sku
-        p.name = (sku=='KIT' ? 'KIT' : 'CARD')
+        p.name = sku
         p.stock = 100
         p.club_id = self.id
         p.save
