@@ -37,7 +37,7 @@ end
 
 desc "Restart delayed jobs"
 task :restart_delayed_jobs do
-  run "cd #{release_path} && bundle exec god restart -c /var/www/god_files/delayed_jobs.god #{application}-dj" 
+  run "cd #{release_path} && god restart -c /var/www/god_files/delayed_jobs.god #{application}-dj" 
 end
 
 desc "Notify Campfire room"
