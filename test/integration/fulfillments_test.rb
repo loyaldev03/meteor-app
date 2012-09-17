@@ -18,10 +18,6 @@ class FulfillmentsTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-  def setup_fulfillments_and_products
-
-  end
-
   ############################################################
   # TESTS
   ############################################################
@@ -69,18 +65,5 @@ class FulfillmentsTest < ActionController::IntegrationTest
   	  }
     end
   end
-
-  test "display default initial and end dates on fulfillments index" do
-    setup_member
-    visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-
-    within("#fulfillments_table") do
-      wait_until{
-        assert find_field('initial_date_').value == "#{Date.today-1.week}"
-        assert find_field('end_date_').value == "#{Date.today}"
-      }
-    end
-  end
-
 
 end
