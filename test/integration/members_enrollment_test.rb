@@ -2302,7 +2302,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
   end
 
-  test "search member by invalid characters" do
+  test "search member need needs_approval" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
