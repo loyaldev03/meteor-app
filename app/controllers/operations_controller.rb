@@ -20,9 +20,9 @@ class OperationsController < ApplicationController
   # PUT /operations/1
   def update
     operation = Operation.find(params[:id])
-    @url_helpers = Rails.application.routes.url_helpers
+    @link = (view_context.link_to "#{operation.id}", operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,operation.id))
     if operation.update_attributes(params[:operation])
-      message = "Edited operation note <a href=\"/partner/#{@current_partner.prefix}/club/#{@current_club.name}/member/#{@current_member.visible_id}/operations/#{operation.id}\">#{operation.id}</a>.".html_safe
+      message = "Edited operation note #{@link}".html_safe
       Auditory.audit(@current_agent, operation, message, @current_member)
       redirect_to operation_path(:id => operation), notice: message
     else

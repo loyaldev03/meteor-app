@@ -569,7 +569,13 @@ class Member < ActiveRecord::Base
             self.save!
             message = "#{cct.amount.to_i.abs} club cash was successfully #{ amount.to_i >= 0 ? 'added' : 'deducted' }!"
             # TODO: club cash amount tiene que tener un tipo de operación.
-            Auditory.audit(agent, cct, message, self)
+            if amount.to_i > 0
+              Auditory.audit(agent, cct, message, self, Settings.operation_types.add_club_cash)
+            elsif amount.to_i < 0 and amount.to_i.abs == club_cash_amount 
+              Auditory.audit(agent, cct, message, self, Settings.operation_types.reset_club_cash)
+            elsif amount.to_i < 0 
+              Auditory.audit(agent, cct, message, self, Settings.operation_types.deducted_club_cash)
+            end
             answer = { :message => message, :code => Settings.error_codes.success }
           else
             answer[:message] = "Could not saved club cash transaction: #{cct.error_to_s} #{self.error_to_s}"

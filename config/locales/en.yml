@@ -55,6 +55,10 @@ en:
     save_credit_card: 'Save credit card'
     report: 'Report'
     generate_csv: 'Generate csv'
+    resend_welcome_email: 'Resend welcome email'
+    password_reset: 'Password reset'
+    blacklist: 'Blacklist'
+    cancel: 'Cancel'
   admin:
     agents:
       index:
