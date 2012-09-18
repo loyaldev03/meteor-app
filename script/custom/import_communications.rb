@@ -148,7 +148,7 @@ def get_terms_of_membership_id(campaign_id)
     payment_type = '1.month' 
   end
 
-  return nil if campaign.phoenix_mega_channel != 'SLOOP' and campaign.phoenix_mega_channel != 'PTX' and campaign.phoenix_mega_channel != 'OTHER'
+  return nil unless ['LG2C', 'SLOOP', 'PTX', 'OTHER'].include?(campaign.phoenix_mega_channel)
 
   name = "#{payment_type} - #{campaign.phoenix_mega_channel} - #{campaign.phoenix_amount}"
   # find uses name because TOMs differ between mega_channel (emails are diff).
@@ -165,7 +165,12 @@ def get_terms_of_membership_id(campaign_id)
     m.club_id = CLUB
     m.provisional_days = campaign.phoenix_trial_days
     m.mode = "production"
-    m.club_cash_amount = 150
+    # refs to 19806
+    if campaign.terms_of_membership_id.to_i == 365
+      m.club_cash_amount = 150
+    else
+      m.club_cash_amount = 12
+    end
     m.save!
 
     if campaign.terms_of_membership_id.to_i == 365
@@ -175,7 +180,7 @@ def get_terms_of_membership_id(campaign_id)
       if campaign.phoenix_mega_channel.include?('SLOOP')
         upload_email_services(@annual_sloop, m.id)
       end
-      if campaign.phoenix_mega_channel.include?('OTHER')
+      if campaign.phoenix_mega_channel.include?('OTHER') || campaign.phoenix_mega_channel.include?('LG2C')
         upload_email_services(@annual_join_now, m.id)
       end
     else

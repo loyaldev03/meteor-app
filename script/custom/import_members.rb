@@ -6,24 +6,6 @@ require 'import_models'
 ActiveRecord::Base.logger = @log
 
 
-# club cash import could it be modify
-def update_club_cash(member)
-  @member.club_cash_expire_date = @member.join_date + (Date.today.year - @member.join_date.year + 1).years
-  if @member.phoenix_status == 'lapsed' 
-    @member.club_cash_amount = 0
-    @member.club_cash_expire_date = nil
-  elsif member.is_chapter_member
-    @member.club_cash_amount = 200
-  else
-    @member.club_cash_amount = 150 # TODO: creo que esto sale del TOM
-  end
-  cct = PhoenixClubCashTransaction.find_or_create_by_member_id @member.uuid
-  cct.amount = @member.club_cash_amount
-  cct.description = "Imported club cash"
-  cct.save!
-  @member.save
-end
-
 # fulfillment load should be review.
 # def add_fulfillment(fulfillment_kit, fulfillment_since_date, fulfillment_expire_date)
 #   if not fulfillment_kit.nil? and not fulfillment_expire_date.nil? and not fulfillment_since_date.nil?
@@ -76,7 +58,8 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.blacklisted = member.blacklisted
   phoenix.join_date = convert_from_date_to_time(member.phoenix_join_date)
   phoenix.api_id = member.drupal_user_api_id
-  phoenix.club_cash_expire_date = convert_from_date_to_time(member.club_cash_expire_date)
+  phoenix.club_cash_expire_date = nil
+  phoenix.club_cash_amount = 0
   if member.is_chapter_member
     phoenix.member_group_type_id = MEMBER_GROUP_TYPE
   else
@@ -164,9 +147,6 @@ def update_members(cid)
           end
 
           phoenix.save!
-
-          # create Club cash transaction.
-          update_club_cash(member)
 
           unless TEST
             phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
@@ -269,9 +249,6 @@ def add_new_members(cid)
         if phoenix.status == "lapsed"
           load_cancellation(@member.cancel_date)
         end
-
-        # create Club cash transaction.
-        update_club_cash(member)
 
         # create CC
         phoenix_cc = PhoenixCreditCard.new 
