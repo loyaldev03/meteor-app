@@ -2329,4 +2329,67 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
     end
   end
+
+  test "should accept applied member" do
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @partner = FactoryGirl.create(:partner)
+    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    Time.zone = @club.time_zone 
+    @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 
+                                       :terms_of_membership => @terms_of_membership_with_gateway_needs_approval,
+                                       :created_by => @admin_agent)
+    @enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => @saved_member.id)
+
+    @saved_member.reload
+
+    sign_in_as(@admin_agent)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    confirm_ok_js
+    click_link_or_button 'Approve'
+
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+    }
+
+    @saved_member.reload
+    within("#table_membership_information") do  
+      wait_until{
+        within("#td_mi_status") { assert page.has_content?('provisional') }
+      }
+    end
+  end
+
+  test "should reject applied member" do
+   @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @partner = FactoryGirl.create(:partner)
+    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    Time.zone = @club.time_zone 
+    @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 
+                                       :terms_of_membership => @terms_of_membership_with_gateway_needs_approval,
+                                       :created_by => @admin_agent)
+    @enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => @saved_member.id)
+
+    @saved_member.reload
+
+    sign_in_as(@admin_agent)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    confirm_ok_js
+    click_link_or_button 'Reject'
+
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+    }
+
+    @saved_member.reload
+    within("#table_membership_information") do  
+      wait_until{
+        within("#td_mi_status") { assert page.has_content?('lapsed') }
+      }
+    end
+  end
+
 end
