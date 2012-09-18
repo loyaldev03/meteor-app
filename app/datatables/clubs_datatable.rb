@@ -36,7 +36,7 @@ private
     clubs = Club.where(:partner_id => @current_partner.id).order("#{sort_column} #{sort_direction}")
     clubs = clubs.page(page).per_page(per_page)
     if params[:sSearch].present?
-      clubs = clubs.where("id like :search or email like :search or username like :search", search: "%#{params[:sSearch]}%")
+      clubs = clubs.where("id like :search or name like :search", search: "%#{params[:sSearch]}%")
     end
     clubs
   end

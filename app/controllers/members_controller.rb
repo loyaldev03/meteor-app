@@ -200,16 +200,6 @@ class MembersController < ApplicationController
     end
   end
 
-  def resend_fulfillment 
-    if request.post?
-      fulfillment = Fulfillment.find(params[:fulfillment_id])
-      message = "Resend fulfillment #{fulfillment.product}."
-      Auditory.audit(@current_agent,@current_member,message,@current_member)    
-      flash[:notice] = message 
-      redirect_to show_member_path
-    end
-  end
-
   def add_club_cash
     if request.post?
       cct = ClubCashTransaction.new(params[:club_cash_transaction])
@@ -229,10 +219,10 @@ class MembersController < ApplicationController
   def approve
     if @current_member.can_be_approved?
       @current_member.set_as_provisional!
-      message = "Member approved"
       Auditory.audit(@current_agent, @current_member, message, @current_member)
+      flash[:notice] = "Member approved"
     else
-      message = "Member cannot be approved. It must be applied."
+      flash[:error] = "Member cannot be approved. It must be applied."
     end
     redirect_to show_member_path
   end
@@ -241,12 +231,12 @@ class MembersController < ApplicationController
   def reject
     if @current_member.can_be_rejected?
       @current_member.set_as_canceled!
-      message = "Member was rejected and now its lapsed."
       Auditory.audit(@current_agent, @current_member, message, @current_member)
+      flash[:notice] = "Member was rejected and now its lapsed."
     else
-      message = "Member cannot be rejected. It must be applied."
+      flash[:error] = "Member cannot be rejected. It must be applied."
     end
-    redirect_to show_member_path  
+      redirect_to show_member_path  
   end
 
   def login_as_member

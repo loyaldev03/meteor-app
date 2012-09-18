@@ -18,9 +18,8 @@ private
         domain.description,
         domain.data_rights,
         domain.hosted,
-        I18n.l(domain.created_at,:format=>:long),
-        link_to(I18n.t(:show), @url_helpers.domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')+' '+
-        link_to(I18n.t(:edit),@url_helpers.edit_domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')+' '+
+        link_to(I18n.t(:show), @url_helpers.domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')+
+        link_to(I18n.t(:edit),@url_helpers.edit_domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')+
         link_to(I18n.t(:destroy),@url_helpers.domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id),
                       :method => :delete, 
                       :confirm => I18n.t("are_you_sure"),
@@ -37,7 +36,7 @@ private
     domains = Domain.where(:partner_id => @current_partner.id).order("#{sort_column} #{sort_direction}")
     domains = domains.page(page).per_page(per_page)
     if params[:sSearch].present?
-      domains = domains.where("id like :search or email like :search or username like :search", search: "%#{params[:sSearch]}%")
+      domains = domains.where("id like :search or url like :search", search: "%#{params[:sSearch]}%")
     end
     domains
   end

@@ -50,7 +50,10 @@ class ClubsController < ApplicationController
   # DELETE /clubs/1
   def destroy
     @club = Club.find(params[:id])
-    @club.destroy
-    redirect_to clubs_url 
+    if @club.destroy
+      redirect_to clubs_url, notice: "Club #{@club.name} was successfully destroyed"
+    else
+      flash[:error] = "Club #{@club.name} was not destroyed."
+    end
   end
 end

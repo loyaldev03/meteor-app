@@ -390,13 +390,13 @@ POST /partners
       <pre class="lines">
 
 
-56
-57
-58
-59</pre>
+59
+60
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 59</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_dashboard'>dashboard</span>
   <span class='ivar'>@partner</span> <span class='op'>=</span> <span class='ivar'>@current_partner</span>
@@ -438,15 +438,21 @@ DELETE /partners/1
 51
 52
 53
-54</pre>
+54
+55
+56
+57</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/admin/partners_controller.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroy'>destroy</span>
   <span class='ivar'>@partner</span> <span class='op'>=</span> <span class='const'>Partner</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='ivar'>@partner</span><span class='period'>.</span><span class='id identifier rubyid_destroy'>destroy</span>
-  <span class='id identifier rubyid_redirect_to'>redirect_to</span> <span class='id identifier rubyid_admin_partners_url'>admin_partners_url</span>
+  <span class='kw'>if</span> <span class='ivar'>@partner</span><span class='period'>.</span><span class='id identifier rubyid_destroy'>destroy</span>
+    <span class='id identifier rubyid_redirect_to'>redirect_to</span> <span class='id identifier rubyid_admin_partners_url'>admin_partners_url</span><span class='comma'>,</span> <span class='label'>notice:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Partner </span><span class='embexpr_beg'>#{</span><span class='ivar'>@partner</span><span class='period'>.</span><span class='id identifier rubyid_prefix'>prefix</span><span class='rbrace'>}</span><span class='tstring_content'> was successfully destroyed</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_flash'>flash</span><span class='lbracket'>[</span><span class='symbol'>:error</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Partner </span><span class='embexpr_beg'>#{</span><span class='ivar'>@partner</span><span class='period'>.</span><span class='id identifier rubyid_prefix'>prefix</span><span class='rbrace'>}</span><span class='tstring_content'> was not destroyed.</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -686,7 +692,7 @@ PUT /partners/1
 </div>
 
     <div id="footer">
-  Generated on Wed Sep  5 12:12:50 2012 by
+  Generated on Mon Sep 17 18:08:25 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

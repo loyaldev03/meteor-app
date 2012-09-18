@@ -163,6 +163,28 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#call_these_members-instance_method" title="#call_these_members (instance method)">- (Object) <strong>call_these_members</strong>(csv) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#cancellation-instance_method" title="#cancellation (instance method)">- (Object) <strong>cancellation</strong>(email) </a>
     
 
@@ -350,6 +372,46 @@ default bcc: &#8220;platformadmins@xagax.com&#8221;.
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="call_these_members-instance_method">
+  
+    - (<tt>Object</tt>) <strong>call_these_members</strong>(csv) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+42
+43
+44
+45
+46
+47
+48
+49</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/mailers/notifier.rb', line 42</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_call_these_members'>call_these_members</span><span class='lparen'>(</span><span class='id identifier rubyid_csv'>csv</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subject'>subject</span>    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>AUS answered CALL to these members </span><span class='embexpr_beg'>#{</span><span class='const'>Date</span><span class='period'>.</span><span class='id identifier rubyid_today'>today</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_bcc'>bcc</span>        <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>platformadmins@xagax.com</span><span class='tstring_end'>'</span></span>
+  <span class='id identifier rubyid_recipients'>recipients</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_call_these_members_recipients'>call_these_members_recipients</span>
+  <span class='id identifier rubyid_attachment'>attachment</span> <span class='symbol'>:content_type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>text/csv</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:filename</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>call_members_</span><span class='embexpr_beg'>#{</span><span class='const'>Date</span><span class='period'>.</span><span class='id identifier rubyid_today'>today</span><span class='rbrace'>}</span><span class='tstring_content'>.csv</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='op'>|</span>
+    <span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span> <span class='op'>=</span> <span class='id identifier rubyid_csv'>csv</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="cancellation-instance_method">
   
     - (<tt>Object</tt>) <strong>cancellation</strong>(email) 
@@ -528,7 +590,7 @@ default bcc: &#8220;platformadmins@xagax.com&#8220;
 </div>
 
     <div id="footer">
-  Generated on Wed Sep  5 12:12:47 2012 by
+  Generated on Mon Sep 17 18:08:22 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

@@ -51,8 +51,11 @@ class ProductsController < ApplicationController
   # DELETE /products/1
   def destroy
     @product = Product.find(params[:id])
-    @product.destroy
-    redirect_to products_url 
+    if @product.destroy
+      redirect_to products_url 
+    else
+      flash[:error] = "Product #{@product.sku} was not destroyed."
+    end
   end
 
   private

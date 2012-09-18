@@ -35,7 +35,7 @@ class Api::MembersController < ApplicationController
   #             *birth_date: Birth date of the member. This date is stored with format "yyyy-mm-dd"
   #             *credit_card  [Hash]
   #             *prospect_id: Id of the prospect the enrollment info is related to.
-  #             *product_sku: Freeform text that is representative of the SKU.
+  #             *product_sku: Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet")
   #             *product_description: Description of the selected product.
   #             *mega_channel: 
   #             *marketing_code: multi-team

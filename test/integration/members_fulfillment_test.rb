@@ -153,18 +153,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal @fulfillment.status, 'canceled'
   end 
 
-  test "display default initial and end dates on fulfillments index" do
-    setup_member
-    visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-
-    within("#fulfillments_table") do
-      wait_until{
-        assert find_field('initial_date_').value == "#{Date.today-1.week}"
-        assert find_field('end_date_').value == "#{Date.today}"
-      }
-    end
-  end
-
   test "display 'Mark as sent' and 'Set as wrong number' when fulfillment is processing on memebr's profile." do
     setup_member
     @fulfillment.set_as_processing    
@@ -214,4 +202,15 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal @fulfillment.status,'not_processed'
   end
 
+  test "display default initial and end dates on fulfillments index" do
+    setup_member
+    visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+
+    within("#fulfillments_table") do
+      wait_until{
+        assert find_field('initial_date_').value == "#{Date.today-1.week}"
+        assert find_field('end_date_').value == "#{Date.today}"
+      }
+    end
+  end
 end

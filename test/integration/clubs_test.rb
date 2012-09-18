@@ -78,8 +78,10 @@ class ClubTest < ActionController::IntegrationTest
         click_link_or_button 'Destroy'
       }
     end
-    assert !page.has_content?(saved_club.name)
-    assert Club.with_deleted.where(:id => saved_club.id).first
+    wait_until{
+      assert page.has_content?("Club #{saved_club.name} was successfully destroyed")
+      assert Club.with_deleted.where(:id => saved_club.id).first
+    }
   end
 
   test "should create default product when creating club" do

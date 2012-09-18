@@ -17,7 +17,7 @@ class Domain < ActiveRecord::Base
   before_destroy :verify_if_is_last_domain
 
   def self.datatable_columns
-    ['id', 'url', 'description', 'data_rights', 'hosted', 'created_at' ]
+    ['id', 'url', 'description', 'data_rights', 'hosted' ]
   end
 
   def verify_if_is_last_domain

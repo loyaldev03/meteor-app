@@ -18,10 +18,6 @@ class FulfillmentsTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-  def setup_fulfillments_and_products
-
-  end
-
   ############################################################
   # TESTS
   ############################################################
@@ -69,6 +65,5 @@ class FulfillmentsTest < ActionController::IntegrationTest
   	  }
     end
   end
-
 
 end

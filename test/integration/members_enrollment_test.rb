@@ -2302,4 +2302,31 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
   end
 
+  test "search member need needs_approval" do
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @partner = FactoryGirl.create(:partner)
+    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    Time.zone = @club.time_zone 
+    @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 
+                                       :terms_of_membership => @terms_of_membership_with_gateway_needs_approval,
+                                       :created_by => @admin_agent)
+    @saved_member.reload
+
+    sign_in_as(@admin_agent)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+
+    member_to_seach = Member.first
+    within("#payment_details")do
+      wait_until{
+        check('member[needs_approval]')
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?("#{@saved_member.full_name}")
+      }
+    end
+  end
 end
