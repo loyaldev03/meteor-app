@@ -99,7 +99,9 @@ class PartnersTest < ActionController::IntegrationTest
         click_link_or_button 'Destroy'
       }
     end
-    assert !page.has_content?(saved_partner.prefix)
-    assert Partner.with_deleted.where(:id => saved_partner.id).first
+    wait_until{
+      assert page.has_content?('Partner #{saved_partner.prefix} was successfully destroyed')
+      assert Partner.with_deleted.where(:id => saved_partner.id).first
+    }
   end
 end
