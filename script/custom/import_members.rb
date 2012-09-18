@@ -280,18 +280,6 @@ def fill_credit_card(phoenix_cc, member, phoenix)
   phoenix_cc.expire_year = member.cc_year_exp
   # fill_aus_attributes(phoenix_cc, member)
   phoenix_cc.member_id = phoenix.uuid
-
-  ActiveMerchant::Billing::CreditCard.require_verification_value = false
-  am = ActiveMerchant::Billing::CreditCard.new(
-    :number     => phoenix_cc.number,
-    :month      => member.cc_month_exp,
-    :year       => member.cc_year_exp,
-    :first_name => member.first_name,
-    :last_name  => member.last_name
-  )
-  if am.valid?
-    phoenix_cc.cc_type = am.type
-  end
 end
 
 
