@@ -64,11 +64,7 @@ class Fulfillment < ActiveRecord::Base
   def renew!
     if recurrent and membership_billed_recently?
       if self.undeliverable?
-        if member.wrong_address.nil?
-          self.new_fulfillment
-        else
-          self.new_fulfillment('undeliverable')
-        end
+        self.new_fulfillment('undeliverable')
       else
         self.new_fulfillment
       end
