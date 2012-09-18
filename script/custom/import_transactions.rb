@@ -35,10 +35,10 @@ def load_refunds
           transaction.save!
 
           if refund.result == "Success"
-            add_operation(transaction.created_at, transaction, "Credit success $#{transaction.amount}",
+            add_operation(transaction.created_at, 'Transaction', transaction.id, "Credit success $#{transaction.amount}",
                               Settings.operation_types.credit, transaction.created_at, transaction.updated_at)
           else
-            add_operation(transaction.created_at, transaction, "Credit $#{transaction.amount} error: #{refund.result}",
+            add_operation(transaction.created_at, 'Transaction', transaction.id, "Credit $#{transaction.amount} error: #{refund.result}",
                               Settings.operation_types.credit_error, transaction.created_at, transaction.updated_at)
           end
           refund.update_attribute :imported_at, Time.now.utc
@@ -95,7 +95,7 @@ def load_enrollment_transactions
 
             if transaction.response_code.to_i == 0 and (authorization.captured == 1 || authorization.authorized == 1)
               set_last_billing_date_on_credit_card(@member, transaction.created_at)
-              add_operation(transaction.created_at, transaction, 
+              add_operation(transaction.created_at, 'Transaction', transaction.id, 
                             "Member enrolled successfully $#{transaction.amount} on TOM(#{transaction.terms_of_membership_id}) -#{get_terms_of_membership_name(transaction.terms_of_membership_id)}-",
                             Settings.operation_types.membership_billing, transaction.created_at, transaction.updated_at)
             end
@@ -156,15 +156,15 @@ def load_membership_transactions
             transaction.save!
             if transaction.response_code.to_i == 0 and (authorization.captured == 1 || authorization.authorized == 1)
               set_last_billing_date_on_credit_card(@member, transaction.created_at)
-              add_operation(transaction.created_at, transaction, 
+              add_operation(transaction.created_at, 'Transaction', transaction.id, 
                             "Member billed successfully $#{transaction.amount} Transaction id: #{transaction.id}", 
                             Settings.operation_types.membership_billing, transaction.created_at, transaction.updated_at)
             elsif [301,327,304,303].include?(transaction.response_code.to_i)
-              add_operation(transaction.created_at, transaction, 
+              add_operation(transaction.created_at, 'Transaction', transaction.id, 
                             "Hard Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}", 
                             Settings.operation_types.membership_billing_hard_decline, transaction.created_at, transaction.updated_at)
             else
-              add_operation(transaction.created_at, transaction, 
+              add_operation(transaction.created_at, 'Transaction', transaction.id, 
                             "Soft Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}",
                             Settings.operation_types.membership_billing_soft_decline, transaction.created_at, transaction.updated_at)
             end
