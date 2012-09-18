@@ -63,21 +63,22 @@ class Fulfillment < ActiveRecord::Base
 
   def renew!
     if recurrent and membership_billed_recently?
-      if undeliverable?
+      if self.undeliverable?
         self.new_fulfillment('undeliverable')
       else
         self.new_fulfillment
       end
-      self.set_as_canceled! unless self.sent?
+      self.set_as_canceled! unless self.sent? or self.undeliverable?
     end
   end
 
   def new_fulfillment(status = nil)
     if member.can_receive_another_fulfillment?
       f = Fulfillment.new 
-      f.status = status if status.nil?
+      f.status = status unless status.nil?
       f.product_sku = self.product_sku
       f.member_id = self.member_id
+      f.recurrent = true
       f.save
     end
   end
