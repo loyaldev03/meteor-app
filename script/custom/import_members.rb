@@ -120,17 +120,18 @@ def update_members(cid)
             if phoenix_cc.nil?
               @log.info "  * member ##{member.id} does not have Credit Card active"
               new_phoenix_cc.save!
+              set_last_digits(new_phoenix_cc.id)
             elsif phoenix_cc.encrypted_number != member.encrypted_cc_number or 
                   phoenix_cc.expire_month != member.cc_month_exp or 
                   phoenix_cc.expire_year != member.cc_year_exp
 
               phoenix_cc.active = false
               new_phoenix_cc.save!
+              set_last_digits(new_phoenix_cc.id)
               phoenix_cc.save!
-              add_operation(Time.zone.now, 'CreditCard', new_phoenix_cc.id, "Credit card #{new_phoenix_cc.last_digits} added and set active.", nil)
             else
-              # fill_aus_attributes(phoenix_cc, member)
-              # phoenix_cc.save!
+              fill_aus_attributes(phoenix_cc, member)
+              phoenix_cc.save!
             end
           end
           member.update_attribute :imported_at, Time.now.utc
@@ -212,6 +213,7 @@ def add_new_members(cid)
         phoenix_cc = PhoenixCreditCard.new 
         fill_credit_card(phoenix_cc, member, phoenix)
         phoenix_cc.save!
+        set_last_digits(phoenix_cc.id)
 
         member.update_attribute :imported_at, Time.now.utc
         print "."
@@ -226,6 +228,14 @@ def add_new_members(cid)
   end
 end
 
+# the only way I found to set correctly the last digits of the cc number
+def set_last_digits(id)
+  c = PhoenixCreditCard.find id
+  c.last_digits = c.number[-4..-1]
+  c.save
+end
+
+
 def fill_credit_card(phoenix_cc, member, phoenix)
   phoenix_cc.number = CREDIT_CARD_NULL
   if not TEST and not member.encrypted_cc_number.nil?
@@ -233,7 +243,7 @@ def fill_credit_card(phoenix_cc, member, phoenix)
   end
   phoenix_cc.expire_month = member.cc_month_exp
   phoenix_cc.expire_year = member.cc_year_exp
-  # fill_aus_attributes(phoenix_cc, member)
+  fill_aus_attributes(phoenix_cc, member)
   phoenix_cc.member_id = phoenix.uuid
 end
 

@@ -1118,6 +1118,7 @@ USE_MEMBER_LIST = true
 )
 
 
+
 if USE_PROD_DB
 #  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
 #  exit
@@ -1311,11 +1312,7 @@ end
 class PhoenixCreditCard < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "credit_cards"
-  attr_encrypted :number, :key => 'reibel3y5estrada8', :encode => true, :algorithm => 'bf' 
-  before_create :update_last_digits
-  def update_last_digits
-    self.last_digits = self.number.last(4) 
-  end  
+  attr_encrypted :number, :key => 'reibel3y5estrada8', :encode => true, :algorithm => 'bf'
 end
 class PhoenixOperation < ActiveRecord::Base
   establish_connection "phoenix" 
