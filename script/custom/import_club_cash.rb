@@ -9,7 +9,7 @@ ActiveRecord::Base.logger = @log
 
 today = Date.today.year
 
-PhoenixMember.execute_sql "update members set club_cash_amount = 0, club_cash_expire_date = NULL where club_id = #{CLUB}"
+ActiveRecord::Base.connection.execute "update members set club_cash_amount = 0, club_cash_expire_date = NULL where club_id = #{CLUB}"
 
 PhoenixMember.where(" status IN ('provisional', 'active') ").find_in_batches do |group|
   puts "cant #{group.count}"
