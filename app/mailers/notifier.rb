@@ -3,28 +3,23 @@ class Notifier < ActionMailer::Base
   #default bcc: "platformadmins@xagax.com"
   
   def prebill_renewal(email)
-    email = nil
-    mail :to => email, :subject => "Renewal Pre bill email"
+    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "Renewal Pre bill email to #{email}"
   end
 
   def pre_bill(email)
-    email = nil
-    mail :to => email, :subject => "Pre bill email"
+    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "Pre bill email to #{email}"
   end
 
   def cancellation(email)
-    email = nil
-    mail :to => email, :subject => "cancellation"
+    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "cancellation to #{email}"
   end
 
   def active(email)
-    email = nil
-    mail :to => email, :subject => "active"
+    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "active to #{email}"
   end
 
   def refund(email)
-    email = nil
-    mail :to => email, :subject => "refund"
+    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "refund to #{email}"
   end
 
   def active_with_approval(agent,member)
