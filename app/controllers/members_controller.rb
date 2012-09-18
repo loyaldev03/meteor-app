@@ -200,6 +200,7 @@ class MembersController < ApplicationController
     end
   end
 
+  # FIXME: we dont have to use  ClubCashTransaction here. We should use the add_club_cash method from member
   def add_club_cash
     if request.post?
       cct = ClubCashTransaction.new(params[:club_cash_transaction])
@@ -215,7 +216,6 @@ class MembersController < ApplicationController
     end
   end
 
-  # TODO: show message in flash
   def approve
     if @current_member.can_be_approved?
       @current_member.set_as_provisional!
@@ -227,7 +227,6 @@ class MembersController < ApplicationController
     redirect_to show_member_path
   end
 
-  # TODO: show message in flash
   def reject
     if @current_member.can_be_rejected?
       @current_member.set_as_canceled!
@@ -236,7 +235,7 @@ class MembersController < ApplicationController
     else
       flash[:error] = "Member cannot be rejected. It must be applied."
     end
-      redirect_to show_member_path  
+    redirect_to show_member_path  
   end
 
   def login_as_member

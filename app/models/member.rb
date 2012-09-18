@@ -323,8 +323,7 @@ class Member < ActiveRecord::Base
             trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
             answer = trans.process
             if trans.success?
-              # club_cash_expire_date will be nil if we did not set club cash on enrollment because of a PTX.
-              assign_club_cash! if self.club_cash_expire_date.nil?
+              assign_club_cash!
               set_as_active!
               schedule_renewal
               message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
@@ -452,7 +451,6 @@ class Member < ActiveRecord::Base
       end
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
-      assign_club_cash! if trans
 
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
@@ -532,32 +530,35 @@ class Member < ActiveRecord::Base
 
   ##################### Club cash ####################################
 
-  # Resets member club cash in case of a cancelation. It calls "add_club_cash" method
+  # Resets member club cash in case of a cancelation.
   def nillify_club_cash
-    add_club_cash(nil, -club_cash_amount.to_i, 'Removing club cash because of member cancellation') unless club_cash_amount.to_f == 0.0
+    add_club_cash(nil, -club_cash_amount.to_i, 'Removing club cash because of member cancellation')
     self.club_cash_expire_date = nil
     self.save(:validate => false)
   end
 
-  # Resets member club cash in case the club cash has expired. It calls "add_club_cash" method
+  # Resets member club cash in case the club cash has expired.
   def reset_club_cash
-    add_club_cash(nil, -club_cash_amount.to_i, 'Removing expired club cash.') unless club_cash_amount.to_i == 0
-    assign_club_cash!('Renewing club cash.')
+    add_club_cash(nil, -club_cash_amount.to_i, 'Removing expired club cash.')
+    self.club_cash_expire_date = self.club_cash_expire_date + 12.months
+    self.save(:validate => false)
   end
 
-  # Adds club cash when enrolling. It calls "add_club_cash" method
-  def assign_club_cash!(message = "Adding club cash on new enrollment.")
+  # Adds club cash when membership billing is success.
+  def assign_club_cash!(message = "Adding club cash after billing")
     amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
     self.add_club_cash(nil, amount, message)
-    self.club_cash_expire_date = self.join_date + 1.year
+    if self.club_cash_expire_date.nil? # first club cash assignment
+      self.club_cash_expire_date = self.join_date + 1.year
+    end
     self.save(:validate => false)
   end
   
   # Adds club cash transaction. 
-  def add_club_cash(agent,amount = 0,description = nil)
+  def add_club_cash(agent, amount = 0,description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
     if amount.to_i == 0
-      answer[:message] = "Cannot add 0 amount. Please add an amount."
+      answer[:message] = "Can not process club cash transaction with amount 0."
     elsif (amount.to_i < 0 and amount.to_i.abs <= self.club_cash_amount.to_i) or amount.to_i > 0
       ClubCashTransaction.transaction do 
         begin
@@ -565,10 +566,9 @@ class Member < ActiveRecord::Base
           cct.member = self
           if cct.valid? 
             cct.save!
-            self.club_cash_amount = self.club_cash_amount + amount.to_f
+            self.club_cash_amount = self.club_cash_amount + amount.to_i
             self.save!
-            message = "#{cct.amount.to_i.abs} club cash was successfully #{ amount.to_i >= 0 ? 'added' : 'deducted' }!"
-            # TODO: club cash amount tiene que tener un tipo de operación.
+            message = "#{cct.amount.to_i.abs} club cash was successfully #{ amount.to_i >= 0 ? 'added' : 'deducted' }"
             if amount.to_i > 0
               Auditory.audit(agent, cct, message, self, Settings.operation_types.add_club_cash)
             elsif amount.to_i < 0 and amount.to_i.abs == club_cash_amount 
