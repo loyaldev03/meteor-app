@@ -150,7 +150,7 @@ class MemberTest < ActiveSupport::TestCase
   test "Should reset club_cash when member is canceled" do
     member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club, :club_cash_amount => 200)
     member.set_as_canceled
-    assert_equal 0, member.club_cash_amount, "The member is #{member.status} with $#{member.club_cash_amount}"
+    assert_equal 0, member.club_cash_amount, "The member is #{member.status} with #{member.club_cash_amount}"
   end
 
   test "Canceled member should have cancel date set " do
