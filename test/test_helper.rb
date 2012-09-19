@@ -90,10 +90,42 @@ module ActionController
       evaluate_script("window.alert = function(msg) { return true; }")
     end
 
+    def create_member_by_sloop(agent, member, credit_card, enrollment_info, terms_of_membership)
+      ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
+        Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
+                                        :auth_code => '111', :duplicate => false, 
+                                        :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
+            ) 
+      )
+      post( api_members_url , { member: {:first_name => member.first_name, 
+                                :last_name => member.last_name,
+                                :address => member.address,
+                                :gender => 'M',
+                                :city => member.city, 
+                                :zip => member.zip,
+                                :state => member.state,
+                                :email => member.email,
+                                :country => member.country,
+                                :type_of_phone_number => member.type_of_phone_number,
+                                :phone_country_code => member.phone_country_code,
+                                :phone_area_code => member.phone_area_code,
+                                :phone_local_number => member.phone_local_number,
+                                :enrollment_amount => 34.34,
+                                :terms_of_membership_id => terms_of_membership.id,
+                                :birth_date => member.birth_date,
+                                :credit_card => {:number => credit_card.number,
+                                                 :expire_month => credit_card.expire_month,
+                                                 :expire_year => credit_card.expire_year },
+                                enrollment_info: enrollment_info.attributes,
+                                },
+                                :api_key => agent.authentication_token, :format => :json})
+      assert_response :success
+    end
+
 
     teardown do
       DatabaseCleaner.clean
-      Capybara.reset_sessions!
+      Capybara.reset_sessions!  
       Capybara.use_default_driver
     end
   end

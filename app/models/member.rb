@@ -558,7 +558,7 @@ class Member < ActiveRecord::Base
   def add_club_cash(agent, amount = 0,description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
     if amount.to_i == 0
-      answer[:message] = "Can not process club cash transaction with amount 0."
+      answer[:message] = "Can not process club cash transaction with amount 0, values with commas, or letters."
     elsif (amount.to_i < 0 and amount.to_i.abs <= self.club_cash_amount.to_i) or amount.to_i > 0
       ClubCashTransaction.transaction do 
         begin
