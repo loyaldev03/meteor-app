@@ -1118,10 +1118,6 @@ USE_MEMBER_LIST = true
 )
 
 
-@cids = %w(
-1797
-)
-
 
 if USE_PROD_DB
 #  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
@@ -1231,30 +1227,35 @@ class PhoenixMember < ActiveRecord::Base
 
     if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
     elsif p.size == 7  || p.size == 8 || p.size == 6
-      phone_country_code = '1'
-      phone_local_number = p
+      self.phone_country_code = '1'
+      self.phone_local_number = p
     elsif p.size >= 20
-      phone_country_code = '1'
-      phone_area_code = p[0..2]
-      phone_local_number = p[3..9]
+      self.phone_country_code = '1'
+      self.phone_area_code = p[0..2]
+      self.phone_local_number = p[3..9]
     elsif p.size == 10 || p.size == 9
-      phone_country_code = '1'
-      phone_area_code = p[0..2]
-      phone_local_number = p[3..-1]
+      self.phone_country_code = '1'
+      self.phone_area_code = p[0..2]
+      self.phone_local_number = p[3..-1]
     elsif p.size == 11
-      phone_country_code = p[0..0]
-      phone_area_code = p[1..3]
-      phone_local_number = p[4..-1]
+      self.phone_country_code = p[0..0]
+      self.phone_area_code = p[1..3]
+      self.phone_local_number = p[4..-1]
     elsif p.size == 12
-      phone_country_code = p[0..1]
-      phone_area_code = p[2..4]
-      phone_local_number = p[5..-1]
+      self.phone_country_code = p[0..1]
+      self.phone_area_code = p[2..4]
+      self.phone_local_number = p[5..-1]
     elsif p.size == 13
-      phone_country_code = p[0..1]
-      phone_area_code = p[2..5]
-      phone_local_number = p[6..-1]
+      self.phone_country_code = p[0..1]
+      self.phone_area_code = p[2..5]
+      self.phone_local_number = p[6..-1]
+    elsif 
+      num = p.split('ext')[0]
+      self.phone_country_code = p[0..1]
+      self.phone_area_code = p[2..5]
+      self.phone_local_number = p[6..-1]
     else
-      # raise "Dont know how to parse -#{p}-"
+      #raise "Dont know how to parse -#{p}-"
     end
   end
 end
@@ -1274,33 +1275,33 @@ class PhoenixProspect < ActiveRecord::Base
 
     if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
     elsif p.size == 7  || p.size == 8 || p.size == 6
-      phone_country_code = '1'
-      phone_local_number = p
+      self.phone_country_code = '1'
+      self.phone_local_number = p
     elsif p.size >= 20
-      phone_country_code = '1'
-      phone_area_code = p[0..2]
-      phone_local_number = p[3..9]
+      self.phone_country_code = '1'
+      self.phone_area_code = p[0..2]
+      self.phone_local_number = p[3..9]
     elsif p.size == 10 || p.size == 9
-      phone_country_code = '1'
-      phone_area_code = p[0..2]
-      phone_local_number = p[3..-1]
+      self.phone_country_code = '1'
+      self.phone_area_code = p[0..2]
+      self.phone_local_number = p[3..-1]
     elsif p.size == 11
-      phone_country_code = p[0..0]
-      phone_area_code = p[1..3]
-      phone_local_number = p[4..-1]
+      self.phone_country_code = p[0..0]
+      self.phone_area_code = p[1..3]
+      self.phone_local_number = p[4..-1]
     elsif p.size == 12
-      phone_country_code = p[0..1]
-      phone_area_code = p[2..4]
-      phone_local_number = p[5..-1]
+      self.phone_country_code = p[0..1]
+      self.phone_area_code = p[2..4]
+      self.phone_local_number = p[5..-1]
     elsif p.size == 13
-      phone_country_code = p[0..1]
-      phone_area_code = p[2..5]
-      phone_local_number = p[6..-1]
+      self.phone_country_code = p[0..1]
+      self.phone_area_code = p[2..5]
+      self.phone_local_number = p[6..-1]
     elsif 
       num = p.split('ext')[0]
-      phone_country_code = p[0..1]
-      phone_area_code = p[2..5]
-      phone_local_number = p[6..-1]
+      self.phone_country_code = p[0..1]
+      self.phone_area_code = p[2..5]
+      self.phone_local_number = p[6..-1]
     else
       raise "Dont know how to parse -#{p}-"
     end

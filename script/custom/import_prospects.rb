@@ -66,6 +66,7 @@ ActiveRecord::Base.logger = @log
         # TODO: 
         # phoenix.gender = @campaign.product_sku
         phoenix.save!
+
         prospect.update_attribute :imported_at, Time.now.utc
         print "."
       rescue Exception => e
