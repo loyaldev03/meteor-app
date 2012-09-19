@@ -51,7 +51,7 @@ def add_enrollment_info(phoenix, member, campaign = nil)
   e_info.referral_host = campaign.referral_host
   e_info.landing_url = campaign.landing_url
   e_info.terms_of_membership_id = phoenix.terms_of_membership_id
-  # e_info.preferences
+  e_info.preferences = {}.to_json
   # e_info.preferences.each do |key, value|
   #   pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(phoenix.id, phoenix.club_id, key)
   #   pref.value = value

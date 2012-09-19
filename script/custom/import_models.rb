@@ -1118,6 +1118,10 @@ USE_MEMBER_LIST = true
 )
 
 
+@cids = %w(
+1797
+)
+
 
 if USE_PROD_DB
 #  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
@@ -1200,8 +1204,6 @@ class ProspectProspect < ActiveRecord::Base
   establish_connection "prospect" 
   self.table_name = "prospects" 
   self.record_timestamps = false
-  serialize :preferences, JSON
-  serialize :referral_parameters, JSON
 
   def email_to_import
     TEST ? "test#{member.id}@xagax.com" : email
@@ -1214,8 +1216,6 @@ class PhoenixMember < ActiveRecord::Base
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 
-  serialize :preferences, JSON
-
   def self.cohort_formula(join_date, enrollment_info, time_zone, installment_type)
     [ join_date.to_time.in_time_zone(time_zone).year.to_s, 
       "%02d" % join_date.to_time.in_time_zone(time_zone).month.to_s, 
@@ -1225,7 +1225,7 @@ class PhoenixMember < ActiveRecord::Base
   end 
 
   def phone_number=(phone)
-    return nil if phone.nil?
+    return if phone.nil?
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.\[\]+]/, '')
     p = p.split('ext')[0] if p.split('ext').size == 2
 
@@ -1254,7 +1254,7 @@ class PhoenixMember < ActiveRecord::Base
       phone_area_code = p[2..5]
       phone_local_number = p[6..-1]
     else
-      raise "Dont know how to parse -#{p}-"
+      # raise "Dont know how to parse -#{p}-"
     end
   end
 end
@@ -1265,13 +1265,10 @@ class PhoenixProspect < ActiveRecord::Base
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 
-  serialize :preferences, JSON
-  serialize :referral_parameters, JSON
-
 # 3304940833ext412
 
   def phone_number=(phone)
-    return nil if phone.nil?
+    return if phone.nil?
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.\[\]+]/, '')
     p = p.split('ext')[0] if p.split('ext').size == 2
 

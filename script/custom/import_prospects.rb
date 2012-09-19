@@ -61,8 +61,9 @@ ActiveRecord::Base.logger = @log
           phoenix.mega_channel.to_s.strip, 
           phoenix.campaign_medium.to_s.strip, tom.installment_type ].join('-').downcase
 
+        phoenix.preferences = { :old_id => prospect.id }.to_json
+        phoenix.referral_parameters = {}.to_json
         # TODO: 
-        # phoenix.preferences = { :fav_driver => prospect.fav_driver }
         # phoenix.gender = @campaign.product_sku
         phoenix.save!
         prospect.update_attribute :imported_at, Time.now.utc
