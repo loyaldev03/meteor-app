@@ -209,11 +209,8 @@ namespace :members do
   task :process_fulfillments => :environment do
     tall = Time.zone.now
     begin
-      Fulfillment.find_in_batches(:conditions => [
-          " date(renewable_at) <= ? AND fulfillments.status IN (?) AND recurrent = true AND renewed = false ", 
-          Time.zone.now.to_date, ['sent', 'undeliverable'] ]) do |group|
+      Fulfillment.to_be_renewed.find_in_batches do |group|
         group.each do |fulfillment| 
-          tz = Time.zone.now
           begin
             Rails.logger.info "  * processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
             fulfillment.renew!
@@ -221,7 +218,6 @@ namespace :members do
             Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for fulfillment ##{fulfillment.id}"
         end
       end
     ensure

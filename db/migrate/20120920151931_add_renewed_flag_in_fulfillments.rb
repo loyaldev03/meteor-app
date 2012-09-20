@@ -1,5 +1,5 @@
 class AddRenewedFlagInFulfillments < ActiveRecord::Migration
   def change
-    add_column :fulfillments, :renewed, :default => false
+    add_column :fulfillments, :renewed, :boolean, :default => false
   end
 end

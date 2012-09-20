@@ -17,9 +17,11 @@ class Fulfillment < ActiveRecord::Base
   scope :where_processing, lambda { where("status = 'processing'") }
   scope :where_not_processed, lambda { where("status = 'not_processed'") }
   scope :where_cancellable, lambda { where("status IN ('not_processed','processing','out_of_stock','undeliverable')") }
-  scope :type_card, lambda{ where("product_sku = 'CARD'")}
-  scope :type_kit, lambda{ where("product_sku = 'KIT'")}
-  scope :type_others, lambda{ where("product_sku NOT IN ('KIT','CARD')")}
+  scope :type_card, lambda { where("product_sku = 'CARD'")}
+  scope :type_kit, lambda { where("product_sku = 'KIT'")}
+  scope :type_others, lambda { where("product_sku NOT IN ('KIT','CARD')")}
+
+  scope :to_be_renewed, lambda { where(" date(renewable_at) <= '#{Time.zone.now.to_date}' AND fulfillments.status NOT IN ('canceled', 'processing') AND recurrent = true AND renewed = false ") }
 
   delegate :club, :to => :member
 
@@ -75,7 +77,11 @@ class Fulfillment < ActiveRecord::Base
 
   def new_fulfillment(status = nil)
     f = Fulfillment.new 
-    f.status = status unless status.nil?
+    if status.nil?
+      f.set_as_not_processed!
+    else
+      f.status = status 
+    end
     f.product_sku = self.product_sku
     f.member_id = self.member_id
     f.recurrent = true
@@ -153,7 +159,9 @@ class Fulfillment < ActiveRecord::Base
     def set_default_values
       self.assigned_at = Time.zone.now
       # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
-      self.renewable_at = self.assigned_at + 1.year if self.recurrent
+      if self.recurrent and self.renewable_at.nil?
+        self.renewable_at = self.assigned_at + 1.year 
+      end
       self.tracking_code = self.product_sku + self.member.visible_id.to_s
     end
 

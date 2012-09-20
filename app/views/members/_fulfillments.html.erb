@@ -3,6 +3,7 @@
   <thead>
       <th> <%= t('activerecord.attributes.fulfillment.asigned_at') %> </th>
   	  <th> <%= t('activerecord.attributes.fulfillment.product') %> </th>
+      <th> <%= t('activerecord.attributes.fulfillment.renewed') %> </th>   
   	  <th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>   
       <th> <%= t('activerecord.attributes.fulfillment.status') %> </th> 
   	  <th> <%= t('actions') %> </th>    
@@ -18,7 +19,8 @@
        		 <% end %> >
         <td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
         <td> <%= fulfillment.product_sku %> </td>
-        <td> <%= I18n.l fulfillment.renewable_at, :format => :long unless fulfillment.renewable_at.nil? %> </td>
+        <td> <%= fulfillment.recurrent ? (fulfillment.renewed ? 'Yes' : 'No') : '-' %> </td>
+        <td> <%= fulfillment.renewable_at.nil? ? '-' : I18n.l(fulfillment.renewable_at, :format => :long) %> </td>
         <td> <%= fulfillment.status %> </td>
         <td NOWRAP>
           <%= render :partial => "shared/fulfillment_actions", :locals => {:fulfillment => fulfillment, :member_show => true} %>

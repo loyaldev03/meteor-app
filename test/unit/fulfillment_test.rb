@@ -17,23 +17,54 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert member.can_receive_another_fulfillment?
   end
 
-  test "fulfillment" do 
-    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    assert_difference('Fulfillment.count') do  
-      fulfillment = FactoryGirl.build(:fulfillment)
-      fulfillment.member = member
-      fulfillment.save
-      fulfillment.renew!
-    end
-  end
-
-  test "Archived fulfillment cant be archived again or opened." do 
+  test "fulfillment not_processed renewal" do 
     member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
+    fulfillment.renewable_at = Time.zone.now - 3.days
+    fulfillment.recurrent = true
+    fulfillment.save
+    assert_equal Fulfillment.to_be_renewed.count, 1
+    assert_difference('Fulfillment.count') do  
+      fulfillment.renew!
+      assert_equal fulfillment.renewed, true
+    end
+    assert_no_difference('Fulfillment.count') do  
+      fulfillment.renew!
+    end
+    assert_equal Fulfillment.to_be_renewed.count, 0
+  end
+
+  test "fulfillment processing cant be renewed" do 
+    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    fulfillment = FactoryGirl.build(:fulfillment)
+    fulfillment.member = member
+    fulfillment.renewable_at = Time.zone.now - 3.days
+    fulfillment.recurrent = true
     fulfillment.save
     fulfillment.set_as_processing!
-    assert_raise(StateMachine::InvalidTransition){ fulfillment.set_as_processing! }
+    assert_equal Fulfillment.to_be_renewed.count, 0
+  end
+
+
+  test "fulfillment sent renewal" do 
+    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    fulfillment = FactoryGirl.build(:fulfillment)
+    fulfillment.member = member
+    fulfillment.renewable_at = Time.zone.now - 3.days
+    fulfillment.recurrent = true
+    fulfillment.save
+    fulfillment.set_as_processing!
+    fulfillment.set_as_sent!
+    assert_equal Fulfillment.to_be_renewed.count, 1
+    assert_difference('Fulfillment.count') do  
+      fulfillment.renew!
+      assert_equal fulfillment.renewed, true
+    end
+    assert_no_difference('Fulfillment.count') do  
+      fulfillment.renew!
+    end
+    assert_equal Fulfillment.to_be_renewed.count, 0
   end
 
   test "Should send fulfillments on acepted applied member" do
@@ -54,8 +85,9 @@ class FulfillmentTest < ActiveSupport::TestCase
     end
     fulfillment_out_of_stock = Fulfillment.find_by_product_sku('circlet')
     assert_equal fulfillment_out_of_stock.status, 'out_of_stock', "Status is #{fulfillment_out_of_stock.status} should be 'out_of_stock'"
+
     fulfillment_with_stock = Fulfillment.find_by_product_sku('Bracelet')
-    assert_equal fulfillment_with_stock.status, 'not_processed', "Status is #{fulfillment_out_of_stock.status} should be 'out_of_stock'"          
+    assert_equal fulfillment_with_stock.status, 'not_processed', "Status is #{fulfillment_out_of_stock.status} should be 'not_processed'"          
   end
 
   test "Should create new fulfillment with recurrent and renewable_date" do
