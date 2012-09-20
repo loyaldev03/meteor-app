@@ -264,7 +264,7 @@ class Member < ActiveRecord::Base
   # Do we need rules on fulfillment renewal?
   # Add logic here!!!
   def can_receive_another_fulfillment?
-    self.active? or self.provisional?
+    (self.active? or self.provisional?) and membership_billed_recently?
   end
   ###############################################
 
@@ -663,6 +663,11 @@ class Member < ActiveRecord::Base
   end
 
   private
+    # TODO: finish this logic
+    def membership_billed_recently?
+      true
+    end
+
     def set_status_on_enrollment!(agent, trans, amount, info)
       operation_type = Settings.operation_types.enrollment_billing
       description = 'enrolled'

@@ -1118,7 +1118,6 @@ USE_MEMBER_LIST = true
 )
 
 
-
 if USE_PROD_DB
 #  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
 #  exit
