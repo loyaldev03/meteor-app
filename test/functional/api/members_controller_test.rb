@@ -19,7 +19,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
@@ -51,10 +51,16 @@ class Api::MembersControllerTest < ActionController::TestCase
                                   :credit_card => {:number => @credit_card.number,
                                                    :expire_month => @credit_card.expire_month,
                                                    :expire_year => @credit_card.expire_year },
-                                  enrollment_info: @enrollment_info.attributes
+                                  :product_sku => enrollment_info.product_sku,
+                                  :product_description => enrollment_info.product_description,
+                                  :mega_channel => enrollment_info.mega_channel,
+                                  :marketing_code => enrollment_info.marketing_code,
+                                  :fulfillment_code => enrollment_info.fulfillment_code,
+                                  :ip_address => enrollment_info.ip_address
                                   },:format => :json})
         assert_response :success
       end
+
     end
 
   end
@@ -63,7 +69,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.build :member_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    enrollment_info = FactoryGirl.build :enrollment_info
     post( :create, { member: {:first_name => @member.first_name, 
                                 :last_name => @member.last_name,
                                 :address => @member.address,
@@ -83,7 +89,12 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 :credit_card => {:number => @credit_card.number,
                                                  :expire_month => @credit_card.expire_month,
                                                  :expire_year => @credit_card.expire_year },
-                                enrollment_info: @enrollment_info.attributes
+                                :product_sku => enrollment_info.product_sku,
+                                :product_description => enrollment_info.product_description,
+                                :mega_channel => enrollment_info.mega_channel,
+                                :marketing_code => enrollment_info.marketing_code,
+                                :fulfillment_code => enrollment_info.fulfillment_code,
+                                :ip_address => enrollment_info.ip_address
                                 },:format => :json})
     assert_response :unauthorized
   end
@@ -92,7 +103,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @supervisor_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
@@ -121,7 +132,12 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 :credit_card => {:number => @credit_card.number,
                                                  :expire_month => @credit_card.expire_month,
                                                  :expire_year => @credit_card.expire_year },
-                                enrollment_info: @enrollment_info.attributes
+                                :product_sku => enrollment_info.product_sku,
+                                :product_description => enrollment_info.product_description,
+                                :mega_channel => enrollment_info.mega_channel,
+                                :marketing_code => enrollment_info.marketing_code,
+                                :fulfillment_code => enrollment_info.fulfillment_code,
+                                :ip_address => enrollment_info.ip_address
                                 },:format => :json})
       assert_response :unauthorized
     end
@@ -131,7 +147,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @api_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.build :member_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    enrollment_info = FactoryGirl.build :enrollment_info
     post( :create, { member: {:first_name => @member.first_name, 
                                 :last_name => @member.last_name,
                                 :address => @member.address,
@@ -150,7 +166,12 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 :credit_card => {:number => @credit_card.number,
                                                  :expire_month => @credit_card.expire_month,
                                                  :expire_year => @credit_card.expire_year },
-                                enrollment_info: @enrollment_info.attributes
+                                :product_sku => enrollment_info.product_sku,
+                                :product_description => enrollment_info.product_description,
+                                :mega_channel => enrollment_info.mega_channel,
+                                :marketing_code => enrollment_info.marketing_code,
+                                :fulfillment_code => enrollment_info.fulfillment_code,
+                                :ip_address => enrollment_info.ip_address
                                 },:format => :json})
     assert_response :success
   end

@@ -116,7 +116,12 @@ module ActionController
                                 :credit_card => {:number => credit_card.number,
                                                  :expire_month => credit_card.expire_month,
                                                  :expire_year => credit_card.expire_year },
-                                enrollment_info: enrollment_info.attributes,
+                                :product_sku => enrollment_info.product_sku,
+                                :product_description => enrollment_info.product_description,
+                                :mega_channel => enrollment_info.mega_channel,
+                                :marketing_code => enrollment_info.marketing_code,
+                                :fulfillment_code => enrollment_info.fulfillment_code,
+                                :ip_address => enrollment_info.ip_address
                                 },
                                 :api_key => agent.authentication_token, :format => :json})
       assert_response :success

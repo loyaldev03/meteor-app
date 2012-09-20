@@ -6,17 +6,31 @@ FactoryGirl.define do
     stock 10
   end
 
-  factory :product_without_stock, class: Product do
+  factory :product_without_stock_and_not_recurrent, class: Product do
     name "Circlet"
     sku "circlet"
     stock 0
+    recurrent false
   end  	
 
   factory :product_with_recurrent, class: Product do
     name "Kit kard"
     sku "kit-kard"
     recurrent true
-    stock 0
+    stock 10
   end  
 
+  factory :product_without_recurrent, class: Product do
+    name "Kit kard"
+    sku "kit-kard"
+    recurrent false
+    stock 10
+  end  
+
+  factory :product_without_stock_and_recurrent, class: Product do
+    name "Kit kard"
+    sku "kit-kard"
+    recurrent true
+    stock 0
+  end  
 end
