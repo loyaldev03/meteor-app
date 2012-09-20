@@ -101,7 +101,7 @@ class CreditCard < ActiveRecord::Base
       else
         new_year_exp=Time.zone.now.year
       end
-      return new_active_credit_card(acc, new_year_exp) || acc
+      return CreditCard.new_expiration_on_active_credit_card(acc, new_year_exp) || acc
     end
     acc
   end
