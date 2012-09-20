@@ -53,6 +53,7 @@ class Admin::PartnersController < ApplicationController
       redirect_to admin_partners_url, notice: "Partner #{@partner.prefix} was successfully destroyed"
     else
       flash[:error] = "Partner #{@partner.prefix} was not destroyed."
+      redirect_to admin_partners_url
     end
   end
 

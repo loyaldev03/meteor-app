@@ -54,6 +54,7 @@ class ClubsController < ApplicationController
       redirect_to clubs_url, notice: "Club #{@club.name} was successfully destroyed"
     else
       flash[:error] = "Club #{@club.name} was not destroyed."
-    end
+      redirect_to clubs_url
+    end 
   end
 end

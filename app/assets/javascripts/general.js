@@ -271,6 +271,10 @@ $(document).ready( function() {
             alert (data.message);
             if (data.code == 000)
               window.location.replace('../'+visible_id);
+            else{
+              $("#error").empty();
+              $("#error").append("<p>"+data.message+"</p>");
+            }
           },
         });
     });

@@ -3,12 +3,13 @@
 <%= form_tag(member_add_club_cash_path) do %> 
   <table class="table table-condensed table-bordered">
     <tr> 
-      <td >
-        <div class="input-prepend input-append">  
+      <td>
+        <div class="input-prepend input-append" style="float:left; width:25%">  
 	      <%= t('activerecord.attributes.club_cash_transaction.amount') %>
 	      <%= text_field nil, :amount, 
             :value => (params[:club_cash_transaction][:amount] if params[:club_cash_transaction]) %>
       	</div>
+        <div id="error" style="float:right; width:75%"></div>
       </td>
     </tr>
     <tr> 
@@ -23,7 +24,6 @@
     </tr>
   </table>
 <% end %>
-
 
 <script>
   var member_id = "<%= @current_member.id %>"; 

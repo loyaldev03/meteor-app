@@ -15,9 +15,8 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
     Time.zone = @club.time_zone
+    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @communication_type = FactoryGirl.create(:communication_type)
-    @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
     
     @saved_member = FactoryGirl.create(:active_member, 
@@ -86,5 +85,155 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
   end
 
+  test "invalid characters on club cash" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Add club cash'
 
+    fill_in '[amount]', :with => "random text"
+    alert_ok_js
+    click_on 'Save club cash transaction'
+
+    wait_until{
+      assert page.has_content?('Can not process club cash transaction with amount 0, values with commas, or letters.')
+    }
+  end
+
+  test "add club cash with ammount 0" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Add club cash'
+
+    fill_in '[amount]', :with => "0"
+    alert_ok_js
+    click_on 'Save club cash transaction'
+
+    wait_until{
+      assert page.has_content?('Can not process club cash transaction with amount 0, values with commas, or letters.')
+    }
+  end
+
+  test "add club cash with float ammount" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Add club cash'
+    fill_in '[amount]', :with => "0.99"
+    alert_ok_js
+    click_on 'Save club cash transaction'
+
+    wait_until{
+      assert page.has_content?('Can not process club cash transaction with amount 0, values with commas, or letters.')
+    }
+
+  end
+
+  test "create member with terms_of_membership without club cash" do
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @partner = FactoryGirl.create(:partner)
+    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id, :name => 'club_testing_')
+    Time.zone = @club.time_zone
+    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_without_club_cash, :club_id => @club.id)
+    FactoryGirl.create(:batch_agent)
+
+    @saved_member = FactoryGirl.create(:active_member, 
+      :club_id => @club.id, 
+      :terms_of_membership => @terms_of_membership_with_gateway,
+      :created_by => @admin_agent)
+    @saved_member.reload
+
+    sign_in_as(@admin_agent)
+    @saved_member.bill_membership
+    sleep(3) #To wait until billing is finished.
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+  
+    within("#operations_table")do
+      wait_until{
+        assert page.has_no_content?('0 club cash was successfully added')
+      }
+    end
+  end
+
+  test "member cancelation must set to 0 the club cash" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Add club cash'
+    fill_in '[amount]', :with => "99"
+    alert_ok_js
+    click_on 'Save club cash transaction'
+
+    within("#table_membership_information"){
+      within("#td_mi_club_cash_amount"){
+        wait_until{
+          assert page.has_content?('99.0')
+        }
+      }
+    }
+
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within("#table_membership_information"){
+      within("#td_mi_club_cash_amount"){
+        wait_until{
+          assert page.has_content?('0')
+        }
+      }
+    }
+  end 
+
+  test "member cancelation must set club cash expired day as nil" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Add club cash'
+    fill_in '[amount]', :with => "99"
+    alert_ok_js
+    click_on 'Save club cash transaction'
+
+    within("#table_membership_information"){
+      within("#td_mi_club_cash_amount"){
+        wait_until{
+          assert page.has_content?('99.0')
+        }
+      }
+    }
+
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within("#table_membership_information"){
+      within("#td_mi_club_cash_expire_date"){
+        wait_until{
+          assert page.has_content?('')
+        }
+      }
+    }
+  end
+
+  test "set club cash expire date on member created by sloop once it is billed" do
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @partner = FactoryGirl.create(:partner)
+    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id, :name => 'dasd')
+    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build(:enrollment_info)
+    
+    create_member_by_sloop(@admin_agent, @member, @credit_card, @enrollment_info, @terms_of_membership_with_gateway)
+
+    sign_in_as @admin_agent
+    @saved_member = Member.find_by_email(@member.email)
+    @saved_member.bill_membership
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+    }
+    @saved_member.reload
+    within("#table_membership_information"){
+      within("#td_mi_club_cash_expire_date"){
+        wait_until{
+          assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
+        }
+      }
+    }
+  end
 end
