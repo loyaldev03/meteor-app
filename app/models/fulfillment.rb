@@ -77,15 +77,12 @@ class Fulfillment < ActiveRecord::Base
 
   def new_fulfillment(status = nil)
     f = Fulfillment.new 
-    if status.nil?
-      f.set_as_not_processed!
-    else
-      f.status = status 
-    end
+    f.status = status  unless status.nil?
     f.product_sku = self.product_sku
     f.member_id = self.member_id
     f.recurrent = true
     f.save
+    f.set_as_not_processed! if status.nil?
   end
 
   def validate_stock

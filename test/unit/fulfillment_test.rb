@@ -19,6 +19,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "fulfillment not_processed renewal" do 
     member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member.reload
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
     fulfillment.renewable_at = Time.zone.now - 3.days
@@ -37,6 +38,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "fulfillment processing cant be renewed" do 
     member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member.reload
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
     fulfillment.renewable_at = Time.zone.now - 3.days
@@ -49,6 +51,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "fulfillment sent renewal" do 
     member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member.reload
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
     fulfillment.renewable_at = Time.zone.now - 3.days
