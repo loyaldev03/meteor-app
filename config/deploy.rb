@@ -21,8 +21,10 @@ set :campfire_options, :account => 'stoneacreinc',
 
 desc "Link config files."
 task :link_config_files do
+  puts "  * Creating shared symlinks... "
   run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
   run "ln -nfs #{release_path}/doc #{release_path}/public/doc"
+  run "ln -nfs #{shared_path}/assets #{release_path}/public/assets"
   run "if [ -e #{release_path}/rake_task_runner ]; then chmod +x #{release_path}/rake_task_runner; fi"
 end
 
@@ -37,7 +39,7 @@ end
 
 desc "Restart delayed jobs"
 task :restart_delayed_jobs do
-  run "cd #{release_path} && god restart -c /var/www/god_files/delayed_jobs.god #{application}-dj" 
+  run "cd #{release_path} && #{sudo} god restart -c /var/www/god_files/delayed_jobs.god #{application}-dj" 
 end
 
 desc "Notify Campfire room"
@@ -86,7 +88,10 @@ namespace :deploy do
   end
 
   task :migrate, :roles => :web, :except => { :no_release => true } do
-    run "cd #{release_path}; RAILS_ENV='#{stage}' rake db:migrate --trace"
+    run <<-EOF
+      cd #{release_path} &&
+      RAILS_ENV=#{stage} bundle exec rake db:migrate --trace
+    EOF
   end
   # if you're still using the script/reaper helper you will need
   # these http://github.com/rails/irs_process_scripts
@@ -116,6 +121,11 @@ namespace :server_stats do
   task :log_web, :roles  => :web do
     stream "tail -f #{shared_path}/log/#{stage}.log" 
   end
+
+  desc "Show Passenger status" 
+  task :passenger, :roles => :web do
+    run "#{sudo} passenger-status && #{sudo} passenger-memory-stats"
+  end
 end
 
 # taken from https://gist.github.com/1027117
@@ -141,8 +151,32 @@ namespace :foreman do
   end
 end
 
+# taken from http://stackoverflow.com/questions/9016002/speed-up-assetsprecompile-with-rails-3-1-3-2-capistrano-deployment
+task :assets, :roles => :web do
+  run <<-EOF
+    cd #{release_path} &&
+    rm -rf public/assets &&
+    mkdir -p #{shared_path}/assets &&
+    ln -s #{shared_path}/assets public/assets &&
+    export FROM=`[ -f #{current_path}/REVISION ] && (cat #{current_path}/REVISION | perl -pe 's/$/../')` &&
+    export TO=`cat #{release_path}/REVISION` &&
+    echo ${FROM}${TO} &&
+    cd #{shared_path}/cached-copy &&
+    git log ${FROM}${TO} -- app/assets vendor/assets | wc -l | egrep '^0$' ||
+    (
+      echo "Recompiling assets" &&
+      cd #{release_path} &&
+      source .rvmrc &&
+      RAILS_ENV=production bundle exec rake assets:precompile --trace
+    )
+  EOF
+end
+
+
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
 # after "deploy:update", 'envfile', "foreman:restart"
+after "deploy:update_code", "link_config_files"
 after 'deploy:update', 'restart_delayed_jobs', 'notify_campfire'
-before "deploy:assets:precompile", "link_config_files", "bundle_install", "deploy:migrate"
+after "deploy:update", "bundle_install", "deploy:migrate"
+after "deploy:update", "assets"
 after "deploy", "deploy:tag"
