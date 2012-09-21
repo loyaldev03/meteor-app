@@ -27,4 +27,8 @@
       <% end %>
     <% end %>
   <% end %>
+<% elsif fulfillment.sent? %>
+  <% if fulfillment.product_sku == 'KIT' or fulfillment.product_sku == 'CARD' %>
+    <%= link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small" %>
+  <% end %>
 <% end %>

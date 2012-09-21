@@ -427,5 +427,174 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     end
   end
 
+  # TODO: Complete test ... line 52
+  # test "fulfillment record at not_processed status - recurrent true" do
+  #   setup_member(false)
+  #   @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+  #   enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+
+  #   create_member_throught_sloop(enrollment_info)
+  #   sleep(1)
+  #   @saved_member = Member.find_by_email(@member.email)
+
+  #   fulfillment = Fulfillment.last
+  #   assert_equal(fulfillment.member_id, @saved_member.id)
+  #   assert_equal(fulfillment.product_sku, @product.sku)
+  #   assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
+  #   assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
+  #   assert_equal(fulfillment.renewable_at, @saved_member.join_date + 1.year)
+  #   assert_equal(fulfillment.recurrent, true)
+  #   assert_equal(fulfillment.status, 'not_processed')
+
+  #   click_link_or_button("My Clubs")
+  #   within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+  #   wait_until{page.has_content?("Fulfillments")}
+
+  #   within("#fulfillments_table")do
+  #     wait_until{
+  #       assert page.find_field('initial_date_')
+  #       assert page.find_field('end_date_')
+  #       assert page.find_field('status')
+  #       assert page.find_field('_all_times')    
+  #       assert page.find_field('product_type')  
+  #     }
+  #   end
+  # end
+
+  test "dislpay default data on fulfillments index" do
+    setup_member(false)
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+
+    within("#fulfillments_table")do
+      wait_until{
+        assert find_field('initial_date_').value == "#{Date.today-1.week}"
+        assert find_field('end_date_').value == "#{Date.today}"
+        assert page.find_field('status').value == 'not_processed'
+        assert page.find_field('_all_times')   
+        assert page.find_field('product_type')
+      }
+    end
+  end
+
+  test "fulfillment record at processing" do
+    setup_member(false)
+    @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+
+    create_member_throught_sloop(enrollment_info)
+    sleep(1)
+    @saved_member = Member.find_by_email(@member.email)
+
+    fulfillment = Fulfillment.last
+    assert_equal(fulfillment.member_id, @saved_member.id)
+    assert_equal(fulfillment.product_sku, @product.sku)
+    assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
+    assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
+    assert_equal(fulfillment.renewable_at, @saved_member.join_date + 1.year)
+    assert_equal(fulfillment.recurrent, true)
+    assert_equal(fulfillment.status, 'not_processed')
+
+    fulfillment.set_as_processing
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+
+    within("#fulfillments_table")do
+      wait_until{
+        assert page.find_field('initial_date_')
+        assert page.find_field('end_date_')
+        assert page.find_field('status')
+        assert page.find_field('_all_times')    
+        assert page.find_field('product_type')  
+      }
+      check('_all_times')
+      select('processing', :from => 'status')
+      select('Others',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?('processing') 
+      }
+    end
+  end
+
+  test "resend fulfillment with status sent and sku KIT" do
+    setup_member(false)
+    @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
+
+    create_member_throught_sloop(enrollment_info)
+    sleep(1)
+    @saved_member = Member.find_by_email(@member.email)
+
+    fulfillment = Fulfillment.last
+    assert_equal(fulfillment.member_id, @saved_member.id)
+    assert_equal(fulfillment.product_sku, 'KIT')
+    assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
+    assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
+    assert_equal(fulfillment.renewable_at.year, @saved_member.join_date.year + 1)
+    assert_equal(fulfillment.renewable_at.day, @saved_member.join_date.day)
+    assert_equal(fulfillment.recurrent, true)
+    assert_equal(fulfillment.status, 'not_processed')
+
+    fulfillment.set_as_processing
+    fulfillment.set_as_sent
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+
+    within("#fulfillments_table")do
+      wait_until{
+        assert page.find_field('initial_date_')
+        assert page.find_field('end_date_')
+        assert page.find_field('status')
+        assert page.find_field('_all_times')    
+        assert page.find_field('product_type')  
+      }
+      check('_all_times')
+      select('sent', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?('sent') 
+
+        click_link_or_button("Resend")
+        assert page.has_content?("Fulfillment KIT was marked to be delivered next time.")
+      }
+    end
+
+    fulfillment = Fulfillment.last
+    assert_equal(fulfillment.member_id, @saved_member.id)
+    assert_equal(fulfillment.product_sku, 'KIT')
+    assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
+    assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
+    assert_equal(fulfillment.renewable_at, @saved_member.join_date + 1.year)
+    assert_equal(fulfillment.recurrent, true)
+    assert_equal(fulfillment.status, 'not_processed')
+    assert_equal(fulfillment.product.stock,98)
+  end
+
 
 end

@@ -60,6 +60,7 @@ class Club < ActiveRecord::Base
         p.sku = sku
         p.name = sku
         p.stock = 100
+        p.recurrent = true
         p.club_id = self.id
         p.save
       end
