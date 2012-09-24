@@ -273,11 +273,12 @@ class Member < ActiveRecord::Base
       if new_tom_id.to_i == self.terms_of_membership_id.to_i
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
+        old_tom_id = self.terms_of_membership_id
         self.terms_of_membership_id = new_tom_id
         res = enroll(self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
         if res[:code] == Settings.error_codes.success
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
-            "Save the sale from TOMID #{self.terms_of_membership_id} to TOMID #{new_tom_id}", self, Settings.operation_types.save_the_sale)
+            "Save the sale from TOMID #{old_tom_id} to TOMID #{new_tom_id}", self, Settings.operation_types.save_the_sale)
         end
         res
       end

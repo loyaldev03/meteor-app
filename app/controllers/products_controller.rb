@@ -42,7 +42,7 @@ class ProductsController < ApplicationController
     @product = Product.find(params[:id])
     @product.update_product_data_by_params params[:product]
     if @product.save
-      redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully created.' 
+      redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully updated.' 
     else
       render action: "edit"
     end

@@ -479,11 +479,11 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "fulfillment record at processing" do
+  test "fulfillment record at processing + check stock" do
     setup_member(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
-
+    initial_stock = @product.stock
     create_member_throught_sloop(enrollment_info)
     sleep(1)
     @saved_member = Member.find_by_email(@member.email)
@@ -528,6 +528,10 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
         assert page.has_content?('processing') 
       }
     end
+
+    @product.reload
+
+    assert @product.stock == initial_stock-1
   end
 
   test "resend fulfillment with status sent and sku KIT" do

@@ -223,4 +223,25 @@ class AgentsTest < ActionController::IntegrationTest
     assert_equal saved_agent.email, unsaved_agent.email
     assert_equal saved_agent.roles, ['api']
   end
+
+
+
+
+  test "create agent like Administrator, Supervisor and representative" do
+    visit new_admin_agent_path
+    unsaved_agent = FactoryGirl.build(:agent)
+    fill_in 'agent[email]', :with => unsaved_agent.email
+    fill_in 'agent[username]', :with => unsaved_agent.username
+    fill_in 'agent[password]', :with => unsaved_agent.password
+    fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
+    
+    assert_difference('Agent.count') do
+      click_link_or_button 'Create Agent'
+    end
+    
+    assert page.has_content?("Agent was successfully created")
+    
+    
+  end
+
 end
