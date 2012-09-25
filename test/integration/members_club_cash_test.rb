@@ -19,16 +19,22 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
     
-    @saved_member = FactoryGirl.create(:active_member, 
-      :club_id => @club.id, 
+    @saved_member = FactoryGirl.create(:active_member, :club_id => @club.id, 
       :terms_of_membership => @terms_of_membership_with_gateway,
       :created_by => @admin_agent)
-
 		@saved_member.reload
-		
     sign_in_as(@admin_agent)
-   end
+  end
 
+  def create_member_throught_sloop(enrollment_info, terms_of_membership)
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    Time.zone = @club.time_zone
+
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    create_member_by_sloop(@admin_agent, @member, @credit_card, enrollment_info, terms_of_membership)
+    sign_in_as(@admin_agent)
+  end
 
   test "add club cash amount" do
     setup_member
@@ -236,4 +242,185 @@ class MembersClubCashTest < ActionController::IntegrationTest
       }
     }
   end
+
+  test "add club cash with member created by sloop" do
+    @partner = FactoryGirl.create(:partner)
+    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:complete_enrollment_info_with_cero_amount)
+  
+    create_member_throught_sloop(enrollment_info, @terms_of_membership_with_gateway)
+
+    @saved_member = Member.last
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount")do
+        wait_until{
+          assert page.has_content?('0.0')
+        }
+      end
+    end
+    wait_until{ assert @saved_member.club_cash_expire_date == nil }
+
+    @saved_member.bill_membership 
+    wait_until{ assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount ) }
+    @saved_member.reload
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount")do
+        wait_until{
+          assert page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s)
+        }
+      end
+      within("#td_mi_club_cash_expire_date")do
+        wait_until{
+          assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
+        }
+      end
+    end
+  end
+
+  test "add club cash from club cash amount configured in the TOM - Monthly Member" do
+    setup_member
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount")do
+        wait_until{
+          assert page.has_content?('0.0')
+        }
+      end
+    end
+    wait_until{ assert @saved_member.club_cash_expire_date == nil }
+
+    @saved_member.bill_membership 
+    wait_until{ assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount ) }
+    @saved_member.reload
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount")do
+        wait_until{
+          assert page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s)
+        }
+      end
+      within("#td_mi_club_cash_expire_date")do
+        wait_until{
+          assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
+        }
+      end
+    end    
+  end
+
+  test "add club cash from club cash amount configured in the TOM - Yearly Member" do
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @partner = FactoryGirl.create(:partner)
+    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    Time.zone = @club.time_zone
+    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    FactoryGirl.create(:batch_agent)
+    
+    @saved_member = FactoryGirl.create(:active_member, :club_id => @club.id, 
+      :terms_of_membership => @terms_of_membership_with_gateway,
+      :created_by => @admin_agent)
+    @saved_member.reload
+    sign_in_as(@admin_agent)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount")do
+        wait_until{
+          assert page.has_content?('0.0')
+        }
+      end
+    end
+    wait_until{ assert @saved_member.club_cash_expire_date == nil }
+
+    @saved_member.bill_membership 
+    wait_until{ assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount ) }
+    @saved_member.reload
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount")do
+        wait_until{
+          assert page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s)
+        }
+      end
+      within("#td_mi_club_cash_expire_date")do
+        wait_until{
+          assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
+        }
+      end
+    end
+  end
+
+  test "Add club cash from club cash amount configured in the TOM - Yearly and Chapter Member" do
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @partner = FactoryGirl.create(:partner)
+    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    Time.zone = @club.time_zone
+    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    FactoryGirl.create(:batch_agent)
+    
+    @saved_member = FactoryGirl.create(:active_member, :club_id => @club.id, 
+      :terms_of_membership => @terms_of_membership_with_gateway,
+      :created_by => @admin_agent)
+    @saved_member.reload
+    sign_in_as(@admin_agent)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    click_link_or_button('Edit')
+    
+    select('VIP', :from => 'member[member_group_type_id]')
+    alert_ok_js
+    click_link_or_button('Update Member')
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+    }
+    @saved_member.reload
+    @saved_member.bill_membership 
+    wait_until{ assert_equal(@saved_member.club_cash_amount, 200 ) }
+    @saved_member.reload
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount")do
+        wait_until{
+          assert page.has_content?('200.0')
+        }
+      end
+      within("#td_mi_club_cash_expire_date")do
+        wait_until{
+          assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
+        }
+      end
+    end
+  end  
+
+  # FixME : Rake::Task does not work.
+  # test "club cash Renewal" do
+  #   setup_member
+  #   @saved_member.bill_membership
+  #   @saved_member.club_cash_expire_date = Date.today - 1.day
+  #   @saved_member.save
+  #   Rake::Task['members:process_club_cash'].invoke
+  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+  
+  #   sleep(50)
+  # end
+
 end
+
