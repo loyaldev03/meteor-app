@@ -200,22 +200,6 @@ class MembersController < ApplicationController
     end
   end
 
-  # FIXME: we dont have to use  ClubCashTransaction here. We should use the add_club_cash method from member
-  def add_club_cash
-    if request.post?
-      cct = ClubCashTransaction.new(params[:club_cash_transaction])
-      cct.member_id = @current_member
-      if cct.save
-        message = "Club cash transaction done!. Amount: #{cct.amount}"
-        Auditory.audit(@current_agent, cct, message, @current_member)
-        flash[:notice] = message
-        redirect_to show_member_path
-      else
-        flash.now[:error] = "Could not save club cash transaction: #{cct.error_to_s}"
-      end
-    end
-  end
-
   def approve
     if @current_member.can_be_approved?
       @current_member.set_as_provisional!

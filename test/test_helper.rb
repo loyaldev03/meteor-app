@@ -9,6 +9,7 @@ require 'capybara/rails'
 require 'capybara/dsl'
 require 'database_cleaner'
 require 'mocha'
+require 'rake'
 
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
@@ -110,7 +111,7 @@ module ActionController
                                 :phone_country_code => member.phone_country_code,
                                 :phone_area_code => member.phone_area_code,
                                 :phone_local_number => member.phone_local_number,
-                                :enrollment_amount => 34.34,
+                                :enrollment_amount => enrollment_info.enrollment_amount,
                                 :terms_of_membership_id => terms_of_membership.id,
                                 :birth_date => member.birth_date,
                                 :credit_card => {:number => credit_card.number,
