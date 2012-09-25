@@ -197,7 +197,7 @@ test:
 
 production:
   <<: *defaults
-  call_these_members_recipients: 'jelwood@stoneacreinc.com,jsmith@stoneacreinc.com'
+  call_these_members_recipients: 'rmosher@stoneacreinc.com,wbryant@stoneacreinc.com,mfulginiti@stoneacreinc.com,kflynn@stoneacreinc.com,jsmith@stoneacreinc.com'
   mes_report_service:
     user: Stoneacrereports
     password: Letmein123
