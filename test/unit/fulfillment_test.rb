@@ -8,7 +8,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   def setup_products 
     @product_with_stock = FactoryGirl.create(:product, club_id: @terms_of_membership_with_gateway.club.id)
-    @product_without_stock = FactoryGirl.create(:product_without_stock, club_id: @terms_of_membership_with_gateway.club.id)
+    @product_without_stock = FactoryGirl.create(:product_without_stock_and_not_recurrent, club_id: @terms_of_membership_with_gateway.club.id)
     @product_recurrent = FactoryGirl.create(:product_with_recurrent, club_id: @terms_of_membership_with_gateway.club.id)
   end
 

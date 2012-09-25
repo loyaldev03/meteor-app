@@ -596,5 +596,378 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal(fulfillment.product.stock,98)
   end
 
+  test "resend fulfillment with status sent and sku CARD" do
+    setup_member(false)
+    @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'CARD')
 
+    create_member_throught_sloop(enrollment_info)
+    sleep(1)
+    @saved_member = Member.find_by_email(@member.email)
+
+    fulfillment = Fulfillment.last
+    assert_equal(fulfillment.member_id, @saved_member.id)
+    assert_equal(fulfillment.product_sku, 'CARD')
+    assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
+    assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
+    assert_equal(fulfillment.renewable_at.year, @saved_member.join_date.year + 1)
+    assert_equal(fulfillment.renewable_at.day, @saved_member.join_date.day)
+    assert_equal(fulfillment.recurrent, true)
+    assert_equal(fulfillment.status, 'not_processed')
+
+    fulfillment.set_as_processing
+    fulfillment.set_as_sent
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+
+    within("#fulfillments_table")do
+      wait_until{
+        assert page.find_field('initial_date_')
+        assert page.find_field('end_date_')
+        assert page.find_field('status')
+        assert page.find_field('_all_times')    
+        assert page.find_field('product_type')  
+      }
+      check('_all_times')
+      select('sent', :from => 'status')
+      select('Card',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?('sent') 
+
+        click_link_or_button("Resend")
+        assert page.has_content?("Fulfillment CARD was marked to be delivered next time.")
+      }
+    end
+
+    fulfillment = Fulfillment.last
+    assert_equal(fulfillment.member_id, @saved_member.id)
+    assert_equal(fulfillment.product_sku, 'CARD')
+    assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
+    assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
+    assert_equal(fulfillment.renewable_at, @saved_member.join_date + 1.year)
+    assert_equal(fulfillment.recurrent, true)
+    assert_equal(fulfillment.status, 'not_processed')
+    assert_equal(fulfillment.product.stock,98)
+  end
+
+  test "fulfillment record at Processing" do
+    setup_member(false)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
+
+    create_member_throught_sloop(enrollment_info)
+    sleep(1)
+    @saved_member = Member.find_by_email(@member.email)
+
+    @saved_member.fulfillments.each do |fulfillment|
+      fulfillment.set_as_processing
+    end
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    fulfillment = Fulfillment.find_by_product_sku('KIT')
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('processing', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?('processing') 
+        assert page.has_selector?('#mark_as_sent')
+        assert page.has_selector?('#set_as_wrong_address')
+
+        click_link_or_button('Set as wrong address')
+        wait_until{ page.has_selector?('#reason') }
+        fill_in 'reason', :with => 'spam'
+        confirm_ok_js
+        click_link_or_button('Set wrong address')
+        wait_until{ page.has_content?("#{fulfillment.member.full_address} is undeliverable. Reason: spam")}
+      }
+    end
+  end
+  
+  test "mark sent fulfillment at processing status" do
+    setup_member(false)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
+
+    create_member_throught_sloop(enrollment_info)
+    sleep(1)
+    @saved_member = Member.find_by_email(@member.email)
+
+    fulfillment = Fulfillment.find_by_product_sku('KIT')
+    fulfillment.set_as_processing
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('processing', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?('processing') 
+        assert page.has_selector?('#mark_as_sent')
+        assert page.has_selector?('#set_as_wrong_address')
+
+        click_link_or_button('Mark as sent')
+        wait_until{ assert page.has_content?('Fulfillment KIT was set as sent.') }
+      }
+    end
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(I18n.l @saved_member.join_date, :format => :long)
+        assert page.has_content?('KIT')
+        assert page.has_content?('sent')  
+      }
+    end
+  end
+
+  test "set as wrong address fulfillment at processing status" do
+    setup_member(false)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
+
+    create_member_throught_sloop(enrollment_info)
+    sleep(1)
+    @saved_member = Member.find_by_email(@member.email)
+
+    fulfillment = Fulfillment.find_by_product_sku('KIT')
+    fulfillment.set_as_processing
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('processing', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?('processing') 
+        assert page.has_selector?('#mark_as_sent')
+        assert page.has_selector?('#set_as_wrong_address')
+
+        click_link_or_button('Set as wrong address')
+        wait_until{ page.has_selector?('#reason') }
+        fill_in 'reason', :with => 'spam'
+        confirm_ok_js
+        click_link_or_button('Set wrong address')
+        wait_until{ page.has_content?("#{fulfillment.member.full_address} is undeliverable. Reason: spam")}
+      }
+    end
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(I18n.l @saved_member.join_date, :format => :long)
+        assert page.has_content?('KIT')
+        assert page.has_content?('undeliverable')  
+      }
+    end
+  end
+
+  test "display fulfillment record at out_of_stock status" do
+    setup_member(false)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
+
+    create_member_throught_sloop(enrollment_info)
+    sleep(1)
+    @saved_member = Member.find_by_email(@member.email)
+
+    fulfillment = Fulfillment.find_by_product_sku('KIT')
+    fulfillment.set_as_out_of_stock
+    product = fulfillment.product
+    product.stock = 0
+    product.save
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('out_of_stock', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?('out_of_stock') 
+        assert page.has_content?('Actual stock: 0.')
+      }
+    end
+  end
+
+  test "add stock and check fulfillment record with out_of_stock status" do
+    setup_member(false)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
+
+    create_member_throught_sloop(enrollment_info)
+    sleep(1)
+    @saved_member = Member.find_by_email(@member.email)
+
+    fulfillment = Fulfillment.find_by_product_sku('KIT')
+    fulfillment.set_as_out_of_stock
+    product = fulfillment.product
+    product.stock = 0
+    product.save
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('out_of_stock', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?('out_of_stock') 
+        assert page.has_content?('Actual stock: 0.')
+      }
+    end
+    visit products_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#products_table")do
+      wait_until{ click_link_or_button('Edit') }
+    end
+    wait_until{ page.has_content?('Edit Product') }
+    fill_in 'product[stock]', :with => '10'
+    click_link_or_button('Update Product')
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('out_of_stock', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?('out_of_stock') 
+        assert page.has_content?('Actual stock: 10.')
+        assert page.has_selector?("#resend")
+      }
+    end
+  end
+
+test "resend fulfillment - Product out of stock" do
+    setup_member(false)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
+
+    create_member_throught_sloop(enrollment_info)
+    sleep(1)
+    @saved_member = Member.find_by_email(@member.email)
+
+    fulfillment = Fulfillment.find_by_product_sku('KIT')
+    fulfillment.set_as_out_of_stock
+    product = fulfillment.product
+    product.stock = 0
+    product.save
+
+    visit products_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#products_table")do
+      wait_until{ click_link_or_button('Edit') }
+    end
+    wait_until{ page.has_content?('Edit Product') }
+    fill_in 'product[stock]', :with => '10'
+    click_link_or_button('Update Product')
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('out_of_stock', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?('out_of_stock') 
+        assert page.has_content?('Actual stock: 10.')
+        assert page.has_selector?("#resend")
+      }
+      click_link_or_button('Resend')
+      wait_until{ assert page.has_content?('Fulfillment KIT was marked to be delivered next time.') }
+    end
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(I18n.l @saved_member.join_date, :format => :long)
+        assert page.has_content?('KIT')
+        assert page.has_content?('not_processed')  
+      }
+    end
+  end
 end

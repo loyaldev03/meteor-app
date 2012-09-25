@@ -124,7 +124,7 @@ class Fulfillment < ActiveRecord::Base
         csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
       else
-        csv << ['Member Number','First Name','Member Last Name','Member Since Date','Member Expiration Date',
+        csv << ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
                 'ADDRESS','CITY','ZIP','Product','Charter Member Status' ]
       end
 
