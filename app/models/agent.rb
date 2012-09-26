@@ -9,7 +9,7 @@ class Agent < ActiveRecord::Base
          :encryptable, :token_authenticatable
 
   easy_roles :roles
-  ROLES = %W(admin api representative supervisor)
+  ROLES = %W(admin api representative supervisor agency)
 
   acts_as_paranoid
   validates_as_paranoid
