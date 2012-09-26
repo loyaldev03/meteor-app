@@ -36,6 +36,10 @@ class MembersClubCashTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
+  ###########################################################
+  # TESTS
+  ###########################################################
+
   test "add club cash amount" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -243,7 +247,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     }
   end
 
-  test "add club cash with member created by sloop" do
+  test "add club cash amount using the amount on member TOM enrollment amount > 0" do
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
@@ -410,17 +414,70 @@ class MembersClubCashTest < ActionController::IntegrationTest
     end
   end  
 
-  # FixME : Rake::Task does not work.
-  # test "club cash Renewal" do
-  #   setup_member
-  #   @saved_member.bill_membership
-  #   @saved_member.club_cash_expire_date = Date.today - 1.day
-  #   @saved_member.save
-  #   Rake::Task['members:process_club_cash'].invoke
-  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+  test "club cash Renewal" do
+    setup_member
+    @saved_member.bill_membership
+    @saved_member.club_cash_expire_date = Date.today - 1
+    @saved_member.save
+    date = @saved_member.club_cash_expire_date
+    @saved_member.reset_club_cash
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount")do
+        wait_until{
+          assert page.has_content?('0.0')
+        }
+      end
+      within("#td_mi_club_cash_expire_date")do
+        wait_until{
+          assert page.has_content?(I18n.l(date+1.year, :format => :only_date))
+        }
+      end
+    end
+  end
+
+  test "Add club cash amount using the amount on member TOM enrollment amount = 0" do
+    @partner = FactoryGirl.create(:partner)
+    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:complete_enrollment_info_with_cero_amount)
   
-  #   sleep(50)
-  # end
+    create_member_throught_sloop(enrollment_info, @terms_of_membership_with_gateway)
+
+    @saved_member = Member.last
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount")do
+        wait_until{
+          assert page.has_content?('0.0')
+        }
+      end
+    end
+    wait_until{ assert @saved_member.club_cash_expire_date == nil }
+
+    @saved_member.bill_membership 
+    wait_until{ assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount ) }
+    @saved_member.reload
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount")do
+        wait_until{
+          assert page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s)
+        }
+      end
+      within("#td_mi_club_cash_expire_date")do
+        wait_until{
+          assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
+        }
+      end
+    end
+  end
 
 end
 
