@@ -54,7 +54,7 @@ class ProductsController < ApplicationController
     if @product.destroy
       redirect_to products_url, notice: "Product #{@product.sku} was successfully destroyed."
     else
-      flash.now[:error] = "Product #{@product.sku} was not destroyed."
+      flash[:error] = "Product #{@product.sku} was not destroyed."
       redirect_to products_url
     end
   end
