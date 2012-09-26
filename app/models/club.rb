@@ -41,7 +41,7 @@ class Club < ActiveRecord::Base
   end
 
   def sync?
-    [self.api_type, self.api_username, self.api_password].none?(&:nil?)
+    [self.api_type, self.api_username, self.api_password].none?(&:blank?)
   end
 
   private
