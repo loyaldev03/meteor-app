@@ -435,7 +435,8 @@ $(document).ready( function() {
         success: function(data) {
           if (data.code == "000"){
             button.parent().children().hide();
-            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>");
+            //button.parent().append("<div class='alert-info alert'>"+data.message+"</div>");
+            button.parent().parent().after("<tr><td colspan='8'><p style='text-align: center;'><div class='alert-info alert'>"+data.message+"</div></p></td></tr>");
           }else{
             button.removeAttr('disabled');
             alert(data.message);
@@ -456,7 +457,7 @@ $(document).ready( function() {
         success: function(data) {
           if (data.code == "000"){
             button.parent().children().hide();
-            button.parent().append("<div class='alert-info alert'>"+data.message+"</div>")
+            button.parent().parent().after("<tr><td colspan='8'><p style='text-align: center;'><div class='alert-info alert'>"+data.message+"</div></p></td></tr>");
           }else{
             button.removeAttr('disabled');
             alert(data.message);
