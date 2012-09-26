@@ -91,7 +91,7 @@ class PartnersTest < ActionController::IntegrationTest
   end
 
   test "Should delete partner" do
-    saved_partner = FactoryGirl.create(:partner)
+    saved_partner = FactoryGirl.create(:partner, :prefix => 'WIEGANDTOY')
     visit admin_partners_path
     confirm_ok_js
     within("#partners_table") do
@@ -99,8 +99,9 @@ class PartnersTest < ActionController::IntegrationTest
         click_link_or_button 'Destroy'
       }
     end
+    saved_partner.reload
     wait_until{
-      assert page.has_content?('Partner #{saved_partner.prefix} was successfully destroyed')
+      assert page.has_content?('Partner WIEGANDTOY was successfully destroyed')
       assert Partner.with_deleted.where(:id => saved_partner.id).first
     }
   end
