@@ -8,12 +8,16 @@ class Ability
       can :enroll_member, Agent
       can :undo_credit_card_blacklist, CreditCard
       can :manage, Member
+      can :manage, CreditCard
       can :manage, Agent
       can :manage, Partner
       can :manage, Club
       can :manage, Domain
       can :manage, Product
       can :manage, Fulfillment
+      can :manage, Operation
+      can :manage, MemberNote
+      can :manage, TermsOfMembership
       can :api_enroll, Member
       can :api_update, Member
       can :api_profile, Member
@@ -42,6 +46,11 @@ class Ability
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Member
+    elsif agent.has_role? 'agency'
+      can :manage, Product
+      can :read, Fulfillment
+      can :report, Fulfillment
+      can :read, Member
       # EXAMPLE
       # can :manage, Partner do |partner|
       #   # agent is enabled to manage a specific partner

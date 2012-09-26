@@ -1,7 +1,8 @@
 class CreditCardsController < ApplicationController
 	before_filter :validate_club_presence
 	before_filter :validate_member_presence
-  
+  authorize_resource :credit_card
+
   def new
     @credit_card = CreditCard.new
     @actual_credit_card = @current_member.active_credit_card

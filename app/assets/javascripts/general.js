@@ -331,6 +331,11 @@ $(document).ready( function() {
   }
 
   function show_member_functions(){
+    $(".btn").live('click',function(event){
+      if ($(this).attr('disabled') == 'disabled'){
+        event.preventDefault();
+      }
+    })
     $('.help').popover();
     mark_as_sent_fulfillment("../fulfillments/");
     resend_fulfillment("../fulfillments/");
