@@ -85,7 +85,7 @@ class MembersBillTest < ActionController::IntegrationTest
     
   end
 
-  def bill_member(member, do_refund = true)
+  def bill_member(member, do_refund = true, refund_amount = nil)
 
     answer = member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
@@ -124,8 +124,11 @@ class MembersBillTest < ActionController::IntegrationTest
     if do_refund
       visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id, :transaction_id => Transaction.last.id)
 
-      fill_in 'refund_amount', :with => @terms_of_membership_with_gateway.installment_amount.to_s   
-      
+      final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
+      final_amount = refund_amount.to_s if not refund_amount.nil?
+
+      fill_in 'refund_amount', :with => final_amount   
+
       assert_difference ['Transaction.count'] do 
         click_on 'Refund'
       end
@@ -133,14 +136,14 @@ class MembersBillTest < ActionController::IntegrationTest
       within("#operations_table") do 
         wait_until {
           assert page.has_content?("Communication 'Test refund' sent")
-          assert page.has_content?("Credit success $#{@terms_of_membership_with_gateway.installment_amount}")
+          assert page.has_content?("Credit success $#{final_amount}")
         }
       end
     
       within("#transactions_table") do 
         wait_until {
           assert page.has_content?("Credit : This transaction has been approved")
-          assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
+          assert page.has_content?(final_amount)
         }
       end
     end
@@ -151,24 +154,24 @@ class MembersBillTest < ActionController::IntegrationTest
   # TEST
   ############################################################
 
-  # test "create a member billing enroll > 0" do
-  #   active_merchant_stubs
-  #   setup_member
-  #   bill_member(@saved_member, false)
-  # end 
+  test "create a member billing enroll > 0" do
+    active_merchant_stubs
+    setup_member
+    bill_member(@saved_member, false)
+  end 
 
-  # test "create a member billing enroll > 0 + refund" do
-  #   active_merchant_stubs
-  #   setup_member
-  #   bill_member(@saved_member, true)
-  # end 
+  test "create a member billing enroll > 0 + refund" do
+    active_merchant_stubs
+    setup_member
+    bill_member(@saved_member, true)
+  end 
 
-  # test "create a member billing enroll = 0 provisional_days = 0 installment amount > 0" do
-  #   active_merchant_stubs
-  #   setup_member(0)
-  #   EnrollmentInfo.last.update_attribute(:enrollment_amount, 0.0)
-  #   bill_member(@saved_member, false)
-  # end 
+  test "create a member billing enroll = 0 provisional_days = 0 installment amount > 0" do
+    active_merchant_stubs
+    setup_member(0)
+    EnrollmentInfo.last.update_attribute(:enrollment_amount, 0.0)
+    bill_member(@saved_member, false)
+  end 
 
   test "create a member + bill + check fultillment" do
     active_merchant_stubs
@@ -188,6 +191,91 @@ class MembersBillTest < ActionController::IntegrationTest
     
   end
 
+  test "member refund full save" do
+    active_merchant_stubs
+    setup_member
+    bill_member(@saved_member, false)
     
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    click_on 'Full save'
+     
+    assert page.has_content?("Full save done")
+    
+    within("#operations_table") do 
+      wait_until {
+        assert page.has_content?("Full save done")
+      }
+    end
+  
+  end
+ 
+ 
+  test "uncontrolled refund more than transaction amount" do
+    active_merchant_stubs
+    setup_member
+    bill_member(@saved_member, false)
+    
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    fill_in 'refund_amount', :with => "99999999"   
+      
+    click_on 'Refund'
+    assert page.has_content?("Cant credit more $ than the original transaction amount")
+  end
+ 
+
+  test "two uncontrolled refund more than transaction amount" do
+    active_merchant_stubs
+    setup_member
+    bill_member(@saved_member, true, (@terms_of_membership_with_gateway.installment_amount / 2))
+    
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    fill_in 'refund_amount', :with => ((@terms_of_membership_with_gateway.installment_amount / 2) + 1).to_s      
+    
+    assert_difference('Transaction.count', 0) do 
+      click_on 'Refund'
+    end
+    assert page.has_content?("Cant credit more $ than the original transaction amount")
+  end
+
+  test "partial refund - uncontrolled refund" do
+    active_merchant_stubs
+    setup_member
+    bill_member(@saved_member, true, (@terms_of_membership_with_gateway.installment_amount / 2))
+  end 
+
+  test "two partial refund - uncontrolled refund" do
+    active_merchant_stubs
+    setup_member
+    final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
+
+    bill_member(@saved_member, true, final_amount)
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    fill_in 'refund_amount', :with => final_amount.to_s
+    assert_difference('Transaction.count') do 
+      click_on 'Refund'
+    end
+    
+    within("#operations_table") do 
+      wait_until {
+        assert page.has_content?("Communication 'Test refund' sent")
+        assert page.has_content?("Credit success $#{final_amount}")
+      }
+    end
+  end 
+
+  test "uncontrolled refund special characters" do
+    active_merchant_stubs
+    setup_member
+    bill_member(@saved_member, false)
+    
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    fill_in 'refund_amount', :with => "&%$"
+    alert_ok_js
+    assert_difference('Transaction.count', 0) do 
+      click_on 'Refund'
+    end
+    
+  end
+
 
 end

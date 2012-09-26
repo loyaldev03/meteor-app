@@ -29,7 +29,7 @@
     			<td> <%= fulfillment.product_sku %> </td>
     			<td> <%= fulfillment.tracking_code %> </td>
     			<td> <%= fulfillment.status %> </td>
-          <td NOWRAP> 
+          <td> 
             <%= render :partial => "shared/fulfillment_actions", :locals => {:fulfillment => fulfillment, :member_show => false } %>
           </td>
     		</tr>

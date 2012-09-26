@@ -4,6 +4,7 @@ FactoryGirl.define do
     name "Bracelet"
     sku "Bracelet"
     stock 10
+    weight 5
   end
 
   factory :product_without_stock_and_not_recurrent, class: Product do
