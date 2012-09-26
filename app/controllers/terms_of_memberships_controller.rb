@@ -1,7 +1,7 @@
 class TermsOfMembershipsController < ApplicationController
   before_filter :validate_club_presence
   before_filter :validate_member_presence
-
+  authorize_resource :terms_of_membership
 
   def show
     @tom = TermsOfMembership.find(params[:id])

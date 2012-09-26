@@ -39,26 +39,26 @@
     
     <div class="row-fluid">
       <div class="span4">
-        <%= link_to 'Edit', edit_member_path, :class => "btn btn-success btn-large-w" %>
+        <%= link_to 'Edit', edit_member_path, :class => "btn btn-success btn-large-w", :disabled => (cannot? :edit, Member) %>
       </div>
       <div class="span4">
         <% disable_save_sale = @current_member.can_save_the_sale? == false  %>
-        <%= link_to("Save the sale", (!disable_save_sale ? member_save_the_sale_path : "#"), :class => "btn btn-large-w #{(disable_save_sale ? "disabled" : "btn-info")}") %>
+        <%= link_to("Save the sale", (!disable_save_sale ? member_save_the_sale_path : "#"), :class => "btn btn-large-w #{(disable_save_sale ? "disabled" : "btn-info")}", :disabled => (cannot? :save_sale, Member)) %>
       </div>
       <div class="span4">
         <% disable_black_list = @current_member.blacklisted? == true && @current_member.lapsed? == true %>
-        <%= link_to "Blacklist", (!disable_black_list ? member_blacklist_path : "#"), :class => "btn btn-large-w #{(disable_black_list ? "disabled" : "btn-danger")}" %>
+        <%= link_to "Blacklist", (!disable_black_list ? member_blacklist_path : "#"), :class => "btn btn-large-w #{(disable_black_list ? "disabled" : "btn-danger")}", :disabled => (cannot? :blacklist, Member) %>
       </div>
     </div>
 
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
-        <%= link_to "Add a note", new_member_note_path, :class => "btn btn-success btn-large-w" %>
+        <%= link_to "Add a note", new_member_note_path, :class => "btn btn-success btn-large-w", :disabled => (cannot? :add_member_note, Member) %>
       </div>
       <div class="span4">&nbsp</div>
       <div class="span4">
         <% disable_cancel = @current_member.can_be_canceled? == false %>
-        <%= link_to("Cancel", (!disable_cancel ? member_cancel_path : "#"), :class => "btn  btn-large-w #{(disable_cancel ? "disabled" : "btn-danger")}")  %>
+        <%= link_to("Cancel", (!disable_cancel ? member_cancel_path : "#"), :class => "btn  btn-large-w #{(disable_cancel ? "disabled" : "btn-danger")}", :disabled => (cannot? :cancel, Member))  %>
       </div>
     </div>  
 
@@ -101,7 +101,7 @@
       <td><%= @current_member.zip %></td>
       <td NOWRAP>
         <% if @current_member.wrong_address.nil? %>
-          <%= link_to(member_set_undeliverable_path, :class => "btn btn-danger", :id => "link_member_set_undeliverable") do %> 
+          <%= link_to(member_set_undeliverable_path, :class => "btn btn-danger", :id => "link_member_set_undeliverable", :disabled => (cannot? :set_undeliverable, Member)) do %> 
             <i class="icon-remove"></i> <%= t('activerecord.attributes.member.set_undeliverable') %>
           <% end %>        
         <% else %>
@@ -124,7 +124,7 @@
       <td nowrap="nowrap">
         <%= @current_member.full_phone_number %>
         <% if @current_member.wrong_phone_number.nil? %>
-          <%= link_to(member_set_unreachable_path, :class => "btn btn-danger", :id => "link_member_set_unreachable") do %> 
+          <%= link_to(member_set_unreachable_path, :class => "btn btn-danger", :id => "link_member_set_unreachable", :disabled => (cannot? :set_unreachable, Member)) do %> 
             <i class="icon-remove"></i> <%= t('activerecord.attributes.member.set_unreachable') %>
           <% end %>        
         <% else %>
@@ -144,7 +144,7 @@
     <tr class="box_title">
       <th><h4>Active Credit Card</h4></th>
       <td style="border: none; text-align: right;">
-        <%= link_to(new_credit_card_path, :class => "btn btn-success") do %> 
+        <%= link_to(new_credit_card_path, :class => "btn btn-success", :disabled => (cannot? :create, CreditCard)) do %> 
           <i class="icon-plus"></i> Add a credit card
         <% end %>
       </td>
@@ -198,7 +198,7 @@
           <tr>
             <th><%= t('menu.activerecord.term_of_membership') %>:</th>
             <td id="td_mi_terms_of_membership_name">
-              <%= link_to(terms_of_membership_path(:id => @current_member.terms_of_membership), :class => "btn btn-small") do %> 
+              <%= link_to(terms_of_membership_path(:id => @current_member.terms_of_membership), :class => "btn btn-small", :disabled => (cannot? :read, TermsOfMembership)) do %> 
                 <i class="icon-zoom-in"></i> <%= @current_member.terms_of_membership.name %>
               <% end %>
             </td>  
@@ -242,7 +242,7 @@
             <td id="td_mi_next_retry_bill_date">
               <%= I18n.l(@current_member.next_retry_bill_date, :format => :only_date) unless @current_member.next_retry_bill_date.nil? %>&nbsp;&nbsp;&nbsp;
               <% unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
-                <%= link_to(member_change_next_bill_date_path, :class => "btn btn-info", :id => "link_member_change_next_bill_date") do %> 
+                <%= link_to(member_change_next_bill_date_path, :class => "btn btn-info", :id => "link_member_change_next_bill_date", :disabled => (cannot? :change_next_bill_date, Member)) do %> 
                   <i class="icon-pencil"></i> Change
                 <% end %>
               <% end %>
@@ -259,7 +259,7 @@
             <td id="td_mi_club_cash_amount">
               <%= @current_member.club_cash_amount.to_f %>&nbsp;&nbsp;&nbsp;
               <% unless disable_save_sale %>
-                <%= link_to(member_add_club_cash_path, :class => "btn btn-success", :id => "link_member_add_club_cash") do %> 
+                <%= link_to(member_add_club_cash_path, :class => "btn btn-success", :id => "link_member_add_club_cash", :disabled => (cannot? :add_club_cash, Member)) do %> 
                   <i class="icon-plus"></i> <%= t('activerecord.attributes.member.add_club_cash_transaction') %>
                 <% end %>
               <% end %>

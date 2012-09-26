@@ -8,12 +8,13 @@ class OperationsController < ApplicationController
     end
     respond_to do |format|
       format.html
-      format.json { render json: OperationsDatatable.new(view_context,@current_partner,@current_club,@current_member)}
+      format.json { render json: OperationsDatatable.new(view_context,@current_partner,@current_club,@current_member,@current_agent)}
     end
   end
 
   # GET /operations/1
   def show
+    authorize! :edit, Operation
     @operation = Operation.find(params[:id])
   end
 

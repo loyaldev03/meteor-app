@@ -2,6 +2,7 @@ class FulfillmentsController < ApplicationController
   before_filter :validate_club_presence
 
   def index
+    authorize! :report, Fulfillment
     if request.post?
     	if params[:all_times] == '1'
         if params[:product_type] == 'KIT'
@@ -37,12 +38,14 @@ class FulfillmentsController < ApplicationController
   end
 
   def resend
+    authorize! :resend, Fulfillment
     render json: Fulfillment.find(params[:id]).resend(@current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
   end
 
   def mark_as_sent
+    authorize! :mark_as_sent, Fulfillment
     render json: Fulfillment.find(params[:id]).mark_as_sent(@current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
@@ -55,19 +58,19 @@ class FulfillmentsController < ApplicationController
   end
 
   def generate_csv
-        if params[:product_type][0] == 'KIT'
-          fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_kit
-        elsif params[:product_type][0] == 'CARD'
-          fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_card
-        elsif params[:product_type][0] == 'OTHERS'
-          fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_others
-        end
-        if params[:product_type][0] == 'KIT' or params[:product_type][0] == 'CARD' 
-          csv_string = Fulfillment.generateCSV(fulfillments,false)
-        else
-          csv_string = Fulfillment.generateCSV(fulfillments)
-        end
-
+    authorize! :report, Fulfillment
+    if params[:product_type][0] == 'KIT'
+      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_kit
+    elsif params[:product_type][0] == 'CARD'
+      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_card
+    elsif params[:product_type][0] == 'OTHERS'
+      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_others
+    end
+    if params[:product_type][0] == 'KIT' or params[:product_type][0] == 'CARD' 
+      csv_string = Fulfillment.generateCSV(fulfillments,false)
+    else
+      csv_string = Fulfillment.generateCSV(fulfillments)
+    end
     send_data csv_string, :filename => "miworkingfile2.csv",
                  :type => 'text/csv; charset=iso-8859-1; header=present',
                  :disposition => "attachment; filename=miworkingfile2.csv"

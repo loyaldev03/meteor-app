@@ -19,7 +19,7 @@ private
         operation.description.html_safe, 
         operation.notes.to_s.truncate(42),
         operation.created_by.username,
-        link_to("<i class='icon-zoom-in'>".html_safe, @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,:id => operation.id), :class => "btn btn-small"),
+        link_to("<i class='icon-zoom-in'>".html_safe, @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,:id => operation.id), :class => "btn btn-small", :disabled=>(!@current_agent.can? :edit, Operation)),
       ]
     end
   end

@@ -1,7 +1,8 @@
 class MemberNotesController < ApplicationController
   before_filter :validate_club_presence
   before_filter :validate_member_presence
-
+  authorize_resource :member_note
+  
   def new
     @member_note = MemberNote.new
     @disposition_types = DispositionType.find_all_by_club_id(@current_club.id)
