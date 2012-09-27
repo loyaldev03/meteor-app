@@ -638,6 +638,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
       select('sent', :from => 'status')
       select('Card',:from => 'product_type')
     end
+    sleep(200)
     click_link_or_button('Report')
 
     within("#report_results")do
