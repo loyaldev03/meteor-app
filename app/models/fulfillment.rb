@@ -100,7 +100,7 @@ class Fulfillment < ActiveRecord::Base
       raise "Product does not have stock."
     end
     if product.undeliverable?
-      raise "Product is undeliverable"
+      raise "Fulfillment is undeliverable"
     end
 
     self.set_as_not_processed!
