@@ -579,11 +579,11 @@ class Member < ActiveRecord::Base
             end
             answer = { :message => message, :code => Settings.error_codes.success }
           else
-            answer[:message] = "Could not saved club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
+            answer[:message] = "Could not save club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
           end
         rescue Exception => e
-          answer[:message] = "Could not saved club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
-          Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => answer[:message])
+          answer[:message] = "Could not save club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
+          Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message])
           raise ActiveRecord::Rollback
         end
       end
