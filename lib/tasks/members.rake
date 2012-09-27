@@ -166,14 +166,16 @@ namespace :members do
               am = credit_card.am_card
               if am.valid?
                 credit_card.cc_type = am.type
-                credit_card.save
+              else
+                credit_card.cc_type = 'unknown'
               end
+              credit_card.save
             end
           rescue Exception => e
             Airbrake.notify(:error_class => "Members::CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for template ##{credit_card.id}"
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for credit_card ##{credit_card.id}"
         end
       end
     ensure
