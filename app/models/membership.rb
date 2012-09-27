@@ -13,7 +13,7 @@ class Membership < ActiveRecord::Base
   delegate :recycled_times, :to => :member
 
   def self.datatable_columns
-    ['id' ]
+    ['id', 'status', 'tom', 'join_date', 'cancel_date', 'quota' ]
   end
 
   def bill

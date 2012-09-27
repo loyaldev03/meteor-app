@@ -319,7 +319,7 @@
 <div class="tab-content">
   <div class="tab-pane active" id="operations">
     <div class="tab_body_padding">
-      <%= render :partial => 'operations', :locals => { :operations => @operations} %>
+      <%= render :partial => 'operations' %>
     </div>
   </div>
   <div class="tab-pane" id="notes">
@@ -334,7 +334,7 @@
   </div>  
   <div class="tab-pane" id="transactions">
     <div class="tab_body_padding">
-      <%= render :partial => 'transactions', :locals => { :transactions => @transactions} %>
+      <%= render :partial => 'transactions' %>
     </div>
   </div>
   <div class="tab-pane" id="fulfillments">
@@ -354,6 +354,11 @@
       </div>
     </div>
   <% end %>
+  <div class="tab-pane" id="memberships">
+    <div class="tab_body_padding">
+      <%= render :partial => 'memberships' %>
+    </div>
+  </div>
 </div>
 
 <script>

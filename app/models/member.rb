@@ -284,7 +284,7 @@ class Member < ActiveRecord::Base
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
         old_tom_id = terms_of_membership_id
-        res = enroll(self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first, TermsOfMembership.find(new_tom_id))
+        res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
         if res[:code] == Settings.error_codes.success
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
             "Save the sale from TOMID #{old_tom_id} to TOMID #{new_tom_id}", self, Settings.operation_types.save_the_sale)
@@ -298,7 +298,7 @@ class Member < ActiveRecord::Base
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
   def recover(new_tom_id, agent = nil)
-    enroll(self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first, TermsOfMembership.find(new_tom_id))
+    enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
   end
 
   def bill_membership
@@ -329,6 +329,9 @@ class Member < ActiveRecord::Base
         member.skip_api_sync! if member.api_id.present? || skip_api_sync
         member.club = club
 
+require 'ruby-debug'
+debugger
+
         unless member.valid? and credit_card.valid?
           # errors = member.error_to_s + credit_card.error_to_s
           errors = member.errors.to_hash
@@ -346,12 +349,11 @@ class Member < ActiveRecord::Base
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_already_in_use)
         return { :message => message, :code => Settings.error_codes.credit_card_in_use }
       end
+    elsif member.blacklisted
+      message = "Member email is blacklisted."
+      Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
+      return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
     else
-      if member.blacklisted
-        message = "Member email is blacklisted."
-        Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
-        return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
-      end
       credit_card = CreditCard.new credit_card_params
       member.update_member_data_by_params member_params
     end
@@ -361,7 +363,7 @@ class Member < ActiveRecord::Base
       return { :message => message, :code => Settings.error_codes.credit_card_blank }        
     end   
 
-    member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, member_params, tom)
+    member.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
   end
 
   def self.cohort_formula(join_date, enrollment_info, time_zone, installment_type)

@@ -329,6 +329,19 @@ $(document).ready( function() {
       "sAjaxSource": $('#transactions_table').data('source'),
     });
   }
+  
+  function memberships_member_functions(column_count){
+    oTable = $('#memberships_table').dataTable({
+      "oLanguage": {"sSearch": "Filtered by:"},
+      "bJQueryUI": false,
+      "bProcessing": true,
+      "sPaginationType": "bootstrap",
+      "bServerSide": true,
+      "aaSorting": [[ 0, "desc" ]],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+      "sAjaxSource": $('#memberships_table').data('source'),
+    });
+  }
 
   function show_member_functions(){
     $(".btn").live('click',function(event){
