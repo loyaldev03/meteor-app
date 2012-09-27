@@ -127,19 +127,18 @@ namespace :members do
           tz = Time.zone.now
           begin
             Rails.logger.info "  * processing template ##{template.id}"
-            Member.find_in_batches(:conditions => 
-                [ " join_date = ? AND terms_of_membership_id = ? ", Time.zone.now.to_date - template.days_after_join_date.days, 
+            Membership.find_in_batches(:conditions => 
+                [ " join_date = ? AND terms_of_membership_id = ? AND status = 'active' ", 
+                  Time.zone.now.to_date - template.days_after_join_date.days, 
                   template.terms_of_membership_id ]) do |group1|
-              group1.each do |member| 
-                tz = Time.zone.now
+              group1.each do |membership| 
                 begin
-                  Rails.logger.info "  * processing member ##{member.uuid}"
-                  Communication.deliver!(template, member)
+                  Rails.logger.info "  * processing member ##{membership.member_id}"
+                  Communication.deliver!(template, membership.member)
                 rescue Exception => e
                   Airbrake.notify(:error_class => "Members::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
                   Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
                 end
-                Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
               end
             end
           rescue Exception => e

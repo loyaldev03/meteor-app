@@ -11,7 +11,12 @@ private
 
   def data
     memberships.map do |membership|
-      [
+      [ membership.id, 
+        membership.status, 
+        membership.terms_of_membership.to_label, 
+        membership.join_date, 
+        membership.cancel_date, 
+        membership.quota
       ]
     end
   end

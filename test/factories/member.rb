@@ -35,7 +35,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member_with_api#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -46,7 +46,6 @@ FactoryGirl.define do
     club_cash_amount 0
     cohort { Time.zone.now.strftime TEST_COHORT }
     association :club, factory: :club_with_api
-    association :terms_of_membership, factory: :terms_of_membership_with_gateway
   end
 
   factory :member_with_cc, class: Member do
@@ -57,7 +56,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member_with_cc#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -65,11 +64,11 @@ FactoryGirl.define do
     gender "M"
     country "US"
     club_cash_amount 0
-    join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
+    memberships {|ccs| [ccs.association(:membership)]}
   end
 
 
@@ -85,8 +84,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
-    type_of_phone_number "home"
-    join_date { DateTime.now }
+    type_of_phone_number Settings.type_of_phone_number.home
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     birth_date { DateTime.now }
@@ -96,6 +94,7 @@ FactoryGirl.define do
     gender "M"
     blacklisted false
     credit_cards {|ccs| [ccs.association(:credit_card)]}
+    memberships {|ccs| [ccs.association(:active_membership)]}
   end
 
   factory :active_member_with_external_id, class: Member do
@@ -110,8 +109,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
-    type_of_phone_number "home"
-    join_date { DateTime.now }
+    type_of_phone_number Settings.type_of_phone_number.home
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     birth_date { DateTime.now }
@@ -121,6 +119,7 @@ FactoryGirl.define do
     gender "M"
     blacklisted false
     credit_cards {|ccs| [ccs.association(:credit_card)]}
+    memberships {|ccs| [ccs.association(:active_membership)]}
     external_id 123456
   end
 
@@ -138,13 +137,13 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
-    join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
     cohort { Time.zone.now.strftime TEST_COHORT }
+    memberships {|ccs| [ccs.association(:active_membership)]}
   end
 
   factory :lapsed_member, class: Member do
@@ -161,15 +160,14 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
-    join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
-    cancel_date { DateTime.now - 1.month }
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
     blacklisted false
     cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
+    memberships {|ccs| [ccs.association(:lapsed_membership)]}
   end
 
 
@@ -183,18 +181,18 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "provisional_member_with_cc#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
-    join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
+    memberships {|ccs| [ccs.association(:provisional_membership)]}
   end
 
   factory :provisional_member, class: Member do
@@ -207,7 +205,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "provisional_member#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -215,9 +213,9 @@ FactoryGirl.define do
     country "US"
     club_cash_amount 0
     cohort { Time.zone.now.strftime TEST_COHORT }
-    join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
+    memberships {|ccs| [ccs.association(:provisional_membership)]}
   end
 
   factory :applied_member, class: Member do
@@ -230,16 +228,16 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "applied_member#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
     birth_date { DateTime.now }
-    join_date { DateTime.now }
     country "US"
     club_cash_amount 0
     cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
+    memberships {|ccs| [ccs.association(:applied_membership)]}
   end
 
 end

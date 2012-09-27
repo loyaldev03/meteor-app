@@ -322,6 +322,7 @@ $(document).ready( function() {
       "oLanguage": {"sSearch": "Filtered by:"},
       "bJQueryUI": false,
       "bProcessing": true,
+      "bFilter": false,
       "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
@@ -334,6 +335,7 @@ $(document).ready( function() {
     oTable = $('#memberships_table').dataTable({
       "oLanguage": {"sSearch": "Filtered by:"},
       "bJQueryUI": false,
+      "bFilter": false,
       "bProcessing": true,
       "sPaginationType": "bootstrap",
       "bServerSide": true,
