@@ -14,24 +14,26 @@ class CreateMemberships < ActiveRecord::Migration
     add_column :members, :current_membership_id, :integer
     add_column :enrollment_infos, :membership_id, :integer
     add_column :transactions, :membership_id, :integer
-    Member.all.each do |member|
-      m = Membership.new 
-      m.status = member.status
-      m.terms_of_membership_id = member.terms_of_membership_id
-      m.join_date = member.join_date
-      m.cancel_date = member.cancel_date
-      m.created_by_id = member.created_by_id
-      m.quota = member.quota
-      m.save
-      member.update_attribute :current_membership_id, m.id
-      unless member.enrollment_infos.first.nil?
-        member.enrollment_infos.first.update_attribute :membership_id, m.id
+    Member.find_in_batches do |group|
+      group.each do |member|
+        m = Membership.new 
+        m.status = member.status
+        m.terms_of_membership_id = member.terms_of_membership_id
+        m.join_date = member.join_date
+        m.cancel_date = member.cancel_date
+        m.created_by_id = member.created_by_id
+        m.quota = member.quota
+        m.save
+        member.update_attribute :current_membership_id, m.id
+        unless member.enrollment_infos.first.nil?
+          member.enrollment_infos.first.update_attribute :membership_id, m.id
+        end
       end
     end
     [ :terms_of_membership_id, :join_date, :cancel_date, :created_by_id, :quota].each do |column|
       remove_column :members, column
     end
-    CreateVersions.new.down
+    drop_table :versions
   end
 
   def down
@@ -56,6 +58,16 @@ class CreateMemberships < ActiveRecord::Migration
     remove_column :enrollment_infos, :membership_id
     remove_column :transactions, :membership_id
     drop_table :memberships
-    CreateVersions.new.up
+    # create versions table again
+    create_table :versions do |t|
+      t.string   :item_type, :null => false
+      t.integer  :item_id,   :null => false
+      t.string   :event,     :null => false
+      t.string   :whodunnit
+      t.text     :object
+      t.datetime :created_at
+    end
+    add_index :versions, [:item_type, :item_id]
+
   end
 end
