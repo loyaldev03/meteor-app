@@ -87,7 +87,7 @@ class Fulfillment < ActiveRecord::Base
 
   def validate_stock
     if product.nil? or not product.has_stock?
-      set_as_out_of_stock
+      set_as_out_of_stock!
       false
     else
       product.decrease_stock
@@ -96,7 +96,11 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def resend(agent)
-    set_as_not_processed!
+    if product.nil? or not product.has_stock? 
+      raise "Product does not have stock."
+    end
+
+    self.set_as_not_processed!
     self.assigned_at = Time.zone.now
     self.save
     message = "Fulfillment #{self.product_sku} was marked to be delivered next time."
