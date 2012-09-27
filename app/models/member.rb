@@ -3,11 +3,7 @@ class Member < ActiveRecord::Base
   include Extensions::UUID
   extend Extensions::Member::CountrySpecificValidations
 
-  has_paper_trail :only => [:join_date, :cancel_date, :status]
-
-  belongs_to :terms_of_membership
   belongs_to :club
-  belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
   belongs_to :member_group_type
   has_many :member_notes
   has_many :credit_cards
@@ -18,11 +14,16 @@ class Member < ActiveRecord::Base
   has_many :club_cash_transactions
   has_many :enrollment_infos, :order => "created_at DESC"
   has_many :member_preferences
+  has_many :memberships
+  belongs_to :current_membership, :class_name => 'Membership'
 
-  attr_accessible :address, :bill_date, :city, :country, :created_by, :description, 
+  delegate :terms_of_membership, :to => :current_membership
+  delegate :timezone, :to => :club
+
+  attr_accessible :address, :bill_date, :city, :country, :description, 
       :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
-      :join_date, :last_name, :status, :cancel_date, :next_retry_bill_date, 
-      :bill_date, :quota, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
+      :last_name, :next_retry_bill_date, 
+      :bill_date, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
       :wrong_phone_number, :credit_cards_attributes, :birth_date,
       :gender, :type_of_phone_number, :preferences
 
@@ -111,6 +112,7 @@ class Member < ActiveRecord::Base
     after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
     after_transition :lapsed => :applied, :do => [ :set_join_date, :send_recover_needs_approval_email ]
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
+    after_transition all => all, :do => :propagate_membership_data
 
     event :set_as_provisional do
       transition [:none, :provisional,:applied, :active] => :provisional
@@ -172,24 +174,27 @@ class Member < ActiveRecord::Base
 
   # Sets join date. It is called when members status is changed from 'none' to 'applied'
   def set_join_date
-    self.join_date = Time.zone.now
-    self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, self.club.time_zone, self.terms_of_membership.installment_type)
+    self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, time_zone, terms_of_membership.installment_type)
     self.save
+    membership = current_membership
+    membership.join_date = Time.zone.now
+    membership.cohort = self.cohort
+    membership.save
   end
+
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
   def schedule_first_membership
     send_fulfillment
     self.bill_date = Time.zone.now + terms_of_membership.provisional_days
     self.next_retry_bill_date = bill_date
-    # Documentation #18928 - recoveries will not change the quota number.
-    if reactivation_times == 0
-      self.quota = (terms_of_membership.monthly? ? 1 :  0)
-    end
-    self.join_date = Time.zone.now
-    self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, self.club.time_zone, self.terms_of_membership.installment_type)
-    self.cancel_date = nil
+    self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, time_zone, terms_of_membership.installment_type)
     self.save
+    membership = current_membership
+    membership.quota = (terms_of_membership.monthly? ? 1 :  0)
+    membership.join_date = Time.zone.now
+    membership.cohort = self.cohort
+    membership.save
   end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.  
@@ -197,11 +202,10 @@ class Member < ActiveRecord::Base
     send_fulfillment
     self.bill_date = Time.zone.now + terms_of_membership.provisional_days
     self.next_retry_bill_date = bill_date
-    if reactivation_times == 0
-      self.quota = (terms_of_membership.monthly? ? 1 :  0)
-    end
-    self.cancel_date = nil
     self.save
+    membership = current_membership
+    membership.quota = (terms_of_membership.monthly? ? 1 :  0)
+    membership.save
   end
 
   # Changes next bill date.
@@ -276,12 +280,11 @@ class Member < ActiveRecord::Base
 
   def save_the_sale(new_tom_id, agent = nil)
     if can_save_the_sale?
-      if new_tom_id.to_i == self.terms_of_membership_id.to_i
+      if new_tom_id.to_i == terms_of_membership_id.to_i
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
-        old_tom_id = self.terms_of_membership_id
-        self.terms_of_membership_id = new_tom_id
-        res = enroll(self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
+        old_tom_id = terms_of_membership_id
+        res = enroll(self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first, TermsOfMembership.find(new_tom_id))
         if res[:code] == Settings.error_codes.success
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
             "Save the sale from TOMID #{old_tom_id} to TOMID #{new_tom_id}", self, Settings.operation_types.save_the_sale)
@@ -295,56 +298,12 @@ class Member < ActiveRecord::Base
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
   def recover(new_tom_id, agent = nil)
-    self.terms_of_membership_id = new_tom_id
-    enroll(self.active_credit_card, 0.0, agent)
+    enroll(self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first, TermsOfMembership.find(new_tom_id))
   end
 
   def bill_membership
     if can_bill_membership?
-      amount = self.terms_of_membership.installment_amount
-      if amount.to_f > 0.0
-        # Grace period
-        # why cero times? Because only 1 time must be Billed.
-        # Before we were using times = 1. Problem is that times = 1, on case logic will allow times values [0,1].
-        # So grace period will be granted twice.
-        #        limit = 0 
-        #        days  = campaign.grace_period
-        if active_credit_card.nil?
-          if terms_of_membership.grace_period > 0
-            { :code => Settings.error_codes.credit_card_blank_with_grace, 
-              :message => "Credit card is blank. Allowing grace period" }
-          else
-            { :code => Settings.error_codes.credit_card_blank_without_grace,
-              :message => "Credit card is blank and grace period is disabled" }
-          end
-        else
-          if terms_of_membership.payment_gateway_configuration.nil?
-            message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
-            Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
-            Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect })
-            { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
-          else
-            acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
-            trans = Transaction.new
-            trans.transaction_type = "sale"
-            trans.prepare(self, acc, amount, self.terms_of_membership.payment_gateway_configuration)
-            answer = trans.process
-            if trans.success?
-              assign_club_cash!
-              set_as_active!
-              schedule_renewal
-              message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
-              Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
-              { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
-            else
-              message = set_decline_strategy(trans)
-              answer # TODO: should we answer set_decline_strategy message too?
-            end
-          end
-        end
-      else
-        { :message => "Called billing method but no amount on TOM is set.", :code => Settings.error_codes.no_amount }
-      end
+      current_membership.bill
     else
       { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
     end
@@ -369,8 +328,6 @@ class Member < ActiveRecord::Base
         member.update_member_data_by_params member_params
         member.skip_api_sync! if member.api_id.present? || skip_api_sync
         member.club = club
-        member.created_by_id = current_agent.id
-        member.terms_of_membership = tom
 
         unless member.valid? and credit_card.valid?
           # errors = member.error_to_s + credit_card.error_to_s
@@ -404,8 +361,7 @@ class Member < ActiveRecord::Base
       return { :message => message, :code => Settings.error_codes.credit_card_blank }        
     end   
 
-    member.terms_of_membership = tom
-    member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
+    member.enroll(credit_card, enrollment_amount, current_agent, true, cc_blank, member_params, tom)
   end
 
   def self.cohort_formula(join_date, enrollment_info, time_zone, installment_type)
@@ -428,13 +384,14 @@ class Member < ActiveRecord::Base
       return { :message => "Member data is invalid: \n#{error_to_s}", :code => Settings.error_codes.member_data_invalid }
     end
         
-    enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => self.terms_of_membership_id
+    enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => tom.id
     enrollment_info.update_enrollment_info_by_hash member_params
+    membership = Membership.new(terms_of_membership_id: tom.id, created_by_id: agent.id)
 
     if amount.to_f != 0.0
       trans = Transaction.new
       trans.transaction_type = "sale"
-      trans.prepare(self, credit_card, amount, self.terms_of_membership.payment_gateway_configuration)
+      trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
       answer = trans.process
       unless trans.success?
         Auditory.audit(agent, self, "Transaction was not succesful.", self, answer.code)
@@ -445,6 +402,7 @@ class Member < ActiveRecord::Base
     begin
       self.credit_cards << credit_card
       self.enrollment_infos << enrollment_info
+      self.memberships << membership
       self.save!
 
       if trans
@@ -635,8 +593,7 @@ class Member < ActiveRecord::Base
 
   def cancel!(cancel_date, message, current_agent = nil)
     if can_be_canceled?
-      self.cancel_date = cancel_date
-      self.save(:validate => false)
+      self.current_membership.update_attribute :cancel_date, cancel_date
       Auditory.audit(current_agent, self, message, self, Settings.operation_types.future_cancel)
     end
   end
@@ -647,7 +604,7 @@ class Member < ActiveRecord::Base
         self.fulfillments.where_processing.not_renewed.each { |s| s.set_as_undeliverable }
         self.fulfillments.where_not_processed.not_renewed.each { |s| s.set_as_undeliverable }
         message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
-        Auditory.audit(agent,self,message,self)
+        Auditory.audit(agent, self, message, self)
         { :message => message, :code => Settings.error_codes.success }
       else
         message = "Could not set member's address as undeliverable. #{self.errors.inspect}"
@@ -692,7 +649,7 @@ class Member < ActiveRecord::Base
       info.update_attribute(:cohort, self.cohort)
       trans.update_attribute(:cohort, self.cohort) unless trans.nil?
 
-      message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership_id}) -#{terms_of_membership.name}-"
+      message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership.id}) -#{terms_of_membership.name}-"
       Auditory.audit(agent, 
         (trans.nil? ? terms_of_membership : trans), 
         message, self, operation_type)
@@ -710,13 +667,13 @@ class Member < ActiveRecord::Base
     def schedule_renewal
       new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
       if terms_of_membership.monthly?
-        self.quota = self.quota + 1
+        self.current_membership.increment(:quota)
         if self.recycled_times > 1
           new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
         end
       elsif terms_of_membership.yearly?
         # refs #15935
-        self.quota = self.quota + 12
+        self.current_membership.increment(:quota, 12)
       end
       self.recycled_times = 0
       self.bill_date = new_bill_date
@@ -738,7 +695,7 @@ class Member < ActiveRecord::Base
 
     def set_decline_strategy(trans)
       # soft / hard decline
-      type = self.terms_of_membership.installment_type
+      type = terms_of_membership.installment_type
       decline = DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
                   trans.response_code, type, trans.credit_card_type) || 
                 DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
@@ -793,6 +750,12 @@ class Member < ActiveRecord::Base
     def wrong_address_logic
       if self.changed.include?('wrong_address') and self.wrong_address.nil?
         self.fulfillments.where_undeliverable.each { |s| s.decrease_stock! }
+      end
+    end
+
+    def propagate_membership_data
+      if self.changed.include?('status')
+        self.current_membership.update_attribute :status, status
       end
     end
 

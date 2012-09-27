@@ -202,14 +202,14 @@
           <tr>
             <th><%= t('menu.activerecord.term_of_membership') %>:</th>
             <td id="td_mi_terms_of_membership_name">
-              <%= link_to(terms_of_membership_path(:id => @current_member.terms_of_membership), :class => "btn btn-small", :disabled => (cannot? :read, TermsOfMembership)) do %> 
-                <i class="icon-zoom-in"></i> <%= @current_member.terms_of_membership.name %>
+              <%= link_to(terms_of_membership_path(:id => @current_membership.terms_of_membership), :class => "btn btn-small", :disabled => (cannot? :read, TermsOfMembership)) do %> 
+                <i class="icon-zoom-in"></i> <%= @current_membership.terms_of_membership.name %>
               <% end %>
             </td>  
           </tr>
           <tr>
             <th> <%= t('activerecord.attributes.member.created_by') %>: </th>
-            <td id="td_mi_created_by"> <%= @current_member.created_by.try(:username) %> </td>
+            <td id="td_mi_created_by"> <%= @current_membership.created_by.try(:username) %> </td>
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.recovery_times') %>:</th>
@@ -238,7 +238,7 @@
         <table class="hidden_table_border">
           <tr>
             <th><%= t('activerecord.attributes.member.join_date') %>:</th>
-            <td id="td_mi_join_date"><%= I18n.l @current_member.join_date, :format => :only_date %></td>
+            <td id="td_mi_join_date"><%= I18n.l @current_membership.join_date, :format => :only_date %></td>
           </tr>
           
           <tr class="ligthgrey">
@@ -255,7 +255,7 @@
 
           <tr>
             <th><%= t('activerecord.attributes.member.cancel_date') %>:</th>
-            <td id="td_mi_cancel_date"><%= I18n.l(@current_member.cancel_date, :format => :only_date) unless @current_member.cancel_date.nil? %></td>  
+            <td id="td_mi_cancel_date"><%= I18n.l(@current_membership.cancel_date, :format => :only_date) unless @current_membership.cancel_date.nil? %></td>  
           </tr>
   
           <tr class="ligthgrey">
@@ -275,7 +275,7 @@
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.quota') %>: </th>
-            <td id="td_mi_quota"><%= @current_member.quota %></td>  
+            <td id="td_mi_quota"><%= @current_membership.quota %></td>  
           </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.date_of_active_credit_card') %>: </th>

@@ -14,7 +14,7 @@ class Agent < ActiveRecord::Base
   acts_as_paranoid
   validates_as_paranoid
 
-  has_many :created_members, :class_name => 'Member'
+  has_many :created_members, :class_name => 'Membership'
   has_many :operations
 
   # Virtual attribute for authenticating by either username or email
