@@ -96,8 +96,11 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def resend(agent)
-    if product.nil? or not product.has_stock? 
+    if product.nil? or not product.has_stock?
       raise "Product does not have stock."
+    end
+    if product.undeliverable?
+      raise "Product is undeliverable"
     end
 
     self.set_as_not_processed!
