@@ -44,6 +44,7 @@ class ActiveSupport::TestCase
     active_member.memberships << membership
     active_member.save
     FactoryGirl.create(enrollment_type, :member_id => active_member.id) unless enrollment_type.nil?
+    active_member.reload
     active_member
   end  
 

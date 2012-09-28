@@ -19,13 +19,14 @@ class Member < ActiveRecord::Base
 
   # TODO: should we use delegate??
   delegate :terms_of_membership, :to => :current_membership
+  # attr :terms_of_membership_id # is it necesarilly??? 
+  delegate :terms_of_membership_id, :to => :current_membership
   delegate :join_date, :to => :current_membership
   delegate :cancel_date, :to => :current_membership
   delegate :quota, :to => :current_membership
   delegate :time_zone, :to => :club
   ##### 
 
-  attr :terms_of_membership_id
   attr_accessible :address, :bill_date, :city, :country, :description, 
       :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
       :last_name, :next_retry_bill_date, 
@@ -307,7 +308,48 @@ class Member < ActiveRecord::Base
 
   def bill_membership
     if can_bill_membership?
-      current_membership.bill
+      amount = terms_of_membership.installment_amount
+      if amount.to_f > 0.0
+        # Grace period
+        # why cero times? Because only 1 time must be Billed.
+        # Before we were using times = 1. Problem is that times = 1, on case logic will allow times values [0,1].
+        # So grace period will be granted twice.
+        #        limit = 0 
+        #        days  = campaign.grace_period
+        if active_credit_card.nil?
+          if terms_of_membership.grace_period > 0
+            { :code => Settings.error_codes.credit_card_blank_with_grace, 
+              :message => "Credit card is blank. Allowing grace period" }
+          else
+            { :code => Settings.error_codes.credit_card_blank_without_grace,
+              :message => "Credit card is blank and grace period is disabled" }
+          end
+        elsif terms_of_membership.payment_gateway_configuration.nil?
+          message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
+          Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
+          Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership })
+          { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
+        else
+          acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
+          trans = Transaction.new
+          trans.transaction_type = "sale"
+          trans.prepare(self, acc, amount, terms_of_membership.payment_gateway_configuration)
+          answer = trans.process
+          if trans.success?
+            assign_club_cash!
+            set_as_active!
+            schedule_renewal
+            message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
+            Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
+            { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
+          else
+            message = set_decline_strategy(trans)
+            answer # TODO: should we answer set_decline_strategy message too?
+          end
+        end
+      else
+        { :message => "Called billing method but no amount on TOM is set.", :code => Settings.error_codes.no_amount }
+      end
     else
       { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
     end
@@ -619,28 +661,29 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def schedule_renewal
-    new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
-    if terms_of_membership.monthly?
-      self.current_membership.increment!(:quota)
-      if self.recycled_times > 1
-        new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
-      end
-    elsif terms_of_membership.yearly?
-      # refs #15935
-      self.current_membership.increment!(:quota, 12)
-    end
-    self.recycled_times = 0
-    self.bill_date = new_bill_date
-    self.next_retry_bill_date = new_bill_date
-    self.save
-    Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date}", self)
-  end
 
   private
     # TODO: finish this logic
     def membership_billed_recently?
       true
+    end
+
+    def schedule_renewal
+      new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
+      if terms_of_membership.monthly?
+        self.current_membership.increment!(:quota)
+        if self.recycled_times > 1
+          new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
+        end
+      elsif terms_of_membership.yearly?
+        # refs #15935
+        self.current_membership.increment!(:quota, 12)
+      end
+      self.recycled_times = 0
+      self.bill_date = new_bill_date
+      self.next_retry_bill_date = new_bill_date
+      self.save
+      Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date}", self)
     end
 
     def set_status_on_enrollment!(agent, trans, amount, info)
@@ -712,8 +755,6 @@ class Member < ActiveRecord::Base
       end
     end
 
-  public 
-
     def set_decline_strategy(trans)
       # soft / hard decline
       type = terms_of_membership.installment_type
@@ -774,6 +815,8 @@ class Member < ActiveRecord::Base
         self.fulfillments.where_undeliverable.each { |s| s.decrease_stock! }
       end
     end
+
+  public 
 
     def desnormalize_preferences
       if self.preferences.present?

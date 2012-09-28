@@ -66,8 +66,6 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-
-
   test "controlled refund (refund completely a transaction)" do
     active_merchant_stubs unless @use_active_merchant
     active_member = create_active_member(@terms_of_membership)
@@ -80,7 +78,7 @@ class TransactionTest < ActiveSupport::TestCase
         assert_difference('Communication.count') do
           trans = active_member.transactions.last
           answer = Transaction.refund(amount, trans)
-          assert (answer[:code] == Settings.error_codes.success), answer[:message]
+          assert_equal answer[:code], Settings.error_codes.success, answer[:message]
           trans.reload
           assert_equal trans.refunded_amount, amount
           assert_equal trans.amount_available_to_refund, 0.0
@@ -100,7 +98,7 @@ class TransactionTest < ActiveSupport::TestCase
   ############ DECLINE ###################
   test "Billing with SD is re-scheduled" do 
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
-    assert_difference('Operation.count', +1) do
+    assert_difference('Operation.count') do
       assert_difference('Transaction.count') do
         active_member = create_active_member(@terms_of_membership)
         nbd = active_member.bill_date

@@ -1,14 +1,10 @@
 FactoryGirl.define do
   factory :member_membership, class: Membership do
-    join_date { DateTime.now }
     status "none"
-    cohort { Time.zone.now.strftime TEST_COHORT }
   end
 
   factory :member_with_api_membership, class: Membership do
-    join_date { DateTime.now }
     status "none"
-    cohort { Time.zone.now.strftime TEST_COHORT }
   end
 
   factory :member_with_cc_membership, class: Membership do
@@ -55,7 +51,7 @@ FactoryGirl.define do
   factory :lapsed_member_membership, class: Membership do
     join_date { DateTime.now }
     status 'lapsed'
-    cancel_date { DateTime.now - 1.month }
+    cancel_date { Time.zone.now + 1.month }
     cohort { Time.zone.now.strftime TEST_COHORT }
   end
 
