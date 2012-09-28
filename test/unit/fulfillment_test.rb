@@ -92,7 +92,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Should create new fulfillment with recurrent and renewable_date" do
     setup_products
-    member = create_active_member(@terms_of_membership_with_gateway, :applied_member, :enrollment_info_with_product_without_stock)
+    member = create_active_member(@terms_of_membership_with_gateway, :applied_member, :enrollment_info_with_product_recurrent)
     assert_difference('Fulfillment.count') do
       member.set_as_provisional!
     end

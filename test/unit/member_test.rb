@@ -63,6 +63,7 @@ class MemberTest < ActiveSupport::TestCase
       member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
+      member.reload
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
       assert_equal member.quota, 1, "quota is #{member.quota} should be 1"
       assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
@@ -171,7 +172,6 @@ class MemberTest < ActiveSupport::TestCase
     member = FactoryGirl.build(:member)
     assert !member.save, member.errors.inspect
     member.club =  @terms_of_membership_with_gateway.club
-    member.terms_of_membership =  @terms_of_membership_with_gateway
     member.first_name = 'Billy 3ro'
     member.last_name = 'Sáenz'
     assert member.save, "member cant be save #{member.errors.inspect}"

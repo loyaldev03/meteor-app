@@ -73,6 +73,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_member = create_active_member(@terms_of_membership)
     amount = @terms_of_membership.installment_amount
     answer = active_member.bill_membership
+    active_member.reload
     assert_equal active_member.status, 'active'
     assert_difference('Operation.count', +2) do
       assert_difference('Transaction.count') do
@@ -139,6 +140,7 @@ class TransactionTest < ActiveSupport::TestCase
       active_member.recycled_times = 4
       active_member.save
       answer = active_member.bill_membership
+      active_member.reload
       assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
       assert active_member.lapsed?, "member should be lapsed after recycle limit is reached"
       assert_nil active_member.next_retry_bill_date, "next_retry_bill_date should be nil"
@@ -168,6 +170,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_member = create_active_member(@terms_of_membership)
     amount = @terms_of_membership.installment_amount
     answer = active_member.bill_membership
+    active_member.reload
     assert_equal active_member.next_retry_bill_date.to_date, (Time.zone.now + eval(Settings.next_retry_on_missing_decline)).to_date, "Next retry bill date incorrect"
   end
   ############################################
