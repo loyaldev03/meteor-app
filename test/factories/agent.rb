@@ -51,6 +51,15 @@ FactoryGirl.define do
     roles ["api"]
   end
 
+  factory :confirmed_agency_agent, class: Agent do
+    sequence(:username) {|n| "agency#{n}" }
+    password "secret"
+    password_confirmation { password }
+    sequence(:email) {|n| "agency#{n}@test.no" }
+    confirmed_at Date.today-1.month
+    roles ["agency"]
+  end
+
   factory :batch_agent, class: Agent do
     email "batch@xagax.com"
     username "batch@xagax.com"

@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :club do
-    name { Faker::Name.name }
+    sequence(:name) {|n| "#{Faker::Name.name}#{n}" }
     time_zone { TZInfo::Timezone.all.sample.name }
     description "My description"
     association :partner
@@ -23,7 +23,7 @@ FactoryGirl.define do
   end  
 
   factory :club_with_api, class: Club do
-    name { Faker::Name.name }
+    sequence(:name) {|n| "#{Faker::Name.name}#{n}" }
     description "My description"
     time_zone { TZInfo::Timezone.all.sample.name }
     association :partner
@@ -34,7 +34,7 @@ FactoryGirl.define do
   end
 
   factory :club_with_gateway, class: Club do
-    name { Faker::Name.name }
+    sequence(:name) {|n| "#{Faker::Name.name}#{n}" }
     time_zone { TZInfo::Timezone.all.sample.name }
     description "My description"
     association :partner

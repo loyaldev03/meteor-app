@@ -6,6 +6,7 @@ class ProductsControllerTest < ActionController::TestCase
     @representative_user = FactoryGirl.create(:confirmed_representative_agent)
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @api_user = FactoryGirl.create(:confirmed_api_agent)
+    @agency_user = FactoryGirl.create(:confirmed_agency_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:club, :partner_id => @partner.id)
   end
@@ -34,6 +35,12 @@ class ProductsControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
+  test "Agency user should not get index" do
+    sign_in @agency_user
+    get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
+    assert_response :success
+  end
+
   test "Admin should get new" do
     sign_in @admin_user
     get :new, :partner_prefix => @partner.prefix, :club_prefix => @club.name
@@ -56,6 +63,12 @@ class ProductsControllerTest < ActionController::TestCase
     sign_in @api_user
     get :new, :partner_prefix => @partner.prefix, :club_prefix => @club.name
     assert_response :unauthorized
+  end
+
+  test "Agency user should get new" do
+    sign_in @agency_user
+    get :new, :partner_prefix => @partner.prefix, :club_prefix => @club.name
+    assert_response :success
   end
 
   test "Admin should create product" do
@@ -92,6 +105,16 @@ class ProductsControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
+  test "Agency user should create product" do
+    sign_in @agency_user
+    product = FactoryGirl.build(:product)
+    assert_difference('Product.count',1) do
+      post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, product: { name: product.name,
+                     recurrent: product.recurrent, sku: product.sku, stock: product.stock, weight: product.weight }
+    end
+    assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  end
+
   test "Admin should show product" do
     sign_in @admin_user
     @product = FactoryGirl.create(:product)
@@ -120,6 +143,13 @@ class ProductsControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
+  test "Agency user should show product" do
+    sign_in @admin_user
+    @product = FactoryGirl.create(:product)
+    get :show, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
+    assert_response :success
+  end
+
   test "Admin should get edit" do
     sign_in @admin_user
     @product = FactoryGirl.create(:product)
@@ -146,6 +176,13 @@ class ProductsControllerTest < ActionController::TestCase
     @product = FactoryGirl.create(:product)
     get :edit, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
     assert_response :unauthorized
+  end
+
+  test "Agency user should get edit" do
+    sign_in @agency_user
+    @product = FactoryGirl.create(:product)
+    get :edit, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
+    assert_response :success
   end
 
   test "Admin should update product" do
@@ -180,13 +217,20 @@ class ProductsControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
+  test "Agency user should update product" do
+    sign_in @agency_user
+    @product = FactoryGirl.create(:product)
+    put :update, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name, 
+                 product: { name: @product.name, recurrent: @product.recurrent, sku: @product.sku, stock: @product.stock, weight: @product.weight }
+    assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  end
+
   test "Admin should destroy product" do
     sign_in @admin_user
     @product = FactoryGirl.create(:product)   
     assert_difference('Product.count', -1) do
       delete :destroy, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
     end
-
     assert_redirected_to products_path
   end
 
@@ -209,5 +253,14 @@ class ProductsControllerTest < ActionController::TestCase
     @product = FactoryGirl.create(:product) 
     delete :destroy, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
     assert_response :unauthorized
+  end
+
+  test "Agency user should destroy product" do
+    sign_in @agency_user
+    @product = FactoryGirl.create(:product)   
+    assert_difference('Product.count', -1) do
+      delete :destroy, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
+    end
+    assert_redirected_to products_path
   end
 end
