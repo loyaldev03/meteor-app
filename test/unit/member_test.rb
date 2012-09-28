@@ -119,7 +119,8 @@ class MemberTest < ActiveSupport::TestCase
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
     member = FactoryGirl.create(:lapsed_member, terms_of_membership: @tom_approval, club: @tom_approval.club)
     enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
-    answer = member.recover(@terms_of_membership_with_gateway)
+    answer = member.recover(@tom_approval)
+    member.reload
     assert answer[:code] == Settings.error_codes.success, answer[:message]
     assert_equal 'applied', member.status
     assert_equal 1, member.reactivation_times
@@ -137,13 +138,13 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "If member is rejected, when recovering it should increment reactivation_times" do
-    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
-    member = FactoryGirl.create(:applied_member, terms_of_membership: @tom_approval, club: @tom_approval.club)
+    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)   
     member.set_as_canceled!
     answer = member.recover(@terms_of_membership_with_gateway)
+    member.reload
     assert answer[:code] == Settings.error_codes.success, answer[:message]
-    assert_equal 'applied', member.status
+    assert_equal 'provisional', member.status
     assert_equal 1, member.reactivation_times
   end
 
@@ -211,7 +212,6 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal member.operations.last.description, "The email contains '@noemail.com' which is an empty email. The email won't be sent."
   end
 
-
   test "show dates according to club timezones" do
     @club = @terms_of_membership_with_gateway.club
     @saved_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @club)
@@ -227,6 +227,4 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal I18n.l(Time.zone.at(@saved_member.next_retry_bill_date)), "03/05/2012"
     assert_equal I18n.l(Time.zone.at(@saved_member.join_date)), "03/05/2012"
   end
-
-
 end
