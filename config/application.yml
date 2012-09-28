@@ -110,12 +110,12 @@ defaults: &defaults
         format: !ruby/regexp /^([0-9a-zA-Z\-_]([-_\.]?[+?]?[0-9a-zA-Z\-_])*@([0-9a-zA-Z]+[-_\.]?[0-9a-zA-Z]*\.)+[a-zA-Z]{2,9})$/
       club_id:
         presence: true
-      gender:
-        presence: true
+      # gender:
+      #   presence: true
       terms_of_membership_id:
         presence: true
       type_of_phone_number:
-        presence: true
+        # presence: true
         inclusion:
           :within:  # this needs to be a Symbol
           - Home 
