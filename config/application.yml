@@ -116,8 +116,6 @@ defaults: &defaults
         presence: true
       # gender:
       #   presence: true
-      terms_of_membership_id:
-        presence: true
       type_of_phone_number:
         # presence: true
         inclusion:

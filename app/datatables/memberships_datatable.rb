@@ -13,7 +13,7 @@ private
     memberships.map do |membership|
       [ membership.id, 
         membership.status, 
-        membership.terms_of_membership.to_label, 
+        membership.terms_of_membership, 
         membership.join_date, 
         membership.cancel_date, 
         membership.quota

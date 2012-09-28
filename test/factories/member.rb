@@ -1,4 +1,3 @@
-TEST_COHORT = "%Y-%m-super channel-xyz123456-1.month" #HARDCODED
 FactoryGirl.define do
     # HACK only if using schema as rb instead of sql: 
     # visible_id should be created automatically by mysql.
@@ -68,7 +67,6 @@ FactoryGirl.define do
     bill_date { DateTime.now }
     cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
-    memberships {|ccs| [ccs.association(:membership)]}
   end
 
 
@@ -94,7 +92,6 @@ FactoryGirl.define do
     gender "M"
     blacklisted false
     credit_cards {|ccs| [ccs.association(:credit_card)]}
-    memberships {|ccs| [ccs.association(:active_membership)]}
   end
 
   factory :active_member_with_external_id, class: Member do
@@ -119,7 +116,6 @@ FactoryGirl.define do
     gender "M"
     blacklisted false
     credit_cards {|ccs| [ccs.association(:credit_card)]}
-    memberships {|ccs| [ccs.association(:active_membership)]}
     external_id 123456
   end
 
@@ -143,7 +139,6 @@ FactoryGirl.define do
     country "US"
     club_cash_amount 0
     cohort { Time.zone.now.strftime TEST_COHORT }
-    memberships {|ccs| [ccs.association(:active_membership)]}
   end
 
   factory :lapsed_member, class: Member do
@@ -167,7 +162,6 @@ FactoryGirl.define do
     blacklisted false
     cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
-    memberships {|ccs| [ccs.association(:lapsed_membership)]}
   end
 
 
@@ -192,7 +186,6 @@ FactoryGirl.define do
     bill_date { DateTime.now }
     cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
-    memberships {|ccs| [ccs.association(:provisional_membership)]}
   end
 
   factory :provisional_member, class: Member do
@@ -215,7 +208,6 @@ FactoryGirl.define do
     cohort { Time.zone.now.strftime TEST_COHORT }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
-    memberships {|ccs| [ccs.association(:provisional_membership)]}
   end
 
   factory :applied_member, class: Member do
@@ -237,7 +229,6 @@ FactoryGirl.define do
     club_cash_amount 0
     cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
-    memberships {|ccs| [ccs.association(:applied_membership)]}
   end
 
 end

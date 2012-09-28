@@ -38,7 +38,7 @@ class Transaction < ActiveRecord::Base
     self.country = member.country
     self.zip = member.zip
     self.cohort = member.cohort
-    self.terms_of_membership_id = member.terms_of_membership_id
+    self.terms_of_membership_id = member.terms_of_membership.id
   end
 
   def credit_card=(credit_card)
@@ -62,7 +62,7 @@ class Transaction < ActiveRecord::Base
   end
 
   def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil)
-    self.terms_of_membership_id = terms_of_membership_id || member.terms_of_membership_id
+    self.terms_of_membership_id = terms_of_membership_id || member.terms_of_membership.id
     self.member = member
     self.credit_card = credit_card
     self.amount = amount

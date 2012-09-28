@@ -5,12 +5,15 @@ class Membership < ActiveRecord::Base
   has_one :enrollment_info
   has_many :transactions
 
-  attr_accessible :created_by, :join_date, :status, :cancel_date, :quota
-
-  after_create :set_current_membership_at_member
+  attr_accessible :created_by, :join_date, :status, :cancel_date, :quota, :terms_of_membership_id
 
   delegate :active_credit_card, :to => :member
   delegate :recycled_times, :to => :member
+
+  before_create :set_default_quota
+
+  # validates :terms_of_membership, :presence => true
+  # validates :member, :presence => true
 
   def self.datatable_columns
     ['id', 'status', 'tom', 'join_date', 'cancel_date', 'quota' ]
@@ -60,11 +63,11 @@ class Membership < ActiveRecord::Base
       { :message => "Called billing method but no amount on TOM is set.", :code => Settings.error_codes.no_amount }
     end
   end
-  
-  private
-    def set_current_membership_at_member
-      self.member.update_attribute :current_membership_id, self.id
-    end
 
+  private 
+    def set_default_quota
+      quota = (terms_of_membership.monthly? ? 1 :  0)
+    end
+  
 end
 

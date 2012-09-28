@@ -1,29 +1,58 @@
-TEST_COHORT = "%Y-%m-super channel-xyz123456-1.month"
 FactoryGirl.define do
-  factory :membership do
+  factory :member_membership, class: Membership do
+    join_date { DateTime.now }
+    status "none"
+    cohort { Time.zone.now.strftime TEST_COHORT }
+  end
+
+  factory :member_with_api_membership, class: Membership do
+    join_date { DateTime.now }
+    status "none"
+    cohort { Time.zone.now.strftime TEST_COHORT }
+  end
+
+  factory :member_with_cc_membership, class: Membership do
     join_date { DateTime.now }
     cohort { Time.zone.now.strftime TEST_COHORT }
   end
 
-  factory :active_membership, class: Membership do
+  factory :active_member_membership, class: Membership do
     join_date { DateTime.now }
     status 'active'
     cohort { Time.zone.now.strftime TEST_COHORT }
   end
 
-  factory :provisional_membership, class: Membership do
+  factory :active_member_with_external_id_membership, class: Membership do
+    join_date { DateTime.now }
+    status 'active'
+    cohort { Time.zone.now.strftime TEST_COHORT }
+  end
+
+  factory :active_member_without_cc_membership, class: Membership do
+    join_date { DateTime.now }
+    status 'active'
+    cohort { Time.zone.now.strftime TEST_COHORT }
+  end
+
+  factory :provisional_member_with_cc_membership, class: Membership do
     join_date { DateTime.now }
     status 'provisional'
     cohort { Time.zone.now.strftime TEST_COHORT }
   end
 
-  factory :applied_membership, class: Membership do
+  factory :provisional_member_membership, class: Membership do
+    join_date { DateTime.now }
+    status 'provisional'
+    cohort { Time.zone.now.strftime TEST_COHORT }
+  end
+
+  factory :applied_member_membership, class: Membership do
     join_date { DateTime.now }
     status 'applied'
     cohort { Time.zone.now.strftime TEST_COHORT }
   end
 
-  factory :lapsed_membership, class: Membership do
+  factory :lapsed_member_membership, class: Membership do
     join_date { DateTime.now }
     status 'lapsed'
     cancel_date { DateTime.now - 1.month }

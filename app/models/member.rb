@@ -14,12 +14,18 @@ class Member < ActiveRecord::Base
   has_many :club_cash_transactions
   has_many :enrollment_infos, :order => "created_at DESC"
   has_many :member_preferences
-  has_many :memberships
+  has_many :memberships, :order => "created_at DESC"
   belongs_to :current_membership, :class_name => 'Membership'
 
+  # TODO: should we use delegate??
   delegate :terms_of_membership, :to => :current_membership
-  delegate :timezone, :to => :club
+  delegate :join_date, :to => :current_membership
+  delegate :cancel_date, :to => :current_membership
+  delegate :quota, :to => :current_membership
+  delegate :time_zone, :to => :club
+  ##### 
 
+  attr :terms_of_membership_id
   attr_accessible :address, :bill_date, :city, :country, :description, 
       :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
       :last_name, :next_retry_bill_date, 
@@ -174,10 +180,10 @@ class Member < ActiveRecord::Base
 
   # Sets join date. It is called when members status is changed from 'none' to 'applied'
   def set_join_date
-    self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, time_zone, terms_of_membership.installment_type)
-    self.save
     membership = current_membership
     membership.join_date = Time.zone.now
+    self.cohort = Member.cohort_formula(membership.join_date, self.enrollment_infos.first, time_zone, terms_of_membership.installment_type)
+    self.save
     membership.cohort = self.cohort
     membership.save
   end
@@ -186,13 +192,12 @@ class Member < ActiveRecord::Base
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
   def schedule_first_membership
     send_fulfillment
+    membership = current_membership
+    membership.join_date = Time.zone.now
     self.bill_date = Time.zone.now + terms_of_membership.provisional_days
     self.next_retry_bill_date = bill_date
-    self.cohort = Member.cohort_formula(self.join_date, self.enrollment_infos.first, time_zone, terms_of_membership.installment_type)
+    self.cohort = Member.cohort_formula(membership.join_date, self.enrollment_infos.first, time_zone, terms_of_membership.installment_type)
     self.save
-    membership = current_membership
-    membership.quota = (terms_of_membership.monthly? ? 1 :  0)
-    membership.join_date = Time.zone.now
     membership.cohort = self.cohort
     membership.save
   end
@@ -204,7 +209,6 @@ class Member < ActiveRecord::Base
     self.next_retry_bill_date = bill_date
     self.save
     membership = current_membership
-    membership.quota = (terms_of_membership.monthly? ? 1 :  0)
     membership.save
   end
 
@@ -280,10 +284,10 @@ class Member < ActiveRecord::Base
 
   def save_the_sale(new_tom_id, agent = nil)
     if can_save_the_sale?
-      if new_tom_id.to_i == terms_of_membership_id.to_i
+      if new_tom_id.to_i == terms_of_membership.id
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
-        old_tom_id = terms_of_membership_id
+        old_tom_id = terms_of_membership.id
         res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
         if res[:code] == Settings.error_codes.success
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
@@ -297,8 +301,8 @@ class Member < ActiveRecord::Base
   end
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
-  def recover(new_tom_id, agent = nil)
-    enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
+  def recover(new_tom, agent = nil)
+    enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
   end
 
   def bill_membership
@@ -328,10 +332,6 @@ class Member < ActiveRecord::Base
         member.update_member_data_by_params member_params
         member.skip_api_sync! if member.api_id.present? || skip_api_sync
         member.club = club
-
-require 'ruby-debug'
-debugger
-
         unless member.valid? and credit_card.valid?
           # errors = member.error_to_s + credit_card.error_to_s
           errors = member.errors.to_hash
@@ -388,7 +388,8 @@ debugger
         
     enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => tom.id
     enrollment_info.update_enrollment_info_by_hash member_params
-    membership = Membership.new(terms_of_membership_id: tom.id, created_by_id: agent.id)
+    membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent)
+    self.current_membership = membership
 
     if amount.to_f != 0.0
       trans = Transaction.new
@@ -515,7 +516,7 @@ debugger
     amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
     self.add_club_cash(nil, amount, message)
     if self.club_cash_expire_date.nil? # first club cash assignment
-      self.club_cash_expire_date = self.join_date + 1.year
+      self.club_cash_expire_date = join_date + 1.year
     end
     self.save(:validate => false)
   end
@@ -618,6 +619,24 @@ debugger
     end
   end
 
+  def schedule_renewal
+    new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
+    if terms_of_membership.monthly?
+      self.current_membership.increment!(:quota)
+      if self.recycled_times > 1
+        new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
+      end
+    elsif terms_of_membership.yearly?
+      # refs #15935
+      self.current_membership.increment!(:quota, 12)
+    end
+    self.recycled_times = 0
+    self.bill_date = new_bill_date
+    self.next_retry_bill_date = new_bill_date
+    self.save
+    Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date}", self)
+  end
+
   private
     # TODO: finish this logic
     def membership_billed_recently?
@@ -666,24 +685,6 @@ debugger
       self.member_since_date = Time.zone.now
     end
 
-    def schedule_renewal
-      new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
-      if terms_of_membership.monthly?
-        self.current_membership.increment(:quota)
-        if self.recycled_times > 1
-          new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
-        end
-      elsif terms_of_membership.yearly?
-        # refs #15935
-        self.current_membership.increment(:quota, 12)
-      end
-      self.recycled_times = 0
-      self.bill_date = new_bill_date
-      self.next_retry_bill_date = new_bill_date
-      self.save
-      Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date}", self)
-    end
-
     def cancellation
       self.next_retry_bill_date = nil
       self.bill_date = nil
@@ -694,6 +695,24 @@ debugger
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
       cancel_member_at_remote_domain
     end
+
+    def asyn_desnormalize_preferences(opts = {})
+      self.desnormalize_preferences if opts[:force] || self.changed.include?('preferences') 
+    end
+
+    def wrong_address_logic
+      if self.changed.include?('wrong_address') and self.wrong_address.nil?
+        self.fulfillments.where_undeliverable.each { |s| s.set_as_not_processed }
+      end
+    end
+
+    def propagate_membership_data
+      if self.changed.include?('status')
+        self.current_membership.update_attribute :status, status
+      end
+    end
+
+  public 
 
     def set_decline_strategy(trans)
       # soft / hard decline
@@ -740,8 +759,9 @@ debugger
         set_as_canceled!
       else
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_soft_decline)
-        increment(:recycled_times, 1)
+        increment!(:recycled_times, 1)
       end
+      self.save
       message
     end
 
@@ -755,13 +775,6 @@ debugger
       end
     end
 
-    def propagate_membership_data
-      if self.changed.include?('status')
-        self.current_membership.update_attribute :status, status
-      end
-    end
-
-  public 
     def desnormalize_preferences
       if self.preferences.present?
         self.preferences.each do |key, value|

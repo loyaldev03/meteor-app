@@ -141,18 +141,15 @@
           </td>  
         </tr>
         <% if @member.new_record? %>
-        <tr class = "control-group">
-          <th>
-            <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %>
-          </th>
-          <% if @member.new_record? %>
-          <td> 
-            <%= f.select(:terms_of_membership_id, options_from_collection_for_select(@terms_of_memberships, "id", "name")) %>
-          </td>  
-          <% end %>
-        </tr>
+          <tr class = "control-group">
+            <th>
+              <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %>
+            </th>
+            <td> 
+              <%= select_tag('member[terms_of_membership_id]', options_from_collection_for_select(@terms_of_memberships, "id", "name")) %>
+            </td>  
+          </tr>
         <% end %>
-        <tr>
       </table>
     </td>
     <td style="width: 50%;">

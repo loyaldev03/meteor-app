@@ -318,11 +318,10 @@ $(document).ready( function() {
   };
 
   function transactions_member_functions(column_count){
-    oTable = $('#transactions_table').dataTable({
+    $('#transactions_table').dataTable({
       "oLanguage": {"sSearch": "Filtered by:"},
       "bJQueryUI": false,
       "bProcessing": true,
-      "bFilter": false,
       "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
@@ -332,11 +331,11 @@ $(document).ready( function() {
   }
   
   function memberships_member_functions(column_count){
-    oTable = $('#memberships_table').dataTable({
+    $('#memberships_table').dataTable({
       "oLanguage": {"sSearch": "Filtered by:"},
       "bJQueryUI": false,
-      "bFilter": false,
       "bProcessing": true,
+      "bFilter": false,
       "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
