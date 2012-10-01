@@ -46,7 +46,7 @@ FactoryGirl.define do
     club_cash_amount 0
     cohort { Time.zone.now.strftime TEST_COHORT }
     association :club, factory: :club_with_api
-    terms_of_membership
+    association :terms_of_membership, factory: :terms_of_membership_with_gateway
   end
 
   factory :member_with_cc, class: Member do
