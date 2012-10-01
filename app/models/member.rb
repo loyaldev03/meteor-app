@@ -477,7 +477,7 @@ class Member < ActiveRecord::Base
         f.member_id = self.uuid
         f.recurrent = Product.find_by_sku_and_club_id(product,self.club_id).recurrent rescue false
         f.save
-        f.set_as_not_processed!
+        f.decrease_stock!
       end
     end
   end
@@ -795,7 +795,7 @@ class Member < ActiveRecord::Base
 
     def wrong_address_logic
       if self.changed.include?('wrong_address') and self.wrong_address.nil?
-        self.fulfillments.where_undeliverable.each { |s| s.set_as_not_processed }
+        self.fulfillments.where_undeliverable.each { |s| s.decrease_stock! }
       end
     end
 
