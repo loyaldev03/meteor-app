@@ -13,7 +13,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
   def setup_member
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @member_blacklist_reason =  FactoryGirl.create(:member_blacklist_reason)
@@ -184,7 +184,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     @saved_member.reload
     bl_credit_card = @saved_member.active_credit_card
     partner_new = FactoryGirl.create(:partner)
-    club_new = FactoryGirl.create(:simple_club, :partner_id => partner_new.id)
+    club_new = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner_new.id)
     Time.zone = club_new.time_zone
     terms_of_membership_with_gateway_new = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => club_new.id)
 

@@ -211,6 +211,7 @@ en:
         not_found: 'No fulfillments were found.'
         status: 'Status'
         product_type: 'Product type'
+        renewed: 'Renewed.'
       communication:
         response: 'Response'
         template_name: 'Template name'

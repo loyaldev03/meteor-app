@@ -13,9 +13,8 @@ class MembersClubCashTest < ActionController::IntegrationTest
   def setup_member
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
-    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
     
@@ -140,7 +139,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
   test "create member with terms_of_membership without club cash" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id, :name => 'club_testing_')
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id, :name => 'club_testing_')
     Time.zone = @club.time_zone
     @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_without_club_cash, :club_id => @club.id)
@@ -221,8 +220,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
   test "set club cash expire date on member created by sloop once it is billed" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id, :name => 'dasd')
-    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id, :name => 'dasd')
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -249,9 +247,8 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
   test "add club cash amount using the amount on member TOM enrollment amount > 0" do
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:complete_enrollment_info_with_cero_amount)
   
     create_member_throught_sloop(enrollment_info, @terms_of_membership_with_gateway)
@@ -326,9 +323,8 @@ class MembersClubCashTest < ActionController::IntegrationTest
   test "add club cash from club cash amount configured in the TOM - Yearly Member" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
-    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
     
@@ -372,9 +368,8 @@ class MembersClubCashTest < ActionController::IntegrationTest
   test "Add club cash from club cash amount configured in the TOM - Yearly and Chapter Member" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
-    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
     
@@ -439,9 +434,8 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
   test "Add club cash amount using the amount on member TOM enrollment amount = 0" do
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:complete_enrollment_info_with_cero_amount)
   
     create_member_throught_sloop(enrollment_info, @terms_of_membership_with_gateway)

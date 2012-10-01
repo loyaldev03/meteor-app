@@ -9,7 +9,7 @@ class ClubsControllerTest < ActionController::TestCase
     @agency_user = FactoryGirl.create(:confirmed_agency_agent)    
     @partner = FactoryGirl.create(:partner)
     @partner_prefix = @partner.prefix
-    @club = FactoryGirl.create(:club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
   end
 
   test "Admin should get index" do

@@ -10,7 +10,7 @@ class ClubTest < ActionController::IntegrationTest
   end
 
   test "create club" do
-    unsaved_club = FactoryGirl.build(:simple_club)
+    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
     fill_in 'club[name]', :with => unsaved_club.name
@@ -34,7 +34,7 @@ class ClubTest < ActionController::IntegrationTest
   end
 
   test "should read club" do
-    saved_club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    saved_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     visit clubs_path(@partner.prefix)
     within("#clubs_table") do
       wait_until{
@@ -46,7 +46,7 @@ class ClubTest < ActionController::IntegrationTest
   end
 
   test "should update club" do
-    saved_club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    saved_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     visit clubs_path(@partner.prefix)
     within("#clubs_table") do
       wait_until{
@@ -70,7 +70,7 @@ class ClubTest < ActionController::IntegrationTest
   end
 
   test "should delete club" do
-    saved_club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    saved_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     visit clubs_path(@partner.prefix)
     confirm_ok_js
     within("#clubs_table") do
@@ -85,7 +85,7 @@ class ClubTest < ActionController::IntegrationTest
   end
 
   test "should create default product when creating club" do
-    unsaved_club = FactoryGirl.build(:simple_club)
+    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
     fill_in 'club[name]', :with => unsaved_club.name
@@ -114,7 +114,7 @@ class ClubTest < ActionController::IntegrationTest
   end
 
   test "should see all clubs as admin on my clubs section" do
-    10.times{ FactoryGirl.create(:simple_club, :partner_id => @partner.id) }
+    10.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
     within("#partners_table") do
       wait_until{
         assert page.has_content?('Show')

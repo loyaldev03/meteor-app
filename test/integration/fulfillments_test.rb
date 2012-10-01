@@ -10,7 +10,7 @@ class FulfillmentsTest < ActionController::IntegrationTest
   setup do
     init_test_setup
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
    
@@ -23,9 +23,9 @@ class FulfillmentsTest < ActionController::IntegrationTest
   ############################################################
 
   test "Should show response when marking as sent" do
-  	@fulfillment_without_stock = FactoryGirl.create(:fulfillment_without_stock_with_product_with_stock, :member_id => @member.id) 
-  	@product= FactoryGirl.create(:product, :club_id => @club.id)
-
+    @product= FactoryGirl.create(:product, :club_id => @club.id)
+  	@fulfillment_without_stock = FactoryGirl.create(:fulfillment, :member_id => @member.id, :product_id => @product) 
+    @fulfillment.set_as_out_of_stock
   	visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   	within ("#fulfillments_table") do
 			select('out_of_stock', :from => '[status]')
