@@ -24,16 +24,9 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     @saved_member = nil
     
     if create_provisional
-	    @saved_member = FactoryGirl.create(:provisional_member_with_cc, 
-	      :club_id => @club.id, 
-	      :terms_of_membership => @terms_of_membership_with_gateway,
-	      :created_by => @admin_agent)
+      @saved_member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc, nil, {}, { :created_by => @admin_agent })
     else
-      @saved_member = FactoryGirl.create(:active_member, 
-        :club_id => @club.id, 
-        :terms_of_membership => @terms_of_membership_with_gateway,
-        :created_by => @admin_agent)
-			
+      @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })			
 		end
     @saved_member.reload
     sign_in_as(@admin_agent)

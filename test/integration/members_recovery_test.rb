@@ -19,12 +19,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
     FactoryGirl.create(:batch_agent)
 
-    saved_member = FactoryGirl.create(:active_member, 
-	      :club_id => @club.id, 
-	      :terms_of_membership => @terms_of_membership_with_gateway,
-	      :created_by => @admin_agent)
-
-		saved_member.reload
+    saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
     
     cancel_date = Time.zone.now + 1.days
     message = "Member cancellation scheduled to #{cancel_date} - Reason: #{@member_cancel_reason.name}"
