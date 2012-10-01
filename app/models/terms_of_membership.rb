@@ -21,6 +21,7 @@ class TermsOfMembership < ActiveRecord::Base
   validates :installment_amount, :presence => true
   validates :installment_type, :presence => true
   validates :club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  validate :validate_payment_gateway_configuration
 
   ###########################################
   # Installment types:
@@ -50,6 +51,10 @@ class TermsOfMembership < ActiveRecord::Base
   end
 
   private
+
+    def validate_payment_gateway_configuration
+      errors.add :base, :club_payment_gateway_configuration unless self.payment_gateway_configuration
+    end
 
     def setup_defaul_email_templates
       if development?
