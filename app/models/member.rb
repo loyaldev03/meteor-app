@@ -477,7 +477,7 @@ class Member < ActiveRecord::Base
         f.member_id = self.uuid
         f.recurrent = Product.find_by_sku_and_club_id(product,self.club_id).recurrent rescue false
         f.save
-        f.set_as_not_processed!
+        f.decrease_stock!
       end
     end
   end
@@ -579,11 +579,11 @@ class Member < ActiveRecord::Base
             end
             answer = { :message => message, :code => Settings.error_codes.success }
           else
-            answer[:message] = "Could not saved club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
+            answer[:message] = "Could not save club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
           end
         rescue Exception => e
-          answer[:message] = "Could not saved club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
-          Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => answer[:message])
+          answer[:message] = "Could not save club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
+          Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message])
           raise ActiveRecord::Rollback
         end
       end
@@ -795,7 +795,7 @@ class Member < ActiveRecord::Base
 
     def wrong_address_logic
       if self.changed.include?('wrong_address') and self.wrong_address.nil?
-        self.fulfillments.where_undeliverable.each { |s| s.set_as_not_processed }
+        self.fulfillments.where_undeliverable.each { |s| s.decrease_stock! }
       end
     end
 

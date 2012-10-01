@@ -26,8 +26,6 @@ class Fulfillment < ActiveRecord::Base
   delegate :club, :to => :member
 
   state_machine :status, :initial => :not_processed do
-    after_transition all => :not_processed, :do => :decrease_stock
-
     event :set_as_not_processed do
       transition [:sent, :out_of_stock, :undeliverable, :not_processed] => :not_processed
     end
@@ -82,16 +80,15 @@ class Fulfillment < ActiveRecord::Base
     f.member_id = self.member_id
     f.recurrent = true
     f.save
-    f.set_as_not_processed! if status.nil?
+    f.decrease_stock! if status.nil?
   end
 
-  def validate_stock
+  def decrease_stock!
     if product.nil? or not product.has_stock?
       set_as_out_of_stock!
-      false
     else
+      set_as_not_processed!
       product.decrease_stock
-      true
     end
   end
 
@@ -103,7 +100,7 @@ class Fulfillment < ActiveRecord::Base
       raise "Fulfillment is undeliverable"
     end
 
-    self.set_as_not_processed!
+    self.decrease_stock!
     self.assigned_at = Time.zone.now
     self.save
     message = "Fulfillment #{self.product_sku} was marked to be delivered next time."
@@ -155,11 +152,8 @@ class Fulfillment < ActiveRecord::Base
     @product ||= Product.find_by_sku_and_club_id(self.product_sku, self.member.club_id)
   end
 
-  private
-    def decrease_stock
-      validate_stock
-    end
 
+  private
     def set_default_values
       self.assigned_at = Time.zone.now
       # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
