@@ -25,6 +25,7 @@ class Ability
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent
+      can :see_sync_status, Member
     elsif agent.has_role? 'representative'
       can :manage, Member
       cannot :enroll, Member
