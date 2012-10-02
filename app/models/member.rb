@@ -348,7 +348,7 @@ class Member < ActiveRecord::Base
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end
 
-  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0')
+  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0', skip_api_sync = false)
     credit_card_params = {} if credit_card_params.blank? # might be [], we expect a Hash
     club = tom.club
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
@@ -361,7 +361,7 @@ class Member < ActiveRecord::Base
       if credit_cards.empty? or cc_blank == '1'
         member = Member.new
         member.update_member_data_by_params member_params
-        member.skip_api_sync! if member.api_id.present? 
+        member.skip_api_sync! if member.api_id.present? || skip_api_sync
         member.club = club
         member.created_by_id = current_agent.id
         member.terms_of_membership = tom

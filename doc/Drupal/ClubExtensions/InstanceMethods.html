@@ -186,7 +186,7 @@
 
     <span class='ivar'>@drupal_client</span> <span class='op'>=</span> <span class='const'>Faraday</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
       <span class='label'>url:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_api_domain'>api_domain</span><span class='period'>.</span><span class='id identifier rubyid_url'>url</span><span class='comma'>,</span> 
-      <span class='label'>request:</span> <span class='lbrace'>{</span> <span class='label'>open_timeout:</span> <span class='int'>10</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='int'>10</span> <span class='rbrace'>}</span>
+      <span class='label'>request:</span> <span class='lbrace'>{</span> <span class='label'>open_timeout:</span> <span class='int'>20</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='int'>20</span> <span class='rbrace'>}</span>
     <span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_builder'>builder</span><span class='op'>|</span>
       <span class='id identifier rubyid_builder'>builder</span><span class='period'>.</span><span class='id identifier rubyid_request'>request</span> <span class='symbol'>:json</span>
       <span class='id identifier rubyid_builder'>builder</span><span class='period'>.</span><span class='id identifier rubyid_request'>request</span> <span class='symbol'>:drupal_auth</span><span class='comma'>,</span>
@@ -217,7 +217,7 @@
 </div>
 
     <div id="footer">
-  Generated on Tue Aug 28 09:39:10 2012 by
+  Generated on Tue Oct  2 11:30:18 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
