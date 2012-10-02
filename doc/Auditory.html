@@ -186,12 +186,12 @@ scripts.
       <pre class="lines">
 
 
-19
 20
-21</pre>
+21
+22</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/auditory.rb', line 19</span>
+      <pre class="code"><span class="info file"># File 'lib/auditory.rb', line 20</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_add_redmine_ticket'>add_redmine_ticket</span><span class='lparen'>(</span><span class='id identifier rubyid_error'>error</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Special Error</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='const'>Airbrake</span><span class='period'>.</span><span class='id identifier rubyid_notify'>notify</span><span class='lparen'>(</span><span class='symbol'>:error_class</span>   <span class='op'>=&gt;</span> <span class='id identifier rubyid_error'>error</span><span class='comma'>,</span> <span class='symbol'>:error_message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_error'>error</span><span class='rbrace'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_message'>message</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:parameters</span>    <span class='op'>=&gt;</span> <span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span>    
@@ -243,7 +243,8 @@ operation_type : operation type used by reporting/web to group operations
 15
 16
 17
-18</pre>
+18
+19</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/auditory.rb', line 7</span>
@@ -251,10 +252,11 @@ operation_type : operation type used by reporting/web to group operations
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_audit'>audit</span><span class='lparen'>(</span><span class='id identifier rubyid_current_agent'>current_agent</span><span class='comma'>,</span> <span class='id identifier rubyid_object'>object</span><span class='comma'>,</span> <span class='id identifier rubyid_description'>description</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_operation_type'>operation_type</span> <span class='op'>=</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_operation_types'>operation_types</span><span class='period'>.</span><span class='id identifier rubyid_others'>others</span><span class='rparen'>)</span>
   <span class='kw'>begin</span>
     <span class='id identifier rubyid_current_agent'>current_agent</span> <span class='op'>=</span> <span class='const'>Agent</span><span class='period'>.</span><span class='id identifier rubyid_find_by_email'>find_by_email</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>batch@xagax.com</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_current_agent'>current_agent</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
-    <span class='id identifier rubyid_o'>o</span> <span class='op'>=</span> <span class='const'>Operation</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='symbol'>:operation_date</span> <span class='op'>=&gt;</span> <span class='const'>DateTime</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='comma'>,</span> 
+    <span class='id identifier rubyid_o'>o</span> <span class='op'>=</span> <span class='const'>Operation</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='symbol'>:operation_date</span> <span class='op'>=&gt;</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='comma'>,</span> 
       <span class='symbol'>:resource</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_object'>object</span><span class='comma'>,</span> <span class='symbol'>:description</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_description'>description</span><span class='comma'>,</span> <span class='symbol'>:operation_type</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_operation_type'>operation_type</span>
     <span class='id identifier rubyid_o'>o</span><span class='period'>.</span><span class='id identifier rubyid_created_by_id'>created_by_id</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_current_agent'>current_agent</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='kw'>nil</span> <span class='op'>:</span> <span class='id identifier rubyid_current_agent'>current_agent</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_o'>o</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='id identifier rubyid_member'>member</span>
+    <span class='id identifier rubyid_o'>o</span><span class='period'>.</span><span class='id identifier rubyid_cohort'>cohort</span> <span class='op'>=</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_cohort'>cohort</span> <span class='kw'>unless</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
     <span class='id identifier rubyid_o'>o</span><span class='period'>.</span><span class='id identifier rubyid_save!'>save!</span>
   <span class='kw'>rescue</span> <span class='const'>Exception</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
     <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> * * * * * CANT SAVE OPERATION </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -270,7 +272,7 @@ operation_type : operation type used by reporting/web to group operations
 </div>
 
     <div id="footer">
-  Generated on Tue Aug 28 09:39:10 2012 by
+  Generated on Tue Oct  2 11:30:19 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

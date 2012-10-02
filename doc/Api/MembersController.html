@@ -299,6 +299,7 @@ enrolling, or &#8220;wrong_address&#8221; for update.
  * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. It should only be true
              when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following 
              attributes: number=&gt;&quot;0000000000&quot; and expire_month and expired_year setted as today's month and year respectively.
+ * skip_api_sync: Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal)
 </code></pre>
 </dd>
 <dt>message</dt><dd><p>
@@ -443,7 +444,6 @@ creation page.
       <pre class="lines">
 
 
-85
 86
 87
 88
@@ -458,10 +458,12 @@ creation page.
 97
 98
 99
-100</pre>
+100
+101
+102</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_authorize!'>authorize!</span> <span class='symbol'>:api_enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
@@ -476,6 +478,7 @@ creation page.
       <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='comma'>,</span> 
       <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:credit_card</span><span class='rbracket'>]</span><span class='comma'>,</span> 
       <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:cc_blank</span><span class='rbracket'>]</span><span class='comma'>,</span> 
+      <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:skip_api_sync</span><span class='rbracket'>]</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -661,8 +664,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-216
-217
 218
 219
 220
@@ -714,10 +715,12 @@ Code related to the method result.
 266
 267
 268
-269</pre>
+269
+270
+271</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 216</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 218</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_show'>show</span>
   <span class='id identifier rubyid_authorize!'>authorize!</span> <span class='symbol'>:api_profile</span><span class='comma'>,</span> <span class='const'>Member</span>
@@ -979,8 +982,6 @@ page.
       <pre class="lines">
 
 
-141
-142
 143
 144
 145
@@ -1001,10 +1002,12 @@ page.
 160
 161
 162
-163</pre>
+163
+164
+165</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 141</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 143</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_authorize!'>authorize!</span> <span class='symbol'>:api_update</span><span class='comma'>,</span> <span class='const'>Member</span>
@@ -1039,7 +1042,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Mon Sep 17 18:08:24 2012 by
+  Generated on Tue Oct  2 11:30:22 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

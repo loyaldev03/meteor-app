@@ -581,7 +581,7 @@ Later if not successful = (+2), 3/2013 6 Days Later if not successful =
     <span class='kw'>else</span>
       <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='op'>=</span><span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_year'>year</span>
     <span class='kw'>end</span>
-    <span class='kw'>return</span> <span class='id identifier rubyid_new_active_credit_card'>new_active_credit_card</span><span class='lparen'>(</span><span class='id identifier rubyid_acc'>acc</span><span class='comma'>,</span> <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_acc'>acc</span>
+    <span class='kw'>return</span> <span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_new_expiration_on_active_credit_card'>new_expiration_on_active_credit_card</span><span class='lparen'>(</span><span class='id identifier rubyid_acc'>acc</span><span class='comma'>,</span> <span class='id identifier rubyid_new_year_exp'>new_year_exp</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_acc'>acc</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_acc'>acc</span>
 <span class='kw'>end</span></pre>
@@ -915,7 +915,7 @@ Later if not successful = (+2), 3/2013 6 Days Later if not successful =
 </div>
 
     <div id="footer">
-  Generated on Mon Sep 17 18:08:23 2012 by
+  Generated on Tue Oct  2 11:30:20 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

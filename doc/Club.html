@@ -324,7 +324,7 @@ api_type column should have Drupal::Member or Wordpress::Member
       <pre class="code"><span class="info file"># File 'app/models/club.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sync?'>sync?</span>
-  <span class='lbracket'>[</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_api_type'>api_type</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_api_username'>api_username</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_api_password'>api_password</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_none?'>none?</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:nil?</span><span class='rparen'>)</span>
+  <span class='lbracket'>[</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_api_type'>api_type</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_api_username'>api_username</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_api_password'>api_password</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_none?'>none?</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:blank?</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -336,7 +336,7 @@ api_type column should have Drupal::Member or Wordpress::Member
 </div>
 
     <div id="footer">
-  Generated on Mon Sep 17 18:08:21 2012 by
+  Generated on Tue Oct  2 11:30:19 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

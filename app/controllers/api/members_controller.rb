@@ -67,6 +67,7 @@ class Api::MembersController < ApplicationController
   #           * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. It should only be true
   #                       when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following 
   #                       attributes: number=>"0000000000" and expire_month and expired_year setted as today's month and year respectively.
+  #           * skip_api_sync: Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal)
   #
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
@@ -95,6 +96,7 @@ class Api::MembersController < ApplicationController
         params[:member], 
         params[:member][:credit_card], 
         params[:setter] && params[:setter][:cc_blank], 
+        params[:setter] && params[:setter][:skip_api_sync]
       )
     end
   end
