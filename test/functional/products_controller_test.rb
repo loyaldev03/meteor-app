@@ -8,7 +8,7 @@ class ProductsControllerTest < ActionController::TestCase
     @api_user = FactoryGirl.create(:confirmed_api_agent)
     @agency_user = FactoryGirl.create(:confirmed_agency_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
   end
 
   test "Admin should get index" do

@@ -1,5 +1,5 @@
 <% if fulfillment.renewed %>
-  <%= t('activerecord.attributes.fulfillment.renewed')%>
+  <%= t('activerecord.activerecord.attributes.fulfillment.renewed')%>
 <% else %>
   <% if fulfillment.processing? %>
     <% unless fulfillment.member.wrong_address %>

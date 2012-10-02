@@ -30,6 +30,16 @@ class MemberTest < ActiveSupport::TestCase
     assert !member.save
   end
 
+  test "Should create a member without gender" do
+    member = FactoryGirl.build(:member, :gender => nil)
+    assert !member.save
+  end
+
+  test "Should create a member without type_of_phone_number" do
+    member = FactoryGirl.build(:member, :type_of_phone_number => nil)
+    assert !member.save
+  end
+
   test "Member should not be billed if it is not active or provisional" do
     member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
     answer = member.bill_membership

@@ -6,18 +6,6 @@ FactoryGirl.define do
     status 'not_processed'
   end
 
-  factory :fulfillment_without_stock_with_product_without_stock, class: Fulfillment do
-    product_sku "circlet"
-    assigned_at DateTime.now
-    status 'out_of_stock'
-  end
-
-  factory :fulfillment_without_stock_with_product_with_stock, class: Fulfillment do
-    product_sku "Bracelet"
-    assigned_at DateTime.now
-    status 'out_of_stock'
-  end
-
   factory :fulfillment_undeliverable_with_stock, class: Fulfillment do
     product_sku "Bracelet"
     assigned_at DateTime.now

@@ -13,7 +13,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
   def setup_member(create_new_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
@@ -1095,4 +1095,309 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
       }
     end
   end
+
+  test "fulfillment status undeliverable" do
+    setup_member
+
+    @fulfillment.set_as_processing
+    @saved_member.set_wrong_address(@admin_agent, 'admin')
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('undeliverable', :from => 'status')
+      select('Others',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    @fulfillment.reload
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{@fulfillment.member.visible_id}")
+        assert page.has_content?(@fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?(@fulfillment.tracking_code)
+        assert page.has_content?('undeliverable')
+      }
+    end
+  end
+
+  test "Resend fulfillment with status undeliverable - Product with stock" do
+    setup_member
+
+    @fulfillment.set_as_processing
+    @saved_member.set_wrong_address(@admin_agent, 'admin')
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('undeliverable', :from => 'status')
+      select('Others',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    @fulfillment.reload
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{@fulfillment.member.visible_id}")
+        assert page.has_content?(@fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?(@fulfillment.tracking_code)
+        assert page.has_content?('undeliverable')
+        click_link_or_button('This address is undeliverable.')
+      }
+    end
+    click_link_or_button 'Edit'
+
+    within("#table_demographic_information")do
+      wait_until{
+        check('setter_wrong_address')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?('not_processed')
+      }
+    end
+  end
+
+  test "resend fulfillment with status undeliverable - Product without stock" do
+    setup_member(false)
+    @saved_member = FactoryGirl.create(:active_member, :club_id => @club.id, 
+                                       :terms_of_membership => @terms_of_membership_with_gateway,
+                                       :created_by => @admin_agent)
+
+    @saved_member.reload
+    @product = FactoryGirl.create(:product_without_stock_and_recurrent, :club_id => @club.id)
+    @fulfillment = FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => @product.sku)
+    
+    @fulfillment.set_as_processing
+    @saved_member.set_wrong_address(@admin_agent, 'admin')
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('undeliverable', :from => 'status')
+      select('Others',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    @fulfillment.reload
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{@fulfillment.member.visible_id}")
+        assert page.has_content?(@fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?(@fulfillment.tracking_code)
+        assert page.has_content?('undeliverable')
+        click_link_or_button('This address is undeliverable.')
+      }
+    end
+    click_link_or_button 'Edit'
+
+    within("#table_demographic_information")do
+      wait_until{
+        check('setter_wrong_address')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?('out_of_stock')
+      }
+    end
+  end
+
+  test "fulfillment record from not_processed to cancel status" do
+    setup_member
+
+    @saved_member.set_as_canceled
+    @saved_member.reload
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#table_membership_information")do
+      wait_until{
+        assert page.has_content?('lapsed')
+      }
+    end
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?('canceled')
+      }
+    end
+  end
+
+  test "fulfillment record from processing to cancel status" do
+    setup_member
+    @fulfillment.set_as_processing
+
+    @saved_member.set_as_canceled
+    @saved_member.reload
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#table_membership_information")do
+      wait_until{
+        assert page.has_content?('lapsed')
+      }
+    end
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?('canceled')
+      }
+    end
+  end
+
+  test "fulfillment record from out_of_stock to cancel status" do
+    setup_member
+    @fulfillment.set_as_out_of_stock
+
+    @saved_member.set_as_canceled
+    @saved_member.reload
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#table_membership_information")do
+      wait_until{
+        assert page.has_content?('lapsed')
+      }
+    end
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?('canceled')
+      }
+    end
+  end
+
+  test "fulfillment record from undeliverable to cancel status" do
+    setup_member
+    @fulfillment.set_as_processing
+    @saved_member.set_wrong_address(@admin_agent, 'admin')
+    @fulfillment.reload
+    wait_until{ assert_equal(@fulfillment.status, 'undeliverable') }
+    @saved_member.set_as_canceled
+    @saved_member.reload
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#table_membership_information")do
+      wait_until{
+        assert page.has_content?('lapsed')
+      }
+    end
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?('canceled')
+      }
+    end
+  end
+
+  test "fulfillment record at sent status when member is canceled" do
+    setup_member
+    @fulfillment.set_as_processing
+    @fulfillment.set_as_sent
+    wait_until{ assert_equal(@fulfillment.status, 'sent') }
+    @saved_member.set_as_canceled
+    @saved_member.reload
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#table_membership_information")do
+      wait_until{
+        assert page.has_content?('lapsed')
+      }
+    end
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?('sent')
+      }
+    end
+  end
+
+  test "Fulfillments to be renewable with status canceled" do
+    setup_member
+    @product_recurrent = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id)
+
+    @fulfillment_renewable.set_as_canceled
+    @fulfillment_renewable.reload
+    @fulfillment.renew!
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(@fulfillment_renewable.product_sku)
+        assert page.has_content?('canceled')
+      }
+    end
+    @fulfillment_renewable.reload
+    wait_until{ assert_equal(@fulfillment_renewable.renewed,false) }
+  end
+
+
+  test "resend fulfillment" do
+    setup_member
+    @fulfillment.set_as_out_of_stock
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?('out_of_stock')
+        click_link_or_button 'Resend'
+        wait_until{ page.has_content?("Fulfillment #{@fulfillment.product_sku} was marked to be delivered next time.") }
+        wait_until{ assert_equal(Operation.last.description, "Fulfillment #{@fulfillment.product_sku} was marked to be delivered next time.") }
+      }
+    end
+  end
+
 end

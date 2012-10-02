@@ -18,7 +18,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   def setup_member(create_new_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @communication_type = FactoryGirl.create(:communication_type)
@@ -41,7 +41,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   def setup_search
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     20.times{ FactoryGirl.create(:active_member, 
@@ -2305,7 +2305,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "search member need needs_approval" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     Time.zone = @club.time_zone 
     @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 
@@ -2333,7 +2333,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "should accept applied member" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     Time.zone = @club.time_zone 
     @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 
@@ -2364,7 +2364,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "should reject applied member" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     Time.zone = @club.time_zone 
     @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 

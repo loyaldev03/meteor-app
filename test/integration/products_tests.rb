@@ -6,7 +6,7 @@ class ProductsTests < ActionController::IntegrationTest
     init_test_setup
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     sign_in_as(@admin_agent)
   end
 
