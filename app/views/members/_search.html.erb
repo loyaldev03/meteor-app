@@ -40,8 +40,16 @@
         </td>
       <% end %>
       <td><a href="<%= show_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
-      <td><a href="<%= edit_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a></td>
-      <td><%= member_action_drop_menu(member) %></td>
+      <td>
+        <% if can? :edit, Member %>
+          <a href="<%= edit_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a>
+        <% end %>
+      </td>
+      <td>
+        <% if can? :edit, Member %> 
+          <%= member_action_drop_menu(member) %>
+        <% end %>
+      </td>
     </tr>
   <% end %>
   </thead>  
