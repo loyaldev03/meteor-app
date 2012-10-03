@@ -32,7 +32,11 @@
     <% end %>
   <% elsif fulfillment.sent? %>
     <% if fulfillment.product_sku == 'KIT' or fulfillment.product_sku == 'CARD' %>
-      <%= (link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small") if can? :resend, Fulfillment %>
+      <% unless fulfillment.member.lapsed? %>
+        <%= (link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small") if can? :resend, Fulfillment %>
+      <% else %>
+        <%= t('activerecord.attributes.member.is_lapsed') %>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

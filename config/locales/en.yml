@@ -169,6 +169,7 @@ en:
           synced: Synced
           unsynced: Not Synced
           error: Sync Error
+        is_lapsed: 'Member was canceled.'
       club:
         id: 'ID'
         name: 'Name'
