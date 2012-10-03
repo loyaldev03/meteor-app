@@ -49,6 +49,7 @@ class Ability
       can :manage_token_api, Member
     elsif agent.has_role? 'agency'
       can :manage, Product
+      can :read, Club
       can :read, Fulfillment
       can :report, Fulfillment
       can :read, Member
