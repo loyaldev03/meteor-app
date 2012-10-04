@@ -12,8 +12,8 @@ module MembersHelper
       html << "<li><a onclick='#{js_confirm}' href='#{member_cancel_path(:member_prefix => current_member.visible_id)}'>#{t('buttons.cancel')}</a></li>"
     end
     unless current_member.api_id.nil? 
-      html << "<li><a onclick='#{js_confirm}' href= #{resend_welcome_email_path} >#{t('buttons.resend_welcome_email')}</a></li>"
-      html << "<li><a onclick='#{js_confirm}' href= #{reset_password_path} >#{t('buttons.password_reset')}</a></li>"
+      html << "<li><a onclick='#{js_confirm}' href= #{member_resend_welcome_path(:member_prefix => current_member.visible_id)} >#{t('buttons.resend_welcome_email')}</a></li>"
+      html << "<li><a onclick='#{js_confirm}' href= #{member_reset_password_path(:member_prefix => current_member.visible_id)} >#{t('buttons.password_reset')}</a></li>"
     end
     html << "</ul>"
     html << "</div>"
