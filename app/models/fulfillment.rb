@@ -21,6 +21,8 @@ class Fulfillment < ActiveRecord::Base
   scope :type_kit, lambda { where("product_sku = 'KIT'")}
   scope :type_others, lambda { where("product_sku NOT IN ('KIT','CARD')")}
 
+  scope :not_renewed, lambda { where("renewed = false") }
+
   scope :to_be_renewed, lambda { where(" date(renewable_at) <= '#{Time.zone.now.to_date}' AND fulfillments.status NOT IN ('canceled', 'processing') AND recurrent = true AND renewed = false ") }
 
   delegate :club, :to => :member
@@ -42,7 +44,7 @@ class Fulfillment < ActiveRecord::Base
       transition [:not_processed,:processing,:out_of_stock, :undeliverable] => :canceled
     end
     event :set_as_undeliverable do
-      transition :processing => :undeliverable
+      transition [:not_processed, :processing] => :undeliverable
     end
     
     #First status. fulfillment is waiting to be processed.
@@ -133,7 +135,7 @@ class Fulfillment < ActiveRecord::Base
       end
 
       fulfillments.each do |fulfillment|
-        Fulfillment.find(fulfillment.id).set_as_processing unless fulfillment.processing?
+        Fulfillment.find(fulfillment.id).set_as_processing unless fulfillment.processing? or fulfillment.renewed?
         member = fulfillment.member
         if type_others
           csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,

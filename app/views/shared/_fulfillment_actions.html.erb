@@ -1,5 +1,5 @@
 <% if fulfillment.renewed %>
-  <%= t('activerecord.activerecord.attributes.fulfillment.renewed')%>
+  <%= t('activerecord.attributes.fulfillment.renewed')%>
 <% else %>
   <% if fulfillment.processing? %>
     <% unless fulfillment.member.wrong_address %>
@@ -32,10 +32,16 @@
     <% end %>
   <% elsif fulfillment.sent? %>
     <% if fulfillment.product_sku == 'KIT' or fulfillment.product_sku == 'CARD' %>
-      <% unless fulfillment.member.lapsed? %>
-        <%= (link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small") if can? :resend, Fulfillment %>
-      <% else %>
+      <% if fulfillment.member.lapsed? %>
         <%= t('activerecord.attributes.member.is_lapsed') %>
+      <% elsif fulfillment.member.wrong_address %>
+        <% unless member_show %>
+          <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.visible_id)%>
+          <% else %>
+            <%= t('activerecord.attributes.member.undeliverable') %>
+        <% end %> 
+      <% else %>      
+        <%= (link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small") if can? :resend, Fulfillment %>
       <% end %>
     <% end %>
   <% end %>

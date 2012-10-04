@@ -16,13 +16,13 @@ class FulfillmentsController < ApplicationController
         @product_type = params[:product_type]
       elsif params[:status] == 'not_processed'
         if params[:product_type] == 'KIT'
-          fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+          fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false', 
             'not_processed', params[:initial_date], params[:end_date], @current_club.id]).type_kit
         elsif params[:product_type] == 'CARD'        
-          fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+          fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false', 
             'not_processed', params[:initial_date], params[:end_date], @current_club.id]).type_card
         else
-          fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+          fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false', 
             'not_processed', params[:initial_date], params[:end_date], @current_club.id]).type_others
         end
         if params[:product_type] == 'KIT' or params[:product_type] == 'CARD' 

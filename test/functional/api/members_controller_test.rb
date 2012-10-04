@@ -61,7 +61,6 @@ class Api::MembersControllerTest < ActionController::TestCase
                                   },:format => :json})
         assert_response :success
       end
-
     end
 
   end

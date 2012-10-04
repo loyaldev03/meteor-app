@@ -649,7 +649,8 @@ class Member < ActiveRecord::Base
   def set_wrong_address(agent, reason)
     if self.wrong_address.nil?
       if self.update_attribute(:wrong_address, reason)
-        self.fulfillments.where_processing.each { |s| s.set_as_undeliverable }
+        self.fulfillments.where_processing.not_renewed.each { |s| s.set_as_undeliverable }
+        self.fulfillments.where_not_processed.not_renewed.each { |s| s.set_as_undeliverable }
         message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
         Auditory.audit(agent,self,message,self)
         { :message => message, :code => Settings.error_codes.success }
