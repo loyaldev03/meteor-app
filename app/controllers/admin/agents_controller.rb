@@ -6,7 +6,7 @@ class Admin::AgentsController < ApplicationController
   def index
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: AgentsDatatable.new(view_context)  }
+      format.json { render json: AgentsDatatable.new(view_context,nil,nil,nil,@current_agent)  }
     end
   end
 
