@@ -132,4 +132,25 @@ class ClubTest < ActionController::IntegrationTest
       }
     end
   end
+
+  test "should only see clubs that are related to agency agent on club datatable" do
+    @admin_agent.update_attribute(:roles,['agency'])
+    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+    first_club = Club.first
+    last_club = Club.last
+    @admin_agent.add_role_with_club('representative',first_club)
+    @admin_agent.add_role_with_club('representative',last_club)
+
+    visit clubs_path(@partner.prefix)
+    within("#clubs_table")do
+      Club.all.each do |club|
+        if club.name == first_club.name or club.name == last_club.name
+          assert page.has_content?(club.name)
+          assert page.has_content?(club.id.to_s)
+        else
+          assert page.has_no_content?(club.name)
+        end
+      end
+    end
+  end
 end
