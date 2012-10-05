@@ -15,7 +15,7 @@ class Communication < ActiveRecord::Base
       end
       if template.nil?
         message = "Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
-        Airbrake.notify(:error_class => "Communication Template", :error_message => message)
+        Airbrake.notify(:error_class => "Communication Template", :error_message => message, :parameters => { :member => member.inspect })
         logger.error "* * * * * Template does not exist"
       else
         c = Communication.new :email => member.email
@@ -59,7 +59,7 @@ class Communication < ActiveRecord::Base
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
-    Airbrake.notify(:error_class => "Communication deliver_lyris", :error_message => e)
+    Airbrake.notify(:error_class => "Communication deliver_lyris", :error_message => e, :parameters => { :member => member.inspect, :communication => self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_lyris
@@ -88,7 +88,7 @@ class Communication < ActiveRecord::Base
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
-    Airbrake.notify(:error_class => "Communication deliver_lyris", :error_message => e)
+    Airbrake.notify(:error_class => "Communication deliver_lyris", :error_message => e, :parameters => { :member => member.inspect, :communication => self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_action_mailer

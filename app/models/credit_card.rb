@@ -71,7 +71,7 @@ class CreditCard < ActiveRecord::Base
         return cc
       rescue Exception => e
         logger.error e
-        Airbrake.notify(:error_class => "CreditCard::new_active_credit_card_year_change", :error_message => e)
+        Airbrake.notify(:error_class => "CreditCard::new_expiration_on_active_credit_card", :error_message => e, :parameters => { :member => actual.member.inspect, :actual_credit_card => actual.inspect })
         raise ActiveRecord::Rollback
       end
     end

@@ -45,10 +45,15 @@ class Member < ActiveRecord::Base
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
     # Because maybe we have already bill this member.
-    Airbrake.notify(:error_class => "Member:enroll", :error_message => e)
+    Airbrake.notify(:error_class => "Member:enroll:sync", :error_message => e, :parameters => { :member => self.inspect })
   end
   def after_update_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
+  rescue
+    # refs #21133
+    # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
+    # Because maybe we have already bill this member.
+    Airbrake.notify(:error_class => "Member:update:sync", :parameters => { :member => self.inspect })
   end
 
   validates :country, 
@@ -315,7 +320,7 @@ class Member < ActiveRecord::Base
           if terms_of_membership.payment_gateway_configuration.nil?
             message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
             Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
-            Airbrake.notify(:error_class => "Billing", :error_message => message)
+            Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect })
             { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
           else
             acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
@@ -455,7 +460,7 @@ class Member < ActiveRecord::Base
 
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
-      Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e)
+      Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       message = "Could not save member. #{e}"
       Auditory.audit(agent, self, message, nil, Settings.operation_types.error_on_enrollment_billing)
@@ -562,8 +567,8 @@ class Member < ActiveRecord::Base
       answer[:message] = "Can not process club cash transaction with amount 0, values with commas, or letters."
     elsif (amount.to_i < 0 and amount.to_i.abs <= self.club_cash_amount.to_i) or amount.to_i > 0
       ClubCashTransaction.transaction do 
+        cct = ClubCashTransaction.new(:amount => amount, :description => description)
         begin
-          cct = ClubCashTransaction.new(:amount => amount, :description => description)
           cct.member = self
           if cct.valid? 
             cct.save!
@@ -583,7 +588,7 @@ class Member < ActiveRecord::Base
           end
         rescue Exception => e
           answer[:message] = "Could not save club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
-          Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message])
+          Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message], :parameters => { :club_cash => cct.inspect, :member => self.inspect })
           raise ActiveRecord::Rollback
         end
       end
@@ -606,7 +611,7 @@ class Member < ActiveRecord::Base
       { :message => message, :success => true }
     end
   rescue Exception => e
-    Airbrake.notify(:error_class => "Member::blacklist", :error_message => e)
+    Airbrake.notify(:error_class => "Member::blacklist", :error_message => e, :parameters => { :member => self.inspect })
     { :message => "Could not blacklisted this member.", :success => false }
   end
   ###################################################################
@@ -758,7 +763,8 @@ class Member < ActiveRecord::Base
         unless trans.response_code == Settings.error_codes.invalid_credit_card 
           Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
             :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.credit_card_type}. " + 
-                "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.")
+              "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
+            :parameters => { :member => self.inspect })
         end
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
         cancel_member = true if self.recycled_times >= Settings.number_of_retries_on_missing_decline
