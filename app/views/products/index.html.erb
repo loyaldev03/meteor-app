@@ -1,7 +1,7 @@
 <section>
   <div class="page-header">
     <h1>Search</h1>
-    <% if can? :create, @current_agent %>
+    <% if can? :create, Product %>
       <%= link_to(new_product_path, :class => "btn btn-primary btn_on_header") do %> 
         <i class="icon-plus"></i> New Product
       <% end %>
