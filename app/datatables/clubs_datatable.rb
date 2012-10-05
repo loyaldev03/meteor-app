@@ -33,7 +33,11 @@ private
   end
 
   def fetch_clubs
-    clubs = Club.where(:partner_id => @current_partner.id).order("#{sort_column} #{sort_direction}")
+    if @current_agent.has_role? 'admin'
+      clubs = Club.where(:partner_id => @current_partner.id).order("#{sort_column} #{sort_direction}")
+    else
+      clubs = @current_agent.clubs.where(:partner_id => @current_partner.id).order("#{sort_column} #{sort_direction}")
+    end
     clubs = clubs.page(page).per_page(per_page)
     if params[:sSearch].present?
       clubs = clubs.where("id like :search or name like :search", search: "%#{params[:sSearch]}%")
