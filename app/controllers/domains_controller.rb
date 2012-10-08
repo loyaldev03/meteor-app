@@ -7,7 +7,7 @@ class DomainsController < ApplicationController
   def index
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: DomainsDatatable.new(view_context,@current_partner)}
+      format.json { render json: DomainsDatatable.new(view_context,@current_partner,nil,nil,@current_agent)}
     end
   end
   

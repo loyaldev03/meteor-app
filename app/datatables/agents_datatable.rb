@@ -19,11 +19,11 @@ private
         agent.username,
         if (agent.locked_at); I18n.l(agent.locked_at,:format=>:long) ;end,
         I18n.l(agent.created_at,:format=>:long),
-        link_to(I18n.t(:show), @url_helpers.admin_agent_path(agent), :class => 'btn btn-mini')+' '+
-        link_to(I18n.t(:edit), @url_helpers.edit_admin_agent_path(agent), :class => 'btn btn-mini' )+' '+
-        link_to(I18n.t(:destroy), @url_helpers.admin_agent_path(agent), :method => :delete,
+        (link_to(I18n.t(:show), @url_helpers.admin_agent_path(agent), :class => 'btn btn-mini')if @current_agent.can? :read, Agent)+
+        (link_to(I18n.t(:edit), @url_helpers.edit_admin_agent_path(agent), :class => 'btn btn-mini' )if @current_agent.can? :edit, Agent)+
+        (link_to(I18n.t(:destroy), @url_helpers.admin_agent_path(agent), :method => :delete,
                         :confirm => I18n.t("are_you_sure"),
-                        :class => 'btn btn-mini btn-danger')
+                        :class => 'btn btn-mini btn-danger')if @current_agent.can? :delete, Agent)
       ]
     end
   end

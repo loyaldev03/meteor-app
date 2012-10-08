@@ -7,7 +7,7 @@ class ProductsController < ApplicationController
   def index
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: ProductsDatatable.new(view_context,@current_partner,@current_club) }
+      format.json { render json: ProductsDatatable.new(view_context,@current_partner,@current_club,nil,@current_agent) }
     end
   end
 
