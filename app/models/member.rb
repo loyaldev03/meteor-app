@@ -237,7 +237,7 @@ class Member < ActiveRecord::Base
 
   # Returns true if members is lapsed.
   def can_be_canceled?
-    !self.lapsed?
+    !self.lapsed? or !self.cancel_date
   end
 
   # Returns true if member is applied. 
