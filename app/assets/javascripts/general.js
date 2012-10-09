@@ -262,7 +262,7 @@ $(document).ready( function() {
 
   function club_cash_functions(){
     $('form').submit( function(event) {
-      event.preventDefault()
+      event.preventDefault(); 
         $.ajax({
           type: 'POST',
           url: "/api/v1/members/"+member_id+"/club_cash",
@@ -331,11 +331,10 @@ $(document).ready( function() {
   }
 
   function show_member_functions(){
-    $(".btn").live('click',function(event){
-      if ($(this).attr('disabled') == 'disabled'){
-        event.preventDefault();
-      }
+    $(".disabled").live('click',function(event){
+        event.preventDefault(); 
     })
+
     $('.help').popover();
     mark_as_sent_fulfillment("../fulfillments/");
     resend_fulfillment("../fulfillments/");
