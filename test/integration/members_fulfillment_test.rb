@@ -38,9 +38,9 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     create_member_by_sloop(@admin_agent, @member, @credit_card, enrollment_info, @terms_of_membership_with_gateway)
   end
 
-  ###########################################################
-  # TESTS
-  ###########################################################
+  # ###########################################################
+  # # TESTS
+  # ###########################################################
 
   test "cancel member and check if not_processed fulfillments were updated to canceled" do
     setup_member
@@ -1883,7 +1883,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     @saved_member = Member.find_by_email(@member.email)
     fulfillment_card = Fulfillment.find_by_product_sku(product_card.sku)
     fulfillment_kit = Fulfillment.find_by_product_sku(product_kit.sku)
-
     fulfillment_card.update_attribute(:renewed, true)
     fulfillment_kit.update_attribute(:renewed, true)
 
@@ -1920,6 +1919,329 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
         assert page.has_content?((I18n.t('activerecord.attributes.fulfillment.renewed')))
       }
     end
+  end
+
+  test "fulfillment record at not_processed status - recurrent = false" do
+    setup_member(false)
+    product = FactoryGirl.create(:product_without_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+
+    create_member_throught_sloop(enrollment_info)
+    @saved_member = Member.find_by_email(@member.email)
+    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+    wait_until{
+      assert_equal((I18n.l(fulfillment.assigned_at, :format => :long)),(I18n.l(fulfillment.member.join_date, :format => :long)))
+      assert_equal(fulfillment.renewable_at,nil)
+      assert_equal(fulfillment.status,'not_processed')
+      assert_equal(fulfillment.recurrent,false)
+    }
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('not_processed', :from => 'status')
+      select('Others',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?('not_processed')
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+      }
+    end
+    fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+            'not_processed', Date.today, Date.today, @club.id]).type_others
+
+    csv_string = Fulfillment.generateCSV(fulfillments, true) 
+    assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},Costcenter,#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
+  
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+  
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?('processing')
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_selector?("#mark_as_sent")
+      }
+    end
+  end
+
+  test "fulfillment record at not_processed status - recurrent = true" do
+    setup_member(false)
+    product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+
+    create_member_throught_sloop(enrollment_info)
+    @saved_member = Member.find_by_email(@member.email)
+    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+    wait_until{
+      assert_equal((I18n.l(fulfillment.assigned_at, :format => :long)),(I18n.l(fulfillment.member.join_date, :format => :long)))
+      assert_equal((I18n.l(fulfillment.renewable_at, :format => :long)),(I18n.l(fulfillment.assigned_at + 1.year, :format => :long)))
+      assert_equal(fulfillment.status,'not_processed')
+      assert_equal(fulfillment.recurrent,true)
+    }
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('not_processed', :from => 'status')
+      select('Others',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?('not_processed')
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+      }
+    end
+    fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+            'not_processed', Date.today, Date.today, @club.id]).type_others
+
+    csv_string = Fulfillment.generateCSV(fulfillments, true) 
+    assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},Costcenter,#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
+  
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+  
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?('processing')
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_selector?("#mark_as_sent")
+      }
+    end
+  end
+
+  test "Generate CSV with fulfillment at processing status." do
+    setup_member(false)
+    product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+
+    create_member_throught_sloop(enrollment_info)
+    @saved_member = Member.find_by_email(@member.email)
+    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+    
+    fulfillment.set_as_processing
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?('processing')
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_selector?("#mark_as_sent")
+      }
+    end
+
+    fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', 'processing', @club.id).type_others
+    csv_string = Fulfillment.generateCSV(fulfillments, true) 
+    assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},Costcenter,#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
+  end
+
+  test "change status of fulfillment KIT from not_processed to undeliverable" do
+    setup_member(false)
+    product = Product.find_by_sku('KIT')
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+
+    create_member_throught_sloop(enrollment_info)
+    @saved_member = Member.find_by_email(@member.email)
+    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('not_processed', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?('not_processed')
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+      }
+    end
+    fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+            'not_processed', Date.today, Date.today, @club.id]).type_kit
+
+    csv_string = Fulfillment.generateCSV(fulfillments, false) 
+    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},\n")
+  
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('processing', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?('processing')
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_selector?("#mark_as_sent")
+        assert page.has_selector?('#set_as_wrong_address')
+      }
+      click_link_or_button('Set as wrong address')
+      wait_until{ page.has_selector?('#reason') }
+      fill_in 'reason', :with => 'spam'
+      confirm_ok_js
+      click_link_or_button('Set wrong address')
+      wait_until{ page.has_content?("#{fulfillment.member.full_address} is undeliverable. Reason: spam") }
+    end
+    fulfillment.reload
+    wait_until{ assert_equal(fulfillment.status,'undeliverable') }
+  end
+
+  test "change status of fulfillment CARD from not_processed to undeliverable" do
+    setup_member(false)
+    product = Product.find_by_sku('CARD')
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+
+    create_member_throught_sloop(enrollment_info)
+    @saved_member = Member.find_by_email(@member.email)
+    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('not_processed', :from => 'status')
+      select('Card',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?('not_processed')
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+      }
+    end
+    fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+            'not_processed', Date.today, Date.today, @club.id]).type_card
+
+    csv_string = Fulfillment.generateCSV(fulfillments, false) 
+    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},\n")
+  
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('processing', :from => 'status')
+      select('Card',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?('processing')
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_selector?("#mark_as_sent")
+        assert page.has_selector?('#set_as_wrong_address')
+      }
+      click_link_or_button('Set as wrong address')
+      wait_until{ page.has_selector?('#reason') }
+      fill_in 'reason', :with => 'spam'
+      confirm_ok_js
+      click_link_or_button('Set wrong address')
+      wait_until{ page.has_content?("#{fulfillment.member.full_address} is undeliverable. Reason: spam") }
+    end
+    fulfillment.reload
+    wait_until{ assert_equal(fulfillment.status,'undeliverable') }
+  end
+
+  test "create a report fulfillment selecting KIT at product type - Chapter member status" do
+    setup_member(false)
+    product = Product.find_by_sku('KIT')
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+
+    create_member_throught_sloop(enrollment_info)
+    @saved_member = Member.find_by_email(@member.email)
+    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+    fulfillment.set_as_processing
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    click_link_or_button 'Edit'
+    wait_until{ select('VIP', :from => 'member_member_group_type_id') }
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('processing', :from => 'status')
+      select('Kit',:from => 'product_type')
+    end
+
+    click_link_or_button 'Report'
+    fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+            'processing', Date.today, Date.today, @club.id]).type_kit
+    csv_string = Fulfillment.generateCSV(fulfillments, false) 
+    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
+  end
+
+  test "Create a report fulfillment selecting CARD at product type - Chapter member status" do
+    setup_member(false)
+    product = Product.find_by_sku('CARD')
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+
+    create_member_throught_sloop(enrollment_info)
+    @saved_member = Member.find_by_email(@member.email)
+    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+    fulfillment.set_as_processing
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    click_link_or_button 'Edit'
+    wait_until{ select('VIP', :from => 'member_member_group_type_id') }
+    alert_ok_js
+    click_link_or_button 'Update Member'
+
+    visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('processing', :from => 'status')
+      select('Card',:from => 'product_type')
+    end
+
+    click_link_or_button 'Report'
+    fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+            'processing', Date.today, Date.today, @club.id]).type_card
+    csv_string = Fulfillment.generateCSV(fulfillments, false) 
+    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
   end
 
 end
