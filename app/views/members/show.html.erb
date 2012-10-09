@@ -23,7 +23,11 @@
       <tr>
         <td><%= t('activerecord.attributes.member.gender') %>:</td>
         <td>
+          <% unless @current_member.gender.blank? %>
           <input id="input_gender" readonly="true" type="text" class="test_field" value="<%= @current_member.gender == 'F' ? 'Female' : 'Male' %>" />
+          <% else %>
+            <input id="input_gender" readonly="true" type="text" class="test_field" value="<%=t('activerecord.attributes.member.no_gender')%>"  />
+          <% end %>
         </td>  
       </tr>
       <tr>

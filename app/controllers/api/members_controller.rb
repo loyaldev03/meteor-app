@@ -150,6 +150,7 @@ class Api::MembersController < ApplicationController
     member.wrong_phone_number = nil if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
                                                           member.phone_area_code != params[:member][:phone_area_code].to_i ||
                                                           member.phone_local_number != params[:member][:phone_local_number].to_i)
+    
     if member.update_attributes(params[:member]) 
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member)
