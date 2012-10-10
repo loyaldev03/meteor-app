@@ -222,6 +222,27 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
 	end
 
+  test "display external_id at member search" do
+    setup_member(false)
+    @club.requires_external_id = true
+    @club.save!
+
+    unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id, 
+      :terms_of_membership => @terms_of_membership_with_gateway,
+      :created_by => @admin_agent, :external_id => "9876543210")
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_on 'New Member'
+    create_new_member(unsaved_member)
+
+    member = Member.last
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
+    search_member("member[member_id]", "#{member.visible_id}", member)
+
+  end
+  
   test "create member" do
   	setup_member(false)
 

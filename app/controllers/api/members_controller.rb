@@ -95,8 +95,8 @@ class Api::MembersController < ApplicationController
         params[:member][:enrollment_amount], 
         params[:member], 
         params[:member][:credit_card], 
-        params[:setter] && params[:setter][:cc_blank], 
-        params[:setter] && params[:setter][:skip_api_sync]
+        params[:setter] && params[:setter][:cc_blank].to_s.to_bool, 
+        params[:setter] && params[:setter][:skip_api_sync].to_s.to_bool
       )
     end
   end
@@ -126,8 +126,8 @@ class Api::MembersController < ApplicationController
   #           * wrong_address: Boolean value that (if it is true) it will tell us to unset member's addres as wrong. (It will set wrong_address as nil)
   #           * wrong_phone_number: Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set 
   #                                 wrong_phone_number as nil)
-  #           * batch_update: Boolean variable which tell us if this update was made by a member or by a system (different operations will be stored)
-  #           * skip_api_sync: Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal)
+  #           * batch_update: Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) (optional)
+  #           * skip_api_sync: Boolean variable which tell us if we have to sync or not user to remote api. Send 1 if you want to skip sync otherwise dont send this attribute. (optional) (e.g drupal)
   #
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
@@ -145,13 +145,13 @@ class Api::MembersController < ApplicationController
   def update
     authorize! :api_update, Member
     response = {}
-    batch_update = params[:setter] && params[:setter][:batch_update] && params[:setter][:batch_update] == '1' 
+    batch_update = params[:setter] && params[:setter][:batch_update] && params[:setter][:batch_update].to_s.to_bool
 
     member = Member.find(params[:id])
-    member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync] && params[:setter][:skip_api_sync] == '1'
+    member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync] && params[:setter][:skip_api_sync].to_s.to_bool
     member.api_id = params[:member][:api_id] if params[:member][:api_id].present? and batch_update
-    member.wrong_address = nil if params[:setter][:wrong_address] == '1' unless params[:setter].nil?
-    member.wrong_phone_number = nil if params[:setter][:wrong_phone_number] == '1' unless params[:setter].nil?
+    member.wrong_address = nil if params[:setter][:wrong_address].to_s.to_bool unless params[:setter].nil?
+    member.wrong_phone_number = nil if params[:setter][:wrong_phone_number].to_s.to_bool unless params[:setter].nil?
     member.wrong_phone_number = nil if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
                                                           member.phone_area_code != params[:member][:phone_area_code].to_i ||
                                                           member.phone_local_number != params[:member][:phone_local_number].to_i)

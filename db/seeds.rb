@@ -28,7 +28,7 @@ p2 = Partner.new :prefix => 'AO', :name => 'American Outdoorsman', :contract_uri
 p2.save!
 p3 = Partner.new :prefix => 'TC', :name => 'Tennis', :contract_uri => '/tennis', :website_url => 'http://www.tennischanneladvantage.com/'
 p3.save!
-p4 = Partner.new :prefix => 'ONMC', :name => 'ONMC-Import', :contract_uri => '', :website_url => '', :description => 'Partner to test imports from ONMC.'
+p4 = Partner.new :prefix => 'ONMC', :name => 'ONMC Import', :contract_uri => '', :website_url => '', :description => 'Partner to test imports from ONMC.'
 p4.save!
 p5 = Partner.new :prefix => 'pri', :name => 'TEST', :contract_uri => 'www.test.com', :website_url => 'www.test.com', :description => 'Partner to test imports from ONMC.'
 p5.save!
@@ -97,7 +97,7 @@ end
     :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
     :mode => "production", :gateway => "mes", :report_group => "SAC_STAGING_TEST"
   pgc.club = c
-pgc.save!
+  pgc.save!
 end
 
 tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "1.month", 
