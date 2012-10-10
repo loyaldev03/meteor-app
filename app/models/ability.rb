@@ -30,7 +30,7 @@ class Ability
       can :manage, Member
       cannot :enroll, Member
       cannot :api_enroll, Member
-      cannot :api_update, Member
+      can :api_update, Member
       cannot :api_profile, Member
       can :manage, MemberNote
       can :manage_token_api, Agent

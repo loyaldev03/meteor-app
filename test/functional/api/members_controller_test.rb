@@ -174,13 +174,13 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
 
-  test "representative user should not update member" do
+  test "representative user should update member" do
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.create :member_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     generate_put_message
-    assert_response :unauthorized
+    assert_response :success
   end
 
   test "supervisor user should update member" do
