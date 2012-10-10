@@ -32,12 +32,16 @@ class Ability
       cannot :api_enroll, Member
       cannot :api_update, Member
       cannot :api_profile, Member
+      can :manage, MemberNote
+      can :manage_token_api, Agent
       can :see_credit_card_last_digits, CreditCard
     elsif agent.has_role? 'supervisor'
       can :manage, Member
-      cannot :api_enroll, Member
-      cannot :api_update, Member
+      can :api_enroll, Member
+      can :api_update, Member
       cannot :api_profile, Member
+      can :manage, MemberNote
+      can :manage_token_api, Agent
       can :see_credit_card, CreditCard
     elsif agent.has_role? 'api'
       can :api_enroll, Member

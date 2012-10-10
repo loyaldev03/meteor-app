@@ -331,7 +331,8 @@ $(document).ready( function() {
   }
 
   function show_member_functions(){
-    $(".disabled").live('click',function(event){
+    $(".btn").live('click',function(event){
+      if($(this).attr('disabled') == 'disabled')
         event.preventDefault(); 
     })
 

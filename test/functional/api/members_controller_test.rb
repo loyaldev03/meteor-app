@@ -99,7 +99,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
-  test "Supervisor should not enroll/create member" do
+  test "Supervisor should enroll/create member" do
     sign_in @supervisor_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -139,7 +139,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 :fulfillment_code => enrollment_info.fulfillment_code,
                                 :ip_address => enrollment_info.ip_address
                                 },:format => :json})
-      assert_response :unauthorized
+      assert_response :success
     end
   end
 

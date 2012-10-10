@@ -43,7 +43,7 @@
     
     <div class="row-fluid">
       <div class="span4">
-        <%= link_to 'Edit', edit_member_path, :class => "btn btn-success btn-large-w", :disabled => (cannot? :edit, Member) %>
+        <%= link_to 'Edit', edit_member_path, :class => "btn btn-success btn-large-w", :disabled => (cannot? :api_update, Member) %>
       </div>
       <div class="span4">
         <% disable_save_sale = @current_member.can_save_the_sale? == false  %>
@@ -57,7 +57,7 @@
 
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
-        <%= link_to "Add a note", new_member_note_path, :class => "btn btn-success btn-large-w", :disabled => (cannot? :add_member_note, Member) %>
+        <%= link_to "Add a note", new_member_note_path, :class => "btn btn-success btn-large-w", :disabled => (cannot? :add_member_note, MemberNote) %>
       </div>
       <div class="span4">&nbsp</div>
       <div class="span4">
