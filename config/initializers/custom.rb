@@ -15,3 +15,13 @@ Delayed::Worker.max_attempts = 3
 Delayed::Worker.max_run_time = 5.minutes
 Delayed::Worker.read_ahead = 10
 Delayed::Worker.delay_jobs = !Rails.env.test?
+
+
+class String
+  def to_bool
+    return true if self == true || self =~ (/(true|t|yes|y|1)$/i)
+    return false if self == false || self.blank? || self =~ (/(false|f|no|n|0)$/i)
+    Rails.logger.error "invalid value for Boolean: \"#{self}\""
+    return false
+  end
+end
