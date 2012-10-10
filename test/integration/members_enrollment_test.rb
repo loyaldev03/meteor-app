@@ -186,21 +186,21 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   def generate_operations(member)
   	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => 100, :description => 'Member was enrolled' )
+  										 :member_id => member.id, :operation_type => Settings.operation.enrollment_billing, :description => 'Member was enrolled' )
   	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => 200, :description => 'Blacklisted member. Reason: Too much spam' )
+  										 :member_id => member.id, :operation_type => Settings.operation.cancel, :description => 'Blacklisted member. Reason: Too much spam' )
   	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => 201, :description => 'Blacklisted member. Reason: dont like it' )
+  										 :member_id => member.id, :operation_type => Settings.operation.save_the_sale, :description => 'Blacklisted member. Reason: dont like it' )
   	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => 202, :description => 'Blacklisted member. Reason: testing' )
+  										 :member_id => member.id, :operation_type => Settings.operation.recovery, :description => 'Blacklisted member. Reason: testing' )
   	FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => 300, :description => 'Communication sent successfully' )
+  										 :member_id => member.id, :operation_type => Settings.operation.active_email, :description => 'Communication sent successfully' )
   	FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => 301, :description => 'Communication was not sent' )
+  										 :member_id => member.id, :operation_type => Settings.operation.prebill_email, :description => 'Communication was not sent' )
  		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => 1000, :description => 'Member updated successfully' )
+  										 :member_id => member.id, :operation_type => Settings.operation.others, :description => 'Member updated successfully' )
  		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => 1000, :description => 'Member was recovered' )
+  										 :member_id => member.id, :operation_type => Settings.operation.others, :description => 'Member was recovered' )
   end
 
 
@@ -2249,25 +2249,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "create member without gender" do
-    setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent,
-                                         :gender => '')
-
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => 2011)
-    
-    fill_in_member(unsaved_member,credit_card)
-
-    within("#error_explanation")do
-      wait_until{
-        assert page.has_content?("gender: can't be blank")
-      }
-    end
-  end
-
   test "create member without type of type_of_phone_number" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
@@ -2427,6 +2408,30 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
     @saved_member.reload
     wait_until{ assert_equal(@saved_member.type_of_phone_number, '') }
+  end
+ 
+  #TODO: Improve test... we should validate that the 'Cancel' button is being disabled.
+  test "canceled date will not be changed when it is set." do
+    setup_member
+    cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    click_link_or_button 'Cancel'
+    page.execute_script("window.jQuery('#cancel_date').next().click()")
+    within("#ui-datepicker-div") do
+      click_on("#{Time.zone.now.day+1}")
+    end
+    select(cancel_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_link_or_button 'Cancel member'
+
+    @saved_member.reload
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    wait_until{ assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") }    
+    click_link_or_button 'Cancel'
+    sleep 1 
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
   end
 
 end
