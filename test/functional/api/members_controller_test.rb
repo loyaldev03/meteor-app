@@ -97,7 +97,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
-  test "Supervisor should not enroll/create member" do
+  test "Supervisor should enroll/create member" do
     sign_in @supervisor_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -110,9 +110,9 @@ class Api::MembersControllerTest < ActionController::TestCase
                                       :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
           ) 
     )
-    assert_difference('Member.count',0) do
+    assert_difference('Member.count') do
       generate_post_message
-      assert_response :unauthorized
+      assert_response :success
     end
   end
 
@@ -145,103 +145,126 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
  
 
-  # test "admin user should update member" do
-  #   sign_in @admin_user
-  #   @member = FactoryGirl.create :member_with_api
-  #   assert_difference('Operation') do
-  #     generate_put_message
-  #   end
-  #   assert_response :success
-  # end
-
-
-  # test "api_id should be updated if batch_update enabled" do
-  #   sign_in @admin_user
-  #   @member = FactoryGirl.create :member_with_api
-  #   new_api_id = @member.api_id.to_i + 10
-
-  #   assert_difference('Operation', 0) do
-  #     generate_put_message({:api_id => new_api_id})
-  #     assert_response :success
-  #     @member.reload
-  #     assert_not_equal new_api_id, @member.api_id
-  #   end
-
-  #   assert_difference('Operation', 0) do
-  #     generate_put_message({:api_id => new_api_id, :setter => { :batch_update => true }})
-  #     assert_response :success
-  #     @member.reload
-  #     assert_not_equal new_api_id, @member.api_id
-  #   end
+  test "admin user should update member" do
+    sign_in @admin_user
+    @member = FactoryGirl.create :member_with_api
+    assert_difference('Operation') do
+      generate_put_message
+    end
+    assert_response :success
   end
 
 
-  # test "representative user should not update member" do
-  #   sign_in @representative_user
-  #   @credit_card = FactoryGirl.build :credit_card    
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   put( :update, { member: {:first_name => @member.first_name, 
-  #                               :last_name => @member.last_name,
-  #                               :address => @member.address,
-  #                               :gender => 'M',
-  #                               :city => @member.city, 
-  #                               :zip => @member.zip,
-  #                               :state => @member.state,
-  #                               :email => @member.email,
-  #                               :country => @member.country,
-  #                               :type_of_phone_number => @member.type_of_phone_number,
-  #                               :phone_country_code => @member.phone_country_code,
-  #                               :phone_area_code => @member.phone_area_code,
-  #                               :phone_local_number => @member.phone_local_number,
-  #                               :birth_date => @member.birth_date,
-  #                               },:format => :json})
-  #   assert_response :unauthorized
-  # end
+  test "api_id should be updated if batch_update enabled" do
+    sign_in @admin_user
+    @member = FactoryGirl.create :member_with_api
+    new_api_id = @member.api_id.to_i + 10
 
-  # test "supervisor user should not update member" do
-  #   sign_in @supervisor_user
-  #   @credit_card = FactoryGirl.build :credit_card    
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   put( :update, { member: {:first_name => @member.first_name, 
-  #                               :last_name => @member.last_name,
-  #                               :address => @member.address,
-  #                               :gender => 'M',
-  #                               :city => @member.city, 
-  #                               :zip => @member.zip,
-  #                               :state => @member.state,
-  #                               :email => @member.email,
-  #                               :country => @member.country,
-  #                               :type_of_phone_number => @member.type_of_phone_number,
-  #                               :phone_country_code => @member.phone_country_code,
-  #                               :phone_area_code => @member.phone_area_code,
-  #                               :phone_local_number => @member.phone_local_number,
-  #                               :birth_date => @member.birth_date,
-  #                               },:format => :json})
-  #   assert_response :unauthorized
-  # end
+    assert_difference('Operation', 0) do
+      generate_put_message({:api_id => new_api_id})
+      assert_response :success
+      @member.reload
+      assert_not_equal new_api_id, @member.api_id
+    end
 
-  # test "api user should update member" do
-  #   sign_in @api_user
-  #   @credit_card = FactoryGirl.build :credit_card    
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   put( :update, { member: {:first_name => @member.first_name, 
-  #                               :last_name => @member.last_name,
-  #                               :address => @member.address,
-  #                               :gender => 'M',
-  #                               :city => @member.city, 
-  #                               :zip => @member.zip,
-  #                               :state => @member.state,
-  #                               :email => @member.email,
-  #                               :country => @member.country,
-  #                               :type_of_phone_number => @member.type_of_phone_number,
-  #                               :phone_country_code => @member.phone_country_code,
-  #                               :phone_area_code => @member.phone_area_code,
-  #                               :phone_local_number => @member.phone_local_number,
-  #                               :birth_date => @member.birth_date,
-  #                               },:format => :json})
-  #   assert_response :success
-  # end
+    assert_difference('Operation', 0) do
+      generate_put_message({:api_id => new_api_id, :setter => { :batch_update => true }})
+      assert_response :success
+      @member.reload
+      assert_not_equal new_api_id, @member.api_id
+    end
+  end
+
+
+  test "representative user should not update member" do
+    sign_in @representative_user
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    put( :update, { member: {:first_name => @member.first_name, 
+                                :last_name => @member.last_name,
+                                :address => @member.address,
+                                :gender => 'M',
+                                :city => @member.city, 
+                                :zip => @member.zip,
+                                :state => @member.state,
+                                :email => @member.email,
+                                :country => @member.country,
+                                :type_of_phone_number => @member.type_of_phone_number,
+                                :phone_country_code => @member.phone_country_code,
+                                :phone_area_code => @member.phone_area_code,
+                                :phone_local_number => @member.phone_local_number,
+                                :birth_date => @member.birth_date,
+                                },:format => :json})
+    assert_response :unauthorized
+  end
+
+  test "supervisor user should update member" do
+    sign_in @supervisor_user
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = FactoryGirl.create :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    put( :update, { id: @member.id, member: {:first_name => @member.first_name, 
+                                :last_name => @member.last_name,
+                                :address => @member.address,
+                                :gender => 'M',
+                                :city => @member.city, 
+                                :zip => @member.zip,
+                                :state => @member.state,
+                                :email => @member.email,
+                                :country => @member.country,
+                                :type_of_phone_number => @member.type_of_phone_number,
+                                :phone_country_code => @member.phone_country_code,
+                                :phone_area_code => @member.phone_area_code,
+                                :phone_local_number => @member.phone_local_number,
+                                :birth_date => @member.birth_date,
+                                },:format => :json})
+    assert_response :success
+  end
+
+  test "api user should update member" do
+    sign_in @api_user
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = FactoryGirl.create :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    put( :update, { id: @member.id, member: {:first_name => @member.first_name, 
+                                :last_name => @member.last_name,
+                                :address => @member.address,
+                                :gender => 'M',
+                                :city => @member.city, 
+                                :zip => @member.zip,
+                                :state => @member.state,
+                                :email => @member.email,
+                                :country => @member.country,
+                                :type_of_phone_number => @member.type_of_phone_number,
+                                :phone_country_code => @member.phone_country_code,
+                                :phone_area_code => @member.phone_area_code,
+                                :phone_local_number => @member.phone_local_number,
+                                :birth_date => @member.birth_date,
+                                },:format => :json})
+    assert_response :success
+  end
+
+  test "agency user should not update member" do
+    sign_in @agency_agent
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = FactoryGirl.create :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    put( :update, { id: @member.id, member: {:first_name => @member.first_name, 
+                                :last_name => @member.last_name,
+                                :address => @member.address,
+                                :gender => 'M',
+                                :city => @member.city, 
+                                :zip => @member.zip,
+                                :state => @member.state,
+                                :email => @member.email,
+                                :country => @member.country,
+                                :type_of_phone_number => @member.type_of_phone_number,
+                                :phone_country_code => @member.phone_country_code,
+                                :phone_area_code => @member.phone_area_code,
+                                :phone_local_number => @member.phone_local_number,
+                                :birth_date => @member.birth_date,
+                                },:format => :json})
+    assert_response :unauthorized
+  end
 end
