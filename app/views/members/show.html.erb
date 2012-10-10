@@ -62,7 +62,7 @@
       <div class="span4">&nbsp</div>
       <div class="span4">
         <% disable_cancel = @current_member.can_be_canceled? == false %>
-        <%= link_to("Cancel", (!disable_cancel ? member_cancel_path : "#"), :class => "btn  btn-large-w #{(disable_cancel ? "disabled" : "btn-danger")}", :disabled => (cannot? :cancel, Member))  %>
+        <%= link_to("Cancel", (!disable_cancel ? member_cancel_path : "#"), :class => "btn  btn-large-w #{(disable_cancel ? "disabled" : "btn-danger")}", :disabled => (cannot? :cancel, Member) , :id => 'cancel') %>
       </div>
     </div>  
 
