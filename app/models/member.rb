@@ -237,7 +237,7 @@ class Member < ActiveRecord::Base
 
   # Returns true if members is lapsed.
   def can_be_canceled?
-    !self.lapsed?
+    !self.lapsed? or !self.cancel_date
   end
 
   # Returns true if member is applied. 
@@ -628,7 +628,7 @@ class Member < ActiveRecord::Base
     self.birth_date = params[:birth_date]
     self.joint = params[:joint]
     self.gender = params[:gender]
-    params[:type_of_phone_number].blank? ? self.type_of_phone_number=nil : self.type_of_phone_number = params[:type_of_phone_number]
+    self.type_of_phone_number = params[:type_of_phone_number]
     self.phone_country_code = params[:phone_country_code]
     self.phone_area_code = params[:phone_area_code]
     self.phone_local_number = params[:phone_local_number]

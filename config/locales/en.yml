@@ -120,6 +120,7 @@ en:
           ca: Canada
         zip: 'Zip'
         gender: 'Gender'
+        no_gender: 'No gender selected'
         member_notes: 'Member Notes'
         phone_number: 'Phone Number'
         type_of_phone_number: 'Type of phone number'

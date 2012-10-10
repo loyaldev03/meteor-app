@@ -7,9 +7,10 @@ class DomainsControllerTest < ActionController::TestCase
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @api_user = FactoryGirl.create(:confirmed_api_agent)
     @agency_user = FactoryGirl.create(:confirmed_agency_agent)
-    @partner = FactoryGirl.create(:partner)
+
+    @domain = FactoryGirl.create(:domain)
+    @partner = @domain.partner
     @partner_prefix = @partner.prefix
-    @domain = FactoryGirl.create(:domain, :partner_id => @partner.id )
   end
 
   test "Admin should get index" do

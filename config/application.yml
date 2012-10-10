@@ -122,6 +122,7 @@ defaults: &defaults
           - Mobile
           - Other
           :allow_nil: true
+          :allow_blank: true
       phone_country_code:
         presence: true
         numericality: 

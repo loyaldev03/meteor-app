@@ -2392,4 +2392,41 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
+  test "create member without gender" do
+    setup_member(false)
+
+    unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id, 
+      :terms_of_membership => @terms_of_membership_with_gateway,
+      :created_by => @admin_agent)
+    unsaved_member.gender = ''
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    fill_in_member(unsaved_member,credit_card)
+    @saved_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+      assert find_field('input_last_name').value == @saved_member.last_name
+      assert find_field('input_gender').value == I18n.t('activerecord.attributes.member.no_gender')
+      assert find_field('input_member_group_type').value == (@saved_member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : @saved_member.member_group_type.name)
+    }
+  end
+
+  test "create member without type of phone number" do
+    setup_member(false)
+
+    unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id, 
+      :terms_of_membership => @terms_of_membership_with_gateway,
+      :created_by => @admin_agent)
+    unsaved_member.type_of_phone_number = ''
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    fill_in_member(unsaved_member,credit_card)
+    @saved_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+    }
+    @saved_member.reload
+    wait_until{ assert_equal(@saved_member.type_of_phone_number, '') }
+  end
+
 end
