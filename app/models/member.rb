@@ -49,11 +49,11 @@ class Member < ActiveRecord::Base
   end
   def after_update_sync_remote_domain
     api_member.save! unless @skip_api_sync || api_member.nil?
-  rescue
+  rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
     # Because maybe we have already bill this member.
-    Airbrake.notify(:error_class => "Member:update:sync", :parameters => { :member => self.inspect })
+    Airbrake.notify(:error_class => "Member:update:sync", :error_message => e, :parameters => { :member => self.inspect })
   end
 
   validates :country, 

@@ -121,10 +121,13 @@ class Api::MembersController < ApplicationController
   #             *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with the following formats: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+  #             *api_id: Send this value with the User Id of your site. This id is used to access your API (e.g. Autologin URL - Update member data). (optional)
   # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling or "wrong_address" for update.
   #           * wrong_address: Boolean value that (if it is true) it will tell us to unset member's addres as wrong. (It will set wrong_address as nil)
   #           * wrong_phone_number: Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set 
   #                                 wrong_phone_number as nil)
+  #           * batch_update: Boolean variable which tell us if this update was made by a member or by a system (different operations will be stored)
+  #           * skip_api_sync: Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal)
   #
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
@@ -143,21 +146,26 @@ class Api::MembersController < ApplicationController
   def update
     authorize! :api_update, Member
     response = {}
+    batch_update = (params[:setter] && params[:setter][:batch_update]) 
     member = Member.find(params[:id])
-    # member.skip_api_sync! if XXX
+    member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync]
+    member.api_id = params[:member][:api_id] if member.api_id.present? and batch_update
     member.wrong_address = nil if params[:setter][:wrong_address] == '1' unless params[:setter].nil?
     member.wrong_phone_number = nil if params[:setter][:wrong_phone_number] == '1' unless params[:setter].nil?
     member.wrong_phone_number = nil if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
                                                           member.phone_area_code != params[:member][:phone_area_code].to_i ||
                                                           member.phone_local_number != params[:member][:phone_local_number].to_i)
-    
-    if member.update_attributes(params[:member]) 
+    if member.update_attributes(params[:member])
       message = "Member updated successfully"
-      Auditory.audit(current_agent, member, message, member)
+      Auditory.audit(current_agent, member, message, member) unless batch_update
       response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
     else
       message = "Member could not be updated, #{member.errors.to_s}"
-      Auditory.audit(current_agent, member, message, member)
+      if batch_update
+        logger.error "Remote batch update message: #{message}"
+      else
+        Auditory.audit(current_agent, member, message, member)
+      end
       response = { :message => "Member data is invalid.", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
     end
     render json: response
