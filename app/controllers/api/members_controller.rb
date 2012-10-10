@@ -146,8 +146,10 @@ class Api::MembersController < ApplicationController
   def update
     authorize! :api_update, Member
     response = {}
+    batch_update = (params[:setter] && params[:setter][:batch_update]) 
     member = Member.find(params[:id])
     member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync]
+    member.api_id = params[:member][:api_id] if member.api_id.present? and batch_update
     member.wrong_address = nil if params[:setter][:wrong_address] == '1' unless params[:setter].nil?
     member.wrong_phone_number = nil if params[:setter][:wrong_phone_number] == '1' unless params[:setter].nil?
     member.wrong_phone_number = nil if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
@@ -155,11 +157,11 @@ class Api::MembersController < ApplicationController
                                                           member.phone_local_number != params[:member][:phone_local_number].to_i)
     if member.update_attributes(params[:member])
       message = "Member updated successfully"
-      Auditory.audit(current_agent, member, message, member) unless params[:setter] && params[:setter][:batch_update]
+      Auditory.audit(current_agent, member, message, member) unless batch_update
       response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
     else
       message = "Member could not be updated, #{member.errors.to_s}"
-      if params[:setter] && params[:setter][:batch_update]
+      if batch_update
         logger.error "Remote batch update message: #{message}"
       else
         Auditory.audit(current_agent, member, message, member)
