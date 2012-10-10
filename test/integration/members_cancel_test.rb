@@ -34,17 +34,14 @@ class MembersCancelTest < ActionController::IntegrationTest
 
   test "cancel member" do
     setup_member
-    
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     click_on 'Cancel'
-
     date_time = Time.zone.now + 1.days
 
     page.execute_script("window.jQuery('#cancel_date').next().click()")
     within("#ui-datepicker-div") do
       click_on("#{date_time.day}")
     end
-
     select(@member_cancel_reason.name, :from => 'reason')
     confirm_ok_js
     click_on 'Cancel member'
@@ -54,7 +51,6 @@ class MembersCancelTest < ActionController::IntegrationTest
     within("#td_mi_cancel_date") do
       assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
     end
-    
     within("#operations_table") do
       wait_until {
         assert page.has_content?("Member cancellation scheduled to #{date_time.to_date} - Reason: #{@member_cancel_reason.name}")
@@ -82,8 +78,9 @@ class MembersCancelTest < ActionController::IntegrationTest
         assert page.has_content?("Communication 'Test cancellation' sent")
       }
     end
-
-    
+    click_link_or_button 'Cancel'
+    sleep 2
+    wait_until{ assert assert find_field('input_first_name').value == @saved_member.first_name }
   end
 
 
