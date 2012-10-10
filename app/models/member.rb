@@ -389,7 +389,6 @@ class Member < ActiveRecord::Base
         return { :message => message, :code => Settings.error_codes.credit_card_in_use }
       end
     else
-      # TODO: should we update member profile? and Credit card information?
       if member.blacklisted
         message = "Member email is blacklisted."
         Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
