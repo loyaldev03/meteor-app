@@ -37,7 +37,6 @@ class Api::MembersControllerTest < ActionController::TestCase
   end  
 
   def generate_post_message(options = {})
-    
     post( :create, { member: {:first_name => @member.first_name, 
                               :last_name => @member.last_name,
                               :address => @member.address,
@@ -148,27 +147,26 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "admin user should update member" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api
-    assert_difference('Operation') do
+    assert_difference('Operation.count') do
       generate_put_message
     end
     assert_response :success
   end
-
 
   test "api_id should be updated if batch_update enabled" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api
     new_api_id = @member.api_id.to_i + 10
 
-    assert_difference('Operation', 0) do
-      generate_put_message({:api_id => new_api_id})
+    assert_difference('Operation.count') do
+      generate_put_message
       assert_response :success
       @member.reload
       assert_not_equal new_api_id, @member.api_id
     end
 
-    assert_difference('Operation', 0) do
-      generate_put_message({:api_id => new_api_id, :setter => { :batch_update => true }})
+    assert_difference('Operation.count') do
+      generate_put_message({:api_id => new_api_id, })
       assert_response :success
       @member.reload
       assert_not_equal new_api_id, @member.api_id
@@ -179,23 +177,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "representative user should not update member" do
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card    
-    @member = FactoryGirl.build :member_with_api
+    @member = FactoryGirl.create :member_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
-    put( :update, { member: {:first_name => @member.first_name, 
-                                :last_name => @member.last_name,
-                                :address => @member.address,
-                                :gender => 'M',
-                                :city => @member.city, 
-                                :zip => @member.zip,
-                                :state => @member.state,
-                                :email => @member.email,
-                                :country => @member.country,
-                                :type_of_phone_number => @member.type_of_phone_number,
-                                :phone_country_code => @member.phone_country_code,
-                                :phone_area_code => @member.phone_area_code,
-                                :phone_local_number => @member.phone_local_number,
-                                :birth_date => @member.birth_date,
-                                },:format => :json})
+    generate_put_message
     assert_response :unauthorized
   end
 
@@ -204,21 +188,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.create :member_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
-    put( :update, { id: @member.id, member: {:first_name => @member.first_name, 
-                                :last_name => @member.last_name,
-                                :address => @member.address,
-                                :gender => 'M',
-                                :city => @member.city, 
-                                :zip => @member.zip,
-                                :state => @member.state,
-                                :email => @member.email,
-                                :country => @member.country,
-                                :type_of_phone_number => @member.type_of_phone_number,
-                                :phone_country_code => @member.phone_country_code,
-                                :phone_area_code => @member.phone_area_code,
-                                :phone_local_number => @member.phone_local_number,
-                                :birth_date => @member.birth_date,
-                                },:format => :json})
+    generate_put_message
     assert_response :success
   end
 
@@ -227,21 +197,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.create :member_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
-    put( :update, { id: @member.id, member: {:first_name => @member.first_name, 
-                                :last_name => @member.last_name,
-                                :address => @member.address,
-                                :gender => 'M',
-                                :city => @member.city, 
-                                :zip => @member.zip,
-                                :state => @member.state,
-                                :email => @member.email,
-                                :country => @member.country,
-                                :type_of_phone_number => @member.type_of_phone_number,
-                                :phone_country_code => @member.phone_country_code,
-                                :phone_area_code => @member.phone_area_code,
-                                :phone_local_number => @member.phone_local_number,
-                                :birth_date => @member.birth_date,
-                                },:format => :json})
+    generate_put_message
     assert_response :success
   end
 
@@ -250,21 +206,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.create :member_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
-    put( :update, { id: @member.id, member: {:first_name => @member.first_name, 
-                                :last_name => @member.last_name,
-                                :address => @member.address,
-                                :gender => 'M',
-                                :city => @member.city, 
-                                :zip => @member.zip,
-                                :state => @member.state,
-                                :email => @member.email,
-                                :country => @member.country,
-                                :type_of_phone_number => @member.type_of_phone_number,
-                                :phone_country_code => @member.phone_country_code,
-                                :phone_area_code => @member.phone_area_code,
-                                :phone_local_number => @member.phone_local_number,
-                                :birth_date => @member.birth_date,
-                                },:format => :json})
+    generate_put_message
     assert_response :unauthorized
   end
 end
