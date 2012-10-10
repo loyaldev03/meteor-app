@@ -147,27 +147,26 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "admin user should update member" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api
-    assert_difference('Operation') do
+    assert_difference('Operation.count') do
       generate_put_message
     end
     assert_response :success
   end
-
 
   test "api_id should be updated if batch_update enabled" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api
     new_api_id = @member.api_id.to_i + 10
 
-    assert_difference('Operation', 0) do
-      generate_put_message({:api_id => new_api_id})
+    assert_difference('Operation.count') do
+      generate_put_message
       assert_response :success
       @member.reload
       assert_not_equal new_api_id, @member.api_id
     end
 
-    assert_difference('Operation', 0) do
-      generate_put_message({:api_id => new_api_id, :setter => { :batch_update => true }})
+    assert_difference('Operation.count') do
+      generate_put_message({:api_id => new_api_id, })
       assert_response :success
       @member.reload
       assert_not_equal new_api_id, @member.api_id
@@ -178,7 +177,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "representative user should not update member" do
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card    
-    @member = FactoryGirl.build :member_with_api
+    @member = FactoryGirl.create :member_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     generate_put_message
     assert_response :unauthorized
@@ -189,7 +188,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.create :member_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
-    pgenerate_put_message
+    generate_put_message
     assert_response :success
   end
 
