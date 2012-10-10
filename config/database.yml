@@ -1,6 +1,6 @@
 development:
   adapter: mysql2
-  database: sac_platform_development1
+  database: sac_platform_development
   host: localhost
   user: root
   encoding: utf8
