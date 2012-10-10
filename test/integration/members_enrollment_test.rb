@@ -186,21 +186,21 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   def generate_operations(member)
   	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => Settings.operation.enrollment_billing, :description => 'Member was enrolled' )
+  										 :member_id => member.id, :operation_type => Settings.operation_types.enrollment_billing, :description => 'Member was enrolled' )
   	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => Settings.operation.cancel, :description => 'Blacklisted member. Reason: Too much spam' )
+  										 :member_id => member.id, :operation_type => Settings.operation_types.cancel, :description => 'Blacklisted member. Reason: Too much spam' )
   	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => Settings.operation.save_the_sale, :description => 'Blacklisted member. Reason: dont like it' )
+  										 :member_id => member.id, :operation_type => Settings.operation_types.save_the_sale, :description => 'Blacklisted member. Reason: dont like it' )
   	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => Settings.operation.recovery, :description => 'Blacklisted member. Reason: testing' )
+  										 :member_id => member.id, :operation_type => Settings.operation_types.recovery, :description => 'Blacklisted member. Reason: testing' )
   	FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => Settings.operation.active_email, :description => 'Communication sent successfully' )
+  										 :member_id => member.id, :operation_type => Settings.operation_types.active_email, :description => 'Communication sent successfully' )
   	FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => Settings.operation.prebill_email, :description => 'Communication was not sent' )
+                       :member_id => member.id, :operation_type => Settings.operation_types.prebill_email, :description => 'Communication was not sent' )
  		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => Settings.operation.others, :description => 'Member updated successfully' )
+  										 :member_id => member.id, :operation_type => Settings.operation_types.others, :description => 'Member updated successfully' )
  		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => Settings.operation.others, :description => 'Member was recovered' )
+  										 :member_id => member.id, :operation_type => Settings.operation_types.others, :description => 'Member was recovered' )
   end
 
 

@@ -58,6 +58,10 @@ class Ability
       can :report, Fulfillment
       can :read, Member
       can :search_result, Member
+      cannot :enroll, Member
+      cannot :api_enroll, Member
+      cannot :api_update, Member
+      cannot :api_profile, Member
       # EXAMPLE
       # can :manage, Partner do |partner|
       #   # agent is enabled to manage a specific partner
