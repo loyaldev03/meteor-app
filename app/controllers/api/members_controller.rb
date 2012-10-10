@@ -95,8 +95,8 @@ class Api::MembersController < ApplicationController
         params[:member][:enrollment_amount], 
         params[:member], 
         params[:member][:credit_card], 
-        params[:setter] && params[:setter][:cc_blank].to_bool, 
-        params[:setter] && params[:setter][:skip_api_sync].to_bool
+        params[:setter] && params[:setter][:cc_blank].to_s.to_bool, 
+        params[:setter] && params[:setter][:skip_api_sync].to_s.to_bool
       )
     end
   end
@@ -145,13 +145,13 @@ class Api::MembersController < ApplicationController
   def update
     authorize! :api_update, Member
     response = {}
-    batch_update = params[:setter] && params[:setter][:batch_update] && params[:setter][:batch_update].to_bool
+    batch_update = params[:setter] && params[:setter][:batch_update] && params[:setter][:batch_update].to_s.to_bool
 
     member = Member.find(params[:id])
-    member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync] && params[:setter][:skip_api_sync].to_bool
+    member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync] && params[:setter][:skip_api_sync].to_s.to_bool
     member.api_id = params[:member][:api_id] if params[:member][:api_id].present? and batch_update
-    member.wrong_address = nil if params[:setter][:wrong_address].to_bool unless params[:setter].nil?
-    member.wrong_phone_number = nil if params[:setter][:wrong_phone_number].to_bool unless params[:setter].nil?
+    member.wrong_address = nil if params[:setter][:wrong_address].to_s.to_bool unless params[:setter].nil?
+    member.wrong_phone_number = nil if params[:setter][:wrong_phone_number].to_s.to_bool unless params[:setter].nil?
     member.wrong_phone_number = nil if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
                                                           member.phone_area_code != params[:member][:phone_area_code].to_i ||
                                                           member.phone_local_number != params[:member][:phone_local_number].to_i)
