@@ -141,7 +141,6 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id, :name => 'club_testing_')
     Time.zone = @club.time_zone
-    @payment_gateway_configuration = FactoryGirl.create(:payment_gateway_configuration, :club_id => @club.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_without_club_cash, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
 

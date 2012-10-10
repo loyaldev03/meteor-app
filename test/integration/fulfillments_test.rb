@@ -24,8 +24,8 @@ class FulfillmentsTest < ActionController::IntegrationTest
 
   test "Should show response when marking as sent" do
     @product= FactoryGirl.create(:product, :club_id => @club.id)
-  	@fulfillment_without_stock = FactoryGirl.create(:fulfillment, :member_id => @member.id, :product_id => @product) 
-    @fulfillment.set_as_out_of_stock
+  	@fulfillment_without_stock = FactoryGirl.create(:fulfillment, :member_id => @member.id, :product_sku => @product.sku) 
+    @fulfillment_without_stock.set_as_out_of_stock
   	visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   	within ("#fulfillments_table") do
 			select('out_of_stock', :from => '[status]')

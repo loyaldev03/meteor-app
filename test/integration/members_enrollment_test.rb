@@ -1124,25 +1124,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "create member without type of type_of_phone_number" do
-    setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent,
-                                         :type_of_phone_number => '')
-
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => 2011)
-    
-    fill_in_member(unsaved_member,credit_card)
-
-    within("#error_explanation")do
-      wait_until{
-        assert page.has_content?("type_of_phone_number: can't be blank,is not included in the list")
-      }
-    end
-  end
-
   test "display member with blank product_sku." do
     setup_member
     enrollment_info = FactoryGirl.create(:enrollment_info, :product_sku => '', :member_id => @saved_member.id)
