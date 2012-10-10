@@ -140,16 +140,16 @@ class Api::MembersController < ApplicationController
   # @return [String] *message*
   # @return [Integer] *member_id*  
   # @return [Integer] *code*
-  # @return [Integer] *v_id*
   # @return [Hash] *errors*
   # 
   def update
     authorize! :api_update, Member
     response = {}
-    batch_update = (params[:setter] && params[:setter][:batch_update]) 
+    batch_update = params[:setter] && params[:setter][:batch_update] && params[:setter][:batch_update] == '1' 
+
     member = Member.find(params[:id])
-    member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync]
-    member.api_id = params[:member][:api_id] if member.api_id.present? and batch_update
+    member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync] && params[:setter][:skip_api_sync] == '1'
+    member.api_id = params[:member][:api_id] if params[:member][:api_id].present? and batch_update
     member.wrong_address = nil if params[:setter][:wrong_address] == '1' unless params[:setter].nil?
     member.wrong_phone_number = nil if params[:setter][:wrong_phone_number] == '1' unless params[:setter].nil?
     member.wrong_phone_number = nil if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
