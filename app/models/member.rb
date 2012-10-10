@@ -353,7 +353,7 @@ class Member < ActiveRecord::Base
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end
 
-  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = '0', skip_api_sync = false)
+  def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = false, skip_api_sync = false)
     credit_card_params = {} if credit_card_params.blank? # might be [], we expect a Hash
     club = tom.club
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
@@ -363,7 +363,7 @@ class Member < ActiveRecord::Base
       credit_card = CreditCard.new credit_card_params
       credit_cards = CreditCard.joins(:member).where( :encrypted_number => credit_card.encrypted_number, :members => { :club_id => club.id } )
 
-      if credit_cards.empty? or cc_blank == '1'
+      if credit_cards.empty? or cc_blank
         member = Member.new
         member.update_member_data_by_params member_params
         member.skip_api_sync! if member.api_id.present? || skip_api_sync
@@ -383,7 +383,7 @@ class Member < ActiveRecord::Base
         message = "That credit card is blacklisted, please use another."
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
-      elsif not (cc_blank == '1' or credit_card_params[:number].blank?)
+      elsif not (cc_blank or credit_card_params[:number].blank?)
         message = "Credit card is already in use. call support."
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_already_in_use)
         return { :message => message, :code => Settings.error_codes.credit_card_in_use }
@@ -399,7 +399,7 @@ class Member < ActiveRecord::Base
       member.update_member_data_by_params member_params
     end
 
-    if cc_blank == '0' and credit_card_params[:number].blank?
+    if not cc_blank and credit_card_params[:number].blank?
       message = "Credit card is blank. Insert number or allow credit card blank."
       return { :message => message, :code => Settings.error_codes.credit_card_blank }        
     end   
@@ -416,8 +416,8 @@ class Member < ActiveRecord::Base
       installment_type ].join('-').downcase
   end
 
-  def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = 0, member_params = nil)
-    amount.to_f == 0 and cc_blank == '1' ? allow_cc_blank = true : allow_cc_blank = false
+  def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, member_params = nil)
+    allow_cc_blank = (amount.to_f == 0.0 and cc_blank)
     if recovery_check and not self.new_record? and not self.can_recover?
       return { :message => "Cant recover member. Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
