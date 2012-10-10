@@ -90,6 +90,24 @@ module ActionController
       evaluate_script("window.alert = function(msg) { return true; }")
     end
 
+    def search_member(field_selector, value, validate_obj)
+      fill_in field_selector, :with => value unless value.nil?
+      click_on 'Search'
+
+      within("#members") do
+        wait_until {
+          assert page.has_content?(validate_obj.status)
+          assert page.has_content?("#{validate_obj.visible_id}")
+          assert page.has_content?(validate_obj.full_name)
+          assert page.has_content?(validate_obj.full_address)
+        }
+
+        if !validate_obj.external_id.nil?
+          assert page.has_content?(validate_obj.external_id)
+        end
+      end
+    end
+        
     def create_member_by_sloop(agent, member, credit_card, enrollment_info, terms_of_membership)
       ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
         Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 

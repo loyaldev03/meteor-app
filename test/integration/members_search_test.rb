@@ -65,23 +65,6 @@ class MembersSearchTest < ActionController::IntegrationTest
  #  # UTILS
  #  ############################################################
 
-  def search_member(field_selector, value, validate_obj)
-    fill_in field_selector, :with => value unless value.nil?
-    click_on 'Search'
-
-    within("#members") do
-      wait_until {
-        assert page.has_content?(validate_obj.status)
-        assert page.has_content?("#{validate_obj.visible_id}")
-        assert page.has_content?(validate_obj.full_name)
-        assert page.has_content?(validate_obj.full_address)
-      }
-
-      if !validate_obj.external_id.nil?
-        assert page.has_content?(validate_obj.external_id)
-      end
-    end
-  end
 
   def validate_view_member_base(member)
 
