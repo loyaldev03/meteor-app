@@ -36,10 +36,8 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-
   test "recovery a member with provisional TOM" do
     setup_member
-    
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
     click_on 'Recover'
     
@@ -63,7 +61,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
 
   test "recovery a member 3 times" do
     setup_member
-    
     4.times{ 
       visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
       click_on 'Recover'
@@ -81,10 +78,62 @@ class MembersRecoveryTest < ActionController::IntegrationTest
         Member.last.set_as_canceled!
       end
     }
-    
     assert page.has_content?("Cant recover member. Max reactivations reached")
-    
   end
 
+  test "Recover a member by Monthly membership" do
+    setup_member
+    @terms_of_membership_with_gateway.installment_type = "1.month"
 
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
+    click_on 'Recover'
+    wait_until{ page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-") }
+   
+    within("#td_mi_status") do
+      assert page.has_content?("provisional")
+    end
+    within("#td_mi_join_date") do
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+    end
+    within("#td_mi_reactivation_times") do
+      assert page.has_content?("1")
+    end
+
+    within(".nav-tabs") do
+      click_on("Operations")
+    end
+    within("#operations_table")do
+      wait_until{
+        assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
+      }
+    end
+  end 
+
+  test "Recover a member by Annual Membership" do
+    setup_member
+    @terms_of_membership_with_gateway.installment_type = "1.year"
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
+    click_on 'Recover'
+    wait_until{ page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-") }
+   
+    within("#td_mi_status") do
+      assert page.has_content?("provisional")
+    end
+    within("#td_mi_join_date") do
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+    end
+    within("#td_mi_reactivation_times") do
+      assert page.has_content?("1")
+    end
+
+    within(".nav-tabs") do
+      click_on("Operations")
+    end
+    within("#operations_table")do
+      wait_until{
+        assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
+      }
+    end
+  end 
 end

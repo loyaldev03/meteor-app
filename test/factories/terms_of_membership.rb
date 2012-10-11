@@ -42,7 +42,7 @@ FactoryGirl.define do
     installment_type '1.month'
     needs_enrollment_approval false
     club_cash_amount 150
-    association :club, factory: :club_with_gateway
+    association :club, factory: :simple_club_with_gateway
   end
 
   factory :terms_of_membership_with_gateway_yearly, class: TermsOfMembership do

@@ -116,4 +116,58 @@ class ProductsTests < ActionController::IntegrationTest
 		assert page.has_content?('Search')		
 	end
 
+	test "Stock limit at Product" do
+		unsaved_product = FactoryGirl.create(:product, :club_id => @club.id )
+		visit products_path(@partner.prefix, @club.name)
+		within("#products_table") do
+			wait_until { assert page.has_content?(unsaved_product.name) }
+			click_link_or_button 'Edit'
+  	end
+
+  	wait_until{ assert page.has_content?('Edit Product') }
+  	fill_in 'product[stock]', :with => '2000000'
+  	click_link_or_button 'Update Product'
+  	wait_until{ assert page.has_content?('must be less than 1999999') }
+	end
+
+	test "Create empty product" do
+		unsaved_product = FactoryGirl.create(:product, :club_id => @club.id )
+		visit products_path(@partner.prefix, @club.name)
+
+		click_link_or_button 'New Product'
+
+  	click_link_or_button 'Create Product'
+  	wait_until{ assert page.has_content?("can't be blank,is invalid") }
+  	wait_until{ assert page.has_content?("is not a number") }
+	end
+
+	test "Create an invalid product" do
+		unsaved_product = FactoryGirl.create(:product, :club_id => @club.id )
+		visit products_path(@partner.prefix, @club.name)
+
+		click_link_or_button 'New Product'
+		fill_in 'product[sku]', :with => '@#$^&*&^%$#%^'
+  	click_link_or_button 'Create Product'
+  	wait_until{ assert page.has_content?("is invalid") }
+	end
+
+	test "Create a product with negative stock" do
+		unsaved_product = FactoryGirl.create(:product, :club_id => @club.id )
+		visit products_path(@partner.prefix, @club.name)
+
+		click_link_or_button 'New Product'
+		fill_in 'product[stock]', :with => '-3'
+  	click_link_or_button 'Create Product'
+  	wait_until{ assert page.has_content?("must be greater than or equal to 0") }
+	end
+
+	test "Duplicate product in the same club" do
+		unsaved_product = FactoryGirl.create(:product, :club_id => @club.id )
+		visit products_path(@partner.prefix, @club.name)
+
+		click_link_or_button 'New Product'
+		fill_in 'product[sku]', :with => 'KIT'
+  	click_link_or_button 'Create Product'
+  	wait_until{ assert page.has_content?("has already been taken") }
+	end
 end

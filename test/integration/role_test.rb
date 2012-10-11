@@ -26,6 +26,24 @@ class RolesTest < ActionController::IntegrationTest
     sign_in_as(@agency_agent)
   end
 
+  def setup_member(create_new_member = true)
+    @partner = FactoryGirl.create(:partner)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    Time.zone = @club.time_zone
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @communication_type = FactoryGirl.create(:communication_type)
+    @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
+    FactoryGirl.create(:batch_agent)
+    
+    if create_new_member
+      @saved_member = FactoryGirl.create(:active_member, 
+        :club_id => @club.id, 
+        :terms_of_membership => @terms_of_membership_with_gateway,
+        :created_by => @admin_agent)
+      @saved_member.reload
+    end
+   end
+
   test "select all clubs for admin agent."do
   	setup_admin
     partner = FactoryGirl.create(:partner)
@@ -82,4 +100,26 @@ class RolesTest < ActionController::IntegrationTest
       wait_until{ assert page.has_no_content?("#{partner.prefix} - #{second_club.name}") }
     end
   end
+
+  test "Profile supervisor - See full CC" do
+    setup_admin
+    setup_member
+    @admin_agent.roles = ['supervisor']
+    @admin_agent.reload
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    within("#table_active_credit_card")do
+      wait_until{ assert page.has_content?(@saved_member.active_credit_card.number.to_s) }
+    end
+    within(".nav-tabs") do
+      click_on("Credit Cards")
+    end
+    within("#credit_cards")do
+      wait_until{
+        assert page.has_content?(@saved_member.active_credit_card.number.to_s)
+      }
+    end
+  end
+
 end
