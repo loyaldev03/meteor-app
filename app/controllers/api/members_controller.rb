@@ -155,7 +155,12 @@ class Api::MembersController < ApplicationController
     member.wrong_phone_number = nil if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
                                                           member.phone_area_code != params[:member][:phone_area_code].to_i ||
                                                           member.phone_local_number != params[:member][:phone_local_number].to_i)
-    if member.update_attributes(params[:member])
+    member.update_member_data_by_params(params[:member])
+    if member.save
+      if params[:member][:credit_card]
+        member.active_credit_card.update_attribute(:expire_year, params[:member][:credit_card][:expire_year]) if params[:member][:credit_card][:expire_year] != member$
+        member.active_credit_card.update_attribute(:expire_month, params[:member][:credit_card][:expire_month]) if params[:member][:credit_card][:expire_month] != mem$
+      end
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member) unless batch_update
       response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
