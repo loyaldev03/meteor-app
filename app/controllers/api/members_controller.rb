@@ -158,8 +158,8 @@ class Api::MembersController < ApplicationController
     member.update_member_data_by_params(params[:member])
     if member.save
       if params[:member][:credit_card]
-        member.active_credit_card.update_attribute(:expire_year, params[:member][:credit_card][:expire_year]) if params[:member][:credit_card][:expire_year] != member$
-        member.active_credit_card.update_attribute(:expire_month, params[:member][:credit_card][:expire_month]) if params[:member][:credit_card][:expire_month] != mem$
+        member.active_credit_card.update_attribute(:expire_year, params[:member][:credit_card][:expire_year]) if params[:member][:credit_card][:expire_year] != member.active_credit_card.expire_year
+        member.active_credit_card.update_attribute(:expire_month, params[:member][:credit_card][:expire_month]) if params[:member][:credit_card][:expire_month] != member.active_credit_card.expire_month
       end
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member) unless batch_update
