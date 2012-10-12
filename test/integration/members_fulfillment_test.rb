@@ -69,7 +69,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     @fulfillment.reload
     assert_equal @fulfillment.status, 'canceled'
   end
-
+  
   test "cancel member and check if processing fulfillments were updated to canceled" do
     setup_member
     @fulfillment.set_as_processing
@@ -426,39 +426,42 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     end
   end
 
-  # TODO: Complete test ... line 52
-  # test "fulfillment record at not_processed status - recurrent true" do
-  #   setup_member(false)
-  #   @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-  #   enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+test "Enroll a member with recurrent product and it on the list" do
+    setup_member(false)
+    @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    create_member_throught_sloop(enrollment_info)
+    sleep(1)
+    @saved_member = Member.find_by_email(@member.email)
 
-  #   create_member_throught_sloop(enrollment_info)
-  #   sleep(1)
-  #   @saved_member = Member.find_by_email(@member.email)
+    fulfillment = Fulfillment.last
 
-  #   fulfillment = Fulfillment.last
-  #   assert_equal(fulfillment.member_id, @saved_member.id)
-  #   assert_equal(fulfillment.product_sku, @product.sku)
-  #   assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
-  #   assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
-  #   assert_equal(fulfillment.renewable_at, @saved_member.join_date + 1.year)
-  #   assert_equal(fulfillment.recurrent, true)
-  #   assert_equal(fulfillment.status, 'not_processed')
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
 
-  #   click_link_or_button("My Clubs")
-  #   within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
-  #   wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('not_processed', :from => 'status')
+      select('Others',:from => 'product_type')
+    end
+    click_link_or_button('Report')
 
-  #   within("#fulfillments_table")do
-  #     wait_until{
-  #       assert page.find_field('initial_date_')
-  #       assert page.find_field('end_date_')
-  #       assert page.find_field('status')
-  #       assert page.find_field('_all_times')    
-  #       assert page.find_field('product_type')  
-  #     }
-  #   end
-  # end
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?(fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_no_selector?('#resend') 
+      }
+    end
+    stock = @product.stock
+    @product.reload
+    wait_until{ assert_equal(@product.stock,stock-1) }
+  end
 
   test "dislpay default data on fulfillments index" do
     setup_member(false)

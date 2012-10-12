@@ -44,7 +44,6 @@ class MembersBillTest < ActionController::IntegrationTest
 
   def create_new_member(unsaved_member)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-
     click_on 'New Member'
 
     within("#table_demographic_information") {
@@ -277,5 +276,100 @@ class MembersBillTest < ActionController::IntegrationTest
     
   end
 
+  test "Change member from Provisional (trial) status to Lapse (inactive) status" do
+    setup_member
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+   
+    within("#td_mi_next_retry_bill_date")do
+      wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+    end
+  end
 
+  test "Change member from active status to lapse status" do
+    setup_member
+    @saved_member.set_as_active!
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+   
+    within("#td_mi_next_retry_bill_date")do
+      wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+    end
+  end
+
+  test "Change member from Lapse status to Provisional statuss" do
+    setup_member
+    @saved_member.set_as_canceled
+    @saved_member.recover(@terms_of_membership_with_gateway.id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    
+    next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
+    
+    within("#td_mi_next_retry_bill_date")do
+      wait_until{ assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date)) }
+    end
+  end
+  
+  test "Change member from Lapse status to active status" do
+    setup_member
+    @saved_member.set_as_canceled
+    @saved_member.recover(@terms_of_membership_with_gateway.id)
+    @saved_member.set_as_active
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    
+    next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
+    
+    within("#td_mi_next_retry_bill_date")do
+      wait_until{ assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date)) }
+    end
+  end  
+
+  test "Change Next Bill Date for tomorrow" do
+    setup_member
+    @saved_member.set_as_canceled
+    @saved_member.recover(@terms_of_membership_with_gateway.id)
+    @saved_member.set_as_active
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    
+    click_link_or_button 'Change'
+    wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
+    page.execute_script("window.jQuery('#next_bill_date').next().click()")
+    within("#ui-datepicker-div") do
+      wait_until { click_on("#{Time.zone.now.day+1}") }
+    end
+    click_link_or_button 'Change next bill date'
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    next_bill_date = Time.zone.now + 1
+    puts next_bill_date
+    within("#td_mi_next_retry_bill_date")do
+      wait_until{ assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date)) }
+    end
+  end  
+
+  test "Next Bill Date for monthly memberships" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
+
+    within("#td_mi_next_retry_bill_date")do
+      wait_until{ assert page.has_no_content?(I18n.l(@saved_member.join_date+1.month, :format => :only_date)) }
+    end
+  end  
+
+  test "Successful payment." do
+    setup_member
+    @saved_member.join_date = Time.zone.now-3
+    final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
+    bill_member(@saved_member, false, final_amount)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+  end  
 end

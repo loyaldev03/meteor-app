@@ -34,7 +34,6 @@ class ProductsTests < ActionController::IntegrationTest
   	end
 	end
 
-
 	test "create, update, delete a product" do
 		unsaved_product = FactoryGirl.build(:product)
 		visit products_path(@partner.prefix, @club.name)
@@ -170,4 +169,5 @@ class ProductsTests < ActionController::IntegrationTest
   	click_link_or_button 'Create Product'
   	wait_until{ assert page.has_content?("has already been taken") }
 	end
+	
 end
