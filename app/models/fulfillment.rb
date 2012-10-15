@@ -142,8 +142,8 @@ class Fulfillment < ActiveRecord::Base
                 member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
                 fulfillment.product.weight, 'MID']
         else
-          csv << [member.visible_id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
-                  (I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at), member.address, member.city,
+          csv << [member.visible_id, member.first_name, member.last_name, "'"+(I18n.l member.member_since_date, :format => :only_date_short)+"'",
+                  "'"+(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)+"'", member.address, member.city,
                   member.zip, fulfillment.product_sku, ('C' if member.member_group_type_id) ]
         end
       end
