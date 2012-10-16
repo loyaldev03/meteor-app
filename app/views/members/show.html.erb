@@ -79,10 +79,10 @@
       <% disable_applied = @current_member.applied? == false  %>
       <% unless disable_applied %>
         <div class="span4">
-          <%= link_to "Approve", member_approve_path, :class => "btn btn-large-w btn-info", :confirm => t('are_you_sure'), :method => :post %>
+          <%= link_to "Approve", member_approve_path, :class => "btn btn-large-w btn-info", :confirm => t('are_you_sure'),:id => 'approve', :method => :post %>
         </div>
         <div class="span4">
-          <%= link_to "Reject", member_reject_path, :class => "btn btn-large-w btn-danger", :confirm => t('are_you_sure'), :method => :post %>
+          <%= link_to "Reject", member_reject_path, :class => "btn btn-large-w btn-danger", :confirm => t('are_you_sure'),:id => 'reject', :method => :post %>
         </div>
       <% end %>
     </div>  

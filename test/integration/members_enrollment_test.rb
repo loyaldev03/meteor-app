@@ -21,6 +21,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     @communication_type = FactoryGirl.create(:communication_type)
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
@@ -141,6 +142,43 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Create Member'  	
+  end
+
+  def fill_in_member_approval(unsaved_member, credit_card)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select(unsaved_member.gender, :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        fill_in 'member[state]', :with => unsaved_member.state
+        select(unsaved_member.country_name, :from => 'member[country]')
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(unsaved_member.type_of_phone_number, :from => 'member[type_of_phone_number]')
+        fill_in 'member[email]', :with => unsaved_member.email
+        select(@terms_of_membership_with_approval.name, :from => 'member[terms_of_membership_id]')
+      }
+    end
+    within("#table_credit_card")do
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Create Member'    
   end
 
   def generate_operations(member)
@@ -1139,66 +1177,64 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
   end
 
-  test "should accept applied member" do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
-    Time.zone = @club.time_zone 
-    @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 
-                                       :terms_of_membership => @terms_of_membership_with_gateway_needs_approval,
-                                       :created_by => @admin_agent)
-    @enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => @saved_member.id)
-
-    @saved_member.reload
-
-    sign_in_as(@admin_agent)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-
-    confirm_ok_js
-    click_link_or_button 'Approve'
+  test "Approve member" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_approval,
+                                         :created_by => @admin_agent)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    fill_in_member_approval(unsaved_member,credit_card)
 
     wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
+      assert find_field('input_first_name').value == unsaved_member.first_name
     }
 
+    @saved_member = Member.find_by_email(unsaved_member.email)
+    confirm_ok_js
+    click_link_or_button 'Approve'
+    wait_until{ page.has_content?("Member approved") }
     @saved_member.reload
-    within("#table_membership_information") do  
-      wait_until{
-        within("#td_mi_status") { assert page.has_content?('provisional') }
-      }
+
+    within("#td_mi_status")do
+      wait_until{ assert page.has_content?('provisional') }
+    end
+    within("#td_mi_join_date")do
+      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+    end
+    within("#td_mi_next_retry_bill_date")do
+      wait_until{ assert page.has_content?(I18n.l(Time.zone.now+@terms_of_membership_with_approval.provisional_days, :format => :only_date)) }
     end
   end
 
-  test "should reject applied member" do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
-    Time.zone = @club.time_zone 
-    @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 
-                                       :terms_of_membership => @terms_of_membership_with_gateway_needs_approval,
-                                       :created_by => @admin_agent)
-    @enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => @saved_member.id)
+  test "Reject member" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_approval,
+                                         :created_by => @admin_agent)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    fill_in_member_approval(unsaved_member,credit_card)
 
-    @saved_member.reload
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
-    sign_in_as(@admin_agent)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    @saved_member = Member.find_by_email(unsaved_member.email)
+
 
     confirm_ok_js
     click_link_or_button 'Reject'
-
-    wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
-    }
-
+    wait_until{ page.has_content?("Member was rejected and now its lapsed.") }
     @saved_member.reload
-    within("#table_membership_information") do  
-      wait_until{
-        within("#td_mi_status") { assert page.has_content?('lapsed') }
-      }
+
+    within("#td_mi_status")do
+      wait_until{ assert page.has_content?('lapsed') }
     end
+    within("#td_mi_join_date")do
+      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+    end
+    within("#operations_table") { assert page.has_content?("Member was rejected and now its lapsed.") }
   end
 
   test "create member without gender" do
@@ -1238,6 +1274,36 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     wait_until{ assert_equal(@saved_member.type_of_phone_number, '') }
   end
  
+  test "Enroll a member with member approval TOM" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :terms_of_membership => @terms_of_membership_with_approval,
+                                         :created_by => @admin_agent)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    fill_in_member_approval(unsaved_member,credit_card)
 
+    wait_until{
+      assert find_field('input_first_name').value == unsaved_member.first_name
+    }
 
+    @saved_member = Member.find_by_email(unsaved_member.email)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    wait_until{ page.has_selector?('#approve') }
+    wait_until{ page.has_selector?('#reject') }
+
+    within("#td_mi_status")do
+      wait_until{ assert page.has_content?('applied') }
+    end
+    within("#td_mi_join_date")do
+      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+    end
+    within("#td_mi_next_retry_bill_date")do
+      wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+    end
+    within("#operations_table") { assert page.has_content?("Member enrolled pending approval successfully $0.0 on TOM(2) -#{@terms_of_membership_with_approval.name}-") }
+  end
 end

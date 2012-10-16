@@ -18,6 +18,7 @@ class Ability
       can :manage, Operation
       can :manage, MemberNote
       can :manage, TermsOfMembership
+      can :manage, Transaction
       can :api_enroll, Member
       can :api_update, Member
       can :api_profile, Member

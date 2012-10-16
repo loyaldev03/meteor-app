@@ -19,7 +19,7 @@ private
         transaction.response_transaction_id,
         transaction.can_be_refunded? ? link_to(I18n.t('refund'),
             @url_helpers.member_refund_path(@current_partner.prefix,@current_club.name,@current_member.visible_id, :transaction_id => transaction.id), 
-            :class=>"btn btn-warning btn-mini", :disabled=>(!@current_agent.can? :refund, Transaction)) : '',
+            :class=>"btn btn-warning btn-mini", :id => 'refund' ,:disabled=>(!@current_agent.can? :refund, Transaction)) : '',
       ]
     end
   end
