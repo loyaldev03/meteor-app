@@ -133,7 +133,11 @@ module Drupal
           und: m.gender 
         },
         field_profile_phone_type: { 
-          und: m.type_of_phone_number
+          und:[
+            { 
+              value: m.type_of_phone_number
+            }
+          ]
         },
         field_profile_phone_country_code: { 
           und: [ 
@@ -172,7 +176,14 @@ module Drupal
           und: {
             select: m.country
           } 
-        }  
+        },
+        field_profile_dob: { 
+          und: [ 
+            { 
+              value: m.birth_date.to_s
+            } 
+          ] 
+        }
       }
 
       if self.new_record?

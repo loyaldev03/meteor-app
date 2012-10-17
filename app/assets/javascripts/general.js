@@ -220,7 +220,7 @@ $(document).ready( function() {
     $('#error_explanation').hide();
     $(".datepicker").datepicker({ constrainInput: true, 
                                   maxDate: 0, 
-                                  dateFormat: "yy-mm-dd", 
+                                  dateFormat: "mm-dd-yy",
                                   showOn: "both", 
                                   buttonImage: "/icon-calendar.png", 
                                   changeMonth: true,
