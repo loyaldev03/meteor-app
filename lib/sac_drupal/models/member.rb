@@ -37,7 +37,7 @@ module Drupal
     rescue Faraday::Error::ParsingError # Drupal sends invalid application/json
       Drupal.logger.info "  => #{$!.to_s}"
     ensure
-      # update_member(res)
+      update_member(res, true)
       res
     end
 
@@ -75,11 +75,11 @@ module Drupal
       self.member.club.drupal
     end
 
-    def update_member(res)
+    def update_member(res, destroy = false)
       if res
         data = if res.status == 200
           { 
-            api_id: res.body['uid'],
+            api_id: ( destroy ? nil : res.body['uid'] ),
             last_synced_at: Time.now,
             last_sync_error: nil,
             last_sync_error_at: nil

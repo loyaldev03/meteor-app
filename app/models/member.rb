@@ -40,10 +40,7 @@ class Member < ActiveRecord::Base
   after_update :asyn_desnormalize_preferences
   
   def cancel_member_at_remote_domain
-    unless @skip_api_sync || api_member.nil? || api_id.nil?
-      api_member.destroy! 
-      self.update_attribute :api_id, nil
-    end
+    api_member.destroy! unless @skip_api_sync || api_member.nil? || api_id.nil?
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
