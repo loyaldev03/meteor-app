@@ -99,7 +99,6 @@ module Drupal
       m = self.member
 
       map = { 
-        # name: m.full_name,
         mail: m.email,
         field_profile_address: { 
           und: [ 
@@ -202,6 +201,7 @@ module Drupal
         })
       end
 
+      # Add credit card information
       cc = m.active_credit_card
       if cc
         map.merge!({
@@ -215,6 +215,15 @@ module Drupal
             und: [{
               value: "XXXX-XXXX-XXXX-%{last_digits}" % { last_digits: cc.number.to_s[-4..-1] }
             }]
+          }
+        })
+      end
+
+      # Add dynamyc preferences.
+      m.preferences.each do |key, value|
+        map.merge!({
+          "field_phoenix_pref_#{key}": {
+            und: value
           }
         })
       end
