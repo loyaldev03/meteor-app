@@ -33,27 +33,31 @@ class Member < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
 
-  after_create :after_create_sync_remote_domain
-  after_update :after_update_sync_remote_domain
-  after_destroy 'api_member.destroy! unless @skip_api_sync || api_member.nil? || api_id.nil?'
+  after_create 'after_save_sync_to_remote_domain(:enroll)'
+  after_update 'after_save_sync_to_remote_domain(:update)'
+  after_destroy :cancel_member_at_remote_domain
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
   
-  def after_create_sync_remote_domain
-    api_member.save! unless @skip_api_sync || api_member.nil?
+  def cancel_member_at_remote_domain
+    unless @skip_api_sync || api_member.nil? || api_id.nil?
+      api_member.destroy! 
+      self.update_attribute :api_id, nil
+    end
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
     # Because maybe we have already bill this member.
-    Airbrake.notify(:error_class => "Member:enroll:sync", :error_message => e, :parameters => { :member => self.inspect })
+    Airbrake.notify(:error_class => "Member:account_cancel:sync", :error_message => e, :parameters => { :member => self.inspect })
   end
-  def after_update_sync_remote_domain
+
+  def after_save_sync_to_remote_domain(type)
     api_member.save! unless @skip_api_sync || api_member.nil?
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
     # Because maybe we have already bill this member.
-    Airbrake.notify(:error_class => "Member:update:sync", :error_message => e, :parameters => { :member => self.inspect })
+    Airbrake.notify(:error_class => "Member:#{type.to_s}:sync", :error_message => e, :parameters => { :member => self.inspect })
   end
 
   validates :country, 
@@ -741,9 +745,9 @@ class Member < ActiveRecord::Base
       self.recycled_times = 0
       Communication.deliver!(:cancellation, self)
       self.fulfillments.where_cancellable.each &:set_as_canceled
-      # TODO: Deactivate drupal account
       self.save
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
+      cancel_member_at_remote_domain
     end
 
     def set_decline_strategy(trans)
