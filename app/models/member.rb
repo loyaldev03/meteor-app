@@ -617,24 +617,12 @@ class Member < ActiveRecord::Base
   ###################################################################
 
   def update_member_data_by_params(params)
-    self.first_name = params[:first_name]
-    self.last_name = params[:last_name]
-    self.address = params[:address]
-    self.state = params[:state]
-    self.city = params[:city]
-    self.country = params[:country]
-    self.zip = params[:zip]
-    self.email = params[:email]
-    self.birth_date = params[:birth_date]
-    self.joint = params[:joint]
-    self.gender = params[:gender]
-    self.type_of_phone_number = params[:type_of_phone_number]
-    self.phone_country_code = params[:phone_country_code]
-    self.phone_area_code = params[:phone_area_code]
-    self.phone_local_number = params[:phone_local_number]
-    self.member_group_type_id = params[:member_group_type_id] if params[:member_group_type_id]
-    self.preferences = params[:preferences] if params[:preferences]
-    self.external_id = params[:external_id] if params[:external_id]
+    [ :first_name, :last_name, :address, :state, :city, :country, :zip,
+      :email, :birth_date, :joint, :gender, :type_of_phone_number, 
+      :phone_country_code, :phone_area_code, :phone_local_number, 
+      :member_group_type_id, :preferences, :external_id ].each do |key|
+          self.send("#{key}=", params[key]) if params.include? key
+    end
   end
 
   def chargeback!(transaction_chargebacked, args)
