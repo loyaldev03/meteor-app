@@ -98,6 +98,10 @@ defaults: &defaults
   wrong_phone_number:
       unreachable: 'Unreachable'
       wrong_phone_number: 'Wrong phone'
+  type_of_phone_number:
+      home: 'home'
+      mobile: 'mobile'
+      other: 'other'
   validations:
     supported_countries:
     - ca
@@ -118,9 +122,9 @@ defaults: &defaults
         # presence: true
         inclusion:
           :within:  # this needs to be a Symbol
-          - Home 
-          - Mobile
-          - Other
+          - home 
+          - mobile
+          - other
           :allow_nil: true
           :allow_blank: true
       phone_country_code:

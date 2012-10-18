@@ -62,7 +62,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     within("#table_contact_information") do
       assert page.has_content?(member.full_phone_number)
-      assert page.has_content?(member.type_of_phone_number)
+      assert page.has_content?(member.type_of_phone_number.capitalize)
       assert page.has_content?("#{member.birth_date}")
       assert page.has_selector?('#link_member_set_unreachable')     
     end
@@ -129,7 +129,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number, :from => 'member[type_of_phone_number]')
+        select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -165,7 +165,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number, :from => 'member[type_of_phone_number]')
+        select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
         select(@terms_of_membership_with_approval.name, :from => 'member[terms_of_membership_id]')
       }
@@ -231,7 +231,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 			fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
 			fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
 			fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-			select('Home', :from => 'member[type_of_phone_number]')
+			select('home', :from => 'member[type_of_phone_number]')
 			select(@terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
 		}
 
@@ -611,7 +611,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number,:from => 'member[type_of_phone_number]')
+        select(unsaved_member.type_of_phone_number.capitalize,:from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -708,7 +708,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number,:from => 'member[type_of_phone_number]')
+        select(unsaved_member.type_of_phone_number.capitalize,:from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -874,7 +874,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#table_contact_information")do
       wait_until{
         assert page.has_content?(unsaved_member.full_phone_number)
-        assert page.has_content?('Home')
+        assert page.has_content?(Settings.type_of_phone_number.home.capitalize)
       }
     end
   end

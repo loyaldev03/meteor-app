@@ -618,11 +618,12 @@ class Member < ActiveRecord::Base
 
   def update_member_data_by_params(params)
     [ :first_name, :last_name, :address, :state, :city, :country, :zip,
-      :email, :birth_date, :joint, :gender, :type_of_phone_number, 
+      :email, :birth_date, :joint, :gender,
       :phone_country_code, :phone_area_code, :phone_local_number, 
       :member_group_type_id, :preferences, :external_id ].each do |key|
           self.send("#{key}=", params[key]) if params.include? key
     end
+    self.type_of_phone_number = params[:type_of_phone_number].downcase
   end
 
   def chargeback!(transaction_chargebacked, args)

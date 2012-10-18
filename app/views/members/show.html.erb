@@ -135,7 +135,7 @@
           <%= @current_member.wrong_phone_number %>
         <% end %>
       </td>
-      <td> <%= @current_member.type_of_phone_number %></td>
+      <td> <%= @current_member.type_of_phone_number.capitalize %> </td>
       <td nowrap="nowrap"><a href="mailto:<%= @current_member.email %>"><%= @current_member.email %></a></td>
       <td nowrap="nowrap"><%= @current_member.birth_date.nil? ? t('activerecord.attributes.member.not_have_birth_date_set') : @current_member.birth_date %></td>
     </tr>
