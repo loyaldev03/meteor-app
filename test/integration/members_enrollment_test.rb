@@ -1215,7 +1215,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
 
     unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, :gender => ''
+      :club_id => @club.id, :gender => '',
       :created_by => @admin_agent)
     unsaved_member.gender = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)

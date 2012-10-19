@@ -26,12 +26,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     FactoryGirl.create(:batch_agent)
     
     if create_new_member
-      @saved_member = FactoryGirl.create(:active_member, 
-        :club_id => @club.id, 
-        :terms_of_membership => @terms_of_membership_with_gateway,
-        :created_by => @admin_agent)
-
-      @saved_member.reload
+      @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, :enrollment_info, {}, { :created_by => @admin_agent })
     end
 
     sign_in_as(@admin_agent)
@@ -509,10 +504,9 @@ class MembersSearchTest < ActionController::IntegrationTest
   test "search by external_id" do
     setup_member(false)
     @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
-    @member_with_external_id = FactoryGirl.create(:active_member_with_external_id, 
-                                                  :club_id => @club_external_id.id, 
-                                                  :terms_of_membership => @terms_of_membership_with_gateway,
-                                                  :created_by => @admin_agent)
+    @member_with_external_id = create_active_member(@terms_of_membership_with_gateway, :active_member_with_external_id, 
+      nil, {}, { :created_by => @admin_agent })
+
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club_external_id.name)
     assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
     within("#payment_details")do
@@ -593,10 +587,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     Time.zone = @club.time_zone 
-    @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 
-                                       :terms_of_membership => @terms_of_membership_with_gateway_needs_approval,
-                                       :created_by => @admin_agent)
-    @saved_member.reload
+
+    @saved_member = create_active_member(@terms_of_membership_with_gateway_needs_approval, :applied_member, :enrollment_info, {}, { :created_by => @admin_agent })
 
     sign_in_as(@admin_agent)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -621,12 +613,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     Time.zone = @club.time_zone 
-    @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 
-                                       :terms_of_membership => @terms_of_membership_with_gateway_needs_approval,
-                                       :created_by => @admin_agent)
-    @enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => @saved_member.id)
 
-    @saved_member.reload
+    @saved_member = create_active_member(@terms_of_membership_with_gateway_needs_approval, :applied_member, :enrollment_info, {}, { :created_by => @admin_agent })
 
     sign_in_as(@admin_agent)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -652,12 +640,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     Time.zone = @club.time_zone 
-    @saved_member = FactoryGirl.create(:applied_member, :club_id => @club.id, 
-                                       :terms_of_membership => @terms_of_membership_with_gateway_needs_approval,
-                                       :created_by => @admin_agent)
-    @enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => @saved_member.id)
-
-    @saved_member.reload
+   
+    @saved_member = create_active_member(@terms_of_membership_with_gateway_needs_approval, :applied_member, :enrollment_info, {}, { :created_by => @admin_agent })
 
     sign_in_as(@admin_agent)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
