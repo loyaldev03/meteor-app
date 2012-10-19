@@ -623,7 +623,7 @@ class Member < ActiveRecord::Base
       :member_group_type_id, :preferences, :external_id ].each do |key|
           self.send("#{key}=", params[key]) if params.include? key
     end
-    self.type_of_phone_number = params[:type_of_phone_number].downcase
+    self.type_of_phone_number = params[:type_of_phone_number].downcase if params.include? :type_of_phone_number
   end
 
   def chargeback!(transaction_chargebacked, args)
