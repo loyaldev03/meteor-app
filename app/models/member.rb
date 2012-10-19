@@ -416,7 +416,7 @@ class Member < ActiveRecord::Base
       installment_type ].join('-').downcase
   end
 
-  def enroll(credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, member_params = nil)
+  def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, member_params = nil)
     allow_cc_blank = (amount.to_f == 0.0 and cc_blank)
     if recovery_check and not self.new_record? and not self.can_recover?
       return { :message => "Cant recover member. Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
