@@ -666,7 +666,6 @@ class MembersSearchTest < ActionController::IntegrationTest
 
     unsaved_member = FactoryGirl.build(:active_member, 
       :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
       :created_by => @admin_agent)
     unsaved_member.gender = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
@@ -685,7 +684,6 @@ class MembersSearchTest < ActionController::IntegrationTest
 
     unsaved_member = FactoryGirl.build(:active_member, 
       :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
       :created_by => @admin_agent)
     unsaved_member.type_of_phone_number = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
