@@ -133,7 +133,7 @@ module Drupal
         },
         field_profile_phone_type: { 
           und: { 
-              value: m.type_of_phone_number
+              select: m.type_of_phone_number
             }
         },
         field_profile_phone_country_code: { 
