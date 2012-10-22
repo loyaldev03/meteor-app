@@ -179,7 +179,7 @@ class Api::MembersController < ApplicationController
           render json: { :message => message, :code => Settings.error_codes.credit_card_in_use }
       else
         member.active_credit_card.update_attribute(:expire_year, params[:member][:credit_card][:expire_year]) if new_credit_card.expire_year != member.active_credit_card.expired_year
-        member.active_credit_card.update_attribute(:expire_month, params[:member][:credit_card][:expire_month]) if new_credit_card.expire_month != member.active_credi$
+        member.active_credit_card.update_attribute(:expire_month, params[:member][:credit_card][:expire_month]) if new_credit_card.expire_month != member.active_credit_card.expire_month
       end
     end
       
