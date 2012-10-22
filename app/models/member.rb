@@ -821,8 +821,11 @@ class Member < ActiveRecord::Base
 
     def update_credit_card_from_drupal(credit_card)
       new_year, new_month, new_number = nil, nil, nil
+      
+      return { :code => Settings.error_codes.success } if credit_card.nil?
+
       # Drupal sends X when member does not change the credit card number
-      unless credit_card.include? 'X'
+      unless credit_card[:number].include? 'X'
         credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? and credit_cards.uuid != ? ", 
             credit_card.encrypted_number, club.id, member.id ] )
         if credit_cards.empty?
