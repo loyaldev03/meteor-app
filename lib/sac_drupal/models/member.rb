@@ -173,6 +173,13 @@ module Drupal
           und: {
             select: m.country
           } 
+        },
+        field_profile_dob: {
+          und: [
+            {
+              value: { date: m.birth_date.to_date.strftime("%m/%d/%Y") }
+            }
+          ]
         }
       }
 
