@@ -12,6 +12,9 @@ class CreateMemberships < ActiveRecord::Migration
       t.timestamps
     end
     rename_column :members, :terms_of_membership_id, :terms_of_membership_id2
+    rename_column :members, :join_date, :join_date2
+    rename_column :members, :cancel_date, :cancel_date2
+    rename_column :members, :quota, :quota2
     add_column :members, :current_membership_id, :integer
     add_column :enrollment_infos, :membership_id, :integer
     add_column :transactions, :membership_id, :integer
@@ -20,10 +23,10 @@ class CreateMemberships < ActiveRecord::Migration
         m = Membership.new 
         m.status = member.status
         m.terms_of_membership_id = member.terms_of_membership_id2
-        m.join_date = member.join_date
-        m.cancel_date = member.cancel_date
+        m.join_date = member.join_date2
+        m.cancel_date = member.cancel_date2
         m.created_by_id = member.created_by_id
-        m.quota = member.quota
+        m.quota = member.quota2
         m.member = member
         m.save
         member.update_attribute :current_membership_id, m.id
@@ -32,7 +35,7 @@ class CreateMemberships < ActiveRecord::Migration
         end
       end
     end
-    [ :terms_of_membership_id2, :join_date, :cancel_date, :created_by_id, :quota].each do |column|
+    [ :terms_of_membership_id2, :join_date2, :cancel_date2, :created_by_id, :quota2].each do |column|
       remove_column :members, column
     end
     drop_table :versions
