@@ -157,30 +157,29 @@ class Api::MembersController < ApplicationController
                                                           member.phone_local_number != params[:member][:phone_local_number].to_i)
     
     if credit_cards.empty?
-        new_credit_card.member = member
-        if new_credit_card.am_card.valid?
-          if new_credit_card.save
-            member.active_credit_card.deactivate
-          else
-           render json: { :message => "Could not saved credit card", :code => Settings.error_codes.member_data_invalid,
-            :errors => new_credit_card.errors }
-          end
+      new_credit_card.member = member
+      if new_credit_card.am_card.valid?
+        if new_credit_card.save
+          member.active_credit_card.deactivate
         else
-          render json: { :message => "Credit card data is invalid.", :code => Settings.error_codes.member_data_invalid,
-         :errors => new_credit_card.errors }
+         render json: { :message => "Could not saved credit card", :code => Settings.error_codes.member_data_invalid,
+          :errors => new_credit_card.errors }
         end
-      elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
+      else
+        render json: { :message => "Credit card data is invalid.", :code => Settings.error_codes.member_data_invalid,
+       :errors => new_credit_card.errors }
+      end
+    elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
           message = "That credit card is blacklisted, please use another."
           Auditory.audit(current_agent, member, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
           render json: { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
-      elsif not (member.active_credit_card.number == new_credit_card.number)
+    elsif not (member.active_credit_card.number == new_credit_card.number)
           message = "Credit card is already in use. call support."
           Auditory.audit(current_agent, member, message, credit_cards.first.member, Settings.operation_types.credit_card_already_in_use)
           render json: { :message => message, :code => Settings.error_codes.credit_card_in_use }
-      else
-        member.active_credit_card.update_attribute(:expire_year, params[:member][:credit_card][:expire_year]) if new_credit_card.expire_year != member.active_credit_card.expired_year
-        member.active_credit_card.update_attribute(:expire_month, params[:member][:credit_card][:expire_month]) if new_credit_card.expire_month != member.active_credit_card.expire_month
-      end
+    else
+      member.active_credit_card.update_attribute(:expire_year, params[:member][:credit_card][:expire_year]) if new_credit_card.expire_year != member.active_credit_card.expired_year
+      member.active_credit_card.update_attribute(:expire_month, params[:member][:credit_card][:expire_month]) if new_credit_card.expire_month != member.active_credit_card.expire_month
     end
       
     member.update_member_data_by_params(params[:member])
