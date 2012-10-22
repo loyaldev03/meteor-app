@@ -35,7 +35,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member_with_api#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -57,7 +57,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "member_with_cc#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -85,7 +85,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
@@ -110,7 +110,7 @@ FactoryGirl.define do
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
@@ -134,7 +134,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "active_member_without_cc#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -157,7 +157,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "lapsed_member#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -183,7 +183,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "provisional_member_with_cc#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -207,7 +207,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "provisional_member#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -230,7 +230,7 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state { Faker::Address.us_state }
     sequence(:email) {|n| "applied_member#{n}@test.no" }
-    type_of_phone_number "home"
+    type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
