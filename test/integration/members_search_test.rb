@@ -92,7 +92,7 @@ class MembersSearchTest < ActionController::IntegrationTest
       
       within("#td_mi_reactivation_times") { assert page.has_content?("#{member.reactivation_times}") }
       
-      assert page.has_content?(member.created_by.username)
+      assert page.has_content?(member.current_membership.created_by.username)
 
       within("#td_mi_reactivation_times") { assert page.has_content?("#{member.reactivation_times}") }
       

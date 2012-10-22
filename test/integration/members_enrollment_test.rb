@@ -1157,8 +1157,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "Approve member" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :created_by => @admin_agent)
+                                         :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member_approval(unsaved_member,credit_card)
@@ -1187,8 +1186,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "Reject member" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :created_by => @admin_agent)
+                                         :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member_approval(unsaved_member,credit_card)
@@ -1215,8 +1213,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
 
     unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, :gender => '',
-      :created_by => @admin_agent)
+      :club_id => @club.id, :gender => '')
     unsaved_member.gender = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member,credit_card)
@@ -1232,9 +1229,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create member without type of phone number" do
     setup_member(false)
 
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, 
-      :created_by => @admin_agent)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     unsaved_member.type_of_phone_number = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member,credit_card)
@@ -1249,8 +1244,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "Enroll a member with member approval TOM" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :created_by => @admin_agent)
+                                         :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member_approval(unsaved_member,credit_card)
