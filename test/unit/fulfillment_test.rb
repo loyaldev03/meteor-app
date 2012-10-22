@@ -13,12 +13,12 @@ class FulfillmentTest < ActiveSupport::TestCase
   end
 
   test "active member can receive fulfillments" do 
-    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = create_active_member(@terms_of_membership_with_gateway)
     assert member.can_receive_another_fulfillment?
   end
 
   test "fulfillment not_processed renewal" do 
-    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = create_active_member(@terms_of_membership_with_gateway)
     member.reload
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
@@ -37,7 +37,7 @@ class FulfillmentTest < ActiveSupport::TestCase
   end
 
   test "fulfillment processing cant be renewed" do 
-    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = create_active_member(@terms_of_membership_with_gateway)
     member.reload
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
@@ -50,7 +50,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
 
   test "fulfillment sent renewal" do 
-    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = create_active_member(@terms_of_membership_with_gateway)
     member.reload
     fulfillment = FactoryGirl.build(:fulfillment)
     fulfillment.member = member
@@ -71,8 +71,7 @@ class FulfillmentTest < ActiveSupport::TestCase
   end
 
   test "Should send fulfillments on acepted applied member" do
-    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
-    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
+    member = create_active_member(@terms_of_membership_with_gateway)
     assert_difference('Fulfillment.count',2) do
       member.set_as_provisional!
     end
@@ -80,9 +79,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Should send fulfillments on acepted applied member and set correct status on fulfillments" do
     setup_products
-
-    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
-    enrollment_info = FactoryGirl.create(:enrollment_info_with_product_without_stock, :member_id => member.id)
+    member = create_active_member(@terms_of_membership_with_gateway, :applied_member, :enrollment_info_with_product_without_stock)
     assert_difference('Fulfillment.count',2) do
       member.set_as_provisional!
     end
@@ -95,8 +92,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Should create new fulfillment with recurrent and renewable_date" do
     setup_products
-    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
-    enrollment_info = FactoryGirl.create(:enrollment_info_with_product_recurrent, :member_id => member.id)
+    member = create_active_member(@terms_of_membership_with_gateway, :applied_member, :enrollment_info_with_product_recurrent)
     assert_difference('Fulfillment.count') do
       member.set_as_provisional!
     end
@@ -108,7 +104,7 @@ class FulfillmentTest < ActiveSupport::TestCase
   test "When resending fulfillment has stock, it should be set as not_processed" do
     setup_products
     agent = FactoryGirl.create(:confirmed_admin_agent)
-    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club) 
+    member = create_active_member(@terms_of_membership_with_gateway, :applied_member)
     fulfillment = FactoryGirl.create(:fulfillment_undeliverable_with_stock, :member_id => member.id)
     stock = fulfillment.product.stock
     fulfillment.resend(agent)

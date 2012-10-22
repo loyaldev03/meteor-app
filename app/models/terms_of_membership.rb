@@ -4,7 +4,7 @@ class TermsOfMembership < ActiveRecord::Base
 
   belongs_to :club
   has_many :transactions
-  has_many :members
+  has_many :memberships
   has_many :prospects
   has_many :email_templates
 

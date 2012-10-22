@@ -18,13 +18,8 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @member_blacklist_reason =  FactoryGirl.create(:member_blacklist_reason)
     FactoryGirl.create(:batch_agent)
-    
-    @saved_member = FactoryGirl.create(:active_member, 
-	      :club_id => @club.id, 
-	      :terms_of_membership => @terms_of_membership_with_gateway,
-	      :created_by => @admin_agent)
 
-    @saved_member.reload
+    @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
     
     sign_in_as(@admin_agent)
   end
@@ -129,9 +124,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     bl_credit_card = @saved_member.active_credit_card
 
     unsaved_member = FactoryGirl.build(:active_member, 
-        :club_id => @club.id, 
-        :terms_of_membership => @terms_of_membership_with_gateway,
-        :created_by => @admin_agent)
+        :club_id => @club.id)
 
     create_new_member(unsaved_member, bl_credit_card, unsaved_member.email, @partner, @club, @terms_of_membership_with_gateway)
 
@@ -157,10 +150,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     bl_email = @saved_member.email
 
     unsaved_member = FactoryGirl.build(:active_member, 
-        :club_id => @club.id, 
-        :terms_of_membership => @terms_of_membership_with_gateway,
-        :created_by => @admin_agent)
-
+        :club_id => @club.id)
 
     create_new_member(unsaved_member, unsaved_member.credit_cards.first, bl_email, @partner, @club, @terms_of_membership_with_gateway)
 

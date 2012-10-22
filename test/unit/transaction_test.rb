@@ -68,17 +68,17 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "controlled refund (refund completely a transaction)" do
     active_merchant_stubs unless @use_active_merchant
-    active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
-    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
+    active_member = create_active_member(@terms_of_membership)
     amount = @terms_of_membership.installment_amount
     answer = active_member.bill_membership
+    active_member.reload
     assert_equal active_member.status, 'active'
     assert_difference('Operation.count', +2) do
       assert_difference('Transaction.count') do
         assert_difference('Communication.count') do
           trans = active_member.transactions.last
           answer = Transaction.refund(amount, trans)
-          assert (answer[:code] == Settings.error_codes.success), answer[:message]
+          assert_equal answer[:code], Settings.error_codes.success, answer[:message]
           trans.reload
           assert_equal trans.refunded_amount, amount
           assert_equal trans.amount_available_to_refund, 0.0
@@ -98,12 +98,12 @@ class TransactionTest < ActiveSupport::TestCase
   ############ DECLINE ###################
   test "Billing with SD is re-scheduled" do 
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
-    assert_difference('Operation.count', +1) do
+    assert_difference('Operation.count') do
       assert_difference('Transaction.count') do
-        active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
-        enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
+        active_member = create_active_member(@terms_of_membership)
         nbd = active_member.bill_date
         answer = active_member.bill_membership
+        active_member.reload
         assert !active_member.lapsed?, "member cant be lapsed"
         assert_equal active_member.next_retry_bill_date.to_date, @sd_strategy.days.days.from_now.to_date, "next_retry_bill_date should #{@sd_strategy.days.days.from_now}"
         assert_equal active_member.bill_date, nbd, "bill_date should not be touched #{nbd}"
@@ -113,7 +113,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
   test "Billing with grace period enabled on tom and missing CC" do
     @grace_strategy = FactoryGirl.create(:grace_period_decline_strategy)
-    active_member = FactoryGirl.create(:active_member_without_cc, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+    active_member = create_active_member(@terms_of_membership, :active_member_without_cc)
     nbd = active_member.bill_date
     @terms_of_membership.grace_period = 15
     @terms_of_membership.save
@@ -122,7 +122,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   end
   test "Billing with grace period disable on tom and missing CC" do
-    active_member = FactoryGirl.create(:active_member_without_cc, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+    active_member = create_active_member(@terms_of_membership, :active_member_without_cc)
     nbd = active_member.bill_date
     @terms_of_membership.grace_period = 0
     @terms_of_membership.save
@@ -133,12 +133,12 @@ class TransactionTest < ActiveSupport::TestCase
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
     assert_difference('Operation.count', +3) do
-      active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
-      enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
+      active_member = create_active_member(@terms_of_membership)
       amount = @terms_of_membership.installment_amount
       active_member.recycled_times = 4
       active_member.save
       answer = active_member.bill_membership
+      active_member.reload
       assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
       assert active_member.lapsed?, "member should be lapsed after recycle limit is reached"
       assert_nil active_member.next_retry_bill_date, "next_retry_bill_date should be nil"
@@ -151,10 +151,10 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
     assert_difference('Operation.count', +3) do
       assert_difference('Communication.count', +1) do
-        active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
-        enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
+        active_member = create_active_member(@terms_of_membership)
         amount = @terms_of_membership.installment_amount
         answer = active_member.bill_membership
+        active_member.reload
         assert active_member.lapsed?, "member should be lapsed after HD"
         assert_nil active_member.next_retry_bill_date, "next_retry_bill_date should be nil"
         assert_nil active_member.bill_date, "bill_date should be nil"
@@ -165,17 +165,17 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing declined, but there is no decline rule. Send email" do 
     active_merchant_stubs("34234", "decline stubbed", false) 
-    active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
-    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
+    active_member = create_active_member(@terms_of_membership)
     amount = @terms_of_membership.installment_amount
     answer = active_member.bill_membership
+    active_member.reload
     assert_equal active_member.next_retry_bill_date.to_date, (Time.zone.now + eval(Settings.next_retry_on_missing_decline)).to_date, "Next retry bill date incorrect"
   end
   ############################################
 
   # TODO: how do we stub faraday?
   test "Chargeback processing should create transaction, blacklist and cancel the member" do
-    active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership, club: @terms_of_membership.club)
+    active_member = create_active_member(@terms_of_membership)
     transaction = FactoryGirl.create(:transaction, member: active_member, terms_of_membership: @terms_of_membership)
     answer = { :body => '"Merchant Id","DBA Name","Control Number","Incoming Date","Card Number","Reference Number",' + 
       '"Tran Date","Tran Amount","Trident Tran ID","Purchase ID","Client Ref Num","Auth Code","Adj Date",' +

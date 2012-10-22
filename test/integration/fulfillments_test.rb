@@ -12,7 +12,7 @@ class FulfillmentsTest < ActionController::IntegrationTest
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    @member = create_active_member(@terms_of_membership_with_gateway)
    
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     sign_in_as(@admin_agent)

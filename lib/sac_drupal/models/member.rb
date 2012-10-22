@@ -213,7 +213,7 @@ module Drupal
       # Add dynamyc preferences.
       m.preferences.each do |key, value|
         map.merge!({
-          "field_phoenix_pref_#{key}": {
+          "field_phoenix_pref_#{key}" =>  {
             und: value
           }
         })

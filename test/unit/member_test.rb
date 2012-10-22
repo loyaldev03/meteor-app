@@ -12,7 +12,6 @@ class MemberTest < ActiveSupport::TestCase
     member = FactoryGirl.build(:member)
     assert !member.save, member.errors.inspect
     member.club =  @terms_of_membership_with_gateway.club
-    member.terms_of_membership =  @terms_of_membership_with_gateway
     Delayed::Worker.delay_jobs = true
     assert_difference('Delayed::Job.count', 1, 'should ceate job for #desnormalize_preferences') do
       assert member.save, "member cant be save #{member.errors.inspect}"
@@ -41,31 +40,30 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Member should not be billed if it is not active or provisional" do
-    member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = create_active_member(@terms_of_membership_with_gateway, :lapsed_member)
     answer = member.bill_membership
     assert !(answer[:code] == Settings.error_codes.success), answer[:message]
   end
 
   test "Member should not be billed if no credit card is on file." do
-    member = FactoryGirl.create(:provisional_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member)
     answer = member.bill_membership
     assert (answer[:code] != Settings.error_codes.success), answer[:message]
   end
 
   test "Insfufficient funds hard decline" do
     active_merchant_stubs unless @use_active_merchant
-    active_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => active_member.id)
+    active_member = create_active_member(@terms_of_membership_with_gateway)
     answer = active_member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
   end
 
   test "Monthly member should be billed if it is active or provisional" do
     assert_difference('Operation.count', 4) do
-      member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-      enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
+      member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
+      member.reload
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
       assert_equal member.quota, 1, "quota is #{member.quota} should be 1"
       assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
@@ -83,41 +81,40 @@ class MemberTest < ActiveSupport::TestCase
   test "Should not be two members with the same email within the same club" do
     member = FactoryGirl.build(:member)
     member.club =  @terms_of_membership_with_gateway.club
-    member.terms_of_membership =  @terms_of_membership_with_gateway
     member.save
     member_two = FactoryGirl.build(:member)
     member_two.club =  @terms_of_membership_with_gateway.club
-    member_two.terms_of_membership =  @terms_of_membership_with_gateway
     member_two.email = member.email
     member_two.valid?
     assert_not_nil member_two, member_two.errors.full_messages.inspect
   end
 
   test "Should let save two members with the same email in differents clubs" do
-    member = FactoryGirl.build(:member, email: 'testing@xagax.com' , terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @terms_of_membership_with_gateway.club)
     member.club_id = 1
     member.save
-    member_two = FactoryGirl.build(:member, email: 'testing@xagax.com',terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member_two = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @terms_of_membership_with_gateway.club)
     member_two.club_id = 14
     assert member_two.save, "member cant be save #{member_two.errors.inspect}"
   end
 
   test "active member cant be recovered" do
-    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    answer = member.recover(4)
+    member = create_active_member(@terms_of_membership_with_gateway)
+    tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway)
+    answer = member.recover(tom_dup)
     assert answer[:code] == Settings.error_codes.cant_recover_member, answer[:message]
   end
 
   test "Lapsed member with reactivation_times = 5 cant be recovered" do
-    member = FactoryGirl.create(:lapsed_member, reactivation_times: 5, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    answer = member.recover(4)
+    member = create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, { reactivation_times: 5 })
+    tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway)
+    answer = member.recover(tom_dup)
     assert answer[:code] == Settings.error_codes.cant_recover_member, answer[:message]
   end
 
   test "Lapsed member can be recovered" do
     assert_difference('Fulfillment.count',2) do
-      member = FactoryGirl.create(:lapsed_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-      enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
+      member = create_active_member(@terms_of_membership_with_gateway, :lapsed_member)
       answer = member.recover(@terms_of_membership_with_gateway)
       assert answer[:code] == Settings.error_codes.success, answer[:message]
       assert_equal 'provisional', member.status, "Status was not updated."
@@ -127,8 +124,7 @@ class MemberTest < ActiveSupport::TestCase
 
   test "Lapsed member can be recovered unless it needs approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
-    member = FactoryGirl.create(:lapsed_member, terms_of_membership: @tom_approval, club: @tom_approval.club)
-    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)
+    member = create_active_member(@tom_approval, :lapsed_member)
     answer = member.recover(@tom_approval)
     member.reload
     assert answer[:code] == Settings.error_codes.success, answer[:message]
@@ -138,18 +134,17 @@ class MemberTest < ActiveSupport::TestCase
 
   test "Should not let create a member with a wrong format zip" do
     ['12345-1234', '12345'].each {|zip| zip
-      member = FactoryGirl.build(:member, zip: zip, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+      member = FactoryGirl.build(:member, zip: zip, club: @terms_of_membership_with_gateway.club)
       assert member.save, "Member cant be save #{member.errors.inspect}"
     }    
     ['1234-1234', '12345-123', '1234'].each {|zip| zip
-      member = FactoryGirl.build(:member, zip: zip, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+      member = FactoryGirl.build(:member, zip: zip, club: @terms_of_membership_with_gateway.club)
       assert !member.save, "Member cant be save #{member.errors.inspect}"
     }        
   end
 
   test "If member is rejected, when recovering it should increment reactivation_times" do
-    member = FactoryGirl.create(:applied_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
-    enrollment_info = FactoryGirl.create(:enrollment_info, :member_id => member.id)   
+    member = create_active_member(@terms_of_membership_with_gateway, :applied_member)
     member.set_as_canceled!
     answer = member.recover(@terms_of_membership_with_gateway)
     member.reload
@@ -159,13 +154,13 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should reset club_cash when member is canceled" do
-    member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club, :club_cash_amount => 200)
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc, nil, { :club_cash_amount => 200 })
     member.set_as_canceled
     assert_equal 0, member.club_cash_amount, "The member is #{member.status} with #{member.club_cash_amount}"
   end
 
   test "Canceled member should have cancel date set " do
-    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
     cancel_date = member.cancel_date
     member.cancel! Time.zone.now, "Cancel from Unit Test"
     m = Member.find member.uuid
@@ -177,20 +172,19 @@ class MemberTest < ActiveSupport::TestCase
     member = FactoryGirl.build(:member)
     assert !member.save, member.errors.inspect
     member.club =  @terms_of_membership_with_gateway.club
-    member.terms_of_membership =  @terms_of_membership_with_gateway
     member.first_name = 'Billy 3ro'
     member.last_name = 'Sáenz'
     assert member.save, "member cant be save #{member.errors.inspect}"
   end
 
   test "Should not deduct more club_cash than the member has" do
-    member = FactoryGirl.create(:provisional_member_with_cc, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club, :club_cash_amount => 200)
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc, nil, { :club_cash_amount => 200 })
     member.add_club_cash(-300)
     assert_equal 200, member.club_cash_amount, "The member is #{member.status} with $#{member.club_cash_amount}"
   end
 
   test "if active member is blacklisted, should have cancel date set " do
-    member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = create_active_member(@terms_of_membership_with_gateway)
     cancel_date = member.cancel_date
     # 2 operations : cancel and blacklist
     assert_difference('Operation.count', 2) do
@@ -203,7 +197,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "if lapsed member is blacklisted, it should not be canceled again" do
-    member = FactoryGirl.create(:lapsed_member, reactivation_times: 5, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club)
+    member = create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, { reactivation_times: 5 })
     cancel_date = member.cancel_date
     assert_difference('Operation.count', 1) do
       member.blacklist(nil, "Test")
@@ -215,26 +209,25 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "If member's email contains '@noemail.com' it should not send emails." do
-    member = FactoryGirl.create(:lapsed_member, reactivation_times: 5, terms_of_membership: @terms_of_membership_with_gateway, club: @terms_of_membership_with_gateway.club, email: "testing@noemail.com")
+    member = create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, { email: "testing@noemail.com" })
     assert_difference('Operation.count', 1) do
-      Communication.deliver!(:active,member)
+      Communication.deliver!(:active, member)
     end
     assert_equal member.operations.last.description, "The email contains '@noemail.com' which is an empty email. The email won't be sent."
   end
 
   test "show dates according to club timezones" do
-    @club = @terms_of_membership_with_gateway.club
-    @saved_member = FactoryGirl.create(:active_member, terms_of_membership: @terms_of_membership_with_gateway, club: @club)
-    @saved_member.member_since_date = "Wed, 02 May 2012 19:10:51 UTC 00:00"
-    @saved_member.join_date = "Wed, 03 May 2012 13:10:51 UTC 00:00"
-    @saved_member.next_retry_bill_date = "Wed, 03 May 2012 00:10:51 UTC 00:00"
+    saved_member = create_active_member(@terms_of_membership_with_gateway)
+    saved_member.member_since_date = "Wed, 02 May 2012 19:10:51 UTC 00:00"
+    saved_member.current_membership.join_date = "Wed, 03 May 2012 13:10:51 UTC 00:00"
+    saved_member.next_retry_bill_date = "Wed, 03 May 2012 00:10:51 UTC 00:00"
     Time.zone = "Eastern Time (US & Canada)"
-    assert_equal I18n.l(Time.zone.at(@saved_member.member_since_date)), "02/05/2012"
-    assert_equal I18n.l(Time.zone.at(@saved_member.next_retry_bill_date)), "02/05/2012"
-    assert_equal I18n.l(Time.zone.at(@saved_member.join_date)), "03/05/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.member_since_date)), "02/05/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date)), "02/05/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "03/05/2012"
     Time.zone = "Ekaterinburg"
-    assert_equal I18n.l(Time.zone.at(@saved_member.member_since_date)), "03/05/2012"
-    assert_equal I18n.l(Time.zone.at(@saved_member.next_retry_bill_date)), "03/05/2012"
-    assert_equal I18n.l(Time.zone.at(@saved_member.join_date)), "03/05/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.member_since_date)), "03/05/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date)), "03/05/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "03/05/2012"
   end
 end

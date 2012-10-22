@@ -27,12 +27,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     FactoryGirl.create(:batch_agent)
     
     if create_new_member
-	    @saved_member = FactoryGirl.create(:active_member, 
-	      :club_id => @club.id, 
-	      :terms_of_membership => @terms_of_membership_with_gateway,
-	      :created_by => @admin_agent)
-
-			@saved_member.reload
+      @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
 		end
 
     sign_in_as(@admin_agent)
@@ -83,7 +78,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       
       within("#td_mi_reactivation_times") { assert page.has_content?("#{member.reactivation_times}") }
       
-      assert page.has_content?(member.created_by.username)
+      assert page.has_content?(member.current_membership.created_by.username)
 
       within("#td_mi_reactivation_times") { assert page.has_content?("#{member.reactivation_times}") }
       
@@ -260,34 +255,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
 	end
 
-  test "display external_id at member search" do
-    setup_member(false)
-    @club.requires_external_id = true
-    @club.save!
-
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
-      :created_by => @admin_agent, :external_id => "9876543210")
-
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_on 'New Member'
-    create_new_member(unsaved_member)
-
-    member = Member.last
-
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
-    search_member("member[member_id]", "#{member.visible_id}", member)
-
-  end
   
   test "create member" do
   	setup_member(false)
 
   	unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
-      :created_by => @admin_agent)
+      :club_id => @club.id)
 
  		create_new_member(unsaved_member)
     created_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
@@ -317,9 +290,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
 
     unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
-      :created_by => @admin_agent)
+      :club_id => @club.id)
 
     create_new_member(unsaved_member, true)
     
@@ -352,9 +323,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   	@club.save!
 
   	unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
-      :created_by => @admin_agent, :external_id => "9876543210")
+      :club_id => @club.id, :external_id => "9876543210")
 
   	visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_on 'New Member'
@@ -373,10 +342,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   	@club.requires_external_id = true
   	@club.save!
 
-  	unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
-      :created_by => @admin_agent)
+  	unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
 
   	visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_on 'New Member'
@@ -384,6 +350,24 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   end
 
+  test "display external_id at member search" do
+  	setup_member(false)
+  	@club.requires_external_id = true
+  	@club.save!
+
+  	unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id, :external_id => "9876543210")
+
+  	visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_on 'New Member'
+    create_new_member(unsaved_member)
+
+    member = Member.last
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
+    search_member("member[member_id]", "#{member.visible_id}", member)
+
+  end
 
 
   def validate_timezone_dates(timezone)
@@ -403,9 +387,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     validate_timezone_dates("Eastern Time (US & Canada)")
     validate_timezone_dates("Ekaterinburg")
   end
-
-
-
 
   test "create member without information" do
     setup_member
@@ -586,9 +567,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create member with gender male" do
     setup_member
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent)
+                                         :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -632,9 +611,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create member with gender female" do
     setup_member
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent)
+                                         :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -681,9 +658,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create member with phone number" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent)
+                                         :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
 
@@ -734,9 +709,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create member without phone number" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent)
+                                         :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -780,10 +753,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   test "should create member and display type of phone number" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -831,9 +801,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create member with 'home' telephone type" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent)
+                                         :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -874,7 +842,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#table_contact_information")do
       wait_until{
         assert page.has_content?(unsaved_member.full_phone_number)
-        assert page.has_content?(Settings.type_of_phone_number.home.capitalize)
+        assert page.has_content?('Home')
       }
     end
   end
@@ -883,8 +851,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   	setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent,
                                          :address => '1455 De Maisonneuve Blvd. W. Montreal',
                                          :state => 'Quebec',
                                          :zip => 'H3G 1M8',
@@ -908,8 +874,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   	setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent,
                                          :address => '1455 De Maisonneuve Blvd. W. Montreal',
                                          :state => 'Quebec',
                                          :zip => '%^tYU2123',
@@ -946,9 +910,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "display all operations on member profile" do
   	setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent)
+                                         :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)
@@ -1136,9 +1098,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create a member with an expired credit card" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_gateway,
-                                         :created_by => @admin_agent)
+                                         :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => 2011)
     
     fill_in_member(unsaved_member,credit_card)
@@ -1162,6 +1122,23 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
+  test "create member without type of type_of_phone_number" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id, 
+                                         :type_of_phone_number => '')
+
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => 2011)
+    
+    fill_in_member(unsaved_member,credit_card)
+
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?("type_of_phone_number: can't be blank,is not included in the list")
+      }
+    end
+  end
+
   test "display member with blank product_sku." do
     setup_member
     enrollment_info = FactoryGirl.create(:enrollment_info, :product_sku => '', :member_id => @saved_member.id)
@@ -1181,7 +1158,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_approval,
                                          :created_by => @admin_agent)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
@@ -1212,7 +1188,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_approval,
                                          :created_by => @admin_agent)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
@@ -1221,7 +1196,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
     @saved_member = Member.find_by_email(unsaved_member.email)
-
 
     confirm_ok_js
     click_link_or_button 'Reject'
@@ -1241,8 +1215,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
 
     unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
+      :club_id => @club.id, :gender => '',
       :created_by => @admin_agent)
     unsaved_member.gender = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
@@ -1261,7 +1234,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     unsaved_member = FactoryGirl.build(:active_member, 
       :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
       :created_by => @admin_agent)
     unsaved_member.type_of_phone_number = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
@@ -1278,7 +1250,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id, 
-                                         :terms_of_membership => @terms_of_membership_with_approval,
                                          :created_by => @admin_agent)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     

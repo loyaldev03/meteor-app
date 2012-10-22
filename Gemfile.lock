@@ -198,9 +198,6 @@ GEM
       net-ssh (>= 1.99.1)
     nokogiri (1.5.5)
     orm_adapter (0.0.7)
-    paper_trail (2.6.3)
-      activerecord (~> 3.0)
-      railties (~> 3.0)
     paperclip (3.1.4)
       activemodel (>= 3.0.0)
       activerecord (>= 3.0.0)
@@ -338,7 +335,6 @@ DEPENDENCIES
   mocha
   mysql2 (= 0.3.11)
   nokogiri
-  paper_trail (~> 2)
   paperclip (~> 3.0)
   rack-bug!
   rails (= 3.2.8)

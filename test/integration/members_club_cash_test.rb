@@ -18,10 +18,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
     
-    @saved_member = FactoryGirl.create(:active_member, :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
-      :created_by => @admin_agent)
-		@saved_member.reload
+    @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
     sign_in_as(@admin_agent)
   end
 
@@ -144,11 +141,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_without_club_cash, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
 
-    @saved_member = FactoryGirl.create(:active_member, 
-      :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
-      :created_by => @admin_agent)
-    @saved_member.reload
+    @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
 
     sign_in_as(@admin_agent)
     @saved_member.bill_membership
@@ -327,10 +320,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
     
-    @saved_member = FactoryGirl.create(:active_member, :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
-      :created_by => @admin_agent)
-    @saved_member.reload
+    @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
     sign_in_as(@admin_agent)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -372,10 +362,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
     
-    @saved_member = FactoryGirl.create(:active_member, :club_id => @club.id, 
-      :terms_of_membership => @terms_of_membership_with_gateway,
-      :created_by => @admin_agent)
-    @saved_member.reload
+    @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
     sign_in_as(@admin_agent)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)

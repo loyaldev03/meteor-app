@@ -25,9 +25,7 @@ class MembersBillTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
 
     unsaved_member = FactoryGirl.build(:member_with_cc, 
-        :club_id => @club.id, 
-        :terms_of_membership => @terms_of_membership_with_gateway,
-        :created_by => @admin_agent)
+        :club_id => @club.id)
 
     create_new_member(unsaved_member)
     

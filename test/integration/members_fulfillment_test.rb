@@ -19,12 +19,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     FactoryGirl.create(:batch_agent)
 
     if create_new_member
-	    @saved_member = FactoryGirl.create(:active_member, 
-	      :club_id => @club.id, 
-	      :terms_of_membership => @terms_of_membership_with_gateway,
-	      :created_by => @admin_agent)
-
-			@saved_member.reload
+      @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
       @product = FactoryGirl.create(:product, :club_id => @club.id, :sku => 'kit-card')
       @fulfillment = FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'kit-card')
 		end
