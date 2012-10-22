@@ -83,7 +83,6 @@ FactoryGirl.define do
     phone_area_code 123
     phone_local_number 1234
     type_of_phone_number Settings.type_of_phone_number.home
-    join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     birth_date { DateTime.now }
@@ -108,7 +107,6 @@ FactoryGirl.define do
     phone_area_code 123
     phone_local_number 1234
     type_of_phone_number Settings.type_of_phone_number.home
-    join_date { DateTime.now }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     birth_date { DateTime.now }
