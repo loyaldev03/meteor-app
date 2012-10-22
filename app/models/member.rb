@@ -819,6 +819,28 @@ class Member < ActiveRecord::Base
 
   public 
 
+    def update_credit_card_from_drupal(credit_card)
+      new_year, new_month, new_number = nil, nil, nil
+      # Drupal sends X when member does not change the credit card number
+      unless credit_card.include? 'X'
+        credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? and credit_cards.uuid != ? ", 
+            credit_card.encrypted_number, club.id, member.id ] )
+        if credit_cards.empty?
+          new_number = credit_card[:number]
+        elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
+          return { :message => "That credit card is blacklisted, please use another.", :code => Settings.error_codes.credit_card_blacklisted }
+        else # there is another member with this credit card. prevent this update.
+          return { :message => "That credit card already in use.", :code => Settings.error_codes.credit_card_in_use }
+        end
+      end
+
+      new_year = credit_card[:expire_year] if credit_card[:expire_year] != member.active_credit_card.expire_year  
+      new_month = credit_card[:expire_month] if credit_card[:expire_month] != member.active_credit_card.expire_month  
+      
+      CreditCard.new_expiration_on_active_credit_card(member.active_credit_card, new_year, new_month, new_number)
+      { :code => Settings.error_codes.success }
+    end
+
     def desnormalize_preferences
       if self.preferences.present?
         self.preferences.each do |key, value|
