@@ -11,18 +11,20 @@ class CreateMemberships < ActiveRecord::Migration
       t.string   "cohort"
       t.timestamps
     end
+    rename_column :members, :terms_of_membership_id, :terms_of_membership_id2
     add_column :members, :current_membership_id, :integer
     add_column :enrollment_infos, :membership_id, :integer
     add_column :transactions, :membership_id, :integer
-    Member.where("terms_of_membership_id is not null").find_in_batches do |group|
+    Member.where("terms_of_membership_id2 is not null").find_in_batches do |group|
       group.each do |member|
         m = Membership.new 
         m.status = member.status
-        m.terms_of_membership_id = member.terms_of_membership_id
+        m.terms_of_membership_id = member.terms_of_membership_id2
         m.join_date = member.join_date
         m.cancel_date = member.cancel_date
         m.created_by_id = member.created_by_id
         m.quota = member.quota
+        m.member = member
         m.save
         member.update_attribute :current_membership_id, m.id
         unless member.enrollment_infos.first.nil?
@@ -30,7 +32,7 @@ class CreateMemberships < ActiveRecord::Migration
         end
       end
     end
-    [ :terms_of_membership_id, :join_date, :cancel_date, :created_by_id, :quota].each do |column|
+    [ :terms_of_membership_id2, :join_date, :cancel_date, :created_by_id, :quota].each do |column|
       remove_column :members, column
     end
     drop_table :versions
