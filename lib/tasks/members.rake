@@ -28,7 +28,7 @@ namespace :billing do
     tall = Time.zone.now
     begin
       # We use bill_date because we will only send this email once!
-      Member.find_in_batches(:conditions => [" date(bill_date) = ? ", Time.zone.now.to_date + 7.days ]) do |group|
+      Member.find_in_batches(:conditions => [" date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
         group.each do |member| 
           tz = Time.zone.now
           begin
