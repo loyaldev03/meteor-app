@@ -14,7 +14,7 @@ class CreateMemberships < ActiveRecord::Migration
     add_column :members, :current_membership_id, :integer
     add_column :enrollment_infos, :membership_id, :integer
     add_column :transactions, :membership_id, :integer
-    Member.find_in_batches do |group|
+    Member.where("terms_of_membership_id is not null").find_in_batches do |group|
       group.each do |member|
         m = Membership.new 
         m.status = member.status
