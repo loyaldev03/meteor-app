@@ -339,8 +339,8 @@ $(document).ready( function() {
       "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
-      "sAjaxSource": $('#memberships_table').data('source'),
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count-1 ] }],
+      "sAjaxSource": $('#memberships_table').data('source')
     });
   }
 
