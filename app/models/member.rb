@@ -57,6 +57,7 @@ class Member < ActiveRecord::Base
   end
 
   def after_save_sync_to_remote_domain(type)
+    skip_api_sync! if lapsed? or applied? # Bug #23017 - skip sync if lapsed or applied.
     api_member.save! unless @skip_api_sync || api_member.nil?
   rescue Exception => e
     # refs #21133
