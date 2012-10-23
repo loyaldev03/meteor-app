@@ -751,9 +751,7 @@ class Member < ActiveRecord::Base
     end
 
     def propagate_membership_data
-      if self.changed.include?('status')
-        self.current_membership.update_attribute :status, status
-      end
+      self.current_membership.update_attribute :status, status
     end
 
     def set_decline_strategy(trans)
