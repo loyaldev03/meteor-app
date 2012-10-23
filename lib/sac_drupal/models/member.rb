@@ -1,6 +1,6 @@
 module Drupal
   class Member < Struct.new(:member)
-    OBSERVED_FIELDS = %w(first_name last_name address city email phone_country_code phone_local_number phone_local_number state zip country visible_id).to_set.freeze
+    OBSERVED_FIELDS = %w(first_name last_name gender address city email phone_country_code phone_area_code phone_local_number state zip country visible_id type_of_phone_number birth_date type_of_phone_number).to_set.freeze
 
     def get
       res = conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }).body unless self.new_record?
@@ -133,7 +133,7 @@ module Drupal
         },
         field_profile_phone_type: { 
           und: { 
-              select: m.type_of_phone_number.downcase
+              select: (type_of_phone_number.blank? ? '' : m.type_of_phone_number.downcase)
             }
         },
         field_profile_phone_country_code: { 
