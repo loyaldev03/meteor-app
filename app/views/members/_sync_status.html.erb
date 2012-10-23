@@ -1,5 +1,5 @@
 <div class="">
-  <% if can_be_synced_to_remote? %>
+  <% if @current_member.can_be_synced_to_remote? %>
     <div class='tab-toolbar'>
       <%= 
         link_to login_as_member_path, 
@@ -43,7 +43,7 @@
       <% end %>
     </div>
   <% end %>
-  
+
   <table class='hidden_table_border'>
     <tr>
       <td NOWRAP><%= t('activerecord.attributes.member.api_id') %>:</td>
