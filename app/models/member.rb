@@ -47,8 +47,9 @@ class Member < ActiveRecord::Base
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
   
+  # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
-    api_member.destroy! unless @skip_api_sync || api_member.nil? || api_id.nil?
+    api_member.destroy! unless api_member.nil? || api_id.nil?
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
@@ -735,14 +736,14 @@ class Member < ActiveRecord::Base
     end
 
     def cancellation
+      self.cancel_member_at_remote_domain
+      self.fulfillments.where_cancellable.each &:set_as_canceled
       self.next_retry_bill_date = nil
       self.bill_date = nil
       self.recycled_times = 0
-      Communication.deliver!(:cancellation, self)
-      self.fulfillments.where_cancellable.each &:set_as_canceled
       self.save
+      Communication.deliver!(:cancellation, self)
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
-      self.cancel_member_at_remote_domain
     end
 
     def asyn_desnormalize_preferences(opts = {})
