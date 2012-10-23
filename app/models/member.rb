@@ -737,7 +737,7 @@ class Member < ActiveRecord::Base
       self.fulfillments.where_cancellable.each &:set_as_canceled
       self.save
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
-      cancel_member_at_remote_domain
+      self.cancel_member_at_remote_domain
     end
 
     def asyn_desnormalize_preferences(opts = {})
@@ -837,10 +837,10 @@ class Member < ActiveRecord::Base
         end
       end
 
-      new_year = credit_card[:expire_year] if credit_card[:expire_year] != member.active_credit_card.expire_year  
-      new_month = credit_card[:expire_month] if credit_card[:expire_month] != member.active_credit_card.expire_month  
+      new_year = credit_card[:expire_year] if credit_card[:expire_year] != active_credit_card.expire_year  
+      new_month = credit_card[:expire_month] if credit_card[:expire_month] != active_credit_card.expire_month  
       
-      CreditCard.new_expiration_on_active_credit_card(member.active_credit_card, new_year, new_month, new_number)
+      CreditCard.new_expiration_on_active_credit_card(active_credit_card, new_year, new_month, new_number)
       { :code => Settings.error_codes.success }
     end
 
