@@ -75,16 +75,16 @@ namespace :members do
       base =  Member.joins(:current_membership).where(" date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
       Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
       base.find_in_batches do |group|
-        group.each do |membership| 
+        group.each do |member| 
           tz = Time.zone.now
           begin
-            Rails.logger.info "  * processing member ##{membership.member_id}"
-            membership.member.set_as_canceled!
+            Rails.logger.info "  * processing member ##{member.id}"
+            member.set_as_canceled!
           rescue Exception => e
             Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{membership.member_id}"
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
         end
       end
     ensure
