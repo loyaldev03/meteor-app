@@ -171,6 +171,13 @@ en:
           unsynced: Not Synced
           error: Sync Error
         is_lapsed: 'Member was canceled.'
+      membership:
+        id: 'ID'
+        status: 'Status'
+        join_date: 'Join date'
+        cancel_date: 'Cancel date'
+        tom: 'TOM'
+        quota: 'Quota'
       club:
         id: 'ID'
         name: 'Name'

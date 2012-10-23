@@ -13,9 +13,9 @@ private
     memberships.map do |membership|
       [ membership.id, 
         membership.status, 
-        membership.terms_of_membership, 
-        membership.join_date, 
-        membership.cancel_date, 
+        membership.terms_of_membership_id, 
+        I18n.l(membership.join_date, :format => :only_date), 
+        (I18n.l(membership.cancel_date, :format => :only_date) if membership.cancel_date),
         membership.quota
       ]
     end

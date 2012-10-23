@@ -133,7 +133,7 @@ module Drupal
         },
         field_profile_phone_type: { 
           und: { 
-              select: m.type_of_phone_number
+              select: m.type_of_phone_number.downcase
             }
         },
         field_profile_phone_country_code: { 
@@ -177,7 +177,7 @@ module Drupal
         field_profile_dob: {
           und: [
             {
-              value: { date: m.birth_date.to_date.strftime("%m/%d/%Y") }
+              value: { date: (m.birth_date.nil? ? '' : m.birth_date.to_date.strftime("%m/%d/%Y")) }
             }
           ]
         }
@@ -204,7 +204,7 @@ module Drupal
       if cc
         map.merge!({
           field_profile_cc_month: {
-            und: cc.expire_month.to_s
+            und: "%02d" % cc.expire_month.to_s
           },
           field_profile_cc_year: {
             und: cc.expire_year.to_s
