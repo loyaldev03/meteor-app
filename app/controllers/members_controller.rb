@@ -267,7 +267,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#sync: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
-    Airbrake.notify(:error_class => "Member:sync", :parameters => { :member => @current_member })
+    Airbrake.notify(:error_class => "Member:sync", :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message
   end
 
@@ -291,7 +291,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#reset_password: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
-    Airbrake.notify(:error_class => "Member:reset_password", :parameters => { :member => @current_member })
+    Airbrake.notify(:error_class => "Member:reset_password", :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message
   end
 
@@ -307,7 +307,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#resend_welcome: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
-    Airbrake.notify(:error_class => "Member:resend_welcome", :parameters => { :member => @current_member })
+    Airbrake.notify(:error_class => "Member:resend_welcome", :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message
   end
 end
