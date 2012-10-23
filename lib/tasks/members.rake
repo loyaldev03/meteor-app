@@ -72,7 +72,7 @@ namespace :members do
   task :cancel => :environment do
     tall = Time.zone.now
     begin
-      base =  Membership.where(" date(cancel_date) <= ? AND status != ? ", Time.zone.now.to_date, 'lapsed')
+      base =  Member.joins(:current_membership).where(" date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
       Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
       base.find_in_batches do |group|
         group.each do |membership| 
