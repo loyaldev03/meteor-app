@@ -1,46 +1,49 @@
 <div class="">
-  <div class='tab-toolbar'>
-    <%= 
-      link_to login_as_member_path, 
-        class: "btn btn-success #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}", 
-        target: '_blank' do %>
-      <i class='icon-signin'></i>
-      Login Remotely as Member
-    <% end %>
-    <%= 
-      link_to member_resend_welcome_path, 
-        method: :post, 
-        class: "btn btn-info #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}", 
-        confirm: 'Are you sure?' do %>
-      <i class='icon-envelope'></i>
-      Resend Welcome Email
-    <% end %>
-    <%= 
-      link_to member_sync_path, 
-        method: :post, 
-        class: 'btn btn-warning #{"disabled" if @current_member.lapsed? || !@current_member.api_member}', 
-        confirm: 'Are you sure?' do %>
-      <i class='icon-retweet'></i>
-      Sync to Remote
-    <% end %>
-    <%= 
-      link_to member_reset_password_path, 
-        method: :post, 
-        class: "btn btn-warning #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}", 
-        confirm: 'Are you sure?' do %>
-      <i class='icon-key'></i>
-      Password Reset
-    <% end %>
-    <%= 
-      link_to member_sync_data_path, 
-        remote: true, 
-        class: "btn btn-success #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}",
-        style: 'float: right;',
-        data: { replace: '#sync-data' } do %>
-      <i class='icon-download-alt'></i>
-      Show Remote Data
-    <% end %>
-  </div>
+  <% if @current_member.can_be_synced_to_remote? %>
+    <div class='tab-toolbar'>
+      <%= 
+        link_to login_as_member_path, 
+          class: "btn btn-success #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}", 
+          target: '_blank' do %>
+        <i class='icon-signin'></i>
+        Login Remotely as Member
+      <% end %>
+      <%= 
+        link_to member_resend_welcome_path, 
+          method: :post, 
+          class: "btn btn-info #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}", 
+          confirm: 'Are you sure?' do %>
+        <i class='icon-envelope'></i>
+        Resend Welcome Email
+      <% end %>
+      <%= 
+        link_to member_sync_path, 
+          method: :post, 
+          class: 'btn btn-warning #{"disabled" if @current_member.lapsed? || !@current_member.api_member}', 
+          confirm: 'Are you sure?' do %>
+        <i class='icon-retweet'></i>
+        Sync to Remote
+      <% end %>
+      <%= 
+        link_to member_reset_password_path, 
+          method: :post, 
+          class: "btn btn-warning #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}", 
+          confirm: 'Are you sure?' do %>
+        <i class='icon-key'></i>
+        Password Reset
+      <% end %>
+      <%= 
+        link_to member_sync_data_path, 
+          remote: true, 
+          class: "btn btn-success #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}",
+          style: 'float: right;',
+          data: { replace: '#sync-data' } do %>
+        <i class='icon-download-alt'></i>
+        Show Remote Data
+      <% end %>
+    </div>
+  <% end %>
+
   <table class='hidden_table_border'>
     <tr>
       <td NOWRAP><%= t('activerecord.attributes.member.api_id') %>:</td>
