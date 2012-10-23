@@ -56,8 +56,9 @@ class Member < ActiveRecord::Base
     Airbrake.notify(:error_class => "Member:account_cancel:sync", :error_message => e, :parameters => { :member => self.inspect })
   end
 
+
   def after_save_sync_to_remote_domain(type)
-    skip_api_sync! if lapsed? or applied? # Bug #23017 - skip sync if lapsed or applied.
+    skip_api_sync! unless can_be_synced_to_remote? # Bug #23017 - skip sync if lapsed or applied.
     api_member.save! unless @skip_api_sync || api_member.nil?
   rescue Exception => e
     # refs #21133
@@ -245,6 +246,10 @@ class Member < ActiveRecord::Base
   end
 
   ####  METHODS USED TO SHOW OR NOT BUTTONS. 
+
+  def can_be_synced_to_remote?
+    provisional? or active?
+  end
 
   # Returns true if members is lapsed.
   def can_be_canceled?
