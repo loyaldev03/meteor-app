@@ -221,7 +221,7 @@ module Drupal
       m.preferences.each do |key, value|
         map.merge!({
           "field_phoenix_pref_#{key}" =>  {
-            und: value
+            und: { "select" => "select_or_other", "other" => value }
           }
         })
       end
