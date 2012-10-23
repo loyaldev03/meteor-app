@@ -18,7 +18,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
     FactoryGirl.create(:batch_agent)
-
     saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
     
     cancel_date = Time.zone.now + 1.days
@@ -51,7 +50,19 @@ class MembersRecoveryTest < ActionController::IntegrationTest
         assert page.has_content?("Member recovered successfully $0.0")
       }
     end
-    
+    membership = @canceled_member.current_membership
+    within(".nav-tabs") do
+      click_on("Memberships")
+    end
+    within("#memberships_table")do
+      wait_until{
+        assert page.has_content?(membership.id.to_s)
+        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+        assert page.has_content?(membership.quota.to_s)
+        assert page.has_content?('lapsed')
+        assert page.has_content?('provisional')
+      }
+    end    
   end
 
   test "recovery a member 3 times" do

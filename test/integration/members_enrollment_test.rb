@@ -226,7 +226,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 			fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
 			fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
 			fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-			select('home', :from => 'member[type_of_phone_number]')
+			select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
 			select(@terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
 		}
 
@@ -254,7 +254,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert page.has_content?("#{unsaved_member.first_name} #{unsaved_member.last_name}")
 
 	end
-
   
   test "create member" do
   	setup_member(false)
@@ -634,7 +633,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number,:from => 'member[type_of_phone_number]')
+        select(unsaved_member.type_of_phone_number.capitalize,:from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -792,7 +791,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     member = Member.find_by_email(unsaved_member.email)
     within("#table_contact_information")do
       wait_until{
-        assert page.has_content?(unsaved_member.type_of_phone_number)
+        assert page.has_content?(unsaved_member.type_of_phone_number.capitalize)
       }
     end
 
@@ -1122,23 +1121,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "create member without type of type_of_phone_number" do
-    setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, 
-                                         :type_of_phone_number => '')
-
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => 2011)
-    
-    fill_in_member(unsaved_member,credit_card)
-
-    within("#error_explanation")do
-      wait_until{
-        assert page.has_content?("type_of_phone_number: can't be blank,is not included in the list")
-      }
-    end
-  end
-
   test "display member with blank product_sku." do
     setup_member
     enrollment_info = FactoryGirl.create(:enrollment_info, :product_sku => '', :member_id => @saved_member.id)
@@ -1165,8 +1147,20 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     wait_until{
       assert find_field('input_first_name').value == unsaved_member.first_name
     }
-
     @saved_member = Member.find_by_email(unsaved_member.email)
+    membership = @saved_member.current_membership
+    within(".nav-tabs") do
+      click_on("Memberships")
+    end
+    within("#memberships_table")do
+      wait_until{
+        assert page.has_content?(membership.id.to_s)
+        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+        assert page.has_content?(membership.quota.to_s)
+        assert page.has_content?('applied')
+      }
+    end
+
     confirm_ok_js
     click_link_or_button 'Approve'
     wait_until{ page.has_content?("Member approved") }
@@ -1181,6 +1175,18 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#td_mi_next_retry_bill_date")do
       wait_until{ assert page.has_content?(I18n.l(Time.zone.now+@terms_of_membership_with_approval.provisional_days, :format => :only_date)) }
     end
+    
+    within(".nav-tabs") do
+      click_on("Memberships")
+    end
+    within("#memberships_table")do
+      wait_until{
+        assert page.has_content?(membership.id.to_s)
+        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+        assert page.has_content?(membership.quota.to_s)
+        assert page.has_content?('provisional')
+      }
+    end
   end
 
   test "Reject member" do
@@ -1194,6 +1200,18 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
     @saved_member = Member.find_by_email(unsaved_member.email)
+    membership = @saved_member.current_membership
+    within(".nav-tabs") do
+      click_on("Memberships")
+    end
+    within("#memberships_table")do
+      wait_until{
+        assert page.has_content?(membership.id.to_s)
+        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+        assert page.has_content?(membership.quota.to_s)
+        assert page.has_content?('applied')
+      }
+    end
 
     confirm_ok_js
     click_link_or_button 'Reject'
@@ -1207,6 +1225,19 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
     end
     within("#operations_table") { assert page.has_content?("Member was rejected and now its lapsed.") }
+
+    within(".nav-tabs") do
+      click_on("Memberships")
+    end
+    within("#memberships_table")do
+      wait_until{
+        assert page.has_content?(membership.id.to_s)
+        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+        assert page.has_content?(membership.quota.to_s)
+        assert page.has_content?('lapsed')
+      }
+    end
+  
   end
 
   test "create member without gender" do
@@ -1234,9 +1265,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member,credit_card)
     @saved_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
-    wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
-    }
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     @saved_member.reload
     wait_until{ assert_equal(@saved_member.type_of_phone_number, '') }
   end
@@ -1270,5 +1299,56 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
     end
     within("#operations_table") { assert page.has_content?("Member enrolled pending approval successfully $0.0 on TOM(2) -#{@terms_of_membership_with_approval.name}-") }
+    
+    membership = @saved_member.current_membership
+    within(".nav-tabs") do
+      click_on("Memberships")
+    end
+    within("#memberships_table")do
+      wait_until{
+        assert page.has_content?(membership.id.to_s)
+        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+        assert page.has_content?(membership.quota.to_s)
+        assert page.has_content?('applied')
+      }
+    end   
   end
+
+  test "Enroll a member should create membership" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    fill_in_member(unsaved_member,credit_card)
+
+    wait_until{
+      assert find_field('input_first_name').value == unsaved_member.first_name
+    }
+
+    @saved_member = Member.find_by_email(unsaved_member.email)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#td_mi_status")do
+      wait_until{ assert page.has_content?('provisional') }
+    end
+    within("#td_mi_join_date")do
+      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+    end
+    
+    membership = @saved_member.current_membership
+    within(".nav-tabs") do
+      click_on("Memberships")
+    end
+    within("#memberships_table")do
+      wait_until{
+        assert page.has_content?(membership.id.to_s)
+        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+        assert page.has_content?(membership.quota.to_s)
+        assert page.has_content?('provisional')
+      }
+    end
+  end 
 end
