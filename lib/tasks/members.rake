@@ -28,7 +28,7 @@ namespace :billing do
     tall = Time.zone.now
     begin
       # We use bill_date because we will only send this email once!
-      Member.find_in_batches(:conditions => [" date(bill_date) = ? ", Time.zone.now.to_date + 7.days ]) do |group|
+      Member.find_in_batches(:conditions => [" date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
         group.each do |member| 
           tz = Time.zone.now
           begin
@@ -72,19 +72,19 @@ namespace :members do
   task :cancel => :environment do
     tall = Time.zone.now
     begin
-      base =  Member.where(" date(cancel_date) <= ? AND status != ? ", Time.zone.now.to_date, 'lapsed')
+      base =  Membership.where(" date(cancel_date) <= ? AND status != ? ", Time.zone.now.to_date, 'lapsed')
       Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
       base.find_in_batches do |group|
-        group.each do |member| 
+        group.each do |membership| 
           tz = Time.zone.now
           begin
-            Rails.logger.info "  * processing member ##{member.uuid}"
-            member.set_as_canceled!
+            Rails.logger.info "  * processing member ##{membership.member_id}"
+            membership.member.set_as_canceled!
           rescue Exception => e
             Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{membership.member_id}"
         end
       end
     ensure
