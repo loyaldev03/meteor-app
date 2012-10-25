@@ -173,7 +173,7 @@ class Api::MembersController < ApplicationController
         else
           Auditory.audit(current_agent, member, message, member)
         end
-        response = { :message => "Member data is invalid.", :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
+        response = { :message => Settings.error_messages.member_data_invalid, :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
       end
     end
     render json: response

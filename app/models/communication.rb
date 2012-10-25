@@ -59,7 +59,8 @@ class Communication < ActiveRecord::Base
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
-    Airbrake.notify(:error_class => "Communication deliver_lyris", :error_message => e, :parameters => { :member => member.inspect, :communication => self.inspect })
+    Airbrake.notify(:error_class => "Communication deliver_lyris", :error_message => e, :parameters => { :member => member.inspect, 
+      :current_membership => member.current_membership.inspect, :communication => self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_lyris

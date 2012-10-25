@@ -544,12 +544,12 @@ Returns the value of attribute refund_response_transaction_id
       <pre class="lines">
 
 
-15
 16
-17</pre>
+17
+18</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_refund_response_transaction_id'>refund_response_transaction_id</span>
   <span class='ivar'>@refund_response_transaction_id</span>
@@ -581,12 +581,12 @@ Returns the value of attribute refund_response_transaction_id
       <pre class="lines">
 
 
-22
 23
-24</pre>
+24
+25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 22</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_datatable_columns'>datatable_columns</span>
   <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>created_at</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
@@ -611,7 +611,6 @@ Returns the value of attribute refund_response_transaction_id
       <pre class="lines">
 
 
-151
 152
 153
 154
@@ -624,10 +623,11 @@ Returns the value of attribute refund_response_transaction_id
 161
 162
 163
-164</pre>
+164
+165</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 151</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 152</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_new_chargeback'>new_chargeback</span><span class='lparen'>(</span><span class='id identifier rubyid_sale_transaction'>sale_transaction</span><span class='comma'>,</span> <span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_trans'>trans</span> <span class='op'>=</span> <span class='const'>Transaction</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -663,7 +663,6 @@ Returns the value of attribute refund_response_transaction_id
       <pre class="lines">
 
 
-117
 118
 119
 120
@@ -691,10 +690,11 @@ Returns the value of attribute refund_response_transaction_id
 142
 143
 144
-145</pre>
+145
+146</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 117</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 118</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_refund'>refund</span><span class='lparen'>(</span><span class='id identifier rubyid_amount'>amount</span><span class='comma'>,</span> <span class='id identifier rubyid_sale_transaction_id'>sale_transaction_id</span><span class='comma'>,</span> <span class='id identifier rubyid_agent'>agent</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_amount'>amount</span> <span class='op'>=</span> <span class='id identifier rubyid_amount'>amount</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
@@ -751,12 +751,12 @@ Returns the value of attribute refund_response_transaction_id
       <pre class="lines">
 
 
-147
 148
-149</pre>
+149
+150</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 147</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 148</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_amount_available_to_refund'>amount_available_to_refund</span>
   <span class='id identifier rubyid_amount'>amount</span> <span class='op'>-</span> <span class='id identifier rubyid_refunded_amount'>refunded_amount</span>
@@ -803,12 +803,12 @@ Returns the value of attribute refund_response_transaction_id
       <pre class="lines">
 
 
-76
 77
-78</pre>
+78
+79</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 76</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 77</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_can_be_refunded?'>can_be_refunded?</span>
   <span class='lbracket'>[</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sale</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>capture</span><span class='tstring_end'>'</span></span> <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_transaction_type'>transaction_type</span><span class='rparen'>)</span> <span class='kw'>and</span> <span class='id identifier rubyid_amount_available_to_refund'>amount_available_to_refund</span> <span class='op'>&gt;</span> <span class='float'>0.0</span> <span class='kw'>and</span> <span class='op'>!</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_blacklisted?'>blacklisted?</span>
@@ -833,15 +833,15 @@ Returns the value of attribute refund_response_transaction_id
       <pre class="lines">
 
 
-43
 44
 45
 46
 47
-48</pre>
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 44</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_credit_card='>credit_card=</span><span class='lparen'>(</span><span class='id identifier rubyid_credit_card'>credit_card</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_credit_card_id'>credit_card_id</span> <span class='op'>=</span> <span class='id identifier rubyid_credit_card'>credit_card</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
@@ -886,13 +886,13 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
       <pre class="lines">
 
 
-112
 113
 114
-115</pre>
+115
+116</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 113</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_credit_card_type'>credit_card_type</span>
   <span class='ivar'>@cc</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span>
@@ -918,7 +918,6 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
       <pre class="lines">
 
 
-26
 27
 28
 29
@@ -933,10 +932,11 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
 38
 39
 40
-41</pre>
+41
+42</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 26</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 27</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_member='>member=</span><span class='lparen'>(</span><span class='id identifier rubyid_member'>member</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member_id'>member_id</span> <span class='op'>=</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
@@ -952,7 +952,7 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_country'>country</span> <span class='op'>=</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_country'>country</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_zip'>zip</span> <span class='op'>=</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_zip'>zip</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_cohort'>cohort</span> <span class='op'>=</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_cohort'>cohort</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_terms_of_membership_id'>terms_of_membership_id</span> <span class='op'>=</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_terms_of_membership_id'>terms_of_membership_id</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_terms_of_membership_id'>terms_of_membership_id</span> <span class='op'>=</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_terms_of_membership'>terms_of_membership</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -996,12 +996,12 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
       <pre class="lines">
 
 
-105
 106
-107</pre>
+107
+108</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 105</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 106</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mes?'>mes?</span>
   <span class='id identifier rubyid_gateway'>gateway</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>mes</span><span class='tstring_end'>&quot;</span></span>
@@ -1026,7 +1026,6 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
       <pre class="lines">
 
 
-50
 51
 52
 53
@@ -1037,10 +1036,11 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
 58
 59
 60
-61</pre>
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_payment_gateway_configuration='>payment_gateway_configuration=</span><span class='lparen'>(</span><span class='id identifier rubyid_pgc'>pgc</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_payment_gateway_configuration_id'>payment_gateway_configuration_id</span> <span class='op'>=</span> <span class='id identifier rubyid_pgc'>pgc</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
@@ -1074,20 +1074,20 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
       <pre class="lines">
 
 
-63
 64
 65
 66
 67
 68
 69
-70</pre>
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 63</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 64</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prepare'>prepare</span><span class='lparen'>(</span><span class='id identifier rubyid_member'>member</span><span class='comma'>,</span> <span class='id identifier rubyid_credit_card'>credit_card</span><span class='comma'>,</span> <span class='id identifier rubyid_amount'>amount</span><span class='comma'>,</span> <span class='id identifier rubyid_payment_gateway_configuration'>payment_gateway_configuration</span><span class='comma'>,</span> <span class='id identifier rubyid_terms_of_membership_id'>terms_of_membership_id</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_terms_of_membership_id'>terms_of_membership_id</span> <span class='op'>=</span> <span class='id identifier rubyid_terms_of_membership_id'>terms_of_membership_id</span> <span class='op'>||</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_terms_of_membership_id'>terms_of_membership_id</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_terms_of_membership_id'>terms_of_membership_id</span> <span class='op'>=</span> <span class='id identifier rubyid_terms_of_membership_id'>terms_of_membership_id</span> <span class='op'>||</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_terms_of_membership'>terms_of_membership</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='id identifier rubyid_member'>member</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_credit_card'>credit_card</span> <span class='op'>=</span> <span class='id identifier rubyid_credit_card'>credit_card</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_amount'>amount</span> <span class='op'>=</span> <span class='id identifier rubyid_amount'>amount</span>
@@ -1114,7 +1114,6 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
       <pre class="lines">
 
 
-80
 81
 82
 83
@@ -1133,10 +1132,11 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
 96
 97
 98
-99</pre>
+99
+100</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 81</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_process'>process</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_transaction_type'>transaction_type</span>
@@ -1200,12 +1200,12 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
       <pre class="lines">
 
 
-101
 102
-103</pre>
+103
+104</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 101</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 102</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_production?'>production?</span>
   <span class='id identifier rubyid_mode'>mode</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>production</span><span class='tstring_end'>&quot;</span></span>
@@ -1252,12 +1252,12 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
       <pre class="lines">
 
 
-72
 73
-74</pre>
+74
+75</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 72</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_success?'>success?</span>
   <span class='id identifier rubyid_response_code'>response_code</span> <span class='op'>==</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span>
@@ -1282,13 +1282,13 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
       <pre class="lines">
 
 
-17
 18
 19
-20</pre>
+20
+21</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 17</span>
+      <pre class="code"><span class="info file"># File 'app/models/transaction.rb', line 18</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_label'>to_label</span>
   <span class='const'>I18n</span><span class='period'>.</span><span class='id identifier rubyid_t'>t</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>activerecord.attributes.transaction.transaction_types.</span><span class='tstring_end'>'</span></span><span class='op'>+</span><span class='id identifier rubyid_transaction_type'>transaction_type</span><span class='rparen'>)</span> <span class='op'>+</span> 
@@ -1304,7 +1304,7 @@ we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
 </div>
 
     <div id="footer">
-  Generated on Wed Oct 10 14:14:54 2012 by
+  Generated on Thu Oct 25 08:50:12 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

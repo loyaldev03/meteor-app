@@ -60,6 +60,8 @@ defaults: &defaults
     refund_email: 303 
     #other
     others: 1000
+  error_messages:
+    member_data_invalid: "Member data is invalid."
   error_codes:
     success: '000'
     not_found: '401'

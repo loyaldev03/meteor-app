@@ -271,7 +271,8 @@ A new instance of Ability
 93
 94
 95
-96</pre>
+96
+97</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/models/ability.rb', line 4</span>
@@ -293,6 +294,7 @@ A new instance of Ability
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Operation</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>MemberNote</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>TermsOfMembership</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Transaction</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:api_enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:api_update</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:api_profile</span><span class='comma'>,</span> <span class='const'>Member</span>
@@ -305,7 +307,7 @@ A new instance of Ability
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
-    <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_update</span><span class='comma'>,</span> <span class='const'>Member</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:api_update</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_profile</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>MemberNote</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_token_api</span><span class='comma'>,</span> <span class='const'>Agent</span>
@@ -380,7 +382,7 @@ A new instance of Ability
 </div>
 
     <div id="footer">
-  Generated on Wed Oct 10 14:14:53 2012 by
+  Generated on Thu Oct 25 08:50:11 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

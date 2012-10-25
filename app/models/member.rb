@@ -382,10 +382,9 @@ class Member < ActiveRecord::Base
         member.skip_api_sync! if member.api_id.present? || skip_api_sync
         member.club = club
         unless member.valid? and credit_card.valid?
-          # errors = member.error_to_s + credit_card.error_to_s
           errors = member.errors.to_hash
           errors.merge!(credit_card: credit_card.errors.to_hash) unless credit_card.errors.empty?
-          return { :message => "Member data is invalid.", :code => Settings.error_codes.member_data_invalid, 
+          return { :message => Settings.error_messages.member_data_invalid, :code => Settings.error_codes.member_data_invalid, 
                    :errors => errors }
         end
         # enroll allowed
@@ -432,7 +431,10 @@ class Member < ActiveRecord::Base
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
     elsif not self.valid? 
-      return { :message => "Member data is invalid: \n#{error_to_s}", :code => Settings.error_codes.member_data_invalid }
+      errors = member.errors.to_hash
+      errors.merge!(credit_card: credit_card.errors.to_hash) unless credit_card.errors.empty?
+      return { :message => Settings.error_messages.member_data_invalid, :code => Settings.error_codes.member_data_invalid, 
+               :errors => errors }
     end
         
     enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => tom.id

@@ -16,7 +16,7 @@ class ApiTest < ActiveSupport::TestCase
 
   test "New member should POST remote user" do
     @club.stub! do |stub|
-      stub.post('/api/user') { [200, {}, {'uid' => 999}] }
+      stub.post('/api/user') { [200, {}, {'api_id' => 999}] }
     end
     assert @member.valid?
     @member.save
