@@ -832,8 +832,9 @@ class Member < ActiveRecord::Base
 
       # Drupal sends X when member does not change the credit card number
       unless credit_card[:number].include? 'X'
-        credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? and credit_cards.uuid != ? ", 
-            credit_card.encrypted_number, club.id, member.id ] )
+        credit_card_to_check = CreditCard.new(:number => credit_card[:number])
+        credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? and members.uuid != ? ",
+            credit_card_to_check.encrypted_number, club.id, self.id ] )
         if credit_cards.empty?
           new_number = credit_card[:number]
         elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
