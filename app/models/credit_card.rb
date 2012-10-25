@@ -4,16 +4,11 @@ class CreditCard < ActiveRecord::Base
 
   attr_accessible :active, :number, :expire_month, :expire_year, :blacklisted
 
-  attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
-
-  before_create :update_last_digits
-
+  before_create :set_data_before_credit_card_number_disappear
   before_destroy :confirm_presence_of_another_credit_card_related_to_member
 
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }
-  validates :number, :numericality => { :only_integer => true }, :allow_blank => true
-
 
   def confirm_presence_of_another_credit_card_related_to_member
     if self.active 
@@ -71,12 +66,16 @@ class CreditCard < ActiveRecord::Base
     )
   end
 
-  def am_card
-    @am ||= CreditCard.am_card(number, expire_month, expire_year, member.first_name, member.last_name)
-  end
-
-  def update_last_digits
-    self.last_digits = self.number.last(4) 
+  def set_data_before_credit_card_number_disappear
+    if self.cc_type.nil?
+      am = CreditCard.am_card(number, expire_month, expire_year, member.first_name, member.last_name)
+      if am.valid?
+        self.cc_type = am.type
+      else
+        self.cc_type = 'unknown'
+      end
+    end
+    self.last_digits = self.number.last(4) if self.last_digits.nil? and self.number
   end
 
   def set_as_active!

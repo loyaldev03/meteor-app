@@ -223,7 +223,7 @@ module Drupal
           },
           field_profile_cc_number: {
             und: [{
-              value: "XXXX-XXXX-XXXX-%{last_digits}" % { last_digits: cc.number.to_s[-4..-1] }
+              value: "XXXX-XXXX-XXXX-%{last_digits}" % { last_digits: cc.last_digits }
             }]
           }
         })
