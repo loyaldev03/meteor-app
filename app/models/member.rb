@@ -389,16 +389,16 @@ class Member < ActiveRecord::Base
         end
         # enroll allowed
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-        message = "That credit card is blacklisted, please use another."
+        message = Settings.error_messages.credit_card_blacklisted
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
       elsif not (cc_blank or credit_card_params[:number].blank?)
-        message = "Credit card is already in use. call support."
+        message = Settings.error_messages.credit_card_already_in_use
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_already_in_use)
         return { :message => message, :code => Settings.error_codes.credit_card_in_use }
       end
     elsif member.blacklisted
-      message = "Member email is blacklisted."
+      message = Settings.error_messages.member_email_blacklisted
       Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
       return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
     else
@@ -407,7 +407,7 @@ class Member < ActiveRecord::Base
     end
 
     if not cc_blank and credit_card_params[:number].blank?
-      message = "Credit card is blank. Insert number or allow credit card blank."
+      message = Settings.error_messages.credit_card_blank
       return { :message => message, :code => Settings.error_codes.credit_card_blank }        
     end   
 
@@ -425,11 +425,11 @@ class Member < ActiveRecord::Base
   def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, member_params = nil)
     allow_cc_blank = (amount.to_f == 0.0 and cc_blank)
     if recovery_check and not self.new_record? and not self.can_recover?
-      return { :message => "Cant recover member. Max reactivations reached.", :code => Settings.error_codes.cant_recover_member }
+      return { :message => Settings.error_messages.cant_recover_member, :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
-        return { :message => "Credit card is invalid or is expired!", :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
+        return { :message => Settings.error_messages.invalid_credit_card, :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
     elsif credit_card.blacklisted? or self.blacklisted?
-      return { :message => "Member or credit card are blacklisted", :code => Settings.error_codes.blacklisted }
+      return { :message => Settings.error_messages.blacklisted, :code => Settings.error_codes.blacklisted }
     elsif not self.valid? 
       errors = member.errors.to_hash
       errors.merge!(credit_card: credit_card.errors.to_hash) unless credit_card.errors.empty?
@@ -474,7 +474,7 @@ class Member < ActiveRecord::Base
     rescue Exception => e
       Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
-      message = "Could not save member. #{e}"
+      message = "#{Settings.error_messages.member_not_saved} #{e}"
       Auditory.audit(agent, self, message, nil, Settings.operation_types.error_on_enrollment_billing)
       { :message => message, :code => Settings.error_codes.member_not_saved }
     end
@@ -661,11 +661,11 @@ class Member < ActiveRecord::Base
         Auditory.audit(agent, self, message, self)
         { :message => message, :code => Settings.error_codes.success }
       else
-        message = "Could not set member's address as undeliverable. #{self.errors.inspect}"
+        message = "#{Settings.error_messages.member_set_wrong_address_error} #{self.errors.inspect}"
         {:message => message, :code => Settings.error_codes.member_set_wrong_address_error}
       end
     else
-      message = "Member's address already set as wrong address."
+      message = Settings.error_messages.member_already_set_wrong_address
       { :message => message, :code => Settings.error_codes.member_already_set_wrong_address }
     end
   end
@@ -838,16 +838,18 @@ class Member < ActiveRecord::Base
         if credit_cards.empty?
           new_number = credit_card[:number]
         elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-          return { :message => "That credit card is blacklisted, please use another.", :code => Settings.error_codes.credit_card_blacklisted }
+          return { :message => Settings.error_messages.credit_card_blacklisted, :code => Settings.error_codes.credit_card_blacklisted }
         else # there is another member with this credit card. prevent this update.
-          return { :message => "That credit card already in use.", :code => Settings.error_codes.credit_card_in_use }
+          return { :message => Settings.error_messages.credit_card_in_use, :code => Settings.error_codes.credit_card_in_use }
         end
       end
 
       new_year = credit_card[:expire_year] if credit_card[:expire_year] != active_credit_card.expire_year  
-      new_month = credit_card[:expire_month] if credit_card[:expire_month] != active_credit_card.expire_month  
+      new_month = credit_card[:expire_month] if credit_card[:expire_month] != "%02d" % active_credit_card.expire_month
       
-      CreditCard.new_expiration_on_active_credit_card(active_credit_card, new_year, new_month, new_number)
+      if new_number or new_year or new_month
+        CreditCard.new_expiration_on_active_credit_card(active_credit_card, new_year, new_month, new_number)
+      end
       { :code => Settings.error_codes.success }
     end
 
