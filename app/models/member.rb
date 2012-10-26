@@ -850,10 +850,10 @@ class Member < ActiveRecord::Base
       end
 
       new_year = credit_card[:expire_year] if credit_card[:expire_year] != active_credit_card.expire_year  
-      new_month = credit_card[:expire_month] if credit_card[:expire_month] != "%02d" % active_credit_card.expire_month
+      new_month = credit_card[:expire_month] if credit_card[:expire_month] != ("%02d" % active_credit_card.expire_month)
       
       if new_number or new_year or new_month
-        CreditCard.new_expiration_on_active_credit_card(active_credit_card, new_year, new_month, new_number)
+        CreditCard.new_expiration_on_active_credit_card(active_credit_card, new_year, new_month, new_number, false)
       end
       { :code => Settings.error_codes.success }
     end

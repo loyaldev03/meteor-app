@@ -59,7 +59,7 @@ class CreditCard < ActiveRecord::Base
     self.last_digits = self.number.last(4) 
   end
   
-  def self.new_expiration_on_active_credit_card(actual, new_year_exp, new_month_exp = nil, new_cc_number = nil)
+  def self.new_expiration_on_active_credit_card(actual, new_year_exp, new_month_exp = nil, new_cc_number = nil, recyclation = true)
     CreditCard.transaction do
       begin
         actual.update_attribute :active , false
@@ -67,7 +67,7 @@ class CreditCard < ActiveRecord::Base
         cc.member = actual.member
         cc.active = true
         cc.save!
-        Auditory.audit(nil, cc, "Automatic Recycled Expired card", cc.member, Settings.operation_types.automatic_recycle_credit_card)
+        Auditory.audit(nil, cc, "Automatic Recycled Expired card", cc.member, Settings.operation_types.automatic_recycle_credit_card) if recyclation
         return cc
       rescue Exception => e
         logger.error e
