@@ -292,13 +292,13 @@
   </tbody>
 </table>
 
-<% if @enrollment_info and not @enrollment_info.preferences.nil? %>
+<% unless @current_member.preferences.nil? %>
   <table id="table_enrollment_info" class="table table-bordered table-condensed table-nohover">
     <thead>
       <tr class="box_title"><th><h4>Preferences</h4></th></tr>
     </thead>
     <tbody>
-      <% @enrollment_info.preferences.each do |key, value| %>
+      <% @current_member.preferences.each do |key, value| %>
         <tr><td> <%= key %>: <%= value %> </td></tr>
       <% end %>
     </tbody>
