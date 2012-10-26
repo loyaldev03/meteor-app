@@ -1274,7 +1274,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
     end
   end
-  
+
   test "Enroll a member with member approval TOM" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
@@ -1354,6 +1354,31 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?(membership.quota.to_s)
         assert page.has_content?('provisional')
       }
+    end
+  end 
+
+test "Update Birthday after 12 like a day" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    fill_in_member(unsaved_member,credit_card)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    @saved_member = Member.find_by_email(unsaved_member.email)
+
+    click_link_or_button 'Edit'
+
+    page.execute_script("window.jQuery('#member_birth_date').next().click()")
+    within(".ui-datepicker-calendar") do
+      click_on("13")
+    end    
+    
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    @saved_member.reload
+    within("#table_contact_information")do
+      wait_until{ assert page.has_content?("#{@saved_member.birth_date}") }
     end
   end 
 end
