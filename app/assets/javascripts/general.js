@@ -51,7 +51,7 @@ $(document).ready( function() {
       "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 5 ] }],
       "sAjaxSource": $('#agents_table').data('source'),
     });
   }
@@ -75,7 +75,7 @@ $(document).ready( function() {
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ], "sWidth": "13%", "aTargets": [ 3 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count+1, column_count ], "sWidth": "25%", "aTargets": [ 3 ] }],
       "sAjaxSource": $('#clubs_table').data('source'),
     });
   }
@@ -87,7 +87,7 @@ $(document).ready( function() {
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ], "sWidth": "13%", "aTargets": [ 3 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ], "sWidth": "20%", "aTargets": [ 3 ] }],
       "sAjaxSource": $('#my_clubs_table').data('source'),
     });
   }
@@ -305,7 +305,7 @@ $(document).ready( function() {
       "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ] }],
       "sAjaxSource": $('#operations_table').data('source'),
     });
 
@@ -325,7 +325,7 @@ $(document).ready( function() {
       "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 5 ] }],
       "sAjaxSource": $('#transactions_table').data('source'),
     });
   }
