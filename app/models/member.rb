@@ -783,8 +783,8 @@ class Member < ActiveRecord::Base
               "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
             :parameters => { :member => self.inspect })
         end
-        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
         if self.recycled_times < Settings.number_of_retries_on_missing_decline
+          Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
           increment!(:recycled_times, 1)
           return message
         end
