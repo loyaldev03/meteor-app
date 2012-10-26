@@ -773,7 +773,7 @@ class Member < ActiveRecord::Base
 
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
-        message = "Billing error but no decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response}"
+        message = "Billing error. No decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
         self.next_retry_bill_date = Time.zone.now + eval(Settings.next_retry_on_missing_decline)
         self.save
         unless trans.response_code == Settings.error_codes.invalid_credit_card 
@@ -783,7 +783,11 @@ class Member < ActiveRecord::Base
             :parameters => { :member => self.inspect })
         end
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
-        cancel_member = true if self.recycled_times >= Settings.number_of_retries_on_missing_decline
+        if self.recycled_times < Settings.number_of_retries_on_missing_decline
+          increment!(:recycled_times, 1)
+          return message
+        end
+        cancel_member = true
       else
         trans.update_attribute :decline_strategy_id, decline.id
         if decline.hard_decline?
@@ -802,6 +806,7 @@ class Member < ActiveRecord::Base
           end
         end
       end
+      self.save
       if cancel_member
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_hard_decline)
         set_as_canceled!
@@ -809,7 +814,6 @@ class Member < ActiveRecord::Base
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_soft_decline)
         increment!(:recycled_times, 1)
       end
-      self.save
       message
     end
 
