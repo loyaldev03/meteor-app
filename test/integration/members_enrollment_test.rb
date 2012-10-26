@@ -107,6 +107,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
 
+    type_of_phone_number = (unsaved_member[type_of_phone_number].blank? ? '' : unsaved_member.type_of_phone_number.capitalize)
+
     within("#table_demographic_information")do
       wait_until{
         fill_in 'member[first_name]', :with => unsaved_member.first_name
@@ -124,7 +126,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
+        select(type_of_phone_number, :from => 'member[type_of_phone_number]')
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
@@ -1237,7 +1239,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?('lapsed')
       }
     end
-  
   end
 
   test "create member without gender" do
@@ -1257,19 +1258,23 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
   end
 
-  test "create member without type of phone number" do
+  test "Create a member without Telephone Type" do
     setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member,
+                                         :gender => '', 
+                                         :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
 
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    unsaved_member.type_of_phone_number = ''
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    fill_in_member(unsaved_member,credit_card)
-    @saved_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    @saved_member.reload
-    wait_until{ assert_equal(@saved_member.type_of_phone_number, '') }
+    fill_in_member(unsaved_member, credit_card)
+    saved_member = Member.find_by_email(unsaved_member.email)
+
+    within("#table_contact_information")do
+      wait_until{
+        assert page.has_content?('')
+      }
+    end
   end
- 
+  
   test "Enroll a member with member approval TOM" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
