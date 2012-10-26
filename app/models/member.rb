@@ -775,7 +775,7 @@ class Member < ActiveRecord::Base
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
         message = "Billing error. No decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
         self.next_retry_bill_date = Time.zone.now + eval(Settings.next_retry_on_missing_decline)
-        self.save
+        self.save(:validate => false)
         unless trans.response_code == Settings.error_codes.invalid_credit_card 
           Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
             :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.credit_card_type}. " + 
@@ -806,7 +806,7 @@ class Member < ActiveRecord::Base
           end
         end
       end
-      self.save
+      self.save(:validate => false)
       if cancel_member
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_hard_decline)
         set_as_canceled!
