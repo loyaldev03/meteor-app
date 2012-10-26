@@ -79,7 +79,6 @@ class MembersBillTest < ActionController::IntegrationTest
 
     click_link_or_button 'Create Member'
     sleep(5) #Wait for API response
-    
   end
 
   def bill_member(member, do_refund = true, refund_amount = nil)
@@ -456,4 +455,23 @@ test "Partial refund from CS" do
     end
   end 
 
+  test "Refund a transaction with error" do
+    setup_member
+    @terms_of_membership_with_gateway.update_attribute(:installment_amount, 45.56)
+    @saved_member.active_credit_card.update_attribute(:number,'0000000000000000')
+
+
+    @saved_member.bill_membership
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    
+    within(".nav-tabs") do
+      click_on("Transactions")
+    end
+    within("#transactions_table_wrapper")do
+      wait_until{
+        assert page.has_no_selector?('#refund')
+      }
+    end
+  end
 end
