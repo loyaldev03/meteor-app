@@ -620,6 +620,7 @@ class Member < ActiveRecord::Base
       Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
       self.cancel! Time.zone.now, "Automatic cancellation"
       self.credit_cards.each { |cc| cc.blacklist }
+      self.set_as_canceled!
       { :message => message, :success => true }
     end
   rescue Exception => e
