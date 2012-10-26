@@ -73,6 +73,12 @@ defaults: &defaults
     member_set_wrong_address_error: "Could not set member's address as undeliverable."
     member_already_set_wrong_address: "Member's address already set as wrong address."
     credit_card_in_use: "That credit card already in use."
+    fulfillment_out_of_stock: "Product does not have stock."
+    fulfillment_error: "Could not be marked as sent."
+    credit_amount_invalid: "Credit amount must be a positive number."
+    refund_invalid: "Cant credit more $ than the original transaction amount"
+    credit_card_blank_with_grace: "Payment gateway not found."
+    duplicate_transaction: "Duplicated Transaction:"
   error_codes:
     success: '000'
     not_found: '401'
