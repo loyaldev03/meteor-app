@@ -128,7 +128,6 @@ class MembersCancelTest < ActionController::IntegrationTest
 
     confirm_ok_js
     click_link_or_button 'Reject'
-    sleep 15
     puts Date.today
     puts Time.zone.now
 

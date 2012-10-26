@@ -87,7 +87,7 @@ class MembersBillTest < ActionController::IntegrationTest
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
     
-    next_bill_date = member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
+    next_bill_date = member.current_membership.join_date + eval(@terms_of_membership_with_gateway.installment_type)
     
     validate_cohort(member, EnrollmentInfo.last, Transaction.last)
     within("#table_membership_information")do
@@ -299,11 +299,11 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Change member from Lapse status to Provisional statuss" do
     setup_member
     @saved_member.set_as_canceled
-    @saved_member.recover(@terms_of_membership_with_gateway.id)
+    @saved_member.recover(@terms_of_membership_with_gateway)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
-    next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
+    next_bill_date = @saved_member.current_membership.join_date + eval(@terms_of_membership_with_gateway.installment_type)
     
     within("#td_mi_next_retry_bill_date")do
       wait_until{ assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date)) }
@@ -313,12 +313,12 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Change member from Lapse status to active status" do
     setup_member
     @saved_member.set_as_canceled
-    @saved_member.recover(@terms_of_membership_with_gateway.id)
+    @saved_member.recover(@terms_of_membership_with_gateway)
     @saved_member.set_as_active
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
-    next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
+    next_bill_date = @saved_member.current_membership.join_date + eval(@terms_of_membership_with_gateway.installment_type)
     
     within("#td_mi_next_retry_bill_date")do
       wait_until{ assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date)) }
@@ -328,7 +328,7 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Change Next Bill Date for tomorrow" do
     setup_member
     @saved_member.set_as_canceled
-    @saved_member.recover(@terms_of_membership_with_gateway.id)
+    @saved_member.recover(@terms_of_membership_with_gateway)
     @saved_member.set_as_active
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
@@ -355,13 +355,13 @@ class MembersBillTest < ActionController::IntegrationTest
     next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
 
     within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_no_content?(I18n.l(@saved_member.join_date+1.month, :format => :only_date)) }
+      wait_until{ assert page.has_no_content?(I18n.l(@saved_member.current_membership.join_date+1.month, :format => :only_date)) }
     end
   end  
 
   test "Successful payment." do
     setup_member
-    @saved_member.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -370,7 +370,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
   test "Provisional member" do
     setup_member
-    @saved_member.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
@@ -389,7 +389,7 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Lapsed member" do
     setup_member
     @saved_member.set_as_canceled
-    @saved_member.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     answer = @saved_member.bill_membership
     assert (answer[:code] == Settings.error_codes.member_status_dont_allow), answer[:message]
@@ -397,7 +397,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
   test "Refund from CS" do
     setup_member
-    @saved_member.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -427,7 +427,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
 test "Partial refund from CS" do
     setup_member
-    @saved_member.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
