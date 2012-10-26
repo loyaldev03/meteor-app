@@ -253,14 +253,17 @@ class MembersController < ApplicationController
   end
 
   def sync
-    @current_member.after_save_sync_to_remote_domain(:manual_sync)
-    if @current_member.last_sync_error_at
-      message = "Synchronization failed: #{@current_member.last_sync_error}"
-    else
-      message = "Member synchronized"
+    am = @current_member.api_member
+    if am
+      am.save!(force: true)
+      if @current_member.last_sync_error_at
+        message = "Synchronization failed: #{@current_member.last_sync_error}"
+      else
+        message = "Member synchronized"
+      end
+      Auditory.audit(@current_agent, @current_member, message, @current_member)
+      redirect_to show_member_path, notice: message    
     end
-    Auditory.audit(@current_agent, @current_member, message, @current_member)
-    redirect_to show_member_path, notice: message
   rescue
     message = "Error on members#sync: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
