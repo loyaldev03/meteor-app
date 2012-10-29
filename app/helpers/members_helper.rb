@@ -29,6 +29,5 @@ module MembersHelper
     else
       text = "yellow"
     end
-    text + "#{(current_member.blacklisted? ? "Blist" : "")}"
   end
 end
