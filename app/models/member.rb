@@ -249,7 +249,7 @@ class Member < ActiveRecord::Base
   ####  METHODS USED TO SHOW OR NOT BUTTONS. 
 
   def can_be_synced_to_remote?
-    provisional? or active?
+    !(lapsed? or applied?)
   end
 
   # Returns true if members is lapsed.
