@@ -118,4 +118,52 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
+  test "Agent like Administrator, Supervisor and representative" do
+    setup_admin
+    5.times{ FactoryGirl.create(:simple_club_with_gateway) }
+    visit admin_agents_path
+    within("#agents_table")do
+      click_link_or_button 'Edit'
+    end
+    within(".table-condensed")do
+      select('admin', :from => 'agent[club_roles_attributes][0][role]')
+      select('club1', :from => 'agent[club_roles_attributes][0][club_id]')
+      click_link_or_button 'Add'
+    end
+    click_link_or_button 'Edit'
+    within(".table-condensed")do
+      select('supervisor', :from => 'agent[club_roles_attributes][1][role]')
+      select('club2', :from => 'agent[club_roles_attributes][1][club_id]')
+      click_link_or_button 'Add'
+    end
+    click_link_or_button 'Edit'
+    within(".table-condensed")do
+      select('representative', :from => 'agent[club_roles_attributes][2][role]')
+      select('club3', :from => 'agent[club_roles_attributes][2][club_id]')
+      click_link_or_button 'Add'
+    end
+    wait_until{ assert page.has_content?("admin for") }
+    wait_until{ assert page.has_content?("supervisor for") }
+    wait_until{ assert page.has_content?("representative for") }
+  end
+
+  test "Profiles that not allow see products " do
+    setup_supervisor
+    setup_member
+    visit products_path(@club.partner.prefix, @club.name)
+    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+
+    @supervisor_agent.roles = ['representative']
+    @supervisor_agent.save
+    visit products_path(@club.partner.prefix, @club.name)
+    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+
+    @supervisor_agent.roles = ['admin']
+    @supervisor_agent.save
+    visit products_path(@club.partner.prefix, @club.name)
+    within("#products_table_wrapper")do
+      assert page.has_content?(Product.first.name)
+    end
+  end
+
 end

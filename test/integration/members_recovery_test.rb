@@ -142,4 +142,30 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       }
     end
   end 
+
+  test "Recovery a member with Paid TOM" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
+    actual_tom = @canceled_member.current_membership
+
+    click_on 'Recover'
+    wait_until{ assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-") }
+    @canceled_member.reload
+    wait_until{ assert_equal(@canceled_member.current_membership.terms_of_membership_id, actual_tom.terms_of_membership_id) }
+
+    within("#td_mi_reactivation_times")do
+      wait_until{ assert page.has_content?(1.to_s) }
+    end
+    within("#td_mi_join_date") do
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+    end
+    within(".nav-tabs") do
+      click_on("Operations")
+    end
+    within("#operations_table")do
+      wait_until{
+        assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
+      }
+    end
+  end
 end

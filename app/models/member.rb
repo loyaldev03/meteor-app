@@ -122,6 +122,7 @@ class Member < ActiveRecord::Base
     after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
     after_transition :lapsed => :applied, :do => [ :set_join_date, :send_recover_needs_approval_email ]
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
+    after_transition :applied => :lapsed, :do => :set_cancel_date
     after_transition all => all, :do => :propagate_membership_data
 
     event :set_as_provisional do
@@ -192,6 +193,9 @@ class Member < ActiveRecord::Base
     membership.save
   end
 
+  def set_cancel_date
+    self.current_membership.update_attribute(:cancel_date, Time.zone.today)
+  end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
   def schedule_first_membership

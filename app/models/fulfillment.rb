@@ -110,7 +110,7 @@ class Fulfillment < ActiveRecord::Base
     { :message => message, :code => Settings.error_codes.success }
   rescue 
     Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_out_of_stock )
-    { :message => "Product does not have stock.", :code => Settings.error_codes.fulfillment_out_of_stock }
+    { :message => Settings.error_messages.fulfillment_out_of_stock, :code => Settings.error_codes.fulfillment_out_of_stock }
   end
 
   def mark_as_sent(agent)
@@ -119,7 +119,7 @@ class Fulfillment < ActiveRecord::Base
       Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_mannualy_mark_as_sent)
       { :message => message, :code => Settings.error_codes.success }
     else
-      message = "Could not be marked as sent."
+      message = Settings.error_messages.fulfillment_error
       { :message => message, :code => Settings.error_codes.fulfillment_error }
     end
   end

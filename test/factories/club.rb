@@ -31,6 +31,7 @@ FactoryGirl.define do
     association :api_domain, factory: :domain
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end
 
   factory :club_with_gateway, class: Club do
