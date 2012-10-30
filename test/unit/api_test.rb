@@ -9,10 +9,10 @@ class ApiTest < ActiveSupport::TestCase
     @club = @member.club
   end
 
-  test "New member should try to create remote user" do
-    @member.api_member.expects(:save!).once.returns(true) # NEVERFAILS I cant get the expectation to work!
-    @member.save
-  end
+  # test "New member should try to create remote user" do
+  #   @member.api_member.expects(:save!).once.returns(true) # NEVERFAILS I cant get the expectation to work!
+  #   @member.save
+  # end
 
   # test "New member should POST remote user" do
   #   @club.stub! do |stub|
