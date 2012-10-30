@@ -41,7 +41,6 @@ class Member < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
 
-  after_create 'after_save_sync_to_remote_domain(:enroll)'
   after_update 'after_save_sync_to_remote_domain(:update)'
   after_destroy :cancel_member_at_remote_domain
   after_create 'asyn_desnormalize_preferences(force: true)'
@@ -56,7 +55,6 @@ class Member < ActiveRecord::Base
     # Because maybe we have already bill this member.
     Airbrake.notify(:error_class => "Member:account_cancel:sync", :error_message => e, :parameters => { :member => self.inspect })
   end
-
 
   def after_save_sync_to_remote_domain(type)
     skip_api_sync! unless can_be_synced_to_remote? # Bug #23017 - skip sync if lapsed or applied.
