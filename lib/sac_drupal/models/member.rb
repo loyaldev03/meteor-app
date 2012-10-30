@@ -218,14 +218,15 @@ module Drupal
       end
 
       # Add dynamyc preferences.
-      m.preferences.each do |key, value|
-        map.merge!({
-          "field_phoenix_pref_#{key}" =>  {
-            und: { "select" => "select_or_other", "other" => value }
-          }
-        })
+      unless preferences.nil?
+        m.preferences.each do |key, value|
+          map.merge!({
+            "field_phoenix_pref_#{key}" =>  {
+              und: { "select" => "select_or_other", "other" => value }
+            }
+          })
+        end
       end
-
       map
     end
   end
