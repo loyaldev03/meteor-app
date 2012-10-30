@@ -313,7 +313,7 @@
   <li><a href="#fulfillments" data-toggle="tab">Fulfillments</a></li>
   <li><a href="#communication" data-toggle="tab">Communications</a></li>
   <% if @current_member.api_member and can? :see_sync_status, Member %>
-    <li><a href="#sync_status" data-toggle="tab">Sync Status</a></li>
+    <li><a href="#sync_status" data-toggle="tab" id="sync_status">Sync Status</a></li>
   <% end %>
   <li><a href="#memberships" data-toggle="tab">Memberships</a></li>
 </ul>
