@@ -17,7 +17,12 @@ class Transaction < ActiveRecord::Base
 
   def to_label
     I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
-      ( response_result.nil? ? '' : ' : ' + response_result[0..50])
+      ( response_result.nil? ? '' : ' : ' + response_result[0..25])
+  end
+
+  def full_label
+    I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
+      ( response_result.nil? ? '' : ' : ' + response_result)
   end
 
   def self.datatable_columns
