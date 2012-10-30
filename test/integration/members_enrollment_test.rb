@@ -1106,7 +1106,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     within("#error_explanation")do
       wait_until{
-        assert page.has_content?('Credit card is invalid or is expired!')
+        assert page.has_content?(Settings.error_messages.credit_card_blank)
       }
     end
   end
