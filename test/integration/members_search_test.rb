@@ -664,9 +664,7 @@ class MembersSearchTest < ActionController::IntegrationTest
   test "create member without gender" do
     setup_member(false)
 
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, 
-      :created_by => @admin_agent)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     unsaved_member.gender = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member,credit_card)
@@ -682,9 +680,7 @@ class MembersSearchTest < ActionController::IntegrationTest
   test "create member without type of phone number" do
     setup_member(false)
 
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, 
-      :created_by => @admin_agent)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     unsaved_member.type_of_phone_number = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member,credit_card)
