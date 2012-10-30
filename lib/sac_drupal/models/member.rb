@@ -50,7 +50,7 @@ module Drupal
         @token = Hashie::Mash.new(conn.get('/api/urllogin/%{drupal_id}' % { drupal_id: self.member.api_id }).body) unless self.new_record?
       end
 
-      uri = @token.url && URI.parse(@token.url)
+      uri = @token && @token.url && URI.parse(@token.url)
       self.member.update_column :autologin_url, uri.path if uri
 
       @token
