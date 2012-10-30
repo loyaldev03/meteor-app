@@ -1,45 +1,105 @@
+
 <div class="">
   <% if @current_member.can_be_synced_to_remote? %>
     <div class='tab-toolbar'>
-      <%= 
-        link_to login_as_member_path, 
-          class: "btn btn-success #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}", 
-          target: '_blank' do %>
-        <i class='icon-signin'></i>
-        Login Remotely as Member
+      <% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
+        <%= 
+          link_to "#", 
+            class: "btn btn-success disabled",
+            id: "login_remotely_as_member" do %>
+          <i class='icon-signin'></i>
+          Login Remotely as Member
+        <% end %>
+      <% else %>
+        <%= 
+          link_to login_as_member_path, 
+            id: "login_remotely_as_member",
+            class: "btn btn-success", 
+            target: '_blank' do %>
+          <i class='icon-signin'></i>
+          Login Remotely as Member
+        <% end %>
       <% end %>
-      <%= 
-        link_to member_resend_welcome_path, 
-          method: :post, 
-          class: "btn btn-info #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}", 
-          confirm: 'Are you sure?' do %>
-        <i class='icon-envelope'></i>
-        Resend Welcome Email
+      <% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
+        <%= 
+          link_to "#", 
+            method: :post, 
+            class: "btn btn-info disabled",
+            id: "resend_welcome_email" do %>
+          <i class='icon-envelope'></i>
+          Resend Welcome Email
+        <% end %>      
+      <% else %>
+        <%= 
+          link_to member_resend_welcome_path, 
+            method: :post, 
+            class: "btn btn-info",
+            id: "resend_welcome_email", 
+            confirm: 'Are you sure?' do %>
+          <i class='icon-envelope'></i>
+          Resend Welcome Email
+        <% end %>
       <% end %>
-      <%= 
-        link_to member_sync_path, 
-          method: :post, 
-          class: 'btn btn-warning #{"disabled" if @current_member.lapsed? || !@current_member.api_member}', 
-          confirm: 'Are you sure?' do %>
-        <i class='icon-retweet'></i>
-        Sync to Remote
+      <% if @current_member.lapsed? || !@current_member.api_member %>
+        <%= 
+          link_to "#", 
+            method: :post, 
+            id: "sync_to_remote",
+            class: 'btn btn-warning disabled' do %>
+          <i class='icon-retweet'></i>
+          Sync to Remote
+        <% end %>
+      <% else %>
+        <%= 
+          link_to member_sync_path, 
+            method: :post, 
+            class: 'btn btn-warning', 
+            id: "sync_to_remote",
+            confirm: 'Are you sure?' do %>
+          <i class='icon-retweet'></i>
+          Sync to Remote
+        <% end %>
       <% end %>
-      <%= 
-        link_to member_reset_password_path, 
-          method: :post, 
-          class: "btn btn-warning #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}", 
-          confirm: 'Are you sure?' do %>
-        <i class='icon-key'></i>
-        Password Reset
+      <% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
+        <%= 
+          link_to "#", 
+            method: :post,
+            id: "password_reset",
+            class: "btn btn-warning disabled" do %>
+          <i class='icon-key'></i>
+          Password Reset
+        <% end %>
+      <% else %>
+        <%= 
+          link_to member_reset_password_path, 
+            method: :post, 
+            class: "btn btn-warning", 
+            id: "password_reset",
+            confirm: 'Are you sure?' do %>
+          <i class='icon-key'></i>
+          Password Reset
+        <% end %>
       <% end %>
-      <%= 
-        link_to member_sync_data_path, 
-          remote: true, 
-          class: "btn btn-success #{"disabled" if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank?}",
-          style: 'float: right;',
-          data: { replace: '#sync-data' } do %>
-        <i class='icon-download-alt'></i>
-        Show Remote Data
+      <% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
+        <%= 
+          link_to "#", 
+            class: "btn btn-success disabled",
+            id: "show_remote_data",
+            style: 'float: right;' do %>
+          <i class='icon-download-alt'></i>
+          Show Remote Data
+        <% end %>  
+      <% else %>
+        <%= 
+          link_to member_sync_data_path, 
+            remote: true, 
+            class: "btn btn-success",
+            id: "show_remote_data",
+            style: 'float: right;',
+            data: { replace: '#sync-data' } do %>
+          <i class='icon-download-alt'></i>
+          Show Remote Data
+        <% end %>    
       <% end %>
     </div>
   <% end %>
@@ -48,13 +108,13 @@
     <tr>
       <td NOWRAP><%= t('activerecord.attributes.member.api_id') %>:</td>
       <td>
-        <span class='toggler-content default active'>
+        <span class='toggler-content default active' id="span_api_id">
           <% if @current_member.api_id.present? %>
             <%= @current_member.api_id %>
           <% else %>
             <em>none</em>
           <% end %>
-          <span class='label label-<%=t @current_member.sync_status, scope: 'activerecord.attributes.member.sync_status_priorities' -%>'>
+          <span class='label label-<%=t @current_member.sync_status, scope: 'activerecord.attributes.member.sync_status_priorities' -%>', :id => 'span_mi_sync_status'>
             <%=t @current_member.sync_status, scope: 'activerecord.attributes.member.sync_status_captions' -%>
           </span>
         </span>
@@ -80,7 +140,7 @@
     </tr>
     <tr>
       <td><%= t('activerecord.attributes.member.last_synced_at') %>:</td>
-      <td colspan='999'>
+      <td colspan='999' id="td_mi_last_synced_at">
         <%= 
           @current_member.last_synced_at && 
           l(@current_member.last_synced_at, format: :dashed) 
@@ -89,7 +149,7 @@
     </tr>
     <tr>
       <td><%= t('activerecord.attributes.member.last_sync_error') %>:</td>
-      <td colspan='999'>
+      <td colspan='999' id="td_mi_last_sync_error_at">
         <% if @current_member.last_sync_error_at %>
           <code><%= @current_member.last_sync_error %></code>
           on
@@ -103,7 +163,7 @@
     </tr>
     <tr>
       <td><%= t('activerecord.attributes.member.autologin_url') %>:</td>
-      <td colspan='999'>
+      <td colspan='999' id="td_autologin_url">
         <% if @current_member.autologin_url %>
           <%= link_to @current_member.full_autologin_url.to_s, target: '_blank' -%>
         <% else %>
