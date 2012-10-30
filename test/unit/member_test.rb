@@ -187,7 +187,7 @@ class MemberTest < ActiveSupport::TestCase
     member = create_active_member(@terms_of_membership_with_gateway)
     cancel_date = member.cancel_date
     # 2 operations : cancel and blacklist
-    assert_difference('Operation.count', 2) do
+    assert_difference('Operation.count', 4) do
       member.blacklist(nil, "Test")
     end
     m = Member.find member.uuid
