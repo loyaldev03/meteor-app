@@ -114,7 +114,7 @@
           <% else %>
             <em>none</em>
           <% end %>
-          <span class='label label-<%=t @current_member.sync_status, scope: 'activerecord.attributes.member.sync_status_priorities' -%>', :id => 'span_mi_sync_status'>
+          <span class='label label-<%=t @current_member.sync_status, scope: 'activerecord.attributes.member.sync_status_priorities' -%>' id="span_mi_sync_status">
             <%=t @current_member.sync_status, scope: 'activerecord.attributes.member.sync_status_captions' -%>
           </span>
         </span>

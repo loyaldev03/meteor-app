@@ -163,7 +163,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     @saved_member = Member.find_by_email(unsaved_member.email)
 
     within(".nav-tabs") do
-      wait_until { page.has_no_selector?(:xpath, '//a[@id="sync_status"]') }
+      wait_until { page.has_no_selector?(:xpath, '//a[@id="sync_status_tab"]') }
     end
   end
 
@@ -371,30 +371,49 @@ class MembersSyncronize < ActionController::IntegrationTest
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
     within(".nav-tabs") do
-      wait_until { page.has_selector?(:xpath, '//a[@id="sync_status"]') }
+      wait_until { page.has_selector?(:xpath, '//a[@id="sync_status_tab"]') }
     end
   end
 
-  # test "Create a member with Not Synced status" do
-  #   unsaved_member =  FactoryGirl.build(:member_with_api, :club_id => @club.id)
-  #   credit_card = FactoryGirl.build(:credit_card_master_card)
-  #   enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
+  test "Create a member with Not Synced status" do
+    unsaved_member =  FactoryGirl.build(:member_with_api, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
-  #   create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-  #   @saved_member = Member.find_by_email(unsaved_member.email)
-  #   @saved_member.update_attribute(:updated_at, Time.zone.now-1)
-  #   @saved_member.update_attribute(:last_synced_at, Time.zone.now)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_member = Member.find_by_email(unsaved_member.email)
 
-  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-  #   wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
-  #   within(".nav-tabs") do
-  #     wait_until { page.has_selector?(:xpath, '//a[@id="sync_status"]') }
-  #     click_on("Sync Status")
-  #   end
-  #   within("#span_mi_sync_status")do
-  #     wait_until{ page.has_content?('Not Synced') }
-  #   end
-  # end
+    within(".nav-tabs") do
+      wait_until { page.has_selector?(:xpath, '//a[@id="sync_status_tab"]') }
+      click_on("Sync Status")
+    end
+    within("#span_mi_sync_status")do
+      wait_until{ page.has_content?('Not Synced') }
+    end
+  end
+
+  test "Create a member with Sync Error status" do
+    unsaved_member =  FactoryGirl.build(:member_with_api, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
+
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member.update_attribute(:last_sync_error_at, Time.zone.now)
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+
+    within(".nav-tabs") do
+      wait_until { page.has_selector?(:xpath, '//a[@id="sync_status_tab"]') }
+      click_on("Sync Status")
+    end
+    within("#span_mi_sync_status")do
+      wait_until{ page.has_content?('Sync Error') }
+    end
+  end
 
 end
