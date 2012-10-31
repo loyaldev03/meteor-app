@@ -675,9 +675,8 @@ class Member < ActiveRecord::Base
 
 
   private
-    # TODO: finish this logic
     def membership_billed_recently?
-      true
+      self.recycled_times == 0 # and (terms_of_membership.monthly? and (self.current_membership.quota % 12)==0)
     end
 
     def schedule_renewal

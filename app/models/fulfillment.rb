@@ -23,7 +23,9 @@ class Fulfillment < ActiveRecord::Base
 
   scope :not_renewed, lambda { where("renewed = false") }
 
-  scope :to_be_renewed, lambda { where(" date(renewable_at) <= '#{Time.zone.now.to_date}' AND fulfillments.status NOT IN ('canceled', 'processing') AND recurrent = true AND renewed = false ") }
+  scope :to_be_renewed, lambda { where([ " date(renewable_at) <= ? " + 
+    " AND fulfillments.status NOT IN ('canceled', 'processing') " + 
+    " AND recurrent = true AND renewed = false ", Time.zone.now.to_date]) }
 
   delegate :club, :to => :member
 
