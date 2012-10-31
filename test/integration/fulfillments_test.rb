@@ -32,7 +32,6 @@ class FulfillmentsTest < ActionController::IntegrationTest
 			check('[all_times]')
       select('Others', :from => '[product_type]')
 	    click_link_or_button 'Report'
-
   	end
 
   	within ("#report_results") do
