@@ -168,4 +168,24 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       }
     end
   end
+
+  test "Recovery time on approval members" do
+    setup_member
+    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    #fill_in_member_approval(unsaved_member,credit_card)
+
+    # wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+
+    # @saved_member = Member.find_by_email(unsaved_member.email)
+
+    # visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    # wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    # wait_until{ page.has_selector?('#approve') }
+    # wait_until{ page.has_selector?('#reject') }
+  end
+
 end

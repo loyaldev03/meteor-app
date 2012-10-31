@@ -66,6 +66,8 @@ class Api::MembersControllerTest < ActionController::TestCase
                               }.merge(options),:format => :json})
   end
 
+  #Admin should enroll/create member with preferences
+  #Billing membership by Provisional amount
   test "Admin should enroll/create member with preferences" do
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
@@ -79,12 +81,18 @@ class Api::MembersControllerTest < ActionController::TestCase
                                       :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
           ) 
     )
-    assert_difference('MemberPreference.count',@preferences.size) do 
-      assert_difference('Member.count') do
-        generate_post_message
-        assert_response :success
+    assert_difference('Transaction.count')do
+      assert_difference('MemberPreference.count',@preferences.size) do 
+        assert_difference('Member.count') do
+          generate_post_message
+          assert_response :success
+        end
       end
     end
+
+    transaction = Transaction.last
+    assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
+
   end
 
   test "Representative should not enroll/create member" do
