@@ -66,7 +66,7 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def renew!
-    if recurrent and member.can_receive_another_fulfillment? and not renewed?
+    if recurrent and member.can_renew_fulfillment? and not renewed?
       if self.undeliverable?
         self.new_fulfillment('undeliverable')
       else

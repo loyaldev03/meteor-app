@@ -4,6 +4,7 @@ class FulfillmentTest < ActiveSupport::TestCase
   
   setup do 
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
+    @terms_of_membership_with_gateway_yearly = FactoryGirl.create(:terms_of_membership_with_gateway_yearly)
   end
 
   def setup_products 
@@ -12,9 +13,28 @@ class FulfillmentTest < ActiveSupport::TestCase
     @product_recurrent = FactoryGirl.create(:product_with_recurrent, club_id: @terms_of_membership_with_gateway.club.id)
   end
 
-  test "active member can receive fulfillments" do 
-    member = create_active_member(@terms_of_membership_with_gateway)
-    assert member.can_receive_another_fulfillment?
+  test "active member can't renew fulfillments" do 
+    [ 1, 5, 15, 25 ].each do |quota|
+      [ 0, 3 ].each do |recycled_times|
+        member = create_active_member(@terms_of_membership_with_gateway, :active_member, :enrollment_info, { recycled_times: recycled_times }, { quota: quota })
+        assert !member.can_renew_fulfillment?, "monthly recycled_times: #{recycled_times} and quota: #{quota}"
+      end
+    end
+
+    [ 1, 5, 15, 25, 12 ].each do |quota|
+      [ 0, 3 ].each do |recycled_times|
+        member = create_active_member(@terms_of_membership_with_gateway_yearly, :active_member, :enrollment_info, { recycled_times: recycled_times }, { quota: quota })
+        assert !member.can_renew_fulfillment?, "yearly recycled_times: #{recycled_times} and quota: #{quota}"
+      end
+    end
+  end
+
+  test "active member can renew fulfillments" do 
+    member = create_active_member(@terms_of_membership_with_gateway, :active_member, :enrollment_info, { recycled_times: 0 }, { quota: 12, join_date: Time.zone.now-1.year })
+    assert member.can_renew_fulfillment?, "monthly with quota 12 paid"
+
+    member = create_active_member(@terms_of_membership_with_gateway_yearly, :active_member, :enrollment_info, { recycled_times: 0 }, { quota: 24, join_date: Time.zone.now-1.year })
+    assert member.can_renew_fulfillment?, "yearly with quota 24 paid"
   end
 
   test "fulfillment not_processed renewal" do 

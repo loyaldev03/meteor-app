@@ -286,10 +286,16 @@ class Member < ActiveRecord::Base
     self.lapsed? and reactivation_times < Settings.max_reactivations
   end
 
-  # Do we need rules on fulfillment renewal?
-  # Add logic here!!!
-  def can_receive_another_fulfillment?
-    (self.active? or self.provisional?) and membership_billed_recently?
+  # refs #21919
+  def can_renew_fulfillment?
+    self.active? and 
+    (self.recycled_times == 0 and 
+      (
+        (terms_of_membership.monthly? and (self.current_membership.quota % 12)==0) or
+        # self.current_membership.quota > 12 .. yes we need it . because quota = 12 and 2012-2012=0 +1*12 => 12
+        (terms_of_membership.yearly? and self.current_membership.quota > 12 and (self.current_membership.quota == (12 * (Time.zone.now.year - self.current_membership.join_date.year + 1))))
+      )
+    )
   end
   ###############################################
 
@@ -676,10 +682,6 @@ class Member < ActiveRecord::Base
 
 
   private
-    def membership_billed_recently?
-      self.recycled_times == 0 # and (terms_of_membership.monthly? and (self.current_membership.quota % 12)==0)
-    end
-
     def schedule_renewal
       new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
       if terms_of_membership.monthly?
