@@ -129,7 +129,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     create_new_member(unsaved_member, bl_credit_card, unsaved_member.email, @partner, @club, @terms_of_membership_with_gateway)
 
     wait_until {
-      assert page.has_content?("That credit card is blacklisted, please use another")
+      assert page.has_content?(Settings.error_messages.credit_card_blacklisted)
     }
 
     assert Member.count == 1
@@ -155,7 +155,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     create_new_member(unsaved_member, unsaved_member.credit_cards.first, bl_email, @partner, @club, @terms_of_membership_with_gateway)
 
     wait_until {
-      assert page.has_content?("Member email is blacklisted")
+      assert page.has_content?(Settings.error_messages.member_email_blacklisted)
     }
 
     assert Member.count == 1
