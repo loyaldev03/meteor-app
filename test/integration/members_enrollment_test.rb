@@ -1138,6 +1138,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
   end
 
+  #Recovery time on approval members
   test "Approve member" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
@@ -1177,7 +1178,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#td_mi_next_retry_bill_date")do
       wait_until{ assert page.has_content?(I18n.l(Time.zone.now+@terms_of_membership_with_approval.provisional_days, :format => :only_date)) }
     end
-    
+    within("#td_mi_reactivation_times")do
+      wait_until{ assert page.has_content?("1")}
+    end
     within(".nav-tabs") do
       click_on("Memberships")
     end
@@ -1357,7 +1360,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end 
 
-test "Update Birthday after 12 like a day" do
+  test "Update Birthday after 12 like a day" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id)
@@ -1381,4 +1384,37 @@ test "Update Birthday after 12 like a day" do
       wait_until{ assert page.has_content?("#{@saved_member.birth_date}") }
     end
   end 
+
+  #Check active email
+  test "Check active email" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, 
+                                         :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    fill_in_member(unsaved_member,credit_card)
+
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+
+    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member.set_as_active
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    sleep 1
+    within("#table_membership_information") do
+      assert page.has_content?("active")
+    end
+    within("#communication") do
+      wait_until {
+        assert page.has_content?("Test active")
+        assert page.has_content?("active")
+        assert_equal(Communication.last.template_type, 'active')
+      }
+    end
+    within("#operations_table") do
+      wait_until {
+        assert page.has_content?("Communication 'Test active' sent")
+      }
+    end
+  end
 end

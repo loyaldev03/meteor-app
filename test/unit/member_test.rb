@@ -143,6 +143,7 @@ class MemberTest < ActiveSupport::TestCase
     }        
   end
 
+  #Check cancel email
   test "If member is rejected, when recovering it should increment reactivation_times" do
     member = create_active_member(@terms_of_membership_with_gateway, :applied_member)
     member.set_as_canceled!
@@ -230,4 +231,33 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date)), "03/05/2012"
     assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "03/05/2012"
   end
+
+  test "Billing for renewal amount" do
+    @club = @terms_of_membership_with_gateway.club
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+
+    assert_difference('Operation.count', 4) do
+      prev_bill_date = member.next_retry_bill_date
+      answer = member.bill_membership
+      member.reload
+      assert (answer[:code] == Settings.error_codes.success), answer[:message]
+      assert_equal member.quota, 1, "quota is #{member.quota} should be 1"
+      assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
+      assert_equal member.bill_date, member.next_retry_bill_date, "bill_date is #{member.bill_date} should be #{member.next_retry_bill_date}"
+      assert_equal member.next_retry_bill_date, (prev_bill_date + 1.month), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + 1.month)}"
+    end
+
+
+    Timecop.freeze(Time.zone.now + 1.month) do
+      prev_bill_date = member.next_retry_bill_date
+      answer = member.bill_membership
+      member.reload
+      assert (answer[:code] == Settings.error_codes.success), answer[:message]
+      assert_equal member.quota, 2, "quota is #{member.quota} should be 1"
+      assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
+      assert_equal member.bill_date, member.next_retry_bill_date, "bill_date is #{member.bill_date} should be #{member.next_retry_bill_date}"
+      assert_equal member.next_retry_bill_date, (prev_bill_date + 1.month), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + 1.month)}"
+    end
+  end
+
 end

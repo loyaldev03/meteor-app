@@ -56,6 +56,7 @@ gem 'rails3_acts_as_paranoid'
 
 gem "airbrake"
 
+gem "timecop"
 
 
 # To use ActiveModel has_secure_password

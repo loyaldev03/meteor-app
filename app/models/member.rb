@@ -117,7 +117,8 @@ class Member < ActiveRecord::Base
     after_transition :none => :applied, :do => [:set_join_date, :send_active_needs_approval_email]
     after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :nillify_club_cash]
     after_transition :provisional => :active, :do => :send_active_email
-    after_transition :lapsed => [:provisional, :applied], :do => :increment_reactivations
+    after_transition :lapsed => [:provisional], :do => :increment_reactivations
+    after_transition :applied => [:provisional], :do => :increment_reactivations
     after_transition :lapsed => :applied, :do => [ :set_join_date, :send_recover_needs_approval_email ]
     after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
     after_transition :applied => :lapsed, :do => :set_cancel_date
@@ -638,7 +639,11 @@ class Member < ActiveRecord::Base
       :member_group_type_id, :preferences, :external_id ].each do |key|
           self.send("#{key}=", params[key]) if params.include? key
     end
-    self.type_of_phone_number = params[:type_of_phone_number].downcase if params.include? :type_of_phone_number
+    unless params[:type_of_phone_number].nil?
+      self.type_of_phone_number = params[:type_of_phone_number].downcase  
+    else
+      self.type_of_phone_number = ''
+    end
   end
 
   def chargeback!(transaction_chargebacked, args)

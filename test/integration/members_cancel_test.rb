@@ -101,6 +101,8 @@ class MembersCancelTest < ActionController::IntegrationTest
     within("#communication") do
       wait_until {
         assert page.has_content?("Test cancellation")
+        assert page.has_content?("cancellation")
+        assert_equal(Communication.last.template_type, 'cancellation')
       }
     end
    
@@ -111,7 +113,6 @@ class MembersCancelTest < ActionController::IntegrationTest
       }
     end
     click_link_or_button 'Cancel'
-    sleep 2
     wait_until{ assert assert find_field('input_first_name').value == @saved_member.first_name }
   end
 
@@ -135,7 +136,6 @@ class MembersCancelTest < ActionController::IntegrationTest
       wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
     end
   end
-
 
 
 end
