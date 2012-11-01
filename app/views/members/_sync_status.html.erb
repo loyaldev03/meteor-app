@@ -8,7 +8,7 @@
             class: "btn btn-success disabled",
             id: "login_remotely_as_member" do %>
           <i class='icon-signin'></i>
-          Login Remotely as Member
+          <%= t('buttons.login_remotely_as_member') %>
         <% end %>
       <% else %>
         <%= 
@@ -17,7 +17,7 @@
             class: "btn btn-success", 
             target: '_blank' do %>
           <i class='icon-signin'></i>
-          Login Remotely as Member
+          <%= t('buttons.login_remotely_as_member') %>
         <% end %>
       <% end %>
       <% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
@@ -27,7 +27,7 @@
             class: "btn btn-info disabled",
             id: "resend_welcome_email" do %>
           <i class='icon-envelope'></i>
-          Resend Welcome Email
+          <%= t('buttons.resend_welcome_email') %>
         <% end %>      
       <% else %>
         <%= 
@@ -37,7 +37,7 @@
             id: "resend_welcome_email", 
             confirm: 'Are you sure?' do %>
           <i class='icon-envelope'></i>
-          Resend Welcome Email
+          <%= t('buttons.resend_welcome_email') %>
         <% end %>
       <% end %>
       <% if @current_member.lapsed? || !@current_member.api_member %>
@@ -47,7 +47,7 @@
             id: "sync_to_remote",
             class: 'btn btn-warning disabled' do %>
           <i class='icon-retweet'></i>
-          Sync to Remote
+          <%= t('buttons.sync_to_remote') %>
         <% end %>
       <% else %>
         <%= 
@@ -57,7 +57,7 @@
             id: "sync_to_remote",
             confirm: 'Are you sure?' do %>
           <i class='icon-retweet'></i>
-          Sync to Remote
+          <%= t('buttons.sync_to_remote') %>
         <% end %>
       <% end %>
       <% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
@@ -67,7 +67,7 @@
             id: "password_reset",
             class: "btn btn-warning disabled" do %>
           <i class='icon-key'></i>
-          Password Reset
+          <%= t('buttons.password_reset') %>
         <% end %>
       <% else %>
         <%= 
@@ -77,7 +77,7 @@
             id: "password_reset",
             confirm: 'Are you sure?' do %>
           <i class='icon-key'></i>
-          Password Reset
+          <%= t('buttons.password_reset') %>
         <% end %>
       <% end %>
       <% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
@@ -87,7 +87,7 @@
             id: "show_remote_data",
             style: 'float: right;' do %>
           <i class='icon-download-alt'></i>
-          Show Remote Data
+          <%= t('buttons.show_remote_data') %>
         <% end %>  
       <% else %>
         <%= 
@@ -98,7 +98,7 @@
             style: 'float: right;',
             data: { replace: '#sync-data' } do %>
           <i class='icon-download-alt'></i>
-          Show Remote Data
+          <%= t('buttons.show_remote_data') %>
         <% end %>    
       <% end %>
     </div>
@@ -127,13 +127,13 @@
         &nbsp;
         <%= link_to '#', class: 'btn btn-success toggler', data: { target: '.toggler-content' } do %>
           <i class='icon-pencil'></i>
-          <span class='toggler-content default active'>Edit</span>
-          <span class='toggler-content'>Stop editing</span>
+          <span class='toggler-content default active'><%= t('buttons.edit') %></span>
+          <span class='toggler-content'><%= t('buttons.stop_editing') %></span>
         <% end %>
         <% if @current_member.api_id.present? %>
           <%= link_to member_update_sync_path(member: { api_id: '' }), method: :put, confirm: 'Are you sure?', class: 'btn btn-warning' do %>
             <i class='icon-remove'></i>
-            Unset
+            <%= t('buttons.unset') %>
           <% end %>
         <% end %>
       </td>

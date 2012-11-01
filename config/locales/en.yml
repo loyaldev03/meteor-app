@@ -55,10 +55,17 @@ en:
     save_credit_card: 'Save credit card'
     report: 'Report'
     generate_csv: 'Generate csv'
-    resend_welcome_email: 'Resend welcome email'
     password_reset: 'Password reset'
     blacklist: 'Blacklist'
     cancel: 'Cancel'
+    login_remotely_as_member: 'Login remotely as member'
+    resend_welcome_email: 'Resend welcome email'
+    sync_to_remote: 'Sync to remote'
+    password_reset: 'Password reset'
+    show_remote_data: 'Show remote data'
+    unset: 'Unset'
+    edit: 'Edit'
+    stop_editing: 'Stop editing'
   admin:
     agents:
       index:
