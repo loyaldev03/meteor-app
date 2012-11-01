@@ -1441,7 +1441,7 @@ test "Enroll a member with recurrent product and it on the list" do
     setup_member
     @product_recurrent = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
     @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true)
-    @fulfillment_renewable.update_attribute(:renewable_at, Date.today)
+    @fulfillment_renewable.update_attribute(:renewable_at, Time.zone.now)
     @fulfillment_renewable.set_as_processing
     @fulfillment_renewable.set_as_sent
     @fulfillment_renewable.renew!
@@ -1467,7 +1467,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
     last_fulfillment.reload
 
-    wait_until{ assert_equal((I18n.l last_fulfillment.assigned_at, :format => :long), (I18n.l Date.today, :format => :long)) }
+    wait_until{ assert_equal((I18n.l last_fulfillment.assigned_at, :format => :long), (I18n.l Time.zone.now, :format => :long)) }
     wait_until{ assert_equal((I18n.l last_fulfillment.renewable_at, :format => :long), (I18n.l last_fulfillment.assigned_at + 1.year, :format => :long)) }
     wait_until{ assert_equal(last_fulfillment.status, 'not_processed') }
     wait_until{ assert_equal(last_fulfillment.recurrent, true ) }
