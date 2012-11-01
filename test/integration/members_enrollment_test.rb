@@ -1141,7 +1141,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   #Recovery time on approval members
   test "Approve member" do
     setup_member(false)
-    reactivation_times = @saved_member.reactivation_times
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -1152,6 +1151,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert find_field('input_first_name').value == unsaved_member.first_name
     }
     @saved_member = Member.find_by_email(unsaved_member.email)
+    reactivation_times = @saved_member.reactivation_times
     membership = @saved_member.current_membership
     within(".nav-tabs") do
       click_on("Memberships")
