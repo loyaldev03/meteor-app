@@ -48,6 +48,8 @@ FactoryGirl.define do
     time_zone { TZInfo::Timezone.all.sample.name }
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }
+    association :partner
     requires_external_id true
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end
 end

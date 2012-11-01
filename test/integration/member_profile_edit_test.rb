@@ -13,10 +13,10 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   def setup_member(create_new_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
+    @club = @terms_of_membership_with_gateway.club
+    @partner = @club.partner
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @communication_type = FactoryGirl.create(:communication_type)
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
     FactoryGirl.create(:batch_agent)
@@ -31,8 +31,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "edit member" do
     setup_member
-
-
     visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     
     within("#table_demographic_information") {
@@ -394,7 +392,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     within("#table_contact_information")do
       wait_until{
-        assert page.has_content?(@saved_member.type_of_phone_number)
+        assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
       }
     end
 
@@ -413,7 +411,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     }
     within("#table_contact_information")do
       wait_until{
-        assert page.has_content?(@saved_member.type_of_phone_number)
+        assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
       }
     end
   end
@@ -424,7 +422,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     
     within("#table_contact_information")do
       wait_until{
-        assert page.has_content?(@saved_member.type_of_phone_number)
+        assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
       }
     end
     click_link_or_button 'Edit'
@@ -443,7 +441,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
         assert page.has_content?('Mobile')
       }
     end
-    assert_equal Member.last.type_of_phone_number, 'Mobile'
+    assert_equal Member.last.type_of_phone_number, 'mobile'
   end
 
 
@@ -462,7 +460,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       wait_until{
         find(".icon-pencil").click
       }
-    end   
+    end  
     within("#table_contact_information")do
       wait_until{
         fill_in 'member[phone_country_code]', :with => 'TYUIYTRTYUYT'
@@ -483,8 +481,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "go from member index to edit member's type of phone number to home type" do
     setup_member
-    @saved_member.type_of_phone_number = 'Mobile'
-    @saved_member.save
+    @saved_member.update_attribute(:type_of_phone_number, 'mobile')
 
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#personal_details")do
@@ -516,7 +513,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#table_contact_information")do
       wait_until{
         assert page.has_content?(@saved_member.full_phone_number)
-        assert page.has_content?(@saved_member.type_of_phone_number)
+        assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
       }
     end
   end
@@ -612,8 +609,11 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "Update external id" do
     setup_member(false)
     @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
-    @member_with_external_id = create_active_member(@terms_of_membership_with_gateway, :active_member_with_external_id, nil, {}, { :created_by => @admin_agent })
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club_external_id.name)
+    @terms_of_membership_with_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id)
+
+    @member_with_external_id = create_active_member(@terms_of_membership_with_external_id, :active_member_with_external_id, nil, {}, { :created_by => @admin_agent })
+
+    visit members_path(:partner_prefix => @terms_of_membership_with_external_id.club.partner.prefix, :club_prefix => @terms_of_membership_with_external_id.club.name)
     assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
     
     within("#payment_details")do
@@ -644,7 +644,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       assert page.has_content?(@member_with_external_id.external_id)
     }
   end
-
 
   test "change member gender from male to female" do
     setup_member
@@ -723,6 +722,4 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     sleep 1 
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
   end
-
-
 end

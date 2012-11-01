@@ -116,7 +116,7 @@ FactoryGirl.define do
     gender "M"
     blacklisted false
     credit_cards {|ccs| [ccs.association(:credit_card)]}
-    external_id 123456
+    external_id 123456789
   end
 
   factory :active_member_without_cc, class: Member do
