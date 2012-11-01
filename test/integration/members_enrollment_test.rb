@@ -1141,6 +1141,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   #Recovery time on approval members
   test "Approve member" do
     setup_member(false)
+    reactivation_times = @saved_member.reactivation_times
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -1168,6 +1169,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     click_link_or_button 'Approve'
     wait_until{ page.has_content?("Member approved") }
     @saved_member.reload
+
+    assert_equal reactivation_times+1, @saved_member.reactivation_times
 
     within("#td_mi_status")do
       wait_until{ assert page.has_content?('provisional') }
