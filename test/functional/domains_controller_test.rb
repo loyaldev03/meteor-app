@@ -7,9 +7,8 @@ class DomainsControllerTest < ActionController::TestCase
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @api_user = FactoryGirl.create(:confirmed_api_agent)
     @agency_user = FactoryGirl.create(:confirmed_agency_agent)
-
-    @domain = FactoryGirl.create(:domain)
-    @partner = @domain.partner
+    @partner = FactoryGirl.create(:partner)
+    @domain = FactoryGirl.create(:domain, :partner_id => @partner.id)
     @partner_prefix = @partner.prefix
   end
 
