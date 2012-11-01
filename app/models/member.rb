@@ -193,7 +193,7 @@ class Member < ActiveRecord::Base
   end
 
   def set_cancel_date
-    self.current_membership.update_attribute(:cancel_date, Time.zone.today)
+    self.current_membership.update_attribute(:cancel_date, Time.zone.now)
   end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
