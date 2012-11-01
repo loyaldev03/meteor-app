@@ -1084,7 +1084,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillment_new = Fulfillment.last
     wait_until{
       assert_equal(fulfillment_new.product_sku, fulfillment.product_sku)
-      assert_equal((I18n.l fulfillment_new.assigned_at, :format => :long), (I18n.l Date.today, :format => :long))
+      assert_equal((I18n.l fulfillment_new.assigned_at, :format => :long), (I18n.l Time.zone.now, :format => :long))
       assert_equal((I18n.l fulfillment_new.renewable_at, :format => :long), (I18n.l fulfillment_new.assigned_at + 1.year, :format => :long))
       assert_equal(fulfillment_new.status, 'undeliverable')
       assert_equal(fulfillment_new.renewed, false)
