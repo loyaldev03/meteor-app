@@ -7,7 +7,7 @@ class MesAccountUpdater
       :userPass => gateway.aus_password, 
       :reportDateBegin => initial_date, 
       :reportDateEnd => end_date, 
-      :nodeId => gateway.merchant_key, 
+      :nodeId => gateway.aus_login[0..11], 
       :reportType => 1, 
       :includeTridentTranId => true, 
       :includePurchaseId => true, 
@@ -54,7 +54,7 @@ class MesAccountUpdater
       payload[:file] = Faraday::UploadIO.new(local_filename, 'multipart/form-data')
       payload[:userId] = gateway.aus_login
       payload[:userPass] = gateway.aus_password
-      payload[:merchId] = gateway.merchant_key
+      payload[:merchId] = gateway.aus_login[0..11]
 
       result = conn.post '/srv/api/ausUpload', payload
       answer = Rack::Utils.parse_nested_query(result.body)
@@ -66,7 +66,7 @@ class MesAccountUpdater
       file = File.open(local_filename, 'w')
 
       # add header
-      record_type, version_id, merchant_id = 'H1', '100000', "%-32s" % gateway.merchant_key
+      record_type, version_id, merchant_id = 'H1', '100000', "%-32s" % gateway.aus_login[0..11]
       file.write [ record_type, version_id, merchant_id ].join + "\n"
 
       count = 0
@@ -112,7 +112,7 @@ class MesAccountUpdater
       result = conn.get path, { 
         :userId => gateway.aus_login, 
         :userPass => gateway.aus_password, 
-        :merchId => gateway.merchant_key 
+        :merchId => gateway.aus_login[0..11]
       }.merge(options)
       answer = Rack::Utils.parse_nested_query(result.body)
     end
