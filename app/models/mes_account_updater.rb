@@ -145,22 +145,24 @@ class MesAccountUpdater
         discretionary_data = line[92..123]
 
         credit_card = CreditCard.find(discretionary_data[2..32].strip)
-        
         if credit_card.nil?
           Rails.logger.info "CreditCard id not found ##{discretionary_data} while parsing. #{line}"
         else
-          credit_card.aus_answered_at = Time.zone.now
-          credit_card.aus_status = response_code
-          credit_card.save
-          case response_code
-          when 'NEWACCT'
-            CreditCard.new_active_credit_card(credit_card, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3], new_account_number)
-          when 'NEWEXP'
-            CreditCard.new_active_credit_card(credit_card, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3])
-          when 'CLOSED', 'CALL'
-            credit_card.member.cancel! Time.zone.now, "Automatic cancellation. AUS answered account #{response_code} wont be able to bill"
-          else
-            Rails.logger.info "CreditCard id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
+          credit_cards = CreditCard.find_all_by_encrypted_number credit_card.encrypted_number
+          credit_cards.each do |cc|
+            cc.update_attributes :aus_answered_at => Time.zone.now, :aus_status => response_code if cc.aus_status.nil?
+            if credit_card.active 
+              case response_code
+              when 'NEWACCT'
+                CreditCard.new_active_credit_card(credit_card, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3], new_account_number)
+              when 'NEWEXP'
+                CreditCard.new_active_credit_card(credit_card, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3])
+              when 'CLOSED', 'CALL'
+                credit_card.member.cancel! Time.zone.now, "Automatic cancellation. AUS answered account #{response_code} wont be able to bill"
+              else
+                Rails.logger.info "CreditCard id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
+              end
+            end
           end
         end
       end
