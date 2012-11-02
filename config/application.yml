@@ -18,10 +18,6 @@ defaults: &defaults
   mes_aus_service:
     folder: "#{Rails.root}/mes_account_updater_files"
     url: https://www.merchante-solutions.com/
-    # AUS username is diff accross titles. We will use the same to speed up development
-    merchant_id: 
-    user: 
-    password: 
   operation_types: 
     #billing
     enrollment_billing: 100     
