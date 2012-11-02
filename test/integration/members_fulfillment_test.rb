@@ -1011,22 +1011,27 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "renewal as out_of_stock and set renewed when product does not have stock" do
     setup_member(false)
-    product = FactoryGirl.create(:product, :recurrent => true, :club_id => @club.id)
+    product = FactoryGirl.create(:product, :recurrent => true, :club_id => @club.id )
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
     sleep(1)
     @saved_member = Member.find_by_email(@member.email)
+    @saved_member.set_as_active
+    @saved_member.update_attribute(:recycled_times,0)
+    @saved_member.current_membership.update_attribute(:quota, 12)
+    @saved_member.current_membership.update_attribute(:join_date,Time.zone.now-1.year)
+
 
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
     fulfillment.set_as_processing
     fulfillment.set_as_sent
     product = fulfillment.product
-    product.stock = 0
-    product.save
-
+    product.update_attribute(:stock, 0)
+    wait_until{ assert_equal(product.stock, 0) }
     fulfillment.renew!
 
+    sleep 1
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
@@ -1034,9 +1039,9 @@ test "Enroll a member with recurrent product and it on the list" do
     end
     within("#fulfillments")do
       wait_until{
-        assert page.has_content?(I18n.l @saved_member.join_date, :format => :long)
         assert page.has_content?(I18n.l @saved_member.join_date + 1.year, :format => :long)
-        assert page.has_content?(product.sku)
+        assert page.has_content?(I18n.l @saved_member.join_date + 2.year, :format => :long)
+        assert page.has_content?(fulfillment.product_sku)
         assert page.has_content?('out_of_stock')
         assert page.has_content?('sent')
       }
@@ -1060,6 +1065,10 @@ test "Enroll a member with recurrent product and it on the list" do
     create_member_throught_sloop(enrollment_info)
     sleep(1)
     @saved_member = Member.find_by_email(@member.email)
+    @saved_member.set_as_active
+    @saved_member.update_attribute(:recycled_times,0)
+    @saved_member.current_membership.update_attribute(:quota, 12)
+    @saved_member.current_membership.update_attribute(:join_date,Time.zone.now-1.year)
 
     fulfillment = Fulfillment.find_by_product_sku('KIT')
     fulfillment.set_as_processing
@@ -1074,8 +1083,8 @@ test "Enroll a member with recurrent product and it on the list" do
     end
     within("#fulfillments")do
       wait_until{
-        assert page.has_content?(I18n.l @saved_member.join_date, :format => :long)
         assert page.has_content?(I18n.l @saved_member.join_date + 1.year, :format => :long)
+        assert page.has_content?(I18n.l @saved_member.join_date + 2.year, :format => :long)
         assert page.has_content?('KIT')
         assert page.has_content?('undeliverable')
       }
@@ -1100,11 +1109,14 @@ test "Enroll a member with recurrent product and it on the list" do
     create_member_throught_sloop(enrollment_info)
     sleep(1)
     @saved_member = Member.find_by_email(@member.email)
+    @saved_member.set_as_active
+    @saved_member.current_membership.update_attribute(:quota, 12)
+    @saved_member.current_membership.update_attribute(:join_date,Time.zone.now-1.year)  
 
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
     fulfillment.set_as_processing
     fulfillment.set_as_sent
-
+    
     fulfillment.renew!
 
     click_link_or_button("My Clubs")
@@ -1165,7 +1177,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     @fulfillment.set_as_processing
     @saved_member.set_wrong_address(@admin_agent, 'admin')
-
+    @fulfillment.reload
     click_link_or_button("My Clubs")
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
@@ -1175,10 +1187,10 @@ test "Enroll a member with recurrent product and it on the list" do
       select('Others',:from => 'product_type')
     end
     click_link_or_button('Report')
-    @fulfillment.reload
+    
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{@fulfillment.member.visible_id}")
+        assert page.has_content?(@fulfillment.member.visible_id.to_s)
         assert page.has_content?(@fulfillment.member.full_name)
         assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
         assert page.has_content?(@fulfillment.product_sku)
