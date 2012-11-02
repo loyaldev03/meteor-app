@@ -67,7 +67,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
 
   test "recovery a member 3 times" do
     setup_member
-    4.times{ 
+    3.times{ 
       visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
       click_on 'Recover'
       if page.has_no_content?("Cant recover member. Max reactivations reached")
@@ -84,7 +84,10 @@ class MembersRecoveryTest < ActionController::IntegrationTest
         Member.last.set_as_canceled!
       end
     }
-    assert page.has_content?("Cant recover member. Max reactivations reached")
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
+    click_on 'Recover'
+
+    assert page.has_content?(Settings.error_messages.cant_recover_member)
   end
 
   test "Recover a member by Monthly membership" do

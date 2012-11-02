@@ -129,8 +129,6 @@ class MembersCancelTest < ActionController::IntegrationTest
 
     confirm_ok_js
     click_link_or_button 'Reject'
-    puts Date.today
-    puts Time.zone.now
 
     within("#td_mi_cancel_date")do
       wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }

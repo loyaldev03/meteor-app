@@ -125,6 +125,7 @@ class RolesTest < ActionController::IntegrationTest
     within("#agents_table")do
       click_link_or_button 'Edit'
     end
+    sleep 500
     within(".table-condensed")do
       select('admin', :from => 'agent[club_roles_attributes][0][role]')
       select('club1', :from => 'agent[club_roles_attributes][0][club_id]')

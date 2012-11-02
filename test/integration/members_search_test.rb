@@ -71,7 +71,7 @@ class MembersSearchTest < ActionController::IntegrationTest
 
     within("#table_contact_information") do
       assert page.has_content?(member.full_phone_number)
-      assert page.has_content?(member.type_of_phone_number)
+      assert page.has_content?(member.type_of_phone_number.capitalize)
       assert page.has_content?("#{member.birth_date}")
       assert page.has_selector?('#link_member_set_unreachable')     
     end
@@ -503,11 +503,12 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search by external_id" do
     setup_member(false)
+    @terms_of_membership_with_gateway_and_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id)
     @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
-    @member_with_external_id = create_active_member(@terms_of_membership_with_gateway, :active_member_with_external_id, 
+    @member_with_external_id = create_active_member(@terms_of_membership_with_gateway_and_external_id, :active_member_with_external_id, 
       nil, {}, { :created_by => @admin_agent })
 
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club_external_id.name)
+    visit members_path(:partner_prefix => @member_with_external_id.club.partner.prefix, :club_prefix => @member_with_external_id.club.name)
     assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
     within("#payment_details")do
       wait_until{
@@ -515,6 +516,7 @@ class MembersSearchTest < ActionController::IntegrationTest
       }
     end
     click_link_or_button 'Search'
+
     within("#members")do
       wait_until{
         assert page.has_content?(@member_with_external_id.status)
