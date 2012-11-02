@@ -228,10 +228,7 @@ production:
   mes_aus_service:
     folder: "#{Rails.root}/mes_account_updater_files"
     url: https://www.merchante-solutions.com/
-    # AUS username is diff accross titles. We will use the same to speed up development
-    user: '941000110028AUS'
-    password: do3!lAjo5
-    merchant_id: '941000110028'
+
 
 prototype:
   <<: *defaults

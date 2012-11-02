@@ -90,12 +90,14 @@ end
 [c, c2].each do |c|
   pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
     :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
-    :mode => "development", :gateway => "mes", :report_group => "SAC_STAGING_TEST"
+    :mode => "development", :gateway => "mes", :report_group => "SAC_STAGING_TEST", 
+    :aus_login => '941000108792', :aus_password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU"
   pgc.club = c
   pgc.save!
   pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
     :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
-    :mode => "production", :gateway => "mes", :report_group => "SAC_STAGING_TEST"
+    :mode => "production", :gateway => "mes", :report_group => "SAC_STAGING_TEST",
+    :aus_login => '941000108792', :aus_password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU"
   pgc.club = c
   pgc.save!
 end

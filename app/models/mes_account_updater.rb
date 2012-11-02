@@ -2,20 +2,19 @@ class MesAccountUpdater
   def self.process_chargebacks(gateway)
     conn = Faraday.new(:url => Settings.mes_report_service.url, :ssl => {:verify => false})
     initial_date, end_date = (Date.today - 1.days).strftime('%m/%d/%Y'), (Date.today - 1.days).strftime('%m/%d/%Y')
-    merchant_id = gateway.login[0..11]
     result = conn.get Settings.mes_report_service.path, { 
-      :userId => Settings.mes_report_service.user, 
-      :userPass => Settings.mes_report_service.password, 
+      :userId => gateway.aus_login, 
+      :userPass => gateway.aus_password, 
       :reportDateBegin => initial_date, 
       :reportDateEnd => end_date, 
-      :nodeId => merchant_id, 
+      :nodeId => gateway.merchant_key, 
       :reportType => 1, 
       :includeTridentTranId => true, 
       :includePurchaseId => true, 
       :includeClientRefNum => true, 
       :dsReportId => 5
     }
-    process_chargebacks_result(result.body) if result.success?
+    process_chargebacks_result(result.body, gateway) if result.success?
   end 
 
 
@@ -23,17 +22,17 @@ class MesAccountUpdater
   ########## AUS new file! #######################
   ################################################
   def self.account_updater_process_answers(gateway)
-    answer = prepare_connection '/srv/api/ausStatus?', { :statusFilter => 'NEW' }
+    answer = prepare_connection '/srv/api/ausStatus?', { :statusFilter => 'NEW' }, gateway
     0.upto(answer['statusCount'].to_i-1) do |i|
-      request_file_by_id answer["rspfId_#{i}"], "rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway.club_id
+      request_file_by_id answer["rspfId_#{i}"], "rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
     end
     send_email_with_call_members
   end
 
   def self.account_updater_send_file_to_process(gateway)
     local_filename = "#{Settings.mes_aus_service.folder}/#{gateway.club_id}_account_updater_#{Time.zone.now}.txt"
-    store_file local_filename
-    send_file_to_mes local_filename
+    store_file local_filename, gateway
+    send_file_to_mes local_filename, gateway
   end
 
   private
@@ -45,7 +44,7 @@ class MesAccountUpdater
       Notifier.call_these_members(csv).deliver
     end
 
-    def self.send_file_to_mes(local_filename)
+    def self.send_file_to_mes(local_filename, gateway)
       conn = Faraday.new(:url => Settings.mes_aus_service.url, :ssl => {:verify => false}) do |builder|
         builder.request :multipart
         builder.adapter Faraday.default_adapter  # make requests with Net::HTTP  
@@ -53,9 +52,9 @@ class MesAccountUpdater
 
       payload = {}
       payload[:file] = Faraday::UploadIO.new(local_filename, 'multipart/form-data')
-      payload[:userId] = Settings.mes_aus_service.user
-      payload[:userPass] = Settings.mes_aus_service.password
-      payload[:merchId] = Settings.mes_aus_service.merchant_id
+      payload[:userId] = gateway.aus_login
+      payload[:userPass] = gateway.aus_password
+      payload[:merchId] = gateway.merchant_key
 
       result = conn.post '/srv/api/ausUpload', payload
       answer = Rack::Utils.parse_nested_query(result.body)
@@ -63,11 +62,11 @@ class MesAccountUpdater
       Rails.logger.info answer.inspect
     end
 
-    def self.store_file(local_filename)
+    def self.store_file(local_filename, gateway)
       file = File.open(local_filename, 'w')
 
       # add header
-      record_type, version_id, merchant_id = 'H1', '100000', "%-32s" % Settings.mes_aus_service.merchant_id
+      record_type, version_id, merchant_id = 'H1', '100000', "%-32s" % gateway.merchant_key
       file.write [ record_type, version_id, merchant_id ].join + "\n"
 
       count = 0
@@ -108,24 +107,24 @@ class MesAccountUpdater
       file.close
     end
 
-    def self.prepare_connection(path, options = {})
+    def self.prepare_connection(path, options = {}, gateway = nil)
       conn = Faraday.new(:url => Settings.mes_aus_service.url, :ssl => {:verify => false})
       result = conn.get path, { 
-        :userId => Settings.mes_aus_service.user, 
-        :userPass => Settings.mes_aus_service.password, 
-        :merchId => Settings.mes_aus_service.merchat_id 
+        :userId => gateway.aus_login, 
+        :userPass => gateway.aus_password, 
+        :merchId => gateway.merchant_key 
       }.merge(options)
       answer = Rack::Utils.parse_nested_query(result.body)
     end
 
-    def self.request_file_by_id(file_id, filename, club_id)
-      answer = prepare_connection '/srv/api/ausDownload?', { :rspfId => file_id }
+    def self.request_file_by_id(file_id, filename, gateway)
+      answer = prepare_connection '/srv/api/ausDownload?', { :rspfId => file_id }, gateway
       if answer['rspCode'].to_i == 0
         full_filename = "#{Settings.mes_aus_service.folder}/#{filename}"
         file = File.open(full_filename, 'w')
         file.write answer
         file.close
-        parse_file full_filename, club_id
+        parse_file full_filename, gateway.club_id
       end
     end
 
@@ -146,22 +145,24 @@ class MesAccountUpdater
         discretionary_data = line[92..123]
 
         credit_card = CreditCard.find(discretionary_data[2..32].strip)
-        
         if credit_card.nil?
           Rails.logger.info "CreditCard id not found ##{discretionary_data} while parsing. #{line}"
         else
-          credit_card.aus_answered_at = Time.zone.now
-          credit_card.aus_status = response_code
-          credit_card.save
-          case response_code
-          when 'NEWACCT'
-            CreditCard.new_active_credit_card(credit_card, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3], new_account_number)
-          when 'NEWEXP'
-            CreditCard.new_active_credit_card(credit_card, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3])
-          when 'CLOSED'
-            credit_card.member.cancel! Time.zone.now, "Automatic cancellation. AUS answered account CLOSED wont be able to bill"
-          else
-            Rails.logger.info "CreditCard id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
+          credit_cards = CreditCard.find_all_by_encrypted_number credit_card.encrypted_number
+          credit_cards.each do |cc|
+            cc.update_attributes :aus_answered_at => Time.zone.now, :aus_status => response_code if cc.aus_status.nil?
+            if credit_card.active 
+              case response_code
+              when 'NEWACCT'
+                CreditCard.new_active_credit_card(credit_card, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3], new_account_number)
+              when 'NEWEXP'
+                CreditCard.new_active_credit_card(credit_card, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3])
+              when 'CLOSED', 'CALL'
+                credit_card.member.cancel! Time.zone.now, "Automatic cancellation. AUS answered account #{response_code} wont be able to bill"
+              else
+                Rails.logger.info "CreditCard id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
+              end
+            end
           end
         end
       end
