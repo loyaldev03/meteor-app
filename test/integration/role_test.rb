@@ -121,25 +121,30 @@ class RolesTest < ActionController::IntegrationTest
   test "Agent like Administrator, Supervisor and representative" do
     setup_admin
     5.times{ FactoryGirl.create(:simple_club_with_gateway) }
+
+    club1 = Club.first
+    club2 = Club.find(2)
+    club3 = Club.last
+
     visit admin_agents_path
     within("#agents_table")do
       click_link_or_button 'Edit'
     end
     within(".table-condensed")do
       select('admin', :from => 'agent[club_roles_attributes][0][role]')
-      select('club2', :from => 'agent[club_roles_attributes][0][club_id]')
+      select(club1.name, :from => 'agent[club_roles_attributes][0][club_id]')
       click_link_or_button 'Add'
     end
     click_link_or_button 'Edit'
     within(".table-condensed")do
       select('supervisor', :from => 'agent[club_roles_attributes][1][role]')
-      select('club3', :from => 'agent[club_roles_attributes][1][club_id]')
+      select(club2.name, :from => 'agent[club_roles_attributes][1][club_id]')
       click_link_or_button 'Add'
     end
     click_link_or_button 'Edit'
     within(".table-condensed")do
       select('representative', :from => 'agent[club_roles_attributes][2][role]')
-      select('club4', :from => 'agent[club_roles_attributes][2][club_id]')
+      select(club4.name, :from => 'agent[club_roles_attributes][2][club_id]')
       click_link_or_button 'Add'
     end
     wait_until{ assert page.has_content?("admin for") }
