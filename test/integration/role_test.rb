@@ -120,7 +120,8 @@ class RolesTest < ActionController::IntegrationTest
 
   test "Agent like Administrator, Supervisor and representative" do
     setup_admin
-    5.times{ FactoryGirl.create(:simple_club_with_gateway) }
+    setup_member false
+    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     club1 = Club.first
     club2 = Club.find(2)
@@ -144,7 +145,7 @@ class RolesTest < ActionController::IntegrationTest
     click_link_or_button 'Edit'
     within(".table-condensed")do
       select('representative', :from => 'agent[club_roles_attributes][2][role]')
-      select(club4.name, :from => 'agent[club_roles_attributes][2][club_id]')
+      select(club3.name, :from => 'agent[club_roles_attributes][2][club_id]')
       click_link_or_button 'Add'
     end
     wait_until{ assert page.has_content?("admin for") }
