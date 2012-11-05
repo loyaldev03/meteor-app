@@ -1344,12 +1344,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     click_link_or_button 'Edit'
     page.execute_script("window.jQuery('#member_birth_date').next().click()")
+    sleep 1
     within(".ui-datepicker-header")do
-      find(".ui-icon-circle-triangle-w").click
+      wait_until{ find(".ui-icon-circle-triangle-w").click }
     end
     within(".ui-datepicker-calendar") do
-      sleep 5
-      click_on("13")
+      wait_until{ click_on("13") }
     end    
     
     alert_ok_js
