@@ -851,13 +851,20 @@ class Member < ActiveRecord::Base
         else # there is another member with this credit card. prevent this update.
           return { :message => Settings.error_messages.credit_card_in_use, :code => Settings.error_codes.credit_card_in_use }
         end
+        new_number = credit_card[:number]
       end
 
+      new_number = active_credit_card.number if new_number.nil?
       new_year = credit_card[:expire_year] if credit_card[:expire_year] != active_credit_card.expire_year  
       new_month = credit_card[:expire_month] if credit_card[:expire_month] != ("%02d" % active_credit_card.expire_month)
       
       if new_number or new_year or new_month
-        CreditCard.new_expiration_on_active_credit_card(active_credit_card, new_year, new_month, new_number, false)
+        credit_card_to_update = CreditCard.new(:number => new_number, :expire_month => new_month, :expire_year => new_year)
+        if credit_card_to_update.valid?
+          CreditCard.new_expiration_on_active_credit_card(active_credit_card, new_year, new_month, new_number, false)
+        else
+          { :code => Settings.error_codes.invalid_credit_card }
+        end
       end
       { :code => Settings.error_codes.success }
     end
