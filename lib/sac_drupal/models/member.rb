@@ -186,15 +186,17 @@ module Drupal
       if self.new_record?
         map.merge!({
           pass: SecureRandom.hex, 
+          field_phoenix_member_vid: {
+            und: [ { value: m.visible_id } ]
+          },
+          field_phoenix_member_uuid: {
+            und: [ { value: m.uuid } ]
+          }
         })
       else
         map.merge!({
           field_profile_member_id: { 
-            und: [ 
-              {
-                value: m.reload.visible_id
-              } 
-            ] 
+            und: [ { value: m.reload.visible_id } ] 
           }
         })
       end
