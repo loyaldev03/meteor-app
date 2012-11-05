@@ -129,11 +129,11 @@ module Drupal
           ] 
         },
         field_profile_gender: { 
-          und: m.gender 
+          und: { select: (m.gender.blank? ? "_none" : m.gender) }
         },
         field_profile_phone_type: { 
           und: { 
-              select: m.type_of_phone_number.to_s.downcase
+              select: (m.type_of_phone_number.blank? ? "_none" : m.type_of_phone_number.downcase) 
             }
         },
         field_profile_phone_country_code: { 
@@ -222,7 +222,7 @@ module Drupal
         m.preferences.each do |key, value|
           map.merge!({
             "field_phoenix_pref_#{key}" =>  {
-              und: ( value.nil? ? { "select" => "" } : { "select" => "select_or_other", "other" => value } )
+              und: ( value.nil? ? { "select" => "_none" } : { "select" => "select_or_other", "other" => value } )
             }
           })
         end
