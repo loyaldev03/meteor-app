@@ -49,8 +49,8 @@ class Communication < ActiveRecord::Base
       update_attributes :sent_success => false, 
           :response => "Member requested unsubscription to mlid #{external_attributes[:mlid]} at lyris", 
           :processed_at => Time.zone.now
-      Auditory.audit(nil, self, "Communication '#{c.template_name}' wont be sent because email is unsubscribed", 
-        member, Settings.operation_types["#{c.template_type}_email"])
+      Auditory.audit(nil, self, "Communication '#{template_name}' wont be sent because email is unsubscribed", 
+        member, Settings.operation_types["#{template_type}_email"])
     else
       response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
       update_attributes :sent_success => true, :processed_at => Time.zone.now, :response => response
