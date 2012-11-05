@@ -57,11 +57,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     assert_difference('Member.count', 0) do 
       click_link_or_button 'Update Member'
-      sleep(5) #Wait for API response
     end
-
-    assert page.has_content?("#{@saved_member.first_name} #{@saved_member.last_name}")
-
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
   end
 
 
@@ -89,10 +86,10 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       click_link_or_button 'Update Member'
       sleep(5) #Wait for API response
     end
-
-    assert page.has_content?("#{@saved_member.first_name} #{@saved_member.last_name}")
-    assert find_field('input_member_group_type').value == 'Notable'
-    
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+      assert find_field('input_member_group_type').value == 'Notable' 
+    }
   end
 
 

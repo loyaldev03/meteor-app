@@ -112,10 +112,9 @@ class MembersBillTest < ActionController::IntegrationTest
       }
     end
 
-    # Unable to find the refund link
-    #within("#transactions_table") do
-    #  find("a.btn-warning").click
-    #end
+    within("#transactions_table") do
+     wait_until{ assert page.has_selector?('#refund') }
+    end
     
     if do_refund
       visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id, :transaction_id => Transaction.last.id)
