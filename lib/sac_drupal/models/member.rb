@@ -132,9 +132,7 @@ module Drupal
           und: { select: (m.gender.blank? ? "_none" : m.gender) }
         },
         field_profile_phone_type: { 
-          und: { 
-              select: (m.type_of_phone_number.blank? ? "_none" : m.type_of_phone_number.downcase) 
-            }
+          und: ( m.type_of_phone_number.blank? ? { "select" => "_none" } : { "select" => "select_or_other", "other" => m.type_of_phone_number.downcase } )
         },
         field_profile_phone_country_code: { 
           und: [ 
