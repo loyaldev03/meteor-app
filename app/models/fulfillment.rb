@@ -40,7 +40,7 @@ class Fulfillment < ActiveRecord::Base
       transition :processing => :sent
     end
     event :set_as_out_of_stock do
-      transition :not_processed => :out_of_stock
+      transition [:not_processed, :undeliverable] => :out_of_stock
     end
     event :set_as_canceled do
       transition [:not_processed,:processing,:out_of_stock, :undeliverable] => :canceled

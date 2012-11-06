@@ -12,10 +12,11 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
   def setup_member(create_new_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
+    @club = @terms_of_membership_with_gateway.club
+    @partner = @club.partner
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    
     FactoryGirl.create(:batch_agent)
 
     if create_new_member
@@ -1220,61 +1221,62 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
 
-  ## FIXME: The update button keep throwing and error.
-  # test "resend fulfillment with status undeliverable - Product without stock" do
-  #   setup_member(false)
-  #   @saved_member = FactoryGirl.create(:active_member, :club_id => @club.id, 
-  #                                      :terms_of_membership => @terms_of_membership_with_gateway,
-  #                                      :created_by => @admin_agent)
+  test "resend fulfillment with status undeliverable - Product without stock" do
+    setup_member(false)
+    product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
 
-  #   @saved_member.reload
-  #   @product = FactoryGirl.create(:product_without_stock_and_recurrent, :club_id => @club.id)
-  #   @fulfillment = FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => @product.sku)
-    
-  #   @fulfillment.set_as_processing
-  #   @saved_member.set_wrong_address(@admin_agent, 'admin')
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku )
+    create_member_throught_sloop(enrollment_info)
 
-  #   click_link_or_button("My Clubs")
-  #   within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
-  #   wait_until{page.has_content?("Fulfillments")}
-  #   within("#fulfillments_table")do
-  #     check('_all_times')
-  #     select('undeliverable', :from => 'status')
-  #     select('Others',:from => 'product_type')
-  #   end
-  #   click_link_or_button('Report')
-  #   @fulfillment.reload
-  #   within("#report_results")do
-  #     wait_until{
-  #       assert page.has_content?("#{@fulfillment.member.visible_id}")
-  #       assert page.has_content?(@fulfillment.member.full_name)
-  #       assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
-  #       assert page.has_content?(@fulfillment.product_sku)
-  #       assert page.has_content?(@fulfillment.tracking_code)
-  #       assert page.has_content?('undeliverable')
-  #       click_link_or_button('This address is undeliverable.')
-  #     }
-  #   end
-  #   click_link_or_button 'Edit'
+    @saved_member = Member.find_by_email(@member.email)
+    @fulfillment = Fulfillment.first
 
-  #   within("#table_demographic_information")do
-  #     wait_until{
-  #       check('setter_wrong_address')
-  #     }
-  #   end
-  #   alert_ok_js
-  #   click_link_or_button 'Update Member'
-  #   wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     wait_until{
-  #       assert page.has_content?(@fulfillment.product_sku)
-  #       assert page.has_content?('out_of_stock')
-  #     }
-  #   end
-  # end
+    @fulfillment.set_as_processing
+    @saved_member.set_wrong_address(@admin_agent, 'admin')
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
+    wait_until{page.has_content?("Fulfillments")}
+    within("#fulfillments_table")do
+      check('_all_times')
+      select('undeliverable', :from => 'status')
+      select('Others',:from => 'product_type')
+    end
+    click_link_or_button('Report')
+    @fulfillment.reload
+    within("#report_results")do
+      wait_until{
+        assert page.has_content?("#{@fulfillment.member.visible_id}")
+        assert page.has_content?(@fulfillment.member.full_name)
+        assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?(@fulfillment.tracking_code)
+        assert page.has_content?('undeliverable')
+        click_link_or_button('This address is undeliverable.')
+      }
+    end
+    product.update_attribute(:stock,0)
+
+    click_link_or_button 'Edit'
+
+    within("#table_demographic_information")do
+      wait_until{
+        check('setter_wrong_address')
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(@fulfillment.product_sku)
+        assert page.has_content?('out_of_stock')
+      }
+    end
+  end
 
   test "fulfillment record from not_processed to cancel status" do
     setup_member
@@ -2253,5 +2255,4 @@ test "Enroll a member with recurrent product and it on the list" do
     csv_string = Fulfillment.generateCSV(fulfillments, false) 
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
   end
-
 end
