@@ -1490,9 +1490,11 @@ test "Enroll a member with recurrent product and it on the list" do
   end
 
   test "add a new club" do
-    setup_member
+    admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+
     @partner = FactoryGirl.create(:partner)
     unsaved_club = FactoryGirl.build(:simple_club_with_gateway)    
+    sign_in_as(admin_agent)
 
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
