@@ -1,5 +1,6 @@
 class MesAccountUpdater
   def self.process_chargebacks(gateway)
+    return if gateway.aus_login.nil? or gateway.aus_password.nil?
     conn = Faraday.new(:url => Settings.mes_report_service.url, :ssl => {:verify => false})
     initial_date, end_date = (Date.today - 1.days).strftime('%m/%d/%Y'), (Date.today - 1.days).strftime('%m/%d/%Y')
     result = conn.get Settings.mes_report_service.path, { 
@@ -169,6 +170,7 @@ class MesAccountUpdater
     end    
 
     def self.process_chargebacks_result(body, gateway)
+      return if body.include?('Export Failed')
       body.split("\n").each do |line|
         columns = line.split(',')
         next if columns[0].include?('Merchant Id')
