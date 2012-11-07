@@ -757,12 +757,6 @@ class Member < ActiveRecord::Base
       self.desnormalize_preferences if opts[:force] || self.changed.include?('preferences') 
     end
 
-    def wrong_address_logic
-      if self.changed.include?('wrong_address') and self.wrong_address.nil?
-        self.fulfillments.where_undeliverable.each { |s| s.set_as_not_processed }
-      end
-    end
-
     def propagate_membership_data
       self.current_membership.update_attribute :status, status
     end
