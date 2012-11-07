@@ -35,12 +35,10 @@ class Notifier < ActionMailer::Base
   end
 
   def call_these_members(csv)
-    subject    "AUS answered CALL to these members #{Date.today}"
-    bcc        'platformadmins@xagax.com'
-    recipients Settings.call_these_members_recipients
-    attachment :content_type => "text/csv", :filename => "call_members_#{Date.today}.csv" do |a|
-      a.body = csv
-    end
+    attachments["call_members_#{Date.today}.csv"] = { :mime_type => 'text/csv', :content => csv }
+    mail :to => Settings.call_these_members_recipients, 
+         :subject => "AUS answered CALL to these members #{Date.today}",
+         :bcc => 'platformadmins@xagax.com'
   end
 
 end

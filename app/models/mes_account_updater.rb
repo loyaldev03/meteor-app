@@ -41,10 +41,12 @@ class MesAccountUpdater
   private
     def self.send_email_with_call_members
       ccs = CreditCard.where([" aus_status = 'CALL' AND date(aus_answered_at) = ? ", Time.zone.now.to_date ])
-      csv = "id,first_name,last_name,email,phone,status,cs_next_bill_date\n"
-      csv += ccs.collect {|cc| [ cc.member_id, cc.member.first_name, cc.member.last_name, cc.email, cc.full_phone_number,
-          cc.member.status, cc.member.next_retry_bill_date ].join(',') }.join("\n")
-      Notifier.call_these_members(csv).deliver
+      if ccs.size > 0
+        csv = "id,first_name,last_name,email,phone,status,cs_next_bill_date\n"
+        csv += ccs.collect {|cc| [ cc.member_id, cc.member.first_name, cc.member.last_name, cc.email, cc.full_phone_number,
+            cc.member.status, cc.member.next_retry_bill_date ].join(',') }.join("\n")
+        Notifier.call_these_members(csv).deliver
+      end
     end
 
     def self.send_file_to_mes(local_filename, gateway)
