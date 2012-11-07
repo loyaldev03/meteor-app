@@ -34,8 +34,7 @@ class MesAccountUpdater
   def self.account_updater_send_file_to_process(gateway)
     return if gateway.aus_login.nil? or gateway.aus_password.nil?
     local_filename = "#{Settings.mes_aus_service.folder}/#{gateway.club_id}_account_updater_#{Time.zone.now}.txt"
-    store_file local_filename, gateway
-    send_file_to_mes local_filename, gateway
+    send_file_to_mes(local_filename, gateway) if store_file(local_filename, gateway)
   end
 
   private
@@ -110,6 +109,7 @@ class MesAccountUpdater
       record_type, record_count = 'T1', "%06d" % count
       file.write [ record_type, record_count ].join
       file.close
+      count != 0
     end
 
     def self.prepare_connection(path, options = {}, gateway = nil)
