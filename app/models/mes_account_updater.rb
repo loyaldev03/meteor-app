@@ -23,6 +23,7 @@ class MesAccountUpdater
   ########## AUS new file! #######################
   ################################################
   def self.account_updater_process_answers(gateway)
+    return if gateway.aus_login.nil? or gateway.aus_password.nil?
     answer = prepare_connection '/srv/api/ausStatus?', { :statusFilter => 'NEW' }, gateway
     0.upto(answer['statusCount'].to_i-1) do |i|
       request_file_by_id answer["rspfId_#{i}"], "rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
@@ -31,6 +32,7 @@ class MesAccountUpdater
   end
 
   def self.account_updater_send_file_to_process(gateway)
+    return if gateway.aus_login.nil? or gateway.aus_password.nil?
     local_filename = "#{Settings.mes_aus_service.folder}/#{gateway.club_id}_account_updater_#{Time.zone.now}.txt"
     store_file local_filename, gateway
     send_file_to_mes local_filename, gateway
