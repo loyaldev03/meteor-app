@@ -8,22 +8,27 @@ class Api::TokensController < ApplicationController
   # Method  : POST
   #
   # @param [Hash] email
+  # @params[Hash] username
   # @param [Hash] password
   # @return [string] *message*: Shows the method results and also informs the errors.
   # @return [Integer] *status*: Code related to the method result.
   # @return [String] *token*: authentication token
   # @return [String] *location*
   def create
+    username = params[:username]
     email = params[:email]
     password = params[:password]
 
-    if email.nil? or password.nil?
+    if (email.nil? and username.nil?) or password.nil?
       respond_with({:message=>"The request must contain the user email and password."}, :status=>400, 
         :location => nil)
       return
     end
 
-    @user=Agent.find_by_email(email.downcase)
+    @user = Agent.find_by_email(email.downcase) unless email.nil?
+    if @user.nil?
+      @user = Agent.find_by_username(username) unless username.nil?
+    end
 
     if @user.nil?
       logger.info("User #{email} failed signin, user cannot be found.")
