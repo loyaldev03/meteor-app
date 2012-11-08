@@ -44,7 +44,7 @@ FactoryGirl.define do
     country "US"
     club_cash_amount 0
     cohort { Time.zone.now.strftime TEST_COHORT }
-    association :club, factory: :club_with_api
+    #association :club, factory: :club_with_api
   end
 
   factory :member_with_cc, class: Member do

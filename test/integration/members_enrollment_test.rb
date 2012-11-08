@@ -1094,8 +1094,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   test "display member with blank product_sku." do
     setup_member
-    enrollment_info = FactoryGirl.create(:enrollment_info, :product_sku => '', :member_id => @saved_member.id)
+    @saved_member.current_membership.enrollment_info = FactoryGirl.create(:enrollment_info, :product_sku => '', :member_id => @saved_member.id)
     @saved_member.set_as_canceled!
+
     @saved_member.recovered
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)

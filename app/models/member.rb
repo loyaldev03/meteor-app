@@ -186,7 +186,7 @@ class Member < ActiveRecord::Base
   def set_join_date
     membership = current_membership
     membership.join_date = Time.zone.now
-    self.cohort = Member.cohort_formula(membership.join_date, self.enrollment_infos.first, time_zone, terms_of_membership.installment_type)
+    self.cohort = Member.cohort_formula(membership.join_date, self.current_membership.enrollment_info, time_zone, terms_of_membership.installment_type)
     self.save
     membership.cohort = self.cohort
     membership.save
@@ -203,7 +203,7 @@ class Member < ActiveRecord::Base
     membership.join_date = Time.zone.now
     self.bill_date = Time.zone.now + terms_of_membership.provisional_days
     self.next_retry_bill_date = bill_date
-    self.cohort = Member.cohort_formula(membership.join_date, self.enrollment_infos.first, time_zone, terms_of_membership.installment_type)
+    self.cohort = Member.cohort_formula(membership.join_date, self.current_membership.enrollment_info, time_zone, terms_of_membership.installment_type)
     self.save
     membership.cohort = self.cohort
     membership.save
@@ -305,7 +305,7 @@ class Member < ActiveRecord::Base
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
         old_tom_id = terms_of_membership.id
-        res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.enrollment_infos.first)
+        res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info)
         if res[:code] == Settings.error_codes.success
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
             "Save the sale from TOMID #{old_tom_id} to TOMID #{new_tom_id}", self, Settings.operation_types.save_the_sale)
@@ -319,7 +319,7 @@ class Member < ActiveRecord::Base
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
   def recover(new_tom, agent = nil)
-    enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, self.enrollment_infos.first)
+    enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, self.current_membership.enrollment_info)
   end
 
   def bill_membership
@@ -468,6 +468,9 @@ class Member < ActiveRecord::Base
       self.memberships << membership
       self.save!
 
+      enrollment_info.membership = membership
+      enrollment_info.save
+      
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
         # is completed succesfully
@@ -735,7 +738,7 @@ class Member < ActiveRecord::Base
     end
 
     def fulfillments_products_to_send
-      self.enrollment_infos.first.product_sku ? self.enrollment_infos.first.product_sku.split(',') : []
+      self.current_membership.enrollment_info.product_sku ? self.current_membership.enrollment_info.product_sku.split(',') : []
     end
 
     def record_date

@@ -130,8 +130,6 @@ class MemberTest < ActiveSupport::TestCase
     assert answer[:code] == Settings.error_codes.success, answer[:message]
     assert_equal 'applied', member.status
     assert_equal 0, member.reactivation_times
-
-    puts member.reactivation_times
   end
 
   test "Should not let create a member with a wrong format zip" do
