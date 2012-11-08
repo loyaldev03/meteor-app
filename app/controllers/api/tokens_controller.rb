@@ -14,7 +14,7 @@ class Api::TokensController < ApplicationController
   # @return [String] *token*: authentication token
   # @return [String] *location*
   def create
-    email = "sebastian"
+    email = params[:email]
     password = params[:password]
 
     if email.nil? or password.nil?
