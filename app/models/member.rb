@@ -457,7 +457,7 @@ class Member < ActiveRecord::Base
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
       answer = trans.process
       unless trans.success?
-        Auditory.audit(agent, self, "Transaction was not succesful.", self, answer.code)
+          Auditory.audit(agent, self, "Transaction was not succesful.", self, answer[:code])
         return answer 
       end
     end
