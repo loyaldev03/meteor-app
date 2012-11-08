@@ -26,7 +26,7 @@ PhoenixMember.where(" status IN ('provisional', 'active') ").find_in_batches do 
         member.club_cash_amount = tom.club_cash_amount
       else
         # monthly
-        member.club_cash_amount = tom.club_cash_amount * (member % 12)
+        member.club_cash_amount = tom.club_cash_amount * (membership.quota % 12)
       end
 
       cct = PhoenixClubCashTransaction.find_or_create_by_member_id member.uuid
