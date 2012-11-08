@@ -57,8 +57,9 @@ class Member < ActiveRecord::Base
   end
 
   def after_save_sync_to_remote_domain(type)
-    skip_api_sync! unless can_be_synced_to_remote? # Bug #23017 - skip sync if lapsed or applied.
-    api_member.save! unless @skip_api_sync || api_member.nil?
+    if can_be_synced_to_remote? # Bug #23017 - skip sync if lapsed or applied.
+      api_member.save! unless @skip_api_sync || api_member.nil?
+    end
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
@@ -457,7 +458,7 @@ class Member < ActiveRecord::Base
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
       answer = trans.process
       unless trans.success?
-          Auditory.audit(agent, self, "Transaction was not succesful.", self, answer[:code])
+        Auditory.audit(agent, self, "Transaction was not succesful.", self, answer[:code])
         return answer 
       end
     end
