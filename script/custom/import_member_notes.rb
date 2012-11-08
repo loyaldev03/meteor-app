@@ -2,7 +2,7 @@
 
 require 'import_models'
 
-@log = Logger.new('import_notes.log', 10, 1024000)
+@log = Logger.new('log/import_notes.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
 @communication_types = CustomerServicesCommunication.all

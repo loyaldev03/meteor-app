@@ -1118,6 +1118,15 @@ USE_MEMBER_LIST = true
 )
 
 
+@cids = %w(
+1797
+1798
+
+)
+
+
+
+
 if USE_PROD_DB
 #  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
 #  exit
@@ -1403,6 +1412,10 @@ class BillingMember < ActiveRecord::Base
 
   def email_to_import
     TEST ? "test#{member.id}@xagax.com" : email
+  end
+
+  def enrollment_amount_to_import2
+    self.enrollment_amount_to_import || (BillingCampaign.find(self.campaign_id).authorization_amount / 100.0)
   end
 end
 class BillingCampaign < ActiveRecord::Base

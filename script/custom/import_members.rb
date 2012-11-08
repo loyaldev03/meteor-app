@@ -2,7 +2,7 @@
 
 require 'import_models'
 
-@log = Logger.new('import_members.log', 10, 1024000)
+@log = Logger.new('log/import_members.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
 
@@ -36,7 +36,7 @@ end
 def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   e_info = PhoenixEnrollmentInfo.find_or_create_by_member_id(phoenix.id)
   campaign = BillingCampaign.find_by_id(member.campaign_id) if campaign.nil?
-  e_info.enrollment_amount = member.enrollment_amount_to_import
+  e_info.enrollment_amount = member.enrollment_amount_to_import2
   e_info.product_sku = campaign.product_sku
   e_info.product_description = campaign.product_description
   e_info.mega_channel = campaign.phoenix_mega_channel
@@ -46,6 +46,9 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   e_info.landing_url = campaign.landing_url
   e_info.terms_of_membership_id = tom_id
   e_info.preferences = {}.to_json
+  e_info.created_at = member.created_at
+  e_info.updated_at = member.updated_at
+
   # e_info.preferences.each do |key, value|
   #   pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(phoenix.id, phoenix.club_id, key)
   #   pref.value = value
@@ -65,31 +68,38 @@ def fill_aus_attributes(cc, member)
   cc.aus_sent_at = member.aus_sent_at
 end
 
-def set_membership_data(tom_id, phoenix)
-  membership = PhoenixMembership.find_or_create_by_member_id phoenix.id
+def set_membership_data(tom_id, member)
+  membership = PhoenixMembership.find_or_create_by_member_id @member.id
   membership.terms_of_membership_id = tom_id
   membership.created_by_id = DEFAULT_CREATED_BY
-  membership.join_date = convert_from_date_to_time(@member.phoenix_join_date)
-  membership.status = phoenix.status
-  membership.quota = @member.quota
-  membership.member_id = phoenix.id
-  membership.cancel_date = @member.cancelled_at if phoenix.status == "lapsed"
+  membership.join_date = convert_from_date_to_time(member.phoenix_join_date)
+  membership.status = @member.status
+  membership.quota = member.quota
+  membership.created_at = member.created_at
+  membership.updated_at = member.updated_at
+  membership.member_id = @member.id
+  membership.cancel_date = member.cancelled_at if @member.status == "lapsed"
   if membership.changed.include?('status') and membership.status == "lapsed"
-    load_cancellation(@member.cancel_date)
+    load_cancellation(membership.cancel_date)
   end  
   membership.save!
+  @member.current_membership_id = membership.id
+  @member.save
+  e_info = PhoenixEnrollmentInfo.find_or_create_by_member_id(phoenix.id)
+  e_info.membership_id = membership.id
+  e_info.save
   set_cohort(membership)
 end
 
 def set_cohort(membership)
-  e_info = PhoenixEnrollmentInfo.find_by_member_id(membership.id)
+  e_info = PhoenixEnrollmentInfo.find_by_member_id(membership.member_id)
   unless e_info.nil?
-    phoenix.cohort = PhoenixMember.cohort_formula(membership.join_date, e_info, TIMEZONE, 
+    @member.cohort = PhoenixMember.cohort_formula(membership.join_date, e_info, TIMEZONE, 
         PhoenixTermsOfMembership.find(membership.terms_of_membership_id).installment_type)
-    phoenix.save
-    membership.cohort = phoenix.cohort
+    @member.save
+    membership.cohort = @member.cohort
     membership.save
-    e_info.cohort = phoenix.cohort
+    e_info.cohort = @member.cohort
     e_info.save
   end
 end
@@ -130,7 +140,7 @@ def update_members(cid)
           phoenix.save!
 
           # create Membership data
-          set_membership_data(tom_id, phoenix)
+          set_membership_data(tom_id, member)
 
           unless TEST
             phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
@@ -231,7 +241,7 @@ def add_new_members(cid)
         set_last_digits(phoenix_cc.id)
 
         # create Membership data
-        set_membership_data(tom_id, phoenix)
+        set_membership_data(tom_id, member)
 
         member.update_attribute :imported_at, Time.now.utc
         print "."
@@ -261,6 +271,8 @@ def fill_credit_card(phoenix_cc, member, phoenix)
   end
   phoenix_cc.expire_month = member.cc_month_exp
   phoenix_cc.expire_year = member.cc_year_exp
+  phoenix_cc.created_at = member.created_at
+  phoenix_cc.updated_at = member.updated_at
   fill_aus_attributes(phoenix_cc, member)
   phoenix_cc.member_id = phoenix.uuid
 end

@@ -2,7 +2,7 @@
 
 require 'import_models'
 
-@log = Logger.new('import_club_cash.log', 10, 1024000)
+@log = Logger.new('log/import_club_cash.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
 # https://redmine.xagax.com/issues/19806

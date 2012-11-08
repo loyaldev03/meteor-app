@@ -2,7 +2,7 @@
 
 require 'import_models'
 
-@log = Logger.new('import_operations.log', 10, 1024000)
+@log = Logger.new('log/import_operations.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
 def load_save_the_sales
