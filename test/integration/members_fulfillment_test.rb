@@ -694,7 +694,7 @@ test "Enroll a member with recurrent product and it on the list" do
     assert_equal(fulfillment.product_sku, 'CARD')
     assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
     assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
-    assert_equal(fulfillment.renewable_at, @saved_member.join_date + 1.year)
+    assert_equal(I18n.l(fulfillment.renewable_at, :format => :long), I18n.l(@saved_member.join_date + 1.year, :format => :long))
     assert_equal(fulfillment.recurrent, true)
     assert_equal(fulfillment.status, 'not_processed')
     assert_equal(fulfillment.product.stock,98)

@@ -670,7 +670,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     unsaved_member.gender = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member,credit_card)
-    @saved_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
+    @saved_member = Member.find_by_email(unsaved_member.email)
     wait_until{
       assert find_field('input_first_name').value == @saved_member.first_name
       assert find_field('input_last_name').value == @saved_member.last_name

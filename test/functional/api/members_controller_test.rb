@@ -154,7 +154,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "admin user should update member" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
     assert_difference('Operation.count') do
       generate_put_message
     end
@@ -163,7 +163,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "api_id should be updated if batch_update enabled" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
     new_api_id = @member.api_id.to_i + 10
 
     assert_difference('Operation.count') do
@@ -185,7 +185,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "representative user should update member" do
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card    
-    @member = FactoryGirl.create :member_with_api
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
     @enrollment_info = FactoryGirl.build :enrollment_info
     generate_put_message
     assert_response :success
@@ -194,7 +194,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "supervisor user should update member" do
     sign_in @supervisor_user
     @credit_card = FactoryGirl.build :credit_card    
-    @member = FactoryGirl.create :member_with_api
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
     @enrollment_info = FactoryGirl.build :enrollment_info
     generate_put_message
     assert_response :success
@@ -203,7 +203,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "api user should update member" do
     sign_in @api_user
     @credit_card = FactoryGirl.build :credit_card    
-    @member = FactoryGirl.create :member_with_api
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
     @enrollment_info = FactoryGirl.build :enrollment_info
     generate_put_message
     assert_response :success
@@ -212,7 +212,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "agency user should not update member" do
     sign_in @agency_agent
     @credit_card = FactoryGirl.build :credit_card    
-    @member = FactoryGirl.create :member_with_api
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
     @enrollment_info = FactoryGirl.build :enrollment_info
     generate_put_message
     assert_response :unauthorized

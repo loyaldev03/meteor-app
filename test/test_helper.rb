@@ -43,7 +43,8 @@ class ActiveSupport::TestCase
     active_member = FactoryGirl.create(member_type, { club: tom.club, current_membership: membership }.merge(member_args))
     active_member.memberships << membership
     active_member.save
-    FactoryGirl.create(enrollment_type, :member_id => active_member.id) unless enrollment_type.nil?
+    ei = FactoryGirl.create(enrollment_type, :member_id => active_member.id) unless enrollment_type.nil?
+    membership.enrollment_info = ei
     active_member.reload
     active_member
   end  
