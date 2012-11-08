@@ -1219,6 +1219,10 @@ class PhoenixMember < ActiveRecord::Base
       installment_type ].join('-').downcase
   end 
 
+  def terms_of_membership_id
+    PhoenixMembership.find_by_member_id(self.id).terms_of_membership_id rescue nil
+  end
+
   def phone_number=(phone)
     return if phone.nil?
     p = phone.gsub(/[\s~\(\/\-=\)"\_\.\[\]+]/, '')
@@ -1379,7 +1383,10 @@ class PhoenixEmailTemplate < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "email_templates" 
 end
-
+class PhoenixMembership < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "memberships" 
+end
 
 class Settings < Settingslogic
   source "application.yml"

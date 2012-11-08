@@ -64,7 +64,6 @@ def import_customer_notes
         exit
       end
     end
-    sleep(1)
   end
 end
 

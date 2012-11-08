@@ -19,7 +19,6 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.birth_date = member.birth_date
   phoenix.phone_number = member.phone
   phoenix.blacklisted = member.blacklisted
-  phoenix.join_date = convert_from_date_to_time(member.phoenix_join_date)
   phoenix.api_id = member.drupal_user_api_id
   phoenix.club_cash_expire_date = nil
   phoenix.club_cash_amount = 0
@@ -29,18 +28,13 @@ def set_member_data(phoenix, member, merge_member = false)
     phoenix.member_group_type_id = nil
   end
   unless merge_member
-    phoenix.quota = member.quota
     phoenix.created_at = member.created_at
     phoenix.updated_at = member.updated_at
     phoenix.member_since_date = convert_from_date_to_time(member.member_since_date)
   end
 end
-def add_enrollment_info(phoenix, member, campaign = nil)
-  e_info = PhoenixEnrollmentInfo.find_by_member_id(phoenix.id)
-  if e_info.nil?
-    e_info = PhoenixEnrollmentInfo.new 
-    e_info.member_id = phoenix.id
-  end
+def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
+  e_info = PhoenixEnrollmentInfo.find_or_create_by_member_id(phoenix.id)
   campaign = BillingCampaign.find_by_id(member.campaign_id) if campaign.nil?
   e_info.enrollment_amount = member.enrollment_amount_to_import
   e_info.product_sku = campaign.product_sku
@@ -50,7 +44,7 @@ def add_enrollment_info(phoenix, member, campaign = nil)
   e_info.fulfillment_code = campaign.fulfillment_code
   e_info.referral_host = campaign.referral_host
   e_info.landing_url = campaign.landing_url
-  e_info.terms_of_membership_id = phoenix.terms_of_membership_id
+  e_info.terms_of_membership_id = tom_id
   e_info.preferences = {}.to_json
   # e_info.preferences.each do |key, value|
   #   pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(phoenix.id, phoenix.club_id, key)
@@ -63,11 +57,6 @@ def add_enrollment_info(phoenix, member, campaign = nil)
   e_info.campaign_medium_version = campaign.campaign_medium_version
   e_info.joint = campaign.is_joint
   e_info.save
-  phoenix.cohort = PhoenixMember.cohort_formula(phoenix.join_date, e_info, TIMEZONE, 
-      PhoenixTermsOfMembership.find(phoenix.terms_of_membership_id).installment_type)
-  phoenix.save
-  e_info.cohort = phoenix.cohort
-  e_info.save
 end
 
 def fill_aus_attributes(cc, member)
@@ -75,6 +64,36 @@ def fill_aus_attributes(cc, member)
   cc.aus_answered_at = member.aus_answered_at
   cc.aus_sent_at = member.aus_sent_at
 end
+
+def set_membership_data(tom_id, phoenix)
+  membership = PhoenixMembership.find_or_create_by_member_id phoenix.id
+  membership.terms_of_membership_id = tom_id
+  membership.created_by_id = DEFAULT_CREATED_BY
+  membership.join_date = convert_from_date_to_time(@member.phoenix_join_date)
+  membership.status = phoenix.status
+  membership.quota = @member.quota
+  membership.member_id = phoenix.id
+  membership.cancel_date = @member.cancelled_at if phoenix.status == "lapsed"
+  if membership.changed.include?('status') and membership.status == "lapsed"
+    load_cancellation(@member.cancel_date)
+  end  
+  membership.save!
+  set_cohort(membership)
+end
+
+def set_cohort(membership)
+  e_info = PhoenixEnrollmentInfo.find_by_member_id(membership.id)
+  unless e_info.nil?
+    phoenix.cohort = PhoenixMember.cohort_formula(membership.join_date, e_info, TIMEZONE, 
+        PhoenixTermsOfMembership.find(membership.terms_of_membership_id).installment_type)
+    phoenix.save
+    membership.cohort = phoenix.cohort
+    membership.save
+    e_info.cohort = phoenix.cohort
+    e_info.save
+  end
+end
+
 
 # 1- update existing members
 def update_members(cid)
@@ -94,8 +113,7 @@ def update_members(cid)
           
           @member = phoenix
           set_member_data(phoenix, member)
-          add_enrollment_info(phoenix, member)
-          #TODO: puede haber cambio de TOM  en ONMC production ?
+          add_enrollment_info(phoenix, member, tom_id)
 
           phoenix.bill_date = convert_from_date_to_time(member.cs_next_bill_date)
           phoenix.next_retry_bill_date = convert_from_date_to_time(member.cs_next_bill_date)
@@ -110,6 +128,9 @@ def update_members(cid)
           end
 
           phoenix.save!
+
+          # create Membership data
+          set_membership_data(tom_id, phoenix)
 
           unless TEST
             phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
@@ -145,6 +166,7 @@ def update_members(cid)
     end
   end
 end
+
 
 # 2- import new members.
 def add_new_members(cid)
@@ -182,7 +204,6 @@ def add_new_members(cid)
 
         phoenix = PhoenixMember.new 
         phoenix.club_id = CLUB
-        phoenix.terms_of_membership_id = tom_id
         phoenix.visible_id = member.id
         set_member_data(phoenix, member)
         next_bill_date = convert_from_date_to_time(member.cs_next_bill_date)
@@ -195,25 +216,22 @@ def add_new_members(cid)
           phoenix.next_retry_bill_date = next_bill_date 
         else
           phoenix.recycled_times = 0
-          phoenix.cancel_date = member.cancelled_at
           phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
         end
-        phoenix.created_by_id = DEFAULT_CREATED_BY
         phoenix.save!
 
         @member = phoenix
-        add_enrollment_info(phoenix, member, @campaign)
+        add_enrollment_info(phoenix, member, tom_id, @campaign)
         add_operation(Time.now.utc, nil, nil, "Member imported into phoenix!", nil)  
-
-        if phoenix.status == "lapsed"
-          load_cancellation(@member.cancel_date)
-        end
 
         # create CC
         phoenix_cc = PhoenixCreditCard.new 
         fill_credit_card(phoenix_cc, member, phoenix)
         phoenix_cc.save!
         set_last_digits(phoenix_cc.id)
+
+        # create Membership data
+        set_membership_data(tom_id, phoenix)
 
         member.update_attribute :imported_at, Time.now.utc
         print "."
