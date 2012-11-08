@@ -25,10 +25,13 @@ class MesAccountUpdater
   def self.account_updater_process_answers(gateway)
     return if gateway.aus_login.nil? or gateway.aus_password.nil?
     answer = prepare_connection '/srv/api/ausStatus?', { :statusFilter => 'NEW' }, gateway
-    0.upto(answer['statusCount'].to_i-1) do |i|
-      request_file_by_id answer["rspfId_#{i}"], "rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
+    quantity = answer['statusCount'].to_i-1
+    if quantity > 0
+      0.upto(quantity) do |i|
+        request_file_by_id answer["rspfId_#{i}"], "rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
+      end
+      send_email_with_call_members
     end
-    send_email_with_call_members
   end
 
   def self.account_updater_send_file_to_process(gateway)
