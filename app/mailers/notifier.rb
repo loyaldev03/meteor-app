@@ -1,25 +1,30 @@
 class Notifier < ActionMailer::Base
   default from: "platform@xagax.com"
-  #default bcc: "platformadmins@xagax.com"
+  default bcc: "platformadmins@xagax.com"
   
   def prebill_renewal(email)
-    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "Renewal Pre bill email to #{email}"
+    destination = (Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email)
+    mail :to => destination, :subject => "Renewal Pre bill email to #{email}"
   end
 
   def pre_bill(email)
-    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "Pre bill email to #{email}"
+    destination = (Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email)
+    mail :to => destination, :subject => "Pre bill email to #{email}"
   end
 
   def cancellation(email)
-    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "cancellation to #{email}"
+    destination = (Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email)
+    mail :to => destination, :subject => "cancellation to #{email}"
   end
 
   def active(email)
-    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "active to #{email}"
+    destination = (Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email)
+    mail :to => destination, :subject => "active to #{email}"
   end
 
   def refund(email)
-    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "refund to #{email}"
+    destination = (Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email)
+    mail :to => destination, :subject => "refund to #{email}"
   end
 
   def active_with_approval(agent,member)
