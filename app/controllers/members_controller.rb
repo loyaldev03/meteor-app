@@ -155,19 +155,23 @@ class MembersController < ApplicationController
 
   def change_next_bill_date
     if request.post?
-      if params[:next_bill_date].to_date > Time.zone.now.to_date
-        begin
-          @current_member.change_next_bill_date!(params[:next_bill_date])
-          message = "Next bill date changed to #{params[:next_bill_date]}"
-          Auditory.audit(current_agent, @current_member, message, @current_member, Settings.operation_types.change_next_bill_date)
-          flash[:notice] = message
-          redirect_to show_member_path
-        rescue Exception => e
-          flash.now[:error] = "Could not set the NBD on this member. Ticket sent to IT"
-          Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e)
+      unless params[:next_bill_date].blank?
+        if params[:next_bill_date].to_date > Time.zone.now.to_date
+          begin
+            @current_member.change_next_bill_date!(params[:next_bill_date])
+            message = "Next bill date changed to #{params[:next_bill_date]}"
+            Auditory.audit(current_agent, @current_member, message, @current_member, Settings.operation_types.change_next_bill_date)
+            flash[:notice] = message
+            redirect_to show_member_path
+          rescue Exception => e
+            flash.now[:error] = "Could not set the NBD on this member. Ticket sent to IT"
+            Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e)
+          end
+        else
+          flash.now[:error] = "Next bill date should be older that actual date."
         end
       else
-        flash.now[:error] = "Next bill date should be older that actual date."
+        flash.now[:error] = "Next bill date should not be blank."
       end
     end
   end
