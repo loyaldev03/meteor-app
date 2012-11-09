@@ -851,20 +851,25 @@ class Member < ActiveRecord::Base
         end
         new_number = credit_card[:number]
       end
-
-      new_number = active_credit_card.number if new_number.nil?
-      new_year = credit_card[:expire_year] if credit_card[:expire_year] != active_credit_card.expire_year  
-      new_month = credit_card[:expire_month] if credit_card[:expire_month] != ("%02d" % active_credit_card.expire_month)
+      
+      new_year = credit_card[:expire_year] if credit_card[:expire_year].to_i != active_credit_card.expire_year  
+      new_month = credit_card[:expire_month] if credit_card[:expire_month].to_i != active_credit_card.expire_month
       
       if new_number or new_year or new_month
+        new_number = active_credit_card.number if new_number.nil?
         credit_card_to_update = CreditCard.new(:number => new_number, :expire_month => new_month, :expire_year => new_year)
-        if credit_card_to_update.valid?
+        credit_card_to_update.member = self
+
+        if credit_card_to_update.valid? 
           CreditCard.new_expiration_on_active_credit_card(active_credit_card, new_year, new_month, new_number, false)
+          {:code => Settings.error_codes.success, :message => "Credit card #{credit_card_to_update.last_digits} added and activated." }
         else
-          { :code => Settings.error_codes.invalid_credit_card }
+          { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card }
         end
+      else
+        { :code => Settings.error_codes.success } 
       end
-      { :code => Settings.error_codes.success }
+      
     end
 
     def desnormalize_preferences
