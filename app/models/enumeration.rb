@@ -3,6 +3,7 @@ class Enumeration < ActiveRecord::Base
   belongs_to :club
 
   acts_as_paranoid
+  validates_as_paranoid
   acts_as_list :scope => [:type, :club_id]
 
   validates_presence_of :name
