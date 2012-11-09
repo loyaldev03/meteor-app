@@ -171,7 +171,7 @@ class MembersController < ApplicationController
           flash.now[:error] = "Next bill date should be older that actual date."
         end
       else
-        flash.now[:error] = "Next bill date should not be blank."
+        flash.now[:error] = Settings.error_messages.next_bill_date_blank
       end
     end
   end

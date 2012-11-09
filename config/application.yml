@@ -75,6 +75,7 @@ defaults: &defaults
     refund_invalid: "Cant credit more $ than the original transaction amount"
     credit_card_blank_with_grace: "Payment gateway not found."
     duplicate_transaction: "Duplicated Transaction:"
+    next_bill_date_blank: "Next bill date should not be blank."
   error_codes:
     success: '000'
     not_found: '401'

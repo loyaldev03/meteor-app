@@ -324,6 +324,22 @@ class MembersBillTest < ActionController::IntegrationTest
     end
   end  
 
+  test "Change Next Bill Date for blank" do
+    setup_member
+    @saved_member.set_as_canceled
+    @saved_member.recover(@terms_of_membership_with_gateway)
+    @saved_member.set_as_active
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    
+    click_link_or_button 'Change'
+    wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
+
+    click_link_or_button 'Change next bill date'
+    wait_until{ assert page.has_content?(Settings.error_messages.next_bill_date_blank) }
+  end  
+
+
   test "Change Next Bill Date for tomorrow" do
     setup_member
     @saved_member.set_as_canceled
