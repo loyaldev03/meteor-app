@@ -102,7 +102,7 @@ def delete_transactions(member)
   tz = Time.now.utc
   transactions = Transaction.find_all_by_member_id(member.id)
   transactions.each do |transaction|
-    transaction.delete
+    transaction.delete rescue nil
   end
   @log.info "    ... took #{Time.now.utc - tz} to delete member's transactions."
 end
