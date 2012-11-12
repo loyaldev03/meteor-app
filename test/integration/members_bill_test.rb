@@ -125,7 +125,6 @@ class MembersBillTest < ActionController::IntegrationTest
       
       within("#operations_table") do 
         wait_until {
-          assert page.has_content?("Communication 'Test refund' sent")
           assert page.has_content?("Credit success $#{final_amount}")
         }
       end
@@ -247,7 +246,6 @@ class MembersBillTest < ActionController::IntegrationTest
     
     within("#operations_table") do 
       wait_until {
-        assert page.has_content?("Communication 'Test refund' sent")
         assert page.has_content?("Credit success $#{final_amount}")
       }
     end
@@ -554,13 +552,7 @@ test "Partial refund from CS" do
     sleep 1
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-   
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Communication 'Test prebill' sent")
-      }
-    end
-  end
+     end
 
 end
 
