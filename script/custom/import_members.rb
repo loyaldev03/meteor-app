@@ -14,7 +14,7 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.city = member.city
   phoenix.state = member.state
   phoenix.zip = member.zip
-  phoenix.country = member.country
+  phoenix.country = (member.country.nil? ? 'US' : member.country)
   phoenix.joint = member.joint
   phoenix.birth_date = member.birth_date
   phoenix.phone_number = member.phone
@@ -85,7 +85,7 @@ def set_membership_data(tom_id, member)
   membership.save!
   @member.current_membership_id = membership.id
   @member.save
-  e_info = PhoenixEnrollmentInfo.find_or_create_by_member_id(phoenix.id)
+  e_info = PhoenixEnrollmentInfo.find_or_create_by_member_id(@member.id)
   e_info.membership_id = membership.id
   e_info.save
   set_cohort(membership)
