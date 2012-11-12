@@ -506,7 +506,11 @@ class Member < ActiveRecord::Base
   end
 
   def pardot_member
-    @pardot_member ||= Pardot::Member.new self
+    @pardot_member ||= if !self.pardot_sync?
+      nil
+    else
+      Pardot::Member.new self
+    end
   end
 
   def skip_pardot_sync!

@@ -1,55 +1,52 @@
 module Pardot
   class Member < Struct.new(:member)
-    OBSERVED_FIELDS = %w(first_name last_name gender address city email phone_country_code phone_area_code phone_local_number state zip country visible_id type_of_phone_number birth_date type_of_phone_number).to_set.freeze
+    MEMBER_OBSERVED_FIELDS = %w(first_name last_name address city email phone_country_code phone_area_code phone_local_number state zip visible_id birth_date blacklisted preferences status member_since_date wrong_address wrong_phone_number joint next_bill_date).to_set.freeze
+    MEMBERSHIP_OBSERVED_FIELDS = %w(terms_of_membership join_date cancel_date).to_set.freeze
+    ENROLLMENT_INFO_OBSERVED_FIELDS = %w(marketing_code mega_channel fulfillment_code campaign_medium_version campaign_medium product_sku landing_url enrollment_amount).to_set.freeze
 
-    def update!(options = {})
+    def save!(options = {})
       if options[:force] || sync_fields.present? # change tracking
-        begin
-          res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }, fieldmap)
-        rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
-          Drupal.logger.info "  => #{$!.to_s}"
-        ensure
-          update_member(res)
-          res
+        unless self.member.email.include?('@noemail.com') # do not sync @noemail.com
+          begin
+            res = conn.prospects.upsert_by_email(self.member.email, fieldmap)
+          rescue Exception
+            Pardot.logger.info "  => #{$!.to_s}"
+          ensure
+            update_member(res)
+            res
+          end
         end
       end
     end
 
-    def create!(options = {})
-      res = conn.post '/api/user', fieldmap
-      update_member(res)
-    end
-
-    def save!(options = {})
-      self.new_record? ? self.create!(options) : self.update!(options)
-    end
-
     def new_record?
-      self.member.api_id.nil?
+      self.member.pardot_id.nil?
     end
 
   private
     def sync_fields
-      OBSERVED_FIELDS.intersection(self.member.changed)
+      MEMBER_OBSERVED_FIELDS.intersection(self.member.changed)
     end
 
     def conn
-      self.member.club.drupal
+      self.member.club.pardot
     end
 
     def update_member(res, destroy = false)
       if res
         data = if res.status == 200
           { 
-            api_id: ( destroy ? nil : res.body['uid'] ),
-            last_synced_at: Time.now,
-            last_sync_error: nil,
-            last_sync_error_at: nil
+            pardot_id: res.body['uid'],
+            pardot_last_synced_at: Time.now,
+            pardot_synced_status: 'synced',
+            pardot_last_sync_error: nil,
+            pardot_last_sync_error_at: nil
           }
         else
           {
-            last_sync_error: res.body.respond_to?(:[]) ? res.body[:message] : res.body,
-            last_sync_error_at: Time.now
+            pardot_last_sync_error: res.body.respond_to?(:[]) ? res.body[:message] : res.body,
+            pardot_synced_status: 'error',
+            pardot_last_sync_error_at: Time.now
           }
         end
         ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
@@ -59,135 +56,46 @@ module Pardot
 
     def fieldmap
       m = self.member
-
-      map = { 
-        mail: m.email,
-        field_profile_address: { 
-          und: [ 
-            { 
-              value: m.address
-            } 
-          ] 
-        }, 
-        field_profile_firstname: { 
-          und: [ 
-            { 
-              value: m.first_name
-            } 
-          ] 
-        }, 
-        field_profile_lastname: { 
-          und: [ 
-            { 
-              value: m.last_name
-            } 
-          ] 
-        }, 
-        field_profile_city: { 
-          und: [ 
-            { 
-              value: m.city
-            } 
-          ] 
-        },
-        field_profile_gender: { 
-          und: { select: (m.gender.blank? ? "_none" : m.gender) }
-        },
-        field_profile_phone_type: { 
-          und: ( m.type_of_phone_number.blank? ? { "select" => "_none" } : { "select" => "select_or_other", "other" => m.type_of_phone_number.downcase } )
-        },
-        field_profile_phone_country_code: { 
-          und: [ 
-            { 
-              value: m.phone_country_code
-            } 
-          ] 
-        },
-        field_profile_phone_area_code: { 
-          und: [ 
-            { 
-              value: m.phone_area_code
-            } 
-          ] 
-        },
-        field_profile_phone_local_number: { 
-          und: [ 
-            { 
-              value: m.phone_local_number
-            } 
-          ] 
-        },
-        field_profile_stateprovince: { 
-          und: { 
-            select: m.state
-          } 
-        }, 
-        field_profile_zip: { 
-          und: [ 
-            {
-              value: m.zip
-            } 
-          ] 
-        }, 
-        field_profile_country: { 
-          und: {
-            select: m.country
-          } 
-        },
-        field_profile_dob: {
-          und: [
-            {
-              value: { date: (m.birth_date.nil? ? '' : m.birth_date.to_date.strftime("%m/%d/%Y")) }
-            }
-          ]
-        }
+      map = {
+        first_name: m.first_name,
+        last_name: m.last_name,
+        email: m.email,
+        address_one: m.address,
+        city: m.city,
+        state: m.state,
+        zip: m.zip,
+        country: m.country,
+        phone_number: m.full_phone_number,
+        opted_out: m.blacklisted,
+        birth_date: m.birth_date,
+        preferences: m.preferences,
+        gender: m.gender,
+        status: m.status,
+        terms_of_membership: m.terms_of_membership_id,
+        member_since_date: m.member_since_date,
+        wrong_address: m.wrong_address,
+        wrong_phone_number: m.wrong_phone_number,
+        join_date: m.join_date,
+        joint: m.joint,
+        cancel_date: m.cancel_date,
+        next_bill_date: m.bill_date,
+        marketing_code: m.current_membership.enrollment_info.marketing_code,
+        mega_channel: m.current_membership.enrollment_info.mega_channel,
+        fulfillment_code: m.current_membership.enrollment_info.fulfillment_code,
+        campaign_medium_version: m.current_membership.enrollment_info.campaign_medium_version,
+        campaign_medium: m.current_membership.enrollment_info.campaign_medium,
+        product_sku: m.current_membership.enrollment_info.product_sku,
+        landing_url: m.current_membership.enrollment_info.landing_url,
+        enrollment_amount: m.current_membership.enrollment_info.enrollment_amount,
+        installment_amount: m.terms_of_membership.installment_amount
       }
-
       if self.new_record?
         map.merge!({
-          pass: SecureRandom.hex, 
-          field_phoenix_member_vid: {
-            und: [ { value: m.visible_id } ]
-          },
-          field_phoenix_member_uuid: {
-            und: [ { value: m.uuid } ]
-          }
+          uuid: m.uuid,
+          visible_id: m.visible_id,
+          club: m.club_id,
+          client: m.club.partner_id,
         })
-      else
-        map.merge!({
-          field_profile_member_id: { 
-            und: [ { value: m.reload.visible_id } ] 
-          }
-        })
-      end
-
-      # Add credit card information
-      cc = m.active_credit_card
-      if cc
-        map.merge!({
-          field_profile_cc_month: {
-            und: "%02d" % cc.expire_month.to_s
-          },
-          field_profile_cc_year: {
-            und: cc.expire_year.to_s
-          },
-          field_profile_cc_number: {
-            und: [{
-              value: "XXXX-XXXX-XXXX-%{last_digits}" % { last_digits: cc.number.to_s[-4..-1] }
-            }]
-          }
-        })
-      end
-
-      # Add dynamyc preferences.
-      unless m.preferences.nil?
-        m.preferences.each do |key, value|
-          map.merge!({
-            "field_phoenix_pref_#{key}" =>  {
-              und: ( value.nil? ? { "select" => "_none" } : { "select" => "select_or_other", "other" => value } )
-            }
-          })
-        end
       end
       map
     end

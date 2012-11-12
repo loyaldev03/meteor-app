@@ -44,6 +44,11 @@ class Club < ActiveRecord::Base
     [self.api_type, self.api_username, self.api_password].none?(&:blank?)
   end
 
+  def pardot_sync?
+    [self.pardot_email, self.pardot_password, self.pardot_user_key].none?(&:blank?)
+  end
+
+
   private
     def add_default_member_groups
       ['VIP', 'Celebrity', 'Notable'].each do |name|

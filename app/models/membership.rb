@@ -8,12 +8,23 @@ class Membership < ActiveRecord::Base
   attr_accessible :created_by, :join_date, :status, :cancel_date, :quota, :terms_of_membership_id
 
   before_create :set_default_quota
+  after_update :after_save_sync_to_remote_domain
 
   # validates :terms_of_membership, :presence => true
   # validates :member, :presence => true
 
   def self.datatable_columns
     ['id', 'status', 'tom', 'join_date', 'cancel_date', 'quota' ]
+  end
+
+  def after_save_sync_to_remote_domain
+    pm = member.pardot_member
+    member.pardot_member.save!(force: true) unless pm.nil?
+  rescue Exception => e
+    # refs #21133
+    # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
+    # Because maybe we have already bill this member.
+    Airbrake.notify(:error_class => "Membership:#{type.to_s}:sync", :error_message => e, :parameters => { :member => self.inspect })
   end
 
   private 
