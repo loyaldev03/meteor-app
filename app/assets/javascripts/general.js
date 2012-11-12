@@ -264,7 +264,6 @@ $(document).ready( function() {
     $('form').submit( function(event) {
       $('#submit_button').attr('disabled', 'disabled');
       event.preventDefault();
-      alert("JÑA");
       $.ajax({
         type: 'PUT',
         url: "/api/v1/members/"+id,
@@ -272,22 +271,8 @@ $(document).ready( function() {
         success: function(data) {
           alert(data.message);
           $('input').parent().parent().removeClass("error");
-          if (data.code == 000){
-            alert("Exito!");
-            // window.location.replace('../'+v_id);
-          }
-          else{
+          if (data.code != 000){
             $('#submit_button').removeAttr('disabled');
-            alert("Problema en la carga");
-            // $('#error_explanation').show();
-            // $('#error_explanation ul').empty();
-            // $('#error_explanation ul').append("<b>"+data.message+"</b>");
-            // for (var key in data.errors){
-            //   if (data.errors.hasOwnProperty(key)) {
-            //     $('#member_'+key).parent().parent().addClass("error");
-            //     $('#error_explanation ul').append("<li>"+key+': '+data.errors[key]+"</li>");
-            //   }     
-            // }       
           }
         }
       });
