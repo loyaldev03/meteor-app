@@ -1,0 +1,198 @@
+module Pardot
+  class Member < Struct.new(:member)
+    OBSERVED_FIELDS = %w(first_name last_name gender address city email phone_country_code phone_area_code phone_local_number state zip country visible_id type_of_phone_number birth_date type_of_phone_number).to_set.freeze
+
+    def update!(options = {})
+      if options[:force] || sync_fields.present? # change tracking
+        begin
+          res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }, fieldmap)
+        rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
+          Drupal.logger.info "  => #{$!.to_s}"
+        ensure
+          update_member(res)
+          res
+        end
+      end
+    end
+
+    def create!(options = {})
+      res = conn.post '/api/user', fieldmap
+      update_member(res)
+    end
+
+    def save!(options = {})
+      self.new_record? ? self.create!(options) : self.update!(options)
+    end
+
+    def new_record?
+      self.member.api_id.nil?
+    end
+
+  private
+    def sync_fields
+      OBSERVED_FIELDS.intersection(self.member.changed)
+    end
+
+    def conn
+      self.member.club.drupal
+    end
+
+    def update_member(res, destroy = false)
+      if res
+        data = if res.status == 200
+          { 
+            api_id: ( destroy ? nil : res.body['uid'] ),
+            last_synced_at: Time.now,
+            last_sync_error: nil,
+            last_sync_error_at: nil
+          }
+        else
+          {
+            last_sync_error: res.body.respond_to?(:[]) ? res.body[:message] : res.body,
+            last_sync_error_at: Time.now
+          }
+        end
+        ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+        self.member.reload rescue self.member
+      end
+    end
+
+    def fieldmap
+      m = self.member
+
+      map = { 
+        mail: m.email,
+        field_profile_address: { 
+          und: [ 
+            { 
+              value: m.address
+            } 
+          ] 
+        }, 
+        field_profile_firstname: { 
+          und: [ 
+            { 
+              value: m.first_name
+            } 
+          ] 
+        }, 
+        field_profile_lastname: { 
+          und: [ 
+            { 
+              value: m.last_name
+            } 
+          ] 
+        }, 
+        field_profile_city: { 
+          und: [ 
+            { 
+              value: m.city
+            } 
+          ] 
+        },
+        field_profile_gender: { 
+          und: { select: (m.gender.blank? ? "_none" : m.gender) }
+        },
+        field_profile_phone_type: { 
+          und: ( m.type_of_phone_number.blank? ? { "select" => "_none" } : { "select" => "select_or_other", "other" => m.type_of_phone_number.downcase } )
+        },
+        field_profile_phone_country_code: { 
+          und: [ 
+            { 
+              value: m.phone_country_code
+            } 
+          ] 
+        },
+        field_profile_phone_area_code: { 
+          und: [ 
+            { 
+              value: m.phone_area_code
+            } 
+          ] 
+        },
+        field_profile_phone_local_number: { 
+          und: [ 
+            { 
+              value: m.phone_local_number
+            } 
+          ] 
+        },
+        field_profile_stateprovince: { 
+          und: { 
+            select: m.state
+          } 
+        }, 
+        field_profile_zip: { 
+          und: [ 
+            {
+              value: m.zip
+            } 
+          ] 
+        }, 
+        field_profile_country: { 
+          und: {
+            select: m.country
+          } 
+        },
+        field_profile_dob: {
+          und: [
+            {
+              value: { date: (m.birth_date.nil? ? '' : m.birth_date.to_date.strftime("%m/%d/%Y")) }
+            }
+          ]
+        }
+      }
+
+      if self.new_record?
+        map.merge!({
+          pass: SecureRandom.hex, 
+          field_phoenix_member_vid: {
+            und: [ { value: m.visible_id } ]
+          },
+          field_phoenix_member_uuid: {
+            und: [ { value: m.uuid } ]
+          }
+        })
+      else
+        map.merge!({
+          field_profile_member_id: { 
+            und: [ { value: m.reload.visible_id } ] 
+          }
+        })
+      end
+
+      # Add credit card information
+      cc = m.active_credit_card
+      if cc
+        map.merge!({
+          field_profile_cc_month: {
+            und: "%02d" % cc.expire_month.to_s
+          },
+          field_profile_cc_year: {
+            und: cc.expire_year.to_s
+          },
+          field_profile_cc_number: {
+            und: [{
+              value: "XXXX-XXXX-XXXX-%{last_digits}" % { last_digits: cc.number.to_s[-4..-1] }
+            }]
+          }
+        })
+      end
+
+      # Add dynamyc preferences.
+      unless m.preferences.nil?
+        m.preferences.each do |key, value|
+          map.merge!({
+            "field_phoenix_pref_#{key}" =>  {
+              und: ( value.nil? ? { "select" => "_none" } : { "select" => "select_or_other", "other" => value } )
+            }
+          })
+        end
+      end
+      map
+    end
+  end
+end
+
+
+

@@ -41,28 +41,3 @@
     </tr>
     </thead>
   </table>
-
-<table class="table table-bordered table-condensed" id="table_email_template">
-  <thead>
-    <tr> <th colspan="3"> <%= t('activerecord.email_template') %> </th> </tr>
-    <tr>
-  	  <th> <%= t('activerecord.attributes.email_template.name') %> </th>
-  	  <th> <%= t('activerecord.attributes.email_template.type') %> </th>
-     	<th> <%= t('activerecord.attributes.email_template.client') %> </th>
-      <th> <%= t('activerecord.attributes.email_template.external_attributes')%>
-    </tr>
-  </thead>
-  <tbody>
-  	<% @email_templates.each do |et| %>
-  	<tr>
-  	  <td> <%= et.name %> </td>
-  	  <td> <%= et.template_type%> </td>
-  	  <td> <%= et.client %> </td>
-      <td> <%= et.external_attributes.to_s %> </td>
-  	</tr>
-  	<% end %>
-  </tbody>
-  <tfoot>
-    <tr> <td colspan="4"> <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => "btn" %> </td> </tr>
-  </tfoot>
-</table>

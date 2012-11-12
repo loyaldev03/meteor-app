@@ -1,5 +1,4 @@
 require 'auditory'
-require 'lyris_service'
 require 'clean_find_in_batches'
 require 'csv'
 
