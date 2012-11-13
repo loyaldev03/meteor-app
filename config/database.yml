@@ -1,6 +1,6 @@
 development:
   adapter: mysql2
-  database: sac_platform_development
+  database: sac_platform_development_pardot
   host: localhost
   user: root
   encoding: utf8
