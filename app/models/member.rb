@@ -505,6 +505,10 @@ class Member < ActiveRecord::Base
     @skip_api_sync = true
   end
 
+  def pardot_sync?
+    self.club.pardot_sync?
+  end
+
   def pardot_member
     @pardot_member ||= if !self.pardot_sync?
       nil

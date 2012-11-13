@@ -19,12 +19,12 @@ class Membership < ActiveRecord::Base
 
   def after_save_sync_to_remote_domain
     pm = member.pardot_member
-    member.pardot_member.save!(force: true) unless pm.nil?
+    pm.save!(force: true) unless pm.nil?
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
     # Because maybe we have already bill this member.
-    Airbrake.notify(:error_class => "Membership:#{type.to_s}:sync", :error_message => e, :parameters => { :member => self.inspect })
+    Airbrake.notify(:error_class => "Membership:sync", :error_message => e, :parameters => { :membership => self.inspect })
   end
 
   private 

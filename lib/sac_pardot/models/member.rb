@@ -8,8 +8,10 @@ module Pardot
       if options[:force] || sync_fields.present? # change tracking
         unless self.member.email.include?('@noemail.com') # do not sync @noemail.com
           begin
-            res = conn.prospects.upsert_by_email(self.member.email, fieldmap)
-          rescue Exception
+            res = conn.prospects.upsert_by_email(CGI.escape(self.member.email), fieldmap)
+            Pardot.logger.debug res
+          rescue Exception => e
+            res = $!.to_s
             Pardot.logger.info "  => #{$!.to_s}"
           ensure
             update_member(res)
@@ -33,25 +35,23 @@ module Pardot
     end
 
     def update_member(res, destroy = false)
-      if res
-        data = if res.status == 200
-          { 
-            pardot_id: res.body['uid'],
-            pardot_last_synced_at: Time.now,
-            pardot_synced_status: 'synced',
-            pardot_last_sync_error: nil,
-            pardot_last_sync_error_at: nil
-          }
-        else
-          {
-            pardot_last_sync_error: res.body.respond_to?(:[]) ? res.body[:message] : res.body,
-            pardot_synced_status: 'error',
-            pardot_last_sync_error_at: Time.now
-          }
-        end
-        ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
-        self.member.reload rescue self.member
+      data = if res.has_key? 'id'
+        { 
+          pardot_id: res['id'],
+          pardot_last_synced_at: Time.zone.now,
+          pardot_synced_status: 'synced',
+          pardot_last_sync_error: nil,
+          pardot_last_sync_error_at: nil
+        }
+      else
+        {
+          pardot_last_sync_error: res,
+          pardot_synced_status: 'error',
+          pardot_last_sync_error_at: Time.zone.now
+        }
       end
+      ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+      self.member.reload rescue self.member
     end
 
     def fieldmap
