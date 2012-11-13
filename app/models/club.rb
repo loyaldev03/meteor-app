@@ -19,7 +19,7 @@ class Club < ActiveRecord::Base
     foreign_key: 'drupal_domain_id'
 
   attr_accessible :description, :name, :logo, :drupal_domain_id, :theme, :requires_external_id,
-    :api_type, :api_username, :api_password, :time_zone
+    :api_type, :api_username, :api_password, :time_zone, :pardot_email, :pardot_password, :pardot_user_key
 
   acts_as_paranoid
 
