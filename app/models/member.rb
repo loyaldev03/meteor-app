@@ -102,7 +102,7 @@ class Member < ActiveRecord::Base
   scope :with_address_like, lambda { |value| where('address like ?', '%'+value+'%') unless value.blank? }
   scope :with_city_like, lambda { |value| where('city like ?', '%'+value+'%') unless value.blank? }
   scope :with_state_like, lambda { |value| where('state like ?', '%'+value+'%') unless value.blank? }
-  scope :with_zip, lambda { |value| where('zip = ?', value) unless value.blank? }
+  scope :with_zip, lambda { |value| where('zip like ?', '%'+value+'%') unless value.blank? }
   scope :with_email_like, lambda { |value| where('email like ?', '%'+value+'%') unless value.blank? }
   scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value) unless value.blank? }
   scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value+'%') unless value.blank? }
