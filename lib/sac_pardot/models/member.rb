@@ -1,8 +1,8 @@
 module Pardot
   class Member < Struct.new(:member)
-    MEMBER_OBSERVED_FIELDS = %w(first_name last_name address city email phone_country_code phone_area_code phone_local_number state zip visible_id birth_date blacklisted preferences status member_since_date wrong_address wrong_phone_number joint next_bill_date).to_set.freeze
-    MEMBERSHIP_OBSERVED_FIELDS = %w(terms_of_membership join_date cancel_date).to_set.freeze
-    ENROLLMENT_INFO_OBSERVED_FIELDS = %w(marketing_code mega_channel fulfillment_code campaign_medium_version campaign_medium product_sku landing_url enrollment_amount).to_set.freeze
+    MEMBER_OBSERVED_FIELDS = %w(first_name last_name address city email phone_country_code phone_area_code phone_local_number state zip visible_id birth_date blacklisted preferences status member_since_date wrong_address wrong_phone_number bill_date gender external_id autologin_url country member_group_type_id club_cash_amount).to_set.freeze
+    MEMBERSHIP_OBSERVED_FIELDS = %w(terms_of_membership join_date cancel_date quota).to_set.freeze
+    ENROLLMENT_INFO_OBSERVED_FIELDS = %w(joint marketing_code mega_channel fulfillment_code campaign_medium_version campaign_medium product_sku landing_url enrollment_amount).to_set.freeze
 
     def save!(options = {})
       if options[:force] || sync_fields.present? # change tracking
@@ -56,6 +56,7 @@ module Pardot
 
     def fieldmap
       m = self.member
+      cm = m.current_membership
       map = {
         first_name: m.first_name,
         last_name: m.last_name,
@@ -71,24 +72,43 @@ module Pardot
         preferences: m.preferences,
         gender: m.gender,
         status: m.status,
-        terms_of_membership: m.terms_of_membership_id,
         member_since_date: m.member_since_date,
         wrong_address: m.wrong_address,
         wrong_phone_number: m.wrong_phone_number,
-        join_date: m.join_date,
-        joint: m.joint,
-        cancel_date: m.cancel_date,
-        next_bill_date: m.bill_date,
-        marketing_code: m.current_membership.enrollment_info.marketing_code,
-        mega_channel: m.current_membership.enrollment_info.mega_channel,
-        fulfillment_code: m.current_membership.enrollment_info.fulfillment_code,
-        campaign_medium_version: m.current_membership.enrollment_info.campaign_medium_version,
-        campaign_medium: m.current_membership.enrollment_info.campaign_medium,
-        product_sku: m.current_membership.enrollment_info.product_sku,
-        landing_url: m.current_membership.enrollment_info.landing_url,
-        enrollment_amount: m.current_membership.enrollment_info.enrollment_amount,
-        installment_amount: m.terms_of_membership.installment_amount
+        external_id: m.external_id,
+        club_cash_amount: m.club_cash_amount,
+        autologin_url: m.autologin_url,
+        next_bill_date: m.bill_date
       }
+
+      unless m.member_group_type_id.nil?
+        map.merge!({ member_group_type: m.member_group_type.name })
+      end
+
+      unless cm.nil?
+        e = cm.enrollment_info
+        unless e.nil?
+          map.merge!({
+            marketing_code: e.marketing_code,
+            mega_channel: e.mega_channel,
+            joint: e.joint,
+            fulfillment_code: e.fulfillment_code,
+            campaign_medium_version: e.campaign_medium_version,
+            campaign_medium: e.campaign_medium,
+            product_sku: e.product_sku,
+            landing_url: e.landing_url,
+            enrollment_amount: e.enrollment_amount
+          })
+        end
+        map.merge!({ 
+          installment_amount: cm.terms_of_membership.installment_amount,
+          terms_of_membership: cm.terms_of_membership_id,
+          quota: cm.quota,
+          join_date: cm.join_date,
+          cancel_date: cm.cancel_date
+        })
+      end
+      
       if self.new_record?
         map.merge!({
           uuid: m.uuid,

@@ -637,7 +637,7 @@ class Member < ActiveRecord::Base
 
   def update_member_data_by_params(params)
     [ :first_name, :last_name, :address, :state, :city, :country, :zip,
-      :email, :birth_date, :joint, :gender,
+      :email, :birth_date, :gender,
       :phone_country_code, :phone_area_code, :phone_local_number, 
       :member_group_type_id, :preferences, :external_id ].each do |key|
           self.send("#{key}=", params[key]) if params.include? key
