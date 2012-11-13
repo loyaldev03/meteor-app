@@ -13,15 +13,19 @@ class CreditCardsController < ApplicationController
     credit_card.member_id = @current_member.id
     actual_credit_card = @current_member.active_credit_card
 
-    if credit_card.am_card.valid?
-      if credit_card.save && actual_credit_card.deactivate
-        message = "Credit card #{credit_card.last_digits} added and activated."
-        Auditory.audit(@current_agent, credit_card, message, @current_member)
-        redirect_to show_member_path(:id => @current_member), notice: message
-        return
-      end
+    if credit_card.number == actual_credit_card.number and credit_card.expire_year == actual_credit_card.expire_year and credit_card.expire_month == actual_credit_card.expire_month 
+      response = { :code => Settings.error_codes.invalid_credit_card,  :message => "Credit card is already set as active." }
+    else
+      response = @current_member.update_credit_card_from_drupal(params[:credit_card])
     end
-    flash.now[:error] = "Credit card is invalid or is expired!"
+
+    if response[:code] == Settings.error_codes.success
+      Auditory.audit(@current_agent, @current_member.active_credit_card, response[:message], @current_member)
+      flash.now[:notice] = response[:message]
+    else
+      flash.now[:error] = "#{response[:message]} #{response[:errors].to_s}"
+    end
+
     render "new"
   end
 

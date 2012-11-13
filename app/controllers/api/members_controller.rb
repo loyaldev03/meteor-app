@@ -157,7 +157,12 @@ class Api::MembersController < ApplicationController
                                                           member.phone_area_code != params[:member][:phone_area_code].to_i ||
                                                           member.phone_local_number != params[:member][:phone_local_number].to_i)
 
-    response = member.update_credit_card_from_drupal(params[:member][:credit_card])
+    if new_credit_card.number == member.active_credit_card.number and new_credit_card.expire_month == member.active_credit_card.expire_month and new_credit_card.expire_year == member.active_credit_card.expire_year
+      { :code => Settings.error_codes.invalid_credit_card,  :message => "Credit card is already set as active." }
+    else
+      response = member.update_credit_card_from_drupal(params[:member][:credit_card])
+    end
+
     if response[:code] != Settings.error_codes.success
       Auditory.audit(current_agent, member, response[:message], member, response[:code])
     else

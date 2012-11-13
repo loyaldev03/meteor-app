@@ -2,13 +2,6 @@
 
 <%= render :partial => "shared/member_information" %>
 
-<%= form_for @credit_card, :as => :member, :url => credit_cards_path, do |f| %>
+<%= form_for @credit_card, :as => :credit_card, :url => credit_cards_path, do |f| %>
   <%= render :partial => 'form', :locals => { :f => f } %>
 <% end%>
-
-<script type="text/javascript"> 
-  var v_id = <%= @current_member.visible_id %>; 
-  var id = "<%= @current_member.id %>"; 
-  $(document).ready( add_credit_card() );
-</script> 
-

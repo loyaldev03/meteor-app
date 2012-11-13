@@ -1,20 +1,18 @@
 <table class="table table-bordered" >
-  <%= f.fields_for :credit_card do |credit_Card| %>
   <tr>
     <td> 
-      <%= credit_Card.label :encrypted_number, t('activerecord.attributes.credit_card.encrypted_number'), :class => 'help-inline' %> 
-      <%= credit_Card.text_field :number, :class => 'text_field input-medium'%> 
+      <%= f.label :encrypted_number, t('activerecord.attributes.credit_card.encrypted_number'), :class => 'help-inline' %> 
+      <%= f.text_field :number, :class => 'text_field input-medium'%> 
     <td> 
-      <%= credit_Card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' 
+      <%= f.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' 
       %> 
-      <%= credit_Card.text_field :expire_month, :class => 'text_field input-small'%>
-      <%= credit_Card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %> 
-      <%= credit_Card.text_field :expire_year, :class => 'text_field input-small' %>
+      <%= f.text_field :expire_month, :class => 'text_field input-small'%>
+      <%= f.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %> 
+      <%= f.text_field :expire_year, :class => 'text_field input-small' %>
     </td>
   </tr>
   <tr class="control-group">
-    <th colspan="2"> <%= credit_Card.submit t('buttons.save_credit_card'), :class => 'btn btn-primary' %>
+    <th colspan="2"> <%= f.submit t('buttons.save_credit_card'), :class => 'btn btn-primary' %>
     <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => 'btn' %> </th>
   </tr>
-  <% end %>
 </table>

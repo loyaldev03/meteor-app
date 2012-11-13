@@ -260,25 +260,6 @@ $(document).ready( function() {
     $('.help').popover({offset: 10});
   };
 
-  function add_credit_card(){
-    $('form').submit( function(event) {
-      $('#submit_button').attr('disabled', 'disabled');
-      event.preventDefault();
-      $.ajax({
-        type: 'PUT',
-        url: "/api/v1/members/"+id,
-        data: $('form').serialize(),
-        success: function(data) {
-          alert(data.message);
-          $('input').parent().parent().removeClass("error");
-          if (data.code != 000){
-            $('#submit_button').removeAttr('disabled');
-          }
-        }
-      });
-    });
-  };
-
   function club_cash_functions(){
     $('form').submit( function(event) {
       event.preventDefault(); 

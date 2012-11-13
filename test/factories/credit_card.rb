@@ -14,4 +14,11 @@ FactoryGirl.define do
     number "5589548939080095"
   end
 
+  factory :credit_card_american_express, class: CreditCard do
+    active true
+    expire_month { (Date.today + 2.month).month }
+    expire_year { (Date.today + 2.year).year }
+    number "340504323632976"
+  end
+
 end

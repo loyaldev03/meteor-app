@@ -857,14 +857,16 @@ class Member < ActiveRecord::Base
       
       if new_number or new_year or new_month
         new_number = active_credit_card.number if new_number.nil?
+        new_year = credit_card[:expire_year] if new_year.nil?
+        new_month = credit_card[:expire_month] if new_month.nil?
         credit_card_to_update = CreditCard.new(:number => new_number, :expire_month => new_month, :expire_year => new_year)
         credit_card_to_update.member = self
 
-        if credit_card_to_update.valid? 
+        if credit_card_to_update.am_card.valid? 
           CreditCard.new_expiration_on_active_credit_card(active_credit_card, new_year, new_month, new_number, false)
           {:code => Settings.error_codes.success, :message => "Credit card #{credit_card_to_update.last_digits} added and activated." }
         else
-          { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card }
+          { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => credit_card_to_update.errors.to_hash }
         end
       else
         { :code => Settings.error_codes.success } 
