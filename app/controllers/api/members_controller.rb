@@ -173,7 +173,7 @@ class Api::MembersController < ApplicationController
           Auditory.audit(current_agent, member, message, member) unless batch_update
           response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
         else
-          message = "Member could not be updated, #{member.errors.to_s}"
+          message = "Member could not be updated, #{member.error_to_s}"
           if batch_update
             logger.error "Remote batch update message: #{message}"
           else
