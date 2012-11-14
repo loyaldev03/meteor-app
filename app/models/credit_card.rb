@@ -87,21 +87,24 @@ class CreditCard < ActiveRecord::Base
     if acc.am_card.expired?
       case times
       when 0
-        new_year_exp=acc.expire_year.to_i + 3
+        new_year_exp=acc.expire_year += 3
       when 1
-        new_year_exp=acc.expire_year.to_i + 2
+        new_year_exp=acc.expire_year += 2
       when 2
-        new_year_exp=acc.expire_year.to_i + 4
+        new_year_exp=acc.expire_year += 4
       when 3
-        new_year_exp=acc.expire_year.to_i + 1
+        new_year_exp=acc.expire_year += 1
       when 4
-        new_year_exp=acc.expire_year.to_i + 6
+        new_year_exp=acc.expire_year += 6
       when 5
-        new_year_exp=acc.expire_year.to_i + 5
+        new_year_exp=acc.expire_year += 5
       else
-        new_year_exp=Time.zone.now.year
+        new_year_exp+=Time.zone.now.year
       end
-      return CreditCard.new_expiration_on_active_credit_card(acc, new_year_exp) || acc
+      if new_year_exp != acc.expire_year.to_i
+        Auditory.audit(nil, cc, "Automatic Recycled Expired card from #{acc.expire_month}/#{acc.expire_year} to #{acc.expire_month}/#{new_year_exp}", cc.member, Settings.operation_types.automatic_recycle_credit_card)
+        acc.expire_year = new_year_exp
+      end
     end
     acc
   end

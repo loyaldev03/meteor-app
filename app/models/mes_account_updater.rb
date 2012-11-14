@@ -156,15 +156,19 @@ class MesAccountUpdater
         if credit_card.nil?
           Rails.logger.info "CreditCard id not found ##{discretionary_data} while parsing. #{line}"
         else
+          new_expire_year = new_expiration_date[0..1].to_i+2000
+          new_expire_month = new_expiration_date[2..3]
           credit_cards = CreditCard.find_all_by_encrypted_number credit_card.encrypted_number
           credit_cards.each do |cc|
             cc.update_attributes :aus_answered_at => Time.zone.now, :aus_status => response_code if cc.aus_status.nil?
             if cc.active 
               case response_code
               when 'NEWACCT'
-                CreditCard.new_active_credit_card(cc, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3], new_account_number)
+                # TODO: Call Sebastián credit card update method
+                # CreditCard.new_active_credit_card(cc, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3], new_account_number)
               when 'NEWEXP'
-                CreditCard.new_active_credit_card(cc, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3])
+                Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.member, Settings.operation_types.aus_recycle_credit_card)
+                cc.update_attributes :expire_year => new_expire_year, :expire_month => new_expire_month
               when 'CLOSED', 'CALL'
                 cc.member.cancel! Time.zone.now, "Automatic cancellation. AUS answered account #{response_code} wont be able to bill"
               else
