@@ -20,7 +20,6 @@ class CreditCardsController < ApplicationController
     end
 
     if response[:code] == Settings.error_codes.success
-      Auditory.audit(@current_agent, @current_member.active_credit_card, response[:message], @current_member)
       flash.now[:notice] = response[:message]
     else
       flash.now[:error] = "#{response[:message]} #{response[:errors].to_s}"

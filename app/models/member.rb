@@ -855,25 +855,54 @@ class Member < ActiveRecord::Base
       new_year = credit_card[:expire_year] if credit_card[:expire_year].to_i != active_credit_card.expire_year  
       new_month = credit_card[:expire_month] if credit_card[:expire_month].to_i != active_credit_card.expire_month
       
-      if new_number or new_year or new_month
+      if new_number and new_number != active_credit_card.number 
         new_number = active_credit_card.number if new_number.nil?
         new_year = credit_card[:expire_year] if new_year.nil?
         new_month = credit_card[:expire_month] if new_month.nil?
         credit_card_to_update = CreditCard.new(:number => new_number, :expire_month => new_month, :expire_year => new_year)
         credit_card_to_update.member = self
 
-        if credit_card_to_update.am_card.valid? 
-          CreditCard.new_expiration_on_active_credit_card(active_credit_card, new_year, new_month, new_number, false)
-          {:code => Settings.error_codes.success, :message => "Credit card #{credit_card_to_update.last_digits} added and activated." }
+        if credit_card_to_update.am_card.valid?
+          credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? and members.uuid = ? ",
+            credit_card_to_update.encrypted_number, club.id, self.id ] )         
+          if credit_cards.empty?
+            credit_card_to_update.save
+            CreditCard.change_active_credit_card(active_credit_card, credit_card_to_update)
+            message = "Credit card #{credit_card_to_update.last_digits} added and activated."
+            Auditory.audit(@current_agent, active_credit_card, message, @current_member)
+            return { :code => Settings.error_codes.success, :message => message }
+          else
+            credit_card_to_activate = nil
+            credit_cards.each do |cc|
+              credit_card_to_activate = CreditCard.find_by_id(cc.id) if cc.am_card.valid?
+            end
+            if credit_card_to_activate.nil?
+              return { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.expired_credit_card, :errors => credit_card_to_update.errors.to_hash }
+            else
+              CreditCard.change_active_credit_card(active_credit_card, credit_card_to_activate)
+              message = "Set as active credit card #{credit_card_to_activate.last_digits}"
+              Auditory.audit(@current_agent, active_credit_card, message, @current_member)
+              return {:code => Settings.error_codes.success, :message => "Credit card #{credit_card_to_update.last_digits} was activated." }
+            end
+          end
         else
-          { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => credit_card_to_update.errors.to_hash }
+          return { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => credit_card_to_update.errors.to_hash }
+        end
+      elsif new_year or new_month
+        credit_card_to_update = CreditCard.new(:number => active_credit_card.number, :expire_month => credit_card[:expire_month], :expire_year => credit_card[:expire_year])
+        credit_card_to_update.member = self
+        if credit_card_to_update.am_card.valid?
+          message = "Changed credit card #{active_credit_card.last_digits} from #{active_credit_card.expire_month}/#{active_credit_card.expire_year} to #{credit_card[:expire_month]}/#{credit_card[:expire_year]}"
+          active_credit_card.update_attributes(:expire_month => credit_card[:expire_month], :expire_year => credit_card[:expire_year] )
+          Auditory.audit(@current_agent, active_credit_card, message, @current_member)
+          return { :code => Settings.error_codes.invalid_credit_card, :message => message, :errors => credit_card_to_update.errors.to_hash }
+        else
+          return { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => credit_card_to_update.errors.to_hash }
         end
       else
-        { :code => Settings.error_codes.success } 
+        { :code => Settings.error_codes.success }
       end
-      
     end
-
     def desnormalize_preferences
       if self.preferences.present?
         self.preferences.each do |key, value|

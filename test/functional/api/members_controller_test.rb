@@ -242,7 +242,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     
     @credit_card = FactoryGirl.build :credit_card_american_express
-    assert_difference('Operation.count') do
+    assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count') do
         generate_put_message()
       end
@@ -261,8 +261,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
     @credit_card.expire_month = active_credit_card.expire_month
 
-    assert_difference('Operation.count') do
-      assert_difference('CreditCard.count',1) do
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',0) do
         generate_put_message()
       end
     end
@@ -281,8 +281,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
     @credit_card.expire_year = active_credit_card.expire_year
 
-    assert_difference('Operation.count') do
-      assert_difference('CreditCard.count',1) do
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',0) do
         generate_put_message()
       end
     end
@@ -311,11 +311,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.number, cc_number)
   end
 
-  test "Should not update credit card when dates are not changed and same number." do
+  test "Should not add new credit card with same data as the one active" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_year => Time.zone.now.year+1, :expire_month => Time.zone.now.month+1
-    active_credit_card.update_attribute(:expire_year, Time.zone.now.year+1)
     cc_number = active_credit_card.number
     
     @credit_card = FactoryGirl.build :credit_card_american_express
@@ -353,5 +352,93 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal(@member.active_credit_card.number, cc_number)
   end
+
+
+
+
+
+
+
+
+
+
+
+
+  test "Should activate old credit when it is already created, if it is not expired" do
+    sign_in @admin_user
+    
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_number = @active_credit_card.number
+    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id
+
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message()
+      end
+    end
+
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, @credit_card.number)
+  end
+
+  test "Should not activate old credit card when update only number, if old is expired" do
+    sign_in @admin_user
+    
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_number = @active_credit_card.number
+    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id
+    @credit_card.expire_month = Time.zone.now.month-1
+    @credit_card.expire_year = Time.zone.now.year-1
+
+    assert_difference('Operation.count',1) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message()
+      end
+    end
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, cc_number)
+  end
+
+  test "Should not update active credit card with expired month" do
+    sign_in @admin_user
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = @member.active_credit_card.number
+    @credit_card.expire_month = Time.zone.now.month-1
+
+    assert_difference('Operation.count',1) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message()
+      end
+    end
+    assert_response :success
+
+    assert_equal(@member.active_credit_card.number, @credit_card.number)
+    assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
+  end
+
+  test "Should not update active credit card with expired year" do
+    sign_in @admin_user
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = @member.active_credit_card.number
+    @credit_card.expire_month = Time.zone.now.month-1
+
+    assert_difference('Operation.count',1) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message()
+      end
+    end
+    assert_response :success
+
+    assert_equal(@member.active_credit_card.number, @credit_card.number)
+    assert_equal(@member.active_credit_card.expire_year, @credit_card.expire_year)
+  end
+
+
 
 end
