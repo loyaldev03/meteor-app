@@ -1,3 +1,10 @@
+<div id="error_explanation">
+  <h2> Errors </h2>
+  <ul>
+  </ul>
+</div>
+
+
 <table class="table table-condensed"> 
   <% if !@member.new_record? %>
   <tr class="control-group"> 
@@ -261,12 +268,6 @@
 <% if @member.new_record? %>
   <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
 <% end %>
-
-<div id="error_explanation">
-  <h2> Errors </h2>
-  <ul>
-  </ul>
-</div>
 
 
 
