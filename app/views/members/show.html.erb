@@ -161,7 +161,6 @@
   </thead>
   <tbody>
     <tr>
-      <th><%= t("activerecord.attributes.credit_card.expire_date") %></th>
       <th>
       <% if can? :see_credit_card, @active_credit_card %>
         <%= t("activerecord.attributes.credit_card.number") %>
@@ -169,11 +168,10 @@
         <%= t("activerecord.attributes.credit_card.last_digits") %>
       <% end %>
       </th>
-      
+      <th><%= t("activerecord.attributes.credit_card.expire_date") %></th>
     </tr>
     <% if @active_credit_card %>
       <tr class="<%= (@active_credit_card.am_card.expired? ? "card_expired" : "") %>">
-        <td><%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %></td>
         <td>
           <% if can? :see_credit_card, @active_credit_card %>
             <%= @active_credit_card.number %>
@@ -181,6 +179,7 @@
             <%= @active_credit_card.last_digits %>
           <% end %>
         </td>
+        <td><%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %></td>
       </tr>
     <% end %>
   </tbody>
