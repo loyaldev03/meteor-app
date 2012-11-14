@@ -232,6 +232,41 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "03/05/2012"
   end
 
+  test "Recycle credit card" do
+    @club = @terms_of_membership_with_gateway.club
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+    original_year = 2000
+    member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
+    member.reload
+
+    assert_difference('CreditCard.count', 0) do
+      assert_difference('Operation.count', 1) do
+        assert_difference('Transaction.count') do
+          assert_equal member.recycled_times, 0
+          answer = member.bill_membership
+          member.reload
+          assert_equal answer[:code], Settings.error_codes.invalid_credit_card
+          assert_equal original_year+3, member.transactions.last.expire_year
+          assert_equal member.recycled_times, 1
+          member.reload
+          assert_equal member.credit_cards.count, 1 # only one credit card
+          assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
+        end
+      end
+      assert_difference('Operation.count', 1) do
+        assert_difference('Transaction.count') do
+          answer = member.bill_membership
+          assert_equal answer[:code], Settings.error_codes.invalid_credit_card
+          assert_equal original_year+2, member.transactions.last.expire_year
+          assert_equal member.recycled_times, 2
+          member.reload
+          assert_equal member.credit_cards.count, 1 # only one credit card
+          assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
+        end
+      end
+    end
+  end
+
   test "Billing for renewal amount" do
     @club = @terms_of_membership_with_gateway.club
     member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)

@@ -13,7 +13,7 @@ class MembersController < ApplicationController
   end
 
   def search_result
-    @members = Member.paginate(:page => params[:page], :per_page => 10)
+    @members = Member.paginate(:page => params[:page], :per_page => 25)
                        .with_visible_id(params[:member][:member_id])
                        .with_first_name_like(params[:member][:first_name])
                        .with_last_name_like(params[:member][:last_name])
