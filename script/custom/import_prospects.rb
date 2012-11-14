@@ -7,7 +7,7 @@ ActiveRecord::Base.logger = @log
 
 @cids.each do |cid|
   @campaign = BillingCampaign.find_by_id(cid)
-  return if @campaign.nil?
+  next if @campaign.nil?
 
   if @campaign.phoenix_tom_id.nil?
     tom_id = get_terms_of_membership_id(cid)
