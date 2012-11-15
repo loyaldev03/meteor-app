@@ -88,20 +88,6 @@ def set_membership_data(tom_id, member)
   e_info = PhoenixEnrollmentInfo.find_or_create_by_member_id(@member.id)
   e_info.membership_id = membership.id
   e_info.save
-  set_cohort(membership)
-end
-
-def set_cohort(membership)
-  e_info = PhoenixEnrollmentInfo.find_by_member_id(membership.member_id)
-  unless e_info.nil?
-    @member.cohort = PhoenixMember.cohort_formula(membership.join_date, e_info, TIMEZONE, 
-        PhoenixTermsOfMembership.find(membership.terms_of_membership_id).installment_type)
-    @member.save
-    membership.cohort = @member.cohort
-    membership.save
-    e_info.cohort = @member.cohort
-    e_info.save
-  end
 end
 
 
