@@ -23,7 +23,6 @@ FactoryGirl.define do
     status "none"
     country "US"
     club_cash_amount 0
-    cohort { Time.zone.now.strftime TEST_COHORT }
   end
 
   factory :member_with_api, class: Member do
@@ -43,7 +42,6 @@ FactoryGirl.define do
     status "none"
     country "US"
     club_cash_amount 0
-    cohort { Time.zone.now.strftime TEST_COHORT }
     #association :club, factory: :club_with_api
   end
 
@@ -65,7 +63,6 @@ FactoryGirl.define do
     club_cash_amount 0
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
-    cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
@@ -88,7 +85,6 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
-    cohort { Time.zone.now.strftime TEST_COHORT }
     gender "M"
     blacklisted false
     credit_cards {|ccs| [ccs.association(:credit_card)]}
@@ -112,7 +108,6 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
-    cohort { Time.zone.now.strftime TEST_COHORT }
     gender "M"
     blacklisted false
     credit_cards {|ccs| [ccs.association(:credit_card)]}
@@ -138,7 +133,6 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
-    cohort { Time.zone.now.strftime TEST_COHORT }
   end
 
   factory :lapsed_member, class: Member do
@@ -160,7 +154,6 @@ FactoryGirl.define do
     country "US"
     club_cash_amount 0
     blacklisted false
-    cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
@@ -184,7 +177,6 @@ FactoryGirl.define do
     club_cash_amount 0
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
-    cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
@@ -205,7 +197,6 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
-    cohort { Time.zone.now.strftime TEST_COHORT }
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
   end
@@ -227,7 +218,6 @@ FactoryGirl.define do
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
-    cohort { Time.zone.now.strftime TEST_COHORT }
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
