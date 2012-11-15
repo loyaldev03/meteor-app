@@ -113,8 +113,8 @@ module Pardot
         map.merge!({
           uuid: m.uuid,
           visible_id: m.visible_id,
-          club: m.club_id,
-          client: m.club.partner_id,
+          club: m.club.name,
+          client: m.club.partner.name,
         })
       end
       map
