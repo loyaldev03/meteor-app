@@ -187,9 +187,6 @@ class Member < ActiveRecord::Base
   def set_join_date
     membership = current_membership
     membership.join_date = Time.zone.now
-    self.cohort = Member.cohort_formula(membership.join_date, self.current_membership.enrollment_info, time_zone, terms_of_membership.installment_type)
-    self.save
-    membership.cohort = self.cohort
     membership.save
   end
 
@@ -204,9 +201,7 @@ class Member < ActiveRecord::Base
     membership.join_date = Time.zone.now
     self.bill_date = Time.zone.now + terms_of_membership.provisional_days
     self.next_retry_bill_date = bill_date
-    self.cohort = Member.cohort_formula(membership.join_date, self.current_membership.enrollment_info, time_zone, terms_of_membership.installment_type)
     self.save
-    membership.cohort = self.cohort
     membership.save
   end
 
@@ -283,7 +278,7 @@ class Member < ActiveRecord::Base
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
   def can_recover?
-  # Add logic to recover some one max 3 times in 5 years
+    # TODO: Add logic to recover some one max 3 times in 5 years
     self.lapsed? and reactivation_times < Settings.max_reactivations
   end
 
@@ -422,14 +417,6 @@ class Member < ActiveRecord::Base
     end   
 
     member.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
-  end
-
-  def self.cohort_formula(join_date, enrollment_info, time_zone, installment_type)
-    [ join_date.in_time_zone(time_zone).year.to_s, 
-      "%02d" % join_date.in_time_zone(time_zone).month.to_s, 
-      enrollment_info.mega_channel.to_s.strip, 
-      enrollment_info.campaign_medium.to_s.strip,
-      installment_type ].join('-').downcase
   end
 
   def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, member_params = nil)
@@ -726,10 +713,6 @@ class Member < ActiveRecord::Base
       else      
         self.set_as_provisional! # set join_date
       end
-
-      # cohort is set on status change
-      info.update_attribute(:cohort, self.cohort)
-      trans.update_attribute(:cohort, self.cohort) unless trans.nil?
 
       message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership.id}) -#{terms_of_membership.name}-"
       Auditory.audit(agent, 

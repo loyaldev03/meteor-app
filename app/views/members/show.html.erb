@@ -226,10 +226,6 @@
               <%= render :partial => "shared/help", :locals => { :title => t('activerecord.attributes.member.recycled_times'), :content => t('activerecord.attributes.member.recycled_times_explanation')} %> 
             </td>  
           </tr>
-          <tr>
-            <th><%= t('activerecord.attributes.member.cohort') %>:</th>
-            <td id="td_mi_cohort"><%= @current_member.cohort %></td>  
-          </tr>
           <% if @current_member.club.requires_external_id %>
           <tr>
             <th><%= t('activerecord.attributes.member.external_id') %>:</th>

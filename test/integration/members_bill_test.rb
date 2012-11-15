@@ -36,10 +36,6 @@ class MembersBillTest < ActionController::IntegrationTest
   # UTILS
   ############################################################
 
-  def validate_cohort(member, enrollment_info, transaction)
-    assert_equal transaction.cohort , Member.cohort_formula(member.join_date, enrollment_info, member.club.time_zone, member.terms_of_membership.installment_type), "validate_cohort error"
-  end
-
   def create_new_member(unsaved_member)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_on 'New Member'
@@ -89,7 +85,6 @@ class MembersBillTest < ActionController::IntegrationTest
     
     next_bill_date = member.current_membership.join_date + eval(@terms_of_membership_with_gateway.installment_type)
     
-    validate_cohort(member, EnrollmentInfo.last, Transaction.last)
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
     end
