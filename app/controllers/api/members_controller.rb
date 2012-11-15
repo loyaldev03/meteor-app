@@ -159,13 +159,11 @@ class Api::MembersController < ApplicationController
 
     if new_credit_card.number == member.active_credit_card.number and new_credit_card.expire_month == member.active_credit_card.expire_month and new_credit_card.expire_year == member.active_credit_card.expire_year
       response = { :code => Settings.error_codes.invalid_credit_card,  :message => "Credit card is already set as active." }
-    else
+    elsif not new_credit_card.number.nil?
       response = member.update_credit_card_from_drupal(params[:member][:credit_card])
     end
 
-    if response[:code] != Settings.error_codes.success
-      Auditory.audit(current_agent, member, response[:message], member, response[:code])
-    else
+    if new_credit_card.number.nil? or response[:code] == Settings.error_codes.success
       unless params[:member].nil?
         member.update_member_data_by_params(params[:member])
         if member.save
