@@ -97,15 +97,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     within("#table_membership_information") do
       assert page.has_content?("lapsed")
     end
-      
-    within("#communication") do
-      wait_until {
-        assert page.has_content?("Test cancellation")
-        assert page.has_content?("cancellation")
-        assert_equal(Communication.last.template_type, 'cancellation')
-      }
-    end
-   
+         
     within("#operations_table") do
       wait_until {
         assert page.has_content?("Member canceled")

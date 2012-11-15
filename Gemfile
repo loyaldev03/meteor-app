@@ -18,6 +18,7 @@ gem 'daemons'
 gem 'foreman'
 gem 'god'
 gem 'rvm-capistrano'
+gem "ruby-pardot"
 
 # Gems used only for assets and not required
 # in production environments by default.

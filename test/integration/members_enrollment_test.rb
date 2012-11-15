@@ -187,10 +187,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   										 :member_id => member.id, :operation_type => Settings.operation_types.save_the_sale, :description => 'Blacklisted member. Reason: dont like it' )
   	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
   										 :member_id => member.id, :operation_type => Settings.operation_types.recovery, :description => 'Blacklisted member. Reason: testing' )
-  	FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-  										 :member_id => member.id, :operation_type => Settings.operation_types.active_email, :description => 'Communication sent successfully' )
-  	FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'Member',
-                       :member_id => member.id, :operation_type => Settings.operation_types.prebill_email, :description => 'Communication was not sent' )
  		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
   										 :member_id => member.id, :operation_type => Settings.operation_types.others, :description => 'Member updated successfully' )
  		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
@@ -282,9 +278,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     within("#fulfillments") { assert page.has_content?(fulfillments_table_empty_text) }
 
-    within("#communication") { assert page.has_content?(communication_table_empty_text) }
-
-
   end
 
   test "Create a member with CC blank" do
@@ -310,9 +303,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
 
     within("#fulfillments") { assert page.has_content?(fulfillments_table_empty_text) }
-
-    within("#communication") { assert page.has_content?(communication_table_empty_text) }
-
 
   end
 
@@ -515,18 +505,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
       }
     end
-    within("#table_email_template")do
-      wait_until{
-        assert page.has_content?('Test welcome')
-        assert page.has_content?('Test active')
-        assert page.has_content?('Test cancellation')
-        assert page.has_content?('Test prebill ')
-        assert page.has_content?('Test prebill_renewal')
-        assert page.has_content?('Test refund')
-        assert page.has_content?('Test birthday')
-        assert page.has_content?('Test pillar')
-      }
-    end
   end
 
   test "return to member's profile from terms of membership" do
@@ -541,18 +519,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s) if @terms_of_membership_with_gateway.installment_amount
         assert page.has_content?(@terms_of_membership_with_gateway.installment_type) if @terms_of_membership_with_gateway.installment_type
         assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
-      }
-    end
-    within("#table_email_template")do
-      wait_until{
-        assert page.has_content?('Test welcome')
-        assert page.has_content?('Test active')
-        assert page.has_content?('Test cancellation')
-        assert page.has_content?('Test prebill ')
-        assert page.has_content?('Test prebill_renewal')
-        assert page.has_content?('Test refund')
-        assert page.has_content?('Test birthday')
-        assert page.has_content?('Test pillar')
       }
     end
     click_link_or_button('Return to member show')
@@ -900,7 +866,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     		assert page.has_content?('Blacklisted member. Reason: Too much spam')
     		assert page.has_content?('Blacklisted member. Reason: dont like it')
     		assert page.has_content?('Blacklisted member. Reason: testing')
-    		assert page.has_content?('Communication sent successfully')
     		assert page.has_content?('Member updated successfully')
     		assert page.has_content?('Member was recovered')
     	}
@@ -911,7 +876,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member
     generate_operations(@saved_member)
     sleep(5) #Wait for chronological difference
-    10.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, 
+    10.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id, 
                                 :resource_type => 'Member', :member_id => @saved_member.id, 
                                 :description => 'Member updated succesfully last' )
     }
@@ -1000,45 +965,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?('Blacklisted member. Reason: Too much spam - 201')
         assert page.has_content?('Blacklisted member. Reason: Too much spam - 202')
         assert page.has_content?('Blacklisted member. Reason: Too much spam - 203')
-      }
-    end
-  end
-
-  test "see operations grouped by communication from lastest to newest" do
-    setup_member
-    generate_operations(@saved_member)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
-                                :resource_type => 'Member', :member_id => @saved_member.id,
-                                :operation_type => 300,
-                                :description => 'Communication sent - 300')
-    }
-    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
-                                :resource_type => 'Member', :member_id => @saved_member.id,
-                                :operation_type => 301,
-                                :description => 'Communication sent - 301')
-    }
-    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
-                                :resource_type => 'Member', :member_id => @saved_member.id,
-                                :operation_type => 302,
-                                :description => 'Communication sent - 302')
-    }
-    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
-                                :resource_type => 'Member', :member_id => @saved_member.id,
-                                :operation_type => 303,
-                                :description => 'Communication sent - 303')
-    }
-    within("#dataTableSelect")do
-      wait_until{
-        select('communications', :from => 'operation[operation_type]')
-      }
-    end
-    within("#operations_table")do
-      wait_until{
-        assert page.has_content?('Communication sent - 300')
-        assert page.has_content?('Communication sent - 301')
-        assert page.has_content?('Communication sent - 302')
-        assert page.has_content?('Communication sent - 303')
       }
     end
   end
@@ -1379,18 +1305,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     sleep 1
     within("#table_membership_information") do
       assert page.has_content?("active")
-    end
-    within("#communication") do
-      wait_until {
-        assert page.has_content?("Test active")
-        assert page.has_content?("active")
-        assert_equal(Communication.last.template_type, 'active')
-      }
-    end
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Communication 'Test active' sent")
-      }
     end
   end
 end

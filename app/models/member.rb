@@ -9,7 +9,6 @@ class Member < ActiveRecord::Base
   has_many :credit_cards
   has_many :transactions
   has_many :operations
-  has_many :communications
   has_many :fulfillments
   has_many :club_cash_transactions
   has_many :enrollment_infos, :order => "created_at DESC"
@@ -60,6 +59,7 @@ class Member < ActiveRecord::Base
     if can_be_synced_to_remote? # Bug #23017 - skip sync if lapsed or applied.
       api_member.save! unless @skip_api_sync || api_member.nil?
     end
+    pardot_member.save! unless @skip_pardot_sync || pardot_member.nil?
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
@@ -117,7 +117,6 @@ class Member < ActiveRecord::Base
                     ] => :provisional, :do => :schedule_first_membership
     after_transition :none => :applied, :do => [:set_join_date, :send_active_needs_approval_email]
     after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :nillify_club_cash]
-    after_transition :provisional => :active, :do => :send_active_email
     after_transition :lapsed => [:provisional], :do => :increment_reactivations
     after_transition :applied => [:provisional], :do => :increment_reactivations
     after_transition :lapsed => :applied, :do => [ :set_join_date, :send_recover_needs_approval_email ]
@@ -159,11 +158,6 @@ class Member < ActiveRecord::Base
 
   def save_state
     save(:validate => false)
-  end
-
-  # Sends the activation mail.
-  def send_active_email
-    Communication.deliver!(:active, self)
   end
 
   # Sends the request mail to every representative to accept/reject the member.
@@ -479,10 +473,6 @@ class Member < ActiveRecord::Base
       { :message => message, :code => Settings.error_codes.member_not_saved }
     end
   end
-
-  def send_pre_bill
-    Communication.deliver!(:prebill, self) if can_bill_membership?
-  end
   
   def send_fulfillment
     # we always send fulfillment to new members or members that do not have 
@@ -513,6 +503,22 @@ class Member < ActiveRecord::Base
 
   def skip_api_sync!
     @skip_api_sync = true
+  end
+
+  def pardot_sync?
+    self.club.pardot_sync?
+  end
+
+  def pardot_member
+    @pardot_member ||= if !self.pardot_sync?
+      nil
+    else
+      Pardot::Member.new self
+    end
+  end
+
+  def skip_pardot_sync!
+    @skip_pardot_sync = true
   end
 
   def synced?
@@ -631,7 +637,7 @@ class Member < ActiveRecord::Base
 
   def update_member_data_by_params(params)
     [ :first_name, :last_name, :address, :state, :city, :country, :zip,
-      :email, :birth_date, :joint, :gender,
+      :email, :birth_date, :gender,
       :phone_country_code, :phone_area_code, :phone_local_number, 
       :member_group_type_id, :preferences, :external_id ].each do |key|
           self.send("#{key}=", params[key]) if params.include? key
@@ -736,7 +742,6 @@ class Member < ActiveRecord::Base
       self.bill_date = nil
       self.recycled_times = 0
       self.save
-      Communication.deliver!(:cancellation, self)
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
     end
 

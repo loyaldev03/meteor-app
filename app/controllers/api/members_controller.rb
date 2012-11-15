@@ -29,9 +29,6 @@ class Api::MembersController < ApplicationController
   #             *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
   #              we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level. 
   #             *enrollment_amount: Amount of money that takes to enroll. It is present at member level.
-  #             *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
-  #              informatión with him. joint=1 means we will share this informatión. If this value is null, we will automaticaly set it as 0. This is an exclusive value, 
-  #              it can be seted using 1 or 0, or true or false. It is present at member level.
   #             *birth_date: Birth date of the member. This date is stored with format "yyyy-mm-dd"
   #             *credit_card  [Hash]
   #             *prospect_id: Id of the prospect the enrollment info is related to.

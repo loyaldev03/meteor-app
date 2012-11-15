@@ -58,11 +58,6 @@ class Fulfillment < ActiveRecord::Base
   self.table_name = "fulfillments"
 end
 
-class Communication < ActiveRecord::Base
-  establish_connection "phoenix" 
-  self.table_name = "communications"
-end
-
 
 ###################################################
 ##### METHODS #####################################
@@ -116,14 +111,6 @@ def delete_fulfillments(member)
   @log.info "    ... took #{Time.now.utc - tz} to delete member fulfillments."
 end
 
-def delete_communications(member)
-  tz = Time.now.utc
-  communications = Communication.find_all_by_member_id(member.id)
-  communications.each do |communication|
-    communication.delete
-  end
-  @log.info "    ... took #{Time.now.utc - tz} to delete member communications."
-end
 
 def delete_club_cash_transactions(member)
   tz = Time.now.utc

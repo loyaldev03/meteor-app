@@ -6,30 +6,7 @@
       <%= f.text_field :name, :class => 'text_field' %>
     </div>
   </div>
-  <div class="control-group">
-    <%= f.label :drupal_domain_id, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.collection_select :drupal_domain_id, @club.domains, :id, :url, include_blank: true %>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :api_type, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.select :api_type, [['Drupal', 'Drupal::Member']], include_blank: true %>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :api_username, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :api_username, :class => 'text_field' %>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :api_password, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :api_password, :class => 'text_field' %>
-    </div>
-  </div>
+
   <div class="control-group">
     <%= f.label :description, :class => 'control-label' %>
     <div class="controls">
@@ -58,6 +35,53 @@
     <%= f.label :time_zone, :class => 'control-label' %>
     <div class="controls">
       <%= f.time_zone_select(:time_zone) %>
+    </div>
+  </div>
+
+  <h3>Remote domain</h3>
+  <div class="control-group">
+    <%= f.label :drupal_domain_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.collection_select :drupal_domain_id, @club.domains, :id, :url, include_blank: true %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :api_type, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select :api_type, [['Drupal', 'Drupal::Member']], include_blank: true %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :api_username, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :api_username, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :api_password, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :api_password, :class => 'text_field' %>
+    </div>
+  </div>
+
+
+  <h3>Pardot</h3>
+  <div class="control-group">
+    <%= f.label :pardot_email, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :pardot_email, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :pardot_password, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :pardot_password, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :pardot_user_key, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :pardot_user_key, :class => 'text_field' %>
     </div>
   </div>
 

@@ -73,16 +73,16 @@ class TransactionTest < ActiveSupport::TestCase
     answer = active_member.bill_membership
     active_member.reload
     assert_equal active_member.status, 'active'
-    assert_difference('Operation.count', +2) do
+    assert_difference('Operation.count', 1) do
       assert_difference('Transaction.count') do
-        assert_difference('Communication.count') do
+        #assert_difference('Communication.count') do # refs 23751 - commented because of pardot.
           trans = active_member.transactions.last
           answer = Transaction.refund(amount, trans)
           assert_equal answer[:code], Settings.error_codes.success, answer[:message]
           trans.reload
           assert_equal trans.refunded_amount, amount
           assert_equal trans.amount_available_to_refund, 0.0
-        end
+        #end
       end
     end
   end
@@ -132,7 +132,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
-    assert_difference('Operation.count', +3) do
+    assert_difference('Operation.count', 2) do
       active_member = create_active_member(@terms_of_membership)
       amount = @terms_of_membership.installment_amount
       active_member.recycled_times = 4
@@ -149,17 +149,15 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing with HD cancels member" do 
     active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
-    assert_difference('Operation.count', +3) do
-      assert_difference('Communication.count', +1) do
-        active_member = create_active_member(@terms_of_membership)
-        amount = @terms_of_membership.installment_amount
-        answer = active_member.bill_membership
-        active_member.reload
-        assert active_member.lapsed?, "member should be lapsed after HD"
-        assert_nil active_member.next_retry_bill_date, "next_retry_bill_date should be nil"
-        assert_nil active_member.bill_date, "bill_date should be nil"
-        assert_equal active_member.recycled_times, 0, "recycled_times should be 0"
-      end
+    assert_difference('Operation.count', 2) do
+      active_member = create_active_member(@terms_of_membership)
+      amount = @terms_of_membership.installment_amount
+      answer = active_member.bill_membership
+      active_member.reload
+      assert active_member.lapsed?, "member should be lapsed after HD"
+      assert_nil active_member.next_retry_bill_date, "next_retry_bill_date should be nil"
+      assert_nil active_member.bill_date, "bill_date should be nil"
+      assert_equal active_member.recycled_times, 0, "recycled_times should be 0"
     end
   end
 

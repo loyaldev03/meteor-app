@@ -186,6 +186,29 @@
 </table>
 
 
+<table id="table_pardot_sync" class="table table-bordered table-condensed">
+  <thead>
+    <tr class="box_title">
+      <th colspan="5"><h4>Pardot sync</h4></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th><%= t("activerecord.attributes.member.pardot_id") %></th>
+      <th><%= t("activerecord.attributes.member.pardot_synced_status") %></th>
+      <th><%= t("activerecord.attributes.member.pardot_last_synced_at") %></th>
+      <th><%= t("activerecord.attributes.member.pardot_last_sync_error") %></th>
+      <th><%= t("activerecord.attributes.member.pardot_last_sync_error_at") %></th>
+    </tr>
+    <tr>
+      <td><%= @current_member.pardot_id %></td>
+      <td><span class='label label-<%=t @current_member.pardot_synced_status, scope: 'activerecord.attributes.member.pardot_synced_status_priorities' -%>' id="span_mi_pardot_synced_status"><%=t @current_member.pardot_synced_status, scope: 'activerecord.attributes.member.pardot_synced_status_captions' -%></span></td>
+      <td><%= l(@current_member.pardot_last_synced_at, format: :dashed) if @current_member.pardot_last_synced_at %></td>
+      <td><%= @current_member.pardot_last_sync_error %></td>
+      <td><%= l(@current_member.pardot_last_sync_error_at, format: :dashed) if @current_member.pardot_last_sync_error_at %></td>
+    </tr>
+  </tbody>
+</table>
 
 <table id="table_membership_information" class="table table-bordered table-condensed table-nohover">
   <thead>
@@ -310,7 +333,6 @@
   <li><a href="#credit_cards" data-toggle="tab">Credit Cards</a></li>
   <li><a href="#transactions" data-toggle="tab">Transactions</a></li>
   <li><a href="#fulfillments" data-toggle="tab">Fulfillments</a></li>
-  <li><a href="#communication" data-toggle="tab">Communications</a></li>
   <% if @current_member.api_member and can? :see_sync_status, Member %>
     <li><a href="#sync_status" data-toggle="tab" id="sync_status_tab">Sync Status</a></li>
   <% end %>
@@ -343,11 +365,6 @@
       <%= render :partial => 'fulfillments', :locals => { :fulfillments => @fulfillments} %>
     </div>
   </div>  
-  <div class="tab-pane" id="communication">
-    <div class="tab_body_padding">
-      <%= render :partial => 'communications', :locals => { :communications => @communications} %>
-    </div>
-  </div>
   <% if @current_member.api_member and can? :see_sync_status, Member %>
     <div class="tab-pane" id="sync_status">
       <div class="tab_body_padding">
