@@ -1,157 +1,156 @@
 <%= form_tag(members_search_result_path, :method => 'get', :id => 'index_search_form' ,:html => { :class => 'well form-inline' }) do |f| %>
 
-<section>
-  <div class="page-header">
-    <h1>Search</h1>
-    <% if can? :enroll, Member %>
-      <%= link_to(new_member_path, :class => "btn btn-primary btn_on_header") do %> 
-        <i class="icon-plus"></i> New Member
+  <section>
+    <div class="page-header">
+      <h1>Search</h1>
+      <% if can? :enroll, Member %>
+        <%= link_to(new_member_path, :class => "btn btn-primary btn_on_header") do %> 
+          <i class="icon-plus"></i> New Member
+        <% end %>
       <% end %>
-    <% end %>
-  </div>
- 
-  <div class="row-fluid">
-
-    <div class="span4">
-      <table class="table table-bordered table-condensed table-nohover" id="personal_details">
-        <thead>
-          <tr class="box_title"><th><h4>Personal Details</h4></th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="height: 233px;">
-             <table class="hidden_table_border">
-                <tr>
-                  <td><%= t('activerecord.attributes.member.member_id') %></td>
-                  <td>  <%= text_field :member, :member_id, :class => 'test_field', 
-                                   :value => (params[:member][:member_id] if params[:member])%>
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= t('activerecord.attributes.member.first_name') %></td>
-                  <td><%= text_field :member, :first_name, :class => 'test_field', 
-                                   :value => (params[:member][:first_name] if params[:member]) %>
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= t('activerecord.attributes.member.last_name') %></td>
-                  <td><%= text_field :member, :last_name, :class => 'test_field',
-                                   :value => (params[:member][:last_name] if params[:member]) %>
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= t('activerecord.attributes.member.email') %></td>
-                  <td><%= text_field :member, :email, :class => 'text_field',
-                                   :value => (params[:member][:email] if params[:member]) %>         
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= t('activerecord.attributes.member.phone_number') %></td>
-                  <td>
-                    <%= text_field :member, :phone_country_code, :class => 'text_field input-mini',
-                                   :value => (params[:member][:phone_country_code] if params[:member]) %> 
-                    <%= text_field :member, :phone_area_code, :class => 'text_field input-mini',
-                                   :value => (params[:member][:phone_area_code] if params[:member]) %> 
-                    <%= text_field :member, :phone_local_number, :class => 'text_field input-mini',
-                                   :value => (params[:member][:phone_local_number] if params[:member]) %> 
-                  </td>
-                </tr>
-                <% if @current_club.sync? %>
+    </div>
+   
+    <div class="row-fluid">
+      <div class="span4">
+        <table class="table table-bordered table-condensed table-nohover" id="personal_details">
+          <thead>
+            <tr class="box_title"><th><h4>Personal Details</h4></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="height: 233px;">
+                <table class="hidden_table_border">
                   <tr>
-                    <td><%= t('activerecord.attributes.member.sync_error') %></td>
-                    <td>
-                      <%= 
-                        select :member, 
-                          :sync_status, 
-                          [
-                            ['Indifferent',   nil], 
-                            ['Synced',        'synced'], 
-                            ['Not Synced',    'unsynced'], 
-                            ['With Error',    'error'], 
-                            ['Without Error', 'noerror']
-                          ],
-                          :class => 'select_field'
-                      %>
+                    <td><%= t('activerecord.attributes.member.member_id') %></td>
+                    <td>  <%= text_field :member, :member_id, :class => 'test_field', 
+                                     :value => (params[:member][:member_id] if params[:member])%>
                     </td>
                   </tr>
-                <% end %>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </div>
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.first_name') %></td>
+                    <td><%= text_field :member, :first_name, :class => 'test_field', 
+                                     :value => (params[:member][:first_name] if params[:member]) %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.last_name') %></td>
+                    <td><%= text_field :member, :last_name, :class => 'test_field',
+                                     :value => (params[:member][:last_name] if params[:member]) %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.email') %></td>
+                    <td><%= text_field :member, :email, :class => 'text_field',
+                                     :value => (params[:member][:email] if params[:member]) %>         
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.phone_number') %></td>
+                    <td>
+                      <%= text_field :member, :phone_country_code, :class => 'text_field input-mini',
+                                     :value => (params[:member][:phone_country_code] if params[:member]) %> 
+                      <%= text_field :member, :phone_area_code, :class => 'text_field input-mini',
+                                     :value => (params[:member][:phone_area_code] if params[:member]) %> 
+                      <%= text_field :member, :phone_local_number, :class => 'text_field input-mini',
+                                     :value => (params[:member][:phone_local_number] if params[:member]) %> 
+                    </td>
+                  </tr>
+                  <% if @current_club.sync? %>
+                    <tr>
+                      <td><%= t('activerecord.attributes.member.sync_error') %></td>
+                      <td>
+                        <%= 
+                          select :member, 
+                            :sync_status, 
+                            [
+                              ['Indifferent',   nil], 
+                              ['Synced',        'synced'], 
+                              ['Not Synced',    'unsynced'], 
+                              ['With Error',    'error'], 
+                              ['Without Error', 'noerror']
+                            ],
+                            :class => 'select_field'
+                        %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <div class="span4">
-      
-      <table class="table table-bordered table-condensed table-nohover" id="contact_details">
-        <thead>
-          <tr class="box_title"><th><h4>Contact Details</h4></th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="height: 233px;">
+      <div class="span4">
+        <table class="table table-bordered table-condensed table-nohover" id="contact_details">
+          <thead>
+            <tr class="box_title"><th><h4>Contact Details</h4></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="height: 233px;">
 
-              <table class="hidden_table_border">
-                <tr>
-                  <td><%= t('activerecord.attributes.member.city') %></td>
-                  <td><%= text_field :member, :city, :class => 'test_field',
-                                   :value => (params[:member][:city] if params[:member]) %>
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= t('activerecord.attributes.member.state') %></td>
-                  <td><%= text_field :member, :state, :class => 'test_field',
-                                   :value => (params[:member][:state] if params[:member]) %>
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= t('activerecord.attributes.member.address') %></td>
-                  <td><%= text_field :member, :address, :class => 'test_field',
-                                   :value => (params[:member][:address] if params[:member]) %>
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= t('activerecord.attributes.member.zip') %></td>
-                  <td><%= text_field :member, :zip, :class => 'test_field',
-                                   :value => (params[:member][:zip] if params[:member]) %>
-                  </td>
-                </tr>
-              </table>
-
-          </td>
-        </tr>
-      </table>
-    </div><!--/span-->
-    <div class="span4">
-      
-      <table  class="table table-bordered table-condensed table-nohover" id="payment_details">
-        <thead>
-          <tr class="box_title"><th><h4>Payment Details</h4></th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="height: 233px;">
-              <table class="hidden_table_border">
-                <tr>
-                  <td><%= t('activerecord.attributes.credit_card.next_bill_date') %></td>
-                  <td>
-                    <%= text_field :member, :next_retry_bill_date, :class => 'text_field datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:next_retry_bill_date] if params[:member]) %> 
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= t('activerecord.credit_card') %> <%= t('activerecord.attributes.credit_card.last_digits') %></td>
-                  <td>
-                    <%= text_field :member, :last_digits, :class => 'text_field',
-                                   :value => (params[:member][:last_digits] if params[:member]) %> 
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= t('activerecord.attributes.member.member_notes') %></td>
-                  <td>
-                    <%= text_field :member, :notes, :class => 'text_field',
-                                   :value => (params[:member][:notes] if params[:member]) %> 
-                  </td>
-                </tr>
+                <table class="hidden_table_border">
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.city') %></td>
+                    <td><%= text_field :member, :city, :class => 'test_field',
+                                     :value => (params[:member][:city] if params[:member]) %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.state') %></td>
+                    <td><%= text_field :member, :state, :class => 'test_field',
+                                     :value => (params[:member][:state] if params[:member]) %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.address') %></td>
+                    <td><%= text_field :member, :address, :class => 'test_field',
+                                     :value => (params[:member][:address] if params[:member]) %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.zip') %></td>
+                    <td><%= text_field :member, :zip, :class => 'test_field',
+                                     :value => (params[:member][:zip] if params[:member]) %>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div><!--/span-->
+      <div class="span4">
+        
+        <table  class="table table-bordered table-condensed table-nohover" id="payment_details">
+          <thead>
+            <tr class="box_title"><th><h4>Payment Details</h4></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="height: 233px;">
+                <table class="hidden_table_border">
+                  <tr>
+                    <td><%= t('activerecord.attributes.credit_card.next_bill_date') %></td>
+                    <td>
+                      <%= text_field :member, :next_retry_bill_date, :class => 'text_field datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:next_retry_bill_date] if params[:member]) %> 
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t('activerecord.credit_card') %> <%= t('activerecord.attributes.credit_card.last_digits') %></td>
+                    <td>
+                      <%= text_field :member, :last_digits, :class => 'text_field',
+                                     :value => (params[:member][:last_digits] if params[:member]) %> 
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.member_notes') %></td>
+                    <td>
+                      <%= text_field :member, :notes, :class => 'text_field',
+                                     :value => (params[:member][:notes] if params[:member]) %> 
+                    </td>
+                  </tr>
                   <tr>
                     <td> <%= t('activerecord.attributes.member.needs_approval') %></td>
                     <td>
@@ -160,43 +159,41 @@
                     </td>
                   </tr>
                   <% if @current_club.requires_external_id %>
-                  <tr>
-                    <td> <%= t('activerecord.attributes.member.external_id') %></td>
-                    <td>
-                      <%= text_field :member, :external_id, :class => 'text-field',
-                                     :value => (params[:member][:external_id] if params[:member]) %> 
-                          
-                    </td>
-                  </tr>
+                    <tr>
+                      <td> <%= t('activerecord.attributes.member.external_id') %></td>
+                      <td>
+                        <%= text_field :member, :external_id, :class => 'text-field',
+                                       :value => (params[:member][:external_id] if params[:member]) %> 
+                            
+                      </td>
+                    </tr>
                   <% end %>
-              </table>
-            </td>
-        </tr>
-      </table>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-  </div>
+    <div class="row-fluid">
+      <p style="text-align: right;">
 
-  <div class="row-fluid">
-    <p style="text-align: right;">
+        <%= link_to('#', :id => "clear_form", :class => "btn") do %> 
+          <i class="icon-refresh"></i> <%= t('clear') %>
+        <% end %>
 
-      <%= link_to('#', :id => "clear_form", :class => "btn") do %> 
-        <i class="icon-refresh"></i> <%= t('clear') %>
-      <% end %>
-
-      <button class="btn" style="width: 190px;">
-        <i class="icon-search"></i> <%= t('search') %>
-      </button>
-    </p>
-  </div>
-</section>
+        <button class="btn" style="width: 190px;">
+          <i class="icon-search"></i> <%= t('search') %>
+        </button>
+      </p>
+    </div>
+  </section>
 
 
   <div class="tab-pane" id="members">
     <%= render :partial => 'search' %>
   </div>  
-
-
 
 <% end %>
 
@@ -205,6 +202,6 @@
   $(document).ready(function(){
     $('.pagination a').attr('data-remote', 'true');
   })
-  
+ 
 </script>
 
