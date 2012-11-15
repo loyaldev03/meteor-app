@@ -405,9 +405,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_expire_month = @active_credit_card.expire_month
     @credit_card = FactoryGirl.build :credit_card_american_express
     @credit_card.number = @member.active_credit_card.number
     @credit_card.expire_month = Time.zone.now.month-1
+    @credit_card.expire_year = Time.zone.now.year
 
     assert_difference('Operation.count',1) do
       assert_difference('CreditCard.count',0) do
@@ -417,16 +419,17 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_equal(@member.active_credit_card.number, @credit_card.number)
-    assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
+    assert_equal(@member.active_credit_card.expire_month, cc_expire_month)
   end
 
   test "Should not update active credit card with expired year" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_expire_year = @active_credit_card.expire_year
     @credit_card = FactoryGirl.build :credit_card_american_express
     @credit_card.number = @member.active_credit_card.number
-    @credit_card.expire_month = Time.zone.now.month-1
+    @credit_card.expire_year = Time.zone.now.year-1
 
     assert_difference('Operation.count',1) do
       assert_difference('CreditCard.count',0) do
@@ -436,7 +439,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_equal(@member.active_credit_card.number, @credit_card.number)
-    assert_equal(@member.active_credit_card.expire_year, @credit_card.expire_year)
+    assert_equal(@member.active_credit_card.expire_year, cc_expire_year)
   end
 
 
