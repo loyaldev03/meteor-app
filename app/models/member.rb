@@ -104,8 +104,8 @@ class Member < ActiveRecord::Base
   scope :with_state_like, lambda { |value| where('state like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_zip, lambda { |value| where('zip like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_email_like, lambda { |value| where('email like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value) unless value.blank? }
-  scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value+'%') unless value.blank? }
+  scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value.strip) unless value.blank? }
+  scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_external_id, lambda{ |value| where("external_id = ?",value) unless value.blank? }
   scope :needs_approval, lambda{ |value| where('status = ?', 'applied') unless value == '0' }
 
