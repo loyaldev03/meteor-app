@@ -862,13 +862,13 @@ class Member < ActiveRecord::Base
             if credit_card_to_activate.nil?
               return { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.expired_credit_card, :errors => credit_card_to_update.errors.to_hash }
             else
-              if credit_card_to_activate.expire_year == credit_card[:expire_year] and credit_card_to_activate.expire_month == credit_card[:expire_month]
+              if credit_card_to_activate.expire_year == credit_card[:expire_year].to_i and credit_card_to_activate.expire_month == credit_card[:expire_month].to_i
                 CreditCard.change_active_credit_card(active_credit_card, credit_card_to_activate)
                 message = "Set as active credit card #{credit_card_to_activate.last_digits}"
                 Auditory.audit(@current_agent, active_credit_card, message, self)
-                return {:code => Settings.error_codes.success, :message => "Credit card XXXX-XXXX-XXXX-#{credit_card_to_update.last_digits} was activated." }
+                return {:code => Settings.error_codes.success, :message => "Credit card XXXX-XXXX-XXXX-#{credit_card_to_activate.last_digits} was activated." }
               else
-                return {:code => Settings.error_codes.invalid_credit_card, :message => "Credit card is already add with other expiration date." }
+                return {:code => Settings.error_codes.invalid_credit_card, :message => "Credit card is already add with other expiration date. #{credit_card_to_activate.expire_month}/#{credit_card_to_activate.expire_year} -- #{credit_card[:expire_month]}/#{credit_card[:expire_year]} --------- #{credit_card_to_activate.expire_year == credit_card[:expire_year]} -- #{credit_card_to_activate.expire_month == credit_card[:expire_month]}" }
               end
             end
           end

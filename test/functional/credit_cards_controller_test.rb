@@ -116,13 +116,13 @@ class CreditCardsControllerTest < ActionController::TestCase
   test "Should activate old credit when it is already created, if it is not expired" do
     sign_in @admin_user
     cc_number = @active_credit_card.number
-    
+
     @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @saved_member.id
 
     assert_difference('Operation.count',1) do
-      # assert_difference('CreditCard.count',0) do
+      assert_difference('CreditCard.count',0) do
         generate_post_message()
-      # end
+      end
     end
 
     assert_response :success
@@ -147,7 +147,7 @@ class CreditCardsControllerTest < ActionController::TestCase
   end
 
   test "Should not update active credit card with expired month" do
-    sign_in @admin_user
+    sign_in @admin_user 
     
     @credit_card = FactoryGirl.build :credit_card_american_express
     @credit_card.number = @saved_member.active_credit_card.number
