@@ -57,9 +57,19 @@ class Member < ActiveRecord::Base
 
   def after_save_sync_to_remote_domain(type)
     if can_be_synced_to_remote? # Bug #23017 - skip sync if lapsed or applied.
-      api_member.save! unless @skip_api_sync || api_member.nil?
+      unless @skip_api_sync || api_member.nil?
+        time_elapsed = Benchmark.ms do
+          api_member.save!
+        end
+        logger.info "Drupal::sync took #{time_elapsed}"
+      end
     end
-    pardot_member.save! unless @skip_pardot_sync || pardot_member.nil?
+    unless @skip_pardot_sync || pardot_member.nil?
+      time_elapsed = Benchmark.ms do
+        pardot_member.save! 
+      end
+      logger.info "Pardot::sync took #{time_elapsed}"
+    end
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
