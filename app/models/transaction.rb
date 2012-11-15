@@ -42,7 +42,6 @@ class Transaction < ActiveRecord::Base
     self.state = member.state
     self.country = member.country
     self.zip = member.zip
-    self.cohort = member.cohort
     self.terms_of_membership_id = member.terms_of_membership.id
   end
 
@@ -137,7 +136,6 @@ class Transaction < ActiveRecord::Base
       return { :message => Settings.error_messages.refund_invalid, :code => Settings.error_codes.refund_invalid }
     end
     trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
-    trans.cohort = sale_transaction.cohort
     answer = trans.process
     if trans.success?
       sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
@@ -160,7 +158,6 @@ class Transaction < ActiveRecord::Base
     trans.refund_response_transaction_id = sale_transaction.response_transaction_id
     trans.prepare(sale_transaction.member, sale_transaction.credit_card, args[:transaction_amount], 
                   sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
-    trans.cohort = sale_transaction.cohort
     trans.response_auth_code=args[:auth_code]
     trans.response_result=args[:reason]
     trans.response_code=args[:reason_code]
