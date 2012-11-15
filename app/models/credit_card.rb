@@ -78,6 +78,11 @@ class CreditCard < ActiveRecord::Base
     nil
   end
 
+  def self.change_active_credit_card(actual_credit_card, new_credit_card)
+    actual_credit_card.update_attribute :active , false
+    new_credit_card.update_attribute :active , true
+  end
+
   # refs #17832 and #19603
   # 6 Days Later if not successful = (+3), 3/2014
   # 6 Days Later if not successful = (+2), 3/2013
