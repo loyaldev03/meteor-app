@@ -181,7 +181,8 @@ class CreditCardsControllerTest < ActionController::TestCase
     end
     assert_response :success
 
-    assert_not_equal(@saved_member.active_credit_card.number, @credit_card.number)
+    assert_equal(@saved_member.active_credit_card.number, @credit_card.number)
+    assert_not_equal(@saved_member.active_credit_card.expire_month, @credit_card.expire_month)
     assert_not_equal(@saved_member.active_credit_card.expire_year, @credit_card.expire_year)
   end
 
