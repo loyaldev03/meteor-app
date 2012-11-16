@@ -58,6 +58,7 @@ SacPlatform::Application.routes.draw do
         post '/sync' => 'members#sync', as: 'member_sync'
         put  '/sync' => 'members#update_sync', as: 'member_update_sync'
         get  '/sync' => 'members#sync_data', as: 'member_sync_data'
+        post  '/pardot_sync' => 'members#pardot_sync', as: 'member_pardot_sync'
         post '/reset_password' => 'members#reset_password', as: 'member_reset_password'
         post '/resend_welcome' => 'members#resend_welcome', as: 'member_resend_welcome'
         get  '/login_as_member' => 'members#login_as_member', as: 'login_as_member'

@@ -255,6 +255,25 @@ class MembersController < ApplicationController
     end
   end
 
+  def pardot_sync
+    am = @current_member.pardot_member
+    if am
+      am.save!(force: true)
+      if @current_member.pardot_last_sync_error_at
+        message = "Synchronization to pardot failed: #{@current_member.pardot_last_sync_error_at}"
+      else
+        message = "Member synchronized to pardot"
+      end
+      Auditory.audit(@current_agent, @current_member, message, @current_member)
+      redirect_to show_member_path, notice: message    
+    end
+  rescue
+    message = "Error on members#pardot_sync: #{$!}"
+    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Airbrake.notify(:error_class => "Member:pardot_sync", :parameters => { :member => @current_member.inspect })
+    redirect_to show_member_path, notice: message
+  end
+
   def sync
     am = @current_member.api_member
     if am

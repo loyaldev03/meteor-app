@@ -30,16 +30,16 @@ module Pardot
       MEMBER_OBSERVED_FIELDS.intersection(self.member.changed)
     end
 
+    # will raise a Pardot::ResponseError if login fails
+    # will raise a Pardot::NetError if the http call fails
     def conn
       c = self.member.club.pardot
-      # will raise a Pardot::ResponseError if login fails
-      # will raise a Pardot::NetError if the http call fails
       c.authenticate
       c
     end
 
     def update_member(res, destroy = false)
-      data = if res.has_key? 'id'
+      data = if res.class == Hash and res.has_key? 'id'
         { 
           pardot_id: res['id'],
           pardot_last_synced_at: Time.zone.now,
