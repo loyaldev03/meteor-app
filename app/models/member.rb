@@ -61,14 +61,14 @@ class Member < ActiveRecord::Base
         time_elapsed = Benchmark.ms do
           api_member.save!
         end
-        logger.info "Drupal::sync took #{time_elapsed}"
+        logger.info "Drupal::sync took #{time_elapsed}ms"
       end
     end
     unless @skip_pardot_sync || pardot_member.nil?
       time_elapsed = Benchmark.ms do
         pardot_member.save! 
       end
-      logger.info "Pardot::sync took #{time_elapsed}"
+      logger.info "Pardot::sync took #{time_elapsed}ms"
     end
   rescue Exception => e
     # refs #21133

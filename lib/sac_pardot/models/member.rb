@@ -9,7 +9,7 @@ module Pardot
         unless self.member.email.include?('@noemail.com') # do not sync @noemail.com
           begin
             res = conn.prospects.upsert_by_email(CGI.escape(self.member.email), fieldmap)
-            Pardot.logger.debug res
+            Pardot.logger.debug "Pardot answer: " + res.inspect
           rescue Exception => e
             res = $!.to_s
             Pardot.logger.info "  => #{$!.to_s}"
@@ -66,8 +66,8 @@ module Pardot
         state: m.state,
         zip: m.zip,
         country: m.country,
-        phone_number: m.full_phone_number,
-        opted_out: m.blacklisted,
+        phone: m.full_phone_number,
+        opted_out: (m.blacklisted ? 1 : 0),
         birth_date: m.birth_date,
         preferences: m.preferences,
         gender: m.gender,
@@ -102,7 +102,7 @@ module Pardot
         end
         map.merge!({ 
           installment_amount: cm.terms_of_membership.installment_amount,
-          terms_of_membership: cm.terms_of_membership_id,
+          terms_of_membership_id: cm.terms_of_membership_id,
           quota: cm.quota,
           join_date: cm.join_date,
           cancel_date: cm.cancel_date
@@ -117,6 +117,7 @@ module Pardot
           client: m.club.partner.name,
         })
       end
+      Pardot.logger.debug "Pardot JSON request: " + map.inspect
       map
     end
   end
