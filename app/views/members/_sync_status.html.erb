@@ -115,7 +115,7 @@
             <em>none</em>
           <% end %>
           <span class='label label-<%=t @current_member.sync_status, scope: 'activerecord.attributes.member.sync_status_priorities' -%>' id="span_mi_sync_status">
-            <%=t @current_member.sync_status, scope: 'activerecord.attributes.member.sync_status_captions' -%>
+            <%=t @current_member.get_sync_status, scope: 'activerecord.attributes.member.sync_status_captions' -%>
           </span>
         </span>
         <span class='toggler-content'>

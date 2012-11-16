@@ -82,12 +82,14 @@ module Drupal
             api_id: ( destroy ? nil : res.body['uid'] ),
             last_synced_at: Time.now,
             last_sync_error: nil,
-            last_sync_error_at: nil
+            last_sync_error_at: nil,
+            sync_status: "synced"
           }
         else
           {
             last_sync_error: res.body.respond_to?(:[]) ? res.body[:message] : res.body,
-            last_sync_error_at: Time.now
+            last_sync_error_at: Time.now,
+            sync_status: "with_error"
           }
         end
         ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)

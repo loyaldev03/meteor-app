@@ -85,8 +85,8 @@ class Member < ActiveRecord::Base
 
   scope :synced, lambda { |bool=true|
     bool ?
-      where('last_synced_at IS NOT NULL AND last_synced_at >= updated_at') :
-      where('last_synced_at IS NULL OR last_synced_at < updated_at')
+      where('sync_status = "synced"') :
+      where('sync_status = "not_synced"')
   }
   scope :with_sync_status, lambda { |status=true|
     case status
@@ -97,9 +97,9 @@ class Member < ActiveRecord::Base
     when false, 'false', 'unsynced'
       synced(false)
     when 'error'
-      where('last_sync_error_at IS NOT NULL')
+      where('sync_status = "with_error"')
     when 'noerror'
-      where('last_sync_error_at IS NULL')
+      where('sync_status IN ("not_synced", "synced")')
     end
   }
   scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
@@ -532,10 +532,10 @@ class Member < ActiveRecord::Base
   end
 
   def synced?
-    self.last_synced_at && self.last_synced_at >= self.updated_at
+    sync_status=="synced"
   end
 
-  def sync_status
+  def get_sync_status
     if self.last_sync_error_at
       'error'
     else
