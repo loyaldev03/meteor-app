@@ -84,6 +84,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
 
+
     fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
     @saved_member = Member.find_by_email(unsaved_member.email)
@@ -187,6 +188,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:updated_at, Time.zone.now-1)
     @saved_member.update_attribute(:last_synced_at, Time.zone.now)
+    @saved_member.update_attribute(:sync_status, "synced")
 
     fill_in("member[last_name]", :with => unsaved_member.last_name)
     select("Synced", :from => 'member[sync_status]')
@@ -232,6 +234,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     wait_until { assert page.has_content?("Search") }
     @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:last_sync_error_at, Time.zone.now)
+    @saved_member.update_attribute(:sync_status, "with_error")
 
     fill_in("member[last_name]", :with => unsaved_member.last_name)
     select("With Error", :from => 'member[sync_status]')
@@ -420,7 +423,8 @@ class MembersSyncronize < ActionController::IntegrationTest
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:last_sync_error_at, Time.zone.now)
-    
+    @saved_member.update_attribute(:sync_status, "with_error")
+
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
@@ -444,7 +448,8 @@ class MembersSyncronize < ActionController::IntegrationTest
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:last_sync_error_at, Time.zone.now)
-    
+    @saved_member.update_attribute(:sync_status, "with_error")
+
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
     

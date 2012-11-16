@@ -535,8 +535,12 @@ class Member < ActiveRecord::Base
     sync_status=="synced"
   end
 
+  def synced_with_error?
+    sync_status=="with_error"
+  end
+
   def get_sync_status
-    if self.last_sync_error_at
+    if synced_with_error?
       'error'
     else
       if self.synced?
