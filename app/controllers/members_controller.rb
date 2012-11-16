@@ -258,7 +258,7 @@ class MembersController < ApplicationController
   def pardot_sync
     am = @current_member.pardot_member
     if am
-      am.save!(force: true)
+      am.save!
       if @current_member.pardot_last_sync_error_at
         message = "Synchronization to pardot failed: #{@current_member.pardot_last_sync_error_at}"
       else
