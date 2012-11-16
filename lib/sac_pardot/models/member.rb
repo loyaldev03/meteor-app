@@ -75,15 +75,14 @@ module Pardot
         birth_date: m.birth_date,
         preferences: m.preferences,
         gender: m.gender,
-        status: m.status,
+        status: m.status.capitalize,
         member_since_date: m.member_since_date,
-        wrong_address: m.wrong_address,
-        wrong_phone_number: m.wrong_phone_number,
+        wrong_address: (m.wrong_address ? 1 : 0),
+        wrong_phone_number: (m.wrong_phone_number ? 1 : 0),
         external_id: m.external_id,
         club_cash_amount: m.club_cash_amount,
         autologin_url: m.autologin_url,
-        uuid: m.uuid,
-        visible_id: m.visible_id,
+        member_number: m.visible_id,
         club: m.club.name,
         client: m.club.partner.name,
         next_bill_date: m.bill_date
@@ -97,19 +96,19 @@ module Pardot
         e = cm.enrollment_info
         unless e.nil?
           map.merge!({
-            marketing_code: e.marketing_code,
-            mega_channel: e.mega_channel,
-            joint: e.joint,
+            marketing_code: e.marketing_code.capitalize,
+            mega_channel: e.mega_channel.capitalize,
+            joint: (e.joint ? 1 : 0),
             fulfillment_code: e.fulfillment_code,
             campaign_medium_version: e.campaign_medium_version,
-            campaign_medium: e.campaign_medium,
+            campaign_medium: e.campaign_medium.capitalize,
             product_sku: e.product_sku,
             landing_url: e.landing_url,
-            enrollment_amount: e.enrollment_amount
+            enrollment_amount: "%.2f" % e.enrollment_amount
           })
         end
         map.merge!({ 
-          installment_amount: cm.terms_of_membership.installment_amount,
+          installment_amount: "%.2f" % cm.terms_of_membership.installment_amount,
           terms_of_membership_id: cm.terms_of_membership_id,
           quota: cm.quota,
           join_date: cm.join_date,
