@@ -32,7 +32,7 @@ class CreditCardsControllerTest < ActionController::TestCase
         generate_post_message
       end
     end
-    assert_response :success
+    assert_response :redirect
     assert_equal(@saved_member.active_credit_card.number, @credit_card.number)
     assert_equal(@saved_member.active_credit_card.expire_month, @credit_card.expire_month)
 	end
@@ -125,7 +125,7 @@ class CreditCardsControllerTest < ActionController::TestCase
       end
     end
 
-    assert_response :success
+    assert_response :redirect
     assert_equal(@saved_member.active_credit_card.number, @credit_card.number)
   end
 

@@ -850,19 +850,20 @@ class Member < ActiveRecord::Base
         new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
         credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? ", new_credit_card.encrypted_number, club.id ] )
         if credit_cards.empty?
-          answer = { :code => Settings.error_codes.success, :message => message }
+          answer = { :message => "There was an error. We could not add the credit card.", :error => Settings.error_codes.invalid_credit_card }
           CreditCard.transaction do 
             begin
               new_credit_card.member = self
               if new_credit_card.am_card.valid?
                 new_credit_card.save!
-                Auditory.audit(current_agent, new_credit_card, "Credit card #{new_credit_card.last_digits} added and activated.", self)
+                message = "Credit card #{new_credit_card.last_digits} added and activated."
+                Auditory.audit(current_agent, new_credit_card, message, self)
+                answer = { :code => Settings.error_codes.success, :message => message }
                 new_credit_card.set_as_active!
               else
-                answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => credit_card_to_update.errors.to_hash }
+                answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => new_credit_card.errors.to_hash }
               end        
             rescue Exception => e
-              answer = { :message => "There was an error. We could not add the credit card.", :error => Settings.error_codes.invalid_credit_card }
               Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card })
               logger.error e.inspect
               raise ActiveRecord::Rollback
