@@ -31,7 +31,11 @@ module Pardot
     end
 
     def conn
-      self.member.club.pardot
+      c = self.member.club.pardot
+      # will raise a Pardot::ResponseError if login fails
+      # will raise a Pardot::NetError if the http call fails
+      c.authenticate
+      c
     end
 
     def update_member(res, destroy = false)
@@ -78,6 +82,10 @@ module Pardot
         external_id: m.external_id,
         club_cash_amount: m.club_cash_amount,
         autologin_url: m.autologin_url,
+        uuid: m.uuid,
+        visible_id: m.visible_id,
+        club: m.club.name,
+        client: m.club.partner.name,
         next_bill_date: m.bill_date
       }
 
@@ -109,14 +117,6 @@ module Pardot
         })
       end
       
-      if self.new_record?
-        map.merge!({
-          uuid: m.uuid,
-          visible_id: m.visible_id,
-          club: m.club.name,
-          client: m.club.partner.name,
-        })
-      end
       Pardot.logger.debug "Pardot JSON request: " + map.inspect
       map
     end
