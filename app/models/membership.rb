@@ -19,7 +19,7 @@ class Membership < ActiveRecord::Base
 
   def after_save_sync_to_remote_domain
     pm = member.pardot_member
-    pm.save!(force: true) unless pm.nil?
+    pm.save! unless pm.nil?
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
