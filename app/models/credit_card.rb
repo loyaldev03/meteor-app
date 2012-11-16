@@ -58,29 +58,32 @@ class CreditCard < ActiveRecord::Base
   def update_last_digits
     self.last_digits = self.number.last(4) 
   end
-  
-  def self.new_expiration_on_active_credit_card(actual, new_year_exp, new_month_exp = nil, new_cc_number = nil, recyclation = true)
-    CreditCard.transaction do
+
+  def set_as_active!
+    CreditCard.transaction do 
       begin
-        actual.update_attribute :active , false
-        cc = CreditCard.new :number => (new_cc_number || actual.number), :expire_month => (new_month_exp || actual.expire_month), :expire_year => new_year_exp
-        cc.member = actual.member
-        cc.active = true
-        cc.save!
-        Auditory.audit(nil, cc, "Automatic Recycled Expired card", cc.member, Settings.operation_types.automatic_recycle_credit_card) if recyclation
-        return cc
+        self.member.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
+        self.update_attribute :active , true
+        message = 
+        Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member)
       rescue Exception => e
-        logger.error e
-        Airbrake.notify(:error_class => "CreditCard::new_expiration_on_active_credit_card", :error_message => e, :parameters => { :member => actual.member.inspect, :actual_credit_card => actual.inspect })
+        logger.error e.inspect
         raise ActiveRecord::Rollback
       end
     end
-    nil
   end
-
-  def self.change_active_credit_card(actual_credit_card, new_credit_card)
-    actual_credit_card.update_attribute :active , false
-    new_credit_card.update_attribute :active , true
+  
+  def update_expire(year, month, current_agent = nil)
+    if year == expire_year and month == expire_month
+      { :code => Settings.error_codes.success, :message => "New expiration date its identically than the one we have in database." }
+    elsif Time.new(year, month) > Time.zone.now
+      message = "Changed credit card XXXX-XXXX-XXXX-#{last_digits} from #{expire_month}/#{expire_year} to #{month}/#{year}"
+      update_attributes(:expire_month => month, :expire_year => year)
+      Auditory.audit(current_agent, self, message, self.member)
+      { :code => Settings.error_codes.success, :message => message }
+    else
+      { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card }
+    end
   end
 
   # refs #17832 and #19603

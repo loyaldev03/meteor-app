@@ -157,7 +157,7 @@ class Api::MembersController < ApplicationController
     if new_credit_card.number == member.active_credit_card.number and new_credit_card.expire_month == member.active_credit_card.expire_month and new_credit_card.expire_year == member.active_credit_card.expire_year
       response = { :code => Settings.error_codes.invalid_credit_card,  :message => "Credit card is already set as active." }
     elsif not new_credit_card.number.nil?
-      response = member.update_credit_card_from_drupal(params[:member][:credit_card])
+      response = member.update_credit_card_from_drupal(params[:member][:credit_card], @current_agent)
     end
 
     if new_credit_card.number.nil? or response[:code] == Settings.error_codes.success

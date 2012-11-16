@@ -9,23 +9,17 @@ class CreditCardsController < ApplicationController
   end
 
   def create
-    credit_card = CreditCard.new(params[:credit_card])
-    credit_card.member_id = @current_member.id
-    actual_credit_card = @current_member.active_credit_card
+    @credit_card = CreditCard.new(params[:credit_card])
+    @credit_card.member_id = @current_member.id
 
-    if credit_card.number == actual_credit_card.number and credit_card.expire_year == actual_credit_card.expire_year and credit_card.expire_month == actual_credit_card.expire_month 
-      response = { :code => Settings.error_codes.invalid_credit_card,  :message => "Credit card is already set as active." }
-    else
-      response = @current_member.update_credit_card_from_drupal(params[:credit_card])
-    end
+    response = @current_member.update_credit_card_from_drupal(params[:credit_card], @current_agent)
 
     if response[:code] == Settings.error_codes.success
-      flash.now[:notice] = response[:message]
+      redirect_to show_member_path(:id => @current_member), notice: response[:message]
     else
       flash.now[:error] = "#{response[:message]} #{response[:errors].to_s}"
+      render "new"
     end
-
-    render "new"
   end
 
   def activate

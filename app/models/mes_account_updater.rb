@@ -164,8 +164,7 @@ class MesAccountUpdater
             if cc.active 
               case response_code
               when 'NEWACCT'
-                # TODO: Call Sebastián credit card update method
-                # CreditCard.new_active_credit_card(cc, new_expiration_date[0..1].to_i+2000, new_expiration_date[2..3], new_account_number)
+                cc.member.update_credit_card_from_drupal({number: new_account_number, :expire_year => new_expire_year, :expire_month => new_expire_month})
               when 'NEWEXP'
                 Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.member, Settings.operation_types.aus_recycle_credit_card)
                 cc.update_attributes :expire_year => new_expire_year, :expire_month => new_expire_month

@@ -834,81 +834,61 @@ class Member < ActiveRecord::Base
 
   public 
 
-    def update_credit_card_from_drupal(credit_card)
-      new_year, new_month, new_number = nil, nil, nil
-      
-      return { :code => Settings.error_codes.success } if credit_card.nil?
 
-      # Drupal sends X when member does not change the credit card number
-      unless credit_card[:number].include? 'X'
-        credit_card_to_check = CreditCard.new(:number => credit_card[:number])
-        credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? and members.uuid != ? ",
-            credit_card_to_check.encrypted_number, club.id, self.id ] )
-        if credit_cards.empty?
-          new_number = credit_card[:number]
-        elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-          return { :message => Settings.error_messages.credit_card_blacklisted, :code => Settings.error_codes.credit_card_blacklisted }
-        else # there is another member with this credit card. prevent this update.
-          return { :message => Settings.error_messages.credit_card_in_use, :code => Settings.error_codes.credit_card_in_use }
+    def update_credit_card_from_drupal(credit_card, current_agent = nil)
+      return { :code => Settings.error_codes.success } if credit_card.nil? || credit_card.empty?
+      new_year, new_month, new_number = credit_card[:expire_year], credit_card[:expire_month], nil
+
+      # Drupal sends X when member does not change the credit card number      
+      if credit_card[:number].include?('X')
+        if active_credit_card.last_digits.to_s == credit_card[:number][-4..-1].to_s # lets update expire month
+          active_credit_card.update_expire(new_year, new_month)
+        else # do not update nothing, credit cards do not match or its expired
+          { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card }
         end
-        new_number = credit_card[:number]
-      end
-      
-      new_year = credit_card[:expire_year] if credit_card[:expire_year].to_i != active_credit_card.expire_year  
-      new_month = credit_card[:expire_month] if credit_card[:expire_month].to_i != active_credit_card.expire_month
-      
-      if new_number and new_number != active_credit_card.number 
-        new_number = active_credit_card.number if new_number.nil?
-        new_year = credit_card[:expire_year] if new_year.nil?
-        new_month = credit_card[:expire_month] if new_month.nil?
-        credit_card_to_update = CreditCard.new(:number => new_number, :expire_month => new_month, :expire_year => new_year)
-        credit_card_to_update.member = self
-
-        if credit_card_to_update.am_card.valid?
-          credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? and members.uuid = ? ",
-            credit_card_to_update.encrypted_number, club.id, self.id ] )         
-          if credit_cards.empty?
-            credit_card_to_update.save
-            CreditCard.change_active_credit_card(active_credit_card, credit_card_to_update)
-            message = "Credit card #{credit_card_to_update.last_digits} added and activated."
-            Auditory.audit(@current_agent, active_credit_card, message, self)
-            return { :code => Settings.error_codes.success, :message => message }
-          else
-            credit_card_to_activate = nil
-            credit_cards.each do |cc|
-              credit_card_to_activate = CreditCard.find_by_id(cc.id) if cc.am_card.valid?
-            end
-            if credit_card_to_activate.nil?
-              return { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.expired_credit_card, :errors => credit_card_to_update.errors.to_hash }
-            else
-              if credit_card_to_activate.expire_year == credit_card[:expire_year].to_i and credit_card_to_activate.expire_month == credit_card[:expire_month].to_i
-                CreditCard.change_active_credit_card(active_credit_card, credit_card_to_activate)
-                message = "Set as active credit card #{credit_card_to_activate.last_digits}"
-                Auditory.audit(@current_agent, active_credit_card, message, self)
-                return {:code => Settings.error_codes.success, :message => "Credit card XXXX-XXXX-XXXX-#{credit_card_to_activate.last_digits} was activated." }
+      else # drupal or CS sends the complete credit card number.
+        new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
+        credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? ", new_credit_card.encrypted_number, club.id ] )
+        if credit_cards.empty?
+          answer = { :code => Settings.error_codes.success, :message => message }
+          CreditCard.transaction do 
+            begin
+              new_credit_card.member = self
+              if new_credit_card.am_card.valid?
+                new_credit_card.save!
+                Auditory.audit(current_agent, new_credit_card, "Credit card #{new_credit_card.last_digits} added and activated.", self)
+                new_credit_card.set_as_active!
               else
-                return {:code => Settings.error_codes.invalid_credit_card, :message => "Credit card is already add with other expiration date. #{credit_card_to_activate.expire_month}/#{credit_card_to_activate.expire_year} -- #{credit_card[:expire_month]}/#{credit_card[:expire_year]} --------- #{credit_card_to_activate.expire_year == credit_card[:expire_year]} -- #{credit_card_to_activate.expire_month == credit_card[:expire_month]}" }
-              end
+                answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => credit_card_to_update.errors.to_hash }
+              end        
+            rescue Exception => e
+              answer = { :message => "There was an error. We could not add the credit card.", :error => Settings.error_codes.invalid_credit_card }
+              Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card })
+              logger.error e.inspect
+              raise ActiveRecord::Rollback
             end
           end
+          answer
+        elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
+          { :message => Settings.error_messages.credit_card_blacklisted, :code => Settings.error_codes.credit_card_blacklisted }
+        elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? # is this credit card already of this member and its already active?
+          active_credit_card.update_expire(new_year, new_month) # lets update expire month
+        elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
+          # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
+          { :message => Settings.error_messages.credit_card_in_use, :code => Settings.error_codes.credit_card_in_use }
+        elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
+          # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
+          new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
+          new_active_credit_card.set_as_active!
+          new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
         else
-          return { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => credit_card_to_update.errors.to_hash }
+          logger.error "Cant be truth. I dont know what is happening here!"
+          Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => "Dont know whats going on", :parameters => { :member => self.inspect })
+          { :message => "Generic error. Ask admin.", :error => Settings.error_codes.invalid_credit_card }
         end
-      elsif new_year or new_month
-        credit_card_to_update = CreditCard.new(:number => active_credit_card.number, :expire_month => credit_card[:expire_month], :expire_year => credit_card[:expire_year])
-        credit_card_to_update.member = self
-        if credit_card_to_update.am_card.valid?
-          message = "Changed credit card XXXX-XXXX-XXXX-#{active_credit_card.last_digits} from #{active_credit_card.expire_month}/#{active_credit_card.expire_year} to #{credit_card[:expire_month]}/#{credit_card[:expire_year]}"
-          active_credit_card.update_attributes(:expire_month => credit_card[:expire_month], :expire_year => credit_card[:expire_year] )
-          Auditory.audit(@current_agent, active_credit_card, message, self)
-          return { :code => Settings.error_codes.success, :message => message, :errors => credit_card_to_update.errors.to_hash }
-        else
-          return { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => credit_card_to_update.errors.to_hash }
-        end
-      else
-        { :code => Settings.error_codes.success }
       end
     end
+
     def desnormalize_preferences
       if self.preferences.present?
         self.preferences.each do |key, value|

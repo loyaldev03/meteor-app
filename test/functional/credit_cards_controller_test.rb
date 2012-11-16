@@ -15,7 +15,7 @@ class CreditCardsControllerTest < ActionController::TestCase
     # request.env["devise.mapping"] = Devise.mappings[:agent]
   end
 
-  def generate_post_message()
+  def generate_post_message
     post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.visible_id, 
                   credit_card: { :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
   end  
@@ -29,7 +29,7 @@ class CreditCardsControllerTest < ActionController::TestCase
    
     assert_difference('Operation.count',1) do
       assert_difference('CreditCard.count',1) do
-        generate_post_message()
+        generate_post_message
       end
     end
     assert_response :success
@@ -48,7 +48,7 @@ class CreditCardsControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count') do
       assert_difference('CreditCard.count',0) do
-        generate_post_message()
+        generate_post_message
       end
     end
     assert_response :success
@@ -67,7 +67,7 @@ class CreditCardsControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count') do
       assert_difference('CreditCard.count',0) do
-        generate_post_message()
+        generate_post_message
       end
     end
     assert_response :success
@@ -86,7 +86,7 @@ class CreditCardsControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
-        generate_post_message()
+        generate_post_message
       end
     end
     assert_response :success
@@ -105,7 +105,7 @@ class CreditCardsControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
-        generate_post_message()
+        generate_post_message
       end
     end
     assert_response :success
@@ -119,9 +119,9 @@ class CreditCardsControllerTest < ActionController::TestCase
 
     @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @saved_member.id
 
-    assert_difference('Operation.count',1) do
+    assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
-        generate_post_message()
+        generate_post_message
       end
     end
 
@@ -139,7 +139,7 @@ class CreditCardsControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
-        generate_post_message()
+        generate_post_message
       end
     end
     assert_response :success
@@ -155,7 +155,7 @@ class CreditCardsControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',1) do
       assert_difference('CreditCard.count',0) do
-        generate_post_message()
+        generate_post_message
       end
     end
     assert_response :success
@@ -173,7 +173,7 @@ class CreditCardsControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',1) do
       assert_difference('CreditCard.count',0) do
-        generate_post_message()
+        generate_post_message
       end
     end
     assert_response :success
