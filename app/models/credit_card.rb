@@ -52,7 +52,7 @@ class CreditCard < ActiveRecord::Base
   end
 
   def am_card
-    CreditCard.am_card(number, expire_month, expire_year, member.first_name, member.last_name)
+    @am ||= CreditCard.am_card(number, expire_month, expire_year, member.first_name, member.last_name)
   end
 
   def update_last_digits

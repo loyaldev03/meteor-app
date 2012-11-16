@@ -850,26 +850,7 @@ class Member < ActiveRecord::Base
         new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
         credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? ", new_credit_card.encrypted_number, club.id ] )
         if credit_cards.empty?
-          answer = { :message => "There was an error. We could not add the credit card.", :error => Settings.error_codes.invalid_credit_card }
-          CreditCard.transaction do 
-            begin
-              new_credit_card.member = self
-              if new_credit_card.am_card.valid?
-                new_credit_card.save!
-                message = "Credit card #{new_credit_card.last_digits} added and activated."
-                Auditory.audit(current_agent, new_credit_card, message, self)
-                answer = { :code => Settings.error_codes.success, :message => message }
-                new_credit_card.set_as_active!
-              else
-                answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => new_credit_card.errors.to_hash }
-              end        
-            rescue Exception => e
-              Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card })
-              logger.error e.inspect
-              raise ActiveRecord::Rollback
-            end
-          end
-          answer
+          add_new_credit_card(new_credit_card, current_agent)
         elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
           { :message => Settings.error_messages.credit_card_blacklisted, :code => Settings.error_codes.credit_card_blacklisted }
         elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? # is this credit card already of this member and its already active?
@@ -882,12 +863,35 @@ class Member < ActiveRecord::Base
           new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
           new_active_credit_card.set_as_active!
           new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
+        elsif credit_cards.select { |cc| cc.active }.empty? # its not my credit card. its from another member. the question is. can I use it?
+          add_new_credit_card(new_credit_card, current_agent)
         else
-          logger.error "Cant be truth. I dont know what is happening here!"
-          Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => "Dont know whats going on", :parameters => { :member => self.inspect })
-          { :message => "Generic error. Ask admin.", :error => Settings.error_codes.invalid_credit_card }
+          { :message => "This credit card is already active by other member.", :error => Settings.error_codes.credit_card_in_use }
         end
       end
+    end
+
+    def add_new_credit_card(new_credit_card, current_agent = nil)
+      answer = { :message => "There was an error. We could not add the credit card.", :error => Settings.error_codes.invalid_credit_card }
+      CreditCard.transaction do 
+        begin
+          new_credit_card.member = self
+          if new_credit_card.am_card.valid?
+            new_credit_card.save!
+            message = "Credit card #{new_credit_card.last_digits} added and activated."
+            Auditory.audit(current_agent, new_credit_card, message, self)
+            answer = { :code => Settings.error_codes.success, :message => message }
+            new_credit_card.set_as_active!
+          else
+            answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => new_credit_card.am_card.errors.to_hash }
+          end        
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card })
+          logger.error e.inspect
+          raise ActiveRecord::Rollback
+        end
+      end
+      answer
     end
 
     def desnormalize_preferences
