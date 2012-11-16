@@ -246,9 +246,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     
     @credit_card = FactoryGirl.build :credit_card_american_express
-    assert_difference('Operation.count',2) do
+    assert_difference('Operation.count',3) do
       assert_difference('CreditCard.count') do
-        generate_put_message()
+        generate_put_message
       end
     end
     assert_response :success
@@ -267,7 +267,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
-        generate_put_message()
+        generate_put_message
       end
     end
 
@@ -288,7 +288,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
-        generate_put_message()
+        generate_put_message
       end
     end
     assert_response :success
@@ -309,7 +309,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count') do
       assert_difference('CreditCard.count',0) do
-        generate_put_message()
+        generate_put_message
       end
     end
     assert_response :success
@@ -329,7 +329,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
-        generate_put_message()
+        generate_put_message
       end
     end
     
@@ -351,7 +351,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
-        generate_put_message()
+        generate_put_message
       end
     end
     assert_response :success
@@ -366,9 +366,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     cc_number = @active_credit_card.number
     @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id
 
-    assert_difference('Operation.count',2) do
+    assert_difference('Operation.count', 2) do
       assert_difference('CreditCard.count',0) do
-        generate_put_message()
+        generate_put_message
       end
     end
 
@@ -388,7 +388,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
-        generate_put_message()
+        generate_put_message
       end
     end
     assert_response :success
@@ -407,7 +407,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
-        generate_put_message()
+        generate_put_message
       end
     end
     assert_response :success
@@ -427,7 +427,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
-        generate_put_message()
+        generate_put_message
       end
     end
     assert_response :success

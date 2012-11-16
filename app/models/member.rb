@@ -861,8 +861,12 @@ class Member < ActiveRecord::Base
         elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
           # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
           new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
-          new_active_credit_card.set_as_active!
-          new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
+          answer = new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
+          if answer[:code] == Settings.error_codes.success
+            # activate new credit card ONLY if expire date was updated.
+            new_active_credit_card.set_as_active!
+          end
+          answer
         elsif credit_cards.select { |cc| cc.active }.empty? # its not my credit card. its from another member. the question is. can I use it?
           add_new_credit_card(new_credit_card, current_agent)
         else
