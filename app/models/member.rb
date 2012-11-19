@@ -64,12 +64,7 @@ class Member < ActiveRecord::Base
         logger.info "Drupal::sync took #{time_elapsed}ms"
       end
     end
-    unless @skip_pardot_sync || pardot_member.nil?
-      time_elapsed = Benchmark.ms do
-        pardot_member.save! 
-      end
-      logger.info "Pardot::sync took #{time_elapsed}ms"
-    end
+    sync_to_pardot unless @skip_pardot_sync || pardot_member.nil?
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
@@ -772,9 +767,7 @@ class Member < ActiveRecord::Base
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
     end
 
-    def asyn_desnormalize_preferences(opts = {})
-      self.desnormalize_preferences if opts[:force] || self.changed.include?('preferences') 
-    end
+
 
     def propagate_membership_data
       self.current_membership.update_attribute :status, status
@@ -921,5 +914,16 @@ class Member < ActiveRecord::Base
       end
     end
     handle_asynchronously :desnormalize_preferences
+
+    def sync_to_pardot
+      time_elapsed = Benchmark.ms do
+        pardot_member.save! 
+      end
+      logger.info "Pardot::sync took #{time_elapsed}ms"
+    rescue Exception => e
+      Airbrake.notify(:error_class => "Pardot:sync", :error_message => e, :parameters => { :member => self.inspect })
+    end
+    # sync member in 10 minutes, why? lets allow prospect to be synced first.
+    handle_asynchronously :sync_to_pardot, :run_at => Proc.new { 5.minutes.from_now }
 
 end

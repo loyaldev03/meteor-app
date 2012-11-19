@@ -33,14 +33,17 @@ class Prospect < ActiveRecord::Base
   private
 
     def after_create_sync_to_remote_domain
-      if pardot_prospect.nil?
-        time_elapsed = Benchmark.ms do
-          pardot_prospect.create! 
-        end
-        logger.info "Pardot::sync took #{time_elapsed}ms"
+      sync_to_remote_domain if pardot_prospect.nil?
+    end
+
+    def sync_to_remote_domain
+      time_elapsed = Benchmark.ms do
+        pardot_prospect.save! 
       end
+      logger.info "Pardot::sync took #{time_elapsed}ms"
     rescue Exception => e
       Airbrake.notify(:error_class => "Prospect:sync", :error_message => e, :parameters => { :prospect => self.inspect })
     end
+    handle_asynchronously :sync_to_remote_domain
 
 end

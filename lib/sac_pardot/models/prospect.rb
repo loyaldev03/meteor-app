@@ -1,11 +1,14 @@
 module Pardot
   class Prospect < Struct.new(:prospect)
 
-    def create!
+    def save!
       unless self.prospect.email.include?('@noemail.com') # do not sync @noemail.com
         begin
-          res = conn.prospects.create(CGI.escape(self.prospect.email), fieldmap)
-          Pardot.logger.debug "Pardot answer: " + res.inspect
+          member = Member.find_by_club_id_and_email(self.club.id, self.prospect.email)
+          if member.nil?
+            res = conn.prospects.save(CGI.escape(self.prospect.email), fieldmap)
+            Pardot.logger.debug "Pardot answer: " + res.inspect
+          end
         rescue Exception => e
           res = $!.to_s
           Pardot.logger.info "  => #{$!.to_s}"
