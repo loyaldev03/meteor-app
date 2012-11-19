@@ -55,6 +55,7 @@ class MembersController < ApplicationController
     @credit_card = @member.credit_cards.build
     @terms_of_memberships = TermsOfMembership.where(:club_id => @current_club )
     @enrollment_info = @member.enrollment_infos.build
+    
   end
 
   def edit  

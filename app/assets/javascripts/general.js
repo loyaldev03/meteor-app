@@ -214,6 +214,12 @@ $(document).ready( function() {
     $('#zip_help').popover({offset: 10});
     $('#phone_number_help').popover({offset: 10});   
     $('.help').popover({offset: 10});
+    
+    $('#member_country').live('change',  function(){
+      country = $('#member_country').val();
+      $.get(this.action, { country_code:country }, null, 'script'); 
+    })
+
   };
 
   function edit_member_functions(){
@@ -258,6 +264,11 @@ $(document).ready( function() {
       alert('An unexpected error occurred.');
     });
     $('.help').popover({offset: 10});
+
+    $('#member_country').live('change',  function(){
+      country = $('#member_country').val();
+      $.get('', { country_code:country }, null, 'script'); 
+    })
   };
 
   function club_cash_functions(){

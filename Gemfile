@@ -34,6 +34,7 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
+gem 'carmen-rails'
 gem 'country_code_select', '~> 1.0.0' 
 gem 'i18n-country-translations'
 gem 'devise', '2.0.4'
