@@ -6,6 +6,8 @@ class Operation < ActiveRecord::Base
 
   before_create :set_operation_date_if_nil
 
+  validates :description, :presence => true
+
   def self.datatable_columns
     ['id', 'operation_date', 'description', 'notes']
   end
