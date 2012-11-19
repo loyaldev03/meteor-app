@@ -143,7 +143,6 @@ class Api::MembersController < ApplicationController
     authorize! :api_update, Member
     response = {}
     batch_update = params[:setter] && params[:setter][:batch_update] && params[:setter][:batch_update].to_s.to_bool
-    new_credit_card = CreditCard.new params[:member][:credit_card]
 
     member = Member.find(params[:id])
     member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync] && params[:setter][:skip_api_sync].to_s.to_bool
@@ -154,13 +153,9 @@ class Api::MembersController < ApplicationController
                                                           member.phone_area_code != params[:member][:phone_area_code].to_i ||
                                                           member.phone_local_number != params[:member][:phone_local_number].to_i)
 
-    if new_credit_card.number == member.active_credit_card.number and new_credit_card.expire_month == member.active_credit_card.expire_month and new_credit_card.expire_year == member.active_credit_card.expire_year
-      response = { :code => Settings.error_codes.invalid_credit_card,  :message => "Credit card is already set as active." }
-    elsif not new_credit_card.number.nil?
-      response = member.update_credit_card_from_drupal(params[:member][:credit_card], @current_agent)
-    end
+    response = member.update_credit_card_from_drupal(params[:member][:credit_card], @current_agent)
 
-    if new_credit_card.number.nil? or response[:code] == Settings.error_codes.success
+    if response[:code] == Settings.error_codes.success
       unless params[:member].nil?
         member.update_member_data_by_params(params[:member])
         if member.save
@@ -178,6 +173,7 @@ class Api::MembersController < ApplicationController
         end
       end
     end
+    logger.error "Answering #{response.inspect}"
     render json: response
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
