@@ -11,7 +11,7 @@ namespace :billing do
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.bill_membership
           rescue Exception => e
-            Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -36,7 +36,7 @@ namespace :members do
           member.refresh_autologin_url!
         rescue
           Airbrake.notify error_class: "Members::Members", 
-            error_message: "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}"
+            error_message: "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect }
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
@@ -58,7 +58,7 @@ namespace :members do
             Rails.logger.info "  * processing member ##{member.id}"
             Member.find(member.id).set_as_canceled!
           rescue Exception => e
-            Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -87,7 +87,7 @@ namespace :members do
               credit_card.save
             end
           rescue Exception => e
-            Airbrake.notify(:error_class => "Members::CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Airbrake.notify(:error_class => "Members::CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :credit_card => credit_card.inspect })
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for credit_card ##{credit_card.id}"
@@ -110,7 +110,7 @@ namespace :members do
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.reset_club_cash
           rescue Exception => e
-            Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -132,7 +132,7 @@ namespace :members do
             Rails.logger.info "  * processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
             fulfillment.renew!
           rescue Exception => e
-            Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :fulfillment => fulfillment.inspect })
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
         end
