@@ -6,7 +6,9 @@ class MembersController < ApplicationController
   authorize_resource :member
   
   def index
-     respond_to do |format|
+    @countries = Carmen::Country.coded('US').subregions + Carmen::Country.coded('CA').subregions
+
+    respond_to do |format|
       format.html 
       format.js 
     end
@@ -61,6 +63,7 @@ class MembersController < ApplicationController
   def edit  
     @member = @current_member
     @member_group_types = MemberGroupType.find_all_by_club_id(@current_club)
+    @country = Carmen::Country.coded(@member.country)
   end
 
   def save_the_sale

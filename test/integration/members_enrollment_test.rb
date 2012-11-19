@@ -114,8 +114,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select(unsaved_member.gender, :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        fill_in 'member[state]', :with => unsaved_member.state
-        select(unsaved_member.country_name, :from => 'member[country]')
+        if unsaved_member.country == 'US'
+          select('United States', :from => 'member[country]')
+        else
+          select('Canada', :from => 'member[country]')
+        end
+        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -137,6 +141,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
       }
     end
+    unless unsaved_member.external_id.nil?
+      fill_in 'member[external_id]', :with => unsaved_member.external_id
+    end 
+
     alert_ok_js
     click_link_or_button 'Create Member'  	
   end
@@ -148,10 +156,13 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#table_demographic_information")do
       wait_until{
         fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select(unsaved_member.gender, :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        fill_in 'member[state]', :with => unsaved_member.state
-        select(unsaved_member.country_name, :from => 'member[country]')
+        if unsaved_member.country == 'US'
+          select('United States', :from => 'member[country]')
+        else
+          select('Canada', :from => 'member[country]')
+        end
+        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -174,6 +185,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
       }
     end
+    unless unsaved_member.external_id.nil?
+      fill_in 'member[external_id]', :with => unsaved_member.external_id
+    end 
     alert_ok_js
     click_link_or_button 'Create Member'    
   end
@@ -209,9 +223,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       fill_in 'member[city]', :with => unsaved_member.city
       fill_in 'member[address]', :with => unsaved_member.address
       fill_in 'member[zip]', :with => unsaved_member.zip
-      fill_in 'member[state]', :with => unsaved_member.state
-      select('M', :from => 'member[gender]')
-	  	select('United States', :from => 'member[country]')
+      if unsaved_member.country == 'US'
+        select('United States', :from => 'member[country]')
+      else
+        select('Canada', :from => 'member[country]')
+      end
+      within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
+      select('M', :from => 'member[gender]') 
+	  	
 		}
 
 		page.execute_script("window.jQuery('#member_birth_date').next().click()")
@@ -236,9 +255,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   			fill_in 'member[credit_card][expire_month]', :with => "#{unsaved_member.active_credit_card.expire_month}"
   			fill_in 'member[credit_card][expire_year]', :with => "#{unsaved_member.active_credit_card.expire_year}"
   		}
-    end
-    
-      
+    end      
     unless unsaved_member.external_id.nil?
     	fill_in 'member[external_id]', :with => unsaved_member.external_id
     end 
@@ -252,9 +269,19 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert page.has_content?("#{unsaved_member.first_name} #{unsaved_member.last_name}")
 
 	end
+  # When creating member from web, should add KIT and CARD fulfillments 
+  def validate_timezone_dates(timezone)
+    @club.time_zone = timezone
+    @club.save
+    Time.zone = timezone
+    @saved_member.reload
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(@saved_member.member_since_date, :format => :only_date)) }
+    within("#td_mi_join_date") { assert page.has_content?(I18n.l(@saved_member.join_date, :format => :only_date)) }    
+    within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(@saved_member.next_retry_bill_date, :format => :only_date)) }    
+    within("#td_mi_credit_cards_first_created_at") { assert page.has_content?(I18n.l(@saved_member.credit_cards.first.created_at, :format => :only_date)) }    
+  end
 
-
-  # When creating member from web, should add KIT and CARD fulfillments
   test "create member" do
   	setup_member(false)
 
@@ -311,8 +338,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   end
 
-
-
   test "create a member inside a club with external_id in true" do
   	setup_member(false)
   	@club.requires_external_id = true
@@ -343,7 +368,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   	visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_on 'New Member'
     create_new_member(unsaved_member)
-
   end
 
   test "display external_id at member search" do
@@ -353,29 +377,15 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   	unsaved_member = FactoryGirl.build(:active_member, 
       :club_id => @club.id, :external_id => "9876543210")
-
-  	visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_on 'New Member'
-    create_new_member(unsaved_member)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    
+    fill_in_member(unsaved_member, credit_card)
 
     member = Member.last
 
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
     search_member("member[member_id]", "#{member.visible_id}", member)
 
-  end
-
-
-  def validate_timezone_dates(timezone)
-    @club.time_zone = timezone
-    @club.save
-    Time.zone = timezone
-    @saved_member.reload
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(@saved_member.member_since_date, :format => :only_date)) }
-    within("#td_mi_join_date") { assert page.has_content?(I18n.l(@saved_member.join_date, :format => :only_date)) }    
-    within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(@saved_member.next_retry_bill_date, :format => :only_date)) }    
-    within("#td_mi_credit_cards_first_created_at") { assert page.has_content?(I18n.l(@saved_member.credit_cards.first.created_at, :format => :only_date)) }    
   end
 
   test "show dates according to club timezones" do
@@ -417,11 +427,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{
         fill_in 'member[first_name]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in 'member[address]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-        fill_in 'member[state]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in 'member[city]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in 'member[last_name]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in 'member[zip]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         select('United States', :from => 'member[country]')
+        within('#states_div'){ select('Colorado', :from => 'member[state]') }
       }
     }
     within("#table_contact_information"){
@@ -443,7 +453,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
         assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
         assert page.has_content?("address: is invalid"), "Failure on address validation message"
-        assert page.has_content?("state: is invalid"), "Failure on state validation message"
         assert page.has_content?("city: is invalid"), "Failure on city validation message"
         assert page.has_content?("zip: The zip code is not valid for the selected country."), "Failure on zip validation message"
       }
@@ -541,40 +550,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New Member'
+    fill_in_member(unsaved_member,credit_card)
 
-    within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select('M', :from => 'member[gender]')
-        fill_in 'member[address]', :with => unsaved_member.address
-        fill_in 'member[state]', :with => unsaved_member.state
-        select('United States', :from => 'member[country]')
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
-    end
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number.capitalize,:from => 'member[type_of_phone_number]')
-        fill_in 'member[email]', :with => unsaved_member.email
-      }
-    end
-    within("#table_credit_card")do
-      wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
-        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
-      }
-    end
-    alert_ok_js
-    click_link_or_button 'Create Member'
     wait_until{
       assert find_field('input_gender').value == ('Male')
     }
@@ -583,42 +560,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create member with gender female" do
     setup_member
     unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
+                                         :club_id => @club.id, :gender => 'F')
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New Member'
-
-    within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select('F', :from => 'member[gender]')
-        fill_in 'member[address]', :with => unsaved_member.address
-        fill_in 'member[state]', :with => unsaved_member.state
-        select('United States', :from => 'member[country]')
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
-    end
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number.capitalize,:from => 'member[type_of_phone_number]')
-        fill_in 'member[email]', :with => unsaved_member.email
-      }
-    end
-    within("#table_credit_card")do
-      wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
-        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
-      }
-    end
-    alert_ok_js
-    click_link_or_button 'Create Member'
+    fill_in_member(unsaved_member,credit_card)
     wait_until{
       assert find_field('input_first_name').value == unsaved_member.first_name
     }
@@ -643,7 +588,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select('M', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        fill_in 'member[state]', :with => unsaved_member.state
+        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
         select('United States', :from => 'member[country]')
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
@@ -692,8 +637,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select('M', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        fill_in 'member[state]', :with => unsaved_member.state
         select('United States', :from => 'member[country]')
+        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -723,6 +668,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
+  # create member with 'home' telephone type
   test "should create member and display type of phone number" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id, :type_of_phone_number => 'home')
@@ -730,56 +676,13 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     
     fill_in_member(unsaved_member, credit_card)
     member = Member.find_by_email(unsaved_member.email)
-    
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+
     within("#table_contact_information")do
       wait_until{
         assert page.has_content?(unsaved_member.type_of_phone_number.capitalize)
       }
     end
-
-  end
-
-  test "create member with 'home' telephone type" do
-    setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New Member'
-
-    within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select('M', :from => 'member[gender]')
-        fill_in 'member[address]', :with => unsaved_member.address
-        fill_in 'member[state]', :with => unsaved_member.state
-        select('United States', :from => 'member[country]')
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
-    end
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select('Home', :from => 'member[type_of_phone_number]')
-        fill_in 'member[email]', :with => unsaved_member.email
-      }
-    end
-    within("#table_credit_card")do
-      wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
-        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
-      }
-    end
-    alert_ok_js
-    click_link_or_button 'Create Member'
-
-    member = Member.find_by_email(unsaved_member.email)
     within("#table_contact_information")do
       wait_until{
         assert page.has_content?(unsaved_member.full_phone_number)
@@ -795,7 +698,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                          :address => '1455 De Maisonneuve Blvd. W. Montreal',
                                          :state => 'Quebec',
                                          :zip => 'H3G 1M8',
-                                         :country => 'CA')
+                                         :country => 'Canada')
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)
@@ -855,10 +758,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member(unsaved_member,credit_card)
-
-    wait_until{
-      assert find_field('input_first_name').value == unsaved_member.first_name
-    }
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
     saved_member = Member.find_by_email(unsaved_member.email)
     generate_operations(saved_member)
@@ -866,15 +766,15 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.visible_id)
 
     within("#operations_table")do
-    	wait_until{
-    		assert page.has_content?('Member was enrolled')
-    		assert page.has_content?('Blacklisted member. Reason: Too much spam')
-    		assert page.has_content?('Blacklisted member. Reason: dont like it')
-    		assert page.has_content?('Blacklisted member. Reason: testing')
-    		assert page.has_content?('Member updated successfully')
-    		assert page.has_content?('Member was recovered')
-    	}
-   	end
+      wait_until{
+        assert page.has_content?('Member was enrolled')
+        assert page.has_content?('Blacklisted member. Reason: Too much spam')
+        assert page.has_content?('Blacklisted member. Reason: dont like it')
+        assert page.has_content?('Blacklisted member. Reason: testing')
+        assert page.has_content?('Member updated successfully')
+        assert page.has_content?('Member was recovered')
+      }
+    end
   end
 
   test "see operation history from lastest to newest" do

@@ -28,7 +28,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
    end
 
-
   test "edit member" do
     setup_member
     visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)

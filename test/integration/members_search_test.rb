@@ -38,9 +38,9 @@ class MembersSearchTest < ActionController::IntegrationTest
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    20.times{ create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) }
-    10.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
-    10.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
+    50.times{ create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) }
+    25.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
+    25.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
     @search_member = Member.first
     sign_in_as(@admin_agent)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -125,8 +125,12 @@ class MembersSearchTest < ActionController::IntegrationTest
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select(unsaved_member.gender, :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        fill_in 'member[state]', :with => unsaved_member.state
-        select(unsaved_member.country_name, :from => 'member[country]')
+        if unsaved_member.country == 'US'
+          select('United States', :from => 'member[country]')
+        else
+          select('Canada', :from => 'member[country]')
+        end
+        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -233,8 +237,6 @@ class MembersSearchTest < ActionController::IntegrationTest
       }
     end
   end
-
-
 
   test "search a member with next bill date in past" do
     setup_search
@@ -390,7 +392,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     member_to_seach = Member.first
     within("#contact_details")do
       wait_until{
-        fill_in "member[state]", :with => member_to_seach.state
+        select member_to_seach.state, :from => 'member[state]'
       }
     end
     click_link_or_button 'Search'
@@ -475,7 +477,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#contact_details")do
       wait_until{
         fill_in "member[city]", :with => @saved_member.city
-        fill_in "member[state]", :with => @saved_member.state
+        select @saved_member.state, :from => 'member[state]'
         fill_in "member[address]", :with => @saved_member.address
         fill_in "member[zip]", :with => @saved_member.zip
       }
@@ -544,7 +546,6 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#contact_details")do
       wait_until{
         fill_in "member[city]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-        fill_in "member[state]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in "member[address]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in "member[zip]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
       }

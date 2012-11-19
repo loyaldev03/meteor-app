@@ -13,7 +13,6 @@
 <script type="text/javascript">
   $(document).ready( edit_member_functions() );
   if(state!=""){
-  	alert("jasd");
   	$.get('', { country_code:"<%=@current_member.country%>", 
   		        selected_state:state }, null, 'script'); 
   }
