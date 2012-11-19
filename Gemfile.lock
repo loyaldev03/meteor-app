@@ -98,6 +98,10 @@ GEM
       rack-test (>= 0.5.4)
       selenium-webdriver (~> 2.0)
       xpath (~> 0.1.4)
+    carmen (1.0.0.beta2)
+    carmen-rails (1.0.0.beta3)
+      carmen (~> 1.0.0.beta2)
+      rails
     childprocess (0.3.5)
       ffi (~> 1.0, >= 1.0.6)
     choice (0.1.6)
@@ -323,6 +327,7 @@ DEPENDENCIES
   brakeman
   cancan
   capybara
+  carmen-rails
   coffee-rails (~> 3.2.1)
   country_code_select (~> 1.0.0)
   daemons

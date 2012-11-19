@@ -60,18 +60,20 @@
         </tr>
         <tr class = "control-group">
           <th>
-            <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline' %>
+            <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline' %>
           </th>
           <td> 
-            <%= f.text_field :state, :class => 'text_field' %> 
+            <%= select_tag('member[country]', options_for_select([["United States","US"],["Canada","CA"]])) %>
           </td>  
         </tr>
         <tr class = "control-group">
           <th>
-            <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline' %>
+            <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline' %>
           </th>
           <td> 
-            <%= f.country_code_select(:country, [['', '']] + Member.supported_countries.map { |cc| [Member.country_name(cc), cc]}) %> 
+            <div id="states_div">
+              <%= render :partial => 'states', :locals => {:f => f, :state => (@current_member.state if @current_member)}  %>
+            </div>
           </td>  
         </tr>
       </table>
@@ -268,6 +270,4 @@
 <% if @member.new_record? %>
   <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
 <% end %>
-
-
 
