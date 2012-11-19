@@ -118,5 +118,3 @@ module Pardot
   end
 end
 
-
-
