@@ -78,7 +78,6 @@ module Pardot
         wrong_phone_number: (m.wrong_phone_number ? 1 : 0),
         external_id: m.external_id,
         club_cash_amount: m.club_cash_amount,
-        autologin_url: m.autologin_url,
         member_number: m.visible_id,
         club: m.club.name,
         client: m.club.partner.name,
