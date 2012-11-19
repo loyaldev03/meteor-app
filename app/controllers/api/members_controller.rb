@@ -173,7 +173,6 @@ class Api::MembersController < ApplicationController
         end
       end
     end
-    logger.error "Answering #{response.inspect}"
     render json: response
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
