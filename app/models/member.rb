@@ -402,8 +402,8 @@ class Member < ActiveRecord::Base
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
       elsif not (cc_blank or credit_card_params[:number].blank?)
-        message = Settings.error_messages.credit_card_already_in_use
-        Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_already_in_use)
+        message = Settings.error_messages.credit_card_in_use
+        Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_in_use)
         return { :message => message, :code => Settings.error_codes.credit_card_in_use }
       end
     elsif member.blacklisted
@@ -870,7 +870,7 @@ class Member < ActiveRecord::Base
         elsif credit_cards.select { |cc| cc.active }.empty? # its not my credit card. its from another member. the question is. can I use it?
           add_new_credit_card(new_credit_card, current_agent)
         else
-          { :message => "This credit card is already active by other member.", :error => Settings.error_codes.credit_card_in_use }
+          { :message => Settings.error_messages.credit_card_in_use, :error => Settings.error_codes.credit_card_in_use }
         end
       end
     end

@@ -45,7 +45,7 @@ defaults: &defaults
     add_club_cash: 209
     deducted_club_cash: 210
     reset_club_cash: 211
-    credit_card_already_in_use: 401
+    credit_card_in_use: 401
     credit_card_blacklisted: 402
     member_email_blacklisted: 403
     automatic_recycle_credit_card: 404
@@ -55,7 +55,6 @@ defaults: &defaults
   error_messages:
     member_data_invalid: "Member data is invalid."
     credit_card_blacklisted: "Unfortunately, there was a problem processing your credit card. Please call member services at: xxx-xxx-xxxx."
-    credit_card_already_in_use: "We're sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: xxx-xxx-xxxx."
     member_email_blacklisted: "There was a problem processing your enrollment. Please call member services at: xxx-xxx-xxxx."
     credit_card_blank: "There was an error with your credit card information. Please verify your information and resubmit."
     cant_recover_member: "There was a problem processing your enrollment. Please call member services at: xxx-xxx-xxxx."

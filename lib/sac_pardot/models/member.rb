@@ -92,12 +92,12 @@ module Pardot
         e = cm.enrollment_info
         unless e.nil?
           map.merge!({
-            marketing_code: e.marketing_code.capitalize,
-            mega_channel: e.mega_channel.capitalize,
+            marketing_code: e.marketing_code.to_s.capitalize,
+            mega_channel: e.mega_channel.to_s.capitalize,
             joint: (e.joint ? 1 : 0),
             fulfillment_code: e.fulfillment_code,
             campaign_medium_version: e.campaign_medium_version,
-            campaign_medium: e.campaign_medium.capitalize,
+            campaign_medium: e.campaign_medium.to_s.capitalize,
             product_sku: e.product_sku,
             landing_url: e.landing_url,
             enrollment_amount: "%.2f" % e.enrollment_amount
