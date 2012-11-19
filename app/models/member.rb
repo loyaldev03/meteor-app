@@ -33,8 +33,6 @@ class Member < ActiveRecord::Base
       :wrong_phone_number, :credit_cards_attributes, :birth_date,
       :gender, :type_of_phone_number, :preferences
 
-  # accepts_nested_attributes_for :credit_cards, :limit => 1
-
   serialize :preferences, JSON
 
   before_create :record_date

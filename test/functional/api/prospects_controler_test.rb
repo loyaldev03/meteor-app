@@ -52,7 +52,6 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     @current_club = @terms_of_membership.club
   	assert_difference('Prospect.count') do
       do_post
-      sleep 1000
       assert_response :success
     end
   end
