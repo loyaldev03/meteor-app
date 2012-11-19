@@ -142,7 +142,6 @@ def delete_functions(member)
   delete_credit_cards(member)
   delete_transactions(member)
   delete_fulfillments(member)
-  delete_communications(member)
   delete_club_cash_transactions(member)
   delete_member(member)
 end
