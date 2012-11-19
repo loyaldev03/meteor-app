@@ -1,0 +1,11 @@
+<%= 
+	unless params[:country_code].nil?
+		select_tag( 'member[state]' , options_from_collection_for_select(
+	        Carmen::Country.coded(params[:country_code]).subregions,
+	        "name", "name", 
+	        params[:selected_state]),
+	        :include_blank => true) 
+	else
+		select_tag 'member[state]' , options_for_select(['',''])
+	end
+%>

@@ -63,7 +63,7 @@
             <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline' %>
           </th>
           <td> 
-            <%= select_tag('member[country]', options_for_select([["United States","US"],["Canada","CA"]])) %>
+            <%= f.select :country, [['United States', 'US'],['Canada', 'CA']], :class => 'select_field', :include_blank => true %>
           </td>  
         </tr>
         <tr class = "control-group">
