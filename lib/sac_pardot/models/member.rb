@@ -6,10 +6,10 @@ module Pardot
     MEMBERSHIP_OBSERVED_FIELDS = %w(terms_of_membership join_date cancel_date quota).to_set.freeze
     ENROLLMENT_INFO_OBSERVED_FIELDS = %w(joint marketing_code mega_channel fulfillment_code campaign_medium_version campaign_medium product_sku landing_url enrollment_amount).to_set.freeze
 
-    def save!
+    def save!(options = {})
       unless self.member.email.include?('@noemail.com') # do not sync @noemail.com
         begin
-          res = conn.prospects.upsert_by_email(CGI.escape(self.member.email), fieldmap)
+          res = conn.prospects.upsert_by_email(CGI.escape(self.member.email), fieldmap(options))
           Pardot.logger.debug "Pardot answer: " + res.inspect
         rescue Exception => e
           res = $!.to_s
@@ -55,7 +55,7 @@ module Pardot
       self.member.reload rescue self.member
     end
 
-    def fieldmap
+    def fieldmap(options)
       m = self.member
       cm = m.current_membership
       map = {
@@ -86,6 +86,10 @@ module Pardot
 
       unless m.member_group_type_id.nil?
         map.merge!({ member_group_type: m.member_group_type.name })
+      end
+
+      unless options.empty?
+        map.merge!(options)
       end
 
       unless cm.nil?

@@ -915,9 +915,9 @@ class Member < ActiveRecord::Base
     end
     handle_asynchronously :desnormalize_preferences
 
-    def sync_to_pardot
+    def sync_to_pardot(options = {})
       time_elapsed = Benchmark.ms do
-        pardot_member.save! 
+        pardot_member.save!(options)
       end
       logger.info "Pardot::sync took #{time_elapsed}ms"
     rescue Exception => e
