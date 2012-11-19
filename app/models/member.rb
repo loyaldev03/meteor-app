@@ -120,18 +120,30 @@ class Member < ActiveRecord::Base
   scope :needs_approval, lambda{ |value| where('status = ?', 'applied') unless value == '0' }
 
   state_machine :status, :initial => :none, :action => :save_state do
-    after_transition [ :none, # enroll
-                       :provisional, # save the sale
-                       :lapsed, # reactivation
-                       :active # save the sale
-                    ] => :provisional, :do => :schedule_first_membership
-    after_transition :none => :applied, :do => [:set_join_date, :send_active_needs_approval_email]
-    after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :nillify_club_cash]
-    after_transition :lapsed => [:provisional], :do => :increment_reactivations
-    after_transition :applied => [:provisional], :do => :increment_reactivations
-    after_transition :lapsed => :applied, :do => [ :set_join_date, :send_recover_needs_approval_email ]
-    after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
-    after_transition :applied => :lapsed, :do => :set_cancel_date
+    ###### member gets applied =====>>>>
+    after_transition :lapsed => 
+                        :applied, :do => [:set_join_date, :send_recover_needs_approval_email]
+    after_transition [ :none, :provisional, :active ] => # none is new join. provisional and active are save the sale
+                        :applied, :do => [:set_join_date, :send_active_needs_approval_email]
+    ###### <<<<<<========
+    ###### member gets provisional =====>>>>
+    after_transition [ :none, :lapsed ] => # enroll and reactivation
+                        :provisional, :do => :schedule_first_membership
+    after_transition [ :provisional, :active ] => 
+                        :provisional, :do => :schedule_first_membership # save the sale
+    after_transition :applied => 
+                        :provisional, :do => :schedule_first_membership_for_approved_member
+    ###### <<<<<<========
+    ###### Reactivation handling =====>>>>
+    after_transition :lapsed => 
+                        [:applied, :provisional], :do => :increment_reactivations
+    ###### <<<<<<========
+    ###### Cancellation =====>>>>
+    after_transition [:provisional, :active ] => 
+                        :lapsed, :do => [:cancellation, :nillify_club_cash]
+    after_transition :applied => 
+                        :lapsed, :do => :set_member_as_rejected
+    ###### <<<<<<========
     after_transition all => all, :do => :propagate_membership_data
 
     event :set_as_provisional do
@@ -194,7 +206,8 @@ class Member < ActiveRecord::Base
     membership.save
   end
 
-  def set_cancel_date
+  def set_member_as_rejected
+    decrement!(:reactivation_times, 1) if reactivation_times > 0 # we increment when it gets applied. If we reject the member we have to get back
     self.current_membership.update_attribute(:cancel_date, Time.zone.now)
   end
 
