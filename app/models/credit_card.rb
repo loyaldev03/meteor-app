@@ -81,7 +81,7 @@ class CreditCard < ActiveRecord::Base
       Auditory.audit(current_agent, self, message, self.member)
       { :code => Settings.error_codes.success, :message => message }
     else
-      { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card + " Expiration date could be wrong.", errors:"New expiration date is expired." }
+      { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card + " Expiration date could be wrong.", :errors => { :number => "New expiration date is expired." }}
     end
   end
 
