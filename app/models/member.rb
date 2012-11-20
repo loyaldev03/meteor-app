@@ -844,7 +844,7 @@ class Member < ActiveRecord::Base
         if active_credit_card.last_digits.to_s == credit_card[:number][-4..-1].to_s # lets update expire month
           active_credit_card.update_expire(new_year, new_month)
         else # do not update nothing, credit cards do not match or its expired
-          { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card }
+          { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, errors:"Credit card do not match the active one." }
         end
       else # drupal or CS sends the complete credit card number.
         new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
@@ -852,12 +852,12 @@ class Member < ActiveRecord::Base
         if credit_cards.empty?
           add_new_credit_card(new_credit_card, current_agent)
         elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-          { :message => Settings.error_messages.credit_card_blacklisted, :code => Settings.error_codes.credit_card_blacklisted }
+          { :message => Settings.error_messages.credit_card_blacklisted, :code => Settings.error_codes.credit_card_blacklisted, errors:"Credit card is blacklisted" }
         elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? # is this credit card already of this member and its already active?
           active_credit_card.update_expire(new_year, new_month) # lets update expire month
         elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
           # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
-          { :message => Settings.error_messages.credit_card_in_use, :code => Settings.error_codes.credit_card_in_use }
+          { :message => Settings.error_messages.credit_card_in_use, :code => Settings.error_codes.credit_card_in_use, errors:"Credit card is already in use" }
         elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
           # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
           new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
@@ -888,8 +888,9 @@ class Member < ActiveRecord::Base
             new_credit_card.set_as_active!
           else
             answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => new_credit_card.am_card.errors.to_hash }
-          end        
+          end         
         rescue Exception => e
+          answer.merge!({:errors => e})
           Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card })
           logger.error e.inspect
           raise ActiveRecord::Rollback

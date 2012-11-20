@@ -64,7 +64,6 @@ class CreditCard < ActiveRecord::Base
       begin
         self.member.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
         self.update_attribute :active , true
-        message = 
         Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member)
       rescue Exception => e
         logger.error e.inspect
@@ -82,7 +81,7 @@ class CreditCard < ActiveRecord::Base
       Auditory.audit(current_agent, self, message, self.member)
       { :code => Settings.error_codes.success, :message => message }
     else
-      { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card + " Expiration date could be wrong." }
+      { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card + " Expiration date could be wrong.", errors:"New expiration date is expired." }
     end
   end
 
