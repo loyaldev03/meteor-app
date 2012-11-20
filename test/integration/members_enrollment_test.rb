@@ -572,57 +572,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
   end
 
-  test "create member with phone number" do
-    setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    
-
-
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New Member'
-
-    within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select('M', :from => 'member[gender]')
-        fill_in 'member[address]', :with => unsaved_member.address
-        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
-        select('United States', :from => 'member[country]')
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
-    end
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number.capitalize,:from => 'member[type_of_phone_number]')
-        fill_in 'member[email]', :with => unsaved_member.email
-      }
-    end
-    within("#table_credit_card")do
-      wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
-        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
-      }
-    end
-    alert_ok_js
-    click_link_or_button 'Create Member'
-    wait_until{
-      assert find_field('input_first_name').value == unsaved_member.first_name
-    }
-    within("#table_contact_information")do
-      wait_until{
-        assert page.has_content?("#{unsaved_member.full_phone_number}")
-      }
-    end
-  end
-
   test "create member without phone number" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
@@ -668,6 +617,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
+  # create member with phone number
   # create member with 'home' telephone type
   test "should create member and display type of phone number" do
     setup_member(false)
@@ -680,13 +630,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     within("#table_contact_information")do
       wait_until{
-        assert page.has_content?(unsaved_member.type_of_phone_number.capitalize)
-      }
-    end
-    within("#table_contact_information")do
-      wait_until{
         assert page.has_content?(unsaved_member.full_phone_number)
-        assert page.has_content?('Home')
+        assert page.has_content?(unsaved_member.type_of_phone_number.capitalize)
       }
     end
   end
