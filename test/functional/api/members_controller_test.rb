@@ -327,7 +327,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card.expire_year = @member.active_credit_card.expire_year
     @credit_card.expire_month = @member.active_credit_card.expire_month
 
-    assert_difference('Operation.count',0) do
+    assert_difference('Operation.count',1) do
       assert_difference('CreditCard.count',0) do
         generate_put_message
       end
@@ -335,6 +335,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     
     assert_response :success
     assert_equal(@member.active_credit_card.number, cc_number)
+    assert_equal(@member.active_credit_card.expire_year, @credit_card.expire_year)
+    assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
   end
 
   test "Should not update credit card when invalidid credit card number" do

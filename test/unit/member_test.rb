@@ -129,8 +129,23 @@ class MemberTest < ActiveSupport::TestCase
     member.reload
     assert answer[:code] == Settings.error_codes.success, answer[:message]
     assert_equal 'applied', member.status
+    assert_equal 1, member.reactivation_times
+  end
+
+  test "Recovered member in applied status is rejected. Reactivation times should stay at 0." do
+    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
+    member = create_active_member(@tom_approval, :lapsed_member)
+    answer = member.recover(@tom_approval)
+    member.reload
+    assert answer[:code] == Settings.error_codes.success, answer[:message]
+    assert_equal 'applied', member.status
+    assert_equal 1, member.reactivation_times
+    member.set_as_canceled
+    member.reload
+    assert_equal 'lapsed', member.status
     assert_equal 0, member.reactivation_times
   end
+
 
   test "Should not let create a member with a wrong format zip" do
     ['12345-1234', '12345'].each {|zip| zip
