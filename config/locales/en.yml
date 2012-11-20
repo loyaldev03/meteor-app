@@ -66,6 +66,8 @@ en:
     unset: 'Unset'
     edit: 'Edit'
     stop_editing: 'Stop editing'
+    select_country: 'Select country'
+    select_state: 'Select state'
   admin:
     agents:
       index:
