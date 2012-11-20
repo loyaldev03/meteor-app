@@ -33,8 +33,6 @@ class Member < ActiveRecord::Base
       :wrong_phone_number, :credit_cards_attributes, :birth_date,
       :gender, :type_of_phone_number, :preferences
 
-  # accepts_nested_attributes_for :credit_cards, :limit => 1
-
   serialize :preferences, JSON
 
   before_create :record_date
@@ -64,12 +62,7 @@ class Member < ActiveRecord::Base
         logger.info "Drupal::sync took #{time_elapsed}ms"
       end
     end
-    unless @skip_pardot_sync || pardot_member.nil?
-      time_elapsed = Benchmark.ms do
-        pardot_member.save! 
-      end
-      logger.info "Pardot::sync took #{time_elapsed}ms"
-    end
+    sync_to_pardot unless @skip_pardot_sync || pardot_member.nil?
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
@@ -120,18 +113,30 @@ class Member < ActiveRecord::Base
   scope :needs_approval, lambda{ |value| where('status = ?', 'applied') unless value == '0' }
 
   state_machine :status, :initial => :none, :action => :save_state do
-    after_transition [ :none, # enroll
-                       :provisional, # save the sale
-                       :lapsed, # reactivation
-                       :active # save the sale
-                    ] => :provisional, :do => :schedule_first_membership
-    after_transition :none => :applied, :do => [:set_join_date, :send_active_needs_approval_email]
-    after_transition [:provisional, :active] => :lapsed, :do => [:cancellation, :nillify_club_cash]
-    after_transition :lapsed => [:provisional], :do => :increment_reactivations
-    after_transition :applied => [:provisional], :do => :increment_reactivations
-    after_transition :lapsed => :applied, :do => [ :set_join_date, :send_recover_needs_approval_email ]
-    after_transition :applied => :provisional, :do => :schedule_first_membership_for_approved_member
-    after_transition :applied => :lapsed, :do => :set_cancel_date
+    ###### member gets applied =====>>>>
+    after_transition :lapsed => 
+                        :applied, :do => [:set_join_date, :send_recover_needs_approval_email]
+    after_transition [ :none, :provisional, :active ] => # none is new join. provisional and active are save the sale
+                        :applied, :do => [:set_join_date, :send_active_needs_approval_email]
+    ###### <<<<<<========
+    ###### member gets provisional =====>>>>
+    after_transition [ :none, :lapsed ] => # enroll and reactivation
+                        :provisional, :do => :schedule_first_membership
+    after_transition [ :provisional, :active ] => 
+                        :provisional, :do => :schedule_first_membership # save the sale
+    after_transition :applied => 
+                        :provisional, :do => :schedule_first_membership_for_approved_member
+    ###### <<<<<<========
+    ###### Reactivation handling =====>>>>
+    after_transition :lapsed => 
+                        [:applied, :provisional], :do => :increment_reactivations
+    ###### <<<<<<========
+    ###### Cancellation =====>>>>
+    after_transition [:provisional, :active ] => 
+                        :lapsed, :do => [:cancellation, :nillify_club_cash]
+    after_transition :applied => 
+                        :lapsed, :do => :set_member_as_rejected
+    ###### <<<<<<========
     after_transition all => all, :do => :propagate_membership_data
 
     event :set_as_provisional do
@@ -194,7 +199,8 @@ class Member < ActiveRecord::Base
     membership.save
   end
 
-  def set_cancel_date
+  def set_member_as_rejected
+    decrement!(:reactivation_times, 1) if reactivation_times > 0 # we increment when it gets applied. If we reject the member we have to get back
     self.current_membership.update_attribute(:cancel_date, Time.zone.now)
   end
 
@@ -759,10 +765,6 @@ class Member < ActiveRecord::Base
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
     end
 
-    def asyn_desnormalize_preferences(opts = {})
-      self.desnormalize_preferences if opts[:force] || self.changed.include?('preferences') 
-    end
-
     def propagate_membership_data
       self.current_membership.update_attribute :status, status
     end
@@ -890,6 +892,7 @@ class Member < ActiveRecord::Base
             answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => new_credit_card.am_card.errors.to_hash }
           end        
         rescue Exception => e
+          answer.merge!({:errors => e})
           Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card })
           logger.error e.inspect
           raise ActiveRecord::Rollback
@@ -908,5 +911,16 @@ class Member < ActiveRecord::Base
       end
     end
     handle_asynchronously :desnormalize_preferences
+
+    def sync_to_pardot(options = {})
+      time_elapsed = Benchmark.ms do
+        pardot_member.save!(options)
+      end
+      logger.info "Pardot::sync took #{time_elapsed}ms"
+    rescue Exception => e
+      Airbrake.notify(:error_class => "Pardot:sync", :error_message => e, :parameters => { :member => self.inspect })
+    end
+    # sync member in 10 minutes, why? lets allow prospect to be synced first.
+    handle_asynchronously :sync_to_pardot, :run_at => Proc.new { 5.minutes.from_now }
 
 end
