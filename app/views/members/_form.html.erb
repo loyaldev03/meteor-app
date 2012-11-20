@@ -267,6 +267,7 @@
 
 <% if @member.new_record? %>
   <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
+  <%= f.hidden_field :product_sku, :value => "KIT,CARD" %>
 <% end %>
 
 

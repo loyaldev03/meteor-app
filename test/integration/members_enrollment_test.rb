@@ -252,16 +252,18 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert page.has_content?("#{unsaved_member.first_name} #{unsaved_member.last_name}")
 
 	end
-  
+
+
+  # When creating member from web, should add KIT and CARD fulfillments
   test "create member" do
   	setup_member(false)
 
   	unsaved_member = FactoryGirl.build(:active_member, 
       :club_id => @club.id)
 
- 		create_new_member(unsaved_member)
+  
+	  create_new_member(unsaved_member)
     created_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
-    
     validate_view_member_base(created_member)
 
     within("#td_mi_status") { assert page.has_content?("provisional") }
@@ -275,8 +277,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     }
 
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
-
-    within("#fulfillments") { assert page.has_content?(fulfillments_table_empty_text) }
+    wait_until { assert_equal(Fulfillment.count,2) }
+    within("#fulfillments") do
+      assert page.has_content?('KIT') 
+      assert page.has_content?('CARD') 
+    end
 
   end
 
