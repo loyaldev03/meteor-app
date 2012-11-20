@@ -81,7 +81,7 @@ en:
     member: 'Member'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
-    credit_card: 'CC'
+    credit_card: 'Credit card'
     notes: 'Notes'
     attributes:
       transaction:
@@ -196,7 +196,7 @@ en:
         description: 'Description'
         members_count: 'Members count'
       credit_card:
-        number: 'Credit card number'
+        number: 'Number'
         expire_date: 'Expire date'
         expire_month: 'Expire month'
         added_at: 'Added at'
