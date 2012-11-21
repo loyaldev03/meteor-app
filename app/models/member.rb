@@ -576,14 +576,14 @@ class Member < ActiveRecord::Base
 
   # Resets member club cash in case of a cancelation.
   def nillify_club_cash
-    add_club_cash(nil, -club_cash_amount.to_i, 'Removing club cash because of member cancellation')
+    add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation')
     self.club_cash_expire_date = nil
     self.save(:validate => false)
   end
 
   # Resets member club cash in case the club cash has expired.
   def reset_club_cash
-    add_club_cash(nil, -club_cash_amount.to_i, 'Removing expired club cash.')
+    add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.')
     self.club_cash_expire_date = self.club_cash_expire_date + 12.months
     self.save(:validate => false)
   end
@@ -601,23 +601,23 @@ class Member < ActiveRecord::Base
   # Adds club cash transaction. 
   def add_club_cash(agent, amount = 0,description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
-    if amount.to_i == 0
+    if amount.to_f == 0
       answer[:message] = "Can not process club cash transaction with amount 0, values with commas, or letters."
-    elsif (amount.to_i < 0 and amount.to_i.abs <= self.club_cash_amount.to_i) or amount.to_i > 0
+    elsif (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
       ClubCashTransaction.transaction do 
         cct = ClubCashTransaction.new(:amount => amount, :description => description)
         begin
           cct.member = self
           if cct.valid? 
             cct.save!
-            self.club_cash_amount = self.club_cash_amount + amount.to_i
+            self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save(:validate => false)
-            message = "#{cct.amount.to_i.abs} club cash was successfully #{ amount.to_i >= 0 ? 'added' : 'deducted' }"
-            if amount.to_i > 0
+            message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }"
+            if amount.to_f > 0
               Auditory.audit(agent, cct, message, self, Settings.operation_types.add_club_cash)
-            elsif amount.to_i < 0 and amount.to_i.abs == club_cash_amount 
+            elsif amount.to_f < 0 and amount.to_f.abs == club_cash_amount 
               Auditory.audit(agent, cct, message, self, Settings.operation_types.reset_club_cash)
-            elsif amount.to_i < 0 
+            elsif amount.to_f < 0 
               Auditory.audit(agent, cct, message, self, Settings.operation_types.deducted_club_cash)
             end
             answer = { :message => message, :code => Settings.error_codes.success }
