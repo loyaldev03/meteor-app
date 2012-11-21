@@ -16,7 +16,7 @@ class Api::MembersController < ApplicationController
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 
   #             *address: The address of the member that is being enrolled.
   #             *city: City from where the member is from.
-  #             *state: State from where the member is from. At the moment we are not using any kind of code.
+  #             *state: The state standard code where the member is from. 
   #             *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
   #             *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
   #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
@@ -108,7 +108,7 @@ class Api::MembersController < ApplicationController
   #             *city: City from where the member is from.
   #             *member_group_type_id: Id of the member's group type where he belongs to. Each club can has many classifications for its member's, like 'VIP' or 'Celebrity'.
   #              This types are stored as 'MemberGroupType'. The id is an integer up to 8 digits.
-  #             *state: State from where the member is from. At the moment we are not using any kind of code.
+  #             *state: The state standard code where the member is from. 
   #             *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
   #             *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
   #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
@@ -185,7 +185,7 @@ class Api::MembersController < ApplicationController
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
   #             *address: The address of the member that is being enrolled. 
   #             *city: City from where the member is from.
-  #             *state: State from where the member is from. At the moment we are not using any kind of code.
+  #             *state: The state standard code where the member is from.
   #             *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
   #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
   #             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
