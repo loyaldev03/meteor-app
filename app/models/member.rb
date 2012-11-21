@@ -408,8 +408,8 @@ class Member < ActiveRecord::Base
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
         return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
       elsif not (cc_blank or credit_card_params[:number].blank?)
-        message = Settings.error_messages.credit_card_already_in_use
-        Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_already_in_use)
+        message = Settings.error_messages.credit_card_in_use
+        Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_in_use)
         return { :message => message, :code => Settings.error_codes.credit_card_in_use }
       end
     elsif member.blacklisted
