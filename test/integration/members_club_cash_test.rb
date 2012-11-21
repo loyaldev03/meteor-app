@@ -48,9 +48,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     within("#td_mi_club_cash_amount") { assert page.has_content?("15") }
 
     within("#operations_table") do
-      wait_until {
-        assert page.has_content?("15 club cash was successfully added")
-      }
+      wait_until { assert page.has_content?("15.0 club cash was successfully added") }
     end
 
     click_on 'Add club cash'
@@ -62,7 +60,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     within("#operations_table") do
       wait_until {
-        assert page.has_content?("5 club cash was successfully deducted")
+        assert page.has_content?("5.0 club cash was successfully deducted")
       }
     end
 
@@ -127,10 +125,8 @@ class MembersClubCashTest < ActionController::IntegrationTest
     alert_ok_js
     click_on 'Save club cash transaction'
 
-    wait_until{
-      assert page.has_content?('Can not process club cash transaction with amount 0, values with commas, or letters.')
-    }
-
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within("#td_mi_club_cash_amount") { assert page.has_content?("0.99") }
   end
 
   test "create member with terms_of_membership without club cash" do
@@ -228,13 +224,11 @@ class MembersClubCashTest < ActionController::IntegrationTest
       assert find_field('input_first_name').value == @saved_member.first_name
     }
     @saved_member.reload
-    within("#table_membership_information"){
-      within("#td_mi_club_cash_expire_date"){
-        wait_until{
-          assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
-        }
-      }
-    }
+    within("#table_membership_information") do
+      within("#td_mi_club_cash_expire_date") do
+        wait_until{ assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date)) }
+      end
+    end
   end
 
   test "add club cash amount using the amount on member TOM enrollment amount > 0" do
