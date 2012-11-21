@@ -269,7 +269,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert page.has_content?("#{unsaved_member.first_name} #{unsaved_member.last_name}")
 
 	end
+
   # When creating member from web, should add KIT and CARD fulfillments 
+
   def validate_timezone_dates(timezone)
     @club.time_zone = timezone
     @club.save
