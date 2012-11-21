@@ -294,7 +294,7 @@ class MembersController < ApplicationController
     message = "Error on members#sync: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
     Airbrake.notify(:error_class => "Member:sync", :parameters => { :member => @current_member.inspect })
-    redirect_to show_member_path, notice: message
+    redirect_to show_member_path, notice: message.html_safe
   end
 
   def sync_data
