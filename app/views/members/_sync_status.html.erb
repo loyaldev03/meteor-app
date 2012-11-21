@@ -151,7 +151,7 @@
       <td><%= t('activerecord.attributes.member.last_sync_error') %>:</td>
       <td colspan='999' id="td_mi_last_sync_error_at">
         <% if @current_member.last_sync_error_at %>
-          <code><%= @current_member.last_sync_error %></code>
+          <code><%= @current_member.last_sync_error.html_safe %></code>
           on
           <em>
             <%=l @current_member.last_sync_error_at, format: :dashed -%>
