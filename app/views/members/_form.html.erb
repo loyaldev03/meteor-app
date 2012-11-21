@@ -70,10 +70,8 @@
           <th>
             <%= f.label :state, t('activerecord.attributes.member.country'), :class => 'help-inline required' %>
           </th>
-          <td> 
-            <div id="states_div">
-              <%= render :partial => 'states', :locals => {:f => f, :state => (@current_member.state if @current_member)}  %>
-            </div>
+          <td id="states_td"> 
+            <%= render :partial => 'states', :locals => {:f => f, :state => (@current_member.state if @current_member)}  %>
           </td>  
         </tr>
       </table>
