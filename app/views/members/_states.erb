@@ -1,10 +1,11 @@
 <%= 
 	unless params[:country_code].blank?
-		select_tag( 'member[state]' , options_for_select([t('buttons.select_state'),''])+options_from_collection_for_select(
+		select_tag( 'member[state]' ,options_from_collection_for_select(
 	        Carmen::Country.coded(params[:country_code]).subregions,
-	        "name", "name", 
-	        params[:selected_state])) 
+	        "code", "name", 
+	        params[:selected_state]),
+					:prompt => t('buttons.select_state'))
 	else
-		select_tag 'member[state]' , options_for_select([t('buttons.select_state'),''])
+		select_tag 'member[state]',options_for_select(['']),:prompt => t('buttons.select_state')
 	end
 %>
