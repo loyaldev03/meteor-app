@@ -152,7 +152,7 @@ class Member < ActiveRecord::Base
       transition [:lapsed] => :provisional
     end
     event :set_as_applied do 
-      transition [:lapsed, :none] => :applied
+      transition [:lapsed, :none, :active, :provisional] => :applied
     end
 
     # A Member is within their review period. These members have joined a Subscription program that has a “Provisional” 
@@ -484,8 +484,7 @@ class Member < ActiveRecord::Base
     rescue Exception => e
       Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
-      message = "#{Settings.error_messages.member_not_saved} #{e}"
-      Auditory.audit(agent, self, message, nil, Settings.operation_types.error_on_enrollment_billing)
+      Auditory.audit(agent, self, e, nil, Settings.operation_types.error_on_enrollment_billing)
       { :message => message, :code => Settings.error_codes.member_not_saved }
     end
   end
