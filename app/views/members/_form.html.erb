@@ -31,7 +31,7 @@
       <table class="hidden_table_border table-nohover">
         <tr class = "control-group">
           <th>
-            <%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline' %>
+            <%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline required' %>
           </th>
           <td> 
             <%= f.text_field :first_name, :class => 'text_field' %> 
@@ -48,7 +48,7 @@
         </tr>        
         <tr class = "control-group">
           <th>
-            <%= f.label :address, t('activerecord.attributes.member.address'), :class => 'help-inline' %>
+            <%= f.label :address, t('activerecord.attributes.member.address'), :class => 'help-inline required' %>
           </th>
           <td> 
             <%= f.text_field :address, :class => 'text_field' %> 
@@ -60,7 +60,7 @@
         </tr>
         <tr class = "control-group">
           <th>
-            <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline' %>
+            <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline required' %>
           </th>
           <td> 
             <%= f.text_field :state, :class => 'text_field' %> 
@@ -68,7 +68,7 @@
         </tr>
         <tr class = "control-group">
           <th>
-            <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline' %>
+            <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline required' %>
           </th>
           <td> 
             <%= f.country_code_select(:country, [['', '']] + Member.supported_countries.map { |cc| [Member.country_name(cc), cc]}) %> 
@@ -80,7 +80,7 @@
       <table class="hidden_table_border">
         <tr class = "control-group">
           <th>
-            <%= f.label :last_name, t('activerecord.attributes.member.last_name'), :class => 'help-inline' %>
+            <%= f.label :last_name, t('activerecord.attributes.member.last_name'), :class => 'help-inline required' %>
           </th>
           <td> 
             <%= f.text_field :last_name, :class => 'text_field' %> 
@@ -88,7 +88,7 @@
         </tr>
         <tr class = "control-group">
           <th>
-            <%= f.label :city, t('activerecord.attributes.member.city'), :class => 'help-inline' %>
+            <%= f.label :city, t('activerecord.attributes.member.city'), :class => 'help-inline required' %>
           </th>
           <td> 
             <%= f.text_field :city, :class => 'text_field' %> 
@@ -96,7 +96,7 @@
         </tr>
         <tr class = "control-group">
           <th>
-            <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline' %>
+            <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline required' %>
           </th>
           <td> 
             <%= f.text_field :zip, :class => 'text_field' %>       
@@ -127,7 +127,7 @@
       <table class="hidden_table_border">
         <tr class = "control-group">
           <th>
-            <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline' %>
+            <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline required' %>
           </th>
           <td> 
             <%= f.text_field :phone_country_code, :class => 'text_field input-mini' %> 
@@ -150,7 +150,7 @@
         <% if @member.new_record? %>
           <tr class = "control-group">
             <th>
-              <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %>
+              <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline required' %>
             </th>
             <td> 
               <%= select_tag('member[terms_of_membership_id]', options_from_collection_for_select(@terms_of_memberships, "id", "name")) %>
@@ -163,7 +163,7 @@
       <table class="hidden_table_border">
         <tr class = "control-group">
           <th>
-            <%= f.label :email, t('activerecord.attributes.member.email'), :class => 'help-inline' %>
+            <%= f.label :email, t('activerecord.attributes.member.email'), :class => 'help-inline required' %>
           </th>
           <td> 
             <%= f.text_field :email, :class => 'text_field'%>
@@ -192,7 +192,7 @@
         <table class="hidden_table_border">
           <tr class = "control-group">
             <th>
-              <%= credit_Card.label :encrypted_number, t('activerecord.attributes.credit_card.number'), :class => 'help-inline' %>
+              <%= credit_Card.label :encrypted_number, t('activerecord.attributes.credit_card.number'), :class => 'help-inline required' %>
             </th>
             <td> 
               <%= credit_Card.text_field :number, :class => 'text_field input-medium', 
@@ -205,7 +205,7 @@
         <table class="hidden_table_border">
           <tr class = "control-group">
             <th>
-              <%= credit_Card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' %> 
+              <%= credit_Card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline required' %> 
             </th>
             <td> 
               <%=credit_Card.text_field :expire_month, :class => 'text_field input-medium',
@@ -214,7 +214,7 @@
           </tr>
           <tr class = "control-group">
             <th>
-              <%= credit_Card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %>
+              <%= credit_Card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline required' %>
             </th>
             <td> 
               <%= credit_Card.text_field :expire_year, :class => 'text_field input-small',
@@ -228,7 +228,9 @@
   </tbody>
 </table>
 <% end %>
-
+Please, have in mind that fields with ' * ' are required. 
+<br>
+<br>
 <% if @current_club.requires_external_id %>
   <table id="external_id" class="table table-bordered table-condensed table-nohover">
     <thead>

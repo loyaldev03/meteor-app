@@ -134,3 +134,4 @@ div.dataTables_filter input {
 	padding: 9px;	
 }
 
+.required:after { content:" *"; }
