@@ -138,7 +138,7 @@ en:
         phone_number: 'Phone Number'
         type_of_phone_number: 'Type of phone number'
         id: 'Member id'
-        status: 'Current Status'
+        status: 'Status'
         email: 'Email'
         external_id: 'External ID'
         member_since_date: 'Member since date'
