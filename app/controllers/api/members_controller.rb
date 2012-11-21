@@ -156,21 +156,19 @@ class Api::MembersController < ApplicationController
     response = member.update_credit_card_from_drupal(params[:member][:credit_card], @current_agent)
 
     if response[:code] == Settings.error_codes.success
-      unless params[:member].nil?
-        member.update_member_data_by_params(params[:member])
-        if member.save
-          message = "Member updated successfully"
-          Auditory.audit(current_agent, member, message, member) unless batch_update
-          response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
+      member.update_member_data_by_params(params[:member])
+      if member.save
+        message = "Member updated successfully"
+        Auditory.audit(current_agent, member, message, member) unless batch_update
+        response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
+      else
+        message = "Member could not be updated, #{member.error_to_s}"
+        if batch_update
+          logger.error "Remote batch update message: #{message}"
         else
-          message = "Member could not be updated, #{member.error_to_s}"
-          if batch_update
-            logger.error "Remote batch update message: #{message}"
-          else
-            Auditory.audit(current_agent, member, message, member)
-          end
-          response = { :message => Settings.error_messages.member_data_invalid, :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
+          Auditory.audit(current_agent, member, message, member)
         end
+        response = { :message => Settings.error_messages.member_data_invalid, :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
       end
     end
     render json: response
