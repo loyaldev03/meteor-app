@@ -67,7 +67,7 @@ module Pardot
         state: m.state,
         zip: m.zip,
         country: m.country,
-        phone: m.full_phone_number,
+        phone: m.phone_area_code.to_s+'-'+m.phone_local_number.to_s[0..2]+'-'+m.phone_local_number.to_s[-4..-1],
         opted_out: (m.blacklisted ? 1 : 0),
         birth_date: m.birth_date,
         preferences: m.preferences,
