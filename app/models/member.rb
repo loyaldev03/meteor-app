@@ -605,7 +605,7 @@ class Member < ActiveRecord::Base
   def add_club_cash(agent, amount = 0,description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
     if amount.to_f == 0
-      answer[:message] = "Can not process club cash transaction with amount 0, values with commas, or letters."
+      answer[:message] = "Can not process club cash transaction with amount 0 or letters."
     elsif (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
       ClubCashTransaction.transaction do 
         cct = ClubCashTransaction.new(:amount => amount, :description => description)
@@ -634,7 +634,7 @@ class Member < ActiveRecord::Base
         end
       end
     else
-      answer[:message] = "You can not deduct #{amount.to_i.abs} because the member only has #{self.club_cash_amount} club cash."
+      answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
     end
     answer
   end

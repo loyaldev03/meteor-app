@@ -184,6 +184,28 @@ api_type column should have Drupal::Member or Wordpress::Member
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#pardot_sync%3F-instance_method" title="#pardot_sync? (instance method)">- (Boolean) <strong>pardot_sync?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#sync%3F-instance_method" title="#sync? (instance method)">- (Boolean) <strong>sync?</strong> </a>
     
 
@@ -280,6 +302,58 @@ api_type column should have Drupal::Member or Wordpress::Member
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="pardot_sync?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>pardot_sync?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/club.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pardot_sync?'>pardot_sync?</span>
+  <span class='lbracket'>[</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_pardot_email'>pardot_email</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_pardot_password'>pardot_password</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_pardot_user_key'>pardot_user_key</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_none?'>none?</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:blank?</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="sync?-instance_method">
   
     - (<tt>Boolean</tt>) <strong>sync?</strong> 
@@ -336,7 +410,7 @@ api_type column should have Drupal::Member or Wordpress::Member
 </div>
 
     <div id="footer">
-  Generated on Thu Oct 25 08:50:10 2012 by
+  Generated on Thu Nov 22 12:34:48 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
