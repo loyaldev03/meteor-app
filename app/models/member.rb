@@ -283,7 +283,7 @@ class Member < ActiveRecord::Base
 
   # Returns true if member is active or provisional.
   def can_bill_membership?
-    self.active? or self.provisional?
+    ( self.active? or self.provisional? ) and self.club.billing_enable
   end
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
@@ -373,7 +373,11 @@ class Member < ActiveRecord::Base
         { :message => "Called billing method but no amount on TOM is set.", :code => Settings.error_codes.no_amount }
       end
     else
-      { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+      if self.club.billing_enable
+        { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+      else
+        { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
+      end
     end
   end
 
