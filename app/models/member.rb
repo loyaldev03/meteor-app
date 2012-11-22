@@ -283,7 +283,7 @@ class Member < ActiveRecord::Base
 
   # Returns true if member is active or provisional.
   def can_bill_membership?
-    self.active? or self.provisional?
+    ( self.active? or self.provisional? ) and self.club.billing_enable
   end
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
@@ -376,7 +376,11 @@ class Member < ActiveRecord::Base
         { :message => "Called billing method but no amount on TOM is set.", :code => Settings.error_codes.no_amount }
       end
     else
-      { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+      if self.club.billing_enable
+        { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+      else
+        { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
+      end
     end
   end
 
@@ -604,7 +608,7 @@ class Member < ActiveRecord::Base
   def add_club_cash(agent, amount = 0,description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
     if amount.to_f == 0
-      answer[:message] = "Can not process club cash transaction with amount 0, values with commas, or letters."
+      answer[:message] = "Can not process club cash transaction with amount 0 or letters."
     elsif (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
       ClubCashTransaction.transaction do 
         cct = ClubCashTransaction.new(:amount => amount, :description => description)
@@ -633,7 +637,7 @@ class Member < ActiveRecord::Base
         end
       end
     else
-      answer[:message] = "You can not deduct #{amount.to_i.abs} because the member only has #{self.club_cash_amount} club cash."
+      answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
     end
     answer
   end

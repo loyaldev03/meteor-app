@@ -99,7 +99,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     click_on 'Save club cash transaction'
 
     wait_until{
-      assert page.has_content?('Can not process club cash transaction with amount 0, values with commas, or letters.')
+      assert page.has_content?('Can not process club cash transaction with amount 0 or letters.')
     }
   end
 
@@ -113,7 +113,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     click_on 'Save club cash transaction'
 
     wait_until{
-      assert page.has_content?('Can not process club cash transaction with amount 0, values with commas, or letters.')
+      assert page.has_content?('Can not process club cash transaction with amount 0 or letters.')
     }
   end
 

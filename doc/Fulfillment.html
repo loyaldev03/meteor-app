@@ -329,8 +329,6 @@ status => open , archived
       <pre class="lines">
 
 
-127
-128
 129
 130
 131
@@ -353,10 +351,12 @@ status => open , archived
 148
 149
 150
-151</pre>
+151
+152
+153</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 127</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 129</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_generateCSV'>generateCSV</span><span class='lparen'>(</span><span class='id identifier rubyid_fulfillments'>fulfillments</span><span class='comma'>,</span> <span class='id identifier rubyid_type_others'>type_others</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
   <span class='const'>CSV</span><span class='period'>.</span><span class='id identifier rubyid_generate'>generate</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_csv'>csv</span><span class='op'>|</span> 
@@ -376,8 +376,8 @@ status => open , archived
               <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_state'>state</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_zip'>zip</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Return Service Requested</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Irregulars</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Y</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Shipper</span><span class='tstring_end'>'</span></span><span class='comma'>,</span>
               <span class='id identifier rubyid_fulfillment'>fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_product'>product</span><span class='period'>.</span><span class='id identifier rubyid_weight'>weight</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>MID</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
       <span class='kw'>else</span>
-        <span class='id identifier rubyid_csv'>csv</span> <span class='op'>&lt;&lt;</span> <span class='lbracket'>[</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_visible_id'>visible_id</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_last_name'>last_name</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>'</span><span class='tstring_end'>&quot;</span></span><span class='op'>+</span><span class='lparen'>(</span><span class='const'>I18n</span><span class='period'>.</span><span class='id identifier rubyid_l'>l</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_member_since_date'>member_since_date</span><span class='comma'>,</span> <span class='symbol'>:format</span> <span class='op'>=&gt;</span> <span class='symbol'>:only_date_short</span><span class='rparen'>)</span><span class='op'>+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>'</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>'</span><span class='tstring_end'>&quot;</span></span><span class='op'>+</span><span class='lparen'>(</span><span class='const'>I18n</span><span class='period'>.</span><span class='id identifier rubyid_l'>l</span> <span class='id identifier rubyid_fulfillment'>fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_renewable_at'>renewable_at</span><span class='comma'>,</span> <span class='symbol'>:format</span> <span class='op'>=&gt;</span> <span class='symbol'>:only_date_short</span> <span class='kw'>if</span> <span class='id identifier rubyid_fulfillment'>fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_renewable_at'>renewable_at</span><span class='rparen'>)</span><span class='op'>+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>'</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_address'>address</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_city'>city</span><span class='comma'>,</span>
+        <span class='id identifier rubyid_csv'>csv</span> <span class='op'>&lt;&lt;</span> <span class='lbracket'>[</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_visible_id'>visible_id</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_last_name'>last_name</span><span class='comma'>,</span> <span class='lparen'>(</span><span class='const'>I18n</span><span class='period'>.</span><span class='id identifier rubyid_l'>l</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_member_since_date'>member_since_date</span><span class='comma'>,</span> <span class='symbol'>:format</span> <span class='op'>=&gt;</span> <span class='symbol'>:only_date_short</span><span class='rparen'>)</span><span class='comma'>,</span>
+                <span class='lparen'>(</span><span class='const'>I18n</span><span class='period'>.</span><span class='id identifier rubyid_l'>l</span> <span class='id identifier rubyid_fulfillment'>fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_renewable_at'>renewable_at</span><span class='comma'>,</span> <span class='symbol'>:format</span> <span class='op'>=&gt;</span> <span class='symbol'>:only_date_short</span> <span class='kw'>if</span> <span class='id identifier rubyid_fulfillment'>fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_renewable_at'>renewable_at</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_address'>address</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_city'>city</span><span class='comma'>,</span>
                 <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_zip'>zip</span><span class='comma'>,</span> <span class='id identifier rubyid_fulfillment'>fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_product_sku'>product_sku</span><span class='comma'>,</span> <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>C</span><span class='tstring_end'>'</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_member_group_type_id'>member_group_type_id</span><span class='rparen'>)</span> <span class='rbracket'>]</span>
       <span class='kw'>end</span>
     <span class='kw'>end</span>
@@ -409,17 +409,17 @@ status => open , archived
       <pre class="lines">
 
 
-88
-89
 90
 91
 92
 93
 94
-95</pre>
+95
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 90</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_decrease_stock!'>decrease_stock!</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_product'>product</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='kw'>or</span> <span class='kw'>not</span> <span class='id identifier rubyid_product'>product</span><span class='period'>.</span><span class='id identifier rubyid_has_stock?'>has_stock?</span>
@@ -449,8 +449,6 @@ status => open , archived
       <pre class="lines">
 
 
-116
-117
 118
 119
 120
@@ -458,10 +456,12 @@ status => open , archived
 122
 123
 124
-125</pre>
+125
+126
+127</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 116</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 118</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mark_as_sent'>mark_as_sent</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_set_as_sent'>set_as_sent</span>
@@ -469,7 +469,7 @@ status => open , archived
     <span class='const'>Auditory</span><span class='period'>.</span><span class='id identifier rubyid_audit'>audit</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='comma'>,</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_operation_types'>operation_types</span><span class='period'>.</span><span class='id identifier rubyid_fulfillment_mannualy_mark_as_sent'>fulfillment_mannualy_mark_as_sent</span><span class='rparen'>)</span>
     <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span> <span class='rbrace'>}</span>
   <span class='kw'>else</span>
-    <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not be marked as sent.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_messages'>error_messages</span><span class='period'>.</span><span class='id identifier rubyid_fulfillment_error'>fulfillment_error</span>
     <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_fulfillment_error'>fulfillment_error</span> <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -493,18 +493,18 @@ status => open , archived
       <pre class="lines">
 
 
-78
-79
 80
 81
 82
 83
 84
 85
-86</pre>
+86
+87
+88</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 78</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_new_fulfillment'>new_fulfillment</span><span class='lparen'>(</span><span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_f'>f</span> <span class='op'>=</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> 
@@ -535,12 +535,12 @@ status => open , archived
       <pre class="lines">
 
 
-153
-154
-155</pre>
+155
+156
+157</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 153</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 155</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_product'>product</span>
   <span class='ivar'>@product</span> <span class='op'>||=</span> <span class='const'>Product</span><span class='period'>.</span><span class='id identifier rubyid_find_by_sku_and_club_id'>find_by_sku_and_club_id</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_product_sku'>product_sku</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_club_id'>club_id</span><span class='rparen'>)</span>
@@ -565,8 +565,6 @@ status => open , archived
       <pre class="lines">
 
 
-66
-67
 68
 69
 70
@@ -575,13 +573,15 @@ status => open , archived
 73
 74
 75
-76</pre>
+76
+77
+78</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_renew!'>renew!</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_recurrent'>recurrent</span> <span class='kw'>and</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_can_receive_another_fulfillment?'>can_receive_another_fulfillment?</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='id identifier rubyid_renewed?'>renewed?</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_recurrent'>recurrent</span> <span class='kw'>and</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_can_renew_fulfillment?'>can_renew_fulfillment?</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='id identifier rubyid_renewed?'>renewed?</span>
     <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_undeliverable?'>undeliverable?</span>
       <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_new_fulfillment'>new_fulfillment</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>undeliverable</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
     <span class='kw'>else</span>
@@ -611,8 +611,6 @@ status => open , archived
       <pre class="lines">
 
 
-97
-98
 99
 100
 101
@@ -628,10 +626,12 @@ status => open , archived
 111
 112
 113
-114</pre>
+114
+115
+116</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 97</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 99</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resend'>resend</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_product'>product</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> 
@@ -649,7 +649,7 @@ status => open , archived
   <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span> <span class='rbrace'>}</span>
 <span class='kw'>rescue</span> 
   <span class='const'>Auditory</span><span class='period'>.</span><span class='id identifier rubyid_audit'>audit</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='comma'>,</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_fulfillment_out_of_stock'>fulfillment_out_of_stock</span> <span class='rparen'>)</span>
-  <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Product does not have stock.</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_fulfillment_out_of_stock'>fulfillment_out_of_stock</span> <span class='rbrace'>}</span>
+  <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_messages'>error_messages</span><span class='period'>.</span><span class='id identifier rubyid_fulfillment_out_of_stock'>fulfillment_out_of_stock</span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_fulfillment_out_of_stock'>fulfillment_out_of_stock</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -661,7 +661,7 @@ status => open , archived
 </div>
 
     <div id="footer">
-  Generated on Thu Oct 25 08:50:12 2012 by
+  Generated on Thu Nov 22 12:34:50 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
