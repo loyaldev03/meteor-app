@@ -6,6 +6,7 @@ FactoryGirl.define do
     installment_type '1.month'
     needs_enrollment_approval false
     club_cash_amount 150
+    provisional_days 30
     association :club
   end
 
@@ -15,6 +16,7 @@ FactoryGirl.define do
     installment_type '1.month'
     needs_enrollment_approval false
     club_cash_amount 150
+    provisional_days 30
     association :club
   end
 
@@ -24,6 +26,7 @@ FactoryGirl.define do
     installment_type '1.month'
     needs_enrollment_approval false
     club_cash_amount 150
+    provisional_days 30
     association :club
   end
 
@@ -33,6 +36,7 @@ FactoryGirl.define do
     installment_type '1.month'
     needs_enrollment_approval false
     club_cash_amount 150
+    provisional_days 30
     association :club
   end
 
@@ -42,6 +46,7 @@ FactoryGirl.define do
     installment_type '1.month'
     needs_enrollment_approval false
     club_cash_amount 150
+    provisional_days 30
     association :club, factory: :simple_club_with_gateway
   end
 
@@ -51,6 +56,7 @@ FactoryGirl.define do
     installment_type '1.month'
     needs_enrollment_approval false
     club_cash_amount 150
+    provisional_days 30
     association :club, factory: :simple_club_with_require_external_id
   end
 
@@ -60,6 +66,7 @@ FactoryGirl.define do
     installment_type '1.month'
     needs_enrollment_approval false
     club_cash_amount 150
+    provisional_days 30
     association :club, factory: :club_with_api
   end
 
@@ -70,6 +77,7 @@ FactoryGirl.define do
     installment_type '1.year'
     needs_enrollment_approval false
     club_cash_amount 150
+    provisional_days 30
     association :club, factory: :club_with_gateway
   end
 
@@ -79,6 +87,7 @@ FactoryGirl.define do
     installment_type '1.month'
     needs_enrollment_approval true
     club_cash_amount 150
+    provisional_days 30
     association :club, factory: :simple_club_with_gateway
   end
 
@@ -88,6 +97,7 @@ FactoryGirl.define do
     installment_type '1.month'
     needs_enrollment_approval false
     club_cash_amount 0
+    provisional_days 30
     association :club, factory: :club_with_gateway
   end  
 end
