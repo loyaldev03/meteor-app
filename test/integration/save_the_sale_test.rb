@@ -27,7 +27,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     @saved_member = nil
     
     if create_provisional
-      @saved_member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc, nil, {}, { :created_by => @admin_agent })
+      @saved_member = create_active_member(@terms_of_membership_with_approval, :provisional_member_with_cc, nil, {}, { :created_by => @admin_agent })
     else
       @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })			
 		end
@@ -48,13 +48,6 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     @saved_member.reload
 
     assert page.has_content?("Save the sale succesfully applied")
-    
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Member enrolled successfully")
-        assert page.has_content?("Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@new_terms_of_membership_with_gateway.id}")
-      }
-    end
   end
 
   test "save the sale from active to provisional" do
@@ -82,7 +75,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
   test "save the sale with the same TOM" do
     setup_member(false)
-    
+      
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     click_on 'Save the sale'    
 
@@ -102,9 +95,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
     select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id')
     confirm_ok_js
-    click_on 'Save the sale'
-
+    assert_difference("Membership.count") do
+      click_on 'Save the sale'
+    end
     wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@terms_of_membership_with_gateway2.id}") }
   end
 
   test "Save the sale from TOM without approbal to TOM without aprobal - status provisional" do
@@ -115,9 +110,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
     select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id')
     confirm_ok_js
-    click_on 'Save the sale'
-
+    assert_difference("Membership.count") do
+      click_on 'Save the sale'
+    end
     wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@terms_of_membership_with_gateway2.id}") }
   end
 
   test "Save the sale from TOM without approbal to TOM aprobal - status active" do
@@ -129,9 +126,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
     wait_until{ select(@terms_of_membership_with_approval.name, :from => 'terms_of_membership_id') }
     confirm_ok_js
-    click_on 'Save the sale'
-
+    assert_difference("Membership.count") do
+      click_on 'Save the sale'
+    end
     wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@terms_of_membership_with_approval.id}") }
   end
 
   test "Save the sale from TOM without approbal to TOM aprobal - status provisional" do
@@ -142,9 +141,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
     wait_until{ select(@terms_of_membership_with_approval.name, :from => 'terms_of_membership_id') }
     confirm_ok_js
-    click_on 'Save the sale'
-
+    assert_difference("Membership.count") do
+      click_on 'Save the sale'
+    end
     wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@terms_of_membership_with_approval.id}") }
   end
 
   test "Save the sale from TOM approbal to TOM without aprobal - status active" do
@@ -156,9 +157,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
     wait_until{ select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id') }
     confirm_ok_js
-    click_on 'Save the sale'
-
+    assert_difference("Membership.count") do
+      click_on 'Save the sale'
+    end
     wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_approval.id} to TOMID #{@terms_of_membership_with_gateway2.id}") }
   end
 
   test "Save the sale from TOM approbal to TOM without aprobal - status provisional" do
@@ -169,9 +172,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
     wait_until{ select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id') }
     confirm_ok_js
-    click_on 'Save the sale'
-
+    assert_difference("Membership.count") do
+      click_on 'Save the sale'
+    end
     wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_approval.id} to TOMID #{@terms_of_membership_with_gateway2.id}") }
   end
 
   test "Save the sale from TOM approbal to TOM aprobal - status active" do
@@ -185,7 +190,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     confirm_ok_js
     click_on 'Save the sale'
 
+    assert_difference("Membership.count") do
+      click_on 'Save the sale'
+    end
     wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_approval.id} to TOMID #{@terms_of_membership_with_approval2.id}") }
   end
 
   test "Save the sale from TOM approbal to TOM aprobal - status provisional" do
@@ -196,8 +205,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
     wait_until{ select(@terms_of_membership_with_approval2.name, :from => 'terms_of_membership_id') }
     confirm_ok_js
-    click_on 'Save the sale'
-
+    
+    assert_difference("Membership.count") do
+      click_on 'Save the sale'
+    end
     wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_approval.id} to TOMID #{@terms_of_membership_with_approval2.id}") }
   end
 end
