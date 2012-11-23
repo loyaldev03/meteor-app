@@ -1,5 +1,9 @@
-$('#members').html('<%=escape_javascript(render(:partial => "search"))%>');
 $('.pagination a').attr('data-remote', 'true');
-
-$('#states_td').html('<%=escape_javascript(render(:partial => "states" ))%>');
 $('#states_td').attr('data-remote', 'true');
+
+
+if(update_select_only==true){
+	$('#states_td').html('<%=escape_javascript(render(:partial => "states" ))%>');
+}else{
+	$('#members').html('<%=escape_javascript(render(:partial => "search"))%>');
+}

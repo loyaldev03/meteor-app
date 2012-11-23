@@ -125,6 +125,7 @@ $(document).ready( function() {
 
   function member_index_functions(){
     $('#index_search_form').submit(function (){
+      update_select_only = false;
       $.get(this.action, $(this).serialize(), null, 'script'); 
       return false;
     });
@@ -133,6 +134,7 @@ $(document).ready( function() {
                                              showOn: "both", buttonImage: "/icon-calendar.png", 
                                              buttonImageOnly: true});
     $('#members .pagination a').live('click', function () {  
+      update_select_only = false;
       $.getScript(this.href);  
       return false;  
     }); 
@@ -143,7 +145,8 @@ $(document).ready( function() {
 
     $('#member_country').live('change',  function(){
       country = $('#member_country').val();
-      $.get(this.action, { country_code:country }, null, 'script'); 
+      update_select_only = true;
+      $.get(this.action, { country_code:country, only_select:update_select_only }, null, 'script'); 
     })
 
   };
