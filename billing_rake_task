@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# needs to find ruby and rake binaries
+export PATH=$PATH:/usr/local/bin
+
+# 15 0 * * * rake_task_runner
+LOGFILE="/tmp/billing_cron_rake.log"
+
+echo "PATH variable => `printenv PATH`"
+
+# billing should be executed after cancel jobs finishes
+cd /var/www/$2/current && RAILS_ENV=$1 rake billing:for_today  >> $LOGFILE 2>&1
+
