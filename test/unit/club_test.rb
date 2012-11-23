@@ -21,15 +21,4 @@ class ClubTest < ActiveSupport::TestCase
       @club.save
     end
   end
-
-  test "Club should not be billed if billing_enable is set as false" do
-    @club.billing_enable = false
-    @club.save
-    @member = FactoryGirl.create(:active_member, :club_id => @club.id, :email=> "testing_billing@gmail.com")
-    assert_difference('Operation.count', 0) do
-      assert_difference('Transaction.count', 0) do
-        @member.bill_membership
-      end
-    end
-  end
 end
