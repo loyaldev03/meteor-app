@@ -44,7 +44,7 @@ class MembersSyncronize < ActionController::IntegrationTest
         else
           select('Canada', :from => 'member[country]')
         end
-        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
+        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip

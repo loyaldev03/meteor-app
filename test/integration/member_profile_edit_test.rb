@@ -178,7 +178,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
     
     assert page.has_content?("Edited operation note")
-    click_on 'Return to member show'
+    click_on 'Cancel'
 
     within("#operations_table") {
       wait_until {
@@ -186,8 +186,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
         assert page.has_content?(text_note) 
       }
     }
-    
-
   end
 
   test "edit a note and click on link" do

@@ -100,10 +100,14 @@
                   <tr>
                     <td><%= t('activerecord.attributes.member.state') %></td>
                     <td>
-                      <%= select_tag( 'member[state]' , options_from_collection_for_select(
-                        @countries, "name", "name", 
-                        params[:selected_state]),
-                        :include_blank => true) %>
+                      <%= select_tag('member[country]', options_for_select(Member.supported_countries.map { |cc| [Member.country_name(cc), cc]}),
+                        :prompt => t('buttons.select_country')) %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t('activerecord.attributes.member.state') %></td>
+                    <td id="states_td">
+                      <%= render :partial => 'states', :locals => { :selected_state => (params[:member][:state] if params[:member])}%>
                     </td>
                   </tr>
                   <tr>
@@ -202,9 +206,5 @@
 
 <script type="text/javascript">
   $(document).ready( member_index_functions() );
-  $(document).ready(function(){
-    $('.pagination a').attr('data-remote', 'true');
-  })
- 
 </script>
 

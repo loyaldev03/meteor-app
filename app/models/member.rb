@@ -104,7 +104,8 @@ class Member < ActiveRecord::Base
   scope :with_last_name_like, lambda { |value| where('last_name like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_address_like, lambda { |value| where('address like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_city_like, lambda { |value| where('city like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_state_like, lambda { |value| where('state like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_country_like, lambda { |value| where('country like ?', value) unless value.blank? }
+  scope :with_state_like, lambda { |value| where('state like ?', value) unless value.blank? }
   scope :with_zip, lambda { |value| where('zip like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_email_like, lambda { |value| where('email like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value.strip) unless value.blank? }

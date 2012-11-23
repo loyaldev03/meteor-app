@@ -119,7 +119,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         else
           select('Canada', :from => 'member[country]')
         end
-        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
+        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -162,7 +162,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         else
           select('Canada', :from => 'member[country]')
         end
-        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
+        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -228,7 +228,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       else
         select('Canada', :from => 'member[country]')
       end
-      within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
+      within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
       select('M', :from => 'member[gender]') 
 	  	
 		}
@@ -433,7 +433,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[last_name]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in 'member[zip]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         select('United States', :from => 'member[country]')
-        within('#states_div'){ select('Colorado', :from => 'member[state]') }
+        within('#states_td'){ select('Colorado', :from => 'member[state]') }
       }
     }
     within("#table_contact_information"){
@@ -589,7 +589,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         select('M', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
         select('United States', :from => 'member[country]')
-        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
+        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip

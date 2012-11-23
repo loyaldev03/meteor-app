@@ -21,6 +21,7 @@ class MembersController < ApplicationController
                        .with_last_name_like(params[:member][:last_name])
                        .with_address_like(params[:member][:address])
                        .with_city_like(params[:member][:city])
+                       .with_country_like(params[:member][:country])
                        .with_state_like(params[:member][:state])
                        .with_zip(params[:member][:zip])
                        .with_email_like(params[:member][:email])

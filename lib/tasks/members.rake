@@ -4,8 +4,7 @@ namespace :billing do
   task :for_today => :environment do
     tall = Time.zone.now
     begin
-      Member.joins(:club).find_in_batches(:conditions => [" date(next_retry_bill_date) <= ? AND clubs.billing_enable = true",
-Time.zone.now.to_date]) do |group|
+      Member.joins(:club).find_in_batches(:conditions => [" date(next_retry_bill_date) <= ? AND clubs.billing_enable = true", Time.zone.now.to_date]) do |group|
         group.each do |member| 
           tz = Time.zone.now
           begin

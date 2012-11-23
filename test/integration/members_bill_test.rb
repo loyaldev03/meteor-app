@@ -51,7 +51,7 @@ class MembersBillTest < ActionController::IntegrationTest
       else
         select('Canada', :from => 'member[country]')
       end
-      within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
+      within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
       select('M', :from => 'member[gender]')
       select('United States', :from => 'member[country]')
     }
