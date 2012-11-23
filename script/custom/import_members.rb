@@ -111,7 +111,11 @@ def update_members(cid)
           set_member_data(phoenix, member)
           add_enrollment_info(phoenix, member, tom_id)
 
-          phoenix.bill_date = convert_from_date_to_time(member.cs_next_bill_date)
+          if member.original_next_bill_date.nil?
+            phoenix.bill_date = convert_from_date_to_time(member.cs_next_bill_date)
+          else
+            phoenix.bill_date = convert_from_date_to_time(member.original_next_bill_date)
+          end
           phoenix.next_retry_bill_date = convert_from_date_to_time(member.cs_next_bill_date)
           if phoenix.status != "lapsed" and member.phoenix_status == "lapsed"
             load_cancellation(@member.cancel_date)
@@ -138,18 +142,21 @@ def update_members(cid)
               @log.info "  * member ##{member.id} does not have Credit Card active"
               new_phoenix_cc.save!
               set_last_digits(new_phoenix_cc.id)
-            elsif phoenix_cc.encrypted_number != member.encrypted_cc_number or 
-                  phoenix_cc.expire_month != member.cc_month_exp or 
-                  phoenix_cc.expire_year != member.cc_year_exp
-
+            elsif phoenix_cc.encrypted_number != member.encrypted_cc_number
               phoenix_cc.active = false
               new_phoenix_cc.save!
               set_last_digits(new_phoenix_cc.id)
               phoenix_cc.save!
             else
+              phoenix_cc.expire_month = member.cc_month_exp 
+              phoenix_cc.expire_year = member.cc_year_exp
               fill_aus_attributes(phoenix_cc, member)
               phoenix_cc.save!
             end
+          end
+          if member.blacklisted
+            ccs = PhoenixCreditCard.find_by_member_id_and_blacklisted(phoenix.uuid, false)
+            ccs.each {|s| s.update_attribute :blacklisted, true }
           end
           member.update_attribute :imported_at, Time.now.utc
         rescue Exception => e
@@ -228,6 +235,11 @@ def add_new_members(cid)
 
         # create Membership data
         set_membership_data(tom_id, member)
+
+        if member.blacklisted
+          ccs = PhoenixCreditCard.find_by_member_id_and_blacklisted(phoenix.uuid, false)
+          ccs.each {|s| s.update_attribute :blacklisted, true }
+        end
 
         member.update_attribute :imported_at, Time.now.utc
         print "."

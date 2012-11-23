@@ -29,7 +29,6 @@ ActiveRecord::Base.logger = @log
       @log.info "  * processing prospect ##{prospect.id}"
       begin
         phoenix = PhoenixProspect.new 
-        phoenix.club_id = CLUB
         phoenix.first_name = prospect.first_name
         phoenix.last_name = prospect.last_name
         phoenix.address = prospect.address
