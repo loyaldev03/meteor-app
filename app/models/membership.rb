@@ -38,7 +38,6 @@ class Membership < ActiveRecord::Base
     self.update_attributes :cancel_date => Time.zone.now, :status => 'lapsed'
   end
 
-
   private 
     def set_default_quota
       quota = (terms_of_membership.monthly? ? 1 :  0)
