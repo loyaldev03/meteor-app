@@ -3,7 +3,7 @@
 # needs to find ruby and rake binaries
 export PATH=$PATH:/usr/local/bin
 
-# 15 0 * * * rake_task_runner
+# */5 * * * * rake_task_runner
 LOGFILE="/tmp/billing_cron_rake.log"
 
 echo "PATH variable => `printenv PATH`"
