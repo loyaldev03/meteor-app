@@ -205,7 +205,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
         else
           select('Canada', :from => 'member[country]')
         end
-        within('#states_div'){ select(unsaved_member.state, :from => 'member[state]') }
+        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
     }
 
     page.execute_script("window.jQuery('#member_birth_date').next().click()")
