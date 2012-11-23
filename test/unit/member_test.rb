@@ -302,4 +302,25 @@ class MemberTest < ActiveSupport::TestCase
     end
   end
 
+  test "Member should not be billed if club's billing_enable is set as false" do
+    @club = @terms_of_membership_with_gateway.club
+    @club.update_attribute(:billing_enable, false)
+    @member = create_active_member(@terms_of_membership_with_gateway, :provisional_member)
+
+    @member.current_membership.update_attribute(:quota, 2)
+    quota_before = @member.quota
+    next_bill_date_before = @member.next_retry_bill_date
+    bill_date_before = @member.bill_date
+
+    assert_difference('Operation.count', 0) do
+      assert_difference('Transaction.count', 0) do
+        @member.bill_membership
+      end
+    end
+    @member.reload
+    assert_equal(quota_before,@member.quota)
+    assert_equal(next_bill_date_before,@member.next_retry_bill_date)
+    assert_equal(bill_date_before,@member.bill_date)
+  end
+
 end
