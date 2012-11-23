@@ -209,7 +209,7 @@ class Member < ActiveRecord::Base
     send_fulfillment
     membership = current_membership
     membership.join_date = Time.zone.now
-    self.bill_date = Time.zone.now + terms_of_membership.provisional_days
+    self.bill_date = Time.zone.now + terms_of_membership.provisional_days.days
     self.next_retry_bill_date = bill_date
     self.save
     membership.save
@@ -218,7 +218,7 @@ class Member < ActiveRecord::Base
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.  
   def schedule_first_membership_for_approved_member
     send_fulfillment
-    self.bill_date = Time.zone.now + terms_of_membership.provisional_days
+    self.bill_date = Time.zone.now + terms_of_membership.provisional_days.days
     self.next_retry_bill_date = bill_date
     self.save
     membership = current_membership
@@ -311,11 +311,14 @@ class Member < ActiveRecord::Base
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
         old_tom_id = terms_of_membership.id
+        prev_membership_id = current_membership.id
         res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info)
         if res[:code] == Settings.error_codes.success
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
             "Save the sale from TOMID #{old_tom_id} to TOMID #{new_tom_id}", self, Settings.operation_types.save_the_sale)
         end
+        # update manually this fields because we cant cancel member
+        Membership.find(prev_membership_id).cancel_because_of_save_the_sale
         res
       end
     else
@@ -717,7 +720,7 @@ class Member < ActiveRecord::Base
       self.bill_date = new_bill_date
       self.next_retry_bill_date = new_bill_date
       self.save
-      Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date}", self)
+      Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date.to_date}", self)
     end
 
     def set_status_on_enrollment!(agent, trans, amount, info)
@@ -747,6 +750,7 @@ class Member < ActiveRecord::Base
       Auditory.audit(agent, 
         (trans.nil? ? terms_of_membership : trans), 
         message, self, operation_type)
+      
       message
     end
 

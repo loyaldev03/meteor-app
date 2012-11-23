@@ -20,9 +20,6 @@ cd /var/www/$2/current && RAILS_ENV=$1 rake members:cancel  >> $LOGFILE 2>&1
 # club cash should be processed before billing. Because if we reset club cash and then we bill, new CC should not be resetted
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_club_cash  >> $LOGFILE 2>&1
 
-# billing should be executed after cancel jobs finishes
-cd /var/www/$2/current && RAILS_ENV=$1 rake billing:for_today  >> $LOGFILE 2>&1
-
 # rake mes:account_updater_send_file_to_process
 # uncomment the following line with a test MeS account configured
 # cd /var/www/$2/current && RAILS_ENV=$1 rake mes:account_updater_send_file_to_process  >> $LOGFILE 2>&1 &
