@@ -16,6 +16,9 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_gateway2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'second_tom_without_aproval')
+    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    @terms_of_membership_with_approval2 = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id, :name => 'second_tom_aproval')
     @new_terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_hold_card, :club_id => @club.id)
     
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
@@ -31,7 +34,6 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     @saved_member.reload
     sign_in_as(@admin_agent)
   end
-
 
   test "save the sale from provisional to provisional" do
     setup_member(true)
@@ -53,10 +55,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
         assert page.has_content?("Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@new_terms_of_membership_with_gateway.id}")
       }
     end
-
   end
-
-
 
   test "save the sale from active to provisional" do
     setup_member(false)
@@ -92,7 +91,113 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     click_on 'Save the sale'
 
     assert page.has_content?("Nothing to change. Member is already enrolled on that TOM")
-    
   end
 
+  test "Save the sale from TOM without approbal to TOM without aprobal - status active" do
+    setup_member(false)
+    @saved_member.set_as_active
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Save the sale'   
+
+    select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id')
+    confirm_ok_js
+    click_on 'Save the sale'
+
+    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+  end
+
+  test "Save the sale from TOM without approbal to TOM without aprobal - status provisional" do
+    setup_member(false)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Save the sale'   
+
+    select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id')
+    confirm_ok_js
+    click_on 'Save the sale'
+
+    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+  end
+
+  test "Save the sale from TOM without approbal to TOM aprobal - status active" do
+    setup_member(false)
+    @saved_member.set_as_active
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Save the sale'   
+
+    wait_until{ select(@terms_of_membership_with_approval.name, :from => 'terms_of_membership_id') }
+    confirm_ok_js
+    click_on 'Save the sale'
+
+    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+  end
+
+  test "Save the sale from TOM without approbal to TOM aprobal - status provisional" do
+    setup_member(false)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Save the sale'   
+
+    wait_until{ select(@terms_of_membership_with_approval.name, :from => 'terms_of_membership_id') }
+    confirm_ok_js
+    click_on 'Save the sale'
+
+    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+  end
+
+  test "Save the sale from TOM approbal to TOM without aprobal - status active" do
+    setup_member
+    @saved_member.set_as_active
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Save the sale'   
+
+    wait_until{ select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id') }
+    confirm_ok_js
+    click_on 'Save the sale'
+
+    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+  end
+
+  test "Save the sale from TOM approbal to TOM without aprobal - status provisional" do
+    setup_member
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Save the sale'   
+
+    wait_until{ select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id') }
+    confirm_ok_js
+    click_on 'Save the sale'
+
+    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+  end
+
+  test "Save the sale from TOM approbal to TOM aprobal - status active" do
+    setup_member
+    @saved_member.set_as_active
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Save the sale'   
+
+    wait_until{ select(@terms_of_membership_with_approval2.name, :from => 'terms_of_membership_id') }
+    confirm_ok_js
+    click_on 'Save the sale'
+
+    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+  end
+
+  test "Save the sale from TOM approbal to TOM aprobal - status provisional" do
+    setup_member
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Save the sale'   
+
+    wait_until{ select(@terms_of_membership_with_approval2.name, :from => 'terms_of_membership_id') }
+    confirm_ok_js
+    click_on 'Save the sale'
+
+    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
+  end
 end
