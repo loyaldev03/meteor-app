@@ -140,6 +140,12 @@ $(document).ready( function() {
     $("#clear_form").click( function() {
       $("#index_search_form input[type=text]").each(function() { $(this).val(''); }); 
     });
+
+    $('#member_country').live('change',  function(){
+      country = $('#member_country').val();
+      $.get(this.action, { country_code:country }, null, 'script'); 
+    })
+
   };
 
   function new_member_functions(){
