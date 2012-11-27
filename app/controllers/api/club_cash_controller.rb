@@ -6,7 +6,7 @@ class Api::ClubCashController < ApplicationController
   # This method adds an specific amount of cash, as club cash to the member.
   #
   # [member_id] ID of the member inside the club. This id is an integer value. With this value and the club id we can search for the memeber.
-  # [amount] Amount of the club cash to add. It should be float and only number.
+  # [amount] Amount of the club cash to add. It should be float and only number. We accept a maximun of two digits after the comma.
   # [description] Description of the club cash. (Eg. why we are adding club cash to the member.)
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.

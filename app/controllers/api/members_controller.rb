@@ -193,7 +193,7 @@ class Api::MembersController < ApplicationController
   #              +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
-  #             *club_cash_amount: Amount of the club cash the member has at this moment.
+  #             *club_cash_amount: Amount of the club cash the member has at this moment. We accept a maximun of two digits after the comma.
   # [credit_card] Information related to member's credit card.
   #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   #                 *expire_year: The year (in numbers) in which the credit card will expire.  
