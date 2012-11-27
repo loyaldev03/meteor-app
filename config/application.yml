@@ -162,6 +162,8 @@ defaults: &defaults
       api_id:
         numericality:
           :only_integer: true
+          :allow_nil: true
+          :allow_blank: true
     sets:
       western:
         first_name:
