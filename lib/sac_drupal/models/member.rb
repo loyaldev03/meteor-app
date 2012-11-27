@@ -209,10 +209,10 @@ module Drupal
       if cc
         map.merge!({
           field_profile_cc_month: {
-            und: "%02d" % cc.expire_month.to_s
+            und: [ { value: "%02d" % cc.expire_month.to_s } ]
           },
           field_profile_cc_year: {
-            und: cc.expire_year.to_s
+            und: [ { value: cc.expire_year.to_s } ]
           },
           field_profile_cc_number: {
             und: [{
