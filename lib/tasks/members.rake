@@ -4,8 +4,8 @@ namespace :billing do
   task :for_today => :environment do
     tall = Time.zone.now
     begin
-      Member.joins(:club).find_in_batches(:conditions => [" date(next_retry_bill_date) <= ? AND clubs.billing_enable = true", Time.zone.now.to_date]) do |group|
-        group.each do |member| 
+      Member.find_in_batches(:conditions => [" date(next_retry_bill_date) <= ? and club_id IN (select id from clubs where billing_enable = true) ", 
+        Time.zone.now.to_date]) do |group|
           tz = Time.zone.now
           begin
             Rails.logger.info "  * processing member ##{member.uuid}"
