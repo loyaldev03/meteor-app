@@ -346,7 +346,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
         }
       end
     end
-  end
+  # end
 
   test "Add club cash from club cash amount configured in the TOM - Yearly and Chapter Member" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
@@ -357,6 +357,8 @@ class MembersClubCashTest < ActionController::IntegrationTest
     FactoryGirl.create(:batch_agent)
     
     @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
+    @saved_member.update_attribute(:country, "US")
+    @saved_member.update_attribute(:state, "AL")
     sign_in_as(@admin_agent)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -452,6 +454,5 @@ class MembersClubCashTest < ActionController::IntegrationTest
       end
     end
   end
-
 end
 

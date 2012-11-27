@@ -611,30 +611,34 @@ class Member < ActiveRecord::Base
     if amount.to_f == 0
       answer[:message] = "Can not process club cash transaction with amount 0 or letters."
     elsif (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
-      ClubCashTransaction.transaction do 
-        cct = ClubCashTransaction.new(:amount => amount, :description => description)
-        begin
-          cct.member = self
-          if cct.valid? 
-            cct.save!
-            self.club_cash_amount = self.club_cash_amount + amount.to_f
-            self.save(:validate => false)
-            message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }"
-            if amount.to_f > 0
-              Auditory.audit(agent, cct, message, self, Settings.operation_types.add_club_cash)
-            elsif amount.to_f < 0 and amount.to_f.abs == club_cash_amount 
-              Auditory.audit(agent, cct, message, self, Settings.operation_types.reset_club_cash)
-            elsif amount.to_f < 0 
-              Auditory.audit(agent, cct, message, self, Settings.operation_types.deducted_club_cash)
+      if /^(\-)?\d*(.\d{0,2})?$/.match(amount.to_s).nil?
+        answer[:message] = "Max amount of digits after comma is 2."
+      else
+        ClubCashTransaction.transaction do 
+          cct = ClubCashTransaction.new(:amount => amount, :description => description)
+          begin
+            cct.member = self
+            if cct.valid? 
+              cct.save!
+              self.club_cash_amount = self.club_cash_amount + amount.to_f
+              self.save(:validate => false)
+              message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }"
+              if amount.to_f > 0
+                Auditory.audit(agent, cct, message, self, Settings.operation_types.add_club_cash)
+              elsif amount.to_f < 0 and amount.to_f.abs == club_cash_amount 
+                Auditory.audit(agent, cct, message, self, Settings.operation_types.reset_club_cash)
+              elsif amount.to_f < 0 
+                Auditory.audit(agent, cct, message, self, Settings.operation_types.deducted_club_cash)
+              end
+              answer = { :message => message, :code => Settings.error_codes.success }
+            else
+              answer[:message] = "Could not save club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
             end
-            answer = { :message => message, :code => Settings.error_codes.success }
-          else
+          rescue Exception => e
             answer[:message] = "Could not save club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
+            Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message], :parameters => { :club_cash => cct.inspect, :member => self.inspect })
+            raise ActiveRecord::Rollback
           end
-        rescue Exception => e
-          answer[:message] = "Could not save club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
-          Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message], :parameters => { :club_cash => cct.inspect, :member => self.inspect })
-          raise ActiveRecord::Rollback
         end
       end
     else
