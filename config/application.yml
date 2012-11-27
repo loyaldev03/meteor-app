@@ -159,6 +159,9 @@ defaults: &defaults
         length: 
           :minimum: 1
           :maximum: 8
+      api_id:
+        numericality:
+          :only_integer: true
     sets:
       western:
         first_name:
