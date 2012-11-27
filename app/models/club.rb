@@ -23,7 +23,7 @@ class Club < ActiveRecord::Base
 
   acts_as_paranoid
 
-  after_create :add_default_member_groups, :add_default_product
+  after_create :add_default_member_groups, :add_default_product, :add_default_disposition_type
 
   validates :partner_id, :presence => true
   validates :name, :presence => true, :uniqueness => true
@@ -68,6 +68,17 @@ class Club < ActiveRecord::Base
         p.recurrent = true
         p.club_id = self.id
         p.save
+      end
+    end
+
+    def add_default_disposition_type
+      ['Website Question', 'Technical Support', 'Benefits Question', 'Pre-Bill Cancellation',
+      'Pre-Bill Save', 'Product Questions', 'Deals and Discounts', 'VIP Question', 'Club Cash Question',
+      'Local Chapter Question'].each do |name|
+        d = DispositionType.new
+        d.name = name
+        d.club_id = self.id
+        d.save
       end
     end
 end
