@@ -63,9 +63,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
         assert page.has_content?("5.0 club cash was successfully deducted")
       }
     end
-
   end
-
 
   test "club cash amount can't be negatibe" do
     setup_member
@@ -86,7 +84,6 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     within("#td_mi_club_cash_amount") { assert page.has_content?("15") }
-
   end
 
   test "invalid characters on club cash" do
@@ -346,7 +343,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
         }
       end
     end
-  # end
+  end
 
   test "Add club cash from club cash amount configured in the TOM - Yearly and Chapter Member" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
@@ -454,5 +451,6 @@ class MembersClubCashTest < ActionController::IntegrationTest
       end
     end
   end
+
 end
 
