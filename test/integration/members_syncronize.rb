@@ -328,6 +328,33 @@ class MembersSyncronize < ActionController::IntegrationTest
     end
   end
 
+test "Update member's api_id (Remote ID) with invalid information" do
+    setup_environment
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member.update_attribute(:updated_at, Time.zone.now-1)
+    @saved_member.update_attribute(:last_synced_at, Time.zone.now)
+    
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+
+    within(".nav-tabs") do
+      click_on("Sync Status")
+    end
+    within("#sync_status")do
+      wait_until{
+        click_link_or_button 'Edit'
+        fill_in "member[api_id]", :with => "asdr"
+        confirm_ok_js
+        click_on 'Update'
+      }
+    end
+    wait_until{ page.has_content?('Sync data cannot be updated {:api_id=>["is not a number"]}') }
+  end
+
   test "Unset member's api_id (Remote ID)" do
     setup_environment
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
