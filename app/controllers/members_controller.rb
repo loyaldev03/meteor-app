@@ -251,12 +251,15 @@ class MembersController < ApplicationController
 
   def update_sync
     old_id = @current_member.api_id
-    if params[:member] && @current_member.update_attribute(:api_id, params[:member][:api_id])
-      message = "Member's api_id changed from #{old_id.inspect} to #{@current_member.api_id.inspect}"
-      Auditory.audit(@current_agent, @current_member, message, @current_member)
-      redirect_to show_member_path, notice: 'Sync data updated'
-    else
-      redirect_to show_member_path, notice: 'Sync data cannot be updated'
+    if params[:member]
+      @current_member.api_id = params[:member][:api_id] 
+      if @current_member.save
+        message = "Member's api_id changed from #{old_id.inspect} to #{@current_member.api_id.inspect}"
+        Auditory.audit(@current_agent, @current_member, message, @current_member)
+        redirect_to show_member_path, notice: 'Sync data updated'
+      else
+        redirect_to show_member_path, notice: "Sync data cannot be updated #{@current_member.errors.to_hash}"
+      end
     end
   end
 
