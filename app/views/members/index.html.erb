@@ -98,7 +98,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td><%= t('activerecord.attributes.member.state') %></td>
+                    <td><%= t('activerecord.attributes.member.country') %></td>
                     <td>
                       <%= select_tag('member[country]', options_for_select(Member.supported_countries.map { |cc| [Member.country_name(cc), cc]}),
                         :prompt => t('buttons.select_country')) %>
