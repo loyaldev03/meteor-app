@@ -16,6 +16,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @new_terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => "another_tom")
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
     FactoryGirl.create(:batch_agent)
     saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
@@ -35,8 +36,17 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
     click_on 'Recover'
     
-    assert page.has_content?("Member recovered successfully $0.0")
-    
+    wait_until{
+      select(@new_terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
+    }
+    confirm_ok_js
+    click_on 'Recover'
+
+    wait_until{ assert find_field('input_first_name').value == @canceled_member.first_name }
+    @canceled_member.reload
+
+    wait_until{ page.has_content? "Member recovered successfully $0.0 on TOM(2) -#{@canceled_member.current_membership.terms_of_membership.name}-"}
+
     within("#td_mi_status") do
       assert page.has_content?("provisional")
     end
@@ -47,7 +57,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     
     within("#operations_table") do
       wait_until {
-        assert page.has_content?("Member recovered successfully $0.0")
+        assert page.has_content?("Member recovered successfully $0.0 on TOM(2) -#{@canceled_member.current_membership.terms_of_membership.name}-")
       }
     end
     membership = @canceled_member.current_membership
@@ -70,6 +80,16 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     3.times{ 
       visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
       click_on 'Recover'
+      wait_until{
+        if @canceled_member.current_membership.terms_of_membership.name == "another_tom"
+          select(@terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
+        else
+          select(@new_terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
+        end
+      }
+      confirm_ok_js
+      click_on 'Recover'
+
       if page.has_no_content?("Cant recover member. Max reactivations reached")
         sleep(2)
         click_on 'Cancel'
@@ -86,17 +106,36 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     }
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
     click_on 'Recover'
-
+    wait_until{
+      if @canceled_member.current_membership.terms_of_membership.name == "another_tom"
+        select(@terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
+      else
+        select(@new_terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
+      end
+    }
+    confirm_ok_js
+    click_on 'Recover'
     assert page.has_content?(Settings.error_messages.cant_recover_member)
   end
 
   test "Recover a member by Monthly membership" do
     setup_member
-    @terms_of_membership_with_gateway.installment_type = "1.month"
+    @new_terms_of_membership_with_gateway.installment_type = "1.month"
+    @new_terms_of_membership_with_gateway.save
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
     click_on 'Recover'
-    wait_until{ page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-") }
+
+    wait_until{
+      select(@new_terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
+    }
+    confirm_ok_js
+    click_on 'Recover'
+
+    wait_until{ assert find_field('input_first_name').value == @canceled_member.first_name }
+    @canceled_member.reload
+
+    wait_until{ page.has_content? "Member recovered successfully $0.0 on TOM(2) -#{@canceled_member.current_membership.terms_of_membership.name}-"}
    
     within("#td_mi_status") do
       assert page.has_content?("provisional")
@@ -113,7 +152,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     end
     within("#operations_table")do
       wait_until{
-        assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
+        assert page.has_content?("Member recovered successfully $0.0 on TOM(2) -#{@canceled_member.current_membership.terms_of_membership.name}-")
       }
     end
   end 
@@ -121,11 +160,22 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   test "Recover a member by Annual Membership" do
     setup_member
     @terms_of_membership_with_gateway.installment_type = "1.year"
+    @terms_of_membership_with_gateway.save
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
     click_on 'Recover'
-    wait_until{ page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-") }
-   
+
+    wait_until{
+      select(@new_terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
+    }
+    confirm_ok_js
+    click_on 'Recover'
+
+    wait_until{ assert find_field('input_first_name').value == @canceled_member.first_name }
+    @canceled_member.reload
+
+    wait_until{ page.has_content? "Member recovered successfully $0.0 on TOM(2) -#{@canceled_member.current_membership.terms_of_membership.name}-"}
+
     within("#td_mi_status") do
       assert page.has_content?("provisional")
     end
@@ -141,7 +191,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     end
     within("#operations_table")do
       wait_until{
-        assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
+        assert page.has_content?("Member recovered successfully $0.0 on TOM(2) -#{@canceled_member.current_membership.terms_of_membership.name}-")
       }
     end
   end 
@@ -151,9 +201,18 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
     actual_tom = @canceled_member.current_membership
 
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
     click_on 'Recover'
-    wait_until{ assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-") }
+
+    confirm_ok_js
+    click_on 'Recover'
+
+    wait_until{ assert find_field('input_first_name').value == @canceled_member.first_name }
     @canceled_member.reload
+
+    wait_until{ assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@canceled_member.current_membership.terms_of_membership.name}-") }
+    @canceled_member.reload
+
     wait_until{ assert_equal(@canceled_member.current_membership.terms_of_membership_id, actual_tom.terms_of_membership_id) }
 
     within("#td_mi_reactivation_times")do
@@ -167,7 +226,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     end
     within("#operations_table")do
       wait_until{
-        assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
+        assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@canceled_member.current_membership.terms_of_membership.name}-")
       }
     end
   end

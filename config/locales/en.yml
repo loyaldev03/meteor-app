@@ -69,6 +69,7 @@ en:
     stop_editing: 'Stop editing'
     select_country: 'Select country'
     select_state: 'Select state'
+    recover: 'Recover'
   admin:
     agents:
       index:
@@ -247,6 +248,7 @@ en:
         not_found: 'No communications were found.'
       club_cash_transaction: 
         amount: 'Amount'
+        amount_help: '(e.g., 100.00) Please enter a negative number to subtract club cash points.'
         description: 'Description'
       product:
         id: 'ID'

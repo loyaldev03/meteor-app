@@ -72,13 +72,7 @@
 
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
-        <%= form_for @current_member, :url => member_recover_path, :method => :post, do |f| %>
-            <% if @current_member.lapsed? %>
-              <%= f.submit t('recover'), :class => 'btn btn-success', :style => "width: 182px;" %>
-            <% else %>
-              <%= f.submit t('recover'), :class => 'btn', :style => "width: 182px;", :disabled => true %>
-            <% end %>
-        <% end %>
+        <%= link_to "Recover", member_recover_path, :class => "btn btn-success btn-large-w", :disabled => (!@current_member.lapsed?) %>
       </div>
       <% disable_applied = @current_member.applied? == false  %>
       <% unless disable_applied %>

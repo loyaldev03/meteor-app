@@ -85,15 +85,20 @@ class MembersController < ApplicationController
   end
 
   def recover
+    tom = TermsOfMembership.find_by_id_and_club_id(params[:terms_of_membership_id], @current_club.id)
     if request.post?
-      answer = @current_member.recover(@current_member.terms_of_membership, current_agent)
-      if answer[:code] == Settings.error_codes.success
-        flash[:notice] = answer[:message]
+      if tom.nil?
+        flash[:error] = "Terms of membership not found"
       else
-        flash[:error] = answer[:message]
+        answer = @current_member.recover(tom, current_agent)
+        if answer[:code] == Settings.error_codes.success
+          flash[:notice] = answer[:message]
+        else
+          flash[:error] = answer[:message]
+        end
       end
+      redirect_to show_member_path
     end
-    redirect_to show_member_path
   end
 
   def refund
