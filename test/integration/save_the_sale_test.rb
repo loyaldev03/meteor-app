@@ -188,7 +188,6 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
     wait_until{ select(@terms_of_membership_with_approval2.name, :from => 'terms_of_membership_id') }
     confirm_ok_js
-    click_on 'Save the sale'
 
     assert_difference("Membership.count") do
       click_on 'Save the sale'
