@@ -5,17 +5,16 @@ namespace :billing do
     tall = Time.zone.now
     begin
       Member.find_in_batches(:conditions => [" date(next_retry_bill_date) <= ? and club_id IN (select id from clubs where billing_enable = true) ", 
-        Time.zone.now.to_date]) do |group|
-          tz = Time.zone.now
-          begin
-            Rails.logger.info "  * processing member ##{member.uuid}"
-            member.bill_membership
-          rescue Exception => e
-            Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+                Time.zone.now.to_date]) do |group|
+        tz = Time.zone.now
+        begin
+          Rails.logger.info "  * processing member ##{member.uuid}"
+          member.bill_membership
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
       end
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
