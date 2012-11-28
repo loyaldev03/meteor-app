@@ -10,12 +10,14 @@ class Api::ClubCashController < ApplicationController
   # [description] Description of the club cash. (Eg. why we are adding club cash to the member.)
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
+  # [errors] A hash with club cash and members errors. This will be use to show errors on club cash cs web page.
   #
   # @param [String] member_id
   # @param [float] amount
   # @param [Text] description
   # @return [String] *message*
   # @return [Integer] *code*
+  # @return [Hash] *errors*
   #
   def create
     member = Member.find(params[:member_id])
