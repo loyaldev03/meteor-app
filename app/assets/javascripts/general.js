@@ -282,8 +282,11 @@ $(document).ready( function() {
 
   function club_cash_functions(){
 
+
+
+
     $('#_amount').live('change', function(){
-      amount = $('#_amount').val();
+      amount = $('#_amount').val().substring(0,15);
       var num = parseFloat(amount);
       if(num!=0)
         $('#_amount').val(Math.floor(num * 100) / 100);
