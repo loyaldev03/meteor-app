@@ -200,12 +200,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
       fill_in 'member[address]', :with => unsaved_member.address
       select('M', :from => 'member[gender]')
       fill_in 'member[zip]', :with => unsaved_member.zip
-      if unsaved_member.country == 'US'
-          select('United States', :from => 'member[country]')
-        else
-          select('Canada', :from => 'member[country]')
-        end
-        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
+      select_country_and_state(unsaved_member.country)
     }
 
     page.execute_script("window.jQuery('#member_birth_date').next().click()")

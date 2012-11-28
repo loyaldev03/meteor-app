@@ -901,9 +901,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     wait_until{ page.has_content?("Member approved") }
     @saved_member.reload
 
-require 'ruby-debug'
-debugger
-
     assert_equal reactivation_times+1, @saved_member.reactivation_times
 
     within("#td_mi_status")do

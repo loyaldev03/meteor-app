@@ -46,12 +46,7 @@ class MembersBillTest < ActionController::IntegrationTest
       fill_in 'member[city]', :with => unsaved_member.city
       fill_in 'member[address]', :with => unsaved_member.address
       fill_in 'member[zip]', :with => unsaved_member.zip
-      if unsaved_member.country == 'US'
-        select('United States', :from => 'member[country]')
-      else
-        select('Canada', :from => 'member[country]')
-      end
-      within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
+      select_country_and_state(unsaved_member.country)
       select('M', :from => 'member[gender]')
       select('United States', :from => 'member[country]')
     }

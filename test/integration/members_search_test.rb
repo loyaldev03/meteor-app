@@ -126,12 +126,7 @@ class MembersSearchTest < ActionController::IntegrationTest
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select(unsaved_member.gender, :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        if unsaved_member.country == 'US'
-          select('United States', :from => 'member[country]')
-        else
-          select('Canada', :from => 'member[country]')
-        end
-        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
+        select_country_and_state(unsaved_member.country)
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -393,12 +388,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     member_to_seach = Member.first
     within("#contact_details")do
       wait_until{
-        if member_to_seach.country == 'US'
-          select('United States', :from => 'member[country]')
-        else
-          select('Canada', :from => 'member[country]')
-        end
-        within('#states_td'){ select(member_to_seach.state, :from => 'member[state]') }
+        select_country_and_state(member_to_seach.country)
       }
     end
     click_link_or_button 'Search'
@@ -483,12 +473,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#contact_details")do
       wait_until{
         fill_in "member[city]", :with => @saved_member.city
-        if @saved_member.country == 'US'
-          select('United States', :from => 'member[country]')
-        else
-          select('Canada', :from => 'member[country]')
-        end
-        within('#states_td'){ select(@saved_member.state, :from => 'member[state]') }
+        select_country_and_state(@saved_member.country)
         fill_in "member[address]", :with => @saved_member.address
         fill_in "member[zip]", :with => @saved_member.zip
       }

@@ -36,12 +36,7 @@ class MembersCancelTest < ActionController::IntegrationTest
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select(unsaved_member.gender, :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        if unsaved_member.country == 'US'
-          select('United States', :from => 'member[country]')
-        else
-          select('Canada', :from => 'member[country]')
-        end
-        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
+        select_country_and_state(unsaved_member.country)
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
