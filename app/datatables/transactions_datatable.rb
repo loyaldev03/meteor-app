@@ -13,7 +13,7 @@ private
     transactions.map do |transaction|
       [
         I18n.l(transaction.created_at, :format => :long),
-        transaction.to_label+
+        transaction.full_label.truncate(50)+
         " <i class ='icon-eye-open help' rel= 'popover' data-toggle='modal' href='#myModal"+transaction.id+"' 
              style='cursor: pointer'></i>"+modal(transaction), 
         number_to_currency(transaction.amount) ,
