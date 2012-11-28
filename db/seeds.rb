@@ -136,7 +136,7 @@ tom.club = c
 tom.save!
 
 
-[ 'Icomming call', 'outbound call' ,  'email' ,  'chat' , 'others' ].each do |name|
+[ 'Incomming Call', 'Outbound Call' ,  'Email' ,  'Chat' , 'Other' ].each do |name|
   c = CommunicationType.new
   c.name = name
   c.save
