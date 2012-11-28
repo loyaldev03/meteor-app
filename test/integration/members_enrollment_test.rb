@@ -114,12 +114,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select(unsaved_member.gender, :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        if unsaved_member.country == 'US'
-          select('United States', :from => 'member[country]')
-        else
-          select('Canada', :from => 'member[country]')
-        end
-        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
+        select_country_and_state(unsaved_member.country)
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -157,12 +152,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         fill_in 'member[address]', :with => unsaved_member.address
-        if unsaved_member.country == 'US'
-          select('United States', :from => 'member[country]')
-        else
-          select('Canada', :from => 'member[country]')
-        end
-        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
+        select_country_and_state(unsaved_member.country)
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -223,14 +213,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       fill_in 'member[city]', :with => unsaved_member.city
       fill_in 'member[address]', :with => unsaved_member.address
       fill_in 'member[zip]', :with => unsaved_member.zip
-      if unsaved_member.country == 'US'
-        select('United States', :from => 'member[country]')
-      else
-        select('Canada', :from => 'member[country]')
-      end
-      within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
+      select_country_and_state(unsaved_member.country)
       select('M', :from => 'member[gender]') 
-	  	
 		}
 
 		page.execute_script("window.jQuery('#member_birth_date').next().click()")
@@ -588,8 +572,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select('M', :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        select('United States', :from => 'member[country]')
-        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
+        select_country_and_state
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -643,7 +626,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id, 
                                          :address => '1455 De Maisonneuve Blvd. W. Montreal',
-                                         :state => 'Quebec',
+                                         :state => 'QC',
                                          :zip => 'H3G 1M8',
                                          :country => 'Canada')
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -666,7 +649,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, 
                                          :club_id => @club.id, 
                                          :address => '1455 De Maisonneuve Blvd. W. Montreal',
-                                         :state => 'Quebec',
+                                         :state => 'QC',
                                          :zip => '%^tYU2123',
                                          :country => 'CA')
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -917,6 +900,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     click_link_or_button 'Approve'
     wait_until{ page.has_content?("Member approved") }
     @saved_member.reload
+
+require 'ruby-debug'
+debugger
 
     assert_equal reactivation_times+1, @saved_member.reactivation_times
 
