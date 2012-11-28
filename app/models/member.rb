@@ -389,6 +389,12 @@ class Member < ActiveRecord::Base
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end
 
+  def errors_merged(credit_card)
+    errors = self.errors.to_hash
+    errors.merge!(credit_card: credit_card.errors.to_hash) unless credit_card.errors.empty?
+    errors
+  end
+
   def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = false, skip_api_sync = false)
     credit_card_params = {} if credit_card_params.blank? # might be [], we expect a Hash
     club = tom.club
@@ -405,10 +411,8 @@ class Member < ActiveRecord::Base
         member.skip_api_sync! if member.api_id.present? || skip_api_sync
         member.club = club
         unless member.valid? and credit_card.valid?
-          errors = member.errors.to_hash
-          errors.merge!(credit_card: credit_card.errors.to_hash) unless credit_card.errors.empty?
           return { :message => Settings.error_messages.member_data_invalid, :code => Settings.error_codes.member_data_invalid, 
-                   :errors => errors }
+                   :errors => member.errors_merged(credit_card) }
         end
         # enroll allowed
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
@@ -439,17 +443,18 @@ class Member < ActiveRecord::Base
 
   def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, member_params = nil)
     allow_cc_blank = (amount.to_f == 0.0 and cc_blank)
+
     if recovery_check and not self.new_record? and not self.can_recover?
       return { :message => Settings.error_messages.cant_recover_member, :code => Settings.error_codes.cant_recover_member }
     elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
-        return { :message => Settings.error_messages.invalid_credit_card, :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
+      return { :message => Settings.error_messages.invalid_credit_card, :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
     elsif credit_card.blacklisted? or self.blacklisted?
       return { :message => Settings.error_messages.blacklisted, :code => Settings.error_codes.blacklisted }
-    elsif not self.valid? 
-      errors = member.errors.to_hash
-      errors.merge!(credit_card: credit_card.errors.to_hash) unless credit_card.errors.empty?
+    end
+
+    unless self.valid? 
       return { :message => Settings.error_messages.member_data_invalid, :code => Settings.error_codes.member_data_invalid, 
-               :errors => errors }
+               :errors => self.errors_merged(credit_card) }
     end
         
     enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => tom.id
@@ -490,9 +495,10 @@ class Member < ActiveRecord::Base
 
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
-      Airbrake.notify(:error_class => "Member:enroll -- member turned invalid", :error_message => e, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
+      error_message = (self.id.nil? ? "Member:enroll" : "Member:recovery/save the sale") + " -- member turned invalid while enrolling"
+      Airbrake.notify(:error_class => error_message, :error_message => e, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
-      Auditory.audit(agent, self, e, nil, Settings.operation_types.error_on_enrollment_billing)
+      Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing)
       { :message => message, :code => Settings.error_codes.member_not_saved }
     end
   end

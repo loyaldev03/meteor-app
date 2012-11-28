@@ -72,7 +72,11 @@
 
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
-        <%= link_to "Recover", member_recover_path, :class => "btn btn-success btn-large-w", :disabled => (!@current_member.lapsed?) %>
+        <% if @current_member.lapsed? %>
+          <%= link_to "Recover", member_recover_path, :class => "btn btn-success btn-large-w" %>
+        <% else %>
+          <%= link_to "Recover", "#", :class => "btn btn-large-w", :disabled => true %>
+        <% end %>
       </div>
       <% disable_applied = @current_member.applied? == false  %>
       <% unless disable_applied %>
