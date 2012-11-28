@@ -107,7 +107,7 @@
       <td><%= @current_member.zip %></td>
       <td NOWRAP>
         <% if @current_member.wrong_address.nil? %>
-          <%= link_to(member_set_undeliverable_path, :class => "btn btn-danger", :id => "link_member_set_undeliverable", :disabled => (cannot? :set_undeliverable, Member)) do %> 
+          <%= link_to(member_set_undeliverable_path, :class => "btn btn-mini btn-danger", :id => "link_member_set_undeliverable", :disabled => (cannot? :set_undeliverable, Member)) do %> 
             <i class="icon-remove"></i> <%= t('activerecord.attributes.member.set_undeliverable') %>
           <% end %>        
         <% else %>
@@ -130,7 +130,7 @@
       <td nowrap="nowrap">
         <%= @current_member.full_phone_number %>
         <% if @current_member.wrong_phone_number.nil? %>
-          <%= link_to(member_set_unreachable_path, :class => "btn btn-danger", :id => "link_member_set_unreachable", :disabled => (cannot? :set_unreachable, Member)) do %> 
+          <%= link_to(member_set_unreachable_path, :class => "btn btn-mini btn-danger", :id => "link_member_set_unreachable", :disabled => (cannot? :set_unreachable, Member)) do %> 
             <i class="icon-remove"></i> <%= t('activerecord.attributes.member.set_unreachable') %>
           <% end %>        
         <% else %>
@@ -204,7 +204,7 @@
           <tr>
             <th><%= t('menu.activerecord.term_of_membership') %>:</th>
             <td id="td_mi_terms_of_membership_name">
-              <%= link_to(terms_of_membership_path(:id => @current_membership.terms_of_membership), :class => "btn btn-small", :disabled => (cannot? :read, TermsOfMembership)) do %> 
+              <%= link_to(terms_of_membership_path(:id => @current_membership.terms_of_membership), :class => "btn btn-mini btn-small", :disabled => (cannot? :read, TermsOfMembership)) do %> 
                 <i class="icon-zoom-in"></i> <%= @current_membership.terms_of_membership.name %>
               <% end %>
             </td>  
@@ -244,7 +244,7 @@
             <td id="td_mi_next_retry_bill_date">
               <%= I18n.l(@current_member.next_retry_bill_date, :format => :only_date) unless @current_member.next_retry_bill_date.nil? %>&nbsp;&nbsp;&nbsp;
               <% unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
-                <%= link_to(member_change_next_bill_date_path, :class => "btn btn-info", :id => "link_member_change_next_bill_date", :disabled => (cannot? :change_next_bill_date, Member)) do %> 
+                <%= link_to(member_change_next_bill_date_path, :class => "btn btn-mini btn-info", :id => "link_member_change_next_bill_date", :disabled => (cannot? :change_next_bill_date, Member)) do %> 
                   <i class="icon-pencil"></i> Change
                 <% end %>
               <% end %>
@@ -261,7 +261,7 @@
             <td id="td_mi_club_cash_amount">
               <%= @current_member.club_cash_amount %>&nbsp;&nbsp;&nbsp;
               <% unless disable_save_sale %>
-                <%= link_to(member_add_club_cash_path, :class => "btn btn-success", :id => "link_member_add_club_cash", :disabled => (cannot? :add_club_cash, Member)) do %> 
+                <%= link_to(member_add_club_cash_path, :class => "btn btn-mini btn-success", :id => "link_member_add_club_cash", :disabled => (cannot? :add_club_cash, Member)) do %> 
                   <i class="icon-plus"></i> <%= t('activerecord.attributes.member.add_club_cash_transaction') %>
                 <% end %>
               <% end %>
