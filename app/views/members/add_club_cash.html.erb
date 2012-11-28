@@ -8,9 +8,12 @@
 	      <%= t('activerecord.attributes.club_cash_transaction.amount') %>
 	      <%= text_field nil, :amount, 
             :value => (params[:club_cash_transaction][:amount] if params[:club_cash_transaction]) %>
-      	</div>
+      	</div>      
         <div id="error" style="float:right; width:75%"></div>
-      </td>
+        </br></br></br>
+        <%= label :amount, t('activerecord.attributes.club_cash_transaction.amount_help'), 
+                  :class => 'help-inline', :style=>"float:left" %>
+      </td>      
     </tr>
     <tr> 
       <td> 

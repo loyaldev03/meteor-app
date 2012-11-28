@@ -619,7 +619,7 @@ class Member < ActiveRecord::Base
             cct.save!
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save(:validate => false)
-            message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }"
+            message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }. Concept: #{description}"
             if amount.to_f > 0
               Auditory.audit(agent, cct, message, self, Settings.operation_types.add_club_cash)
             elsif amount.to_f < 0 and amount.to_f.abs == club_cash_amount 
