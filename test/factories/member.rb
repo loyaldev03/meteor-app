@@ -11,7 +11,7 @@ FactoryGirl.define do
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
-    state "Alabama"
+    state "AL"
     sequence(:email) {|n| "member#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
@@ -31,7 +31,7 @@ FactoryGirl.define do
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
-    state "Alabama"
+    state "AL"
     sequence(:email) {|n| "member_with_api#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
@@ -51,7 +51,7 @@ FactoryGirl.define do
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
-    state "Alabama"
+    state "AL"
     sequence(:email) {|n| "member_with_cc#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
@@ -74,7 +74,7 @@ FactoryGirl.define do
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
-    state "Alabama"
+    state "AL"
     sequence(:email) {|n| "member_active#{n}@test.no" }
     phone_country_code 123
     phone_area_code 123
@@ -97,7 +97,7 @@ FactoryGirl.define do
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
-    state "Alabama"
+    state "AL"
     sequence(:email) {|n| "active_member_with_external_id#{n}@test.no" }
     phone_country_code 123
     phone_area_code 123
@@ -122,7 +122,7 @@ FactoryGirl.define do
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
-    state "Alabama"
+    state "AL"
     sequence(:email) {|n| "active_member_without_cc#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
@@ -143,7 +143,7 @@ FactoryGirl.define do
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
-    state "Alabama"
+    state "AL"
     sequence(:email) {|n| "lapsed_member#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
@@ -166,7 +166,7 @@ FactoryGirl.define do
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
-    state "Alabama"
+    state "AL"
     sequence(:email) {|n| "provisional_member_with_cc#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
@@ -188,7 +188,7 @@ FactoryGirl.define do
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
-    state "Alabama"
+    state "AL"
     sequence(:email) {|n| "provisional_member#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
@@ -209,7 +209,7 @@ FactoryGirl.define do
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
-    state "Alabama"
+    state "AL"
     sequence(:email) {|n| "applied_member#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123

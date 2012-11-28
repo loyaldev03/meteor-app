@@ -15,11 +15,6 @@ class Transaction < ActiveRecord::Base
   attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
   attr_accessor :refund_response_transaction_id
 
-  def to_label
-    I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
-      ( response_result.nil? ? '' : ' : ' + response_result[0..25])
-  end
-
   def full_label
     I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
       ( response_result.nil? ? '' : ' : ' + response_result)

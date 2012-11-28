@@ -101,6 +101,16 @@ module ActionController
       evaluate_script("window.alert = function(msg) { return true; }")
     end
 
+    def select_country_and_state(country = 'US')
+      if country == 'US'
+        select('United States', :from => 'member[country]')
+        within('#states_td'){ select('Alabama', :from => 'member[state]') }
+      else
+        select('Canada', :from => 'member[country]')
+        within('#states_td'){ select('Manitoba', :from => 'member[state]') }
+      end
+    end
+
     def search_member(field_selector, value, validate_obj)
       fill_in field_selector, :with => value unless value.nil?
       click_on 'Search'
@@ -170,8 +180,6 @@ module Airbrake
     # do nothing.
   end
 end
-
-TEST_COHORT = "%Y-%m-super channel-xyz123456-1.month" #HARDCODED
 
 
  # use_transactional_fixtures = false    # DOES NOT WORK!

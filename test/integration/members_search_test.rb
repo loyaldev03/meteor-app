@@ -15,6 +15,7 @@ class MembersSearchTest < ActionController::IntegrationTest
   end
 
   def setup_member(create_new_member = true)
+    @default_state = "Alabama" # when we select options we do it by option text not by value ?
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
