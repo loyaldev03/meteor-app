@@ -281,9 +281,17 @@ $(document).ready( function() {
   };
 
   function club_cash_functions(){
+
+    $('#_amount').live('change', function(){
+      amount = $('#_amount').val();
+      var num = parseFloat(amount);
+      if(num!=0)
+        $('#_amount').val(Math.floor(num * 100) / 100);
+    });
+
     $('#error_explanation').hide();
-    $('#submit_button').attr('disabled', 'disabled');
     $('form').submit( function(event) {
+      $('#submit_button').attr('disabled', 'disabled');
       event.preventDefault(); 
         $.ajax({
           type: 'POST',
