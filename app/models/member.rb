@@ -615,13 +615,14 @@ class Member < ActiveRecord::Base
   def add_club_cash(agent, amount = 0,description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
     if amount.to_f == 0
-      answer[:message] = "Can not process club cash transaction with amount 0 or letters."
+      answer[:message] = "Can not process club cash transaction with amount 0 or letters." 
+      answer[:errors] = {:number => "Invalid number"} 
     elsif (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
       ClubCashTransaction.transaction do 
         cct = ClubCashTransaction.new(:amount => amount, :description => description)
         begin
           cct.member = self
-          if cct.valid? 
+          if cct.valid? and self.valid?
             cct.save!
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save(:validate => false)
@@ -635,16 +636,19 @@ class Member < ActiveRecord::Base
             end
             answer = { :message => message, :code => Settings.error_codes.success }
           else
-            answer[:message] = "Could not save club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
+            answer[:message] = "Could not save club cash transaction." 
+            answer[:errors] = cct.errors_merged(self) 
           end
         rescue Exception => e
-          answer[:message] = "Could not save club cash transaction: #{cct.error_to_s} #{self.error_to_s}"
+          answer[:message] = "Could not save club cash transaction"
+          answer[:errors] = e
           Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message], :parameters => { :club_cash => cct.inspect, :member => self.inspect })
           raise ActiveRecord::Rollback
         end
       end
     else
       answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
+      answer[:errors] = { :number => "Club cash amount is greater that member's actual club cash." }
     end
     answer
   end

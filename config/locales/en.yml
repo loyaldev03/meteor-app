@@ -248,7 +248,7 @@ en:
         not_found: 'No communications were found.'
       club_cash_transaction: 
         amount: 'Amount'
-        amount_help: '(e.g., 100.00) Please enter a negative number to subtract club cash points.'
+        amount_help: '(e.g., 100.00) Please enter a negative number to subtract club cash points. Amounts with more than two digits after comma will be truncate.'
         description: 'Description'
       product:
         id: 'ID'

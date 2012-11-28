@@ -281,19 +281,46 @@ $(document).ready( function() {
   };
 
   function club_cash_functions(){
+
+    $('#_amount').live('change', function(){
+      amount = $('#_amount').val();
+      var num = parseFloat(amount);
+      if(num!=0)
+        $('#_amount').val(Math.floor(num * 100) / 100);
+    });
+
+    $('#error_explanation').hide();
     $('form').submit( function(event) {
+      $('#submit_button').attr('disabled', 'disabled');
       event.preventDefault(); 
         $.ajax({
           type: 'POST',
           url: "/api/v1/members/"+member_id+"/club_cash",
           data: $("form").serialize(),
           success: function(data) {
-            alert (data.message);
             if (data.code == 000)
               window.location.replace('../'+visible_id);
             else{
-              $("#error").empty();
-              $("#error").append("<p>"+data.message+"</p>");
+              $('#submit_button').removeAttr("disabled");
+              $('#error_explanation').show();
+              $("#error_explanation ul").empty();
+              $('#error_explanation ul').append("<b>"+data.message+"</b>");
+              for (var key in data.errors){
+                if (data.errors.hasOwnProperty(key)){
+                  if (key != 'member'){
+                  $("#error_explanation ul").append("<li>"+key+": "+data.errors[key]+"</li>");
+                   }
+                  else{
+                    for (var key2 in data.errors[key]){
+                      if (data.errors[key].hasOwnProperty(key2)){
+                        if (key2 != 0){
+                          $('#error_explanation ul').append("<li>"+key2+': '+data.errors[key][key2]+"</li>");                       
+                        }
+                      }
+                    } 
+                  }
+                }
+              }
             }
           },
         });
