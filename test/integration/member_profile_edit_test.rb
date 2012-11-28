@@ -318,6 +318,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       assert !page.has_css?('tr.yellow')
     end 
     @saved_member.reload
+
     assert_equal @saved_member.wrong_phone_number, nil
 
     #By changing phone_area_code
