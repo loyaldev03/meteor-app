@@ -1,5 +1,12 @@
 <%= render :partial => "shared/member_information" %>
 
+<div id="error_explanation">
+  <h2> Errors </h2>
+  <ul>
+  </ul>
+</div>
+<br>
+
 <%= form_tag(member_add_club_cash_path) do %> 
   <table class="table table-condensed table-bordered">
     <tr> 
@@ -9,7 +16,6 @@
 	      <%= text_field nil, :amount, 
             :value => (params[:club_cash_transaction][:amount] if params[:club_cash_transaction]) %>
       	</div>      
-        <div id="error" style="float:right; width:75%"></div>
         </br></br></br>
         <%= label :amount, t('activerecord.attributes.club_cash_transaction.amount_help'), 
                   :class => 'help-inline', :style=>"float:left" %>
