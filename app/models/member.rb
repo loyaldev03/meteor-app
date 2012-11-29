@@ -290,7 +290,7 @@ class Member < ActiveRecord::Base
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
   def can_recover?
     # TODO: Add logic to recover some one max 3 times in 5 years
-    self.lapsed? and reactivation_times < Settings.max_reactivations
+    self.lapsed? and reactivation_times < Settings.max_reactivations and not self.blacklisted
   end
 
   # refs #21919
