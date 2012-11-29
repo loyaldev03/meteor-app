@@ -283,6 +283,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       
     within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
 
+    within("#table_enrollment_info") { wait_until{ assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) } }
+
     active_credit_card = created_member.active_credit_card
     within("#credit_cards") { 
       assert page.has_content?("#{active_credit_card.number}") 
