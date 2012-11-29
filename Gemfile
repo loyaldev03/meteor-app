@@ -70,6 +70,8 @@ gem "timecop"
 # Use unicorn as the app server
 # gem 'unicorn'
 
+gem 'newrelic_rpm'
+
 # To use debugger
 group :development do
   gem 'ruby-debug19', :require => 'ruby-debug'
