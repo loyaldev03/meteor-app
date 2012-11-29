@@ -198,7 +198,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
 
   test "Recovery a member with Paid TOM" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
     actual_tom = @canceled_member.current_membership
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
@@ -229,5 +228,14 @@ class MembersRecoveryTest < ActionController::IntegrationTest
         assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@canceled_member.current_membership.terms_of_membership.name}-")
       }
     end
+  end
+
+  test "When member is blacklisted, it should not let recover" do
+    setup_member
+    @canceled_member.update_attribute(:blacklisted,true)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
+    
+    wait_until { find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
   end
 end

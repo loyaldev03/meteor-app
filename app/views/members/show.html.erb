@@ -72,10 +72,10 @@
 
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
-        <% if @current_member.lapsed? and not @current_member.blacklisted %>
-          <%= link_to "Recover", member_recover_path, :class => "btn btn-success btn-large-w" %>
+        <% if @current_member.can_recover? %>
+          <%= link_to "Recover", member_recover_path, :class => "btn btn-success btn-large-w", :id => 'recovery' %>
         <% else %>
-          <%= link_to "Recover", "#", :class => "btn btn-large-w", :disabled => true %>
+          <%= link_to "Recover", "#", :class => "btn btn-large-w", :disabled => true, :id => 'recovery' %>
         <% end %>
       </div>
       <% disable_applied = @current_member.applied? == false  %>
