@@ -281,10 +281,6 @@ $(document).ready( function() {
   };
 
   function club_cash_functions(){
-
-
-
-
     $('#_amount').live('change', function(){
       amount = $('#_amount').val().substring(0,15);
       var num = parseFloat(amount);
