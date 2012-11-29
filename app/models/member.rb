@@ -418,16 +418,16 @@ class Member < ActiveRecord::Base
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
         message = Settings.error_messages.credit_card_blacklisted
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
-        return { :message => message, :code => Settings.error_codes.credit_card_blacklisted }
+        return { :message => message, :code => Settings.error_codes.credit_card_blacklisted, :errors => {:credit_card => {:number => "Number is blacklisted"}} }
       elsif not (cc_blank or credit_card_params[:number].blank?)
         message = Settings.error_messages.credit_card_in_use
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_in_use)
-        return { :message => message, :code => Settings.error_codes.credit_card_in_use }
+        return { :message => message, :code => Settings.error_codes.credit_card_in_use, :errors => {:credit_card => {:number => "Number already in use"}} }
       end
     elsif member.blacklisted
       message = Settings.error_messages.member_email_blacklisted
       Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
-      return { :message => message, :code => Settings.error_codes.member_email_blacklisted }
+      return { :message => message, :code => Settings.error_codes.member_email_blacklisted, :errors => {:blacklisted => "Member is blacklisted"} }
     else
       credit_card = CreditCard.new credit_card_params
       member.update_member_data_by_params member_params
@@ -445,11 +445,14 @@ class Member < ActiveRecord::Base
     allow_cc_blank = (amount.to_f == 0.0 and cc_blank)
 
     if recovery_check and not self.new_record? and not self.can_recover?
-      return { :message => Settings.error_messages.cant_recover_member, :code => Settings.error_codes.cant_recover_member }
-    elsif not CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name).valid?
-      return { :message => Settings.error_messages.invalid_credit_card, :code => Settings.error_codes.invalid_credit_card } if not allow_cc_blank
+      return { :message => Settings.error_messages.cant_recover_member, :code => Settings.error_codes.cant_recover_member, :errors => {:reactivation_times => "Max reactivation times reached."} }
     elsif credit_card.blacklisted? or self.blacklisted?
-      return { :message => Settings.error_messages.blacklisted, :code => Settings.error_codes.blacklisted }
+      return { :message => Settings.error_messages.blacklisted, :code => Settings.error_codes.blacklisted, :errors => {:number => "Credit card number is blacklisted"} }
+    else
+      c_card = CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name)
+      unless c_card.valid?
+        return { :message => Settings.error_messages.invalid_credit_card, :code => Settings.error_codes.invalid_credit_card, :errors => c_card.errors } if not allow_cc_blank
+      end
     end
 
     unless self.valid? 
