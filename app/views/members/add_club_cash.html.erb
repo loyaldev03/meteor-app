@@ -12,7 +12,7 @@
     <tr> 
       <td>
         <div class="input-prepend input-append" style="float:left; width:25%">  
-	      <%= t('activerecord.attributes.club_cash_transaction.amount') %>
+	      <%= label :amount, t('activerecord.attributes.club_cash_transaction.amount'), :class=>"help-inline" %>
 	      <%= text_field nil, :amount, 
             :value => (params[:club_cash_transaction][:amount] if params[:club_cash_transaction]) %>
       	</div>      
