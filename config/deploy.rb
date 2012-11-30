@@ -2,6 +2,7 @@ set :stages, %w(production prototype staging)
 set :default_stage, "prototype"
 default_run_options[:pty] = true
 require 'capistrano/ext/multistage'
+require 'new_relic/recipes'
 
 set :port, 30003
 set :keep_releases,       2
@@ -9,6 +10,8 @@ set :term,                "linux"
 set :deploy_via, :remote_cache
 set :user, 'www-data'
 set :use_sudo, false
+
+set :newrelic_appname, 'SAC Platform - Phoenix'
 
 set :branch, ENV['BRANCH'] if ENV['BRANCH']
 

@@ -54,6 +54,9 @@ module Drupal
       self.member.update_column :autologin_url, uri.path if uri
 
       @token
+    rescue
+      Airbrake.notify(:error_class => 'Drupal:Member:login_token', :parameters => { :member => self.member.inspect })
+      nil
     end
 
     def reset_password!
