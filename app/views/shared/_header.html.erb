@@ -41,9 +41,9 @@
             <li><%= link_to "My Clubs", admin_agent_my_clubs_path(@current_agent.id) %></li>
             <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
             <li>
-              <% selected = @current_club ? [ members_path(@current_club.partner.prefix, @current_club.name) ] : nil %>
+              <% selected = @current_club ? [ members_path(@current_partner.prefix, @current_club.name) ] : nil %>
               <%= select_tag "change_partner",
-                options_for_select((@current_agent.has_role?('admin') ? Club.all : @current_agent.clubs).collect{ |u| [ "#{u.partner.prefix} - #{u.name}", members_path(u.partner.prefix, u.name) ]}, 
+                options_for_select((@current_agent.has_role?('admin') ? Club.includes(:partner).all : @current_agent.clubs.includes(:partner)).collect{ |u| [ "#{u.partner.prefix} - #{u.name}", members_path(u.partner.prefix, u.name) ]}, 
                   selected ), 
                 :onchange => "window.open(this.options[this.selectedIndex].value, '_top')", :style => "margin-top: 5px;" %>
                 <%=  %>

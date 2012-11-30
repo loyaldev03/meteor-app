@@ -4,10 +4,10 @@ module Drupal
 
     def get
       res = conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }).body unless self.new_record?
-      rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
-        Drupal.logger.info "  => #{$!.to_s}"
-      ensure
-        res
+    rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
+      Drupal.logger.info "  => #{$!.to_s}"
+    ensure
+      res
     end
 
     def update!(options = {})

@@ -77,13 +77,6 @@ group :development do
   gem 'ruby-debug19', :require => 'ruby-debug'
   gem "rails-erd"
   gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
-
-  # capitrano gems
-  # TODO: something went wrong when I added this gems. Dont know what. But the fastest solution was uncomment them :D
-  #gem "capistrano"
-  #gem "capistrano-campfire"
-  ###
-
 end
 
 group :test do
