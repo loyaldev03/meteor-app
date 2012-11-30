@@ -180,5 +180,6 @@ after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
 after "deploy:update_code", "link_config_files"
 after "deploy:update", "bundle_install", "deploy:migrate"
 after "deploy:update", "assets"
+after "deploy:update", "newrelic:notice_deployment"
 after 'deploy', 'restart_delayed_jobs', 'notify_campfire'
 after "deploy", "deploy:tag"
