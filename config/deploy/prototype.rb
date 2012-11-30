@@ -6,5 +6,4 @@ set :repository, 'git@github.com:stoneacre/sac-platform.git'
 set :database_name, 'sac_platform_prototype'
 set :rails_env, "prototype"
 
-role :web, "prototype.platform.xagax.com"
-
+server "prototype.platform.xagax.com", :app, :web

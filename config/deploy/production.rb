@@ -7,7 +7,7 @@ set :database_name, 'sac_platform_production'
 set :rails_env, "production"
 set :user, 'deploy'
 
-role :web, "50.116.20.46"
+server "50.116.20.46", :app, :web
 
 # taken from https://rvm.io/integration/capistrano/ && http://stackoverflow.com/questions/8003762/rvmsudo-does-not-work-in-deploy-rb-on-ubuntu
 $:.unshift(File.expand_path('./lib', ENV['rvm_path']))
