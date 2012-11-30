@@ -11,6 +11,8 @@ set :deploy_via, :remote_cache
 set :user, 'www-data'
 set :use_sudo, false
 
+set :newrelic_appname, 'SAC Platform - Phoenix'
+
 set :branch, ENV['BRANCH'] if ENV['BRANCH']
 
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
