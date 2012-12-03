@@ -27,15 +27,14 @@ class FulfillmentsController < ApplicationController
         end
 
         if params[:product_type] == 'KIT' or params[:product_type] == 'CARD' 
-          csv_string = Fulfillment.generateCSV(fulfillments,false)
           xls_package = Fulfillment.generateXLS(fulfillments,false)
         else
-          csv_string = Fulfillment.generateCSV(fulfillments)
           xls_package = Fulfillment.generateXLS(fulfillments)
         end
 
-        send_data csv_string, :filename => "miworkingfile2.csv", :type => 'text/csv; charset=iso-8859-1; header=present',
-                     :disposition => "attachment; filename=miworkingfile2.csv"
+        send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
+                 :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                 :disposition => "attachment; filename=miworkingfile2.xlsx"
       end  
     end
   end
