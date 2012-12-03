@@ -126,6 +126,20 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
+  def self.process_fulfillments_up_today
+    Fulfillment.to_be_renewed.find_in_batches do |group|
+      group.each do |fulfillment| 
+        begin
+          Rails.logger.info "  * processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
+          fulfillment.renew!
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :fulfillment => fulfillment.inspect })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+      end
+    end
+  end
+
   def self.generateCSV(fulfillments, type_others = true)
     CSV.generate do |csv| 
       if type_others

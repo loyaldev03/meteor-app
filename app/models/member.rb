@@ -210,8 +210,13 @@ class Member < ActiveRecord::Base
     send_fulfillment
     membership = current_membership
     membership.join_date = Time.zone.now
-    self.bill_date = Time.zone.now + terms_of_membership.provisional_days.days
-    self.next_retry_bill_date = bill_date
+    if terms_of_membership.monthly?
+      self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
+      self.next_retry_bill_date = self.bill_date
+    else
+      self.bill_date = membership.join_date
+      self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
+    end
     self.save
     membership.save
   end
@@ -219,11 +224,16 @@ class Member < ActiveRecord::Base
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.  
   def schedule_first_membership_for_approved_member
     send_fulfillment
-    self.bill_date = Time.zone.now + terms_of_membership.provisional_days.days
-    self.next_retry_bill_date = bill_date
-    self.save
     membership = current_membership
     membership.save
+    if terms_of_membership.monthly?
+      self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
+      self.next_retry_bill_date = self.bill_date
+    else
+      self.bill_date = membership.join_date
+      self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
+    end
+    self.save
   end
 
   # Changes next bill date.
@@ -717,6 +727,57 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def self.bill_all_members_up_today
+    base = Member.where(" date(next_retry_bill_date) <= ? and club_id IN (select id from clubs where billing_enable = true) ", Time.zone.now.to_date)
+    Rails.logger.info " *** Starting members:billing rake task, processing #{base.count} members"
+    base.find_in_batches do |group|
+      group.each do |member| 
+        tz = Time.zone.now
+        begin
+          Rails.logger.info "  * processing member ##{member.uuid}"
+          member.bill_membership
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+      end
+    end
+  end
+
+  def self.reset_club_cash_up_today
+    Member.find_in_batches(:conditions => [" date(club_cash_expire_date) <= ? ", Time.zone.now.to_date ]) do |group|
+      group.each do |member| 
+        tz = Time.zone.now
+        begin
+          Rails.logger.info "  * processing member ##{member.uuid}"
+          member.reset_club_cash
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+      end
+    end    
+  end
+
+  def self.cancel_all_member_up_today
+    base =  Member.joins(:current_membership).where(" date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
+    Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
+    base.find_in_batches do |group|
+      group.each do |member| 
+        tz = Time.zone.now
+        begin
+          Rails.logger.info "  * processing member ##{member.id}"
+          Member.find(member.id).set_as_canceled!
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+      end
+    end
+  end
 
   private
     def schedule_renewal

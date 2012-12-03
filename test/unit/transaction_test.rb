@@ -94,6 +94,16 @@ class TransactionTest < ActiveSupport::TestCase
   # - member bill SD, NBD change , bill_date not change, recycled_times increment
   # - member bill HD, Cancellation => envio mail
 
+  test "Monthly member billed 24 months" do 
+    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
+    assert_difference('Operation.count') do
+      assert_difference('Transaction.count') do
+        active_member = create_active_member(@terms_of_membership)
+        #TODO
+      end
+    end
+  end
+
   ######################################
   ############ DECLINE ###################
   test "Billing with SD is re-scheduled" do 

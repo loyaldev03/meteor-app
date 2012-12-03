@@ -4,19 +4,7 @@ namespace :billing do
   task :for_today => :environment do
     tall = Time.zone.now
     begin
-      Member.find_in_batches(:conditions => [" date(next_retry_bill_date) <= ? and club_id IN (select id from clubs where billing_enable = true) ", Time.zone.now.to_date]) do |group|
-        group.each do |member| 
-          tz = Time.zone.now
-          begin
-            Rails.logger.info "  * processing member ##{member.uuid}"
-            member.bill_membership
-          rescue Exception => e
-            Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
-        end
-      end
+      Member.bill_all_members_up_today
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
@@ -48,21 +36,7 @@ namespace :members do
   task :cancel => :environment do
     tall = Time.zone.now
     begin
-      base =  Member.joins(:current_membership).where(" date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
-      Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
-      base.find_in_batches do |group|
-        group.each do |member| 
-          tz = Time.zone.now
-          begin
-            Rails.logger.info "  * processing member ##{member.id}"
-            Member.find(member.id).set_as_canceled!
-          rescue Exception => e
-            Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
-        end
-      end
+      Member.bill_all_members_up_today
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
@@ -102,19 +76,7 @@ namespace :members do
   task :process_club_cash => :environment do
     tall = Time.zone.now
     begin
-      Member.find_in_batches(:conditions => [" date(club_cash_expire_date) <= ? ", Time.zone.now.to_date ]) do |group|
-        group.each do |member| 
-          tz = Time.zone.now
-          begin
-            Rails.logger.info "  * processing member ##{member.uuid}"
-            member.reset_club_cash
-          rescue Exception => e
-            Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
-        end
-      end
+      Member.reset_club_cash_up_today
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
@@ -125,17 +87,7 @@ namespace :members do
   task :process_fulfillments => :environment do
     tall = Time.zone.now
     begin
-      Fulfillment.to_be_renewed.find_in_batches do |group|
-        group.each do |fulfillment| 
-          begin
-            Rails.logger.info "  * processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
-            fulfillment.renew!
-          rescue Exception => e
-            Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :fulfillment => fulfillment.inspect })
-            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          end
-        end
-      end
+      Fulfillment.process_fulfillments_up_today
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
