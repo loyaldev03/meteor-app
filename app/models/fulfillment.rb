@@ -6,6 +6,7 @@
 #     Will be used by fulfillment script to check which members need a new fulfillment
 # status => open , archived
 #
+
 class Fulfillment < ActiveRecord::Base
   attr_accessible :product_sku
 
@@ -150,6 +151,33 @@ class Fulfillment < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def self.generateXLS(fulfillments, type_others = true)
+    package = Axlsx::Package.new
+    package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
+      if type_others
+        sheet.add_row ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
+              'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
+      else
+        sheet.add_row ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
+                'ADDRESS','CITY','ZIP','Product','Charter Member Status' ]
+      end
+      fulfillments.each do |fulfillment|
+        Fulfillment.find(fulfillment.id).set_as_processing unless fulfillment.processing? or fulfillment.renewed?
+        member = fulfillment.member
+        if type_others
+          sheet.add_row [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
+                member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
+                fulfillment.product.weight, 'MID']
+        else
+          sheet.add_row [member.visible_id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
+                  (I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at), member.address, member.city,
+                  member.zip, fulfillment.product_sku, ('C' if member.member_group_type_id) ]
+        end
+      end
+    end
+    return package
   end
 
   def product
