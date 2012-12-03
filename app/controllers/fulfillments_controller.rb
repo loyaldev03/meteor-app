@@ -25,14 +25,16 @@ class FulfillmentsController < ApplicationController
           fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false', 
             'not_processed', params[:initial_date], params[:end_date], @current_club.id]).type_others
         end
+
         if params[:product_type] == 'KIT' or params[:product_type] == 'CARD' 
-          csv_string = Fulfillment.generateCSV(fulfillments,false)
+          xls_package = Fulfillment.generateXLS(fulfillments,false)
         else
-          csv_string = Fulfillment.generateCSV(fulfillments)
+          xls_package = Fulfillment.generateXLS(fulfillments)
         end
-        send_data csv_string, :filename => "miworkingfile2.csv",
-                     :type => 'text/csv; charset=iso-8859-1; header=present',
-                     :disposition => "attachment; filename=miworkingfile2.csv"
+
+        send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
+                 :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                 :disposition => "attachment; filename=miworkingfile2.xlsx"
       end  
     end
   end
@@ -74,5 +76,26 @@ class FulfillmentsController < ApplicationController
     send_data csv_string, :filename => "miworkingfile2.csv",
                  :type => 'text/csv; charset=iso-8859-1; header=present',
                  :disposition => "attachment; filename=miworkingfile2.csv"
+  end
+
+  def generate_xls
+    authorize! :report, Fulfillment
+    if params[:product_type][0] == 'KIT'
+      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_kit
+    elsif params[:product_type][0] == 'CARD'
+      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_card
+    elsif params[:product_type][0] == 'OTHERS'
+      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_others
+    end
+
+    if params[:product_type][0] == 'KIT' or params[:product_type][0] == 'CARD' 
+      xls_package = Fulfillment.generateXLS(fulfillments,false)
+    else
+      xls_package = Fulfillment.generateXLS(fulfillments)
+    end
+
+    send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
+                 :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                 :disposition => "attachment; filename=miworkingfile2.xlsx"
   end
 end

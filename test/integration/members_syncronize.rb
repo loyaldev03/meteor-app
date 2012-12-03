@@ -39,12 +39,7 @@ class MembersSyncronize < ActionController::IntegrationTest
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select(unsaved_member.gender, :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        if unsaved_member.country == 'US'
-          select('United States', :from => 'member[country]')
-        else
-          select('Canada', :from => 'member[country]')
-        end
-        within('#states_td'){ select(unsaved_member.state, :from => 'member[state]') }
+        select_country_and_state(unsaved_member.country)
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
@@ -328,7 +323,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     end
   end
 
-test "Update member's api_id (Remote ID) with invalid information" do
+  test "Update member's api_id (Remote ID) with invalid information" do
     setup_environment
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -447,6 +442,8 @@ test "Update member's api_id (Remote ID) with invalid information" do
 
   test "Create a member with Sync Error status" do
     setup_environment
+    Member.any_instance.stubs(:last_sync_error).returns("Error on members#sync: #{$!}")
+
     unsaved_member =  FactoryGirl.build(:member_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
@@ -472,6 +469,8 @@ test "Update member's api_id (Remote ID) with invalid information" do
     setup_environment
     response = '{"uid":"291","name":"test20121029","mail":"test20121029@mailinator.com","theme":"","signature":"","signature_format":"full_html","created":"1351570554","access":"0","login":"0","status":"1","timezone":null,"language":"","picture":null,"init":"test20121029@mailinator.com","data":{"htmlmail_plaintext":0},"roles":{"2":"authenticated user"},"field_profile_address":{"und":[{"value":"reibel","format":null,"safe_value":"reibel"}]},"field_profile_cc_month":{"und":[{"value":"12"}]},"field_profile_cc_number":{"und":[{"value":"XXXX-XXXX-XXXX-8250","format":null,"safe_value":"XXXX-XXXX-XXXX-8250"}]},"field_profile_cc_year":{"und":[{"value":"2012"}]},"field_profile_city":{"und":[{"value":"concepcion","format":null,"safe_value":"concepcion"}]},"field_profile_dob":{"und":[{"value":"1991-10-22T00:00:00","timezone":"UTC","timezone_db":"UTC","date_type":"date"}]},"field_profile_firstname":{"und":[{"value":"name","format":null,"safe_value":"name"}]},"field_profile_gender":{"und":[{"value":"M"}]},"field_profile_lastname":{"und":[{"value":"test","format":null,"safe_value":"test"}]},"field_profile_middle_initial":[],"field_profile_nickname":[],"field_profile_salutation":[],"field_profile_suffix":[],"field_profile_token":[],"field_profile_zip":{"und":[{"value":"12345","format":null,"safe_value":"12345"}]},"field_profile_country":{"und":[{"value":"US","format":null,"safe_value":"US"}]},"field_profile_phone_area_code":{"und":[{"value":"123"}]},"field_profile_phone_country_code":{"und":[{"value":"123"}]},"field_profile_phone_local_number":{"und":[{"value":"1234","format":null,"safe_value":"1234"}]},"field_profile_stateprovince":{"und":[{"value":"KY","format":null,"safe_value":"KY"}]},"field_phoenix_member_uuid":[],"field_phoenix_member_vid":[],"field_profile_phone_type":{"und":[{"value":"home","format":null,"safe_value":"home"}]},"field_phoenix_pref_example_color":[],"field_phoenix_pref_example_team":[],"rdf_mapping":{"rdftype":["sioc:UserAccount"],"name":{"predicates":["foaf:name"]},"homepage":{"predicates":["foaf:page"],"type":"rel"}}}'
     Drupal::Member.any_instance.stubs(:get).returns(response)
+    Member.any_instance.stubs(:last_sync_error).returns("Error on members#sync: #{$!}")
+    
     unsaved_member =  FactoryGirl.build(:member_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)

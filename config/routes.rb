@@ -69,6 +69,7 @@ SacPlatform::Application.routes.draw do
       
       scope '/fulfillments' do
         post '/generate_csv' => 'fulfillments#generate_csv', as: 'generate_csv_fulfillments'
+        post '/generate_xls' => 'fulfillments#generate_xls', as: 'generate_xls_fulfillments'
       end
 
       scope '/fulfillments/:id' do

@@ -71,7 +71,7 @@ class MembersCancelTest < ActionController::IntegrationTest
 
     page.execute_script("window.jQuery('#cancel_date').next().click()")
     within("#ui-datepicker-div") do
-      click_on("#{date_time.day}")
+      wait_until { click_on("#{date_time.day}") }
     end
     select(@member_cancel_reason.name, :from => 'reason')
     confirm_ok_js
@@ -100,7 +100,6 @@ class MembersCancelTest < ActionController::IntegrationTest
     within("#operations_table") do
       wait_until {
         assert page.has_content?("Member canceled")
-        assert page.has_content?("Communication 'Test cancellation' sent")
       }
     end
     click_link_or_button 'Cancel'

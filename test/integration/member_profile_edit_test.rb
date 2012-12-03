@@ -330,16 +330,14 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button 'Set wrong phone number'
    
     within("#table_contact_information")do
-      assert page.has_css?('tr.yellow')
+     wait_until{ assert page.has_css?('tr.yellow') }
     end 
     @saved_member.reload
     assert_equal @saved_member.wrong_phone_number, 'Unreachable'
 
     click_link_or_button "Edit"
     within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_area_code]', :with => '9876'
-      }
+      wait_until{ fill_in 'member[phone_area_code]', :with => '9876' }
     end
     alert_ok_js
     click_link_or_button 'Update Member'
@@ -710,7 +708,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     confirm_ok_js
     click_link_or_button 'Cancel member'
 
-    @saved_member.reload
+    @saved_member.reload  
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     wait_until{ assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") }    
     click_link_or_button 'Cancel'

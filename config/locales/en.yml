@@ -55,6 +55,7 @@ en:
     save_credit_card: 'Save credit card'
     report: 'Report'
     generate_csv: 'Generate csv'
+    generate_xls: 'Generate xls'
     password_reset: 'Password reset'
     blacklist: 'Blacklist'
     cancel: 'Cancel'

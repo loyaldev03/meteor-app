@@ -49,6 +49,7 @@ gem 'state_machine', '1.1.2'
 gem 'cancan'
 gem 'easy_roles'
 gem "yard", "~> 0.8.2.1"
+gem "axlsx"
 
 gem 'twitter-bootstrap-rails', '2.0.6'
 
