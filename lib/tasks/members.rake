@@ -36,7 +36,7 @@ namespace :members do
   task :cancel => :environment do
     tall = Time.zone.now
     begin
-      Member.bill_all_members_up_today
+      Member.cancel_all_member_up_today
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
