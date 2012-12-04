@@ -122,11 +122,11 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
-                        :provisional, :do => :schedule_first_membership
+                        :provisional, :do => 'schedule_first_membership(true)'
     after_transition [ :provisional, :active ] => 
-                        :provisional, :do => :schedule_first_membership # save the sale
+                        :provisional, :do => 'schedule_first_membership(true)' # save the sale
     after_transition :applied => 
-                        :provisional, :do => :schedule_first_membership_for_approved_member
+                        :provisional, :do => 'schedule_first_membership(false)'
     ###### <<<<<<========
     ###### Reactivation handling =====>>>>
     after_transition :lapsed => 
@@ -193,7 +193,7 @@ class Member < ActiveRecord::Base
     increment!(:reactivation_times, 1)
   end
 
-  # Sets join date. It is called when members status is changed from 'none' to 'applied'
+  # Sets join date. It is called multiple times.
   def set_join_date
     membership = current_membership
     membership.join_date = Time.zone.now
@@ -206,25 +206,10 @@ class Member < ActiveRecord::Base
   end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
-  def schedule_first_membership
+  def schedule_first_membership(set_join_date)
     send_fulfillment
     membership = current_membership
-    membership.join_date = Time.zone.now
-    if terms_of_membership.monthly?
-      self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
-      self.next_retry_bill_date = self.bill_date
-    else
-      self.bill_date = membership.join_date
-      self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
-    end
-    self.save
-    membership.save
-  end
-
-  # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.  
-  def schedule_first_membership_for_approved_member
-    send_fulfillment
-    membership = current_membership
+    membership.join_date = Time.zone.now if set_join_date
     membership.save
     if terms_of_membership.monthly?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
@@ -727,8 +712,10 @@ class Member < ActiveRecord::Base
     end
   end
 
+  # Method used from rake task and also from tests!
   def self.bill_all_members_up_today
-    base = Member.where(" date(next_retry_bill_date) <= ? and club_id IN (select id from clubs where billing_enable = true) ", Time.zone.now.to_date)
+    base = Member.where(" date(next_retry_bill_date) <= ? and club_id IN (select id from clubs where billing_enable = true) and status != 'lapsed'", 
+                Time.zone.now.to_date)
     Rails.logger.info " *** Starting members:billing rake task, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each do |member| 
@@ -745,6 +732,7 @@ class Member < ActiveRecord::Base
     end
   end
 
+  # Method used from rake task and also from tests!
   def self.reset_club_cash_up_today
     Member.find_in_batches(:conditions => [" date(club_cash_expire_date) <= ? ", Time.zone.now.to_date ]) do |group|
       group.each do |member| 
@@ -761,6 +749,7 @@ class Member < ActiveRecord::Base
     end    
   end
 
+  # Method used from rake task and also from tests!
   def self.cancel_all_member_up_today
     base =  Member.joins(:current_membership).where(" date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
     Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
@@ -778,6 +767,92 @@ class Member < ActiveRecord::Base
       end
     end
   end
+
+  def update_credit_card_from_drupal(credit_card, current_agent = nil)
+    return { :code => Settings.error_codes.success } if credit_card.nil? || credit_card.empty?
+    new_year, new_month, new_number = credit_card[:expire_year], credit_card[:expire_month], nil
+
+    # Drupal sends X when member does not change the credit card number      
+    if credit_card[:number].include?('X')
+      if active_credit_card.last_digits.to_s == credit_card[:number][-4..-1].to_s # lets update expire month
+        active_credit_card.update_expire(new_year, new_month)
+      else # do not update nothing, credit cards do not match or its expired
+        { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => { :number => "Credit card do not match the active one." }}
+      end
+    else # drupal or CS sends the complete credit card number.
+      new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
+      credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? ", new_credit_card.encrypted_number, club.id ] )
+      if credit_cards.empty?
+        add_new_credit_card(new_credit_card, current_agent)
+      elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
+        { :message => Settings.error_messages.credit_card_blacklisted, :code => Settings.error_codes.credit_card_blacklisted, :errors => { :number => "Credit card is blacklisted" }}
+      elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? # is this credit card already of this member and its already active?
+        active_credit_card.update_expire(new_year, new_month) # lets update expire month
+      elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
+        # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
+        { :message => Settings.error_messages.credit_card_in_use, :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
+      elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
+        # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
+        new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
+        answer = new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
+        if answer[:code] == Settings.error_codes.success
+          # activate new credit card ONLY if expire date was updated.
+          new_active_credit_card.set_as_active!
+        end
+        answer
+      elsif credit_cards.select { |cc| cc.active }.empty? # its not my credit card. its from another member. the question is. can I use it?
+        add_new_credit_card(new_credit_card, current_agent)
+      else
+        { :message => Settings.error_messages.credit_card_in_use, :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
+      end
+    end
+  end
+
+  def add_new_credit_card(new_credit_card, current_agent = nil)
+    answer = { :message => "There was an error. We could not add the credit card.", :code => Settings.error_codes.invalid_credit_card }
+    CreditCard.transaction do 
+      begin
+        new_credit_card.member = self
+        if new_credit_card.am_card.valid?
+          new_credit_card.save!
+          message = "Credit card #{new_credit_card.last_digits} added and activated."
+          Auditory.audit(current_agent, new_credit_card, message, self)
+          answer = { :code => Settings.error_codes.success, :message => message }
+          new_credit_card.set_as_active!
+        else
+          answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => new_credit_card.am_card.errors.to_hash }
+        end        
+      rescue Exception => e
+        answer.merge!({:errors => e})
+        Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card })
+        logger.error e.inspect
+        raise ActiveRecord::Rollback
+      end
+    end
+    answer
+  end
+
+  def desnormalize_preferences
+    if self.preferences.present?
+      self.preferences.each do |key, value|
+        pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
+        pref.value = value
+        pref.save
+      end
+    end
+  end
+  handle_asynchronously :desnormalize_preferences
+
+  def sync_to_pardot(options = {})
+    time_elapsed = Benchmark.ms do
+      pardot_member.save!(options)
+    end
+    logger.info "Pardot::sync took #{time_elapsed}ms"
+  rescue Exception => e
+    Airbrake.notify(:error_class => "Pardot:sync", :error_message => e, :parameters => { :member => self.inspect })
+  end
+  # sync member in 10 minutes, why? lets allow prospect to be synced first.
+  handle_asynchronously :sync_to_pardot, :run_at => Proc.new { 5.minutes.from_now }
 
   private
     def schedule_renewal
@@ -916,93 +991,5 @@ class Member < ActiveRecord::Base
       end
     end
 
-  public 
-
-
-    def update_credit_card_from_drupal(credit_card, current_agent = nil)
-      return { :code => Settings.error_codes.success } if credit_card.nil? || credit_card.empty?
-      new_year, new_month, new_number = credit_card[:expire_year], credit_card[:expire_month], nil
-
-      # Drupal sends X when member does not change the credit card number      
-      if credit_card[:number].include?('X')
-        if active_credit_card.last_digits.to_s == credit_card[:number][-4..-1].to_s # lets update expire month
-          active_credit_card.update_expire(new_year, new_month)
-        else # do not update nothing, credit cards do not match or its expired
-          { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => { :number => "Credit card do not match the active one." }}
-        end
-      else # drupal or CS sends the complete credit card number.
-        new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
-        credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? ", new_credit_card.encrypted_number, club.id ] )
-        if credit_cards.empty?
-          add_new_credit_card(new_credit_card, current_agent)
-        elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-          { :message => Settings.error_messages.credit_card_blacklisted, :code => Settings.error_codes.credit_card_blacklisted, :errors => { :number => "Credit card is blacklisted" }}
-        elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? # is this credit card already of this member and its already active?
-          active_credit_card.update_expire(new_year, new_month) # lets update expire month
-        elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
-          # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
-          { :message => Settings.error_messages.credit_card_in_use, :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
-        elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
-          # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
-          new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
-          answer = new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
-          if answer[:code] == Settings.error_codes.success
-            # activate new credit card ONLY if expire date was updated.
-            new_active_credit_card.set_as_active!
-          end
-          answer
-        elsif credit_cards.select { |cc| cc.active }.empty? # its not my credit card. its from another member. the question is. can I use it?
-          add_new_credit_card(new_credit_card, current_agent)
-        else
-          { :message => Settings.error_messages.credit_card_in_use, :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
-        end
-      end
-    end
-
-    def add_new_credit_card(new_credit_card, current_agent = nil)
-      answer = { :message => "There was an error. We could not add the credit card.", :code => Settings.error_codes.invalid_credit_card }
-      CreditCard.transaction do 
-        begin
-          new_credit_card.member = self
-          if new_credit_card.am_card.valid?
-            new_credit_card.save!
-            message = "Credit card #{new_credit_card.last_digits} added and activated."
-            Auditory.audit(current_agent, new_credit_card, message, self)
-            answer = { :code => Settings.error_codes.success, :message => message }
-            new_credit_card.set_as_active!
-          else
-            answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => new_credit_card.am_card.errors.to_hash }
-          end        
-        rescue Exception => e
-          answer.merge!({:errors => e})
-          Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card })
-          logger.error e.inspect
-          raise ActiveRecord::Rollback
-        end
-      end
-      answer
-    end
-
-    def desnormalize_preferences
-      if self.preferences.present?
-        self.preferences.each do |key, value|
-          pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
-          pref.value = value
-          pref.save
-        end
-      end
-    end
-    handle_asynchronously :desnormalize_preferences
-
-    def sync_to_pardot(options = {})
-      time_elapsed = Benchmark.ms do
-        pardot_member.save!(options)
-      end
-      logger.info "Pardot::sync took #{time_elapsed}ms"
-    rescue Exception => e
-      Airbrake.notify(:error_class => "Pardot:sync", :error_message => e, :parameters => { :member => self.inspect })
-    end
-    # sync member in 10 minutes, why? lets allow prospect to be synced first.
-    handle_asynchronously :sync_to_pardot, :run_at => Proc.new { 5.minutes.from_now }
 
 end
