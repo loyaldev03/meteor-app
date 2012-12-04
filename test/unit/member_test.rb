@@ -314,7 +314,7 @@ class MemberTest < ActiveSupport::TestCase
 
     assert_difference('Operation.count', 0) do
       assert_difference('Transaction.count', 0) do
-        @member.bill_membership
+        Member.bill_all_members_up_today
       end
     end
     @member.reload
@@ -323,4 +323,23 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal(bill_date_before,@member.bill_date)
   end
 
+  test "Member should be billed if club's billing_enable is set as true" do
+    @club = @terms_of_membership_with_gateway.club
+    @member = create_active_member(@terms_of_membership_with_gateway, :provisional_member)
+
+    @member.current_membership.update_attribute(:quota, 2)
+    quota_before = @member.quota
+    next_bill_date_before = @member.next_retry_bill_date
+    bill_date_before = @member.bill_date
+
+    assert_difference('Operation.count', 0) do
+      assert_difference('Transaction.count', 0) do
+        Member.bill_all_members_up_today
+      end
+    end
+    @member.reload
+    assert_equal(quota_before,@member.quota)
+    assert_equal(next_bill_date_before,@member.next_retry_bill_date)
+    assert_equal(bill_date_before,@member.bill_date)
+  end
 end

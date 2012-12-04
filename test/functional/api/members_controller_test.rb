@@ -319,7 +319,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not add new credit card with same data as the one active" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_year => Time.zone.now.year+1, :expire_month => Time.zone.now.month+1
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_year => (Time.zone.now+1.year).year, :expire_month => (Time.zone.now+1.month).month
     cc_number = active_credit_card.number
     
     @credit_card = FactoryGirl.build :credit_card_american_express
@@ -342,7 +342,8 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not update credit card when invalidid credit card number" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_year => Time.zone.now.year+1, :expire_month => Time.zone.now.month+1
+
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_year => (Time.zone.now+1.year).year, :expire_month => (Time.zone.now+1.month).month
     active_credit_card.update_attribute(:expire_year, Time.zone.now.year+1)
     cc_number = active_credit_card.number
     
