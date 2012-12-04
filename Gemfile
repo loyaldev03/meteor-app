@@ -18,6 +18,7 @@ gem 'daemons'
 gem 'foreman'
 gem 'god'
 gem 'rvm-capistrano'
+gem 'capistrano-campfire'
 gem "ruby-pardot"
 
 # Gems used only for assets and not required
@@ -85,7 +86,6 @@ group :test do
   gem 'faker'
   gem 'mocha', require: false
   gem 'capybara'
-  #gem 'capybara-webkit' #, :git => "git://github.com/thoughtbot/capybara-webkit.git"
   gem 'selenium-webdriver'
   gem 'brakeman'
   gem 'simplecov'
