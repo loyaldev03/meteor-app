@@ -299,6 +299,12 @@ class Member < ActiveRecord::Base
       )
     )
   end
+
+  # Returns true if member is not blacklisted and not lapsed
+  def can_be_blacklisted?
+    !self.blacklisted?
+  end
+
   ###############################################
 
   def save_the_sale(new_tom_id, agent = nil)
@@ -653,7 +659,7 @@ class Member < ActiveRecord::Base
 
   def blacklist(agent, reason)
     if self.blacklisted?
-      { :message => "Member already blacklisted!", :success => false }
+      { :message => "Member already blacklisted", :success => false }
     else
       self.blacklisted = true
       self.save(:validate => false)

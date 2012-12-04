@@ -708,9 +708,10 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member.reload
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     wait_until{ assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") }    
+    # wait_until{ find(:xpath, "//a[@id='sync_cancel' and @disable='disable']") }
+
     click_link_or_button 'Cancel'
     sleep 1 
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
   end
-
 end

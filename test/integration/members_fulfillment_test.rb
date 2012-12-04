@@ -1413,7 +1413,10 @@ test "Enroll a member with recurrent product and it on the list" do
 
     @fulfillment_renewable.set_as_canceled
     @fulfillment_renewable.reload
-    @fulfillment.renew!
+
+    Fulfillment.process_fulfillments_up_today
+    @fulfillment.reload
+
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
@@ -1458,7 +1461,8 @@ test "Enroll a member with recurrent product and it on the list" do
     @fulfillment_renewable.update_attribute(:renewable_at, Time.zone.now)
     @fulfillment_renewable.set_as_processing
     @fulfillment_renewable.set_as_sent
-    @fulfillment_renewable.renew!
+    
+    Fulfillment.process_fulfillments_up_today
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
@@ -1480,10 +1484,87 @@ test "Enroll a member with recurrent product and it on the list" do
       }
     end
     last_fulfillment.reload
+    @fulfillment_renewable.reload
 
     wait_until{ assert_equal((I18n.l last_fulfillment.assigned_at, :format => :long), (I18n.l Time.zone.now, :format => :long)) }
     wait_until{ assert_equal((I18n.l last_fulfillment.renewable_at, :format => :long), (I18n.l last_fulfillment.assigned_at + 1.year, :format => :long)) }
     wait_until{ assert_equal(last_fulfillment.status, 'not_processed') }
+    wait_until{ assert_equal(last_fulfillment.recurrent, true ) }
+    wait_until{ assert_equal(last_fulfillment.renewed, false ) }
+    wait_until{ assert_equal(@fulfillment_renewable.renewed, true ) }
+  end
+
+  test "Fulfillments to be renewable with status undeliverable" do
+    setup_member
+    @product_recurrent = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true)
+    @fulfillment_renewable.update_attribute(:renewable_at, Time.zone.now)
+    @fulfillment_renewable.set_as_processing
+    @fulfillment_renewable.set_as_undeliverable
+    
+    Fulfillment.process_fulfillments_up_today
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    last_fulfillment = Fulfillment.last
+
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(last_fulfillment.product_sku)
+        assert page.has_content?('undeliverable')
+        assert page.has_content?((I18n.l(last_fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(last_fulfillment.renewable_at, :format => :long)))        
+        assert page.has_content?((I18n.l(@fulfillment_renewable.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(@fulfillment_renewable.renewable_at, :format => :long)))
+      }
+    end
+    last_fulfillment.reload
+    @fulfillment_renewable.reload
+
+    wait_until{ assert_equal((I18n.l last_fulfillment.assigned_at, :format => :long), (I18n.l Time.zone.now, :format => :long)) }
+    wait_until{ assert_equal((I18n.l last_fulfillment.renewable_at, :format => :long), (I18n.l last_fulfillment.assigned_at + 1.year, :format => :long)) }
+    wait_until{ assert_equal(last_fulfillment.status, 'undeliverable') }
+    wait_until{ assert_equal(last_fulfillment.recurrent, true ) }
+    wait_until{ assert_equal(last_fulfillment.renewed, false ) }
+    wait_until{ assert_equal(@fulfillment_renewable.renewed, true ) }
+  end
+
+  test "Fulfillments to be renewable with status out_of_stock" do
+    setup_member
+    @product_recurrent = FactoryGirl.create(:product_without_stock_and_recurrent, :club_id => @club.id)
+    @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true)
+    @fulfillment_renewable.update_attribute(:renewable_at, Time.zone.now)
+    
+    Fulfillment.process_fulfillments_up_today
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    last_fulfillment = Fulfillment.last
+
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      wait_until{
+        assert page.has_content?(last_fulfillment.product_sku)
+        assert page.has_content?('out_of_stock')
+        assert page.has_content?((I18n.l(last_fulfillment.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(last_fulfillment.renewable_at, :format => :long)))        
+        assert page.has_content?((I18n.l(@fulfillment_renewable.assigned_at, :format => :long)))
+        assert page.has_content?((I18n.l(@fulfillment_renewable.renewable_at, :format => :long)))
+      }
+    end
+    last_fulfillment.reload
+    @fulfillment_renewable.reload
+
+    wait_until{ assert_equal((I18n.l last_fulfillment.assigned_at, :format => :long), (I18n.l Time.zone.now, :format => :long)) }
+    wait_until{ assert_equal((I18n.l last_fulfillment.renewable_at, :format => :long), (I18n.l last_fulfillment.assigned_at + 1.year, :format => :long)) }
+    wait_until{ assert_equal(last_fulfillment.status, 'out_of_stock') }
     wait_until{ assert_equal(last_fulfillment.recurrent, true ) }
     wait_until{ assert_equal(last_fulfillment.renewed, false ) }
     wait_until{ assert_equal(@fulfillment_renewable.renewed, true ) }
