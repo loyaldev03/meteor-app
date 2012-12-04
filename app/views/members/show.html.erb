@@ -54,8 +54,7 @@
         <%= link_to("Save the sale", (!disable_save_sale ? member_save_the_sale_path : "#"), :class => "btn btn-large-w #{(disable_save_sale ? "disabled" : "btn-info")}", :disabled => (cannot? :save_sale, Member)) %>
       </div>
       <div class="span4">
-        <% disable_black_list = @current_member.blacklisted? == true && @current_member.lapsed? == true %>
-        <%= link_to "Blacklist", (!disable_black_list ? member_blacklist_path : "#"), :class => "btn btn-large-w #{(disable_black_list ? "disabled" : "btn-danger")}", :disabled => (cannot? :blacklist, Member) %>
+        <%= link_to "Blacklist", (@current_member.can_be_blacklisted? ? member_blacklist_path : "#"), :class => "btn btn-large-w #{(@current_member.can_be_blacklisted? ? "btn-danger" : "disabled")}", :disabled => (cannot? :blacklist, Member) %>
       </div>
     </div>
 
