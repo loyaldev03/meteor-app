@@ -4,11 +4,30 @@ class TransactionTest < ActiveSupport::TestCase
   setup do
     @current_agent = FactoryGirl.create(:agent)
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway)
+    @terms_of_membership_with_gateway_yearly = FactoryGirl.create(:terms_of_membership_with_gateway_yearly)
     @member = FactoryGirl.build(:member)
     @credit_card = FactoryGirl.build(:credit_card)
     @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
     @hd_strategy = FactoryGirl.create(:hard_decline_strategy)
     @use_active_merchant = false
+  end
+
+  def enroll_member(tom)
+    answer = Member.enroll(tom, @current_agent, 23, 
+      { first_name: @member.first_name,
+        last_name: @member.last_name, address: @member.address, city: @member.city, gender: 'M',
+        zip: @member.zip, state: @member.state, email: @member.email, type_of_phone_number: @member.type_of_phone_number,
+        phone_country_code: @member.phone_country_code, phone_area_code: @member.phone_area_code,
+        type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US', 
+        product_sku: 'Circlet' }, 
+      { number: @credit_card.number, 
+        expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
+
+    assert (answer[:code] == Settings.error_codes.success), answer[:message]
+    member = Member.find_by_uuid(answer[:member_id])
+    assert_not_nil member
+    assert_equal member.status, 'provisional'
+    member
   end
 
   test "save operation" do
@@ -44,20 +63,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs unless @use_active_merchant
     assert_difference('Operation.count',1) do
       assert_difference('Fulfillment.count') do
-        answer = Member.enroll(@terms_of_membership, @current_agent, 23, 
-          { first_name: @member.first_name,
-            last_name: @member.last_name, address: @member.address, city: @member.city, gender: 'M',
-            zip: @member.zip, state: @member.state, email: @member.email, type_of_phone_number: @member.type_of_phone_number,
-            phone_country_code: @member.phone_country_code, phone_area_code: @member.phone_area_code,
-            type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US', 
-            product_sku: 'Circlet' }, 
-          { number: @credit_card.number, 
-            expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
-
-        assert (answer[:code] == Settings.error_codes.success), answer[:message]
-        member = Member.find_by_uuid(answer[:member_id])
-        assert_not_nil member
-        assert_equal member.status, 'provisional'
+        member = enroll_member(@terms_of_membership)
         assert_not_nil member.next_retry_bill_date, "NBD should not be nil"
         assert_not_nil member.join_date, "join date should not be nil"
         assert_not_nil member.bill_date, "bill date should not be nil"
@@ -93,16 +99,82 @@ class TransactionTest < ActiveSupport::TestCase
   # - member yearly bill, NBD change
   # - member bill SD, NBD change , bill_date not change, recycled_times increment
   # - member bill HD, Cancellation => envio mail
-
   test "Monthly member billed 24 months" do 
-    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
-    assert_difference('Operation.count') do
-      assert_difference('Transaction.count') do
-        active_member = create_active_member(@terms_of_membership)
-        #TODO
+    active_merchant_stubs
+
+    member = enroll_member(@terms_of_membership)
+    nbd = member.next_retry_bill_date
+
+    # bill members the day before trial days expires. Member should not be billed
+    Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days - 1.day) do
+      Member.bill_all_members_up_today
+      member.reload
+      assert_equal nbd, member.next_retry_bill_date
+      assert_equal 0, member.quota
+    end
+
+require 'ruby-debug'
+debugger
+
+    # bill members the day trial days expires. Member should be billed
+    Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
+      Member.bill_all_members_up_today
+      member.reload
+      assert_equal nbd + eval(member.terms_of_membership.installment_type), member.next_retry_bill_date
+      assert_equal member.bill_date, member.next_retry_bill_date
+      assert_equal 1, member.quota
+    end
+
+    next_month = Time.zone.now + 1.month
+    1.upto(24) do |time|
+      Timecop.travel(next_month + time.month) do
+        Member.bill_all_members_up_today
+        member.reload
+        assert_equal nbd + time.months, member.next_retry_bill_date
+        assert_equal member.bill_date, member.next_retry_bill_date
+        assert_equal member.quota, times
+        assert_equal member.recycled_times, 0
       end
     end
   end
+
+  test "Yearly member billed 4 years" do 
+    active_merchant_stubs
+
+    member = enroll_member(@terms_of_membership_with_gateway_yearly)
+    nbd = member.next_retry_bill_date
+
+    # bill members the day before trial days expires. Member should not be billed
+    Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days - 1.day) do
+      Member.bill_all_members_up_today
+      member.reload
+      assert_equal nbd, member.next_retry_bill_date
+      assert_equal 0, member.quota
+    end
+
+    # bill members the day trial days expires. Member should be billed
+    Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
+      Member.bill_all_members_up_today
+      member.reload
+      assert_equal nbd + eval(member.terms_of_membership.installment_type), member.next_retry_bill_date
+      assert_equal member.bill_date, member.next_retry_bill_date
+      assert_equal 1, member.quota
+    end
+
+    next_year = Time.zone.now + 1.year
+    1.upto(4) do |time|
+      Timecop.travel(next_year + time.years) do
+        Member.bill_all_members_up_today
+        member.reload
+        assert_equal nbd + time.years, member.next_retry_bill_date
+        assert_equal member.bill_date, member.next_retry_bill_date
+        assert_equal member.quota, times
+        assert_equal member.recycled_times, 0
+      end
+    end
+  end
+
+
 
   ######################################
   ############ DECLINE ###################
