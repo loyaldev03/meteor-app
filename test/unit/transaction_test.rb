@@ -133,6 +133,9 @@ class TransactionTest < ActiveSupport::TestCase
   test "Yearly member billed 4 years" do 
     active_merchant_stubs
 
+    # if we use 5 years take care to have a credit card that does not get expired.
+    @credit_card.expire_year = Time.zone.now.year + 7
+
     member = enroll_member(@terms_of_membership_with_gateway_yearly)
     nbd = member.bill_date
 

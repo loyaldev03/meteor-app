@@ -243,7 +243,6 @@ class MemberTest < ActiveSupport::TestCase
     original_year = 2000
     member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
     member.reload
-
     assert_difference('CreditCard.count', 0) do
       assert_difference('Operation.count', 1) do
         assert_difference('Transaction.count') do
@@ -261,6 +260,7 @@ class MemberTest < ActiveSupport::TestCase
       assert_difference('Operation.count', 1) do
         assert_difference('Transaction.count') do
           answer = member.bill_membership
+          member.reload
           assert_equal answer[:code], Settings.error_codes.invalid_credit_card
           assert_equal original_year+2, member.transactions.last.expire_year
           assert_equal member.recycled_times, 2
