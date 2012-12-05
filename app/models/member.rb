@@ -658,21 +658,28 @@ class Member < ActiveRecord::Base
   end
 
   def blacklist(agent, reason)
-    if self.blacklisted?
-      { :message => "Member already blacklisted", :success => false }
-    else
-      self.blacklisted = true
-      self.save(:validate => false)
-      message = "Blacklisted member and all its credit cards. Reason: #{reason}."
-      Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
-      self.cancel! Time.zone.now, "Automatic cancellation"
-      self.credit_cards.each { |cc| cc.blacklist }
-      self.set_as_canceled! unless self.lapsed?
-      { :message => message, :success => true }
+    answer = { :message => "Member already blacklisted", :success => false }
+    unless self.blacklisted?
+      Member.transaction do 
+        begin
+          self.blacklisted = true
+          self.save(:validate => false)
+          message = "Blacklisted member and all its credit cards. Reason: #{reason}."
+          Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
+          self.credit_cards.each { |cc| cc.blacklist }
+          unless self.lapsed?
+            self.cancel! Time.zone.now, "Automatic cancellation"
+            self.set_as_canceled!
+          end
+          answer = { :message => message, :success => true }
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Member::blacklist", :error_message => e, :parameters => { :member => self.inspect })
+          answer = { :message => "Could not blacklist this member.", :success => false }
+          raise ActiveRecord::Rollback
+        end
+      end
     end
-  rescue Exception => e
-    Airbrake.notify(:error_class => "Member::blacklist", :error_message => e, :parameters => { :member => self.inspect })
-    { :message => "Could not blacklisted this member.", :success => false }
+    answer
   end
   ###################################################################
 
