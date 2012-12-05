@@ -94,45 +94,39 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
 
-  # AGREGAR TEST:
-  # - member monthly bill, NBD change
-  # - member yearly bill, NBD change
-  # - member bill SD, NBD change , bill_date not change, recycled_times increment
-  # - member bill HD, Cancellation => envio mail
   test "Monthly member billed 24 months" do 
     active_merchant_stubs
 
     member = enroll_member(@terms_of_membership)
-    nbd = member.next_retry_bill_date
+    nbd = member.bill_date
 
     # bill members the day before trial days expires. Member should not be billed
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days - 1.day) do
       Member.bill_all_members_up_today
       member.reload
-      assert_equal nbd, member.next_retry_bill_date
+      assert_equal nbd, member.bill_date
       assert_equal 0, member.quota
     end
-
-require 'ruby-debug'
-debugger
 
     # bill members the day trial days expires. Member should be billed
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
       Member.bill_all_members_up_today
       member.reload
-      assert_equal nbd + eval(member.terms_of_membership.installment_type), member.next_retry_bill_date
+      nbd = nbd + eval(member.terms_of_membership.installment_type)
+      assert_equal nbd, member.next_retry_bill_date
       assert_equal member.bill_date, member.next_retry_bill_date
       assert_equal 1, member.quota
     end
 
-    next_month = Time.zone.now + 1.month
+    next_month = Time.zone.now + member.terms_of_membership.provisional_days.days
     1.upto(24) do |time|
       Timecop.travel(next_month + time.month) do
         Member.bill_all_members_up_today
         member.reload
-        assert_equal nbd + time.months, member.next_retry_bill_date
+        nbd = nbd + eval(member.terms_of_membership.installment_type)
+        assert_equal nbd, member.next_retry_bill_date
         assert_equal member.bill_date, member.next_retry_bill_date
-        assert_equal member.quota, times
+        assert_equal member.quota, time+1
         assert_equal member.recycled_times, 0
       end
     end
@@ -142,13 +136,13 @@ debugger
     active_merchant_stubs
 
     member = enroll_member(@terms_of_membership_with_gateway_yearly)
-    nbd = member.next_retry_bill_date
+    nbd = member.bill_date
 
     # bill members the day before trial days expires. Member should not be billed
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days - 1.day) do
       Member.bill_all_members_up_today
       member.reload
-      assert_equal nbd, member.next_retry_bill_date
+      assert_equal nbd, member.bill_date
       assert_equal 0, member.quota
     end
 
@@ -156,19 +150,21 @@ debugger
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
       Member.bill_all_members_up_today
       member.reload
-      assert_equal nbd + eval(member.terms_of_membership.installment_type), member.next_retry_bill_date
+      nbd = nbd + eval(member.terms_of_membership.installment_type)
+      assert_equal nbd, member.next_retry_bill_date
       assert_equal member.bill_date, member.next_retry_bill_date
-      assert_equal 1, member.quota
+      assert_equal 12, member.quota
     end
 
-    next_year = Time.zone.now + 1.year
-    1.upto(4) do |time|
+    next_year = Time.zone.now
+    2.upto(5) do |time|
       Timecop.travel(next_year + time.years) do
         Member.bill_all_members_up_today
         member.reload
-        assert_equal nbd + time.years, member.next_retry_bill_date
+        nbd = nbd + eval(member.terms_of_membership.installment_type)
+        assert_equal nbd, member.next_retry_bill_date
         assert_equal member.bill_date, member.next_retry_bill_date
-        assert_equal member.quota, times
+        assert_equal member.quota, time*12
         assert_equal member.recycled_times, 0
       end
     end
@@ -178,6 +174,52 @@ debugger
 
   ######################################
   ############ DECLINE ###################
+  test "Monthly member SD until gets HD" do 
+    active_merchant_stubs
+
+    member = enroll_member(@terms_of_membership)
+    nbd = member.bill_date
+    bill_date = member.bill_date
+    
+    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
+
+    # bill members the day trial days expires. Member should be billed but SD'd
+    Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
+      Member.bill_all_members_up_today
+      member.reload
+      nbd = nbd + @sd_strategy.days.days
+      assert_equal nbd, member.next_retry_bill_date
+      assert_equal bill_date, member.bill_date
+      assert_not_equal member.bill_date, member.next_retry_bill_date
+      assert_equal 0, member.quota
+      assert_equal 1, member.recycled_times
+    end
+
+    # SD retries
+    2.upto(15) do |time|
+      Timecop.travel(nbd) do
+        Member.bill_all_members_up_today
+        member.reload
+        if member.next_retry_bill_date.nil?
+          cancel_date = member.cancel_date
+          assert_equal cancel_date, member.cancel_date
+          assert_nil member.next_retry_bill_date
+          assert_nil member.bill_date
+          assert_not_nil member.cancel_date
+          assert_equal 0, member.quota
+          assert_equal 0, member.recycled_times
+        else
+          nbd = nbd + @sd_strategy.days.days
+          assert_equal nbd, member.next_retry_bill_date
+          assert_equal bill_date, member.bill_date
+          assert_not_equal member.bill_date, member.next_retry_bill_date
+          assert_equal 0, member.quota
+          assert_equal time, member.recycled_times
+        end
+      end
+    end
+  end
+
   test "Billing with SD is re-scheduled" do 
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
     assert_difference('Operation.count') do
