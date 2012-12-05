@@ -9,7 +9,6 @@ class TransactionTest < ActiveSupport::TestCase
     @credit_card = FactoryGirl.build(:credit_card)
     @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
     @hd_strategy = FactoryGirl.create(:hard_decline_strategy)
-    @use_active_merchant = false
   end
 
   def enroll_member(tom)
@@ -38,7 +37,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Enrollment with approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
-    active_merchant_stubs unless @use_active_merchant
+    active_merchant_stubs
     assert_difference('Operation.count',1) do
       assert_no_difference('Fulfillment.count') do
         answer = Member.enroll(@tom_approval, @current_agent, 23, 
@@ -60,7 +59,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Enrollment without approval" do
-    active_merchant_stubs unless @use_active_merchant
+    active_merchant_stubs
     assert_difference('Operation.count',1) do
       assert_difference('Fulfillment.count') do
         member = enroll_member(@terms_of_membership)
@@ -73,7 +72,6 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "controlled refund (refund completely a transaction)" do
-    active_merchant_stubs unless @use_active_merchant
     active_member = create_active_member(@terms_of_membership)
     amount = @terms_of_membership.installment_amount
     answer = active_member.bill_membership
@@ -188,7 +186,7 @@ class TransactionTest < ActiveSupport::TestCase
       Member.bill_all_members_up_today
       member.reload
       nbd = nbd + @sd_strategy.days.days
-      assert_equal nbd, member.next_retry_bill_date
+      assert_equal nbd.to_date, member.next_retry_bill_date.to_date
       assert_equal bill_date, member.bill_date
       assert_not_equal member.bill_date, member.next_retry_bill_date
       assert_equal 0, member.quota
@@ -208,6 +206,7 @@ class TransactionTest < ActiveSupport::TestCase
           assert_not_nil member.cancel_date
           assert_equal 0, member.quota
           assert_equal 0, member.recycled_times
+          assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_hard_decline).count
         else
           nbd = nbd + @sd_strategy.days.days
           assert_equal nbd, member.next_retry_bill_date
@@ -215,16 +214,17 @@ class TransactionTest < ActiveSupport::TestCase
           assert_not_equal member.bill_date, member.next_retry_bill_date
           assert_equal 0, member.quota
           assert_equal time, member.recycled_times
+          assert_equal time, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_soft_decline).count
         end
       end
     end
   end
 
   test "Billing with SD is re-scheduled" do 
-    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
     assert_difference('Operation.count') do
       assert_difference('Transaction.count') do
         active_member = create_active_member(@terms_of_membership)
+        active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
         nbd = active_member.bill_date
         answer = active_member.bill_membership
         active_member.reload
@@ -255,9 +255,9 @@ class TransactionTest < ActiveSupport::TestCase
 
   end
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 
-    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
-    assert_difference('Operation.count', 2) do
+    assert_difference('Operation.count', 3) do
       active_member = create_active_member(@terms_of_membership)
+      active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
       amount = @terms_of_membership.installment_amount
       active_member.recycled_times = 4
       active_member.save
@@ -272,9 +272,9 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing with HD cancels member" do 
-    active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
-    assert_difference('Operation.count', 2) do
+    assert_difference('Operation.count', 3) do
       active_member = create_active_member(@terms_of_membership)
+      active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
       amount = @terms_of_membership.installment_amount
       answer = active_member.bill_membership
       active_member.reload
@@ -286,8 +286,8 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing declined, but there is no decline rule. Send email" do 
-    active_merchant_stubs("34234", "decline stubbed", false) 
     active_member = create_active_member(@terms_of_membership)
+    active_merchant_stubs("34234", "decline stubbed", false) 
     amount = @terms_of_membership.installment_amount
     answer = active_member.bill_membership
     active_member.reload

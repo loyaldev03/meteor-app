@@ -5,7 +5,6 @@ class MemberTest < ActiveSupport::TestCase
 
   setup do
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
-    @use_active_merchant = false
   end
 
   test "Should create a member" do
@@ -52,7 +51,6 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Insfufficient funds hard decline" do
-    active_merchant_stubs unless @use_active_merchant
     active_member = create_active_member(@terms_of_membership_with_gateway)
     answer = active_member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
