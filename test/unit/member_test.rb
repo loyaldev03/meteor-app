@@ -342,4 +342,22 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal(next_bill_date_before,@member.next_retry_bill_date)
     assert_equal(bill_date_before,@member.bill_date)
   end
+
+  test "Change member from Lapsed status to active status" do
+    @club = @terms_of_membership_with_gateway.club
+    @saved_member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+    @saved_member.set_as_canceled
+    @saved_member.recover(@terms_of_membership_with_gateway)
+
+    next_bill_date = @saved_member.bill_date + 1.month
+
+    Timecop.freeze(Time.zone.now + 1.month) do
+      Member.bill_all_members_up_today
+      @saved_member.reload
+
+      assert_equal(@saved_member.current_membership.status, "active")
+      assert_equal(I18n.l(@saved_member.next_retry_bill_date, :format => :only_date), I18n.l(next_bill_date, :format => :only_date))
+    end
+  end
+
 end
