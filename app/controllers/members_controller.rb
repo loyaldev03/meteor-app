@@ -92,7 +92,6 @@ class MembersController < ApplicationController
         if answer[:code] == Settings.error_codes.success
           flash[:notice] = answer[:message]
         else
-          # flash[:error] = answer[:message] + " " + answer[:errors].collect {|attr, message| "#{attr}: #{message}" }.join(' ')
           flash[:error] = answer[:message] + " " + answer[:errors].collect {|attr, message| "#{attr}: #{message}" }.join(' ')
         end
       end

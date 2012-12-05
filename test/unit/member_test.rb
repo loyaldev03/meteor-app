@@ -5,7 +5,6 @@ class MemberTest < ActiveSupport::TestCase
 
   setup do
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
-    @use_active_merchant = false
   end
 
   test "Should create a member" do
@@ -52,7 +51,6 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Insfufficient funds hard decline" do
-    active_merchant_stubs unless @use_active_merchant
     active_member = create_active_member(@terms_of_membership_with_gateway)
     answer = active_member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
@@ -245,7 +243,6 @@ class MemberTest < ActiveSupport::TestCase
     original_year = 2000
     member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
     member.reload
-
     assert_difference('CreditCard.count', 0) do
       assert_difference('Operation.count', 1) do
         assert_difference('Transaction.count') do
@@ -263,6 +260,7 @@ class MemberTest < ActiveSupport::TestCase
       assert_difference('Operation.count', 1) do
         assert_difference('Transaction.count') do
           answer = member.bill_membership
+          member.reload
           assert_equal answer[:code], Settings.error_codes.invalid_credit_card
           assert_equal original_year+2, member.transactions.last.expire_year
           assert_equal member.recycled_times, 2

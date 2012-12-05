@@ -38,7 +38,8 @@ class ActiveSupport::TestCase
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:credit).returns(answer)
   end
 
-  def create_active_member(tom, member_type = :active_member, enrollment_type = :enrollment_info, member_args = {}, membership_args = {})
+  def create_active_member(tom, member_type = :active_member, enrollment_type = :enrollment_info, member_args = {}, membership_args = {}, use_default_active_merchant_stub = true)
+    active_merchant_stubs if use_default_active_merchant_stub
     membership = FactoryGirl.create("#{member_type}_membership".to_sym, { terms_of_membership: tom }.merge(membership_args))
     active_member = FactoryGirl.create(member_type, { club: tom.club, current_membership: membership }.merge(member_args))
     active_member.memberships << membership

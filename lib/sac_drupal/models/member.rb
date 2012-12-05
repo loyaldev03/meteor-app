@@ -90,7 +90,7 @@ module Drupal
           }
         else
           {
-            last_sync_error: res.body.respond_to?(:[]) ? res.body[:message] : res.body,
+            last_sync_error: res.body.class == Hash ? res.body[:message] : res.body,
             last_sync_error_at: Time.now,
             sync_status: "with_error"
           }
@@ -209,7 +209,7 @@ module Drupal
 
       # Add credit card information
       cc = m.active_credit_card
-      if cc
+      if cc and cc.am_card.valid?
         map.merge!({
           field_profile_cc_month: {
             und: { value: "%02d" % cc.expire_month.to_s }
