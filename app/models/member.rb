@@ -7,7 +7,7 @@ class Member < ActiveRecord::Base
   belongs_to :member_group_type
   has_many :member_notes
   has_many :credit_cards
-  has_many :transactions
+  has_many :transactions, :order => "created_at ASC"
   has_many :operations
   has_many :fulfillments
   has_many :club_cash_transactions

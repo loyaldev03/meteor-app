@@ -252,7 +252,6 @@ class MemberTest < ActiveSupport::TestCase
           assert_equal answer[:code], Settings.error_codes.invalid_credit_card
           assert_equal original_year+3, member.transactions.last.expire_year
           assert_equal member.recycled_times, 1
-          member.reload
           assert_equal member.credit_cards.count, 1 # only one credit card
           assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
         end
@@ -264,7 +263,6 @@ class MemberTest < ActiveSupport::TestCase
           assert_equal answer[:code], Settings.error_codes.invalid_credit_card
           assert_equal original_year+2, member.transactions.last.expire_year
           assert_equal member.recycled_times, 2
-          member.reload
           assert_equal member.credit_cards.count, 1 # only one credit card
           assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
         end
