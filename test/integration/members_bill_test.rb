@@ -78,12 +78,11 @@ class MembersBillTest < ActionController::IntegrationTest
   end
 
   def bill_member(member, do_refund = true, refund_amount = nil)
+    next_bill_date = member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)
 
     answer = member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
-    
-    next_bill_date = member.current_membership.join_date + eval(@terms_of_membership_with_gateway.installment_type)
     
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
