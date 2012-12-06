@@ -301,21 +301,6 @@ class MembersBillTest < ActionController::IntegrationTest
     end
   end
   
-  test "Change member from Lapse status to active status" do
-    setup_member
-    @saved_member.set_as_canceled
-    @saved_member.recover(@terms_of_membership_with_gateway)
-    @saved_member.set_as_active
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    
-    next_bill_date = @saved_member.current_membership.join_date + eval(@terms_of_membership_with_gateway.provisional_days)
-    
-    within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date)) }
-    end
-  end  
-
   test "Change Next Bill Date for blank" do
     setup_member
     @saved_member.set_as_canceled
