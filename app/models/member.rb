@@ -354,7 +354,7 @@ class Member < ActiveRecord::Base
         elsif terms_of_membership.payment_gateway_configuration.nil?
           message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
           Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
-          Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership })
+          Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
           { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
         else
           acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
@@ -837,7 +837,7 @@ class Member < ActiveRecord::Base
         end        
       rescue Exception => e
         answer.merge!({:errors => e})
-        Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card })
+        Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card.inspect })
         logger.error e.inspect
         raise ActiveRecord::Rollback
       end
