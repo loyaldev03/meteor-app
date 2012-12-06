@@ -8,8 +8,8 @@ class CreditCard < ActiveRecord::Base
 
   before_create :update_last_digits
 
-  validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }, :allow_blank => true
-  validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }, :allow_blank => true
+  validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
+  validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }
   validates :number, :numericality => { :only_integer => true }, :allow_blank => true
 
   def accepted_on_billing
