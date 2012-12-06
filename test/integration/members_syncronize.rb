@@ -517,5 +517,52 @@ class MembersSyncronize < ActionController::IntegrationTest
       wait_until{ assert page.has_content?('"created":"1351570554"') }
     end
   end
+
+  test "Should not let agent to update api_id when member is lapsed" do
+    setup_environment
+    unsaved_member =  FactoryGirl.build(:member_with_api, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
+
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member.set_as_canceled!
+
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    
+    within(".nav-tabs") do
+      click_on("Sync Status")
+    end
+    within("#sync_status")do
+      wait_until{
+        assert page.has_no_selector?("edit_api_id")
+      }
+    end
+  end
+
+  test "Should not let agent to update api_id when member is applied" do
+    setup_environment
+    unsaved_member =  FactoryGirl.build(:member_with_api, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
+    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_approval)
+    @saved_member = Member.find_by_email(unsaved_member.email)
+
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    
+    within(".nav-tabs") do
+      click_on("Sync Status")
+    end
+    within("#sync_status")do
+      wait_until{
+        assert page.has_no_selector?("edit_api_id")
+      }
+    end
+  end
+
 end
 
