@@ -732,7 +732,7 @@ class Member < ActiveRecord::Base
     base = Member.where(" date(next_retry_bill_date) <= ? and club_id IN (select id from clubs where billing_enable = true) and status != 'lapsed'", 
                 Time.zone.now.to_date)
     Rails.logger.info " *** Starting members:billing rake task, processing #{base.count} members"
-    base.find_in_batches do |group|
+    base.find_in_batches(:batch_size => 60) do |group|
       group.each do |member| 
         tz = Time.zone.now
         begin
