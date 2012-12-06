@@ -826,14 +826,16 @@ class Member < ActiveRecord::Base
     CreditCard.transaction do 
       begin
         new_credit_card.member = self
-        if new_credit_card.am_card.valid?
+        if new_credit_card.valid? and new_credit_card.am_card.valid?
           new_credit_card.save!
           message = "Credit card #{new_credit_card.last_digits} added and activated."
           Auditory.audit(current_agent, new_credit_card, message, self)
           answer = { :code => Settings.error_codes.success, :message => message }
           new_credit_card.set_as_active!
         else
-          answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => new_credit_card.am_card.errors.to_hash }
+          errors = new_credit_card.errors.to_hash
+          errors.merge! new_credit_card.am_card.errors.to_hash unless new_credit_card.am_card.errors.empty?
+          answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => errors }
         end        
       rescue Exception => e
         answer.merge!({:errors => e})
