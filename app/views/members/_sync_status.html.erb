@@ -118,22 +118,24 @@
             <%=t @current_member.get_sync_status, scope: 'activerecord.attributes.member.sync_status_captions' -%>
           </span>
         </span>
-        <span class='toggler-content'>
-          <%= form_for @current_member, url: member_update_sync_path, html: { class: 'form-inline', style: 'display: inline;' } do |f| %>
-            <%= f.text_field :api_id, :class => 'text_field' %>
-            <%= f.submit 'Update', class: 'btn-danger', confirm: 'Are you sure?' %>
+        <% if @current_member.can_be_synced_to_remote? %>
+          <span class='toggler-content'>
+            <%= form_for @current_member, url: member_update_sync_path, html: { class: 'form-inline', style: 'display: inline;' } do |f| %>
+              <%= f.text_field :api_id, :class => 'text_field' %>
+              <%= f.submit 'Update', class: 'btn-danger', confirm: 'Are you sure?' %>
+            <% end %>
+          </span>
+          &nbsp;
+          <%= link_to '#', :id=>"edit_api_id" ,class: 'btn btn-success toggler', data: { target: '.toggler-content' } do %>
+            <i class='icon-pencil'></i>
+            <span class='toggler-content default active'><%= t('buttons.edit') %></span>
+            <span class='toggler-content'><%= t('buttons.stop_editing') %></span>
           <% end %>
-        </span>
-        &nbsp;
-        <%= link_to '#', class: 'btn btn-success toggler', data: { target: '.toggler-content' } do %>
-          <i class='icon-pencil'></i>
-          <span class='toggler-content default active'><%= t('buttons.edit') %></span>
-          <span class='toggler-content'><%= t('buttons.stop_editing') %></span>
-        <% end %>
-        <% if @current_member.api_id.present? %>
-          <%= link_to member_update_sync_path(member: { api_id: '' }), method: :put, confirm: 'Are you sure?', class: 'btn btn-warning' do %>
-            <i class='icon-remove'></i>
-            <%= t('buttons.unset') %>
+          <% if @current_member.api_id.present? %>
+            <%= link_to member_update_sync_path(member: { api_id: '' }), method: :put, confirm: 'Are you sure?', class: 'btn btn-warning' do %>
+              <i class='icon-remove'></i>
+              <%= t('buttons.unset') %>
+            <% end %>
           <% end %>
         <% end %>
       </td>

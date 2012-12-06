@@ -296,6 +296,27 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
   end
 
+  test "Multiple same credit cards with different expiration date" do
+    sign_in @admin_user
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_number = active_credit_card.number
+    
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
+    @credit_card.expire_year = active_credit_card.expire_year
+    @credit_card.expire_month = active_credit_card.expire_month
+
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, cc_number)
+    assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
+  end
+
   test "Should not update credit card when dates are not changed and same number. (With 'X')" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id

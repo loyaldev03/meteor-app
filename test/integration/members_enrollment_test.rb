@@ -19,7 +19,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    Time.zone = @club.trueime_zone
+    Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     # @communication_type = FactoryGirl.create(:communication_type)
@@ -1171,4 +1171,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_content?("active")
     end
   end
+
+  test "Multiple same credit cards with different expiration date" do
+    
+
+  end
+
+  
 end

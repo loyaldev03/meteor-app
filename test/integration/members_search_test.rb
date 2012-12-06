@@ -234,6 +234,62 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
   end
 
+  test "Organize Member results by Pagination" do
+    setup_search
+    click_on 'Search'
+    wait_until {
+      assert page.has_no_selector?(".pagination")
+    }
+    within("#members")do
+      wait_until {
+        assert page.has_content?(Member.find_by_visible_id(24).full_name)
+      }
+    end
+
+    wait_until {
+      assert page.has_selector?(".pagination")
+      assert page.has_content?(Member.first.full_name)
+    }
+    within("#members")do
+      wait_until {
+        click_on("2")
+        if page.has_content?(Member.find_by_visible_id(26).full_name)
+          assert true
+        else
+          assert false, "The last member was not found"
+        end
+      }
+    end
+
+    wait_until {
+      assert page.has_selector?(".pagination")
+    }
+    within("#members")do
+      wait_until {
+        click_on("3")
+        if page.has_content?(Member.find_by_visible_id(51).full_name)
+          assert true
+        else
+          assert false, "The last member was not found"
+        end
+      }
+    end
+
+    wait_until {
+      assert page.has_selector?(".pagination")
+    }
+    within("#members")do
+      wait_until {
+        click_on("4")
+        if page.has_content?(Member.find_by_visible_id(76).full_name)
+          assert true
+        else
+          assert false, "The last member was not found"
+        end
+      }
+    end
+  end
+
   test "search a member with next bill date in past" do
     setup_search
     page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
@@ -415,6 +471,47 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
   end
 
+  test "Searching zip with partial digits" do
+    setup_search
+    member_to_seach = Member.first
+    member_to_seach.update_attribute(:zip, 12345)
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[zip]", :with => "12"
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(member_to_seach.full_name)
+      }
+    end
+
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[zip]", :with => "34"
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(member_to_seach.full_name)
+      }
+    end
+
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[zip]", :with => "45"
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(member_to_seach.full_name)
+      }
+    end
+  end
+
   test "search by last digits" do
     setup_search
     member_to_seach = Member.first
@@ -486,6 +583,52 @@ class MembersSearchTest < ActionController::IntegrationTest
       wait_until{
         fill_in "member[last_digits]", :with => @saved_member.active_credit_card.last_digits
         fill_in "member[notes]", :with => @saved_member.member_notes.first.description
+      }
+    end
+
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(@saved_member.full_name)
+      }
+    end
+  end
+
+  test "Trim texts when searching" do
+    setup_member
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    member_note = FactoryGirl.create(:member_note, :member_id => @saved_member.id, 
+                                       :created_by_id => @admin_agent.id,
+                                       :communication_type_id => @communication_type.id,
+                                       :disposition_type_id => @disposition_type.id)
+    member_to_seach = Member.first
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[member_id]", :with => " #{@saved_member.visible_id} "
+        fill_in "member[first_name]", :with => " #{@saved_member.first_name} "
+        fill_in "member[last_name]", :with => " #{@saved_member.last_name} "
+        fill_in "member[email]", :with => " #{@saved_member.email} "
+        fill_in "member[phone_country_code]", :with => " #{@saved_member.phone_country_code} "
+        fill_in "member[phone_area_code]", :with => " #{@saved_member.phone_area_code} "
+        fill_in "member[phone_local_number]", :with => " #{@saved_member.phone_local_number} "
+      }
+    end
+    within("#contact_details")do
+      wait_until{
+        fill_in "member[city]", :with => " #{@saved_member.city} "
+        select_country_and_state(@saved_member.country)
+        fill_in "member[address]", :with => " #{@saved_member.address} "
+        fill_in "member[zip]", :with => " #{@saved_member.zip} "
+      }
+    end
+    page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
+    within("#ui-datepicker-div") do
+      click_on("#{Time.zone.now.day}")
+    end
+    within("#payment_details")do
+      wait_until{
+        fill_in "member[last_digits]", :with => " #{@saved_member.active_credit_card.last_digits} "
+        fill_in "member[notes]", :with => " #{@saved_member.member_notes.first.description} "
       }
     end
 
