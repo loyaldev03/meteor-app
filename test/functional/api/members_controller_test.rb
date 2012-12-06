@@ -304,8 +304,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     
     @credit_card = FactoryGirl.build :credit_card_american_express
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-    @credit_card.expire_year = active_credit_card.expire_year
-    @credit_card.expire_month = active_credit_card.expire_month
 
     assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
