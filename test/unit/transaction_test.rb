@@ -99,7 +99,7 @@ class TransactionTest < ActiveSupport::TestCase
     nbd = member.bill_date
 
     # bill members the day before trial days expires. Member should not be billed
-    Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days - 1.day) do
+    Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days - 2.days) do
       Member.bill_all_members_up_today
       member.reload
       assert_equal nbd, member.bill_date
@@ -140,7 +140,7 @@ class TransactionTest < ActiveSupport::TestCase
     nbd = member.bill_date
 
     # bill members the day before trial days expires. Member should not be billed
-    Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days - 1.day) do
+    Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days - 2.days) do
       Member.bill_all_members_up_today
       member.reload
       assert_equal nbd, member.bill_date
