@@ -17,6 +17,9 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.country = (member.country.nil? ? 'US' : member.country)
   phoenix.joint = member.joint
   phoenix.birth_date = member.birth_date
+  if member.birth_date + 13.years > Date.today
+    phoenix.birth_date = nil
+  end
   phoenix.phone_number = member.phone
   phoenix.blacklisted = member.blacklisted
   phoenix.api_id = member.drupal_user_api_id
