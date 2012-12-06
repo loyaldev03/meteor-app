@@ -727,10 +727,10 @@ class Member < ActiveRecord::Base
 
   # Method used from rake task and also from tests!
   def self.bill_all_members_up_today
-    file = File.open("/tmp/bill_all_members_up_today.lock", File::RDWR|File::CREAT, 0644)
+    file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
     base = Member.where(" date(next_retry_bill_date) <= ? and club_id IN (select id from clubs where billing_enable = true) and status != 'lapsed'", 
-                Time.zone.now.to_date).limit(60)
+                Time.zone.now.to_date)
     Rails.logger.info " *** Starting members:billing rake task, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each do |member| 
