@@ -887,7 +887,7 @@ class Member < ActiveRecord::Base
       self.recycled_times = 0
       self.bill_date = new_bill_date
       self.next_retry_bill_date = new_bill_date
-      self.save
+      self.save(:validate => false)
       Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date.to_date}", self)
     end
 
@@ -936,7 +936,7 @@ class Member < ActiveRecord::Base
       self.next_retry_bill_date = nil
       self.bill_date = nil
       self.recycled_times = 0
-      self.save
+      self.save(:validate => false)
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
     end
 
