@@ -62,7 +62,6 @@ class Member < ActiveRecord::Base
         logger.info "Drupal::sync took #{time_elapsed}ms"
       end
     end
-    sync_to_pardot unless @skip_pardot_sync || pardot_member.nil?
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
@@ -725,6 +724,24 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def self.sync_members_to_pardot
+    base = Member.where(" date(updated_at) >= ? ", Time.zone.now.yesterday.to_date)
+    Rails.logger.info " *** Starting members:sync_members_to_pardot, processing #{base.count} members"
+    base.find_in_batches do |group|
+      group.each do |member| 
+        tz = Time.zone.now
+        begin
+          Rails.logger.info "  * processing member ##{member.uuid}"
+          member.sync_to_pardot unless member.pardot_member.nil?
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect, :credit_card => member.active_credit_card.inspect })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+      end
+    end
+  end    
+
   # Method used from rake task and also from tests!
   def self.bill_all_members_up_today
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
@@ -732,7 +749,7 @@ class Member < ActiveRecord::Base
     base = Member.where(" date(next_retry_bill_date) <= ? and club_id IN (select id from clubs where billing_enable = true) and status != 'lapsed'", 
                 Time.zone.now.to_date)
     Rails.logger.info " *** Starting members:billing rake task, processing #{base.count} members"
-    base.find_in_batches do |group|
+    base.find_in_batches(:batch_size => 60) do |group|
       group.each do |member| 
         tz = Time.zone.now
         begin
@@ -869,8 +886,6 @@ class Member < ActiveRecord::Base
   rescue Exception => e
     Airbrake.notify(:error_class => "Pardot:sync", :error_message => e, :parameters => { :member => self.inspect })
   end
-  # sync member in 10 minutes, why? lets allow prospect to be synced first.
-  handle_asynchronously :sync_to_pardot, :run_at => Proc.new { 5.minutes.from_now }
 
   private
     def schedule_renewal

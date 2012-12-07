@@ -164,7 +164,10 @@ class MesAccountUpdater
             if cc.active 
               case response_code
               when 'NEWACCT'
-                cc.member.update_credit_card_from_drupal({number: new_account_number, :expire_year => new_expire_year, :expire_month => new_expire_month})
+                answer = cc.member.update_credit_card_from_drupal({number: new_account_number, :expire_year => new_expire_year, :expire_month => new_expire_month})
+                unless answer[:code] == Settings.error_codes.success
+                  Airbrake.notify(:error_class => "MES::aus_update_process", :parameters => { :credit_card => cc.inspect, :answer => answer, :line => line })
+                end
               when 'NEWEXP'
                 Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.member, Settings.operation_types.aus_recycle_credit_card)
                 cc.update_attributes :expire_year => new_expire_year, :expire_month => new_expire_month
