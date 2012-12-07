@@ -50,6 +50,11 @@ defaults: &defaults
     member_email_blacklisted: 403
     automatic_recycle_credit_card: 404
     aus_recycle_credit_card: 405
+    #communication
+    active_email: 300     
+    prebill_email: 301    
+    cancellation_email: 302 
+    refund_email: 303 
     #other
     others: 1000
   error_messages:
