@@ -42,6 +42,19 @@ namespace :members do
     end
   end
 
+
+  desc "Sync members to pardot"
+  # This task should be run each day at 3 am ?
+  task :sync_members_to_pardot => :environment do
+    tall = Time.zone.now
+    begin
+      Member.sync_members_to_pardot
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}"
+    end
+  end
+
+
   desc "Set cc_type on each active credit card."
   task :update_cc_type => :environment do 
     tall = Time.zone.now
