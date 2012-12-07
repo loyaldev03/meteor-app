@@ -57,7 +57,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Monthly member should be billed if it is active or provisional" do
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
@@ -201,7 +201,7 @@ class MemberTest < ActiveSupport::TestCase
     member = create_active_member(@terms_of_membership_with_gateway)
     cancel_date = member.cancel_date
     # 2 operations : cancel and blacklist
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       member.blacklist(nil, "Test")
     end
     m = Member.find member.uuid
@@ -220,6 +220,14 @@ class MemberTest < ActiveSupport::TestCase
     assert_not_nil m.cancel_date 
     assert_equal m.cancel_date.to_date, cancel_date.to_date
     assert_equal m.blacklisted, true
+  end
+
+  test "If member's email contains '@noemail.com' it should not send emails." do
+    member = create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, { email: "testing@noemail.com" })
+    assert_difference('Operation.count', 1) do
+      Communication.deliver!(:active, member)
+    end
+    assert_equal member.operations.last.description, "The email contains '@noemail.com' which is an empty email. The email won't be sent."
   end
 
   test "show dates according to club timezones" do
@@ -274,7 +282,7 @@ class MemberTest < ActiveSupport::TestCase
     @club = @terms_of_membership_with_gateway.club
     member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
 
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
       member.reload

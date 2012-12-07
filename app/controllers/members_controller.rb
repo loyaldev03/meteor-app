@@ -50,6 +50,7 @@ class MembersController < ApplicationController
     @credit_cards = @current_member.credit_cards.all
     @active_credit_card = @current_member.active_credit_card
     @fulfillments = @current_member.fulfillments.all
+    @communications = @current_member.communications.all
   end
 
   def new

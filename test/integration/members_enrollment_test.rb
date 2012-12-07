@@ -1170,6 +1170,19 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#table_membership_information") do
       assert page.has_content?("active")
     end
+
+    within("#communication") do
+      wait_until {
+        assert page.has_content?("Test active")
+        assert page.has_content?("active")
+        assert_equal(Communication.last.template_type, 'active')
+      }
+    end
+    within("#operations_table") do
+      wait_until {
+        assert page.has_content?("Communication 'Test active' sent")
+      }
+    end
   end
 
   test "Multiple same credit cards with different expiration date" do
