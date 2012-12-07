@@ -131,6 +131,10 @@ class Member < ActiveRecord::Base
     after_transition [ :none, :provisional, :active ] => # none is new join. provisional and active are save the sale
                         :applied, :do => [:set_join_date, :send_active_needs_approval_email]
     ###### <<<<<<========
+    ###### member gets active =====>>>>
+    after_transition :provisional => 
+                        :active, :do => :send_active_email
+    ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
                         :provisional, :do => 'schedule_first_membership(true)'

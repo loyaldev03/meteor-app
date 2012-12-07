@@ -524,6 +524,18 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
       }
     end
+    within("#table_email_template")do
+      wait_until{
+        assert page.has_content?('Test welcome')
+        assert page.has_content?('Test active')
+        assert page.has_content?('Test cancellation')
+        assert page.has_content?('Test prebill ')
+        assert page.has_content?('Test prebill_renewal')
+        assert page.has_content?('Test refund')
+        assert page.has_content?('Test birthday')
+        assert page.has_content?('Test pillar')
+      }
+    end    
   end
 
   test "return to member's profile from terms of membership" do
@@ -540,6 +552,18 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
       }
     end
+    within("#table_email_template")do
+      wait_until{
+        assert page.has_content?('Test welcome')
+        assert page.has_content?('Test active')
+        assert page.has_content?('Test cancellation')
+        assert page.has_content?('Test prebill ')
+        assert page.has_content?('Test prebill_renewal')
+        assert page.has_content?('Test refund')
+        assert page.has_content?('Test birthday')
+        assert page.has_content?('Test pillar')
+      }
+    end    
     click_link_or_button('Return to member show')
     wait_until{
       assert find_field('input_visible_id').value == "#{@saved_member.visible_id}"
