@@ -1,0 +1,21 @@
+<p> Dear agents, </p> 
+<p> The following members are having problems with the syncronization due to duplicated emails. </p>
+
+<table class="bordered">
+	<tr> 
+		<td>Visible_id</td> 
+		<td>Club</td> 
+		<td>Email</td> 
+	</tr>
+	<% @members.each do |member| %>
+		<tr> 
+			<td><%= member.visible_id %> - <%= member.full_name %></td> 
+			<td><%= member.club.id %> - <%= member.club.name %></td> 
+			<td><%= member.email %></td> 
+		</tr>
+	<% end %>
+</table>
+
+	<p> Here are a few stepts to fix this problem. </p>
+
+<p> Regards. </p>
