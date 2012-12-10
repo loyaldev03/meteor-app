@@ -74,9 +74,6 @@ class Communication < ActiveRecord::Base
       Notifier.cancellation(email).deliver!
     when :prebill
       Notifier.pre_bill(email).deliver!
-    # prebill_renewal phoenix 1.1
-    when :prebill_renewal
-      Notifier.prebill_renewal(email).deliver!
     when :refund
       Notifier.refund(email).deliver!
     else
