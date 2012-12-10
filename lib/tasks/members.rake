@@ -23,7 +23,7 @@ namespace :billing do
             Rails.logger.info "  * processing member ##{member.uuid}"
             member.send_pre_bill
           rescue Exception => e
-            Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -92,7 +92,7 @@ namespace :members do
             Rails.logger.info "  * processing member ##{member.uuid}"
             Communication.deliver!(:birthday, member)
           rescue Exception => e
-            Airbrake.notify(:error_class => "Members::send_happy_birthday", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Airbrake.notify(:error_class => "Members::send_happy_birthday", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -122,13 +122,13 @@ namespace :members do
                   Rails.logger.info "  * processing member ##{membership.member_id}"
                   Communication.deliver!(template, membership.member)
                 rescue Exception => e
-                  Airbrake.notify(:error_class => "Members::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+                  Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect, :membership => membership.inspect })
                   Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
                 end
               end
             end
           rescue Exception => e
-            Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}")
+            Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect })
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for template ##{template.id}"
@@ -157,7 +157,7 @@ namespace :members do
               credit_card.save
             end
           rescue Exception => e
-            Airbrake.notify(:error_class => "Members::CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :credit_card => credit_card.inspect })
+            Airbrake.notify(:error_class => "Members::CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :credit_card => credit_card.inspect, :member => credit_card.member.inspect })
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for credit_card ##{credit_card.id}"
