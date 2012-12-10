@@ -28,6 +28,8 @@ cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_fulfillments  >> $LO
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:update_cc_type  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:sync_members_to_pardot  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_email_sync_error  >> $LOGFILE 2>&1 &
+cd /var/www/$2/current && RAILS_ENV=$1 rake members:send_happy_birthday  >> $LOGFILE 2>&1 &
+cd /var/www/$2/current && RAILS_ENV=$1 rake members:send_pillar_emails  >> $LOGFILE 2>&1 &
 
 
 # after this script we should do the BK and reports

@@ -83,7 +83,7 @@ namespace :members do
   task :send_happy_birthday => :environment do
     tall = Time.zone.now
     begin
-      base = Member.where(" birth_date = ? and status IN (?) ", Time.zone.now.to_date, [ 'active', 'provisional' ])
+      base = Member.where(" date(birth_date) = ? and status IN (?) ", Time.zone.now.to_date, [ 'active', 'provisional' ])
       Rails.logger.info " *** Starting members:send_happy_birthday rake task, processing #{base.count} members"
       base.find_in_batches do |group|
         group.each do |member| 
