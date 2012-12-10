@@ -75,6 +75,17 @@ class Member < ActiveRecord::Base
     inclusion:                   { within: self.supported_countries }
   country_specific_validations!
 
+
+  def self.supported_states(country='US')
+    if country == 'US'
+       Carmen::Country.coded('US').subregions.select{ |s| %w{AK AL AR AZ CA CO CT DE FL GA 
+        HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH  NJ NM NV NY OH OK OR 
+        PA RI SC SD TN TX UT VA VI VT WA WI WV WY}.include?(s.code) }
+    else
+       Carmen::Country.coded('CA').subregions
+    end
+  end
+
   scope :synced, lambda { |bool=true|
     bool ?
       where('sync_status = "synced"') :
