@@ -5,6 +5,7 @@ class MemberTest < ActiveSupport::TestCase
 
   setup do
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
+    @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
   end
 
   test "Should create a member" do
@@ -248,11 +249,12 @@ class MemberTest < ActiveSupport::TestCase
   test "Recycle credit card" do
     @club = @terms_of_membership_with_gateway.club
     member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
     original_year = 2000
     member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
     member.reload
     assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 1) do
+      assert_difference('Operation.count', 2) do
         assert_difference('Transaction.count') do
           assert_equal member.recycled_times, 0
           answer = member.bill_membership
@@ -260,16 +262,24 @@ class MemberTest < ActiveSupport::TestCase
           assert_equal answer[:code], Settings.error_codes.invalid_credit_card
           assert_equal original_year+3, member.transactions.last.expire_year
           assert_equal member.recycled_times, 1
+          assert_equal Operation.find_all_by_operation_type(Settings.operation_types.automatic_recycle_credit_card).size, 1
           assert_equal member.credit_cards.count, 1 # only one credit card
           assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
         end
       end
-      assert_difference('Operation.count', 1) do
+    end
+    # im sorry to add this sleep. But if I dont, the member.transactions.last does not work always. why?
+    # because the created_at of both transactions has the same value!!!
+    sleep(1)
+    assert_difference('CreditCard.count', 0) do
+      assert_difference('Operation.count', 2) do
         assert_difference('Transaction.count') do
           answer = member.bill_membership
           member.reload
           assert_equal answer[:code], Settings.error_codes.invalid_credit_card
+          member.transactions.last.expire_year
           assert_equal original_year+2, member.transactions.last.expire_year
+          assert_equal Operation.find_all_by_operation_type(Settings.operation_types.automatic_recycle_credit_card).size, 2
           assert_equal member.recycled_times, 2
           assert_equal member.credit_cards.count, 1 # only one credit card
           assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
