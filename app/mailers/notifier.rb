@@ -25,7 +25,6 @@ class Notifier < ActionMailer::Base
   def members_with_duplicated_email_sync_error(member_list)
     @members = member_list
     mail :to => Settings.call_these_members_recipients,
-         :bcc => agent_email_list,         
          :subject => "Members with duplicated email sync error"
   end
 end
