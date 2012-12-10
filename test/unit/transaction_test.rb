@@ -258,24 +258,26 @@ class TransactionTest < ActiveSupport::TestCase
 
   end
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 
-    assert_difference('Operation.count', 3) do
-      active_member = create_active_member(@terms_of_membership)
-      active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
-      amount = @terms_of_membership.installment_amount
-      active_member.recycled_times = 4
-      active_member.save
-      answer = active_member.bill_membership
-      active_member.reload
-      assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
-      assert active_member.lapsed?, "member should be lapsed after recycle limit is reached"
-      assert_nil active_member.next_retry_bill_date, "next_retry_bill_date should be nil"
-      assert_nil active_member.bill_date, "bill_date should be nil"
-      assert_equal active_member.recycled_times, 0, "recycled_times should be 0"
+    assert_difference('Operation.count', 4) do
+      assert_difference('Communication.count', +1) do
+        active_member = create_active_member(@terms_of_membership)
+        active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
+        amount = @terms_of_membership.installment_amount
+        active_member.recycled_times = 4
+        active_member.save
+        answer = active_member.bill_membership
+        active_member.reload
+        assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
+        assert active_member.lapsed?, "member should be lapsed after recycle limit is reached"
+        assert_nil active_member.next_retry_bill_date, "next_retry_bill_date should be nil"
+        assert_nil active_member.bill_date, "bill_date should be nil"
+        assert_equal active_member.recycled_times, 0, "recycled_times should be 0"
+      end
     end
   end
 
   test "Billing with HD cancels member" do 
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       assert_difference('Communication.count', +1) do
         active_member = create_active_member(@terms_of_membership)
         active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
