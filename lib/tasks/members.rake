@@ -212,6 +212,3 @@ namespace :members do
     end 
   end
 end
-
-
-"The e-mail address <em class=\"placeholder\">testemail@mailinator.com</em> is already taken."
