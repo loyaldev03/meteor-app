@@ -69,7 +69,8 @@ class Api::MembersControllerTest < ActionController::TestCase
                               }.merge(options),:format => :json})
   end
 
-  #Admin should enroll/create member with preferences
+  # Store the membership id at enrollment_infos table when enrolling a new member
+  # Admin should enroll/create member with preferences
   # Billing membership by Provisional amount
   test "Admin should enroll/create member with preferences" do
     sign_in @admin_user
@@ -84,14 +85,22 @@ class Api::MembersControllerTest < ActionController::TestCase
                                       :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
           ) 
     )
-    assert_difference('Transaction.count')do
-      assert_difference('MemberPreference.count',@preferences.size) do 
-        assert_difference('Member.count') do
-          generate_post_message
-          assert_response :success
+    assert_difference('Membership.count')do
+      assert_difference('EnrollmentInfo.count')do
+        assert_difference('Transaction.count')do
+          assert_difference('MemberPreference.count',@preferences.size) do 
+            assert_difference('Member.count') do
+              generate_post_message
+              assert_response :success
+            end
+          end
         end
       end
     end
+    saved_member = Member.find_by_email(@member.email)
+    membership = Membership.last
+    enrollment_info = EnrollmentInfo.last
+    assert_equal(enrollment_info.membership_id, membership.id)
 
     transaction = Transaction.last
     assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
@@ -255,6 +264,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.number, @credit_card.number)
   end
 
+  # Multiple same credit cards with different expiration date
   test "Should update credit card only year" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
@@ -276,6 +286,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.expire_year, @credit_card.expire_year)
   end
 
+  # Multiple same credit cards with different expiration date
   test "Should update credit card only month" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
@@ -335,6 +346,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.number, cc_number)
   end
 
+  # Multiple same credit cards with same expiration date
   test "Should not add new credit card with same data as the one active" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
@@ -353,6 +365,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     
     assert_response :success
+    @member.reload
     assert_equal(@member.active_credit_card.number, cc_number)
     assert_equal(@member.active_credit_card.expire_year, @credit_card.expire_year)
     assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
@@ -377,9 +390,11 @@ class Api::MembersControllerTest < ActionController::TestCase
       end
     end
     assert_response :success
+    @member.reload
     assert_equal(@member.active_credit_card.number, cc_number)
   end
 
+  # Activate an inactive credit card record
   test "Should activate old credit when it is already created, if it is not expired" do
     sign_in @admin_user
     
@@ -395,6 +410,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
 
     assert_response :success
+    @member.reload
     assert_equal(@member.active_credit_card.number, @credit_card.number)
   end
 
@@ -414,6 +430,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       end
     end
     assert_response :success
+    @member.reload
     assert_equal(@member.active_credit_card.number, cc_number)
   end
 
@@ -433,7 +450,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       end
     end
     assert_response :success
-
+    @member.reload
     assert_equal(@member.active_credit_card.number, @credit_card.number)
     assert_equal(@member.active_credit_card.expire_month, cc_expire_month)
   end
@@ -452,12 +469,52 @@ class Api::MembersControllerTest < ActionController::TestCase
         generate_put_message
       end
     end
+    @member.reload
     assert_response :success
-
     assert_equal(@member.active_credit_card.number, @credit_card.number)
     assert_equal(@member.active_credit_card.expire_year, cc_expire_year)
   end
 
+  test "Update a profile with CC blacklisted" do
+    sign_in @admin_user
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
+    cc_expire_year = @active_credit_card.expire_year
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = @blacklisted_credit_card.number
+    @credit_card.expire_year = @blacklisted_credit_card.expire_year
+    @credit_card.expire_month = @blacklisted_credit_card.expire_month
 
+    assert_difference('Operation.count',0) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, @active_credit_card .number)
+  end
+
+  test "Update a profile with CC used by another member" do
+    sign_in @admin_user
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
+    cc_expire_year = @active_credit_card.expire_year
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = @blacklisted_credit_card.number
+    @credit_card.expire_year = @blacklisted_credit_card.expire_year
+    @credit_card.expire_month = @blacklisted_credit_card.expire_month
+
+    assert_difference('Operation.count',0) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, @active_credit_card .number)
+  end
 
 end

@@ -104,18 +104,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
         Member.last.set_as_canceled!
       end
     }
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
-    click_on 'Recover'
-    wait_until{
-      if @canceled_member.current_membership.terms_of_membership.name == "another_tom"
-        select(@terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
-      else
-        select(@new_terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
-      end
-    }
-    confirm_ok_js
-    click_on 'Recover'
-    assert page.has_content?(Settings.error_messages.cant_recover_member)
+    wait_until { assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
   end
 
   test "Recover a member by Monthly membership" do

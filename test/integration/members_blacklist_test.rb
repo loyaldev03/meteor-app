@@ -24,7 +24,48 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-  test "blacklist member width CC" do
+  def create_new_member(unsaved_member, bl_credit_card, bl_email, new_partner, new_club, new_terms_of_membership_with_gateway)
+    visit members_path(:partner_prefix => new_partner.prefix, :club_prefix => new_club.name)
+
+    click_on 'New Member'
+
+    within("#table_demographic_information") {
+      fill_in 'member[first_name]', :with => unsaved_member.first_name
+      fill_in 'member[last_name]', :with => unsaved_member.last_name
+      fill_in 'member[city]', :with => unsaved_member.city
+      fill_in 'member[address]', :with => unsaved_member.address
+      select('M', :from => 'member[gender]')
+      fill_in 'member[zip]', :with => unsaved_member.zip
+      select_country_and_state(unsaved_member.country)
+    }
+
+    page.execute_script("window.jQuery('#member_birth_date').next().click()")
+    within(".ui-datepicker-calendar") do
+      click_on("1")
+    end
+
+    within("#table_contact_information") {
+      fill_in 'member[email]', :with => bl_email
+      fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+      fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+      fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+      select('Home', :from => 'member[type_of_phone_number]')
+      select(new_terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
+    }
+
+    within("#table_credit_card") {  
+      fill_in 'member[credit_card][number]', :with => "#{bl_credit_card.number}"
+      fill_in 'member[credit_card][expire_month]', :with => "#{bl_credit_card.expire_month}"
+      fill_in 'member[credit_card][expire_year]', :with => "#{bl_credit_card.expire_year}"
+    }
+    
+    alert_ok_js
+    
+    click_link_or_button 'Create Member'
+    sleep(5) #Wait for API response
+  end
+
+  test "blacklist member with CC" do
     setup_member
     
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -185,49 +226,26 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     assert page.has_content?("#{unsaved_member.first_name} #{unsaved_member.last_name}")
 
     assert Member.count == 2
-
   end
 
-  def create_new_member(unsaved_member, bl_credit_card, bl_email, new_partner, new_club, new_terms_of_membership_with_gateway)
-    visit members_path(:partner_prefix => new_partner.prefix, :club_prefix => new_club.name)
-
-    click_on 'New Member'
-
-    within("#table_demographic_information") {
-      fill_in 'member[first_name]', :with => unsaved_member.first_name
-      fill_in 'member[last_name]', :with => unsaved_member.last_name
-      fill_in 'member[city]', :with => unsaved_member.city
-      fill_in 'member[address]', :with => unsaved_member.address
-      select('M', :from => 'member[gender]')
-      fill_in 'member[zip]', :with => unsaved_member.zip
-      select_country_and_state(unsaved_member.country)
-    }
-
-    page.execute_script("window.jQuery('#member_birth_date').next().click()")
-    within(".ui-datepicker-calendar") do
-      click_on("1")
-    end
-
-    within("#table_contact_information") {
-      fill_in 'member[email]', :with => bl_email
-      fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-      fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-      fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-      select('Home', :from => 'member[type_of_phone_number]')
-      select(new_terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
-    }
-
-    within("#table_credit_card") {  
-      fill_in 'member[credit_card][number]', :with => "#{bl_credit_card.number}"
-      fill_in 'member[credit_card][expire_month]', :with => "#{bl_credit_card.expire_month}"
-      fill_in 'member[credit_card][expire_year]', :with => "#{bl_credit_card.expire_year}"
-    }
+  test "Blacklist a member with status Lapsed" do
+    setup_member
+    @saved_member.set_as_canceled
+    @saved_member.reload
     
-    alert_ok_js
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Blacklist'
+
+    select(@member_blacklist_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_on 'Blacklist member'
+
+    @saved_member.reload
     
-    click_link_or_button 'Create Member'
-    sleep(5) #Wait for API response
-    
+    text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
+    assert page.has_content?(text_reason)
+
+    assert page.has_content?("Blacklisted!!!")
   end
 
 
