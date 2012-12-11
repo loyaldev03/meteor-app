@@ -846,8 +846,7 @@ class Member < ActiveRecord::Base
         GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH  NJ NM NV NY OH 
         OK OR PA RI SC SD TN TX UT VA VI VT WA WI WV WY}.include?(s.code) }
     else
-      Carmen::Country.coded('CA').subregions.select{ |s| %w{AB BC MB NB NL NS ON PE QC 
-        SK}.include?(s.code) }
+      Carmen::Country.coded('CA').subregions
     end
   end
 
