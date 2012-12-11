@@ -5,6 +5,7 @@ class MemberTest < ActiveSupport::TestCase
 
   setup do
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
+    @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
   end
 
   test "Should create a member" do
@@ -57,7 +58,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Monthly member should be billed if it is active or provisional" do
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
@@ -201,7 +202,7 @@ class MemberTest < ActiveSupport::TestCase
     member = create_active_member(@terms_of_membership_with_gateway)
     cancel_date = member.cancel_date
     # 2 operations : cancel and blacklist
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       member.blacklist(nil, "Test")
     end
     m = Member.find member.uuid
@@ -222,6 +223,14 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal m.blacklisted, true
   end
 
+  test "If member's email contains '@noemail.com' it should not send emails." do
+    member = create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, { email: "testing@noemail.com" })
+    assert_difference('Operation.count', 1) do
+      Communication.deliver!(:active, member)
+    end
+    assert_equal member.operations.last.description, "The email contains '@noemail.com' which is an empty email. The email won't be sent."
+  end
+
   test "show dates according to club timezones" do
     saved_member = create_active_member(@terms_of_membership_with_gateway)
     saved_member.member_since_date = "Wed, 02 May 2012 19:10:51 UTC 00:00"
@@ -237,14 +246,39 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "03/05/2012"
   end
 
-  test "Recycle credit card" do
+
+  test "Recycle credit card with billing success" do
     @club = @terms_of_membership_with_gateway.club
     member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+    original_year = (Time.zone.now - 2.years).year
+    member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
+    member.reload
+    assert_difference('CreditCard.count', 0) do
+      assert_difference('Operation.count', 5) do
+        assert_difference('Transaction.count') do
+          assert_equal member.recycled_times, 0
+          answer = member.bill_membership
+          member.reload
+          assert_equal answer[:code], Settings.error_codes.success
+          assert_equal original_year+3, member.transactions.last.expire_year
+          assert_equal member.recycled_times, 0
+          assert_equal Operation.find_all_by_operation_type(Settings.operation_types.automatic_recycle_credit_card).size, 1
+          assert_equal member.credit_cards.count, 1 # only one credit card
+          assert_equal member.credit_cards.first.expire_year, original_year+3 # expire_year should be updated.
+        end
+      end
+    end
+  end
+
+  test "Recycle credit card twice" do
+    @club = @terms_of_membership_with_gateway.club
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
     original_year = 2000
     member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
     member.reload
     assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 1) do
+      assert_difference('Operation.count', 2) do
         assert_difference('Transaction.count') do
           assert_equal member.recycled_times, 0
           answer = member.bill_membership
@@ -252,16 +286,24 @@ class MemberTest < ActiveSupport::TestCase
           assert_equal answer[:code], Settings.error_codes.invalid_credit_card
           assert_equal original_year+3, member.transactions.last.expire_year
           assert_equal member.recycled_times, 1
+          assert_equal Operation.find_all_by_operation_type(Settings.operation_types.automatic_recycle_credit_card).size, 1
           assert_equal member.credit_cards.count, 1 # only one credit card
           assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
         end
       end
-      assert_difference('Operation.count', 1) do
+    end
+    # im sorry to add this sleep. But if I dont, the member.transactions.last does not work always. why?
+    # because the created_at of both transactions has the same value!!!
+    sleep(1)
+    assert_difference('CreditCard.count', 0) do
+      assert_difference('Operation.count', 2) do
         assert_difference('Transaction.count') do
           answer = member.bill_membership
           member.reload
           assert_equal answer[:code], Settings.error_codes.invalid_credit_card
+          member.transactions.last.expire_year
           assert_equal original_year+2, member.transactions.last.expire_year
+          assert_equal Operation.find_all_by_operation_type(Settings.operation_types.automatic_recycle_credit_card).size, 2
           assert_equal member.recycled_times, 2
           assert_equal member.credit_cards.count, 1 # only one credit card
           assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
@@ -274,7 +316,7 @@ class MemberTest < ActiveSupport::TestCase
     @club = @terms_of_membership_with_gateway.club
     member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
 
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
       member.reload

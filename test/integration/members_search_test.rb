@@ -5,6 +5,7 @@ class MembersSearchTest < ActionController::IntegrationTest
   transactions_table_empty_text = "No data available in table"
   operations_table_empty_text = "No data available in table"
   fulfillments_table_empty_text = "No fulfillments were found"
+  communication_table_empty_text = "No communications were found"
 
   ############################################################
   # SETUP
@@ -320,6 +321,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
 
     within("#fulfillments") { assert page.has_content?(fulfillments_table_empty_text) }
+
+    within("#communication") { assert page.has_content?(communication_table_empty_text) }
 
   end
 

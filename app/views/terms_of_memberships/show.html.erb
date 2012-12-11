@@ -23,23 +23,45 @@
   </tr>
 </table>
 
-  <table class="table table-bordered table-condensed" id="table_payment_gateway_configuration">
-    <thead>
-    <tr
-      <% if @payment_gateway_configuration_development.nil? %>
-        class="red"
-      <% end %>
-    >
-      <th> <%= @payment_gateway_configuration_development.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_development') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_development') %> </th>
-    </tr>
-    <tr
-      <% if @payment_gateway_configuration_production.nil? %>
-        class="red"
-      <% end %>
-    >
-      <th> <%= @payment_gateway_configuration_production.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_production') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_production') %>  </th>
-    </tr>
-    </thead>
-  </table>
+<table class="table table-bordered table-condensed" id="table_payment_gateway_configuration">
+  <thead>
+  <tr
+    <% if @payment_gateway_configuration_development.nil? %>
+      class="red"
+    <% end %>
+  >
+    <th> <%= @payment_gateway_configuration_development.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_development') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_development') %> </th>
+  </tr>
+  <tr
+    <% if @payment_gateway_configuration_production.nil? %>
+      class="red"
+    <% end %>
+  >
+    <th> <%= @payment_gateway_configuration_production.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_production') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_production') %>  </th>
+  </tr>
+  </thead>
+</table>
 
-  <%= link_to t('buttons.return_to_member_show'), show_member_path, :class => 'btn' %>
+<table class="table table-bordered table-condensed" id="table_email_template">
+  <thead>
+    <tr> <th colspan="3"> <%= t('activerecord.email_template') %> </th> </tr>
+    <tr>
+  	  <th> <%= t('activerecord.attributes.email_template.name') %> </th>
+  	  <th> <%= t('activerecord.attributes.email_template.type') %> </th>
+     	<th> <%= t('activerecord.attributes.email_template.client') %> </th>
+      <th> <%= t('activerecord.attributes.email_template.external_attributes')%>
+    </tr>
+  </thead>
+  <tbody>
+  	<% @email_templates.each do |et| %>
+  	<tr>
+  	  <td> <%= et.name %> </td>
+  	  <td> <%= et.template_type%> </td>
+  	  <td> <%= et.client %> </td>
+      <td> <%= et.external_attributes.to_s %> </td>
+  	</tr>
+  	<% end %>
+  </tbody>
+</table>
+
+<%= link_to t('buttons.return_to_member_show'), show_member_path, :class => "btn" %>

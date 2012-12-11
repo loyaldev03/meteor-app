@@ -1,5 +1,5 @@
 <%= render :partial => "shared/member_information" %>
-<%= form_for @operation, :as => :operation, :url => operation_path(:id => @operation), do |f|%>
+<%= form_for @operation, :as => :operation, :url => operation_path(:id => @operation) do |f|%>
 <table class="table table-bordered">
 	<tr>
 	  <td colspan="2"> <%= t('activerecord.attributes.operation.operation_date') %>: <%= @operation.operation_date %></td>

@@ -136,7 +136,7 @@ class Transaction < ActiveRecord::Base
       sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
       sale_transaction.save
       Auditory.audit(agent, trans, "Credit success $#{amount}", sale_transaction.member, Settings.operation_types.credit)
-      sale_transaction.member.sync_to_pardot({ refund_amount: amount })
+      Communication.deliver!(:refund, sale_transaction.member)
     else
       Auditory.audit(agent, trans, "Credit $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
     end

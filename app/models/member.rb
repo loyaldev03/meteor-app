@@ -9,6 +9,7 @@ class Member < ActiveRecord::Base
   has_many :credit_cards
   has_many :transactions, :order => "created_at ASC"
   has_many :operations
+  has_many :communications
   has_many :fulfillments
   has_many :club_cash_transactions
   has_many :enrollment_infos, :order => "created_at DESC"
@@ -119,6 +120,10 @@ class Member < ActiveRecord::Base
     after_transition [ :none, :provisional, :active ] => # none is new join. provisional and active are save the sale
                         :applied, :do => [:set_join_date, :send_active_needs_approval_email]
     ###### <<<<<<========
+    ###### member gets active =====>>>>
+    after_transition :provisional => 
+                        :active, :do => :send_active_email
+    ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
                         :provisional, :do => 'schedule_first_membership(true)'
@@ -173,6 +178,11 @@ class Member < ActiveRecord::Base
 
   def save_state
     save(:validate => false)
+  end
+
+  # Sends the activation mail.
+  def send_active_email
+    Communication.deliver!(:active, self)
   end
 
   # Sends the request mail to every representative to accept/reject the member.
@@ -362,6 +372,7 @@ class Member < ActiveRecord::Base
           trans.prepare(self, acc, amount, terms_of_membership.payment_gateway_configuration)
           answer = trans.process
           if trans.success?
+            acc.save # lets update year if we recycle this member
             assign_club_cash!
             set_as_active!
             schedule_renewal
@@ -504,6 +515,10 @@ class Member < ActiveRecord::Base
       Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing)
       { :message => message, :code => Settings.error_codes.member_not_saved }
     end
+  end
+
+  def send_pre_bill
+    Communication.deliver!(:prebill, self) if can_bill_membership?
   end
   
   def send_fulfillment
@@ -862,10 +877,18 @@ class Member < ActiveRecord::Base
       elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
         # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
         new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
-        answer = new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
-        if answer[:code] == Settings.error_codes.success
-          # activate new credit card ONLY if expire date was updated.
-          new_active_credit_card.set_as_active!
+        answer = {}
+        CreditCard.transaction do 
+          begin
+            answer = new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
+            if answer[:code] == Settings.error_codes.success
+              # activate new credit card ONLY if expire date was updated.
+              new_active_credit_card.set_as_active!
+            end
+          rescue Exception => e
+            Airbrake.notify(:error_class => "Members::update_credit_card_from_drupal", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :new_active_credit_card => new_active_credit_card.inspect, :member => self.inspect })
+            raise ActiveRecord::Rollback
+          end
         end
         answer
       elsif credit_cards.select { |cc| cc.active }.empty? # its not my credit card. its from another member. the question is. can I use it?
@@ -987,6 +1010,7 @@ class Member < ActiveRecord::Base
       self.bill_date = nil
       self.recycled_times = 0
       self.save(:validate => false)
+      Communication.deliver!(:cancellation, self)
       Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
     end
 

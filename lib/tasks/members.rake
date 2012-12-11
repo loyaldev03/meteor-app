@@ -9,6 +9,30 @@ namespace :billing do
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
   end
+
+  desc "Send prebill emails"
+  # This task should be run each day at 3 am ?
+  task :send_prebill => :environment do
+    tall = Time.zone.now
+    begin
+      # We use bill_date because we will only send this email once!
+      Member.find_in_batches(:conditions => [" date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
+        group.each do |member| 
+          tz = Time.zone.now
+          begin
+            Rails.logger.info "  * processing member ##{member.uuid}"
+            member.send_pre_bill
+          rescue Exception => e
+            Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        end
+      end
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}"
+    end
+  end
 end
 
 namespace :members do
@@ -54,6 +78,66 @@ namespace :members do
     end
   end
 
+  desc "Send Happy birthday email to members"
+  # This task should be run each day at 3 am ?
+  task :send_happy_birthday => :environment do
+    tall = Time.zone.now
+    begin
+      base = Member.where(" date(birth_date) = ? and status IN (?) ", Time.zone.now.to_date, [ 'active', 'provisional' ])
+      Rails.logger.info " *** Starting members:send_happy_birthday rake task, processing #{base.count} members"
+      base.find_in_batches do |group|
+        group.each do |member| 
+          tz = Time.zone.now
+          begin
+            Rails.logger.info "  * processing member ##{member.uuid}"
+            Communication.deliver!(:birthday, member)
+          rescue Exception => e
+            Airbrake.notify(:error_class => "Members::send_happy_birthday", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        end
+      end
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}"
+    end
+  end
+
+  desc "Send pillar emails"
+  task :send_pillar_emails => :environment do 
+    tall = Time.zone.now
+    begin
+      # TODO: join EmailTemplate and Member querys
+      EmailTemplate.find_in_batches(:conditions => " template_type = 'pillar' ") do |group|
+        group.each do |template| 
+          tz = Time.zone.now
+          begin
+            Rails.logger.info "  * processing template ##{template.id}"
+            Membership.find_in_batches(:conditions => 
+                [ " join_date = ? AND terms_of_membership_id = ? AND status = 'active' ", 
+                  Time.zone.now.to_date - template.days_after_join_date.days, 
+                  template.terms_of_membership_id ]) do |group1|
+              group1.each do |membership| 
+                begin
+                  Rails.logger.info "  * processing member ##{membership.member_id}"
+                  Communication.deliver!(template, membership.member)
+                rescue Exception => e
+                  Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect, :membership => membership.inspect })
+                  Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+                end
+              end
+            end
+          rescue Exception => e
+            Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect })
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for template ##{template.id}"
+        end
+      end
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}"
+    end
+  end
 
   desc "Set cc_type on each active credit card."
   task :update_cc_type => :environment do 
@@ -73,7 +157,7 @@ namespace :members do
               credit_card.save
             end
           rescue Exception => e
-            Airbrake.notify(:error_class => "Members::CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :credit_card => credit_card.inspect })
+            Airbrake.notify(:error_class => "Members::CreditCard", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :credit_card => credit_card.inspect, :member => credit_card.member.inspect })
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
           end
           Rails.logger.info "    ... took #{Time.zone.now - tz} for credit_card ##{credit_card.id}"

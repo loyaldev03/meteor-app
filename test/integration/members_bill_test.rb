@@ -124,6 +124,7 @@ class MembersBillTest < ActionController::IntegrationTest
       
       within("#operations_table") do 
         wait_until {
+          assert page.has_content?("Communication 'Test refund' sent")
           assert page.has_content?("Credit success $#{final_amount}")
         }
       end
@@ -245,6 +246,7 @@ class MembersBillTest < ActionController::IntegrationTest
     
     within("#operations_table") do 
       wait_until {
+        assert page.has_content?("Communication 'Test refund' sent")
         assert page.has_content?("Credit success $#{final_amount}")
       }
     end
@@ -294,7 +296,7 @@ class MembersBillTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
-    next_bill_date = @saved_member.current_membership.join_date + eval(@terms_of_membership_with_gateway.provisional_days)
+    next_bill_date = @saved_member.current_membership.join_date + @terms_of_membership_with_gateway.provisional_days
     
     within("#td_mi_next_retry_bill_date")do
       wait_until{ assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date)) }
@@ -544,6 +546,40 @@ test "Partial refund from CS" do
       wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed)) }
     end
   end 
+
+  #Send Prebill email (7 days before NBD)
+  test "Send Prebill email (7 days before NBD)" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }    
+    @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
+    @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
+    
+    sleep 1   
+    Member.find_in_batches(:conditions => [" date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
+      group.each do |member| 
+        @saved_member.send_pre_bill
+      end
+    end
+    sleep 1
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#communication") do
+      wait_until {
+        assert page.has_content?("Test prebill")
+        assert page.has_content?("prebill")
+        assert_equal(Communication.last.template_type, 'prebill')
+      }
+    end
+   
+    within("#operations_table") do
+      wait_until {
+        assert page.has_content?("Communication 'Test prebill' sent")
+      }
+    end
+  end
+
 end
 
 

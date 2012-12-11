@@ -209,7 +209,7 @@ module Drupal
 
       # Add credit card information
       cc = m.active_credit_card
-      if cc and cc.am_card.valid?
+      if cc and (self.new_record? or (not self.new_record? and cc.am_card.valid?))
         map.merge!({
           field_profile_cc_month: {
             und: { value: "%02d" % cc.expire_month.to_s }
