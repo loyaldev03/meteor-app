@@ -801,6 +801,30 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def self.process_sync 
+    Member.find_in_batches( :conditions => ("sync_status IN ('with_error', 'not_synced')") ) do |group|
+      group.each do |member|
+        Rails.logger.info "  * processing member ##{member.uuid}"
+        api_m = member.api_member
+        if api_m.save!(force: true)
+          unless member.last_sync_error_at
+            Auditory.audit(nil, "Member synchronized by batch script", message, member)
+          end
+        end
+      end
+    end
+  end
+
+  def self.process_email_sync_error
+    member_list = []
+    Member.find_in_batches( :conditions => ("sync_status = 'with_error' AND last_sync_error like 'The e-mail address%is already taken.%'") ) do |group|
+      group.each do |member|
+        member_list << member
+      end
+    end  
+    Notifier.members_with_duplicated_email_sync_error(member_list).deliver!
+  end
+
   def self.supported_states(country='US')
     if country == 'US'
       Carmen::Country.coded('US').subregions.select{ |s| %w{AK AL AR AZ CA CO CT DE FL 
@@ -808,7 +832,7 @@ class Member < ActiveRecord::Base
         OK OR PA RI SC SD TN TX UT VA VI VT WA WI WV WY}.include?(s.code) }
     else
       Carmen::Country.coded('CA').subregions.select{ |s| %w{AB BC MB NB NL NS ON PE QC 
-        SK}.include(s.code) }
+        SK}.include?(s.code) }
     end
   end
 
