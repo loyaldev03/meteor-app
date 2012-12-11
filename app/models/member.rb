@@ -372,6 +372,7 @@ class Member < ActiveRecord::Base
           trans.prepare(self, acc, amount, terms_of_membership.payment_gateway_configuration)
           answer = trans.process
           if trans.success?
+            acc.save # lets update year if we recycle this member
             assign_club_cash!
             set_as_active!
             schedule_renewal

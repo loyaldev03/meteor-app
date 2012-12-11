@@ -246,7 +246,31 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "03/05/2012"
   end
 
-  test "Recycle credit card" do
+
+  test "Recycle credit card with billing success" do
+    @club = @terms_of_membership_with_gateway.club
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+    original_year = (Time.zone.now - 2.years).year
+    member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
+    member.reload
+    assert_difference('CreditCard.count', 0) do
+      assert_difference('Operation.count', 5) do
+        assert_difference('Transaction.count') do
+          assert_equal member.recycled_times, 0
+          answer = member.bill_membership
+          member.reload
+          assert_equal answer[:code], Settings.error_codes.success
+          assert_equal original_year+3, member.transactions.last.expire_year
+          assert_equal member.recycled_times, 0
+          assert_equal Operation.find_all_by_operation_type(Settings.operation_types.automatic_recycle_credit_card).size, 1
+          assert_equal member.credit_cards.count, 1 # only one credit card
+          assert_equal member.credit_cards.first.expire_year, original_year+3 # expire_year should be updated.
+        end
+      end
+    end
+  end
+
+  test "Recycle credit card twice" do
     @club = @terms_of_membership_with_gateway.club
     member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
