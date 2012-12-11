@@ -15,7 +15,7 @@ class CreditCardsController < ApplicationController
     response = @current_member.update_credit_card_from_drupal(params[:credit_card], @current_agent)
 
     if response[:code] == Settings.error_codes.success
-      @current_member.after_save_sync_to_remote_domain('credit_card_update')
+      @current_member.api_member.save!(force: true) rescue nil
       redirect_to show_member_path(:id => @current_member), notice: response[:message]
     else
       flash.now[:error] = "#{response[:message]} #{response[:errors].to_s}"
@@ -26,7 +26,7 @@ class CreditCardsController < ApplicationController
   def activate
   	new_credit_card = CreditCard.find(params[:credit_card_id])
     new_credit_card.set_as_active!
-    @current_member.after_save_sync_to_remote_domain('credit_card_update')
+    @current_member.api_member.save!(force: true) rescue nil
     message = "Credit card #{new_credit_card.last_digits} activated."
     Auditory.audit(@current_agent, new_credit_card, message, @current_member)
     redirect_to show_member_path(:id => @current_member), notice: message
