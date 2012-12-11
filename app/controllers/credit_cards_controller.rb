@@ -15,6 +15,7 @@ class CreditCardsController < ApplicationController
     response = @current_member.update_credit_card_from_drupal(params[:credit_card], @current_agent)
 
     if response[:code] == Settings.error_codes.success
+      @current_member.after_save_sync_to_remote_domain('credit_card_update')
       redirect_to show_member_path(:id => @current_member), notice: response[:message]
     else
       flash.now[:error] = "#{response[:message]} #{response[:errors].to_s}"
@@ -24,16 +25,14 @@ class CreditCardsController < ApplicationController
 
   def activate
   	new_credit_card = CreditCard.find(params[:credit_card_id])
-  	former_credit_card = @current_member.active_credit_card
-
-    # TODO: we NEED transactions!!!    
-    if new_credit_card.activate && former_credit_card.deactivate
-      message = "Credit card #{new_credit_card.last_digits} activated."
-      Auditory.audit(@current_agent, new_credit_card, message, @current_member)
-      redirect_to show_member_path(:id => @current_member), notice: message
-    else
-      redirect_to show_member_path(:id => @current_member), error: new_credit_card.errors
-    end
+    new_credit_card.set_as_active!
+    @current_member.after_save_sync_to_remote_domain('credit_card_update')
+    message = "Credit card #{new_credit_card.last_digits} activated."
+    Auditory.audit(@current_agent, new_credit_card, message, @current_member)
+    redirect_to show_member_path(:id => @current_member), notice: message
+  rescue Exception => e
+    Airbrake.notify(:error_class => "CreditCardsController::activate", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :params => params.inspect })
+    redirect_to show_member_path(:id => @current_member), error: e
   end
 
 end
