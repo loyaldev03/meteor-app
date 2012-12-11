@@ -111,17 +111,7 @@ namespace :members do
   task :process_sync => :environment do
     tall = Time.zone.now
     begin
-      Member.find_in_batches( :conditions => ("sync_status IN ('with_error', 'not_synced')") ) do |group|
-        group.each do |member|
-          Rails.logger.info "  * processing member ##{member.uuid}"
-          api_m = member.api_member
-          if api_m.save!(force: true)
-            unless member.last_sync_error_at
-              Auditory.audit(nil, "Member synchronized by batch script", message, member)
-            end
-          end
-        end
-      end
+      Member.process_sync
     ensure 
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
@@ -130,14 +120,11 @@ namespace :members do
   desc "Process members with duplicated emails errors on sync"
   # This task should be run every X hours. 
   task :process_email_sync_error => :environment do
+    tall = Time.zone.now
     begin
-      member_list = []
-      Member.find_in_batches( :conditions => ("sync_status = 'with_error' AND last_sync_error like 'The e-mail address%is already taken.%'") ) do |group|
-        group.each do |member|
-          member_list << member
-        end
-      end  
-      Notifier.members_with_duplicated_email_sync_error(member_list).deliver!
+      Member.process_email_sync_error
+    ensure 
+      Rails.logger.info "It all took #{Time.zone.now - tall}"
     end 
   end
 end
