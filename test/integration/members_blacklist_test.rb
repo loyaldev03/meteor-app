@@ -71,7 +71,6 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     click_on 'Blacklist'
-
     select(@member_blacklist_reason.name, :from => 'reason')
     confirm_ok_js
     click_on 'Blacklist member'
@@ -104,7 +103,6 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     assert active_credit_card.blacklisted == true
     assert @saved_member.blacklisted? == true
   end
-
 
   test "blacklist member width more CC" do
     setup_member
@@ -174,8 +172,6 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     }
 
     assert Member.count == 1
-    #leep(555555)
-  
   end
 
   test "create member width blacklist email" do

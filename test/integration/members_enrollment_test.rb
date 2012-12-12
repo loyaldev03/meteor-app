@@ -504,7 +504,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     alert_ok_js
     click_link_or_button 'Create Member'
     within("#error_explanation")do
-      wait_until{table_information
+      wait_until{
         assert page.has_content?("email: is invalid"), "Failure on email validation message"
       }
     end    
