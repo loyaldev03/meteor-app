@@ -9,7 +9,8 @@ class EmailTemplate < ActiveRecord::Base
     :prebill, # sent 7 days before we bill member
     :refund, # sent when CS does a refund.
     :birthday, # sent if birthday is on enrollment_info
-    :pillar # emails sent after join date. they use days_after_join_date attribute
+    :pillar, # emails sent after join date and active status. they use days_after_join_date attribute
+    :pillar_provisional # emails sent after join date and provisional status. they use days_after_join_date attribute
   ]
 
   CLIENTS = [ :amazon, :action_mailer, :lyris ]
