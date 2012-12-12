@@ -10,7 +10,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     init_test_setup
   end
 
-  def setup_member
+  def setup_member(create_new_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
@@ -19,8 +19,9 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     @member_blacklist_reason =  FactoryGirl.create(:member_blacklist_reason)
     FactoryGirl.create(:batch_agent)
 
-    @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
-    
+    if create_new_member
+      @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
+    end
     sign_in_as(@admin_agent)
   end
 
@@ -102,7 +103,6 @@ class MembersBlacklistTest < ActionController::IntegrationTest
 
     assert active_credit_card.blacklisted == true
     assert @saved_member.blacklisted? == true
-    
   end
 
 
@@ -243,10 +243,149 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     @saved_member.reload
     
     text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
-    assert page.has_content?(text_reason)
-
-    assert page.has_content?("Blacklisted!!!")
+    wait_until{
+      assert page.has_content?(text_reason)
+      assert page.has_content?("Blacklisted!!!")
+      assert_equal @saved_member.blacklisted, true
+    }
   end
 
+
+  test "Blacklist a member with status Active" do
+    setup_member
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Blacklist'
+
+    select(@member_blacklist_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_on 'Blacklist member'
+
+    @saved_member.reload
+    
+    text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
+    assert page.has_content?(text_reason)
+
+    assert page.has_content?("Blacklisted")
+
+    within("#td_mi_cancel_date") do
+      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
+    end
+
+    within("#operations_table") do
+      wait_until {
+        assert page.has_content?("Automatic cancellation")
+        assert page.has_content?(text_reason)
+      }
+    end
+    
+    active_credit_card = @saved_member.active_credit_card
+    within("#credit_cards") { 
+      assert page.has_content?("#{active_credit_card.number}") 
+      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
+      assert page.has_content?("Blacklisted active")
+    }
+
+    wait_until{
+      assert page.has_content?(text_reason)
+      assert page.has_content?("Blacklisted!!!")
+      assert_equal @saved_member.blacklisted, true
+    }
+  end
+
+  test "Blacklist a member with status Provisional" do
+    setup_member(false)
+    @saved_member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc, nil, {}, { :created_by => @admin_agent })
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Blacklist'
+
+    select(@member_blacklist_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_on 'Blacklist member'
+
+    @saved_member.reload
+    
+    text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
+    assert page.has_content?(text_reason)
+
+    assert page.has_content?("Blacklisted")
+
+    within("#td_mi_cancel_date") do
+      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
+    end
+
+    within("#operations_table") do
+      wait_until {
+        assert page.has_content?("Automatic cancellation")
+        assert page.has_content?(text_reason)
+      }
+    end
+    
+    active_credit_card = @saved_member.active_credit_card
+    within("#credit_cards") { 
+      assert page.has_content?("#{active_credit_card.number}") 
+      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
+      assert page.has_content?("Blacklisted active")
+    }
+
+    wait_until{
+      assert page.has_content?(text_reason)
+      assert page.has_content?("Blacklisted!!!")
+      assert_equal @saved_member.blacklisted, true
+    }
+  end
+
+  test "Blacklist a member with status Applied" do
+    setup_member(false)
+    @saved_member = create_active_member(@terms_of_membership_with_gateway, :applied_member, nil, {}, { :created_by => @admin_agent })
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Blacklist'
+
+    select(@member_blacklist_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_on 'Blacklist member'
+
+    @saved_member.reload
+    
+    text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
+    assert page.has_content?(text_reason)
+
+    assert page.has_content?("Blacklisted")
+
+    within("#td_mi_cancel_date") do
+      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
+    end
+
+    within("#operations_table") do
+      wait_until {
+        assert page.has_content?("Automatic cancellation")
+        assert page.has_content?(text_reason)
+      }
+    end
+    
+    active_credit_card = @saved_member.active_credit_card
+    within("#credit_cards") { 
+      assert page.has_content?("#{active_credit_card.number}") 
+      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
+      assert page.has_content?("Blacklisted active")
+    }
+
+    wait_until{
+      assert page.has_content?(text_reason)
+      assert page.has_content?("Blacklisted!!!")
+      assert_equal @saved_member.blacklisted, true
+    }
+  end
+
+  test "Do not allow recover Blacklist member" do
+    setup_member
+    @saved_member.update_attribute(:blacklisted,true)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
+    wait_until { assert find(:xpath, "//a[@id='blacklist_btn' and @disabled='disabled']") }
+  end
 
 end
