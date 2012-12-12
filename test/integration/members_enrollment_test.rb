@@ -504,7 +504,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     alert_ok_js
     click_link_or_button 'Create Member'
     within("#error_explanation")do
-      wait_until{
+      wait_until{table_information
         assert page.has_content?("email: is invalid"), "Failure on email validation message"
       }
     end    
@@ -526,14 +526,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     within("#table_email_template")do
       wait_until{
-        assert page.has_content?('Test welcome')
-        assert page.has_content?('Test active')
-        assert page.has_content?('Test cancellation')
-        assert page.has_content?('Test prebill ')
-        assert page.has_content?('Test prebill_renewal')
-        assert page.has_content?('Test refund')
-        assert page.has_content?('Test birthday')
-        assert page.has_content?('Test pillar')
+        EmailTemplate::TEMPLATE_TYPES.each do |type|
+          assert page.has_content?("Test #{type}")
+        end 
+        EmailTemplate.find_all_by_terms_of_membership_id(@saved_member.terms_of_membership.id).each do |et|
+          assert page.has_content?(et.client)
+          assert page.has_content?(et.template_type)
+          assert page.has_content?(et.external_attributes.to_s)
+        end 
       }
     end    
   end
@@ -554,16 +554,16 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     within("#table_email_template")do
       wait_until{
-        assert page.has_content?('Test welcome')
-        assert page.has_content?('Test active')
-        assert page.has_content?('Test cancellation')
-        assert page.has_content?('Test prebill ')
-        assert page.has_content?('Test prebill_renewal')
-        assert page.has_content?('Test refund')
-        assert page.has_content?('Test birthday')
-        assert page.has_content?('Test pillar')
+        EmailTemplate::TEMPLATE_TYPES.each do |type|
+          assert page.has_content?("Test #{type}")
+        end 
+        EmailTemplate.find_all_by_terms_of_membership_id(@saved_member.terms_of_membership.id).each do |et|
+          assert page.has_content?(et.client)
+          assert page.has_content?(et.template_type)
+          assert page.has_content?(et.external_attributes.to_s)
+        end 
       }
-    end    
+    end 
     click_link_or_button('Return to member show')
     wait_until{
       assert find_field('input_visible_id').value == "#{@saved_member.visible_id}"
@@ -1252,6 +1252,4 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
     end
   end
-
-  
 end
