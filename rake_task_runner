@@ -24,7 +24,7 @@ cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_club_cash  >> $LOGFI
 # uncomment the following line with a test MeS account configured
 # cd /var/www/$2/current && RAILS_ENV=$1 rake mes:account_updater_send_file_to_process  >> $LOGFILE 2>&1 &
 
-cd /var/www/$2/current && RAILS_ENV=$1 rake members:send_prebill  >> $LOGFILE 2>&1 &
+cd /var/www/$2/current && RAILS_ENV=$1 rake billing:send_prebill  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_fulfillments  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:update_cc_type  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:sync_members_to_pardot  >> $LOGFILE 2>&1 &
