@@ -3,19 +3,33 @@ class Notifier < ActionMailer::Base
   default bcc: "platformadmins@xagax.com"
   
   def pre_bill(email)
-    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "Pre bill email to #{email}"
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "Pre bill email to #{email}"
   end
 
   def cancellation(email)
-    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "cancellation to #{email}"
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "cancellation to #{email}"
   end
 
   def active(email)
-    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "active to #{email}"
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "active to #{email}"
   end
 
   def refund(email)
-    mail :to => Settings.email_to_use_on_action_mailer_as_recipient, :subject => "refund to #{email}"
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "refund to #{email}"
+  end
+
+  def pillar(email)
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "pillar to #{email}"
+  end
+
+  def pillar_provisional(email)
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "pillar_provisional to #{email}"
   end
 
   def active_with_approval(agent,member)

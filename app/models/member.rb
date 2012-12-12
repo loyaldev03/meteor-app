@@ -520,7 +520,7 @@ class Member < ActiveRecord::Base
   def send_pre_bill
     Communication.deliver!(:prebill, self) if can_bill_membership?
   end
-  
+
   def send_fulfillment
     # we always send fulfillment to new members or members that do not have 
     # opened fulfillments (meaning that previous fulfillments expired).
@@ -778,6 +778,36 @@ class Member < ActiveRecord::Base
       end
     end
     file.flock(File::LOCK_UN)
+  end
+
+  def self.send_pillar_emails(type, status)
+    # TODO: join EmailTemplate and Member querys
+    EmailTemplate.find_in_batches(:conditions => [" template_type = ? ", type]) do |group|
+      group.each do |template| 
+        tz = Time.zone.now
+        begin
+          Rails.logger.info "  * processing template ##{template.id}"
+          Membership.find_in_batches(:conditions => 
+              [ " join_date = ? AND terms_of_membership_id = ? AND status = ? ", 
+                Time.zone.now.to_date - template.days_after_join_date.days, 
+                template.terms_of_membership_id, status ]) do |group1|
+            group1.each do |membership| 
+              begin
+                Rails.logger.info "  * processing member ##{membership.member_id}"
+                Communication.deliver!(template, membership.member)
+              rescue Exception => e
+                Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect, :membership => membership.inspect })
+                Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+              end
+            end
+          end
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for template ##{template.id}"
+      end
+    end
   end
 
   # Method used from rake task and also from tests!

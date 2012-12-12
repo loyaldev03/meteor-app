@@ -8,7 +8,7 @@
 # "Email Name ","MLID","Trigger ID","Corresponding Event Name","Recurring","Before or After","Day","Notes"
 
 @annual_sloop = [
-  [ "Welcome E-mail SLOOP",47386,6411,"Join","no","After",0, nil ],
+  #[ "Welcome E-mail SLOOP",47386,6411,"Join","no","After",0, nil ],
   [ "Activation E-mail", 47386, 9400, nil ,"no", nil ,nil ],
   [ "Trial Comm-Day 7",47386,6417,"Join","no","After",7,],
   [ "Pre Bill",47623,6426,"NBD","yes","Before",7,],
@@ -21,16 +21,16 @@
   [ "Renewal Pre Bill",47623,6427,"NBD; Member > 350 days","yes","Before",7,],
   [ "ONMC Newsletter - Annual Activated",116804,"-","Every Thursday","yes",],
   [ "ONMC Newsletter - Annual Not Activated",116804,"-","Every Thursday","yes",],
-  [ "Forgot Password - Customer Service Initiated",9398,183590,"?","no","After",0,nil],
-  [ "Forgot Password - Member Initiated at ONMC.COM",9399,183590,"?","no","After",0,nil],
+  #[ "Forgot Password - Customer Service Initiated",9398,183590,"?","no","After",0,nil],
+  #[ "Forgot Password - Member Initiated at ONMC.COM",9399,183590,"?","no","After",0,nil],
   [ "Active Member Birthday E-mail",6434,47528,"?","yes","After","Platform: Birthday",nil],
   [ "Local Chapter Newsletter",116804,"-","Monthly - 2nd Tuesday","yes",]
 ]
 
 # rename 'Renewal Pre Bill" =>  to "Pre Bill" only on this csv
 @annual_join_now = [
-  [ "Welcome E-mail SLOOP",47386,6411,"Join","no","After",0,],
-  [ "Welcome E-mail Canadians",47386,6412,"Join","no","After",0],
+  #[ "Welcome E-mail SLOOP",47386,6411,"Join","no","After",0,],
+  #[ "Welcome E-mail Canadians",47386,6412,"Join","no","After",0],
   [ "Activation E-mail",47386,9400,nil,"no",nil,nil],
   [ "Pillar 1 - Deals & Discounts",47386,6418,"Join","no","After",2,],
   [ "Pillar 2 - Content",47386,6419,"Join","no","After",4,],
@@ -42,15 +42,15 @@
   [ "Pre Bill",47623,6427,"NBD; Member > 350 days","yes","Before",7,],
   [ "ONMC Newsletter - Annual Activated",116804,"-","Every Thursday","yes",],
   [ "ONMC Newsletter - Annual Not Activated",116804,"-","Every Thursday","yes",],
-  [ "Forgot Password - Customer Service Initiated",9398,183590,"?","no","After",0,],
-  [ "Forgot Password - Member Initiated at ONMC.COM",9399,183590,"?","no","After",0,],
+  #[ "Forgot Password - Customer Service Initiated",9398,183590,"?","no","After",0,],
+  #[ "Forgot Password - Member Initiated at ONMC.COM",9399,183590,"?","no","After",0,],
   [ "Active Member Birthday E-mail",6434,47528,"?","yes","After","Platform: Birthday",],
   [ "Local Chapter Newsletter",116804,"-","Monthly - 2nd Tuesday","yes",nil,nil,nil]
 ]
 
 @annual_ptx = [
-  [ "Welcome E-mail PTX",47386,6414,"Join","no","After",0], 
-  [ "Welcome E-mail Canadians",47386,6412,"Join","no","After",0], 
+  #[ "Welcome E-mail PTX",47386,6414,"Join","no","After",0], 
+  #[ "Welcome E-mail Canadians",47386,6412,"Join","no","After",0], 
   [ "Activation E-mail",47386,9400,nil,"no",nil,nil ], 
   [ "Trial Comm-Day 7",47386,6417,"Join","no","After",7], 
   [ "Pre Bill",47623,6426,"NBD","yes","Before",7], 
@@ -63,14 +63,14 @@
   [ "Renewal Pre Bill",47623,6427,"NBD; Member > 350 days","yes","Before",7], 
   [ "ONMC Newsletter - Annual Activated",116804,"-","Every Thursday","yes",nil,nil ], 
   [ "ONMC Newsletter - Annual Not Activated",116804,"-","Every Thursday","yes",nil,nil ], 
-  [ "Forgot Password - Customer Service Initiated",9398,183590,"?","no","After",0], 
-  [ "Forgot Password - Member Initiated at ONMC.COM",9399,183590,"?","no","After",0], 
+  #[ "Forgot Password - Customer Service Initiated",9398,183590,"?","no","After",0], 
+  #[ "Forgot Password - Member Initiated at ONMC.COM",9399,183590,"?","no","After",0], 
   [ "Active Member Birthday E-mail",6434,47528,"?","yes","After","Platform: Birthday"], 
   [ "Local Chapter Newsletter",116804,"-","Monthly - 2nd Tuesday","yes",nil,nil ]
 ]
 
 @monthly_sloops = [
-  [ "Welcome E-mail SLOOP",47386,6411,"Join","no","After",0],
+  #[ "Welcome E-mail SLOOP",47386,6411,"Join","no","After",0],
   [ "Activation E-mail",47386,9400,nil ,"no",nil,nil ],
   [ "Pillar 1 - Deals & Discounts",47386,6418,"Join","no","After",2],
   [ "Pillar 2 - Content",47386,6419,"Join","no","After",4],
@@ -81,8 +81,8 @@
   [ "Cancel with Refund ",47386,19144,"Refund","no","After",0],
   [ "ONMC Newsletter - Monthly Activated",116804,"-","Every Thursday","yes",nil,nil ],
   [ "ONMC Newsletter - Monthly Not Activated",116804,"-","Every Thursday","yes",nil,nil ],
-  [ "Forgot Password - Customer Service Initiated",9398,183590,"?","no","After",0,nil],
-  [ "Forgot Password - Member Initiated at ONMC.COM",9399,183590,"?","no","After",0,nil],
+  #[ "Forgot Password - Customer Service Initiated",9398,183590,"?","no","After",0,nil],
+  #[ "Forgot Password - Member Initiated at ONMC.COM",9399,183590,"?","no","After",0,nil],
   [ "Active Member Birthday E-mail",6434,47528,"?","yes","After","Platform: Birthday",nil],
   [ "Local Chapter Newsletter",116804,"-","Monthly - 2nd Tuesday","yes",nil,nil ]
 ]
@@ -115,7 +115,7 @@ def upload_email_services(communications, tom_id)
     # elsif comm[0] == 'Renewal Pre Bill'
     #  type = :prebill_renewal
     elsif comm[0].include?('Trial Comm-Day 7')
-      type = :pillar
+      type = :pillar_trial
       days = comm[6]
     elsif comm[0].include?('Pillar')
       type = :pillar
