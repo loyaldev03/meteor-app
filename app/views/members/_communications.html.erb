@@ -19,7 +19,7 @@
   	  <td> 
   	  	<% if communication.sent_success %> 
   	      <i class ="icon-ok help" rel= "popover" data-toggle="modal" href="#myModal<%=communication.id%>" style="cursor: pointer"></i>
-        <% else %>
+        <% elsif not communication.sent_success and communication.processed_at %>
           <i class ="icon-remove help" rel= "popover" data-toggle="modal" href="#myModal<%=communication.id%>" style="cursor: pointer"></i>
         <% end %>
         <div id="myModal<%=communication.id%>" class="well modal hide" style="border: none;">
