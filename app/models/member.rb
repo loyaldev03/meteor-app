@@ -788,8 +788,8 @@ class Member < ActiveRecord::Base
         begin
           Rails.logger.info "  * processing template ##{template.id}"
           Membership.find_in_batches(:conditions => 
-              [ " join_date = ? AND terms_of_membership_id = ? AND status = ? ", 
-                Time.zone.now.to_date - template.days_after_join_date.days, 
+              [ " date(join_date) = ? AND terms_of_membership_id = ? AND status = ? ", 
+                (Time.zone.now - template.days_after_join_date.days).to_date, 
                 template.terms_of_membership_id, status ]) do |group1|
             group1.each do |membership| 
               begin
