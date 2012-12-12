@@ -109,33 +109,8 @@ namespace :members do
   task :send_pillar_emails => :environment do 
     tall = Time.zone.now
     begin
-      # TODO: join EmailTemplate and Member querys
-      EmailTemplate.find_in_batches(:conditions => " template_type = 'pillar' ") do |group|
-        group.each do |template| 
-          tz = Time.zone.now
-          begin
-            Rails.logger.info "  * processing template ##{template.id}"
-            Membership.find_in_batches(:conditions => 
-                [ " join_date = ? AND terms_of_membership_id = ? AND status = 'active' ", 
-                  Time.zone.now.to_date - template.days_after_join_date.days, 
-                  template.terms_of_membership_id ]) do |group1|
-              group1.each do |membership| 
-                begin
-                  Rails.logger.info "  * processing member ##{membership.member_id}"
-                  Communication.deliver!(template, membership.member)
-                rescue Exception => e
-                  Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect, :membership => membership.inspect })
-                  Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-                end
-              end
-            end
-          rescue Exception => e
-            Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect })
-            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for template ##{template.id}"
-        end
-      end
+      Member.send_pillar_emails('pillar', 'active')
+      Member.send_pillar_emails('pillar_provisional', 'provisional')
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end

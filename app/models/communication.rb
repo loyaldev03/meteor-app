@@ -76,6 +76,10 @@ class Communication < ActiveRecord::Base
       Notifier.pre_bill(email).deliver!
     when :refund
       Notifier.refund(email).deliver!
+    when :pillar
+      Notifier.pillar(email).deliver!
+    when :pillar_provisional
+      Notifier.pillar_provisional(email).deliver!
     else
       message = "Deliver action could not be done."
       Airbrake.notify(:error_class => "Communication Delivery", :error_message => message)      
