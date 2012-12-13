@@ -1,5 +1,6 @@
 class Admin::AgentsController < ApplicationController
   load_and_authorize_resource
+#  authorize_resource :agent
   skip_authorize_resource :only => :my_clubs
 
   # GET /agents
@@ -45,36 +46,10 @@ class Admin::AgentsController < ApplicationController
     end
   end
 
-  def cleanup_for_update!(hash)
-    if hash
-      if hash[:password].blank?
-        hash.delete(:password)
-        hash.delete(:password_confirmation)
-      end
-      if hash[:club_roles_attributes].present?
-        hash[:club_roles_attributes].reject! { |k,v| !v[:_destroy] && (v[:role].blank? || v[:club_id].blank?) }
-      end
-    end
-  end
-
   # DELETE /agents/1
   def destroy
     @agent.destroy
     redirect_to(admin_agents_url, :notice => 'Agent was successfully deleted.')
-  end
-
-  def lock
-    agent = Agent.find(params[:agent_id])
-    authorize! :write, agent
-    agent.lock_access!
-    redirect_to(admin_agents_path, :notice => "Agent number #{agent.id} - #{agent.username} - was locked.")
-  end
-
-  def unlock
-    agent = Agent.find(params[:agent_id])
-    authorize! :write, agent
-    agent.unlock_access!
-    redirect_to(admin_agents_path, :notice => "Agent number #{agent.id} - #{agent.username} - was unlocked.")
   end
 
   def my_clubs
@@ -83,4 +58,20 @@ class Admin::AgentsController < ApplicationController
       format.json { render json: MyClubsDatatable.new(view_context,nil,nil,nil,@current_agent) }
     end
   end
+
+  private
+
+    def cleanup_for_update!(hash)
+      if hash
+        if hash[:password].blank?
+          hash.delete(:password)
+          hash.delete(:password_confirmation)
+        end
+        if hash[:club_roles_attributes].present?
+          hash[:club_roles_attributes].reject! { |k,v| !v[:_destroy] && (v[:role].blank? || v[:club_id].blank?) }
+        end
+      end
+    end
+  
+
 end

@@ -38,7 +38,7 @@ class Agent < ActiveRecord::Base
   end
 
   def self.datatable_columns
-    [ 'id', 'email', 'username', 'locked_at', 'created_at' ]
+    [ 'id', 'email', 'username', 'created_at' ]
   end
 
   has_many :club_roles
@@ -48,9 +48,9 @@ class Agent < ActiveRecord::Base
   accepts_nested_attributes_for :club_roles,
     allow_destroy: true
 
-  def has_role_with_club?(role, club = nil)
-    club = club.to_param
-    self.has_role_without_club?(role) || club && self.role_for(role, club).present?
+  def has_role_with_club?(role, club_id = nil)
+    club_id = club_id.to_param
+    self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?
   end
   alias_method_chain :has_role?, :club
 
@@ -70,8 +70,12 @@ class Agent < ActiveRecord::Base
   alias_method_chain :add_role, :club
 
   def can?(*args)
-    @ability ||= Ability.new(self)
+    @ability ||= Ability.new(self, args[2])
     @ability.can?(*args)
+  end
+
+  def club_roles_without_api
+    self.club_roles.select(:club_id).where("role != 'api'").collect &:club_id
   end
 
   protected
