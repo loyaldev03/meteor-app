@@ -83,23 +83,7 @@ namespace :members do
   task :send_happy_birthday => :environment do
     tall = Time.zone.now
     begin
-      today = Time.zone.now.to_date
-      base = Member.where(" birth_date IS NOT NULL and DAYOFMONTH(birth_date) = ? and MONTH(birth_date) = ? and status IN (?) ", 
-        today.day, today.month, [ 'active', 'provisional' ])
-      Rails.logger.info " *** Starting members:send_happy_birthday rake task, processing #{base.count} members"
-      base.find_in_batches do |group|
-        group.each do |member| 
-          tz = Time.zone.now
-          begin
-            Rails.logger.info "  * processing member ##{member.uuid}"
-            Communication.deliver!(:birthday, member)
-          rescue Exception => e
-            Airbrake.notify(:error_class => "Members::send_happy_birthday", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
-        end
-      end
+      Member.send_happy_birthday
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
