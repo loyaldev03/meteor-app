@@ -45,7 +45,7 @@
           <%= f.fields_for :club_roles, @agent.club_roles do |role| %>
             <tr>
               <td><%= role.object.role %></td>
-              <td><%= role.object.club_id %></td>
+              <td><%= role.object.club_id %> <%= role.object.club.name %></td>
               <td>Delete &nbsp;<%= role.check_box '_destroy' %></td>
             </tr>
           <% end %>

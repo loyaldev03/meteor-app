@@ -51,7 +51,7 @@ $(document).ready( function() {
       "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 5 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 4 ] }],
       "sAjaxSource": $('#agents_table').data('source'),
     });
   }

@@ -2,7 +2,7 @@ class FulfillmentsController < ApplicationController
   before_filter :validate_club_presence
 
   def index
-    authorize! :report, Fulfillment
+    my_authorize! :report, Fulfillment, @current_club.id
     if request.post?
     	if params[:all_times] == '1'
         if params[:product_type] == 'KIT'
@@ -40,28 +40,28 @@ class FulfillmentsController < ApplicationController
   end
 
   def resend
-    authorize! :resend, Fulfillment
+    my_authorize! :resend, Fulfillment, @current_club.id
     render json: Fulfillment.find(params[:id]).resend(@current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
   end
 
   def mark_as_sent
-    authorize! :mark_as_sent, Fulfillment
+    my_authorize! :mark_as_sent, Fulfillment, @current_club.id
     render json: Fulfillment.find(params[:id]).mark_as_sent(@current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
   end
 
   def mark_as_wrong_address
-    authorize! :mark_as_wrong_address, Fulfillment
+    my_authorize! :mark_as_wrong_address, Fulfillment, @current_club.id
     render json: Fulfillment.find(params[:id]).member.set_wrong_address(@current_agent, params[:reason])
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
   end
 
   def generate_csv
-    authorize! :report, Fulfillment
+    my_authorize! :report, Fulfillment, @current_club.id
     if params[:product_type][0] == 'KIT'
       fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_kit
     elsif params[:product_type][0] == 'CARD'
@@ -80,7 +80,7 @@ class FulfillmentsController < ApplicationController
   end
 
   def generate_xls
-    authorize! :report, Fulfillment
+    my_authorize! :report, Fulfillment, @current_club.id
     if params[:product_type][0] == 'KIT'
       fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_kit
     elsif params[:product_type][0] == 'CARD'
@@ -99,4 +99,6 @@ class FulfillmentsController < ApplicationController
                  :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                  :disposition => "attachment; filename=miworkingfile2.xlsx"
   end
+
+
 end

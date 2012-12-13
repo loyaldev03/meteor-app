@@ -43,7 +43,7 @@
             <li>
               <% selected = @current_club ? [ members_path(@current_partner.prefix, @current_club.name) ] : nil %>
               <%= select_tag "change_partner",
-                options_for_select((@current_agent.has_role?('admin') ? Club.includes(:partner).all : @current_agent.clubs.includes(:partner)).collect{ |u| [ "#{u.partner.prefix} - #{u.name}", members_path(u.partner.prefix, u.name) ]}, 
+                options_for_select((@current_agent.has_role?('admin') ? Club.includes(:partner).all : Club.includes(:partner).find(@current_agent.club_roles_without_api)).collect{ |u| [ "#{u.partner.prefix} - #{u.name}", members_path(u.partner.prefix, u.name) ]}, 
                   selected ), 
                 :onchange => "window.open(this.options[this.selectedIndex].value, '_top')", :style => "margin-top: 5px;" %>
                 <%=  %>

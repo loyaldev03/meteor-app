@@ -81,21 +81,19 @@ class Api::MembersController < ApplicationController
   # @return [Hash] *errors*
   # 
   def create
-    authorize! :api_enroll, Member
-    tom = TermsOfMembership.find_by_id(params[:member][:terms_of_membership_id])  
-    if tom.nil?
-      render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
-    else
-      render json: Member.enroll(
-        tom, 
-        current_agent, 
-        params[:member][:enrollment_amount], 
-        params[:member], 
-        params[:member][:credit_card], 
-        params[:setter] && params[:setter][:cc_blank].to_s.to_bool, 
-        params[:setter] && params[:setter][:skip_api_sync].to_s.to_bool
-      )
-    end
+    tom = TermsOfMembership.find(params[:member][:terms_of_membership_id])  
+    my_authorize! :api_enroll, Member, tom.club_id
+    render json: Member.enroll(
+      tom, 
+      current_agent, 
+      params[:member][:enrollment_amount], 
+      params[:member], 
+      params[:member][:credit_card], 
+      params[:setter] && params[:setter][:cc_blank].to_s.to_bool, 
+      params[:setter] && params[:setter][:skip_api_sync].to_s.to_bool
+    )
+  rescue ActiveRecord::RecordNotFound
+    render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
   end
 
   # Method : PUT
@@ -140,11 +138,11 @@ class Api::MembersController < ApplicationController
   # @return [Hash] *errors*
   # 
   def update
-    authorize! :api_update, Member
     response = {}
     batch_update = params[:setter] && params[:setter][:batch_update] && params[:setter][:batch_update].to_s.to_bool
 
     member = Member.find(params[:id])
+    my_authorize! :api_update, Member, member.club_id
     member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync] && params[:setter][:skip_api_sync].to_s.to_bool
     member.api_id = params[:member][:api_id] if params[:member][:api_id].present? and batch_update
     member.wrong_address = nil if params[:setter][:wrong_address].to_s.to_bool unless params[:setter].nil?
@@ -228,8 +226,8 @@ class Api::MembersController < ApplicationController
   # @return [Integer] *code*
   #
   def show
-    authorize! :api_profile, Member
     member = Member.find(params[:id])
+    my_authorize! :api_profile, Member, member.club_id
     ei = member.enrollment_infos[0]
     ei = if ei.blank? 
       {} 

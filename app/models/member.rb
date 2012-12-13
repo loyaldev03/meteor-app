@@ -227,7 +227,7 @@ class Member < ActiveRecord::Base
       self.bill_date = membership.join_date
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
     end
-    self.save
+    self.save(:validate => false)
   end
 
   # Changes next bill date.

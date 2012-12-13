@@ -22,8 +22,12 @@ class ApplicationController < ActionController::Base
 
   private
 
+    def my_authorize!(action, what, club_id = nil)
+      raise CanCan::AccessDenied unless can?(action, what, club_id)
+    end
+
     def current_ability
-      @current_ability ||= Ability.new(current_agent)
+      Ability.new(current_agent, params[:club_id] || (@current_club.id rescue nil))
     end
 
     def validate_partner_presence

@@ -1,9 +1,9 @@
 class Ability
   include CanCan::Ability
 
-  def initialize(agent)
+  def initialize(agent, club_id = nil)
     
-    if agent.has_role? 'admin'
+    if agent.has_role_with_club? 'admin', club_id
       can :see_credit_card, CreditCard
       can :enroll_member, Agent
       can :undo_credit_card_blacklist, CreditCard
@@ -27,7 +27,7 @@ class Ability
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent
       can :see_sync_status, Member
-    elsif agent.has_role? 'representative'
+    elsif agent.has_role_with_club? 'representative', club_id
       can :manage, Member
       cannot :enroll, Member
       cannot :api_enroll, Member
@@ -36,15 +36,16 @@ class Ability
       can :manage, MemberNote
       can :manage_token_api, Agent
       can :see_credit_card_last_digits, CreditCard
-    elsif agent.has_role? 'supervisor'
+    elsif agent.has_role_with_club? 'supervisor', club_id
       can :manage, Member
+      can :read, Member
       can :api_enroll, Member
       can :api_update, Member
       cannot :api_profile, Member
       can :manage, MemberNote
       can :manage_token_api, Agent
       can :see_credit_card, CreditCard
-    elsif agent.has_role? 'api'
+    elsif agent.has_role_with_club? 'api', club_id
       can :api_enroll, Member
       can :api_update, Member
       can :api_profile, Member
@@ -52,11 +53,12 @@ class Ability
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Member
-    elsif agent.has_role? 'agency'
+    elsif agent.has_role_with_club? 'agency', club_id
       can :manage, Product
       can :read, Club
       can :read, Fulfillment
       can :report, Fulfillment
+      can :manage, Fulfillment
       can :read, Member
       can :search_result, Member
       cannot :enroll, Member

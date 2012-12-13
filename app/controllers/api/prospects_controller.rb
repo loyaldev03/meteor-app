@@ -64,6 +64,6 @@ class Api::ProspectsController < ApplicationController
 
   private
     def check_authentification
-      authorize! :manage_prospects_api, Prospect
+      my_authorize! :manage_prospects_api, Prospect, params[:club_id]
     end
 end

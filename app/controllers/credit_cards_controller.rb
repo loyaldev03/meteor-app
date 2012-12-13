@@ -1,7 +1,7 @@
 class CreditCardsController < ApplicationController
 	before_filter :validate_club_presence
 	before_filter :validate_member_presence
-  authorize_resource :credit_card
+  before_filter :check_authentification
 
   def new
     @credit_card = CreditCard.new
@@ -34,5 +34,10 @@ class CreditCardsController < ApplicationController
     Airbrake.notify(:error_class => "CreditCardsController::activate", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :params => params.inspect })
     redirect_to show_member_path(:id => @current_member), error: e
   end
+
+  private
+    def check_authentification
+      my_authorize! :manage, CreditCard, @current_club.id
+    end
 
 end

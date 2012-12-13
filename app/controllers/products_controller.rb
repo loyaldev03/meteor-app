@@ -1,6 +1,6 @@
 class ProductsController < ApplicationController
-  before_filter :check_permissions
   before_filter :validate_club_presence
+  before_filter :check_permissions
 
   # GET /products
   # GET /products.json
@@ -62,8 +62,7 @@ class ProductsController < ApplicationController
   private
 
     def check_permissions
-      authorize! :manage, Product.new     
+      my_authorize! :manage, Product, @current_club.id
     end
-
 
 end

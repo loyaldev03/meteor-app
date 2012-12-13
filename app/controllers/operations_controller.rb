@@ -3,6 +3,7 @@ class OperationsController < ApplicationController
   before_filter :validate_member_presence
 
   def index
+    my_authorize! :list, Operation, @current_club.id
     if request.post?
       filter = params[:filter]
     end
@@ -14,12 +15,13 @@ class OperationsController < ApplicationController
 
   # GET /operations/1
   def show
-    authorize! :edit, Operation
+    my_authorize! :edit, Operation, @current_club.id
     @operation = Operation.find(params[:id])
   end
 
   # PUT /operations/1
   def update
+    my_authorize! :edit, Operation, @current_club.id
     operation = Operation.find(params[:id])
     @link = (view_context.link_to "#{operation.id}", operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,operation.id))
     if operation.update_attributes(params[:operation])

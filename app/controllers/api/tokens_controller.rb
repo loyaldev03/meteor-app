@@ -66,7 +66,7 @@ class Api::TokensController < ApplicationController
 
   private
     def check_authentification
-      authorize! :manage_token_api, Member
+      my_authorize! :manage_token_api, Member
     end
 end
 

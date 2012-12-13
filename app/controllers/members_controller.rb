@@ -3,11 +3,10 @@ class MembersController < ApplicationController
 
   before_filter :validate_club_presence
   before_filter :validate_member_presence, :except => [ :index, :new, :search_result ]
-  authorize_resource :member
+  before_filter :check_permissions
   
   def index
     @countries = Carmen::Country.coded('US').subregions + Carmen::Country.coded('CA').subregions
-
     respond_to do |format|
       format.html 
       format.js 
@@ -344,5 +343,11 @@ class MembersController < ApplicationController
     Airbrake.notify(:error_class => "Member:resend_welcome", :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message
   end
+
+  private 
+    def check_permissions
+      my_authorize! params[:action], Member, @current_club.id
+    end
+
 end
 
