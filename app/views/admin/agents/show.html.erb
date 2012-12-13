@@ -74,9 +74,7 @@
   <% @agent.club_roles.each do |role| %>
     <li>
       <%= role.role %> for 
-      <%= link_to role.club do %>
-        Club#<%=role.club_id -%> <%=role.club.full_name -%>
-      <% end %>
+      <%= link_to "Club##{role.club_id} "+role.club.full_name, club_path(:partner_prefix => role.club.partner.prefix, :id => role.club.id) %>
     </li>
   <% end %>
 </ul>
