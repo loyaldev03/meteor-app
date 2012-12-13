@@ -23,6 +23,11 @@ class Member < ActiveRecord::Base
   self.primary_key = 'uuid'
 end
 
+class Membership < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "memberships" 
+end
+
 class Operation < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "operations" 
@@ -134,6 +139,15 @@ def delete_club_cash_transactions(member)
   @log.info "    ... took #{Time.now.utc - tz} to delete member's club cash transactions."
 end
 
+def delete_memberships(member)
+  tz = Time.now.utc
+  memberships = Membership.find_all_by_member_id(member.id)
+  memberships.each do |membership|
+    membership.delete
+  end
+  @log.info "    ... took #{Time.now.utc - tz} to delete member memberships."
+end
+
 def delete_enrollment_infos(member)
   tz = Time.now.utc
   enrollment_infos = EnrollmentInfo.find_all_by_member_id(member.id)
@@ -153,6 +167,7 @@ def delete_functions(member)
   delete_operations(member)
   delete_member_notes(member)
   delete_credit_cards(member)
+  delete_memberships(member)
   delete_transactions(member)
   delete_fulfillments(member)
   delete_club_cash_transactions(member)
