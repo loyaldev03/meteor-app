@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
       if @current_agent.has_role? 'admin'
         admin_partners_path
       else
-        admin_agent_my_clubs_path(@current_agent.id)
+        root_path
       end
     else
       new_agent_session_path

@@ -19,7 +19,6 @@ SacPlatform::Application.routes.draw do
     resources :agents do
       get :lock
       get :unlock
-      get :my_clubs
     end
   end
 
