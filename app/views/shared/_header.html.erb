@@ -7,7 +7,11 @@
         <span class="icon-bar"></span>
       </a>
 
-      <a class="brand" href="<%= root_path %>">SacPlatform</a>
+      <% if @current_agent.has_role?('admin') %>
+        <a class="brand" href="<%= root_path %>">SacPlatform</a>
+      <% else %>
+        <a class="brand" href="<%= admin_agent_my_clubs_path(:agent_id => @current_agent.id) %>">SacPlatform</a>        
+      <% end %>
 
       <% if current_agent %>
         <div class="container nav-collapse">
