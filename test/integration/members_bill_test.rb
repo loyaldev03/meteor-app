@@ -84,6 +84,7 @@ class MembersBillTest < ActionController::IntegrationTest
     sleep(5) #Wait for API response
   end
 
+  # Check Refund email -  It is send it by CS inmediate
   def bill_member(member, do_refund = true, refund_amount = nil)
     next_bill_date = member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)
 
@@ -135,11 +136,16 @@ class MembersBillTest < ActionController::IntegrationTest
           assert page.has_content?("Credit success $#{final_amount}")
         }
       end
-    
       within("#transactions_table") do 
         wait_until {
           assert page.has_content?("Credit : This transaction has been approved")
           assert page.has_content?(final_amount)
+        }
+      end
+      within("#communication") do 
+        wait_until {
+          assert page.has_content?("Test refund")
+          assert page.has_content?("refund")
         }
       end
     end
