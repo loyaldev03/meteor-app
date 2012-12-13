@@ -12,6 +12,8 @@ SacPlatform::Application.routes.draw do
     end
   end
 
+  match '/my_clubs' => 'admin/agents#my_clubs', as: 'my_clubs', :via => [:get]
+
   namespace :admin do
     resources :partners   
     resources :agents do
@@ -134,7 +136,7 @@ SacPlatform::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  root :to => 'admin/partners#index'
+  root :to => 'admin/agents#my_clubs'
 
   # See how all your routes lay out with "rake routes"
 

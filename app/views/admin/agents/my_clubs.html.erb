@@ -1,6 +1,6 @@
 <%- model_class = Club.new.class -%>
 
-<table id="my_clubs_table" class="table table-bordered table-condensed dataTable" data-source="<%= admin_agent_my_clubs_path(format: "json") %>">
+<table id="my_clubs_table" class="table table-bordered table-condensed dataTable" data-source="<%= my_clubs_path(format: "json") %>">
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
