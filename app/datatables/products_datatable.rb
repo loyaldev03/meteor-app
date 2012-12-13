@@ -17,8 +17,8 @@ private
         product.recurrent,
         product.stock,
         product.weight,
-        (link_to(I18n.t(:show), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini')if @current_agent.can? :read, Product)+
-        (link_to(I18n.t(:edit), @url_helpers.edit_product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini')if @current_agent.can? :edit, Product)+
+        (link_to(I18n.t(:show), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini') if @current_agent.can? :read, Product, club.id)+
+        (link_to(I18n.t(:edit), @url_helpers.edit_product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini') if @current_agent.can? :edit, Product, club.id)+
         (link_to(I18n.t(:destroy), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :method => :delete,
                 :confirm => I18n.t("are_you_sure"),
                 :class => 'btn btn-mini btn-danger')if @current_agent.can? :delete, Product)
