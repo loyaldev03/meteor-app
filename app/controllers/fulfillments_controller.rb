@@ -54,6 +54,7 @@ class FulfillmentsController < ApplicationController
   end
 
   def mark_as_wrong_address
+    authorize! :mark_as_wrong_address, Fulfillment
     render json: Fulfillment.find(params[:id]).member.set_wrong_address(@current_agent, params[:reason])
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
