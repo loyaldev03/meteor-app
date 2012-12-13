@@ -172,4 +172,39 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
+  test "Should show agent's related club_roles, even when agent does not have global role."do
+    setup_admin
+    @admin_agent.roles = ['']
+    @admin_agent.save
+    partner = FactoryGirl.create(:partner)
+    2.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    first_club = Club.first
+    second_club = Club.last
+    @admin_agent.add_role_with_club('representative', first_club)
+    @admin_agent.add_role_with_club('supervisor', second_club)
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table")do
+      wait_until{ assert page.has_content?("#{first_club.name}") }
+      wait_until{ assert page.has_content?("#{second_club.name}") }
+    end
+  end
+
+  test "Should show agent's related club_roles, when agent has api global role."do
+    setup_admin
+    @admin_agent.roles = ['api']
+    @admin_agent.save
+    partner = FactoryGirl.create(:partner)
+    2.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    first_club = Club.first
+    second_club = Club.last
+    @admin_agent.add_role_with_club('representative', first_club)
+    @admin_agent.add_role_with_club('supervisor', second_club)
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table")do
+      wait_until{ assert page.has_content?("#{first_club.name}") }
+      wait_until{ assert page.has_content?("#{second_club.name}") }
+    end
+  end
 end
