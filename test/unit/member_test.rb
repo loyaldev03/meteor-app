@@ -340,6 +340,7 @@ class MemberTest < ActiveSupport::TestCase
     end
   end
 
+  # Prevent club to be billed
   test "Member should not be billed if club's billing_enable is set as false" do
     @club = @terms_of_membership_with_gateway.club
     @club.update_attribute(:billing_enable, false)
@@ -361,6 +362,7 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal(bill_date_before,@member.bill_date)
   end
 
+  # Prevent club to be billed
   test "Member should be billed if club's billing_enable is set as true" do
     @club = @terms_of_membership_with_gateway.club
     @member = create_active_member(@terms_of_membership_with_gateway, :provisional_member)

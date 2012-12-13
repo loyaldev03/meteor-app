@@ -124,6 +124,11 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     within("#td_mi_club_cash_amount") { assert page.has_content?("0.99") }
+    within("#operations_table")do
+      wait_until{
+        assert page.has_content?('0.99 club cash was successfully added. Concept:')
+      }
+    end
   end
 
   test "create member with terms_of_membership without club cash" do
@@ -143,7 +148,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
   
     within("#operations_table")do
       wait_until{
-        assert page.has_no_content?('0 club cash was successfully added')
+        assert page.has_no_content?('0 club cash was successfully added. Concept:')
       }
     end
   end
@@ -451,6 +456,5 @@ class MembersClubCashTest < ActionController::IntegrationTest
       end
     end
   end
-
 end
 
