@@ -15,7 +15,7 @@ class OperationsController < ApplicationController
 
   # GET /operations/1
   def show
-    my_authorize! :edit, Operation, @current_club.id
+    my_authorize! :show, Operation, @current_club.id
     @operation = Operation.find(params[:id])
   end
 
@@ -29,7 +29,7 @@ class OperationsController < ApplicationController
       Auditory.audit(@current_agent, operation, message, @current_member)
       redirect_to operation_path(:id => operation), notice: message
     else
-      render action: "edit" 
+      render action: "show" 
     end
   end
 

@@ -1,7 +1,6 @@
 class Api::ProspectsController < ApplicationController
   skip_before_filter :verify_authenticity_token
-  before_filter :check_authentification
-
+  
   respond_to :json
 
   # Method  : POST
@@ -52,6 +51,7 @@ class Api::ProspectsController < ApplicationController
   # @return [Integer] *code*
   # @return [String] *prospect_id*
   def create
+    my_authorize! :manage_prospects_api, Prospect, params[:club_id]
   	response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
   	prospect = Prospect.new(params[:prospect])
   	if prospect.save
@@ -62,8 +62,4 @@ class Api::ProspectsController < ApplicationController
     render json: response
   end
 
-  private
-    def check_authentification
-      my_authorize! :manage_prospects_api, Prospect, params[:club_id]
-    end
 end
