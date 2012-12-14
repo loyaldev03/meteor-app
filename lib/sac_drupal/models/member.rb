@@ -233,7 +233,7 @@ module Drupal
       unless m.preferences.nil?
         m.preferences.each do |key, value|
           map.merge!({
-            "field_phoenix_pref_#{key}" =>  {
+            key =>  {
               und: ( value.nil? ? { "select" => "_none" } : { "select" => value } )
             }
           })
