@@ -32,10 +32,10 @@ private
   end
 
   def fetch_clubs
-    if @current_agent.has_role? 'admin'
-      clubs = Club.where("deleted_at is null").order("#{sort_column} #{sort_direction}")
-    else
+    unless @current_agent.has_global_role?
       clubs = @current_agent.clubs.order("#{sort_column} #{sort_direction}")
+    else
+      clubs = Club.where("deleted_at is null").order("#{sort_column} #{sort_direction}")
     end
     clubs = clubs.page(page).per_page(per_page)
     if params[:sSearch].present?

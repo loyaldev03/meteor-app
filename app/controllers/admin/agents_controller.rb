@@ -21,6 +21,7 @@ class Admin::AgentsController < ApplicationController
   # GET /agents/1/edit
   def edit
     @clubs = Club.all
+    @agent.clubs.each {|c| @clubs.delete(c)}
   end
 
   # POST /agents
