@@ -159,9 +159,9 @@
   <tbody>
     <tr>
       <th>
-      <% if can? :see_credit_card, @active_credit_card %>
+      <% if can? :see_full_credit_card_number, @active_credit_card %>
         <%= t("activerecord.attributes.credit_card.number") %>
-      <% elsif can? :see_credit_card_last_digits, @active_credit_card %>
+      <% else %>
         <%= t("activerecord.attributes.credit_card.last_digits") %>
       <% end %>
       </th>
@@ -170,9 +170,9 @@
     <% if @active_credit_card %>
       <tr class="<%= (@active_credit_card.am_card.expired? ? "card_expired" : "") %>">
         <td>
-          <% if can? :see_credit_card, @active_credit_card %>
+          <% if can? :see_full_credit_card_number, @active_credit_card %>
             <%= @active_credit_card.number %>
-          <% elsif can? :see_credit_card_last_digits, @active_credit_card %>
+          <% else %>
             <%= @active_credit_card.last_digits %>
           <% end %>
         </td>

@@ -3,9 +3,9 @@
   <thead>
     <tr>
       <th> 
-        <% if can? :see_credit_card, CreditCard %>
+        <% if can? :see_full_credit_card_number, CreditCard %>
           <%= t('activerecord.attributes.credit_card.number') %> 
-        <% elsif can? :see_credit_card_last_digits, CreditCard %>
+        <% else %>
           <%= t('activerecord.attributes.credit_card.last_digits') %> 
         <% end %> 
       </th>
@@ -27,9 +27,9 @@
         <% end %>
         >
       <td> 
-        <% if can? :see_credit_card, cc %>
+        <% if can? :see_full_credit_card_number, cc %>
           <%= cc.number %>
-        <% elsif can? :see_credit_card_last_digits, cc %>
+        <% else %>
           <%= cc.last_digits %>
         <% end %> 
       </td>
