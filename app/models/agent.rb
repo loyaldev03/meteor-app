@@ -59,6 +59,14 @@ class Agent < ActiveRecord::Base
     self.club_roles.where(role: role, club_id: club).first
   end
 
+  def has_global_role?
+    !self.roles.empty?
+  end
+
+  def has_club_roles?
+    !self.clubs.empty?
+  end
+
   def add_role_with_club(role, club = nil)
     if club.present? 
       if self.role_for(role, club).blank?

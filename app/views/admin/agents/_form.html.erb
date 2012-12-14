@@ -24,19 +24,21 @@
     </div>
   </div>
 
-  <div class="control-group">
-    <%= f.label :roles, 'Global Roles', :class => 'control-label' %>
-    <div class="controls">
-      <% Agent::ROLES.each do |role| %>
-        <%= label_tag nil, role, class: 'checkbox' do %>
-          <%= check_box_tag "agent[roles][]", role, @agent.has_role?(role), id: "agent_roles_#{role}" %>
-          <%= role -%>
+  <% unless @agent.has_club_roles? %>
+    <div class="control-group">
+      <%= f.label :roles, 'Global Roles', :class => 'control-label' %>
+      <div class="controls">
+        <% Agent::ROLES.each do |role| %>
+          <%= label_tag nil, role, class: 'checkbox' do %>
+            <%= check_box_tag "agent[roles][]", role, @agent.has_role?(role), id: "agent_roles_#{role}" %>
+            <%= role -%>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
     </div>
-  </div>
+  <% end %>
 
-  <% unless f.object.new_record? %>
+  <% if not f.object.new_record? and not @agent.has_global_role? %>
     <div class="control-group">
       <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
       <div class="controls">
