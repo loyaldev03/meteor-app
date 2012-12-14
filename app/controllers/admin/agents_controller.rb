@@ -1,5 +1,5 @@
 class Admin::AgentsController < ApplicationController
-  authorize_resource :agent, :except => :my_clubs
+  load_and_authorize_resource :agent, :except => :my_clubs
 
   # GET /agents
   def index
