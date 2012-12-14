@@ -39,7 +39,7 @@ class ClubsControllerTest < ActionController::TestCase
   test "Agency user should not get index" do
     sign_in @agency_user
     get :index, partner_prefix: @partner_prefix
-    assert_response :success
+    assert_response :unauthorized
   end
 
   test "Admin should get new" do
@@ -136,7 +136,7 @@ class ClubsControllerTest < ActionController::TestCase
   test "Agency user should not show club" do
     sign_in @agency_user
     get :show, id: @club, partner_prefix: @partner_prefix
-    assert_response :success
+    assert_response :unauthorized
   end
 
   test "Admin should get edit" do

@@ -214,7 +214,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
   test "Representative should only see credit card's last digits." do
   	sign_in @representative_user
   	ability = Ability.new(@representative_user)
-  	assert ability.can?(:see_credit_card_last_digits, CreditCard), "Representative cant see member's credit card's las digits."
+  	assert ability.cannot?(:see_full_credit_card_number, CreditCard), "Representative cant see member's credit card's las digits."
   	assert ability.cannot?(:see_credit_card, CreditCard), "Representative can see member's full credit card number."  
   end
 end
