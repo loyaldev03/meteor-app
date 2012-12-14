@@ -203,7 +203,7 @@
           <tr>
             <th><%= t('menu.activerecord.term_of_membership') %>:</th>
             <td id="td_mi_terms_of_membership_name">
-              <%= link_to(terms_of_membership_path(:id => @current_membership.terms_of_membership), :class => "btn btn-mini btn-small", :disabled => (cannot? :read, TermsOfMembership)) do %> 
+              <%= link_to(terms_of_membership_path(:id => @current_membership.terms_of_membership), :class => "btn btn-mini btn-small", :disabled => (cannot? :show, TermsOfMembership)) do %> 
                 <i class="icon-zoom-in"></i> <%= @current_membership.terms_of_membership.name %>
               <% end %>
             </td>  
