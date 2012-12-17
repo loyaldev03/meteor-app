@@ -125,8 +125,8 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-  test "Agent like Administrator, Supervisor and representative" do
-    setup_admin
+  test "Agent admin can assign role_clubs, when there are no global roles" do
+    setup_agent_no_rol
     setup_member false
     @agent_no_role = FactoryGirl.create :confirmed_agent
     7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
@@ -159,20 +159,6 @@ class RolesTest < ActionController::IntegrationTest
     wait_until{ assert page.has_content?("admin for") }
     wait_until{ assert page.has_content?("supervisor for") }
     wait_until{ assert page.has_content?("representative for") }
-
-    click_link_or_button("My Clubs")
-    within("#my_clubs_table")do
-      wait_until{ assert page.has_content?("#{club1.name}") }
-      wait_until{ assert page.has_content?("#{club2.name}") }
-      wait_until{ assert page.has_content?("#{club3.name}") }
-      wait_until{ assert page.has_no_content?("#{club_last.name}") }
-    end
-    within("#change_partner")do
-      wait_until{ assert page.has_content?("#{club1.partner.prefix} - #{club1.name}") }
-      wait_until{ assert page.has_content?("#{club2.partner.prefix} - #{club2.name}") }
-      wait_until{ assert page.has_content?("#{club3.partner.prefix} - #{club3.name}") }
-      wait_until{ assert page.has_no_content?("#{club_last.partner.prefix} - #{club_last.name}") }
-    end
   end
 
   test "Profiles that not allow see products " do
