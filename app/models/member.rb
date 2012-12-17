@@ -761,14 +761,14 @@ class Member < ActiveRecord::Base
   def self.bill_all_members_up_today
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
-    base = Member.where(" date(next_retry_bill_date) <= ? and club_id IN (select id from clubs where billing_enable = true) and status != 'lapsed'", 
-                Time.zone.now.to_date)
+    base = Member.where(" next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status != 'lapsed'", 
+                Time.zone.now)
     Rails.logger.info " *** Starting members:billing rake task, processing #{base.count} members"
     base.find_in_batches(:batch_size => 60) do |group|
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid}"
+          Rails.logger.info "  * processing member ##{member.uuid} nbd: #{member.next_retry_bill_date}"
           member.bill_membership
         rescue Exception => e
           Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect, :credit_card => member.active_credit_card.inspect })
