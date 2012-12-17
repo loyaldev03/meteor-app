@@ -79,7 +79,7 @@ class Agent < ActiveRecord::Base
   alias_method_chain :add_role, :club
 
   def can?(*args)
-    @ability ||= Ability.new(self, args[2])
+    @ability = Ability.new(self, args[2])
     @ability.can?(*args)
   end
 

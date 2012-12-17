@@ -4,7 +4,7 @@
     <div class="page-header">
       <h1>Search</h1>
       <% if can? :enroll, Member %>
-        <%= link_to(new_member_path, :class => "btn btn-primary btn_on_header") do %> 
+        <%= link_to(new_member_path, :class => "btn btn-primary btn_on_header", :id => "new_member") do %> 
           <i class="icon-plus"></i> New Member
         <% end %>
       <% end %>

@@ -1,3 +1,4 @@
+
 class Ability
   include CanCan::Ability
 
@@ -78,20 +79,15 @@ class Ability
       can :manage_token_api, Agent
     elsif agent.has_role_with_club? 'agency', club_id
       can :manage, Product
+      can :read, Fulfillment
       can :report, Fulfillment
-      can :read, Member             #Verificar que solo puede ver members
+      can :read, Member
       can :search_result, Member    
       can :read, Membership
       can :list, Operation
       can :show, Operation
       can :show, TermsOfMembership
       can :read, Transaction
-      cannot :enroll, Member     
-
-      # admin products
-      # admin fulfillments (only access to report, can't resend / mark as undelivered )
-      # see members (read only mode). Any action/button on member profile must be denied.
-
 
       # EXAMPLE
       # can :manage, Partner do |partner|
