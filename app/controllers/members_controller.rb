@@ -346,7 +346,7 @@ class MembersController < ApplicationController
 
   private 
     def check_permissions
-      my_authorize! params[:action], Member, @current_club.id
+      my_authorize! params[:action].to_sym, Member, @current_club.id
     end
 
 end

@@ -26,6 +26,12 @@ class RolesTest < ActionController::IntegrationTest
     sign_in_as(@agency_agent)
   end
 
+  def setup_agent_no_rol
+    init_test_setup
+    @agent = FactoryGirl.create(:confirmed_agent)
+    sign_in_as(@agent)   
+  end
+
   def setup_member(create_new_member = true)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
@@ -44,7 +50,8 @@ class RolesTest < ActionController::IntegrationTest
   	setup_admin
     partner = FactoryGirl.create(:partner)
     10.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
-    visit admin_agents_path
+    click_link_or_button("My Clubs")
+
     within("#change_partner")do
       Club.all.each do |club|
         wait_until{ assert page.has_content?("#{club.partner.prefix} - #{club.name}") }
@@ -52,48 +59,48 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-  test "select only clubs related to supervisor agent."do
+  # Select only clubs related to supervisor agent.
+  test "select every club when member has global role 'supervisor'" do
   	setup_supervisor
     partner = FactoryGirl.create(:partner)
-    2.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
-    first_club = Club.first
-    second_club = Club.last
-    @supervisor_agent.add_role_with_club('supervisor', first_club)
-
+    7.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
     click_link_or_button("My Clubs")
+
     within("#change_partner")do
-      wait_until{ assert page.has_content?("#{partner.prefix} - #{first_club.name}") }
-      wait_until{ assert page.has_no_content?("#{partner.prefix} - #{second_club.name}") }
+      Club.all.each do |club|
+        wait_until{ assert page.has_content?("#{club.partner.prefix} - #{club.name}") }
+      end
+    end
+    within("#my_clubs_table")do
+      Club.all.each {|club| assert page.has_content?(club.name) }
     end
   end
 
-  test "select only clubs related to representative agent."do
+  # Select only clubs related to representative agent.
+  test "select every club when member has global role 'representative'" do
   	setup_representative
     partner = FactoryGirl.create(:partner)
-    2.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
-    first_club = Club.first
-    second_club = Club.last
-    @representative_agent.add_role_with_club('representative', first_club)
-
+    10.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
     click_link_or_button("My Clubs")
+
     within("#change_partner")do
-      wait_until{ assert page.has_content?("#{partner.prefix} - #{first_club.name}") }
-      wait_until{ assert page.has_no_content?("#{partner.prefix} - #{second_club.name}") }
+      Club.all.each do |club|
+        wait_until{ assert page.has_content?("#{club.partner.prefix} - #{club.name}") }
+      end
     end
   end
 
-  test "select only clubs related to agency agent."do
+  # Select only clubs related to agency agent.
+  test "select every club when member has global role 'agency'" do
   	setup_agency
     partner = FactoryGirl.create(:partner)
-    2.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
-    first_club = Club.first
-    second_club = Club.last
-    @agency_agent.add_role_with_club('representative', first_club)
-
+    10.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
     click_link_or_button("My Clubs")
+
     within("#change_partner")do
-      wait_until{ assert page.has_content?("#{partner.prefix} - #{first_club.name}") }
-      wait_until{ assert page.has_no_content?("#{partner.prefix} - #{second_club.name}") }
+      Club.all.each do |club|
+        wait_until{ assert page.has_content?("#{club.partner.prefix} - #{club.name}") }
+      end
     end
   end
 
@@ -121,16 +128,17 @@ class RolesTest < ActionController::IntegrationTest
   test "Agent like Administrator, Supervisor and representative" do
     setup_admin
     setup_member false
-    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+    @agent_no_role = FactoryGirl.create :confirmed_agent
+    7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+
+    sleep 1
 
     club1 = Club.first
     club2 = Club.find(2)
-    club3 = Club.last
+    club3 = Club.find(3)
+    club_last = Club.last
 
-    visit admin_agents_path
-    within("#agents_table")do
-      click_link_or_button 'Edit'
-    end
+    visit edit_admin_agent_path(@agent_no_role.id)
     within(".table-condensed")do
       select('admin', :from => 'agent[club_roles_attributes][0][role]')
       select(club1.name, :from => 'agent[club_roles_attributes][0][club_id]')
@@ -151,6 +159,20 @@ class RolesTest < ActionController::IntegrationTest
     wait_until{ assert page.has_content?("admin for") }
     wait_until{ assert page.has_content?("supervisor for") }
     wait_until{ assert page.has_content?("representative for") }
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table")do
+      wait_until{ assert page.has_content?("#{club1.name}") }
+      wait_until{ assert page.has_content?("#{club2.name}") }
+      wait_until{ assert page.has_content?("#{club3.name}") }
+      wait_until{ assert page.has_no_content?("#{club_last.name}") }
+    end
+    within("#change_partner")do
+      wait_until{ assert page.has_content?("#{club1.partner.prefix} - #{club1.name}") }
+      wait_until{ assert page.has_content?("#{club2.partner.prefix} - #{club2.name}") }
+      wait_until{ assert page.has_content?("#{club3.partner.prefix} - #{club3.name}") }
+      wait_until{ assert page.has_no_content?("#{club_last.partner.prefix} - #{club_last.name}") }
+    end
   end
 
   test "Profiles that not allow see products " do
@@ -206,5 +228,145 @@ class RolesTest < ActionController::IntegrationTest
       wait_until{ assert page.has_content?("#{first_club.name}") }
       wait_until{ assert page.has_content?("#{second_club.name}") }
     end
+  end
+
+  test "Agents that can admin members. (without global role)" do
+    setup_agent_no_rol
+    partner = FactoryGirl.create(:partner)
+    first_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    second_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    third_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fourth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fifth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+
+    @agent.add_role_with_club('supervisor', first_club)
+    @agent.add_role_with_club('representative', second_club)
+    @agent.add_role_with_club('api', third_club)
+    @agent.add_role_with_club('agency', fourth_club)
+    @agent.add_role_with_club('admin', fifth_club)
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table")do
+      wait_until{ assert page.has_content?("#{first_club.name}") }
+      wait_until{ assert page.has_content?("#{second_club.name}") }
+      wait_until{ assert page.has_content?("#{third_club.name}") }
+      wait_until{ assert page.has_content?("#{fourth_club.name}") }
+      wait_until{ assert page.has_content?("#{fifth_club.name}") }
+    end
+
+    visit members_path( :partner_prefix => partner.prefix, :club_prefix => first_club.name)
+    wait_until { assert page.has_selector?("#new_member") }  
+
+    visit members_path( :partner_prefix => partner.prefix, :club_prefix => second_club.name)
+    wait_until { assert page.has_no_selector?("#new_member") }  
+
+    visit members_path( :partner_prefix => partner.prefix, :club_prefix => third_club.name)
+    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+    wait_until { assert page.has_no_selector?("#new_member") }  
+
+    visit members_path( :partner_prefix => partner.prefix, :club_prefix => fourth_club.name)
+    wait_until { assert page.has_no_selector?("#new_member") }  
+
+    visit members_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
+    wait_until { assert page.has_selector?("#new_member") }  
+  end
+
+  test "Agents that can admin products. (without global role)" do
+    setup_agent_no_rol
+    partner = FactoryGirl.create(:partner)
+    first_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    second_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    third_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fourth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fifth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+
+
+    @agent.add_role_with_club('supervisor', first_club)
+    @agent.add_role_with_club('representative', second_club)
+    @agent.add_role_with_club('api', third_club)
+    @agent.add_role_with_club('agency', fourth_club)
+    @agent.add_role_with_club('admin', fifth_club)
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table")do
+      wait_until{ assert page.has_content?("#{first_club.name}") }
+      wait_until{ assert page.has_content?("#{second_club.name}") }
+      wait_until{ assert page.has_content?("#{third_club.name}") }
+      wait_until{ assert page.has_content?("#{fourth_club.name}") }
+      wait_until{ assert page.has_content?("#{fifth_club.name}") }
+    end
+
+    visit products_path( :partner_prefix => partner.prefix, :club_prefix => first_club.name)
+    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+
+    visit products_path( :partner_prefix => partner.prefix, :club_prefix => second_club.name)
+    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+
+    visit products_path( :partner_prefix => partner.prefix, :club_prefix => third_club.name)
+    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+
+    visit products_path( :partner_prefix => partner.prefix, :club_prefix => fourth_club.name)
+    wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+    wait_until { assert page.has_selector?("#new_product") }
+    wait_until { assert page.has_content?("Edit") }
+    wait_until { assert page.has_content?("Show") }
+    click_link_or_button "New Product"
+      wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+    visit products_path( :partner_prefix => partner.prefix, :club_prefix => fourth_club.name)
+    click_link_or_button "Edit"
+      wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+
+
+    visit products_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
+    wait_until { assert page.has_no_content?("401 You are Not Authorized. ") }
+    wait_until { assert page.has_selector?("#new_product") }
+    wait_until { assert page.has_content?("Edit") }
+    wait_until { assert page.has_content?("Show") }
+    click_link_or_button "New Product"
+      wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+    visit products_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
+    click_link_or_button "Edit"
+      wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+  end
+
+  test "Agents that can admin fulfillments. (without global role)" do
+    setup_agent_no_rol
+    partner = FactoryGirl.create(:partner)
+    first_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    second_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    third_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fourth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fifth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+
+
+    @agent.add_role_with_club('supervisor', first_club)
+    @agent.add_role_with_club('representative', second_club)
+    @agent.add_role_with_club('api', third_club)
+    @agent.add_role_with_club('agency', fourth_club)
+    @agent.add_role_with_club('admin', fifth_club)
+
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table")do
+      wait_until{ assert page.has_content?("#{first_club.name}") }
+      wait_until{ assert page.has_content?("#{second_club.name}") }
+      wait_until{ assert page.has_content?("#{third_club.name}") }
+      wait_until{ assert page.has_content?("#{fourth_club.name}") }
+      wait_until{ assert page.has_content?("#{fifth_club.name}") }
+    end
+
+    visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => first_club.name)
+    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+
+    visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => second_club.name)
+    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+
+    visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => third_club.name)
+    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+
+    visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => fourth_club.name)
+    wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+
+    visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
+    wait_until { assert page.has_no_content?("401 You are Not Authorized. ") }
   end
 end
