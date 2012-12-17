@@ -749,7 +749,7 @@ class Member < ActiveRecord::Base
           Rails.logger.info "  * processing member ##{member.uuid}"
           member.sync_to_pardot unless member.pardot_member.nil?
         rescue Exception => e
-          Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect, :credit_card => member.active_credit_card.inspect })
+          Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -987,7 +987,7 @@ class Member < ActiveRecord::Base
 
   def sync_to_pardot(options = {})
     time_elapsed = Benchmark.ms do
-      pardot_member.save!(options)
+      pardot_member.save!(options) unless pardot_member.nil?
     end
     logger.info "Pardot::sync took #{time_elapsed}ms"
   rescue Exception => e
