@@ -239,7 +239,7 @@ class Member < ActiveRecord::Base
 
   # Returns a string with first and last name concatenated. 
   def full_name
-    [ first_name, last_name].join(' ').squeeze
+    [ first_name, last_name].join(' ').squeeze(' ')
   end
 
   def country_name
