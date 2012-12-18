@@ -33,6 +33,38 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
    end
 
+  def setup_email_templates
+    et = EmailTemplate.new :name => "Day 7 - Trial", :client => :lyris, :template_type => :pillar_provisional
+    et.terms_of_membership_id = @terms_of_membership_with_gateway.id
+    et.external_attributes = { :trigger_id => 27648, :mlid => 226095, :site_id => 123 }
+    et.days_after_join_date = 7
+    et.save!
+
+    et = EmailTemplate.new :name => "Day 35 - News", :client => :lyris, :template_type => :pillar_provisional
+    et.terms_of_membership_id = @terms_of_membership_with_gateway.id
+    et.external_attributes = { :trigger_id => 27647, :mlid => 226095, :site_id => 123 }
+    et.days_after_join_date = 35
+    et.save!
+
+    et = EmailTemplate.new :name => "Day 40 - Deals", :client => :lyris, :template_type => :pillar_provisional 
+    et.terms_of_membership_id = @terms_of_membership_with_gateway.id
+    et.external_attributes = { :trigger_id => 27651, :mlid => 226095, :site_id => 123 }
+    et.days_after_join_date = 40
+    et.save!
+    
+    et = EmailTemplate.new :name => "Day 45 - Local Chapters", :client => :lyris, :template_type => :pillar_provisional 
+    et.terms_of_membership_id = @terms_of_membership_with_gateway.id
+    et.external_attributes = { :trigger_id => 27650, :mlid => 226095, :site_id => 123 }
+    et.days_after_join_date = 45
+    et.save!
+    
+    et = EmailTemplate.new :name => "Day 50 - VIP", :client => :lyris, :template_type => :pillar_provisional
+    et.terms_of_membership_id = @terms_of_membership_with_gateway.id
+    et.external_attributes = { :trigger_id => 27649, :mlid => 226095, :site_id => 123 }
+    et.days_after_join_date = 50
+    et.save!
+  end
+
  #  ############################################################
  #  # UTILS
  #  ############################################################
@@ -1277,6 +1309,113 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#operations_table") do
       wait_until {
         assert page.has_content?("Communication 'Test birthday' sent")
+      }
+    end
+  end
+
+
+  test "Send Trial email at Day 7" do
+    setup_member(false)
+
+    unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id)
+
+    create_new_member(unsaved_member)
+    created_member = Member.find_by_email(unsaved_member.email)   
+    created_member.current_membership.update_attribute(:join_date, Time.zone.now-7.day)
+   
+    Member.send_pillar_emails('pillar_provisional', 'provisional')
+    sleep 1
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+    within("#communication") do
+      wait_until {
+        assert page.has_content?("Day 7 - Trial")
+      }
+    end
+  end
+
+  test "Send News email at Day 35" do
+    setup_member(false)
+    setup_email_templates
+    unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id)
+
+    create_new_member(unsaved_member)
+    created_member = Member.find_by_email(unsaved_member.email)   
+    created_member.current_membership.update_attribute(:join_date, Time.zone.now-35.day)
+
+    Member.send_pillar_emails('pillar_provisional', 'provisional')
+    sleep 1
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+    within("#communication") do
+      wait_until {
+        Communication.all.each {|x| puts x.template_name}
+        assert page.has_content?("Day 35 - News")
+      }
+    end
+  end
+
+  test "Send Deals email at Day 40" do
+    setup_member(false)
+    setup_email_templates
+    unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id)
+
+    create_new_member(unsaved_member)
+    created_member = Member.find_by_email(unsaved_member.email)   
+    created_member.current_membership.update_attribute(:join_date, Time.zone.now-40.day)
+
+    Member.send_pillar_emails('pillar_provisional', 'provisional')
+    sleep 1
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+    within("#communication") do
+      wait_until {
+        assert page.has_content?("Day 40 - Deals")
+      }
+    end
+  end
+
+  test "Send Local Chapters email at Day 45" do
+    setup_member(false)
+    setup_email_templates
+    unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id)
+
+    create_new_member(unsaved_member)
+    created_member = Member.find_by_email(unsaved_member.email)   
+    created_member.current_membership.update_attribute(:join_date, Time.zone.now-45.day)
+
+    Member.send_pillar_emails('pillar_provisional', 'provisional')
+    sleep 1
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+    within("#communication") do
+      wait_until {
+        assert page.has_content?("Day 45 - Local Chapters")
+      }
+    end
+  end
+
+  test "Send VIP email at Day 50" do
+    setup_member(false)
+    setup_email_templates
+    unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id)
+
+    create_new_member(unsaved_member)
+    created_member = Member.find_by_email(unsaved_member.email)   
+    created_member.current_membership.update_attribute(:join_date, Time.zone.now-50.day)
+
+    Member.send_pillar_emails('pillar_provisional', 'provisional')
+    sleep 1
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+    within("#communication") do
+      wait_until {
+        assert page.has_content?("Day 50 - VIP")
       }
     end
   end
