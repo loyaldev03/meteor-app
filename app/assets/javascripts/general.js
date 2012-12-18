@@ -371,9 +371,7 @@ $(document).ready( function() {
       "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 3 ] }],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 5 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5 ] }],
       "sAjaxSource": $('#transactions_table').data('source'),
     });
   }
