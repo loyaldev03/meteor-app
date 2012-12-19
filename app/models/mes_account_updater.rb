@@ -1,14 +1,13 @@
 class MesAccountUpdater
   def self.process_chargebacks(gateway)
-    return if gateway.aus_login.nil? or gateway.aus_password.nil?
     conn = Faraday.new(:url => Settings.mes_report_service.url, :ssl => {:verify => false})
-    initial_date, end_date = (Date.today - 1.days).strftime('%m/%d/%Y'), (Date.today - 1.days).strftime('%m/%d/%Y')
+    initial_date, end_date = (Date.today - 1).strftime('%m/%d/%Y'), (Date.today - 1).strftime('%m/%d/%Y')
     result = conn.get Settings.mes_report_service.path, { 
-      :userId => gateway.aus_login, 
-      :userPass => gateway.aus_password, 
+      :userId => Settings.mes_report_service.user, 
+      :userPass => Settings.mes_report_service.password, 
       :reportDateBegin => initial_date, 
       :reportDateEnd => end_date, 
-      :nodeId => gateway.aus_login[0..11], 
+      :nodeId => gateway.login[0..11], 
       :reportType => 1, 
       :includeTridentTranId => true, 
       :includePurchaseId => true, 
