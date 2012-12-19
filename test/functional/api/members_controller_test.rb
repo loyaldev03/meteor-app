@@ -493,7 +493,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     @member.reload
     assert_response :success
-    assert_equal(@member.active_credit_card.number, @active_credit_card .number)
+    assert_equal(@member.active_credit_card.number, @active_credit_card.number)
   end
 
   test "Update a profile with CC used by another member" do
@@ -514,7 +514,48 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     @member.reload
     assert_response :success
-    assert_equal(@member.active_credit_card.number, @active_credit_card .number)
+    assert_equal(@member.active_credit_card.number, @active_credit_card.number)
   end
 
+  test "Update a profile with CC with dashes" do
+    sign_in @admin_user
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
+    cc_expire_year = @active_credit_card.expire_year
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = "340-5043-2363-2976"
+    @credit_card.expire_year = @blacklisted_credit_card.expire_year
+    @credit_card.expire_month = @blacklisted_credit_card.expire_month
+
+    assert_difference('Operation.count',3) do
+      assert_difference('CreditCard.count',1) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, @credit_card.number.gsub('-','').gsub('/',''))
+  end
+
+  test "Update a profile with CC with '/'" do
+    sign_in @admin_user
+    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
+    cc_expire_year = @active_credit_card.expire_year
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = "340/5043/2363/2976"
+    @credit_card.expire_year = @blacklisted_credit_card.expire_year
+    @credit_card.expire_month = @blacklisted_credit_card.expire_month
+
+    assert_difference('Operation.count',3) do
+      assert_difference('CreditCard.count',1) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, @credit_card.number.gsub('-','').gsub('/',''))
+  end
 end
