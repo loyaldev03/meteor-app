@@ -952,6 +952,7 @@ class Member < ActiveRecord::Base
     answer = { :message => "There was an error. We could not add the credit card.", :code => Settings.error_codes.invalid_credit_card }
     CreditCard.transaction do 
       begin
+        new_credit_card.number = new_credit_card.number.gsub('-','').gsub('/','')
         new_credit_card.member = self
         if new_credit_card.valid? and new_credit_card.am_card.valid?
           new_credit_card.save!
