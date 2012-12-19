@@ -198,14 +198,16 @@ class MesAccountUpdater
         transaction_chargebacked = Transaction.find_by_payment_gateway_configuration_id_and_response_transaction_id gateway.id, args[:trident_transaction_id]
         member = Member.find_by_visible_id_and_club_id(args[:client_reference_number], gateway.club_id)
         begin
-          if transaction_chargebacked.member_id == member.id
+          if transaction_chargebacked.nil? || member.nil?
+            raise "Chargeback ##{args[:control_number]} could not be processed. member or transaction_chargebacked are null! #{line}"
+          elsif transaction_chargebacked.member_id == member.id
             member.chargeback! transaction_chargebacked, args
             member.save
           else
             raise "Chargeback ##{args[:control_number]} could not be processed. member and transaction_chargebacked are different! #{line}"
           end
         rescue 
-          Airbrake.notify(:error_class => "MES::chargeback_report", :parameters => { :member => member.inspect })
+          Airbrake.notify(:error_class => "MES::chargeback_report", :parameters => { :gateway => gateway, :member => member.inspect, :line => line, :transaction_chargebacked => transaction_chargebacked })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
