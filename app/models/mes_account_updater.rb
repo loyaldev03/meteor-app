@@ -25,7 +25,7 @@ class MesAccountUpdater
     return if gateway.aus_login.nil? or gateway.aus_password.nil?
     answer = prepare_connection '/srv/api/ausStatus?', { :statusFilter => 'NEW' }, gateway
     quantity = answer['statusCount'].to_i-1
-    if quantity > 0
+    if quantity >= 0
       0.upto(quantity) do |i|
         request_file_by_id answer["rspfId_#{i}"], "rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
       end
@@ -78,9 +78,10 @@ class MesAccountUpdater
       count = 0
       # members with expired credit card and active
       members = Member.joins(:credit_cards).where([ ' date(members.bill_date) = ? AND credit_cards.active = 1 ' + 
-                    ' AND (credit_cards.aus_sent_at IS NULL OR (credit_cards.aus_sent_at < ? AND credit_cards.aus_status IS NULL) )', 
+                    ' AND (credit_cards.aus_sent_at IS NULL OR (credit_cards.aus_sent_at < ? AND credit_cards.aus_status IS NULL) )' + 
+                    ' AND members.club_id = ? ', 
                     (Time.zone.now+7.days).to_date,
-                    (Time.zone.now-1.days).to_date ])
+                    (Time.zone.now-1.days).to_date, gateway.club_id ])
       members.each do |member|
         cc = member.active_credit_card
         credit_card = cc.am_card
