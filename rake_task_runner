@@ -9,37 +9,35 @@ LOGFILE="/tmp/cron_rake.log"
 echo "PATH variable => `printenv PATH`"
 
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:cancel  >> $LOGFILE 2>&1
-# rake mes:chargeback_report needs testing in production mode, because in test we dont have chargebacks.
-# uncomment the following line with a test MeS account configured
-# cd /var/www/$2/current && RAILS_ENV=$1 rake mes:chargeback_report  >> $LOGFILE 2>&1
 
-# rake mes:account_updater_process_answers update members accounts before billing
-# uncomment the following line with a test MeS account configured
-# cd /var/www/$2/current && RAILS_ENV=$1 rake mes:account_updater_process_answers  >> $LOGFILE 2>&1
+if [ "$1" == "production" ]; then
+  cd /var/www/$2/current && RAILS_ENV=$1 rake mes:chargeback_report  >> $LOGFILE 2>&1 
+  cd /var/www/$2/current && RAILS_ENV=$1 rake mes:account_updater_process_answers  >> $LOGFILE 2>&1 &
+  cd /var/www/$2/current && RAILS_ENV=$1 rake mes:account_updater_send_file_to_process  >> $LOGFILE 2>&1 &
 
-# club cash should be processed before billing. Because if we reset club cash and then we bill, new CC should not be resetted
-cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_club_cash  >> $LOGFILE 2>&1
-
-# rake mes:account_updater_send_file_to_process
-# uncomment the following line with a test MeS account configured
-# cd /var/www/$2/current && RAILS_ENV=$1 rake mes:account_updater_send_file_to_process  >> $LOGFILE 2>&1 &
+  WAIT_PIDS=`jobs -l | awk '{print $2}'`
+  wait $WAIT_PIDS
+fi
 
 cd /var/www/$2/current && RAILS_ENV=$1 rake billing:send_prebill  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_fulfillments  >> $LOGFILE 2>&1 &
-cd /var/www/$2/current && RAILS_ENV=$1 rake members:update_cc_type  >> $LOGFILE 2>&1 &
+cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_email_sync_error  >> $LOGFILE 2>&1 &
 
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
-
 wait $WAIT_PIDS
 
 # cd /var/www/$2/current && RAILS_ENV=$1 rake members:sync_members_to_pardot  >> $LOGFILE 2>&1 &
-cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_email_sync_error  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:send_happy_birthday  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:send_pillar_emails  >> $LOGFILE 2>&1 &
 
+WAIT_PIDS=`jobs -l | awk '{print $2}'`
+wait $WAIT_PIDS
+
+# club cash should be processed before billing. Because if we reset club cash and then we bill, new CC should not be resetted
+cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_club_cash  >> $LOGFILE 2>&1 &
+cd /var/www/$2/current && RAILS_ENV=$1 rake members:update_cc_type  >> $LOGFILE 2>&1 &
 
 # after this script we should do the BK and reports
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
-
 wait $WAIT_PIDS
 

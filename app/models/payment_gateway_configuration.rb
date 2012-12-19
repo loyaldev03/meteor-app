@@ -30,7 +30,7 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
 
   def self.process_mes_chargebacks(mode)
     PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
-      MesAccountUpdater.process_chargebacks gateway unless gateway.aus_login.blank?
+      MesAccountUpdater.process_chargebacks gateway
     end
   end
 
