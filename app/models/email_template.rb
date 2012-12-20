@@ -13,6 +13,8 @@ class EmailTemplate < ActiveRecord::Base
     :pillar_provisional # emails sent after join date and provisional status. they use days_after_join_date attribute
   ]
 
+  validates :name, :template_type, :terms_of_membership_id, :presence => :true
+
   CLIENTS = [ :amazon, :action_mailer, :lyris ]
 
   def lyris?
