@@ -21,7 +21,7 @@ class Api::MembersController < ApplicationController
   #             *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
   #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
   #             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
-  #             *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
+  #             *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to
   #              validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   #             *gender: Gender of the member. The values we are recieving are "M" for male or "F" for female.
@@ -111,7 +111,7 @@ class Api::MembersController < ApplicationController
   #             *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
   #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
   #             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
-  #             *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
+  #            *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
   #             *gender: Gender of the member. The values we are recieving are "M" for male or "F" for female.
   #             *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
@@ -187,8 +187,7 @@ class Api::MembersController < ApplicationController
   #             *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
   #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
   #             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
-  #             *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
-  #              +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.
+  #             *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   #             *club_cash_amount: Amount of the club cash the member has at this moment. We accept a maximun of two digits after the comma.

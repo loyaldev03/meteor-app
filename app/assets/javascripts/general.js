@@ -221,7 +221,6 @@ $(document).ready( function() {
     });  
 
     $('#zip_help').popover({offset: 10});
-    $('#phone_number_help').popover({offset: 10});   
     $('.help').popover({offset: 10});
     
     $('#member_country').live('change',  function(){

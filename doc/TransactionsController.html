@@ -181,12 +181,14 @@
 7
 8
 9
-10</pre>
+10
+11</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/transactions_controller.rb', line 5</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_index'>index</span>
+  <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:list</span><span class='comma'>,</span> <span class='const'>Transaction</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
   <span class='id identifier rubyid_respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_format'>format</span><span class='op'>|</span>
     <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_html'>html</span>
     <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_json'>json</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='const'>TransactionsDatatable</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_view_context'>view_context</span><span class='comma'>,</span><span class='ivar'>@current_partner</span><span class='comma'>,</span><span class='ivar'>@current_club</span><span class='comma'>,</span><span class='ivar'>@current_member</span><span class='comma'>,</span><span class='ivar'>@current_agent</span><span class='rparen'>)</span><span class='rbrace'>}</span>
@@ -202,7 +204,7 @@
 </div>
 
     <div id="footer">
-  Generated on Wed Nov 28 15:28:38 2012 by
+  Generated on Thu Dec 20 12:17:05 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
