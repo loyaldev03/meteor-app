@@ -95,6 +95,7 @@ class Member < ActiveRecord::Base
       where('sync_status IN ("not_synced", "synced")')
     end
   }
+  scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }
   scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
   scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value.strip) unless value.blank? }
   scope :with_phone_area_code, lambda { |value| where('phone_area_code = ?', value.strip) unless value.blank? }

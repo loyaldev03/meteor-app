@@ -77,9 +77,9 @@ class MesAccountUpdater
 
       count = 0
       # members with expired credit card and active
-      members = Member.joins(:credit_cards).where([ ' date(members.bill_date) = ? AND credit_cards.active = 1 ' + 
+      members = Member.joins(:credit_cards).billable.where([ ' date(members.bill_date) = ? AND credit_cards.active = 1 ' + 
                     ' AND (credit_cards.aus_sent_at IS NULL OR (credit_cards.aus_sent_at < ? AND credit_cards.aus_status IS NULL) )' + 
-                    ' AND members.club_id = ? ', 
+                    ' AND members.club_id = ? AND credit_cards.blacklisted = false ', 
                     (Time.zone.now+7.days).to_date,
                     (Time.zone.now-1.days).to_date, gateway.club_id ])
       members.each do |member|
@@ -130,7 +130,7 @@ class MesAccountUpdater
       if answer['rspCode'].to_i == 0
         full_filename = "#{Settings.mes_aus_service.folder}/#{filename}"
         file = File.open(full_filename, 'w')
-        file.write answer
+        file.write answer.first[0]
         file.close
         parse_file full_filename, gateway.club_id
       end
@@ -160,8 +160,12 @@ class MesAccountUpdater
           new_expire_month = new_expiration_date[2..3]
           credit_cards = CreditCard.find_all_by_encrypted_number credit_card.encrypted_number
           credit_cards.each do |cc|
-            cc.update_attributes :aus_answered_at => Time.zone.now, :aus_status => response_code if cc.aus_status.nil?
             if cc.active 
+              if cc.aus_status.nil?
+                cc.aus_answered_at = Time.zone.now
+                cc.aus_status = response_code
+                cc.save
+              end
               case response_code
               when 'NEWACCT'
                 answer = cc.member.update_credit_card_from_drupal({number: new_account_number, :expire_year => new_expire_year, :expire_month => new_expire_month})
@@ -169,10 +173,14 @@ class MesAccountUpdater
                   Airbrake.notify(:error_class => "MES::aus_update_process", :parameters => { :credit_card => cc.inspect, :answer => answer, :line => line })
                 end
               when 'NEWEXP'
-                Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.member, Settings.operation_types.aus_recycle_credit_card)
                 cc.update_attributes :expire_year => new_expire_year, :expire_month => new_expire_month
+                Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.member, Settings.operation_types.aus_recycle_credit_card)
               when 'CLOSED', 'CALL'
-                cc.member.cancel! Time.zone.now, "Automatic cancellation. AUS answered account #{response_code} wont be able to bill"
+                member = cc.member
+                unless member.lapsed?
+                  member.cancel! Time.zone.now, "Automatic cancellation. AUS answered account #{response_code} wont be able to bill"
+                  member.set_as_canceled!
+                end
               else
                 Rails.logger.info "CreditCard id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
               end
