@@ -260,13 +260,13 @@ en:
         created_at: 'Created at'
   date:
     formats:
-      default: "%d/%m/%Y"
+      default: "%m/%d/%Y"
       short: "%b %d"
       long: "%B %d, %Y"
       dashed: "%Y-%m-%d %H:%M"
   time:
     formats:
-      default: "%d/%m/%Y"
+      default: "%m/%d/%Y"
       short: "%b %d"
       long: "%B %d, %Y"
       dashed: "%Y-%m-%d %H:%M"
