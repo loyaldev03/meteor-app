@@ -871,8 +871,8 @@ class Member < ActiveRecord::Base
 
   def self.send_happy_birthday
     today = Time.zone.now.to_date
-    base = Member.where(" birth_date IS NOT NULL and DAYOFMONTH(birth_date) = ? and MONTH(birth_date) = ? and status IN (?) ", 
-      today.day, today.month, [ 'active', 'provisional' ])
+    base = Member.billable.where(" birth_date IS NOT NULL and DAYOFMONTH(birth_date) = ? and MONTH(birth_date) = ? ", 
+      today.day, today.month)
     Rails.logger.info " *** Starting members:send_happy_birthday rake task, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each do |member| 
