@@ -385,7 +385,7 @@ $(document).ready( function() {
       "bServerSide": true,
       "bLengthChange": false,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count-1 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2,column_count-1 ] }],
       "sAjaxSource": $('#memberships_table').data('source')
     });
   }
