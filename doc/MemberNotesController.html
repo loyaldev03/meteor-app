@@ -212,12 +212,14 @@
 23
 24
 25
-26</pre>
+26
+27</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/member_notes_controller.rb', line 12</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span> 
+  <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>MemberNote</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
   <span class='id identifier rubyid_member_note'>member_note</span> <span class='op'>=</span> <span class='const'>MemberNote</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='symbol'>:description</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_note</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:description</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_member_note'>member_note</span><span class='period'>.</span><span class='id identifier rubyid_communication_type_id'>communication_type_id</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_note</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:communication_type_id</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_member_note'>member_note</span><span class='period'>.</span><span class='id identifier rubyid_disposition_type_id'>disposition_type_id</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_note</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:disposition_type_id</span><span class='rbracket'>]</span>
@@ -252,6 +254,7 @@
       <pre class="lines">
 
 
+5
 6
 7
 8
@@ -259,9 +262,10 @@
 10</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/member_notes_controller.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/member_notes_controller.rb', line 5</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_new'>new</span>
+  <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>MemberNote</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
   <span class='ivar'>@member_note</span> <span class='op'>=</span> <span class='const'>MemberNote</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
   <span class='ivar'>@disposition_types</span> <span class='op'>=</span> <span class='const'>DispositionType</span><span class='period'>.</span><span class='id identifier rubyid_find_all_by_club_id'>find_all_by_club_id</span><span class='lparen'>(</span><span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
   <span class='ivar'>@communication_types</span> <span class='op'>=</span> <span class='const'>CommunicationType</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span>
@@ -276,7 +280,7 @@
 </div>
 
     <div id="footer">
-  Generated on Wed Nov 28 15:28:38 2012 by
+  Generated on Thu Dec 20 12:17:05 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

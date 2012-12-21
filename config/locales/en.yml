@@ -166,7 +166,6 @@ en:
         not_have_birth_date_set: 'No birth date set.'
         does_not_have_member_groups: 'It has no groups to be selected.'
         zip_help: 'It supports zips with format xxxxx or xxxxx-xxxx. Only numbers.'
-        phone_number_help: 'Formats: xxx-xxx-xxxx, xxxx-xxxx(xxxx), +xx xxxx-xxxx(xxxx), xxx xxx xxxx (intxx) or xxx-xxx-xxxx x123. Only numbers.'
         set_unreachable: 'Set Unreachable'
         set_undeliverable: 'Set undeliverable'
         undeliverable: 'This address is undeliverable.'
@@ -261,13 +260,13 @@ en:
         created_at: 'Created at'
   date:
     formats:
-      default: "%d/%m/%Y"
+      default: "%m/%d/%Y"
       short: "%b %d"
       long: "%B %d, %Y"
       dashed: "%Y-%m-%d %H:%M"
   time:
     formats:
-      default: "%d/%m/%Y"
+      default: "%m/%d/%Y"
       short: "%b %d"
       long: "%B %d, %Y"
       dashed: "%Y-%m-%d %H:%M"

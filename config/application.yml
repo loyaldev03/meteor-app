@@ -86,6 +86,7 @@ defaults: &defaults
     member_not_saved: '404'
     blacklisted: '406'
     cant_recover_member: '407'
+    member_enrollment_error: '408'
     duplicate_transaction: '900'
     not_supported: '902'
     invalid_credit_card: '9506'

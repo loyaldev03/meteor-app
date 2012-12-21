@@ -121,7 +121,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Ability) <strong>initialize</strong>(agent) </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Ability) <strong>initialize</strong>(agent, club_id = nil) </a>
     
 
     
@@ -155,7 +155,7 @@ A new instance of Ability.
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    - (<tt><span class='object_link'><a href="" title="Ability (class)">Ability</a></span></tt>) <strong>initialize</strong>(agent) 
+    - (<tt><span class='object_link'><a href="" title="Ability (class)">Ability</a></span></tt>) <strong>initialize</strong>(agent, club_id = nil) 
   
 
   
@@ -179,7 +179,6 @@ A new instance of Ability
       <pre class="lines">
 
 
-4
 5
 6
 7
@@ -272,18 +271,66 @@ A new instance of Ability
 94
 95
 96
-97</pre>
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/ability.rb', line 4</span>
+      <pre class="code"><span class="info file"># File 'app/models/ability.rb', line 5</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='comma'>,</span> <span class='id identifier rubyid_club_id'>club_id</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   
-  <span class='kw'>if</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role?'>has_role?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>admin</span><span class='tstring_end'>'</span></span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:see_credit_card</span><span class='comma'>,</span> <span class='const'>CreditCard</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:enroll_member</span><span class='comma'>,</span> <span class='const'>Agent</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:undo_credit_card_blacklist</span><span class='comma'>,</span> <span class='const'>CreditCard</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Agent</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Partner</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Club</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>ClubCashTransaction</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>CreditCard</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Domain</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Fulfillment</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Member</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>MemberNote</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Membership</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Operation</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Partner</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Product</span> 
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Prospect</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>TermsOfMembership</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Transaction</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage_club_cash_api</span><span class='comma'>,</span> <span class='const'>ClubCashTransaction</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_update</span><span class='comma'>,</span> <span class='const'>Member</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_profile</span><span class='comma'>,</span> <span class='const'>Member</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage_product_api</span><span class='comma'>,</span> <span class='const'>Product</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage_prospects_api</span><span class='comma'>,</span> <span class='const'>Prospect</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage_token_api</span><span class='comma'>,</span> <span class='const'>Agent</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role_with_club?'>has_role_with_club?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>admin</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_club_id'>club_id</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Member</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Membership</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>CreditCard</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Agent</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Partner</span>
@@ -302,43 +349,46 @@ A new instance of Ability
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_club_cash_api</span><span class='comma'>,</span> <span class='const'>ClubCashTransaction</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_prospects_api</span><span class='comma'>,</span> <span class='const'>Prospect</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_token_api</span><span class='comma'>,</span> <span class='const'>Agent</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:see_sync_status</span><span class='comma'>,</span> <span class='const'>Member</span>
-  <span class='kw'>elsif</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role?'>has_role?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>representative</span><span class='tstring_end'>'</span></span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role_with_club?'>has_role_with_club?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>representative</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_club_id'>club_id</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Member</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Operation</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:read</span><span class='comma'>,</span> <span class='const'>Membership</span>
     <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:api_update</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_profile</span><span class='comma'>,</span> <span class='const'>Member</span>
+    <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:see_full_credit_card_number</span><span class='comma'>,</span> <span class='const'>CreditCard</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>MemberNote</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_token_api</span><span class='comma'>,</span> <span class='const'>Agent</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:see_credit_card_last_digits</span><span class='comma'>,</span> <span class='const'>CreditCard</span>
-  <span class='kw'>elsif</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role?'>has_role?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>supervisor</span><span class='tstring_end'>'</span></span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:show</span><span class='comma'>,</span> <span class='const'>TermsOfMembership</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:read</span><span class='comma'>,</span> <span class='const'>Transaction</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role_with_club?'>has_role_with_club?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>supervisor</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_club_id'>club_id</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Member</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:api_enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:api_update</span><span class='comma'>,</span> <span class='const'>Member</span>
-    <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_profile</span><span class='comma'>,</span> <span class='const'>Member</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Operation</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:read</span><span class='comma'>,</span> <span class='const'>Membership</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>MemberNote</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_token_api</span><span class='comma'>,</span> <span class='const'>Agent</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:see_credit_card</span><span class='comma'>,</span> <span class='const'>CreditCard</span>
-  <span class='kw'>elsif</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role?'>has_role?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>api</span><span class='tstring_end'>'</span></span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>CreditCard</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:show</span><span class='comma'>,</span> <span class='const'>TermsOfMembership</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:read</span><span class='comma'>,</span> <span class='const'>Transaction</span>
+    <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_profile</span><span class='comma'>,</span> <span class='const'>Member</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role_with_club?'>has_role_with_club?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>api</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_club_id'>club_id</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:api_enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:api_update</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:api_profile</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_product_api</span><span class='comma'>,</span> <span class='const'>Product</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_club_cash_api</span><span class='comma'>,</span> <span class='const'>ClubCashTransaction</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_prospects_api</span><span class='comma'>,</span> <span class='const'>Prospect</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_token_api</span><span class='comma'>,</span> <span class='const'>Member</span>
-  <span class='kw'>elsif</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role?'>has_role?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>agency</span><span class='tstring_end'>'</span></span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_token_api</span><span class='comma'>,</span> <span class='const'>Agent</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role_with_club?'>has_role_with_club?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>agency</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_club_id'>club_id</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Product</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:read</span><span class='comma'>,</span> <span class='const'>Club</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:read</span><span class='comma'>,</span> <span class='const'>Fulfillment</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:report</span><span class='comma'>,</span> <span class='const'>Fulfillment</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:read</span><span class='comma'>,</span> <span class='const'>Member</span>
-    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:search_result</span><span class='comma'>,</span> <span class='const'>Member</span>
-    <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
-    <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_enroll</span><span class='comma'>,</span> <span class='const'>Member</span>
-    <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_update</span><span class='comma'>,</span> <span class='const'>Member</span>
-    <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_profile</span><span class='comma'>,</span> <span class='const'>Member</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:search_result</span><span class='comma'>,</span> <span class='const'>Member</span>    
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:read</span><span class='comma'>,</span> <span class='const'>Membership</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:list</span><span class='comma'>,</span> <span class='const'>Operation</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:show</span><span class='comma'>,</span> <span class='const'>Operation</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:show</span><span class='comma'>,</span> <span class='const'>TermsOfMembership</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:read</span><span class='comma'>,</span> <span class='const'>Transaction</span>
+
     <span class='comment'># EXAMPLE
 </span>    <span class='comment'># can :manage, Partner do |partner|
 </span>    <span class='comment'>#   # agent is enabled to manage a specific partner
@@ -382,7 +432,7 @@ A new instance of Ability
 </div>
 
     <div id="footer">
-  Generated on Wed Nov 28 15:28:36 2012 by
+  Generated on Thu Dec 20 12:17:02 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

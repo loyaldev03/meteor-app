@@ -221,7 +221,6 @@ $(document).ready( function() {
     });  
 
     $('#zip_help').popover({offset: 10});
-    $('#phone_number_help').popover({offset: 10});   
     $('.help').popover({offset: 10});
     
     $('#member_country').live('change',  function(){
@@ -386,7 +385,7 @@ $(document).ready( function() {
       "bServerSide": true,
       "bLengthChange": false,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count-1 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2,column_count-1 ] }],
       "sAjaxSource": $('#memberships_table').data('source')
     });
   }
