@@ -3057,7 +3057,7 @@
   attributes: 
     notes: Not applicable in CNP Environment (no swipe)
     days: "0"
-    response_code: 008
+    response_code: "008"
     decline_type: hard
     credit_card_type: master
     installment_type: "yearly"
@@ -5402,6 +5402,7 @@
     credit_card_type: all
     installment_type: "yearly"
     id: "655"
+    gateway: mes
     limit: "0"
   attributes_cache: {}
 
@@ -5631,7 +5632,7 @@
   attributes: 
     notes: Fix data & retry
     days: "1"
-    response_code: 019
+    response_code: '019'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "monthly"
@@ -5670,7 +5671,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 028
+    response_code: '028'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -5787,7 +5788,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 058
+    response_code: '058'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -5800,8 +5801,8 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 059
-    decline_type: hardhard
+    response_code: '059'
+    decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
     id: "442"
@@ -5917,7 +5918,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 078
+    response_code: '078'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -5930,7 +5931,7 @@
   attributes: 
     notes: 
     days: "6"
-    response_code: 080
+    response_code: '080'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "monthly"
@@ -5943,7 +5944,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 081
+    response_code: '081'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -5956,7 +5957,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 082
+    response_code: '082'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -5969,7 +5970,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 085
+    response_code: '085'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -5982,7 +5983,7 @@
   attributes: 
     notes: Fix data & retry
     days: "2"
-    response_code: 086
+    response_code: '086'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "monthly"
@@ -5995,7 +5996,7 @@
   attributes: 
     notes: Retry request
     days: "6"
-    response_code: 091
+    response_code: '091'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6008,7 +6009,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 092
+    response_code: '092'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6021,7 +6022,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 093
+    response_code: '093'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6034,7 +6035,7 @@
   attributes: 
     notes: Need to verify which field is incorrect, fix and retry
     days: "2"
-    response_code: 096
+    response_code: '096'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6073,7 +6074,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0N3
+    response_code: '0N3'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6086,7 +6087,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0N4
+    response_code: '0N4'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6099,7 +6100,7 @@
   attributes: 
     notes: Ask consumer for new CVV code and retry
     days: "0"
-    response_code: 0N7
+    response_code: '0N7'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6112,7 +6113,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0P2
+    response_code: '0P2'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6125,7 +6126,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0P5
+    response_code: '0P5'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6138,7 +6139,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0P6
+    response_code: '0P6'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6151,7 +6152,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0R0
+    response_code: '0R0'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6164,7 +6165,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0R1
+    response_code: '0R1'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6177,7 +6178,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0R3
+    response_code: '0R3'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6190,7 +6191,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0XA
+    response_code: '0XA'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6203,7 +6204,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0XD
+    response_code: '0XD'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "monthly"
@@ -6398,7 +6399,7 @@
   attributes: 
     notes: Fix data & retry
     days: "1"
-    response_code: 019
+    response_code: '019'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6437,7 +6438,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 028
+    response_code: '028'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6554,7 +6555,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 058
+    response_code: '058'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6567,7 +6568,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 059
+    response_code: '059'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6684,7 +6685,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 078
+    response_code: '078'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6697,7 +6698,7 @@
   attributes: 
     notes: 
     days: "6"
-    response_code: 080
+    response_code: '080'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6710,7 +6711,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 081
+    response_code: '081'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6723,7 +6724,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 082
+    response_code: '082'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6736,7 +6737,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 085
+    response_code: '085'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6749,7 +6750,7 @@
   attributes: 
     notes: Fix data & retry
     days: "2"
-    response_code: 086
+    response_code: '086'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6762,7 +6763,7 @@
   attributes: 
     notes: Retry request
     days: "6"
-    response_code: 091
+    response_code: '091'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6775,7 +6776,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 092
+    response_code: '092'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6788,7 +6789,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 093
+    response_code: '093'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6801,7 +6802,7 @@
   attributes: 
     notes: Need to verify which field is incorrect, fix and retry
     days: "2"
-    response_code: 096
+    response_code: '096'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6814,7 +6815,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0B1
+    response_code: '0B1'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6827,7 +6828,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0N0
+    response_code: '0N0'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6840,7 +6841,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0N3
+    response_code: '0N3'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6853,7 +6854,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0N4
+    response_code: '0N4'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6866,7 +6867,7 @@
   attributes: 
     notes: Ask consumer for new CVV code and retry
     days: "0"
-    response_code: 0N7
+    response_code: '0N7'
     decline_type: soft
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6879,7 +6880,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0P2
+    response_code: '0P2'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6892,7 +6893,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0P5
+    response_code: '0P5'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6905,7 +6906,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0P6
+    response_code: '0P6'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6918,7 +6919,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0R0
+    response_code: '0R0'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6931,7 +6932,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0R1
+    response_code: '0R1'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6944,7 +6945,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0R3
+    response_code: '0R3'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6957,7 +6958,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0XA
+    response_code: '0XA'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -6970,7 +6971,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0XD
+    response_code: '0XD'
     decline_type: hard
     credit_card_type: american_express
     installment_type: "yearly"
@@ -7165,7 +7166,7 @@
   attributes: 
     notes: Fix data & retry
     days: "1"
-    response_code: 019
+    response_code: '019'
     decline_type: soft
     credit_card_type: discover
     installment_type: "monthly"
@@ -7204,7 +7205,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 028
+    response_code: '028'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7321,7 +7322,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 058
+    response_code: '058'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7334,7 +7335,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 059
+    response_code: '059'
     decline_type: hardhard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7451,7 +7452,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 078
+    response_code: '078'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7464,7 +7465,7 @@
   attributes: 
     notes: 
     days: "6"
-    response_code: 080
+    response_code: '080'
     decline_type: soft
     credit_card_type: discover
     installment_type: "monthly"
@@ -7477,7 +7478,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 081
+    response_code: '081'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7490,7 +7491,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 082
+    response_code: '082'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7503,7 +7504,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 085
+    response_code: '085'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7516,7 +7517,7 @@
   attributes: 
     notes: Fix data & retry
     days: "2"
-    response_code: 086
+    response_code: '086'
     decline_type: soft
     credit_card_type: discover
     installment_type: "monthly"
@@ -7529,7 +7530,7 @@
   attributes: 
     notes: Retry request
     days: "6"
-    response_code: 091
+    response_code: '091'
     decline_type: soft
     credit_card_type: discover
     installment_type: "monthly"
@@ -7542,7 +7543,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 092
+    response_code: '092'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7555,7 +7556,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 093
+    response_code: '093'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7568,7 +7569,7 @@
   attributes: 
     notes: Need to verify which field is incorrect, fix and retry
     days: "2"
-    response_code: 096
+    response_code: '096'
     decline_type: soft
     credit_card_type: discover
     installment_type: "monthly"
@@ -7581,7 +7582,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0B1
+    response_code: '0B1'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7594,7 +7595,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0N0
+    response_code: '0N0'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7607,7 +7608,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0N3
+    response_code: '0N3'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7620,7 +7621,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0N4
+    response_code: '0N4'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7633,7 +7634,7 @@
   attributes: 
     notes: Ask consumer for new CVV code and retry
     days: "0"
-    response_code: 0N7
+    response_code: '0N7'
     decline_type: soft
     credit_card_type: discover
     installment_type: "monthly"
@@ -7646,7 +7647,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0P2
+    response_code: '0P2'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7659,7 +7660,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0P5
+    response_code: '0P5'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7672,7 +7673,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0P6
+    response_code: '0P6'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7685,7 +7686,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0R0
+    response_code: '0R0'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7698,7 +7699,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0R1
+    response_code: '0R1'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7711,7 +7712,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0R3
+    response_code: '0R3'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7724,7 +7725,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0XA
+    response_code: '0XA'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7737,7 +7738,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 0XD
+    response_code: '0XD'
     decline_type: hard
     credit_card_type: discover
     installment_type: "monthly"
@@ -7932,7 +7933,7 @@
   attributes: 
     notes: Fix data & retry
     days: "1"
-    response_code: 019
+    response_code: '019'
     decline_type: soft
     credit_card_type: discover
     installment_type: "yearly"
@@ -7971,7 +7972,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 028
+    response_code: '028'
     decline_type: hard
     credit_card_type: discover
     installment_type: "yearly"
@@ -8088,7 +8089,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 058
+    response_code: '058'
     decline_type: hard
     credit_card_type: discover
     installment_type: "yearly"
@@ -8101,7 +8102,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 059
+    response_code: '059'
     decline_type: hard
     credit_card_type: discover
     installment_type: "yearly"
@@ -8218,7 +8219,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 078
+    response_code: '078'
     decline_type: hard
     credit_card_type: discover
     installment_type: "yearly"
@@ -8231,7 +8232,7 @@
   attributes: 
     notes: 
     days: "6"
-    response_code: 080
+    response_code: '080'
     decline_type: soft
     credit_card_type: discover
     installment_type: "yearly"
@@ -8244,7 +8245,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 081
+    response_code: '081'
     decline_type: hard
     credit_card_type: discover
     installment_type: "yearly"
@@ -8257,7 +8258,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 082
+    response_code: '082'
     decline_type: hard
     credit_card_type: discover
     installment_type: "yearly"
@@ -8270,7 +8271,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 085
+    response_code: '085'
     decline_type: hard
     credit_card_type: discover
     installment_type: "yearly"
@@ -8283,7 +8284,7 @@
   attributes: 
     notes: Fix data & retry
     days: "2"
-    response_code: 086
+    response_code: '086'
     decline_type: soft
     credit_card_type: discover
     installment_type: "yearly"
@@ -8296,7 +8297,7 @@
   attributes: 
     notes: Retry request
     days: "6"
-    response_code: 091
+    response_code: '091'
     decline_type: soft
     credit_card_type: discover
     installment_type: "yearly"
@@ -8309,7 +8310,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 092
+    response_code: '092'
     decline_type: hard
     credit_card_type: discover
     installment_type: "yearly"
@@ -8322,7 +8323,7 @@
   attributes: 
     notes: 
     days: "0"
-    response_code: 093
+    response_code: "093"
     decline_type: hard
     credit_card_type: discover
     installment_type: "yearly"
@@ -8335,7 +8336,7 @@
   attributes: 
     notes: Need to verify which field is incorrect, fix and retry
     days: "2"
-    response_code: 096
+    response_code: '096'
     decline_type: soft
     credit_card_type: discover
     installment_type: "yearly"
