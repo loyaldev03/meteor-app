@@ -6,6 +6,16 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+File.open("#{Rails.root}/db/decline_strategies.yml", 'r') do |file|
+   YAML::load(file).each do |record|
+      ds = DeclineStrategy.new 
+      record.attributes.each do |key, value|
+        ds.send("#{key}=", value)
+      end
+      ds.save!
+   end
+end
+
 data = 'batch@xagax.com'
 u = Agent.new :email => data, :username => data, :password => data, :password_confirmation => data
 u.save!

@@ -5,7 +5,7 @@
     response_code: "102"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "2"
     gateway: mes
     limit: "1"
@@ -18,7 +18,7 @@
     response_code: "103"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "3"
     gateway: mes
     limit: "1"
@@ -31,7 +31,7 @@
     response_code: "104"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "4"
     gateway: mes
     limit: "1"
@@ -44,7 +44,7 @@
     response_code: "105"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "5"
     gateway: mes
     limit: "1"
@@ -57,7 +57,7 @@
     response_code: "106"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "6"
     gateway: mes
     limit: "1"
@@ -70,7 +70,7 @@
     response_code: "107"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "7"
     gateway: mes
     limit: "1"
@@ -83,7 +83,7 @@
     response_code: "108"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "8"
     gateway: mes
     limit: "1"
@@ -96,7 +96,7 @@
     response_code: "109"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "9"
     gateway: mes
     limit: "1"
@@ -109,7 +109,7 @@
     response_code: "110"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "10"
     gateway: mes
     limit: "1"
@@ -122,7 +122,7 @@
     response_code: "111"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "11"
     gateway: mes
     limit: "1"
@@ -135,7 +135,7 @@
     response_code: "112"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "12"
     gateway: mes
     limit: "1"
@@ -148,7 +148,7 @@
     response_code: "113"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "13"
     gateway: mes
     limit: "1"
@@ -161,7 +161,7 @@
     response_code: "114"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "14"
     gateway: mes
     limit: "1"
@@ -174,7 +174,7 @@
     response_code: "115"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "15"
     gateway: mes
     limit: "1"
@@ -187,7 +187,7 @@
     response_code: "119"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "16"
     gateway: mes
     limit: "1"
@@ -200,7 +200,7 @@
     response_code: "120"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "17"
     gateway: mes
     limit: "1"
@@ -213,7 +213,7 @@
     response_code: "121"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "18"
     gateway: mes
     limit: "1"
@@ -226,7 +226,7 @@
     response_code: "122"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "19"
     gateway: mes
     limit: "0"
@@ -239,7 +239,7 @@
     response_code: "123"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "20"
     gateway: mes
     limit: "1"
@@ -252,7 +252,7 @@
     response_code: "124"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "21"
     gateway: mes
     limit: "1"
@@ -265,7 +265,7 @@
     response_code: "125"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "22"
     gateway: mes
     limit: "1"
@@ -278,7 +278,7 @@
     response_code: "201"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "23"
     gateway: mes
     limit: "1"
@@ -291,7 +291,7 @@
     response_code: "202"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "24"
     gateway: mes
     limit: "1"
@@ -304,7 +304,7 @@
     response_code: "203"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "25"
     gateway: mes
     limit: "1"
@@ -317,7 +317,7 @@
     response_code: "204"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "26"
     gateway: mes
     limit: "1"
@@ -330,7 +330,7 @@
     response_code: "205"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "27"
     gateway: mes
     limit: "0"
@@ -343,7 +343,7 @@
     response_code: "206"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "28"
     gateway: mes
     limit: "0"
@@ -356,7 +356,7 @@
     response_code: "207"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "29"
     gateway: mes
     limit: "1"
@@ -369,7 +369,7 @@
     response_code: "208"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "30"
     gateway: mes
     limit: "2"
@@ -382,7 +382,7 @@
     response_code: "209"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "31"
     gateway: mes
     limit: "1"
@@ -395,7 +395,7 @@
     response_code: "210"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "32"
     gateway: mes
     limit: "0"
@@ -408,7 +408,7 @@
     response_code: "211"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "33"
     gateway: mes
     limit: "0"
@@ -421,7 +421,7 @@
     response_code: "212"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "34"
     gateway: mes
     limit: "1"
@@ -434,7 +434,7 @@
     response_code: "213"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "35"
     gateway: mes
     limit: "1"
@@ -447,7 +447,7 @@
     response_code: "214"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "36"
     gateway: mes
     limit: "1"
@@ -460,7 +460,7 @@
     response_code: "215"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "37"
     gateway: mes
     limit: "1"
@@ -473,7 +473,7 @@
     response_code: "216"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "38"
     gateway: mes
     limit: "1"
@@ -486,7 +486,7 @@
     response_code: "217"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "39"
     gateway: mes
     limit: "1"
@@ -499,7 +499,7 @@
     response_code: "218"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "40"
     gateway: mes
     limit: "1"
@@ -512,7 +512,7 @@
     response_code: "219"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "41"
     gateway: mes
     limit: "1"
@@ -525,7 +525,7 @@
     response_code: "220"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "42"
     gateway: mes
     limit: "1"
@@ -538,7 +538,7 @@
     response_code: "221"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "43"
     gateway: mes
     limit: "1"
@@ -551,7 +551,7 @@
     response_code: "222"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "44"
     gateway: mes
     limit: "1"
@@ -564,7 +564,7 @@
     response_code: "223"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "45"
     gateway: mes
     limit: "1"
@@ -577,7 +577,7 @@
     response_code: "224"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "46"
     gateway: mes
     limit: "1"
@@ -590,7 +590,7 @@
     response_code: "225"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "47"
     gateway: mes
     limit: "1"
@@ -603,7 +603,7 @@
     response_code: "226"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "48"
     gateway: mes
     limit: "1"
@@ -616,7 +616,7 @@
     response_code: "227"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "49"
     gateway: mes
     limit: "1"
@@ -629,7 +629,7 @@
     response_code: "228"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "50"
     gateway: mes
     limit: "1"
@@ -642,7 +642,7 @@
     response_code: "229"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "51"
     gateway: mes
     limit: "1"
@@ -655,7 +655,7 @@
     response_code: "230"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "52"
     gateway: mes
     limit: "0"
@@ -668,7 +668,7 @@
     response_code: "231"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "53"
     gateway: mes
     limit: "1"
@@ -681,7 +681,7 @@
     response_code: "233"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "54"
     gateway: mes
     limit: "1"
@@ -694,7 +694,7 @@
     response_code: "234"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "55"
     gateway: mes
     limit: "0"
@@ -707,7 +707,7 @@
     response_code: "235"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "56"
     gateway: mes
     limit: "0"
@@ -720,7 +720,7 @@
     response_code: "236"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "57"
     gateway: mes
     limit: "0"
@@ -733,7 +733,7 @@
     response_code: "237"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "58"
     gateway: mes
     limit: "1"
@@ -746,7 +746,7 @@
     response_code: "238"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "59"
     gateway: mes
     limit: "1"
@@ -759,7 +759,7 @@
     response_code: "239"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "60"
     gateway: mes
     limit: "1"
@@ -772,7 +772,7 @@
     response_code: "300"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "61"
     gateway: mes
     limit: "1"
@@ -785,7 +785,7 @@
     response_code: "301"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "62"
     gateway: mes
     limit: "1"
@@ -798,7 +798,7 @@
     response_code: "302"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "63"
     gateway: mes
     limit: "1"
@@ -811,7 +811,7 @@
     response_code: "303"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "64"
     gateway: mes
     limit: "0"
@@ -824,7 +824,7 @@
     response_code: "304"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "65"
     gateway: mes
     limit: "1"
@@ -837,7 +837,7 @@
     response_code: "400"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "66"
     gateway: mes
     limit: "2"
@@ -850,7 +850,7 @@
     response_code: "401"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "67"
     gateway: mes
     limit: "1"
@@ -863,7 +863,7 @@
     response_code: "999"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "68"
     gateway: mes
     limit: "5"
@@ -876,7 +876,7 @@
     response_code: "001"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "69"
     gateway: mes
     limit: "4"
@@ -889,7 +889,7 @@
     response_code: "003"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "70"
     gateway: mes
     limit: "1"
@@ -902,7 +902,7 @@
     response_code: "004"
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "71"
     gateway: mes
     limit: "0"
@@ -915,7 +915,7 @@
     response_code: "005"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "72"
     gateway: mes
     limit: "6"
@@ -928,7 +928,7 @@
     response_code: 008
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "73"
     gateway: mes
     limit: "0"
@@ -941,7 +941,7 @@
     response_code: "010"
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "74"
     gateway: mes
     limit: "0"
@@ -954,7 +954,7 @@
     response_code: "012"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "75"
     gateway: mes
     limit: "1"
@@ -967,7 +967,7 @@
     response_code: "013"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "76"
     gateway: mes
     limit: "1"
@@ -980,7 +980,7 @@
     response_code: "014"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "77"
     gateway: mes
     limit: "0"
@@ -993,7 +993,7 @@
     response_code: "015"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "78"
     gateway: mes
     limit: "1"
@@ -1006,7 +1006,7 @@
     response_code: "030"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "79"
     gateway: mes
     limit: "1"
@@ -1019,7 +1019,7 @@
     response_code: "041"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "80"
     gateway: mes
     limit: "0"
@@ -1032,7 +1032,7 @@
     response_code: "043"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "81"
     gateway: mes
     limit: "0"
@@ -1045,7 +1045,7 @@
     response_code: "051"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "82"
     gateway: mes
     limit: "6"
@@ -1058,7 +1058,7 @@
     response_code: "054"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "83"
     gateway: mes
     limit: "5"
@@ -1071,7 +1071,7 @@
     response_code: "055"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "84"
     gateway: mes
     limit: "1"
@@ -1084,7 +1084,7 @@
     response_code: "057"
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "85"
     gateway: mes
     limit: "0"
@@ -1097,7 +1097,7 @@
     response_code: 058
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "86"
     gateway: mes
     limit: "0"
@@ -1110,7 +1110,7 @@
     response_code: "061"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "87"
     gateway: mes
     limit: "2"
@@ -1123,7 +1123,7 @@
     response_code: "062"
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "88"
     gateway: mes
     limit: "0"
@@ -1136,7 +1136,7 @@
     response_code: "063"
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "89"
     gateway: mes
     limit: "0"
@@ -1149,7 +1149,7 @@
     response_code: "065"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "90"
     gateway: mes
     limit: "4"
@@ -1162,7 +1162,7 @@
     response_code: "070"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "91"
     gateway: mes
     limit: "4"
@@ -1175,7 +1175,7 @@
     response_code: "071"
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "92"
     gateway: mes
     limit: "0"
@@ -1188,7 +1188,7 @@
     response_code: "075"
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "93"
     gateway: mes
     limit: "0"
@@ -1201,7 +1201,7 @@
     response_code: "076"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "94"
     gateway: mes
     limit: "1"
@@ -1214,7 +1214,7 @@
     response_code: "077"
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "95"
     gateway: mes
     limit: "1"
@@ -1227,7 +1227,7 @@
     response_code: 078
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "96"
     gateway: mes
     limit: "1"
@@ -1240,7 +1240,7 @@
     response_code: 084
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "97"
     gateway: mes
     limit: "0"
@@ -1253,7 +1253,7 @@
     response_code: 085
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "98"
     gateway: mes
     limit: "0"
@@ -1266,7 +1266,7 @@
     response_code: 086
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "99"
     gateway: mes
     limit: "0"
@@ -1279,7 +1279,7 @@
     response_code: 087
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "100"
     gateway: mes
     limit: "0"
@@ -1292,7 +1292,7 @@
     response_code: 088
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "101"
     gateway: mes
     limit: "1"
@@ -1305,7 +1305,7 @@
     response_code: 089
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "102"
     gateway: mes
     limit: "1"
@@ -1318,7 +1318,7 @@
     response_code: 091
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "103"
     gateway: mes
     limit: "4"
@@ -1331,7 +1331,7 @@
     response_code: 092
     decline_type: hard
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "104"
     gateway: mes
     limit: "0"
@@ -1344,7 +1344,7 @@
     response_code: 094
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "105"
     gateway: mes
     limit: "1"
@@ -1357,7 +1357,7 @@
     response_code: 096
     decline_type: soft
     credit_card_type: master
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "106"
     gateway: mes
     limit: "1"
@@ -1370,7 +1370,7 @@
     response_code: "001"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "107"
     gateway: mes
     limit: "4"
@@ -1383,7 +1383,7 @@
     response_code: "002"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "108"
     gateway: mes
     limit: "4"
@@ -1396,7 +1396,7 @@
     response_code: "003"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "109"
     gateway: mes
     limit: "1"
@@ -1409,7 +1409,7 @@
     response_code: "004"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "110"
     gateway: mes
     limit: "0"
@@ -1422,7 +1422,7 @@
     response_code: "005"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "111"
     gateway: mes
     limit: "6"
@@ -1435,7 +1435,7 @@
     response_code: "006"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "112"
     gateway: mes
     limit: "5"
@@ -1448,7 +1448,7 @@
     response_code: "007"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "113"
     gateway: mes
     limit: "0"
@@ -1461,7 +1461,7 @@
     response_code: "010"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "114"
     gateway: mes
     limit: "0"
@@ -1474,7 +1474,7 @@
     response_code: "011"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "115"
     gateway: mes
     limit: "0"
@@ -1487,7 +1487,7 @@
     response_code: "012"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "116"
     gateway: mes
     limit: "1"
@@ -1500,7 +1500,7 @@
     response_code: "013"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "117"
     gateway: mes
     limit: "1"
@@ -1513,7 +1513,7 @@
     response_code: "014"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "118"
     gateway: mes
     limit: "0"
@@ -1526,7 +1526,7 @@
     response_code: "015"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "119"
     gateway: mes
     limit: "1"
@@ -1539,7 +1539,7 @@
     response_code: 019
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "120"
     gateway: mes
     limit: "1"
@@ -1552,7 +1552,7 @@
     response_code: "021"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "121"
     gateway: mes
     limit: "0"
@@ -1565,7 +1565,7 @@
     response_code: "025"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "122"
     gateway: mes
     limit: "0"
@@ -1578,7 +1578,7 @@
     response_code: 028
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "123"
     gateway: mes
     limit: "0"
@@ -1591,7 +1591,7 @@
     response_code: "041"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "124"
     gateway: mes
     limit: "0"
@@ -1604,7 +1604,7 @@
     response_code: "043"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "125"
     gateway: mes
     limit: "0"
@@ -1617,7 +1617,7 @@
     response_code: "051"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "126"
     gateway: mes
     limit: "6"
@@ -1630,7 +1630,7 @@
     response_code: "052"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "127"
     gateway: mes
     limit: "0"
@@ -1643,7 +1643,7 @@
     response_code: "053"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "128"
     gateway: mes
     limit: "0"
@@ -1656,7 +1656,7 @@
     response_code: "054"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "129"
     gateway: mes
     limit: "5"
@@ -1669,7 +1669,7 @@
     response_code: "055"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "130"
     gateway: mes
     limit: "1"
@@ -1682,7 +1682,7 @@
     response_code: "057"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "131"
     gateway: mes
     limit: "0"
@@ -1695,7 +1695,7 @@
     response_code: 058
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "132"
     gateway: mes
     limit: "0"
@@ -1708,7 +1708,7 @@
     response_code: 059
     decline_type: hardhard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "133"
     gateway: mes
     limit: "0"
@@ -1721,7 +1721,7 @@
     response_code: "061"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "134"
     gateway: mes
     limit: "4"
@@ -1734,7 +1734,7 @@
     response_code: "062"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "135"
     gateway: mes
     limit: "0"
@@ -1747,7 +1747,7 @@
     response_code: "063"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "136"
     gateway: mes
     limit: "0"
@@ -1760,7 +1760,7 @@
     response_code: "064"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "137"
     gateway: mes
     limit: "1"
@@ -1773,7 +1773,7 @@
     response_code: "065"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "138"
     gateway: mes
     limit: "4"
@@ -1786,7 +1786,7 @@
     response_code: "075"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "139"
     gateway: mes
     limit: "0"
@@ -1799,7 +1799,7 @@
     response_code: "076"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "140"
     gateway: mes
     limit: "0"
@@ -1812,7 +1812,7 @@
     response_code: "077"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "141"
     gateway: mes
     limit: "1"
@@ -1825,7 +1825,7 @@
     response_code: 078
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "142"
     gateway: mes
     limit: "0"
@@ -1838,7 +1838,7 @@
     response_code: 080
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "143"
     gateway: mes
     limit: "4"
@@ -1851,7 +1851,7 @@
     response_code: 081
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "144"
     gateway: mes
     limit: "0"
@@ -1864,7 +1864,7 @@
     response_code: 082
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "145"
     gateway: mes
     limit: "0"
@@ -1877,7 +1877,7 @@
     response_code: 085
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "146"
     gateway: mes
     limit: "0"
@@ -1890,7 +1890,7 @@
     response_code: 086
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "147"
     gateway: mes
     limit: "1"
@@ -1903,7 +1903,7 @@
     response_code: 091
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "148"
     gateway: mes
     limit: "4"
@@ -1916,7 +1916,7 @@
     response_code: 092
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "149"
     gateway: mes
     limit: "0"
@@ -1929,7 +1929,7 @@
     response_code: 093
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "150"
     gateway: mes
     limit: "0"
@@ -1942,7 +1942,7 @@
     response_code: 096
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "151"
     gateway: mes
     limit: "1"
@@ -1955,7 +1955,7 @@
     response_code: 0B1
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "152"
     gateway: mes
     limit: "0"
@@ -1968,7 +1968,7 @@
     response_code: 0N0
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "153"
     gateway: mes
     limit: "0"
@@ -1981,7 +1981,7 @@
     response_code: 0N3
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "154"
     gateway: mes
     limit: "0"
@@ -1994,7 +1994,7 @@
     response_code: 0N4
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "155"
     gateway: mes
     limit: "0"
@@ -2007,7 +2007,7 @@
     response_code: 0N7
     decline_type: soft
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "156"
     gateway: mes
     limit: "0"
@@ -2020,7 +2020,7 @@
     response_code: 0P2
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "157"
     gateway: mes
     limit: "0"
@@ -2033,7 +2033,7 @@
     response_code: 0P5
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "158"
     gateway: mes
     limit: "0"
@@ -2046,7 +2046,7 @@
     response_code: 0P6
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "159"
     gateway: mes
     limit: "0"
@@ -2059,7 +2059,7 @@
     response_code: 0R0
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "160"
     gateway: mes
     limit: "0"
@@ -2072,7 +2072,7 @@
     response_code: 0R1
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "161"
     gateway: mes
     limit: "0"
@@ -2085,7 +2085,7 @@
     response_code: 0R3
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "162"
     gateway: mes
     limit: "0"
@@ -2098,7 +2098,7 @@
     response_code: 0XA
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "163"
     gateway: mes
     limit: "0"
@@ -2111,7 +2111,7 @@
     response_code: 0XD
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "164"
     gateway: mes
     limit: "0"
@@ -2124,7 +2124,7 @@
     response_code: 0Z3
     decline_type: hard
     credit_card_type: visa
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "165"
     gateway: mes
     limit: "0"
@@ -2137,7 +2137,7 @@
     response_code: "102"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "167"
     gateway: mes
     limit: "1"
@@ -2150,7 +2150,7 @@
     response_code: "103"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "168"
     gateway: mes
     limit: "1"
@@ -2163,7 +2163,7 @@
     response_code: "104"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "169"
     gateway: mes
     limit: "1"
@@ -2176,7 +2176,7 @@
     response_code: "105"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "170"
     gateway: mes
     limit: "1"
@@ -2189,7 +2189,7 @@
     response_code: "106"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "171"
     gateway: mes
     limit: "1"
@@ -2202,7 +2202,7 @@
     response_code: "107"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "172"
     gateway: mes
     limit: "1"
@@ -2215,7 +2215,7 @@
     response_code: "108"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "173"
     gateway: mes
     limit: "1"
@@ -2228,7 +2228,7 @@
     response_code: "109"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "174"
     gateway: mes
     limit: "1"
@@ -2241,7 +2241,7 @@
     response_code: "110"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "175"
     gateway: mes
     limit: "1"
@@ -2254,7 +2254,7 @@
     response_code: "111"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "176"
     gateway: mes
     limit: "1"
@@ -2267,7 +2267,7 @@
     response_code: "112"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "177"
     gateway: mes
     limit: "1"
@@ -2280,7 +2280,7 @@
     response_code: "113"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "178"
     gateway: mes
     limit: "1"
@@ -2293,7 +2293,7 @@
     response_code: "114"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "179"
     gateway: mes
     limit: "1"
@@ -2306,7 +2306,7 @@
     response_code: "115"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "180"
     gateway: mes
     limit: "1"
@@ -2319,7 +2319,7 @@
     response_code: "119"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "181"
     gateway: mes
     limit: "1"
@@ -2332,7 +2332,7 @@
     response_code: "120"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "182"
     gateway: mes
     limit: "1"
@@ -2345,7 +2345,7 @@
     response_code: "121"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "183"
     gateway: mes
     limit: "1"
@@ -2358,7 +2358,7 @@
     response_code: "122"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "184"
     gateway: mes
     limit: "0"
@@ -2371,7 +2371,7 @@
     response_code: "123"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "185"
     gateway: mes
     limit: "1"
@@ -2384,7 +2384,7 @@
     response_code: "124"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "186"
     gateway: mes
     limit: "1"
@@ -2397,7 +2397,7 @@
     response_code: "125"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "187"
     gateway: mes
     limit: "1"
@@ -2410,7 +2410,7 @@
     response_code: "201"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "188"
     gateway: mes
     limit: "1"
@@ -2423,7 +2423,7 @@
     response_code: "202"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "189"
     gateway: mes
     limit: "1"
@@ -2436,7 +2436,7 @@
     response_code: "203"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "190"
     gateway: mes
     limit: "1"
@@ -2449,7 +2449,7 @@
     response_code: "204"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "191"
     gateway: mes
     limit: "1"
@@ -2462,7 +2462,7 @@
     response_code: "205"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "192"
     gateway: mes
     limit: "0"
@@ -2475,7 +2475,7 @@
     response_code: "206"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "193"
     gateway: mes
     limit: "0"
@@ -2488,7 +2488,7 @@
     response_code: "207"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "194"
     gateway: mes
     limit: "1"
@@ -2501,7 +2501,7 @@
     response_code: "208"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "195"
     gateway: mes
     limit: "2"
@@ -2514,7 +2514,7 @@
     response_code: "209"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "196"
     gateway: mes
     limit: "1"
@@ -2527,7 +2527,7 @@
     response_code: "210"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "197"
     gateway: mes
     limit: "0"
@@ -2540,7 +2540,7 @@
     response_code: "211"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "198"
     gateway: mes
     limit: "0"
@@ -2553,7 +2553,7 @@
     response_code: "212"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "199"
     gateway: mes
     limit: "1"
@@ -2566,7 +2566,7 @@
     response_code: "213"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "200"
     gateway: mes
     limit: "1"
@@ -2579,7 +2579,7 @@
     response_code: "214"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "201"
     gateway: mes
     limit: "1"
@@ -2592,7 +2592,7 @@
     response_code: "215"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "202"
     gateway: mes
     limit: "1"
@@ -2605,7 +2605,7 @@
     response_code: "216"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "203"
     gateway: mes
     limit: "1"
@@ -2618,7 +2618,7 @@
     response_code: "217"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "204"
     gateway: mes
     limit: "1"
@@ -2631,7 +2631,7 @@
     response_code: "218"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "205"
     gateway: mes
     limit: "1"
@@ -2644,7 +2644,7 @@
     response_code: "219"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "206"
     gateway: mes
     limit: "1"
@@ -2657,7 +2657,7 @@
     response_code: "220"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "207"
     gateway: mes
     limit: "1"
@@ -2670,7 +2670,7 @@
     response_code: "221"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "208"
     gateway: mes
     limit: "1"
@@ -2683,7 +2683,7 @@
     response_code: "222"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "209"
     gateway: mes
     limit: "1"
@@ -2696,7 +2696,7 @@
     response_code: "223"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "210"
     gateway: mes
     limit: "1"
@@ -2709,7 +2709,7 @@
     response_code: "224"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "211"
     gateway: mes
     limit: "1"
@@ -2722,7 +2722,7 @@
     response_code: "225"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "212"
     gateway: mes
     limit: "1"
@@ -2735,7 +2735,7 @@
     response_code: "226"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "213"
     gateway: mes
     limit: "1"
@@ -2748,7 +2748,7 @@
     response_code: "227"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "214"
     gateway: mes
     limit: "1"
@@ -2761,7 +2761,7 @@
     response_code: "228"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "215"
     gateway: mes
     limit: "1"
@@ -2774,7 +2774,7 @@
     response_code: "229"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "216"
     gateway: mes
     limit: "1"
@@ -2787,7 +2787,7 @@
     response_code: "230"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "217"
     gateway: mes
     limit: "0"
@@ -2800,7 +2800,7 @@
     response_code: "231"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "218"
     gateway: mes
     limit: "1"
@@ -2813,7 +2813,7 @@
     response_code: "233"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "219"
     gateway: mes
     limit: "1"
@@ -2826,7 +2826,7 @@
     response_code: "234"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "220"
     gateway: mes
     limit: "0"
@@ -2839,7 +2839,7 @@
     response_code: "235"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "221"
     gateway: mes
     limit: "0"
@@ -2852,7 +2852,7 @@
     response_code: "236"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "222"
     gateway: mes
     limit: "0"
@@ -2865,7 +2865,7 @@
     response_code: "237"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "223"
     gateway: mes
     limit: "1"
@@ -2878,7 +2878,7 @@
     response_code: "238"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "224"
     gateway: mes
     limit: "1"
@@ -2891,7 +2891,7 @@
     response_code: "239"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "225"
     gateway: mes
     limit: "1"
@@ -2904,7 +2904,7 @@
     response_code: "300"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "226"
     gateway: mes
     limit: "1"
@@ -2917,7 +2917,7 @@
     response_code: "301"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "227"
     gateway: mes
     limit: "1"
@@ -2930,7 +2930,7 @@
     response_code: "302"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "228"
     gateway: mes
     limit: "1"
@@ -2943,7 +2943,7 @@
     response_code: "303"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "229"
     gateway: mes
     limit: "0"
@@ -2956,7 +2956,7 @@
     response_code: "304"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "230"
     gateway: mes
     limit: "1"
@@ -2969,7 +2969,7 @@
     response_code: "400"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "231"
     gateway: mes
     limit: "2"
@@ -2982,7 +2982,7 @@
     response_code: "401"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "232"
     gateway: mes
     limit: "1"
@@ -2995,7 +2995,7 @@
     response_code: "999"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "233"
     gateway: mes
     limit: "5"
@@ -3008,7 +3008,7 @@
     response_code: "001"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "234"
     gateway: mes
     limit: "6"
@@ -3021,7 +3021,7 @@
     response_code: "003"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "235"
     gateway: mes
     limit: "1"
@@ -3034,7 +3034,7 @@
     response_code: "004"
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "236"
     gateway: mes
     limit: "0"
@@ -3047,7 +3047,7 @@
     response_code: "005"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "237"
     gateway: mes
     limit: "8"
@@ -3060,7 +3060,7 @@
     response_code: 008
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "238"
     gateway: mes
     limit: "0"
@@ -3073,7 +3073,7 @@
     response_code: "010"
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "239"
     gateway: mes
     limit: "0"
@@ -3086,7 +3086,7 @@
     response_code: "012"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "240"
     gateway: mes
     limit: "1"
@@ -3099,7 +3099,7 @@
     response_code: "013"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "241"
     gateway: mes
     limit: "1"
@@ -3112,7 +3112,7 @@
     response_code: "014"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "242"
     gateway: mes
     limit: "0"
@@ -3125,7 +3125,7 @@
     response_code: "015"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "243"
     gateway: mes
     limit: "1"
@@ -3138,7 +3138,7 @@
     response_code: "030"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "244"
     gateway: mes
     limit: "1"
@@ -3151,7 +3151,7 @@
     response_code: "041"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "245"
     gateway: mes
     limit: "0"
@@ -3164,7 +3164,7 @@
     response_code: "043"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "246"
     gateway: mes
     limit: "0"
@@ -3177,7 +3177,7 @@
     response_code: "051"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "247"
     gateway: mes
     limit: "8"
@@ -3190,7 +3190,7 @@
     response_code: "054"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "248"
     gateway: mes
     limit: "5"
@@ -3203,7 +3203,7 @@
     response_code: "055"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "249"
     gateway: mes
     limit: "1"
@@ -3216,7 +3216,7 @@
     response_code: "057"
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "250"
     gateway: mes
     limit: "0"
@@ -3229,7 +3229,7 @@
     response_code: 058
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "251"
     gateway: mes
     limit: "0"
@@ -3242,7 +3242,7 @@
     response_code: "061"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "252"
     gateway: mes
     limit: "2"
@@ -3255,7 +3255,7 @@
     response_code: "062"
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "253"
     gateway: mes
     limit: "0"
@@ -3268,7 +3268,7 @@
     response_code: "063"
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "254"
     gateway: mes
     limit: "0"
@@ -3281,7 +3281,7 @@
     response_code: "065"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "255"
     gateway: mes
     limit: "4"
@@ -3294,7 +3294,7 @@
     response_code: "070"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "256"
     gateway: mes
     limit: "4"
@@ -3307,7 +3307,7 @@
     response_code: "071"
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "257"
     gateway: mes
     limit: "0"
@@ -3320,7 +3320,7 @@
     response_code: "075"
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "258"
     gateway: mes
     limit: "0"
@@ -3333,7 +3333,7 @@
     response_code: "076"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "259"
     gateway: mes
     limit: "1"
@@ -3346,7 +3346,7 @@
     response_code: "077"
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "260"
     gateway: mes
     limit: "1"
@@ -3359,7 +3359,7 @@
     response_code: 078
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "261"
     gateway: mes
     limit: "1"
@@ -3372,7 +3372,7 @@
     response_code: 084
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "262"
     gateway: mes
     limit: "0"
@@ -3385,7 +3385,7 @@
     response_code: 085
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "263"
     gateway: mes
     limit: "0"
@@ -3398,7 +3398,7 @@
     response_code: 086
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "264"
     gateway: mes
     limit: "0"
@@ -3411,7 +3411,7 @@
     response_code: 087
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "265"
     gateway: mes
     limit: "0"
@@ -3424,7 +3424,7 @@
     response_code: 088
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "266"
     gateway: mes
     limit: "1"
@@ -3437,7 +3437,7 @@
     response_code: 089
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "267"
     gateway: mes
     limit: "1"
@@ -3450,7 +3450,7 @@
     response_code: 091
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "268"
     gateway: mes
     limit: "4"
@@ -3463,7 +3463,7 @@
     response_code: 092
     decline_type: hard
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "269"
     gateway: mes
     limit: "0"
@@ -3476,7 +3476,7 @@
     response_code: 094
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "270"
     gateway: mes
     limit: "1"
@@ -3489,7 +3489,7 @@
     response_code: 096
     decline_type: soft
     credit_card_type: master
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "271"
     gateway: mes
     limit: "1"
@@ -3502,7 +3502,7 @@
     response_code: "001"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "272"
     gateway: mes
     limit: "4"
@@ -3515,7 +3515,7 @@
     response_code: "002"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "273"
     gateway: mes
     limit: "4"
@@ -3528,7 +3528,7 @@
     response_code: "003"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "274"
     gateway: mes
     limit: "1"
@@ -3541,7 +3541,7 @@
     response_code: "004"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "275"
     gateway: mes
     limit: "0"
@@ -3554,7 +3554,7 @@
     response_code: "005"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "276"
     gateway: mes
     limit: "8"
@@ -3567,7 +3567,7 @@
     response_code: "006"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "277"
     gateway: mes
     limit: "5"
@@ -3580,7 +3580,7 @@
     response_code: "007"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "278"
     gateway: mes
     limit: "0"
@@ -3593,7 +3593,7 @@
     response_code: "010"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "279"
     gateway: mes
     limit: "0"
@@ -3606,7 +3606,7 @@
     response_code: "011"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "280"
     gateway: mes
     limit: "0"
@@ -3619,7 +3619,7 @@
     response_code: "012"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "281"
     gateway: mes
     limit: "1"
@@ -3632,7 +3632,7 @@
     response_code: "013"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "282"
     gateway: mes
     limit: "1"
@@ -3645,7 +3645,7 @@
     response_code: "014"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "283"
     gateway: mes
     limit: "0"
@@ -3658,7 +3658,7 @@
     response_code: "015"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "284"
     gateway: mes
     limit: "1"
@@ -3671,7 +3671,7 @@
     response_code: 019
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "285"
     gateway: mes
     limit: "1"
@@ -3684,7 +3684,7 @@
     response_code: "021"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "286"
     gateway: mes
     limit: "0"
@@ -3697,7 +3697,7 @@
     response_code: "025"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "287"
     gateway: mes
     limit: "0"
@@ -3710,7 +3710,7 @@
     response_code: 028
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "288"
     gateway: mes
     limit: "0"
@@ -3723,7 +3723,7 @@
     response_code: "041"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "289"
     gateway: mes
     limit: "0"
@@ -3736,7 +3736,7 @@
     response_code: "043"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "290"
     gateway: mes
     limit: "0"
@@ -3749,7 +3749,7 @@
     response_code: "051"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "291"
     gateway: mes
     limit: "8"
@@ -3762,7 +3762,7 @@
     response_code: "052"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "292"
     gateway: mes
     limit: "0"
@@ -3775,7 +3775,7 @@
     response_code: "053"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "293"
     gateway: mes
     limit: "0"
@@ -3788,7 +3788,7 @@
     response_code: "054"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "294"
     gateway: mes
     limit: "5"
@@ -3801,7 +3801,7 @@
     response_code: "055"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "295"
     gateway: mes
     limit: "1"
@@ -3814,7 +3814,7 @@
     response_code: "057"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "296"
     gateway: mes
     limit: "0"
@@ -3827,7 +3827,7 @@
     response_code: 058
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "297"
     gateway: mes
     limit: "0"
@@ -3840,7 +3840,7 @@
     response_code: 059
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "298"
     gateway: mes
     limit: "0"
@@ -3853,7 +3853,7 @@
     response_code: "061"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "299"
     gateway: mes
     limit: "4"
@@ -3866,7 +3866,7 @@
     response_code: "062"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "300"
     gateway: mes
     limit: "0"
@@ -3879,7 +3879,7 @@
     response_code: "063"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "301"
     gateway: mes
     limit: "0"
@@ -3892,7 +3892,7 @@
     response_code: "064"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "302"
     gateway: mes
     limit: "1"
@@ -3905,7 +3905,7 @@
     response_code: "065"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "303"
     gateway: mes
     limit: "4"
@@ -3918,7 +3918,7 @@
     response_code: "075"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "304"
     gateway: mes
     limit: "0"
@@ -3931,7 +3931,7 @@
     response_code: "076"
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "305"
     gateway: mes
     limit: "0"
@@ -3944,7 +3944,7 @@
     response_code: "077"
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "306"
     gateway: mes
     limit: "1"
@@ -3957,7 +3957,7 @@
     response_code: 078
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "307"
     gateway: mes
     limit: "0"
@@ -3970,7 +3970,7 @@
     response_code: 080
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "308"
     gateway: mes
     limit: "4"
@@ -3983,7 +3983,7 @@
     response_code: 081
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "309"
     gateway: mes
     limit: "0"
@@ -3996,7 +3996,7 @@
     response_code: 082
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "310"
     gateway: mes
     limit: "0"
@@ -4009,7 +4009,7 @@
     response_code: 085
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "311"
     gateway: mes
     limit: "0"
@@ -4022,7 +4022,7 @@
     response_code: 086
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "312"
     gateway: mes
     limit: "1"
@@ -4035,7 +4035,7 @@
     response_code: 091
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "313"
     gateway: mes
     limit: "4"
@@ -4048,7 +4048,7 @@
     response_code: 092
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "314"
     gateway: mes
     limit: "0"
@@ -4061,7 +4061,7 @@
     response_code: 093
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "315"
     gateway: mes
     limit: "0"
@@ -4074,7 +4074,7 @@
     response_code: 096
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "316"
     gateway: mes
     limit: "1"
@@ -4087,7 +4087,7 @@
     response_code: 0B1
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "317"
     gateway: mes
     limit: "0"
@@ -4100,7 +4100,7 @@
     response_code: 0N0
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "318"
     gateway: mes
     limit: "0"
@@ -4113,7 +4113,7 @@
     response_code: 0N3
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "319"
     gateway: mes
     limit: "0"
@@ -4126,7 +4126,7 @@
     response_code: 0N4
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "320"
     gateway: mes
     limit: "0"
@@ -4139,7 +4139,7 @@
     response_code: 0N7
     decline_type: soft
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "321"
     gateway: mes
     limit: "0"
@@ -4152,7 +4152,7 @@
     response_code: 0P2
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "322"
     gateway: mes
     limit: "0"
@@ -4165,7 +4165,7 @@
     response_code: 0P5
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "323"
     gateway: mes
     limit: "0"
@@ -4178,7 +4178,7 @@
     response_code: 0P6
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "324"
     gateway: mes
     limit: "0"
@@ -4191,7 +4191,7 @@
     response_code: 0R0
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "325"
     gateway: mes
     limit: "0"
@@ -4204,7 +4204,7 @@
     response_code: 0R1
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "326"
     gateway: mes
     limit: "0"
@@ -4217,7 +4217,7 @@
     response_code: 0R3
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "327"
     gateway: mes
     limit: "0"
@@ -4230,7 +4230,7 @@
     response_code: 0XA
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "328"
     gateway: mes
     limit: "0"
@@ -4243,7 +4243,7 @@
     response_code: 0XD
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "329"
     gateway: mes
     limit: "0"
@@ -4256,7 +4256,7 @@
     response_code: 0Z3
     decline_type: hard
     credit_card_type: visa
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "330"
     gateway: mes
     limit: "0"
@@ -4269,7 +4269,7 @@
     response_code: "111"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "331"
     gateway: litle
     limit: "0"
@@ -4282,7 +4282,7 @@
     response_code: "126"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "332"
     gateway: litle
     limit: "0"
@@ -4295,7 +4295,7 @@
     response_code: "191"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "333"
     gateway: litle
     limit: "0"
@@ -4308,7 +4308,7 @@
     response_code: "301"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "334"
     gateway: litle
     limit: "0"
@@ -4321,7 +4321,7 @@
     response_code: "308"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "335"
     gateway: litle
     limit: "0"
@@ -4334,7 +4334,7 @@
     response_code: "310"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "336"
     gateway: litle
     limit: "0"
@@ -4347,7 +4347,7 @@
     response_code: "311"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "337"
     gateway: litle
     limit: "0"
@@ -4360,7 +4360,7 @@
     response_code: "321"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "338"
     gateway: litle
     limit: "0"
@@ -4373,7 +4373,7 @@
     response_code: "323"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "339"
     gateway: litle
     limit: "0"
@@ -4386,7 +4386,7 @@
     response_code: "324"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "340"
     gateway: litle
     limit: "0"
@@ -4399,7 +4399,7 @@
     response_code: "325"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "341"
     gateway: litle
     limit: "0"
@@ -4412,7 +4412,7 @@
     response_code: "326"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "342"
     gateway: litle
     limit: "0"
@@ -4425,7 +4425,7 @@
     response_code: "327"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "343"
     gateway: litle
     limit: "0"
@@ -4438,7 +4438,7 @@
     response_code: "328"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "344"
     gateway: litle
     limit: "0"
@@ -4451,7 +4451,7 @@
     response_code: "351"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "345"
     gateway: litle
     limit: "0"
@@ -4464,7 +4464,7 @@
     response_code: "352"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "346"
     gateway: litle
     limit: "0"
@@ -4477,7 +4477,7 @@
     response_code: "353"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "347"
     gateway: litle
     limit: "0"
@@ -4490,7 +4490,7 @@
     response_code: "354"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "348"
     gateway: litle
     limit: "0"
@@ -4503,7 +4503,7 @@
     response_code: "357"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "349"
     gateway: litle
     limit: "0"
@@ -4516,7 +4516,7 @@
     response_code: "360"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "350"
     gateway: litle
     limit: "0"
@@ -4529,7 +4529,7 @@
     response_code: "362"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "351"
     gateway: litle
     limit: "0"
@@ -4542,7 +4542,7 @@
     response_code: "363"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "352"
     gateway: litle
     limit: "0"
@@ -4555,7 +4555,7 @@
     response_code: "364"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "353"
     gateway: litle
     limit: "0"
@@ -4568,7 +4568,7 @@
     response_code: "365"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "354"
     gateway: litle
     limit: "0"
@@ -4581,7 +4581,7 @@
     response_code: "366"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "355"
     gateway: litle
     limit: "0"
@@ -4594,7 +4594,7 @@
     response_code: "367"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "356"
     gateway: litle
     limit: "0"
@@ -4607,7 +4607,7 @@
     response_code: "369"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "357"
     gateway: litle
     limit: "0"
@@ -4620,7 +4620,7 @@
     response_code: "400"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "358"
     gateway: litle
     limit: "0"
@@ -4633,7 +4633,7 @@
     response_code: "610"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "359"
     gateway: litle
     limit: "0"
@@ -4646,7 +4646,7 @@
     response_code: "611"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "360"
     gateway: litle
     limit: "0"
@@ -4659,7 +4659,7 @@
     response_code: "612"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "361"
     gateway: litle
     limit: "0"
@@ -4672,7 +4672,7 @@
     response_code: "701"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "362"
     gateway: litle
     limit: "0"
@@ -4685,7 +4685,7 @@
     response_code: "703"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "363"
     gateway: litle
     limit: "0"
@@ -4698,7 +4698,7 @@
     response_code: "705"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "364"
     gateway: litle
     limit: "0"
@@ -4711,7 +4711,7 @@
     response_code: "712"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "365"
     gateway: litle
     limit: "0"
@@ -4724,7 +4724,7 @@
     response_code: "714"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "366"
     gateway: litle
     limit: "0"
@@ -4737,7 +4737,7 @@
     response_code: "950"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "367"
     gateway: litle
     limit: "0"
@@ -4750,7 +4750,7 @@
     response_code: "951"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "368"
     gateway: litle
     limit: "0"
@@ -4763,7 +4763,7 @@
     response_code: "952"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "369"
     gateway: litle
     limit: "0"
@@ -4776,7 +4776,7 @@
     response_code: "953"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "370"
     gateway: litle
     limit: "0"
@@ -4789,7 +4789,7 @@
     response_code: "954"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "371"
     gateway: litle
     limit: "0"
@@ -4802,7 +4802,7 @@
     response_code: "111"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "373"
     gateway: litle
     limit: "0"
@@ -4815,7 +4815,7 @@
     response_code: "126"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "374"
     gateway: litle
     limit: "0"
@@ -4828,7 +4828,7 @@
     response_code: "191"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "375"
     gateway: litle
     limit: "0"
@@ -4841,7 +4841,7 @@
     response_code: "301"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "376"
     gateway: litle
     limit: "0"
@@ -4854,7 +4854,7 @@
     response_code: "308"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "377"
     gateway: litle
     limit: "0"
@@ -4867,7 +4867,7 @@
     response_code: "310"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "378"
     gateway: litle
     limit: "0"
@@ -4880,7 +4880,7 @@
     response_code: "311"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "379"
     gateway: litle
     limit: "0"
@@ -4893,7 +4893,7 @@
     response_code: "321"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "380"
     gateway: litle
     limit: "0"
@@ -4906,7 +4906,7 @@
     response_code: "323"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "381"
     gateway: litle
     limit: "0"
@@ -4919,7 +4919,7 @@
     response_code: "324"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "382"
     gateway: litle
     limit: "0"
@@ -4932,7 +4932,7 @@
     response_code: "325"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "383"
     gateway: litle
     limit: "0"
@@ -4945,7 +4945,7 @@
     response_code: "326"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "384"
     gateway: litle
     limit: "0"
@@ -4958,7 +4958,7 @@
     response_code: "327"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "385"
     gateway: litle
     limit: "0"
@@ -4971,7 +4971,7 @@
     response_code: "328"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "386"
     gateway: litle
     limit: "0"
@@ -4984,7 +4984,7 @@
     response_code: "351"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "387"
     gateway: litle
     limit: "0"
@@ -4997,7 +4997,7 @@
     response_code: "352"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "388"
     gateway: litle
     limit: "0"
@@ -5010,7 +5010,7 @@
     response_code: "353"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "389"
     gateway: litle
     limit: "0"
@@ -5023,7 +5023,7 @@
     response_code: "354"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "390"
     gateway: litle
     limit: "0"
@@ -5036,7 +5036,7 @@
     response_code: "357"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "391"
     gateway: litle
     limit: "0"
@@ -5049,7 +5049,7 @@
     response_code: "360"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "392"
     gateway: litle
     limit: "0"
@@ -5062,7 +5062,7 @@
     response_code: "362"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "393"
     gateway: litle
     limit: "0"
@@ -5075,7 +5075,7 @@
     response_code: "363"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "394"
     gateway: litle
     limit: "0"
@@ -5088,7 +5088,7 @@
     response_code: "364"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "395"
     gateway: litle
     limit: "0"
@@ -5101,7 +5101,7 @@
     response_code: "365"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "396"
     gateway: litle
     limit: "0"
@@ -5114,7 +5114,7 @@
     response_code: "366"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "397"
     gateway: litle
     limit: "0"
@@ -5127,7 +5127,7 @@
     response_code: "367"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "398"
     gateway: litle
     limit: "0"
@@ -5140,7 +5140,7 @@
     response_code: "369"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "399"
     gateway: litle
     limit: "0"
@@ -5153,7 +5153,7 @@
     response_code: "400"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "400"
     gateway: litle
     limit: "0"
@@ -5166,7 +5166,7 @@
     response_code: "610"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "401"
     gateway: litle
     limit: "0"
@@ -5179,7 +5179,7 @@
     response_code: "611"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "402"
     gateway: litle
     limit: "0"
@@ -5192,7 +5192,7 @@
     response_code: "612"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "403"
     gateway: litle
     limit: "0"
@@ -5205,7 +5205,7 @@
     response_code: "701"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "404"
     gateway: litle
     limit: "0"
@@ -5218,7 +5218,7 @@
     response_code: "702"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "405"
     gateway: litle
     limit: "0"
@@ -5231,7 +5231,7 @@
     response_code: "703"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "406"
     gateway: litle
     limit: "0"
@@ -5244,7 +5244,7 @@
     response_code: "705"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "407"
     gateway: litle
     limit: "0"
@@ -5257,7 +5257,7 @@
     response_code: "712"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "408"
     gateway: litle
     limit: "0"
@@ -5270,7 +5270,7 @@
     response_code: "714"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "409"
     gateway: litle
     limit: "0"
@@ -5283,7 +5283,7 @@
     response_code: "950"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "410"
     gateway: litle
     limit: "0"
@@ -5296,7 +5296,7 @@
     response_code: "951"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "411"
     gateway: litle
     limit: "0"
@@ -5309,7 +5309,7 @@
     response_code: "952"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "412"
     gateway: litle
     limit: "0"
@@ -5322,7 +5322,7 @@
     response_code: "953"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "413"
     gateway: litle
     limit: "0"
@@ -5335,7 +5335,7 @@
     response_code: "954"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "414"
     gateway: litle
     limit: "0"
@@ -5348,7 +5348,7 @@
     response_code: "702"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "415"
     gateway: litle
     limit: "0"
@@ -5361,7 +5361,7 @@
     response_code: "9999"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "652"
     gateway: litle
     limit: "0"
@@ -5374,7 +5374,7 @@
     response_code: "9999"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "653"
     gateway: litle
     limit: "0"
@@ -5387,7 +5387,7 @@
     response_code: "9999"
     decline_type: soft
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "654"
     gateway: mes
     limit: "0"
@@ -5400,7 +5400,7 @@
     response_code: "9999"
     decline_type: soft
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "655"
     limit: "0"
   attributes_cache: {}
@@ -5412,7 +5412,7 @@
     response_code: "9997"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "656"
     gateway: litle
     limit: "0"
@@ -5425,7 +5425,7 @@
     response_code: "9997"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "657"
     gateway: litle
     limit: "0"
@@ -5438,7 +5438,7 @@
     response_code: "9997"
     decline_type: hard
     credit_card_type: all
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "658"
     gateway: mes
     limit: "0"
@@ -5451,7 +5451,7 @@
     response_code: "9997"
     decline_type: hard
     credit_card_type: all
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "659"
     gateway: mes
     limit: "0"
@@ -5465,7 +5465,7 @@
     response_code: "001"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "416"
     gateway: mes
     limit: "4"
@@ -5478,7 +5478,7 @@
     response_code: "002"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "417"
     gateway: mes
     limit: "4"
@@ -5491,7 +5491,7 @@
     response_code: "003"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "418"
     gateway: mes
     limit: "1"
@@ -5504,7 +5504,7 @@
     response_code: "004"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "419"
     gateway: mes
     limit: "5"
@@ -5517,7 +5517,7 @@
     response_code: "005"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "420"
     gateway: mes
     limit: "6"
@@ -5530,7 +5530,7 @@
     response_code: "006"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "421"
     gateway: mes
     limit: "5"
@@ -5543,7 +5543,7 @@
     response_code: "007"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "422"
     gateway: mes
     limit: "0"
@@ -5556,7 +5556,7 @@
     response_code: "010"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "423"
     gateway: mes
     limit: "0"
@@ -5569,7 +5569,7 @@
     response_code: "011"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "424"
     gateway: mes
     limit: "0"
@@ -5582,7 +5582,7 @@
     response_code: "012"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "425"
     gateway: mes
     limit: "1"
@@ -5595,7 +5595,7 @@
     response_code: "013"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "426"
     gateway: mes
     limit: "1"
@@ -5608,7 +5608,7 @@
     response_code: "014"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "427"
     gateway: mes
     limit: "0"
@@ -5621,7 +5621,7 @@
     response_code: "015"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "428"
     gateway: mes
     limit: "1"
@@ -5634,7 +5634,7 @@
     response_code: 019
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "429"
     gateway: mes
     limit: "1"
@@ -5647,7 +5647,7 @@
     response_code: "021"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "430"
     gateway: mes
     limit: "0"
@@ -5660,7 +5660,7 @@
     response_code: "025"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "431"
     gateway: mes
     limit: "0"
@@ -5673,7 +5673,7 @@
     response_code: 028
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "432"
     gateway: mes
     limit: "0"
@@ -5686,7 +5686,7 @@
     response_code: "041"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "433"
     gateway: mes
     limit: "0"
@@ -5699,7 +5699,7 @@
     response_code: "043"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "434"
     gateway: mes
     limit: "0"
@@ -5712,7 +5712,7 @@
     response_code: "051"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "435"
     gateway: mes
     limit: "6"
@@ -5725,7 +5725,7 @@
     response_code: "052"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "436"
     gateway: mes
     limit: "0"
@@ -5738,7 +5738,7 @@
     response_code: "053"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "437"
     gateway: mes
     limit: "0"
@@ -5751,7 +5751,7 @@
     response_code: "054"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "438"
     gateway: mes
     limit: "5"
@@ -5764,7 +5764,7 @@
     response_code: "055"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "439"
     gateway: mes
     limit: "1"
@@ -5777,7 +5777,7 @@
     response_code: "057"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "440"
     gateway: mes
     limit: "0"
@@ -5790,7 +5790,7 @@
     response_code: 058
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "441"
     gateway: mes
     limit: "0"
@@ -5803,7 +5803,7 @@
     response_code: 059
     decline_type: hardhard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "442"
     gateway: mes
     limit: "0"
@@ -5816,7 +5816,7 @@
     response_code: "061"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "443"
     gateway: mes
     limit: "4"
@@ -5829,7 +5829,7 @@
     response_code: "062"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "444"
     gateway: mes
     limit: "0"
@@ -5842,7 +5842,7 @@
     response_code: "063"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "445"
     gateway: mes
     limit: "0"
@@ -5855,7 +5855,7 @@
     response_code: "064"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "446"
     gateway: mes
     limit: "1"
@@ -5868,7 +5868,7 @@
     response_code: "065"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "447"
     gateway: mes
     limit: "4"
@@ -5881,7 +5881,7 @@
     response_code: "075"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "448"
     gateway: mes
     limit: "0"
@@ -5894,7 +5894,7 @@
     response_code: "076"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "449"
     gateway: mes
     limit: "0"
@@ -5907,7 +5907,7 @@
     response_code: "077"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "450"
     gateway: mes
     limit: "1"
@@ -5920,7 +5920,7 @@
     response_code: 078
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "451"
     gateway: mes
     limit: "0"
@@ -5933,7 +5933,7 @@
     response_code: 080
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "452"
     gateway: mes
     limit: "4"
@@ -5946,7 +5946,7 @@
     response_code: 081
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "453"
     gateway: mes
     limit: "0"
@@ -5959,7 +5959,7 @@
     response_code: 082
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "454"
     gateway: mes
     limit: "0"
@@ -5972,7 +5972,7 @@
     response_code: 085
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "455"
     gateway: mes
     limit: "0"
@@ -5985,7 +5985,7 @@
     response_code: 086
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "456"
     gateway: mes
     limit: "1"
@@ -5998,7 +5998,7 @@
     response_code: 091
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "457"
     gateway: mes
     limit: "4"
@@ -6011,7 +6011,7 @@
     response_code: 092
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "458"
     gateway: mes
     limit: "0"
@@ -6024,7 +6024,7 @@
     response_code: 093
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "459"
     gateway: mes
     limit: "0"
@@ -6037,7 +6037,7 @@
     response_code: 096
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "460"
     gateway: mes
     limit: "1"
@@ -6050,7 +6050,7 @@
     response_code: 0B1
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "461"
     gateway: mes
     limit: "0"
@@ -6063,7 +6063,7 @@
     response_code: 0N0
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "462"
     gateway: mes
     limit: "0"
@@ -6076,7 +6076,7 @@
     response_code: 0N3
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "463"
     gateway: mes
     limit: "0"
@@ -6089,7 +6089,7 @@
     response_code: 0N4
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "464"
     gateway: mes
     limit: "0"
@@ -6102,7 +6102,7 @@
     response_code: 0N7
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "465"
     gateway: mes
     limit: "0"
@@ -6115,7 +6115,7 @@
     response_code: 0P2
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "466"
     gateway: mes
     limit: "0"
@@ -6128,7 +6128,7 @@
     response_code: 0P5
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "467"
     gateway: mes
     limit: "0"
@@ -6141,7 +6141,7 @@
     response_code: 0P6
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "468"
     gateway: mes
     limit: "0"
@@ -6154,7 +6154,7 @@
     response_code: 0R0
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "469"
     gateway: mes
     limit: "0"
@@ -6167,7 +6167,7 @@
     response_code: 0R1
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "470"
     gateway: mes
     limit: "0"
@@ -6180,7 +6180,7 @@
     response_code: 0R3
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "471"
     gateway: mes
     limit: "0"
@@ -6193,7 +6193,7 @@
     response_code: 0XA
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "472"
     gateway: mes
     limit: "0"
@@ -6206,7 +6206,7 @@
     response_code: 0XD
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "473"
     gateway: mes
     limit: "0"
@@ -6219,7 +6219,7 @@
     response_code: 0Z3
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "474"
     gateway: mes
     limit: "0"
@@ -6232,7 +6232,7 @@
     response_code: "001"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "475"
     gateway: mes
     limit: "4"
@@ -6245,7 +6245,7 @@
     response_code: "002"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "476"
     gateway: mes
     limit: "4"
@@ -6258,7 +6258,7 @@
     response_code: "003"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "477"
     gateway: mes
     limit: "1"
@@ -6271,7 +6271,7 @@
     response_code: "004"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "478"
     gateway: mes
     limit: "4"
@@ -6284,7 +6284,7 @@
     response_code: "005"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "479"
     gateway: mes
     limit: "8"
@@ -6297,7 +6297,7 @@
     response_code: "006"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "480"
     gateway: mes
     limit: "5"
@@ -6310,7 +6310,7 @@
     response_code: "007"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "481"
     gateway: mes
     limit: "0"
@@ -6323,7 +6323,7 @@
     response_code: "010"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "482"
     gateway: mes
     limit: "0"
@@ -6336,7 +6336,7 @@
     response_code: "011"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "483"
     gateway: mes
     limit: "0"
@@ -6349,7 +6349,7 @@
     response_code: "012"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "484"
     gateway: mes
     limit: "1"
@@ -6362,7 +6362,7 @@
     response_code: "013"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "485"
     gateway: mes
     limit: "1"
@@ -6375,7 +6375,7 @@
     response_code: "014"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "486"
     gateway: mes
     limit: "0"
@@ -6388,7 +6388,7 @@
     response_code: "015"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "487"
     gateway: mes
     limit: "1"
@@ -6401,7 +6401,7 @@
     response_code: 019
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "488"
     gateway: mes
     limit: "1"
@@ -6414,7 +6414,7 @@
     response_code: "021"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "489"
     gateway: mes
     limit: "0"
@@ -6427,7 +6427,7 @@
     response_code: "025"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "490"
     gateway: mes
     limit: "0"
@@ -6440,7 +6440,7 @@
     response_code: 028
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "491"
     gateway: mes
     limit: "0"
@@ -6453,7 +6453,7 @@
     response_code: "041"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "492"
     gateway: mes
     limit: "0"
@@ -6466,7 +6466,7 @@
     response_code: "043"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "493"
     gateway: mes
     limit: "0"
@@ -6479,7 +6479,7 @@
     response_code: "051"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "494"
     gateway: mes
     limit: "8"
@@ -6492,7 +6492,7 @@
     response_code: "052"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "495"
     gateway: mes
     limit: "0"
@@ -6505,7 +6505,7 @@
     response_code: "053"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "496"
     gateway: mes
     limit: "0"
@@ -6518,7 +6518,7 @@
     response_code: "054"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "497"
     gateway: mes
     limit: "5"
@@ -6531,7 +6531,7 @@
     response_code: "055"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "498"
     gateway: mes
     limit: "1"
@@ -6544,7 +6544,7 @@
     response_code: "057"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "499"
     gateway: mes
     limit: "0"
@@ -6557,7 +6557,7 @@
     response_code: 058
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "500"
     gateway: mes
     limit: "0"
@@ -6570,7 +6570,7 @@
     response_code: 059
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "501"
     gateway: mes
     limit: "0"
@@ -6583,7 +6583,7 @@
     response_code: "061"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "502"
     gateway: mes
     limit: "4"
@@ -6596,7 +6596,7 @@
     response_code: "062"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "503"
     gateway: mes
     limit: "0"
@@ -6609,7 +6609,7 @@
     response_code: "063"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "504"
     gateway: mes
     limit: "0"
@@ -6622,7 +6622,7 @@
     response_code: "064"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "505"
     gateway: mes
     limit: "1"
@@ -6635,7 +6635,7 @@
     response_code: "065"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "506"
     gateway: mes
     limit: "4"
@@ -6648,7 +6648,7 @@
     response_code: "075"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "507"
     gateway: mes
     limit: "0"
@@ -6661,7 +6661,7 @@
     response_code: "076"
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "508"
     gateway: mes
     limit: "0"
@@ -6674,7 +6674,7 @@
     response_code: "077"
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "509"
     gateway: mes
     limit: "1"
@@ -6687,7 +6687,7 @@
     response_code: 078
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "510"
     gateway: mes
     limit: "0"
@@ -6700,7 +6700,7 @@
     response_code: 080
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "511"
     gateway: mes
     limit: "4"
@@ -6713,7 +6713,7 @@
     response_code: 081
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "512"
     gateway: mes
     limit: "0"
@@ -6726,7 +6726,7 @@
     response_code: 082
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "513"
     gateway: mes
     limit: "0"
@@ -6739,7 +6739,7 @@
     response_code: 085
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "514"
     gateway: mes
     limit: "0"
@@ -6752,7 +6752,7 @@
     response_code: 086
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "515"
     gateway: mes
     limit: "1"
@@ -6765,7 +6765,7 @@
     response_code: 091
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "516"
     gateway: mes
     limit: "4"
@@ -6778,7 +6778,7 @@
     response_code: 092
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "517"
     gateway: mes
     limit: "0"
@@ -6791,7 +6791,7 @@
     response_code: 093
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "518"
     gateway: mes
     limit: "0"
@@ -6804,7 +6804,7 @@
     response_code: 096
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "519"
     gateway: mes
     limit: "1"
@@ -6817,7 +6817,7 @@
     response_code: 0B1
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "520"
     gateway: mes
     limit: "0"
@@ -6830,7 +6830,7 @@
     response_code: 0N0
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "521"
     gateway: mes
     limit: "0"
@@ -6843,7 +6843,7 @@
     response_code: 0N3
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "522"
     gateway: mes
     limit: "0"
@@ -6856,7 +6856,7 @@
     response_code: 0N4
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "523"
     gateway: mes
     limit: "0"
@@ -6869,7 +6869,7 @@
     response_code: 0N7
     decline_type: soft
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "524"
     gateway: mes
     limit: "0"
@@ -6882,7 +6882,7 @@
     response_code: 0P2
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "525"
     gateway: mes
     limit: "0"
@@ -6895,7 +6895,7 @@
     response_code: 0P5
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "526"
     gateway: mes
     limit: "0"
@@ -6908,7 +6908,7 @@
     response_code: 0P6
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "527"
     gateway: mes
     limit: "0"
@@ -6921,7 +6921,7 @@
     response_code: 0R0
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "528"
     gateway: mes
     limit: "0"
@@ -6934,7 +6934,7 @@
     response_code: 0R1
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "529"
     gateway: mes
     limit: "0"
@@ -6947,7 +6947,7 @@
     response_code: 0R3
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "530"
     gateway: mes
     limit: "0"
@@ -6960,7 +6960,7 @@
     response_code: 0XA
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "531"
     gateway: mes
     limit: "0"
@@ -6973,7 +6973,7 @@
     response_code: 0XD
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "532"
     gateway: mes
     limit: "0"
@@ -6986,7 +6986,7 @@
     response_code: 0Z3
     decline_type: hard
     credit_card_type: american_express
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "533"
     gateway: mes
     limit: "0"
@@ -6999,7 +6999,7 @@
     response_code: "001"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "534"
     gateway: mes
     limit: "4"
@@ -7012,7 +7012,7 @@
     response_code: "002"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "535"
     gateway: mes
     limit: "4"
@@ -7025,7 +7025,7 @@
     response_code: "003"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "536"
     gateway: mes
     limit: "1"
@@ -7038,7 +7038,7 @@
     response_code: "004"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "537"
     gateway: mes
     limit: "5"
@@ -7051,7 +7051,7 @@
     response_code: "005"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "538"
     gateway: mes
     limit: "6"
@@ -7064,7 +7064,7 @@
     response_code: "006"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "539"
     gateway: mes
     limit: "5"
@@ -7077,7 +7077,7 @@
     response_code: "007"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "540"
     gateway: mes
     limit: "0"
@@ -7090,7 +7090,7 @@
     response_code: "010"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "541"
     gateway: mes
     limit: "0"
@@ -7103,7 +7103,7 @@
     response_code: "011"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "542"
     gateway: mes
     limit: "0"
@@ -7116,7 +7116,7 @@
     response_code: "012"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "543"
     gateway: mes
     limit: "1"
@@ -7129,7 +7129,7 @@
     response_code: "013"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "544"
     gateway: mes
     limit: "1"
@@ -7142,7 +7142,7 @@
     response_code: "014"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "545"
     gateway: mes
     limit: "0"
@@ -7155,7 +7155,7 @@
     response_code: "015"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "546"
     gateway: mes
     limit: "1"
@@ -7168,7 +7168,7 @@
     response_code: 019
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "547"
     gateway: mes
     limit: "1"
@@ -7181,7 +7181,7 @@
     response_code: "021"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "548"
     gateway: mes
     limit: "0"
@@ -7194,7 +7194,7 @@
     response_code: "025"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "549"
     gateway: mes
     limit: "0"
@@ -7207,7 +7207,7 @@
     response_code: 028
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "550"
     gateway: mes
     limit: "0"
@@ -7220,7 +7220,7 @@
     response_code: "041"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "551"
     gateway: mes
     limit: "0"
@@ -7233,7 +7233,7 @@
     response_code: "043"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "552"
     gateway: mes
     limit: "0"
@@ -7246,7 +7246,7 @@
     response_code: "051"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "553"
     gateway: mes
     limit: "6"
@@ -7259,7 +7259,7 @@
     response_code: "052"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "554"
     gateway: mes
     limit: "0"
@@ -7272,7 +7272,7 @@
     response_code: "053"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "555"
     gateway: mes
     limit: "0"
@@ -7285,7 +7285,7 @@
     response_code: "054"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "556"
     gateway: mes
     limit: "5"
@@ -7298,7 +7298,7 @@
     response_code: "055"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "557"
     gateway: mes
     limit: "1"
@@ -7311,7 +7311,7 @@
     response_code: "057"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "558"
     gateway: mes
     limit: "0"
@@ -7324,7 +7324,7 @@
     response_code: 058
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "559"
     gateway: mes
     limit: "0"
@@ -7337,7 +7337,7 @@
     response_code: 059
     decline_type: hardhard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "560"
     gateway: mes
     limit: "0"
@@ -7350,7 +7350,7 @@
     response_code: "061"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "561"
     gateway: mes
     limit: "4"
@@ -7363,7 +7363,7 @@
     response_code: "062"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "562"
     gateway: mes
     limit: "0"
@@ -7376,7 +7376,7 @@
     response_code: "063"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "563"
     gateway: mes
     limit: "0"
@@ -7389,7 +7389,7 @@
     response_code: "064"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "564"
     gateway: mes
     limit: "1"
@@ -7402,7 +7402,7 @@
     response_code: "065"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "565"
     gateway: mes
     limit: "4"
@@ -7415,7 +7415,7 @@
     response_code: "075"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "566"
     gateway: mes
     limit: "0"
@@ -7428,7 +7428,7 @@
     response_code: "076"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "567"
     gateway: mes
     limit: "0"
@@ -7441,7 +7441,7 @@
     response_code: "077"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "568"
     gateway: mes
     limit: "1"
@@ -7454,7 +7454,7 @@
     response_code: 078
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "569"
     gateway: mes
     limit: "0"
@@ -7467,7 +7467,7 @@
     response_code: 080
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "570"
     gateway: mes
     limit: "4"
@@ -7480,7 +7480,7 @@
     response_code: 081
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "571"
     gateway: mes
     limit: "0"
@@ -7493,7 +7493,7 @@
     response_code: 082
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "572"
     gateway: mes
     limit: "0"
@@ -7506,7 +7506,7 @@
     response_code: 085
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "573"
     gateway: mes
     limit: "0"
@@ -7519,7 +7519,7 @@
     response_code: 086
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "574"
     gateway: mes
     limit: "1"
@@ -7532,7 +7532,7 @@
     response_code: 091
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "575"
     gateway: mes
     limit: "4"
@@ -7545,7 +7545,7 @@
     response_code: 092
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "576"
     gateway: mes
     limit: "0"
@@ -7558,7 +7558,7 @@
     response_code: 093
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "577"
     gateway: mes
     limit: "0"
@@ -7571,7 +7571,7 @@
     response_code: 096
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "578"
     gateway: mes
     limit: "1"
@@ -7584,7 +7584,7 @@
     response_code: 0B1
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "579"
     gateway: mes
     limit: "0"
@@ -7597,7 +7597,7 @@
     response_code: 0N0
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "580"
     gateway: mes
     limit: "0"
@@ -7610,7 +7610,7 @@
     response_code: 0N3
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "581"
     gateway: mes
     limit: "0"
@@ -7623,7 +7623,7 @@
     response_code: 0N4
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "582"
     gateway: mes
     limit: "0"
@@ -7636,7 +7636,7 @@
     response_code: 0N7
     decline_type: soft
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "583"
     gateway: mes
     limit: "0"
@@ -7649,7 +7649,7 @@
     response_code: 0P2
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "584"
     gateway: mes
     limit: "0"
@@ -7662,7 +7662,7 @@
     response_code: 0P5
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "585"
     gateway: mes
     limit: "0"
@@ -7675,7 +7675,7 @@
     response_code: 0P6
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "586"
     gateway: mes
     limit: "0"
@@ -7688,7 +7688,7 @@
     response_code: 0R0
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "587"
     gateway: mes
     limit: "0"
@@ -7701,7 +7701,7 @@
     response_code: 0R1
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "588"
     gateway: mes
     limit: "0"
@@ -7714,7 +7714,7 @@
     response_code: 0R3
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "589"
     gateway: mes
     limit: "0"
@@ -7727,7 +7727,7 @@
     response_code: 0XA
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "590"
     gateway: mes
     limit: "0"
@@ -7740,7 +7740,7 @@
     response_code: 0XD
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "591"
     gateway: mes
     limit: "0"
@@ -7753,7 +7753,7 @@
     response_code: 0Z3
     decline_type: hard
     credit_card_type: discover
-    membership_type: "monthly"
+    installment_type: "monthly"
     id: "592"
     gateway: mes
     limit: "0"
@@ -7766,7 +7766,7 @@
     response_code: "001"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "593"
     gateway: mes
     limit: "4"
@@ -7779,7 +7779,7 @@
     response_code: "002"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "594"
     gateway: mes
     limit: "4"
@@ -7792,7 +7792,7 @@
     response_code: "003"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "595"
     gateway: mes
     limit: "1"
@@ -7805,7 +7805,7 @@
     response_code: "004"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "596"
     gateway: mes
     limit: "4"
@@ -7818,7 +7818,7 @@
     response_code: "005"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "597"
     gateway: mes
     limit: "8"
@@ -7831,7 +7831,7 @@
     response_code: "006"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "598"
     gateway: mes
     limit: "5"
@@ -7844,7 +7844,7 @@
     response_code: "007"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "599"
     gateway: mes
     limit: "0"
@@ -7857,7 +7857,7 @@
     response_code: "010"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "600"
     gateway: mes
     limit: "0"
@@ -7870,7 +7870,7 @@
     response_code: "011"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "601"
     gateway: mes
     limit: "0"
@@ -7883,7 +7883,7 @@
     response_code: "012"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "602"
     gateway: mes
     limit: "1"
@@ -7896,7 +7896,7 @@
     response_code: "013"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "603"
     gateway: mes
     limit: "1"
@@ -7909,7 +7909,7 @@
     response_code: "014"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "604"
     gateway: mes
     limit: "0"
@@ -7922,7 +7922,7 @@
     response_code: "015"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "605"
     gateway: mes
     limit: "1"
@@ -7935,7 +7935,7 @@
     response_code: 019
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "606"
     gateway: mes
     limit: "1"
@@ -7948,7 +7948,7 @@
     response_code: "021"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "607"
     gateway: mes
     limit: "0"
@@ -7961,7 +7961,7 @@
     response_code: "025"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "608"
     gateway: mes
     limit: "0"
@@ -7974,7 +7974,7 @@
     response_code: 028
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "609"
     gateway: mes
     limit: "0"
@@ -7987,7 +7987,7 @@
     response_code: "041"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "610"
     gateway: mes
     limit: "0"
@@ -8000,7 +8000,7 @@
     response_code: "043"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "611"
     gateway: mes
     limit: "0"
@@ -8013,7 +8013,7 @@
     response_code: "051"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "612"
     gateway: mes
     limit: "8"
@@ -8026,7 +8026,7 @@
     response_code: "052"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "613"
     gateway: mes
     limit: "0"
@@ -8039,7 +8039,7 @@
     response_code: "053"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "614"
     gateway: mes
     limit: "0"
@@ -8052,7 +8052,7 @@
     response_code: "054"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "615"
     gateway: mes
     limit: "5"
@@ -8065,7 +8065,7 @@
     response_code: "055"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "616"
     gateway: mes
     limit: "1"
@@ -8078,7 +8078,7 @@
     response_code: "057"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "617"
     gateway: mes
     limit: "0"
@@ -8091,7 +8091,7 @@
     response_code: 058
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "618"
     gateway: mes
     limit: "0"
@@ -8104,7 +8104,7 @@
     response_code: 059
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "619"
     gateway: mes
     limit: "0"
@@ -8117,7 +8117,7 @@
     response_code: "061"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "620"
     gateway: mes
     limit: "4"
@@ -8130,7 +8130,7 @@
     response_code: "062"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "621"
     gateway: mes
     limit: "0"
@@ -8143,7 +8143,7 @@
     response_code: "063"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "622"
     gateway: mes
     limit: "0"
@@ -8156,7 +8156,7 @@
     response_code: "064"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "623"
     gateway: mes
     limit: "1"
@@ -8169,7 +8169,7 @@
     response_code: "065"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "624"
     gateway: mes
     limit: "4"
@@ -8182,7 +8182,7 @@
     response_code: "075"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "625"
     gateway: mes
     limit: "0"
@@ -8195,7 +8195,7 @@
     response_code: "076"
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "626"
     gateway: mes
     limit: "0"
@@ -8208,7 +8208,7 @@
     response_code: "077"
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "627"
     gateway: mes
     limit: "1"
@@ -8221,7 +8221,7 @@
     response_code: 078
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "628"
     gateway: mes
     limit: "0"
@@ -8234,7 +8234,7 @@
     response_code: 080
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "629"
     gateway: mes
     limit: "4"
@@ -8247,7 +8247,7 @@
     response_code: 081
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "630"
     gateway: mes
     limit: "0"
@@ -8260,7 +8260,7 @@
     response_code: 082
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "631"
     gateway: mes
     limit: "0"
@@ -8273,7 +8273,7 @@
     response_code: 085
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "632"
     gateway: mes
     limit: "0"
@@ -8286,7 +8286,7 @@
     response_code: 086
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "633"
     gateway: mes
     limit: "1"
@@ -8299,7 +8299,7 @@
     response_code: 091
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "634"
     gateway: mes
     limit: "4"
@@ -8312,7 +8312,7 @@
     response_code: 092
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "635"
     gateway: mes
     limit: "0"
@@ -8325,7 +8325,7 @@
     response_code: 093
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "636"
     gateway: mes
     limit: "0"
@@ -8338,7 +8338,7 @@
     response_code: 096
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "637"
     gateway: mes
     limit: "1"
@@ -8351,7 +8351,7 @@
     response_code: 0B1
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "638"
     gateway: mes
     limit: "0"
@@ -8364,7 +8364,7 @@
     response_code: 0N0
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "639"
     gateway: mes
     limit: "0"
@@ -8377,7 +8377,7 @@
     response_code: 0N3
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "640"
     gateway: mes
     limit: "0"
@@ -8390,7 +8390,7 @@
     response_code: 0N4
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "641"
     gateway: mes
     limit: "0"
@@ -8403,7 +8403,7 @@
     response_code: 0N7
     decline_type: soft
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "642"
     gateway: mes
     limit: "0"
@@ -8416,7 +8416,7 @@
     response_code: 0P2
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "643"
     gateway: mes
     limit: "0"
@@ -8429,7 +8429,7 @@
     response_code: 0P5
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "644"
     gateway: mes
     limit: "0"
@@ -8442,7 +8442,7 @@
     response_code: 0P6
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "645"
     gateway: mes
     limit: "0"
@@ -8455,7 +8455,7 @@
     response_code: 0R0
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "646"
     gateway: mes
     limit: "0"
@@ -8468,7 +8468,7 @@
     response_code: 0R1
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "647"
     gateway: mes
     limit: "0"
@@ -8481,7 +8481,7 @@
     response_code: 0R3
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "648"
     gateway: mes
     limit: "0"
@@ -8494,7 +8494,7 @@
     response_code: 0XA
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "649"
     gateway: mes
     limit: "0"
@@ -8507,7 +8507,7 @@
     response_code: 0XD
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "650"
     gateway: mes
     limit: "0"
@@ -8520,7 +8520,7 @@
     response_code: 0Z3
     decline_type: hard
     credit_card_type: discover
-    membership_type: "yearly"
+    installment_type: "yearly"
     id: "651"
     gateway: mes
     limit: "0"
