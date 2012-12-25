@@ -167,6 +167,7 @@ defaults: &defaults
           :minimum: 1
           :maximum: 8
       api_id:
+        uniqueness: true
         numericality:
           :only_integer: true
           :allow_nil: true
