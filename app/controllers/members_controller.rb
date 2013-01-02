@@ -136,7 +136,7 @@ class MembersController < ApplicationController
             redirect_to show_member_path
           rescue Exception => e
             flash.now[:error] = "Could not cancel member. Ticket sent to IT"
-            Airbrake.notify(:error_class => "Member:cancel", :error_message => e)
+            Airbrake.notify(:error_class => "Member:cancel", :error_message => e, :parameters => { :member => @current_member.inspect })
           end
         else
           flash.now[:error] = "Cancellation date cant be less or equal than today."
@@ -281,7 +281,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#pardot_sync: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
-    Airbrake.notify(:error_class => "Member:pardot_sync", :parameters => { :member => @current_member.inspect })
+    Airbrake.notify(:error_class => "Member:pardot_sync", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message
   end
 
@@ -300,7 +300,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#sync: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
-    Airbrake.notify(:error_class => "Member:sync", :parameters => { :member => @current_member.inspect })
+    Airbrake.notify(:error_class => "Member:sync", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message.html_safe
   end
 
@@ -324,7 +324,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#reset_password: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
-    Airbrake.notify(:error_class => "Member:reset_password", :parameters => { :member => @current_member.inspect })
+    Airbrake.notify(:error_class => "Member:reset_password", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message
   end
 
@@ -340,7 +340,7 @@ class MembersController < ApplicationController
   rescue
     message = "Error on members#resend_welcome: #{$!}"
     Auditory.audit(@current_agent, @current_member, message, @current_member)
-    Airbrake.notify(:error_class => "Member:resend_welcome", :parameters => { :member => @current_member.inspect })
+    Airbrake.notify(:error_class => "Member:resend_welcome", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message
   end
 
