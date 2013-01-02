@@ -51,8 +51,6 @@ class Ability
       can :manage_token_api, Agent
     elsif agent.has_role_with_club? 'representative', club_id
       can :manage, Member
-      cannot :enroll, Member
-      cannot :api_enroll, Member
       cannot :api_profile, Member
       can :manage, Operation
       can :read, Membership

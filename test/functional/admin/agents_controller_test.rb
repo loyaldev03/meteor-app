@@ -197,10 +197,11 @@ class Admin::AgentsControllerTest < ActionController::TestCase
 
   test "Representative and Api users should not see the enroll button on member#index." do
   	sign_in @representative_user
-  	[@representative_user,@api_user].each do |agent|
- 	    ability = Ability.new(agent)
-      assert ability.cannot?(:enroll, Member), "#{agent.roles} can see member's enroll button on member#index."
-  	end
+ 	    ability = Ability.new(@api_user)
+      assert ability.cannot?(:enroll, Member), "#{@api_user.roles} can see member's enroll button on member#index."
+
+      ability = Ability.new(@representative_user)
+      assert ability.can?(:enroll, Member), "#{@representative_user.roles} can see member's enroll button on member#index."
   end
 
   test "Admin and supervisor should see full credit card." do

@@ -106,13 +106,23 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
   end
 
-  test "Representative should not enroll/create member" do
+  test "Representative should enroll/create member" do
     sign_in @representative_user
-    @credit_card = FactoryGirl.build :credit_card    
+    @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
-    generate_post_message
-    assert_response :unauthorized
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
+      Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
+                                      :auth_code => '111', :duplicate => false, 
+                                      :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
+          ) 
+    )
+    assert_difference('Member.count') do
+      generate_post_message
+      assert_response :success
+    end
   end
 
   test "Supervisor should enroll/create member" do
