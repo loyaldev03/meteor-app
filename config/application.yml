@@ -69,6 +69,7 @@ defaults: &defaults
     member_not_saved: "There was a problem processing your enrollment. Please call member services at: xxx-xxx-xxxx."
     member_set_wrong_address_error: "Could not set member's address as undeliverable."
     member_already_set_wrong_address: "Member's address already set as wrong address."
+    member_set_as_blacklisted: "Operation cannot be done. Member is set as blacklisted"
     credit_card_in_use: "We're sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: xxx-xxx-xxxx."
     expired_credit_card: "Credit card to activate is expired."
     fulfillment_out_of_stock: "Product does not have stock."

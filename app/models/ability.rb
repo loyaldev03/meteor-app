@@ -51,11 +51,12 @@ class Ability
       can :manage_token_api, Agent
     elsif agent.has_role_with_club? 'representative', club_id
       can :manage, Member
-      can :manage, Operation
-      can :read, Membership
       cannot :enroll, Member
       cannot :api_enroll, Member
       cannot :api_profile, Member
+      can :manage, Operation
+      can :read, Membership
+      can :manage, CreditCard
       cannot :see_full_credit_card_number, CreditCard
       can :manage, MemberNote
       can :show, TermsOfMembership

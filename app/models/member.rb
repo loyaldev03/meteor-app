@@ -904,6 +904,10 @@ class Member < ActiveRecord::Base
     return { :code => Settings.error_codes.success } if credit_card.nil? || credit_card.empty?
     new_year, new_month, new_number = credit_card[:expire_year], credit_card[:expire_month], nil
 
+    if self.blacklisted
+      return { :code => Settings.error_codes.blacklisted, :message => Settings.error_messages.member_set_as_blacklisted }
+    end
+
     # Drupal sends X when member does not change the credit card number      
     if credit_card[:number].include?('X')
       if active_credit_card.last_digits.to_s == credit_card[:number][-4..-1].to_s # lets update expire month
