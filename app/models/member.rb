@@ -916,7 +916,7 @@ class Member < ActiveRecord::Base
         { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => { :number => "Credit card do not match the active one." }}
       end
     else # drupal or CS sends the complete credit card number.
-      new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
+      new_credit_card = CreditCard.new(:number => credit_card[:number].gsub(/\D/,''), :expire_month => new_month, :expire_year => new_year)
       credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? ", new_credit_card.encrypted_number, club.id ] )
       if credit_cards.empty?
         add_new_credit_card(new_credit_card, current_agent)
