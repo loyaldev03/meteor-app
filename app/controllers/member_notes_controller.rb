@@ -5,8 +5,8 @@ class MemberNotesController < ApplicationController
   def new
     my_authorize! :manage, MemberNote, @current_club.id
     @member_note = MemberNote.new
-    @disposition_types = DispositionType.find_all_by_club_id_and_visible(@current_club.id,true)
-    @communication_types = CommunicationType.find_all_by_visible(true)
+    @disposition_types = DispositionType.find_all_by_club_id(@current_club.id)
+    @communication_types = CommunicationType.all
   end
 
   def create 

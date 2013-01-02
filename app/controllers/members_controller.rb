@@ -61,7 +61,7 @@ class MembersController < ApplicationController
 
   def edit  
     @member = @current_member
-    @member_group_types = MemberGroupType.find_all_by_club_id_and_visible(@current_club,true)
+    @member_group_types = MemberGroupType.find_all_by_club_id(@current_club)
     @country = Carmen::Country.coded(@member.country)
   end
 
@@ -125,7 +125,7 @@ class MembersController < ApplicationController
   end
 
   def cancel
-    @member_cancel_reason = MemberCancelReason.find_all_by_visible(true)
+    @member_cancel_reason = MemberCancelReason.all
     if request.post?
       unless params[:reason].blank?
         if params[:cancel_date].to_date > Time.zone.now.to_date
@@ -148,7 +148,7 @@ class MembersController < ApplicationController
   end
 
   def blacklist
-    @blacklist_reasons = MemberBlacklistReason.find_all_by_visible(true)
+    @blacklist_reasons = MemberBlacklistReason.all
     if request.post? 
       response = @current_member.blacklist(@current_agent, params[:reason])
       if response[:success]
