@@ -442,6 +442,7 @@ class Member < ActiveRecord::Base
       return { :message => message, :code => Settings.error_codes.member_email_blacklisted, :errors => {:blacklisted => "Member is blacklisted"} }
     else
       credit_card = CreditCard.new credit_card_params
+      member.skip_api_sync! if member.api_id.present? || skip_api_sync
       member.update_member_data_by_params member_params
     end
 

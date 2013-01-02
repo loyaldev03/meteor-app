@@ -82,7 +82,7 @@ class Communication < ActiveRecord::Base
       Notifier.pillar_provisional(email).deliver!
     else
       message = "Deliver action could not be done."
-      Airbrake.notify(:error_class => "Communication Delivery", :error_message => message)      
+      Airbrake.notify(:error_class => "Communication Delivery", :error_message => message, :parameters => { :member => member.inspect, :communication => self.inspect })
       logger.error "Template type #{template_type} not supported."
     end
     update_attributes :sent_success => true, :processed_at => Time.zone.now, :response => response
