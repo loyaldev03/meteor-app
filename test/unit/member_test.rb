@@ -237,13 +237,13 @@ class MemberTest < ActiveSupport::TestCase
     saved_member.current_membership.join_date = "Wed, 03 May 2012 13:10:51 UTC 00:00"
     saved_member.next_retry_bill_date = "Wed, 03 May 2012 00:10:51 UTC 00:00"
     Time.zone = "Eastern Time (US & Canada)"
-    assert_equal I18n.l(Time.zone.at(saved_member.member_since_date)), "02/05/2012"
-    assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date)), "02/05/2012"
-    assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "03/05/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.member_since_date)), "05/02/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date)), "05/02/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "05/03/2012"
     Time.zone = "Ekaterinburg"
-    assert_equal I18n.l(Time.zone.at(saved_member.member_since_date)), "03/05/2012"
-    assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date)), "03/05/2012"
-    assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "03/05/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.member_since_date)), "05/03/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date)), "05/03/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "05/03/2012"
   end
 
 
