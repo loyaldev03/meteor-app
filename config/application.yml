@@ -56,6 +56,8 @@ defaults: &defaults
     prebill_email: 301    
     cancellation_email: 302 
     refund_email: 303 
+    pillar_email: 304
+    pillar_provisional_email: 305
     #other
     others: 1000
   error_messages:

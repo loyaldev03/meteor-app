@@ -1313,7 +1313,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-
   test "Send Trial email at Day 7" do
     setup_member(false)
 
@@ -1321,15 +1320,24 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       :club_id => @club.id)
 
     create_new_member(unsaved_member)
-    created_member = Member.find_by_email(unsaved_member.email)   
+    created_member = Member.find_by_email(unsaved_member.email)
     created_member.current_membership.update_attribute(:join_date, Time.zone.now-7.day)
    
     Member.send_pillar_emails('pillar_provisional', 'provisional')
     sleep 1
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+    sleep 1
     within("#communication") do
       wait_until {
+        assert page.has_content?("Day 7 - Trial")
+      }
+    end
+     within("#operations") do
+      wait_until{
+        select 'communications', :from => "operation[operation_type]"
+      }
+      wait_until{
         assert page.has_content?("Day 7 - Trial")
       }
     end
@@ -1338,9 +1346,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "Send News email at Day 35" do
     setup_member(false)
     setup_email_templates
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id)
-
     create_new_member(unsaved_member)
     created_member = Member.find_by_email(unsaved_member.email)   
     created_member.current_membership.update_attribute(:join_date, Time.zone.now-35.day)
@@ -1351,28 +1356,46 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
     within("#communication") do
       wait_until {
-        Communication.all.each {|x| puts x.template_name}
+        assert page.has_content?("Day 35 - News")
+      }
+    end
+
+    within("#operations") do
+      wait_until{
+        select 'communications', :from => "operation[operation_type]"
+      }
+      wait_until{
         assert page.has_content?("Day 35 - News")
       }
     end
   end
 
+
   test "Send Deals email at Day 40" do
     setup_member(false)
     setup_email_templates
+
     unsaved_member = FactoryGirl.build(:active_member, 
       :club_id => @club.id)
-
     create_new_member(unsaved_member)
-    created_member = Member.find_by_email(unsaved_member.email)   
-    created_member.current_membership.update_attribute(:join_date, Time.zone.now-40.day)
 
+    created_member = Member.find_by_email(unsaved_member.email)   
+    created_member.current_membership.update_attribute(:join_date, Time.zone.now-35.day)
+    
     Member.send_pillar_emails('pillar_provisional', 'provisional')
     sleep 1
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
     within("#communication") do
       wait_until {
+        assert page.has_content?("Day 40 - Deals")
+      }
+    end
+    within("#operations") do
+      wait_until{
+        select 'communications', :from => "operation[operation_type]"
+      }
+      wait_until{
         assert page.has_content?("Day 40 - Deals")
       }
     end
@@ -1397,6 +1420,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("Day 45 - Local Chapters")
       }
     end
+    within("#operations") do
+      wait_until{
+        select 'communications', :from => "operation[operation_type]"
+      }
+      wait_until{
+        assert page.has_content?("Day 45 - Local Chapters")
+      }
+    end
   end
 
   test "Send VIP email at Day 50" do
@@ -1415,6 +1446,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
     within("#communication") do
       wait_until {
+        assert page.has_content?("Day 50 - VIP")
+      }
+    end
+    within("#operations") do
+      wait_until{
+        select 'communications', :from => "operation[operation_type]"
+      }
+      wait_until{
         assert page.has_content?("Day 50 - VIP")
       }
     end
