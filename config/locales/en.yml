@@ -224,6 +224,7 @@ en:
         has_payment_gateway_production: 'The club has payment gateway configuration for production mode'
         not_have_payment_gateway_development: 'The club does not have payment gateway configuration for development mode'
         not_have_payment_gateway_production: 'The club does not have payment gateway configuration for production mode'
+        club_cash_amount: 'Club cash amount'
       email_template:
         name: 'Name'
         type: 'Type'

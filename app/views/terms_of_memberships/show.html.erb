@@ -5,7 +5,7 @@
   </thead>
   <tr>
     <td> <%= t('activerecord.attributes.terms_of_membership.name') %>: <%= @tom.name %> </td>
-    <td colspan="3"> <%= t('activerecord.attributes.terms_of_membership.mode') %>: <%= @tom.mode %> </td>
+    <td colspan="4"> <%= t('activerecord.attributes.terms_of_membership.mode') %>: <%= @tom.mode %> </td>
   </tr>
   <tr>
     <td> <%= t('activerecord.attributes.terms_of_membership.installment_amount') %>: 
@@ -16,6 +16,8 @@
          <%= @tom.grace_period %> </td>
     <td> <%= t('activerecord.attributes.terms_of_membership.provisional_days') %>: 
          <%= @tom.provisional_days %> </td>    
+    <td> <%= t('activerecord.attributes.terms_of_membership.club_cash_amount') %>: 
+         <%= number_to_currency(@tom.club_cash_amount) %> </tr>
   </tr>
   <tr>
     <td colspan="5" class="comment"> <%= t('activerecord.attributes.terms_of_membership.description') %>: 
