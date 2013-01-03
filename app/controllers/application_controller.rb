@@ -5,15 +5,10 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
     sign_in_url = url_for(:action => 'new', :controller => 'sessions', :only_path => false, :protocol => 'http')    
-    if @current_agent
-      if @current_agent.has_role? 'admin'
-        admin_partners_path
-      else
-        root_path
-      end
-    else
-      new_agent_session_path
+    if @current_agent and @current_agent.has_role? 'admin'
+      return admin_partners_path
     end
+    root_path
   end
 
   rescue_from CanCan::AccessDenied do |exception|
