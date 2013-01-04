@@ -126,9 +126,9 @@ class RolesTest < ActionController::IntegrationTest
   end
 
   test "Agent admin can assign role_clubs, when there are no global roles" do
-    setup_agent_no_rol
+    setup_admin
     setup_member false
-    @agent_no_role = FactoryGirl.create :confirmed_agent
+      @agent_no_role = FactoryGirl.create :confirmed_agent
     7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     sleep 1
@@ -137,7 +137,6 @@ class RolesTest < ActionController::IntegrationTest
     club2 = Club.find(2)
     club3 = Club.find(3)
     club_last = Club.last
-
     visit edit_admin_agent_path(@agent_no_role.id)
     within(".table-condensed")do
       select('admin', :from => 'agent[club_roles_attributes][0][role]')
@@ -244,7 +243,7 @@ class RolesTest < ActionController::IntegrationTest
     wait_until { assert page.has_selector?("#new_member") }  
 
     visit members_path( :partner_prefix => partner.prefix, :club_prefix => second_club.name)
-    wait_until { assert page.has_no_selector?("#new_member") }  
+    wait_until { assert page.has_selector?("#new_member") }  
 
     visit members_path( :partner_prefix => partner.prefix, :club_prefix => third_club.name)
     wait_until { assert page.has_content?("401 You are Not Authorized.") }
