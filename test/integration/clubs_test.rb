@@ -123,7 +123,7 @@ class ClubTest < ActionController::IntegrationTest
         assert page.has_content?('Destroy')
       }
     end
-    visit admin_agent_my_clubs_path(@admin_agent.id)
+    visit my_clubs_path(@admin_agent.id)
     within("#my_clubs_table") do
       wait_until{
         Club.all.each do |club|
