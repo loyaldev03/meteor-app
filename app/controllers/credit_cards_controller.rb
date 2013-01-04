@@ -23,6 +23,19 @@ class CreditCardsController < ApplicationController
     end
   end
 
+  def destroy
+    @credit_card = CreditCard.find(params[:id])
+    if @credit_card.destroy
+      message = "Credit Card #{@credit_card.last_digits} was successfully destroyed"
+      Auditory.audit(@current_agent, @credit_card, message, @current_member)
+      redirect_to show_member_path, notice: message
+    else
+      error = @credit_card.errors.collect {|attr, message| "#{message}" }.join("")
+      flash[:error] = "Credit Card #{@credit_card.last_digits} was not destroyed. #{error}"
+      redirect_to show_member_path
+    end
+  end
+
   def activate
   	new_credit_card = CreditCard.find(params[:credit_card_id])
     new_credit_card.set_as_active!

@@ -55,6 +55,7 @@ class Ability
       can :manage, Operation
       can :read, Membership
       can :manage, CreditCard
+      cannot :delete, CreditCard
       cannot :see_full_credit_card_number, CreditCard
       can :manage, MemberNote
       can :show, TermsOfMembership

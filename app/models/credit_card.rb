@@ -8,9 +8,19 @@ class CreditCard < ActiveRecord::Base
 
   before_create :update_last_digits
 
+  before_destroy :confirm_presence_of_another_credit_card_related_to_member
+
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }
   validates :number, :numericality => { :only_integer => true }, :allow_blank => true
+
+
+  def confirm_presence_of_another_credit_card_related_to_member
+    if member.credit_cards.count == 1
+      errors[:credit_card] << "The member should have at least one credit card."
+      return false
+    end
+  end
 
   def accepted_on_billing
     update_attribute :last_successful_bill_date, Time.zone.now

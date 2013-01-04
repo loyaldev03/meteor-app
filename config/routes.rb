@@ -38,7 +38,7 @@ SacPlatform::Application.routes.draw do
         resources :terms_of_memberships, :only => [ :show ]
         resources :transactions, :only => [ :index ]
         resources :memberships, :only => [ :index ]
-        resources :credit_cards, :only => [ :new, :create ] do
+        resources :credit_cards, :only => [ :new, :create, :destroy ] do
           post :activate
         end
         match '/recover' => 'members#recover', as: 'member_recover', :via => [:get, :post]
