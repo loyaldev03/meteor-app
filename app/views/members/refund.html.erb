@@ -5,7 +5,9 @@
     <tr>
       <td> 
         <div class="input-prepend input-append"> 
-            <%= t('activerecord.attributes.transaction.refund_amount_help') %>
+            <%= t('activerecord.attributes.transaction.refund_amount_help') %>: 
+            (Max : <%= number_to_currency(@transaction.amount_available_to_refund) %> )            
+            
             <span class="add-on">$</span><%= text_field_tag :refund_amount, nil ,:id => "refunded_amount" %> 
         </div>
       </td>

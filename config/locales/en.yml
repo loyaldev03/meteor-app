@@ -91,7 +91,7 @@ en:
     attributes:
       transaction:
         refundable: 'Refundable'
-        refund_amount_help: 'Amount to refund (e.g.: $45.34)'
+        refund_amount_help: 'Amount to refund'
         transaction_types: 
           sale: Sale
           refund: Credit
@@ -99,6 +99,7 @@ en:
           void: Credit
           authorization_capture: 'Authorization-Capture'
           chargeback: Chargeback
+        amount_available_to_refund: Max
         date: 'Date'
         description: 'Description'
         amount: 'Amount'
