@@ -1346,7 +1346,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "Send News email at Day 35" do
     setup_member(false)
     setup_email_templates
+
+    unsaved_member = FactoryGirl.build(:active_member, 
+    :club_id => @club.id)
     create_new_member(unsaved_member)
+  
     created_member = Member.find_by_email(unsaved_member.email)   
     created_member.current_membership.update_attribute(:join_date, Time.zone.now-35.day)
 
@@ -1370,7 +1374,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-
   test "Send Deals email at Day 40" do
     setup_member(false)
     setup_email_templates
@@ -1380,7 +1383,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     create_new_member(unsaved_member)
 
     created_member = Member.find_by_email(unsaved_member.email)   
-    created_member.current_membership.update_attribute(:join_date, Time.zone.now-35.day)
+    created_member.current_membership.update_attribute(:join_date, Time.zone.now-40.day)
     
     Member.send_pillar_emails('pillar_provisional', 'provisional')
     sleep 1

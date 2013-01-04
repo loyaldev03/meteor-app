@@ -786,7 +786,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within(".nav-tabs")do
       click_on("Credit Cards")
     end 
-    within("#credit_cards")dog
+    within("#credit_cards")do
       wait_until { assert page.has_selector?("#destroy") }
       confirm_ok_js
       click_link_or_button("Destroy")
