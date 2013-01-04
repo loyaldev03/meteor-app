@@ -16,6 +16,11 @@ class CreditCard < ActiveRecord::Base
 
 
   def confirm_presence_of_another_credit_card_related_to_member
+    if self.active 
+      errors[:active] << "Credit card is set as active. It cannot be destroyed."
+      return false 
+    end
+
     if member.credit_cards.count == 1
       errors[:credit_card] << "The member should have at least one credit card."
       return false
