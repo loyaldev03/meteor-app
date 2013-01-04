@@ -23,6 +23,8 @@ $(document).ready( function() {
 
   $(".alert").alert();
 
+
+
   // taken fom https://makandracards.com/makandra/1383
   $(function() {
     $('[data-remote][data-replace]')
