@@ -45,6 +45,7 @@ class Transaction < ActiveRecord::Base
     self.encrypted_number = credit_card.encrypted_number
     self.expire_month = credit_card.expire_month
     self.expire_year = credit_card.expire_year
+    verify_card
   end
 
   def payment_gateway_configuration=(pgc)
@@ -106,14 +107,6 @@ class Transaction < ActiveRecord::Base
     gateway == "mes"
   end
 
-  # we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
-  # ["switch", "visa", "diners_club", "master", "forbrugsforeningen", "dankort", 
-  #    "laser", "american_express", "solo", "jcb", "discover", "maestro"]
-  def credit_card_type
-    @cc.valid?
-    @cc.type
-  end
-
   def self.refund(amount, sale_transaction_id, agent=nil)
     amount = amount.to_f
     # Lock transaction, so no one can use this record while we refund this member.
@@ -167,7 +160,6 @@ class Transaction < ActiveRecord::Base
       if payment_gateway_configuration.nil?
         { :message => Settings.error_messages.credit_card_blank_with_grace, :code => Settings.error_codes.credit_card_blank_with_grace }
       else
-        verify_card
         if @cc.valid?
           load_gateway
           a = (amount.to_f * 100)
@@ -183,15 +175,10 @@ class Transaction < ActiveRecord::Base
       if payment_gateway_configuration.nil?
         { :message => "Payment gateway not found.", :code => Settings.error_codes.not_found }
       else
-        verify_card
-        if @cc.valid?
-          load_gateway
-          a = (amount.to_f * 100)
-          refund_response=@gateway.refund(a, refund_response_transaction_id, @options)
-          save_response(refund_response)
-        else
-          credit_card_invalid
-        end
+        load_gateway
+        a = (amount.to_f * 100)
+        refund_response=@gateway.refund(a, refund_response_transaction_id, @options)
+        save_response(refund_response)
       end
     end    
 
@@ -202,7 +189,6 @@ class Transaction < ActiveRecord::Base
       elsif amount.to_f == 0.0
         { :message => "Transaction success. Amount $0.0", :code => Settings.error_codes.success }
       else
-        verify_card
         if @cc.valid?
           load_gateway
           a = (amount.to_f * 100)
@@ -253,6 +239,11 @@ class Transaction < ActiveRecord::Base
         :first_name => first_name,
         :last_name  => last_name
       )
+      @cc.valid?
+      # we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
+      # ["switch", "visa", "diners_club", "master", "forbrugsforeningen", "dankort", 
+      #    "laser", "american_express", "solo", "jcb", "discover", "maestro"]
+      self.cc_type = @cc.type
     end
 
     def load_gateway(recurrent = false)

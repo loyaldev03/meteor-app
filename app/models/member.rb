@@ -1076,7 +1076,7 @@ class Member < ActiveRecord::Base
       # soft / hard decline
       type = terms_of_membership.installment_type
       decline = DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
-                  trans.response_code, type, trans.credit_card_type) || 
+                  trans.response_code, type, trans.cc_type) || 
                 DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
                   trans.response_code, type, "all")
       cancel_member = false
@@ -1088,7 +1088,7 @@ class Member < ActiveRecord::Base
         self.save(:validate => false)
         unless trans.response_code == Settings.error_codes.invalid_credit_card 
           Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
-            :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.credit_card_type}. " + 
+            :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.cc_type}. " + 
               "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
             :parameters => { :member => self.inspect })
         end
