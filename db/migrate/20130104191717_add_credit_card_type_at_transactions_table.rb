@@ -3,7 +3,7 @@ class AddCreditCardTypeAtTransactionsTable < ActiveRecord::Migration
     add_column :transactions, :cc_type, :string
     Transaction.all.each do |x|
       ActiveMerchant::Billing::CreditCard.require_verification_value = false
-      @cc ||= ActiveMerchant::Billing::CreditCard.new(
+      @cc = ActiveMerchant::Billing::CreditCard.new(
         :number     => x.number,
         :month      => x.expire_month,
         :year       => x.expire_year,
