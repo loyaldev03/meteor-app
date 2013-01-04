@@ -44,7 +44,7 @@ end
 
 desc "Restart delayed jobs"
 task :restart_delayed_jobs do
-  run "#{sudo} service staging.platform stop && #{sudo} service staging.platform start" 
+  run "#{sudo} service #{application} stop && #{sudo} service #{application} start" 
 end
 
 desc "Notify Campfire room"
