@@ -125,6 +125,10 @@ $(document).ready( function() {
     $('.help').popover({offset: 10});
   }
 
+  function new_product_functions(){
+    $('.help').popover({offset: 10});
+  }
+
   function member_index_functions(){
     $('#index_search_form').submit(function (){
       update_select_only = false;

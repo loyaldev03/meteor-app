@@ -260,6 +260,10 @@ en:
         stock: 'Stock'
         weight: 'Weight'
         created_at: 'Created at'
+        sku: SKU
+        package: Package
+        package_help: 'This value is part of the Packageid on the fulfillment file. e.g: set as package NCARFLAG and platform will add the member id. The packageid obtained will be NCARFLAG20243911111'
+        sku_help: 'Members get fulfills according to the list of SKUs stored while enrollment. Also, this value is the costcenter column on the fulfillment file for sloops.'
   date:
     formats:
       default: "%m/%d/%Y"

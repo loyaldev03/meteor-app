@@ -6,11 +6,22 @@
     </div>
   </div>
   <div class="control-group">
+    <%= f.label :package, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :package, :class => 'text_field' %>
+      <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.product.package_help')} %> 
+    </div>
+  </div>
+
+  <div class="control-group">
     <%= f.label :sku, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :sku, :class => 'text_field' %>
+      <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.product.sku_help')} %> 
     </div>
   </div>
+
+
   <div class="control-group">
     <%= f.label :recurrent, :class => 'control-label' %>
     <div class="controls">
@@ -35,3 +46,7 @@
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 products_path, :class => 'btn' %>
   </div>
+
+<script>
+  $(document).ready(new_product_functions())
+</script>

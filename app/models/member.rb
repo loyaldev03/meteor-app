@@ -528,10 +528,14 @@ class Member < ActiveRecord::Base
     # opened fulfillments (meaning that previous fulfillments expired).
     if self.fulfillments.where_not_processed.empty?
       fulfillments = fulfillments_products_to_send
-      fulfillments.each do |product|
-        f = Fulfillment.new :product_sku => product
+      fulfillments.each do |sku|
+        product = Product.find_by_sku_and_club_id(sku, self.club_id)
+        f = Fulfillment.new :product_sku => sku
+        unless product.nil?
+          f.product_package = product.package
+          f.recurrent = product.recurrent 
+        end
         f.member_id = self.uuid
-        f.recurrent = Product.find_by_sku_and_club_id(product,self.club_id).recurrent rescue false
         f.save
         f.decrease_stock!
       end

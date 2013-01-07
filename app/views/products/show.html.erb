@@ -6,6 +6,10 @@
   <%= @product.name %>
 </p>
 <p>
+  <strong><%= model_class.human_attribute_name(:package) %>:</strong><br>
+  <%= @product.package %>
+</p>
+<p>
   <strong><%= model_class.human_attribute_name(:sku) %>:</strong><br>
   <%= @product.sku %>
 </p>

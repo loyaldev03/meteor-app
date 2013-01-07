@@ -1,5 +1,5 @@
 <%- flash.each do |type, message| %>
-	<% if type != "timedout" %>
+	<% if type.to_s != "timedout" %>
   <div class="<%= twitterized_type(type) %>">
     <a class="close" data-dismiss="alert">×</a>
     <p><%= message %></p>
