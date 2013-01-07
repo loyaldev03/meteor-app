@@ -182,7 +182,7 @@ class Fulfillment < ActiveRecord::Base
         Fulfillment.find(fulfillment.id).set_as_processing unless fulfillment.processing? or fulfillment.renewed?
         member = fulfillment.member
         if type_others
-          sheet.add_row [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
+          sheet.add_row [fulfillment.tracking_code, fulfillment.product_sku, member.full_name, member.address, member.city,
                 member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
                 fulfillment.product.weight, 'MID']
         else
