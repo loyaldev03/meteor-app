@@ -27,9 +27,9 @@ class FulfillmentsController < ApplicationController
         end
 
         if params[:product_type] == 'KIT' or params[:product_type] == 'CARD' 
-          xls_package = Fulfillment.generateXLS(fulfillments,false)
+          xls_package = Fulfillment.generateXLS(fulfillments, false, false)
         else
-          xls_package = Fulfillment.generateXLS(fulfillments)
+          xls_package = Fulfillment.generateXLS(fulfillments, false)
         end
 
         send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
@@ -61,44 +61,35 @@ class FulfillmentsController < ApplicationController
   end
 
   def generate_csv
-    my_authorize! :report, Fulfillment, @current_club.id
-    if params[:product_type][0] == 'KIT'
-      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_kit
-    elsif params[:product_type][0] == 'CARD'
-      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_card
-    elsif params[:product_type][0] == 'OTHERS'
-      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_others
-    end
-    if params[:product_type][0] == 'KIT' or params[:product_type][0] == 'CARD' 
-      csv_string = Fulfillment.generateCSV(fulfillments,false)
-    else
-      csv_string = Fulfillment.generateCSV(fulfillments)
-    end
-    send_data csv_string, :filename => "miworkingfile2.csv",
-                 :type => 'text/csv; charset=iso-8859-1; header=present',
-                 :disposition => "attachment; filename=miworkingfile2.csv"
+    generate_file(:generateCSV)
   end
 
   def generate_xls
-    my_authorize! :report, Fulfillment, @current_club.id
-    if params[:product_type][0] == 'KIT'
-      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_kit
-    elsif params[:product_type][0] == 'CARD'
-      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_card
-    elsif params[:product_type][0] == 'OTHERS'
-      fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status][0], @current_club.id).type_others
-    end
-
-    if params[:product_type][0] == 'KIT' or params[:product_type][0] == 'CARD' 
-      xls_package = Fulfillment.generateXLS(fulfillments,false)
-    else
-      xls_package = Fulfillment.generateXLS(fulfillments)
-    end
-
-    send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
-                 :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                 :disposition => "attachment; filename=miworkingfile2.xlsx"
+    generate_file(:generateXLS)
   end
+
+  private
+    # TODO: filter by period
+    def generate_file(method)
+      my_authorize! :report, Fulfillment, @current_club.id
+      if params[:product_type] == 'KIT'
+        fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_kit
+      elsif params[:product_type] == 'CARD'
+        fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_card
+      elsif params[:product_type] == 'OTHERS'
+        fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_others
+      end
+
+      if params[:product_type] == 'KIT' or params[:product_type] == 'CARD' 
+        xls_package = Fulfillment.send(method, fulfillments, true, false)
+      else
+        xls_package = Fulfillment.send(method, fulfillments, true)
+      end
+
+      send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
+                   :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                   :disposition => "attachment; filename=miworkingfile2.xlsx"    
+    end
 
 
 end

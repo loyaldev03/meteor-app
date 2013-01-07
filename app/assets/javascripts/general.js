@@ -450,14 +450,17 @@ $(document).ready( function() {
     })
   };
 
-  function fulfillments_index_functions(){
+  function fulfillments_index_functions(create_xls_file_url, make_report_url){
     $(".datepicker").datepicker({ constrainInput: true, 
                                   dateFormat: "yy-mm-dd", 
                                   showOn: "both", 
                                   buttonImage: "/icon-calendar.png", 
                                   buttonImageOnly: true });
+    
     $("#initial_date").datepicker( "setDate", '-1w' );
+    
     $("#end_date").datepicker( "setDate", '0' );
+
     $("#all_times").click (function (){
       if ($("#all_times").is(':checked')) {
         $('#td_initial_date').hide();
@@ -467,6 +470,19 @@ $(document).ready( function() {
         $('#td_end_date').show();
       }
     });
+
+    if ($("#all_times").is(':checked')) {
+      $('#td_initial_date').hide();
+      $('#td_end_date').hide();
+    }
+
+
+    $("#create_xls_file").click(function() {
+      $('#fulfillment_report_form').attr("action", create_xls_file_url);
+    });    
+    $("#make_report").click(function() {
+      $('#fulfillment_report_form').attr("action", make_report_url);
+    });    
 
     resend_fulfillment("fulfillments/");
     
