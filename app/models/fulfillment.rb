@@ -82,6 +82,7 @@ class Fulfillment < ActiveRecord::Base
     f = Fulfillment.new 
     f.status = status  unless status.nil?
     f.product_sku = self.product_sku
+    f.product_package = self.product_package
     f.member_id = self.member_id
     f.recurrent = true
     f.save
@@ -155,7 +156,7 @@ class Fulfillment < ActiveRecord::Base
         Fulfillment.find(fulfillment.id).set_as_processing unless fulfillment.processing? or fulfillment.renewed?
         member = fulfillment.member
         if type_others
-          csv << [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
+          csv << [fulfillment.tracking_code, fulfillment.product_sku, member.full_name, member.address, member.city,
                 member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
                 fulfillment.product.weight, 'MID']
         else
@@ -181,7 +182,7 @@ class Fulfillment < ActiveRecord::Base
         Fulfillment.find(fulfillment.id).set_as_processing unless fulfillment.processing? or fulfillment.renewed?
         member = fulfillment.member
         if type_others
-          sheet.add_row [fulfillment.tracking_code, 'Costcenter', member.full_name, member.address, member.city,
+          sheet.add_row [fulfillment.tracking_code, fulfillment.product_sku, member.full_name, member.address, member.city,
                 member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
                 fulfillment.product.weight, 'MID']
         else
@@ -206,7 +207,7 @@ class Fulfillment < ActiveRecord::Base
       if self.recurrent and self.renewable_at.nil?
         self.renewable_at = self.assigned_at + 1.year 
       end
-      self.tracking_code = self.product_sku + self.member.visible_id.to_s
+      self.tracking_code = self.product_package.to_s + self.member.visible_id.to_s
     end
 
 end

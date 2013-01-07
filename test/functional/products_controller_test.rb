@@ -76,7 +76,7 @@ class ProductsControllerTest < ActionController::TestCase
     product = FactoryGirl.build(:product)
     assert_difference('Product.count',1) do
       post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, product: { name: product.name,
-                     recurrent: product.recurrent, sku: product.sku, stock: product.stock, weight: product.weight }
+                     recurrent: product.recurrent, package: product.package, sku: product.sku, stock: product.stock, weight: product.weight }
     end
     assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
   end
@@ -85,7 +85,7 @@ class ProductsControllerTest < ActionController::TestCase
     sign_in @representative_user
     product = FactoryGirl.build(:product)
     post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, product: { name: product.name,
-                     recurrent: product.recurrent, sku: product.sku, stock: product.stock, weight: product.weight }
+                     recurrent: product.recurrent, package: product.package, sku: product.sku, stock: product.stock, weight: product.weight }
     assert_response :unauthorized
   end
 
@@ -93,7 +93,7 @@ class ProductsControllerTest < ActionController::TestCase
     sign_in @supervisor_user
     product = FactoryGirl.build(:product)
     post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, product: { name: product.name,
-                     recurrent: product.recurrent, sku: product.sku, stock: product.stock, weight: product.weight }
+                     recurrent: product.recurrent, package: product.package, sku: product.sku, stock: product.stock, weight: product.weight }
     assert_response :unauthorized
   end
 
@@ -110,7 +110,7 @@ class ProductsControllerTest < ActionController::TestCase
     product = FactoryGirl.build(:product)
     assert_difference('Product.count',1) do
       post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, product: { name: product.name,
-                     recurrent: product.recurrent, sku: product.sku, stock: product.stock, weight: product.weight }
+                     recurrent: product.recurrent, package: product.package, sku: product.sku, stock: product.stock, weight: product.weight }
     end
     assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
   end
@@ -189,7 +189,7 @@ class ProductsControllerTest < ActionController::TestCase
     sign_in @admin_user
     @product = FactoryGirl.create(:product)
     put :update, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name, 
-                 product: { name: @product.name, recurrent: @product.recurrent, sku: @product.sku, stock: @product.stock, weight: @product.weight }
+                 product: { name: @product.name, recurrent: @product.recurrent, package: @product.package, sku: @product.sku, stock: @product.stock, weight: @product.weight }
     assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
   end
 
@@ -197,7 +197,7 @@ class ProductsControllerTest < ActionController::TestCase
     sign_in @representative_user
     @product = FactoryGirl.create(:product)
     put :update, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name, 
-                 product: { name: @product.name, recurrent: @product.recurrent, sku: @product.sku, stock: @product.stock, weight: @product.weight }
+                 product: { name: @product.name, recurrent: @product.recurrent, package: @product.package,sku: @product.sku, stock: @product.stock, weight: @product.weight }
     assert_response :unauthorized
   end
 
@@ -205,7 +205,7 @@ class ProductsControllerTest < ActionController::TestCase
     sign_in @supervisor_user
     @product = FactoryGirl.create(:product)
     put :update, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name, 
-                 product: { name: @product.name, recurrent: @product.recurrent, sku: @product.sku, stock: @product.stock, weight: @product.weight }
+                 product: { name: @product.name, recurrent: @product.recurrent, package: @product.package,sku: @product.sku, stock: @product.stock, weight: @product.weight }
     assert_response :unauthorized
   end
 
@@ -213,7 +213,7 @@ class ProductsControllerTest < ActionController::TestCase
     sign_in @api_user
     @product = FactoryGirl.create(:product)
     put :update, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name, 
-                 product: { name: @product.name, recurrent: @product.recurrent, sku: @product.sku, stock: @product.stock, weight: @product.weight }
+                 product: { name: @product.name, recurrent: @product.recurrent, package: @product.package,sku: @product.sku, stock: @product.stock, weight: @product.weight }
     assert_response :unauthorized
   end
 
@@ -221,7 +221,7 @@ class ProductsControllerTest < ActionController::TestCase
     sign_in @agency_user
     @product = FactoryGirl.create(:product)
     put :update, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name, 
-                 product: { name: @product.name, recurrent: @product.recurrent, sku: @product.sku, stock: @product.stock, weight: @product.weight }
+                 product: { name: @product.name, recurrent: @product.recurrent, package: @product.package,sku: @product.sku, stock: @product.stock, weight: @product.weight }
     assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
   end
 

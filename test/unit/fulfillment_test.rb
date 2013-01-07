@@ -105,6 +105,9 @@ class FulfillmentTest < ActiveSupport::TestCase
     end
     fulfillment_out_of_stock = Fulfillment.find_by_product_sku('circlet')
     assert_equal fulfillment_out_of_stock.status, 'out_of_stock', "Status is #{fulfillment_out_of_stock.status} should be 'out_of_stock'"
+    product = Product.find_by_sku('circlet')
+    assert_equal fulfillment_out_of_stock.product_package, product.package
+    assert_equal fulfillment_out_of_stock.tracking_code, product.package + member.visible_id.to_s
 
     fulfillment_with_stock = Fulfillment.find_by_product_sku('Bracelet')
     assert_equal fulfillment_with_stock.status, 'not_processed', "Status is #{fulfillment_out_of_stock.status} should be 'not_processed'"          

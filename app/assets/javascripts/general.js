@@ -125,6 +125,10 @@ $(document).ready( function() {
     $('.help').popover({offset: 10});
   }
 
+  function new_product_functions(){
+    $('.help').popover({offset: 10});
+  }
+
   function member_index_functions(){
     $('#index_search_form').submit(function (){
       update_select_only = false;
@@ -165,20 +169,21 @@ $(document).ready( function() {
                                   yearRange: '1900',
                                   buttonImageOnly: true});
     $('#new_member').submit( function(event) {
+      $('#error_explanation').hide();
       $('#submit_button').attr('disabled', 'disabled');
-      event.preventDefault()
+      event.preventDefault();
       $.ajax({
         type: 'POST',
         url: "/api/v1/members",
         data: $("#new_member").serialize(),
         success: function(data) {
           $('input').parent().parent().removeClass("error");
-          $('#error_explanation').show();
-          $('#error_explanation ul').empty();
           if (data.code == 000) {
             alert (data.message);
             window.location.replace('../member/'+data.v_id);
           }else{
+            $('#error_explanation').show();
+            $('#error_explanation ul').empty();
             $('#submit_button').removeAttr('disabled');
             $('#error_explanation ul').append("<b>"+data.message+"</b>");
             for (var key in data.errors){

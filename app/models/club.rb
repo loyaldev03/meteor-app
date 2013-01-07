@@ -63,6 +63,7 @@ class Club < ActiveRecord::Base
       ['KIT','CARD'].each do |sku|
         p = Product.new 
         p.sku = sku
+        p.package = sku
         p.name = sku
         p.stock = 100
         p.recurrent = true
