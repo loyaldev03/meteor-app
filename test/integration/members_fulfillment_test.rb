@@ -209,8 +209,8 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
     within("#fulfillments_table") do
       wait_until{
-        assert find_field('initial_date_').value == "#{Date.today-1.week}"
-        assert find_field('end_date_').value == "#{Date.today}"
+        assert find_field('initial_date').value == "#{Date.today-1.week}"
+        assert find_field('end_date').value == "#{Date.today}"
       }
     end
   end
@@ -468,8 +468,8 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#fulfillments_table")do
       wait_until{
-        assert find_field('initial_date_').value == "#{Date.today-1.week}"
-        assert find_field('end_date_').value == "#{Date.today}"
+        assert find_field('initial_date').value == "#{Date.today-1.week}"
+        assert find_field('end_date').value == "#{Date.today}"
         assert page.find_field('status').value == 'not_processed'
         assert page.find_field('all_times')   
         assert page.find_field('product_type')
@@ -503,8 +503,8 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#fulfillments_table")do
       wait_until{
-        assert page.find_field('initial_date_')
-        assert page.find_field('end_date_')
+        assert page.find_field('initial_date')
+        assert page.find_field('end_date')
         assert page.find_field('status')
         assert page.find_field('all_times')    
         assert page.find_field('product_type')  
@@ -559,8 +559,8 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#fulfillments_table")do
       wait_until{
-        assert page.find_field('initial_date_')
-        assert page.find_field('end_date_')
+        assert page.find_field('initial_date')
+        assert page.find_field('end_date')
         assert page.find_field('status')
         assert page.find_field('all_times')    
         assert page.find_field('product_type')  
@@ -662,8 +662,8 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#fulfillments_table")do
       wait_until{
-        assert page.find_field('initial_date_')
-        assert page.find_field('end_date_')
+        assert page.find_field('initial_date')
+        assert page.find_field('end_date')
         assert page.find_field('status')
         assert page.find_field('all_times')    
         assert page.find_field('product_type')  
@@ -1723,7 +1723,7 @@ test "Enroll a member with recurrent product and it on the list" do
       select('Kit',:from => 'product_type')
     end
 
-    csv_string = Fulfillment.generateCSV(fulfillments, false) 
+    csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},KIT,\n")
 
     within("#fulfillments_table")do
@@ -1775,7 +1775,7 @@ test "Enroll a member with recurrent product and it on the list" do
       select('Card',:from => 'product_type')
     end
 
-    csv_string = Fulfillment.generateCSV(fulfillments, false) 
+    csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},CARD,\n")
 
     within("#fulfillments_table")do
@@ -2050,7 +2050,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
             'not_processed', Date.today, Date.today, @club.id]).type_others
 
-    csv_string = Fulfillment.generateCSV(fulfillments, true) 
+    csv_string = Fulfillment.generateCSV(fulfillments, true, true) 
     assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},#{fulfillment.product_sku},#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
   
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -2104,7 +2104,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
             'not_processed', Date.today, Date.today, @club.id]).type_others
 
-    csv_string = Fulfillment.generateCSV(fulfillments, true) 
+    csv_string = Fulfillment.generateCSV(fulfillments, true, true) 
     assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},#{fulfillment.product_sku},#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
   
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -2151,7 +2151,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
 
     fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', 'processing', @club.id).type_others
-    csv_string = Fulfillment.generateCSV(fulfillments, true) 
+    csv_string = Fulfillment.generateCSV(fulfillments, true, true) 
     assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},#{fulfillment.product_sku},#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
   end
 
@@ -2185,7 +2185,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
             'not_processed', Date.today, Date.today, @club.id]).type_kit
 
-    csv_string = Fulfillment.generateCSV(fulfillments, false) 
+    csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},\n")
   
     wait_until{page.has_content?("Fulfillments")}
@@ -2245,7 +2245,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
             'not_processed', Date.today, Date.today, @club.id]).type_card
 
-    csv_string = Fulfillment.generateCSV(fulfillments, false) 
+    csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},\n")
   
     wait_until{page.has_content?("Fulfillments")}
@@ -2303,7 +2303,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button 'Report'
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
             'processing', Date.today, Date.today, @club.id]).type_kit
-    csv_string = Fulfillment.generateCSV(fulfillments, false) 
+    csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
   end
 
@@ -2335,7 +2335,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button 'Report'
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
             'processing', Date.today, Date.today, @club.id]).type_card
-    csv_string = Fulfillment.generateCSV(fulfillments, false) 
+    csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
   end
 end
