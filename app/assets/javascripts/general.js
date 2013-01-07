@@ -456,8 +456,17 @@ $(document).ready( function() {
                                   showOn: "both", 
                                   buttonImage: "/icon-calendar.png", 
                                   buttonImageOnly: true });
-    $("#initial_date_").datepicker( "setDate", '-1w' );
-    $("#end_date_").datepicker( "setDate", '0' );
+    $("#initial_date").datepicker( "setDate", '-1w' );
+    $("#end_date").datepicker( "setDate", '0' );
+    $("#all_times").click (function (){
+      if ($("#all_times").is(':checked')) {
+        $('#td_initial_date').hide();
+        $('#td_end_date').hide();
+      } else {
+        $('#td_initial_date').show();
+        $('#td_end_date').show();
+      }
+    });
 
     resend_fulfillment("fulfillments/");
     
