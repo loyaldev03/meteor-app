@@ -165,8 +165,9 @@ $(document).ready( function() {
                                   yearRange: '1900',
                                   buttonImageOnly: true});
     $('#new_member').submit( function(event) {
+      $('#error_explanation').hide();
       $('#submit_button').attr('disabled', 'disabled');
-      event.preventDefault()
+      event.preventDefault();
       $.ajax({
         type: 'POST',
         url: "/api/v1/members",
