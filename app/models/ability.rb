@@ -60,7 +60,6 @@ class Ability
       can :manage, MemberNote
       can :show, TermsOfMembership
       can :list, Transaction
-      can :refund, Transaction
     elsif agent.has_role_with_club? 'supervisor', club_id
       can :manage, Member
       can :manage, Operation

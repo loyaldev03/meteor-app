@@ -592,12 +592,27 @@ test "Partial refund from CS" do
     end
   end
 
-  test "representative should be able to refund" do
+  test "representative should not be able to refund" do
     active_merchant_stubs
     setup_member
     @admin_agent.update_attribute(:roles, ["representative"])
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#transactions") do
+      wait_until {
+        assert page.has_no_selector?("refund")
+      }
+    end
+  end 
+
+  test "supervisor should be able to refund" do
+    active_merchant_stubs
+    setup_member
+    @admin_agent.update_attribute(:roles, ["supervisor"])
     bill_member(@saved_member, true)
   end 
+
 end
 
 
