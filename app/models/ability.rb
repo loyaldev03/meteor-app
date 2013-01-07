@@ -59,7 +59,8 @@ class Ability
       cannot :see_full_credit_card_number, CreditCard
       can :manage, MemberNote
       can :show, TermsOfMembership
-      can :read, Transaction
+      can :list, Transaction
+      can :refund, Transaction
     elsif agent.has_role_with_club? 'supervisor', club_id
       can :manage, Member
       can :manage, Operation
