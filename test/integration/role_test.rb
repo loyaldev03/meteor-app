@@ -354,4 +354,65 @@ class RolesTest < ActionController::IntegrationTest
     visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
     wait_until { assert page.has_no_content?("401 You are Not Authorized. ") }
   end
+
+  test "Admin should see full breadcrumb" do
+    setup_admin
+    setup_member
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within(".breadcrumb")do
+      wait_until{ assert page.has_content?("Partner") }
+      wait_until{ assert page.has_content?("Club") }
+      wait_until{ assert page.has_content?("Show") }
+    end
+  end
+
+  test "Supervisor should see full breadcrumb" do
+    setup_admin
+    setup_member
+    @admin_agent.update_attribute(:roles, ['supervisor'])
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within(".breadcrumb")do
+      wait_until{ assert page.has_no_content?("Partner") }
+      wait_until{ assert page.has_no_content?("Club") }
+      wait_until{ assert page.has_content?("Show") }
+    end
+  end
+
+  test "Representative should see full breadcrumb" do
+    setup_admin
+    setup_member
+    @admin_agent.update_attribute(:roles, ['representative'])
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within(".breadcrumb")do
+      wait_until{ assert page.has_no_content?("Partner") }
+      wait_until{ assert page.has_no_content?("Club") }
+      wait_until{ assert page.has_content?("Show") }
+    end
+  end
+
+  test "Agency should see full breadcrumb" do
+    setup_admin
+    setup_member
+
+    @admin_agent.update_attribute(:roles, ['agency'])
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within(".breadcrumb")do
+      wait_until{ assert page.has_no_content?("Partner") }
+      wait_until{ assert page.has_no_content?("Club") }
+      wait_until{ assert page.has_content?("Show") }
+    end
+  end
+
 end
