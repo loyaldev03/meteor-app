@@ -437,7 +437,7 @@ test "Enroll a member with recurrent product and it on the list" do
     wait_until{page.has_content?("Fulfillments")}
 
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('not_processed', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -471,7 +471,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert find_field('initial_date_').value == "#{Date.today-1.week}"
         assert find_field('end_date_').value == "#{Date.today}"
         assert page.find_field('status').value == 'not_processed'
-        assert page.find_field('_all_times')   
+        assert page.find_field('all_times')   
         assert page.find_field('product_type')
       }
     end
@@ -506,10 +506,10 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.find_field('initial_date_')
         assert page.find_field('end_date_')
         assert page.find_field('status')
-        assert page.find_field('_all_times')    
+        assert page.find_field('all_times')    
         assert page.find_field('product_type')  
       }
-      check('_all_times')
+      check('all_times')
       select('processing', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -562,10 +562,10 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.find_field('initial_date_')
         assert page.find_field('end_date_')
         assert page.find_field('status')
-        assert page.find_field('_all_times')    
+        assert page.find_field('all_times')    
         assert page.find_field('product_type')  
       }
-      check('_all_times')
+      check('all_times')
       select('sent', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -615,7 +615,7 @@ test "Enroll a member with recurrent product and it on the list" do
     wait_until{page.has_content?("Fulfillments")}
 
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('sent', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -665,10 +665,10 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.find_field('initial_date_')
         assert page.find_field('end_date_')
         assert page.find_field('status')
-        assert page.find_field('_all_times')    
+        assert page.find_field('all_times')    
         assert page.find_field('product_type')  
       }
-      check('_all_times')
+      check('all_times')
       select('sent', :from => 'status')
       select('Card',:from => 'product_type')
     end
@@ -716,7 +716,7 @@ test "Enroll a member with recurrent product and it on the list" do
     wait_until{page.has_content?("Fulfillments")}
     fulfillment = Fulfillment.find_by_product_sku('KIT')
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('processing', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -758,7 +758,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('processing', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -807,7 +807,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('processing', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -864,7 +864,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('out_of_stock', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -901,7 +901,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('out_of_stock', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -930,7 +930,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('out_of_stock', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -976,7 +976,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('out_of_stock', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -1124,7 +1124,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('sent', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -1155,7 +1155,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('undeliverable', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -1183,7 +1183,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('undeliverable', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -1238,7 +1238,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('undeliverable', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -1622,7 +1622,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('undeliverable', :from => 'status')
       within("select#product_type")do
         wait_until{
@@ -1648,7 +1648,7 @@ test "Enroll a member with recurrent product and it on the list" do
     wait_until{page.has_content?("Fulfillments")}
     fulfillment = Fulfillment.find_by_product_sku('kit-card')
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('not_processed', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -1682,7 +1682,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
 
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('out_of_stock', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -1727,7 +1727,7 @@ test "Enroll a member with recurrent product and it on the list" do
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},KIT,\n")
 
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('processing', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -1779,7 +1779,7 @@ test "Enroll a member with recurrent product and it on the list" do
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},CARD,\n")
 
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('processing', :from => 'status')
       select('Card',:from => 'product_type')
     end
@@ -1836,7 +1836,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('sent', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -1887,7 +1887,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('sent', :from => 'status')
       select('Card',:from => 'product_type')
     end
@@ -1925,7 +1925,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('undeliverable', :from => 'status')
       select('Card',:from => 'product_type')
     end
@@ -1938,7 +1938,7 @@ test "Enroll a member with recurrent product and it on the list" do
       }
     end
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('undeliverable', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -1952,7 +1952,7 @@ test "Enroll a member with recurrent product and it on the list" do
       }
     end
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('undeliverable', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -1987,7 +1987,7 @@ test "Enroll a member with recurrent product and it on the list" do
     
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('not_processed', :from => 'status')
       select('Card',:from => 'product_type')
     end
@@ -2002,7 +2002,7 @@ test "Enroll a member with recurrent product and it on the list" do
     
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('not_processed', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -2034,7 +2034,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('not_processed', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -2051,7 +2051,7 @@ test "Enroll a member with recurrent product and it on the list" do
             'not_processed', Date.today, Date.today, @club.id]).type_others
 
     csv_string = Fulfillment.generateCSV(fulfillments, true) 
-    assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},Costcenter,#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
+    assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},#{fulfillment.product_sku},#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
   
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
@@ -2087,7 +2087,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('not_processed', :from => 'status')
       select('Others',:from => 'product_type')
     end
@@ -2105,7 +2105,7 @@ test "Enroll a member with recurrent product and it on the list" do
             'not_processed', Date.today, Date.today, @club.id]).type_others
 
     csv_string = Fulfillment.generateCSV(fulfillments, true) 
-    assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},Costcenter,#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
+    assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},#{fulfillment.product_sku},#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
   
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
@@ -2152,7 +2152,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', 'processing', @club.id).type_others
     csv_string = Fulfillment.generateCSV(fulfillments, true) 
-    assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},Costcenter,#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
+    assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},#{fulfillment.product_sku},#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
   end
 
   test "change status of fulfillment KIT from not_processed to undeliverable" do
@@ -2168,7 +2168,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('not_processed', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -2190,7 +2190,7 @@ test "Enroll a member with recurrent product and it on the list" do
   
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('processing', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -2228,7 +2228,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){wait_until{click_link_or_button("Fulfillments")}}
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('not_processed', :from => 'status')
       select('Card',:from => 'product_type')
     end
@@ -2250,7 +2250,7 @@ test "Enroll a member with recurrent product and it on the list" do
   
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('processing', :from => 'status')
       select('Card',:from => 'product_type')
     end
@@ -2295,7 +2295,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('processing', :from => 'status')
       select('Kit',:from => 'product_type')
     end
@@ -2327,7 +2327,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#fulfillments_table")do
-      check('_all_times')
+      check('all_times')
       select('processing', :from => 'status')
       select('Card',:from => 'product_type')
     end
