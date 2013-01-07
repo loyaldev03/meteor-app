@@ -171,8 +171,7 @@ task :assets, :roles => :web do
     (
       echo "Recompiling assets" &&
       cd #{release_path} &&
-      source .rvmrc &&
-      RAILS_ENV=production bundle exec rake assets:precompile --trace
+      RAILS_ENV=#{rails_env} bundle exec rake assets:precompile --trace
     )
   EOF
 end
