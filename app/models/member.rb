@@ -853,9 +853,15 @@ class Member < ActiveRecord::Base
         api_m = member.api_member
         if api_m.save!(force: true)
           unless member.last_sync_error_at
-            Auditory.audit(nil, "Member synchronized by batch script", message, member)
+            Auditory.audit(nil, member, "Member synchronized by batch script", member)
           end
         end
+      end
+    end       
+    Member.find_in_batches( :conditions => ("status = 'lapsed' AND api_id IS NOT NULL") ) do |group|
+      group.each do |member|
+        member.api_member.destroy!
+        Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member)
       end
     end
   end

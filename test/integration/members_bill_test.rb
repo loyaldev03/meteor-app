@@ -208,7 +208,6 @@ class MembersBillTest < ActionController::IntegrationTest
         assert page.has_content?("Full save done")
       }
     end
-  
   end
  
  
@@ -593,6 +592,12 @@ test "Partial refund from CS" do
     end
   end
 
+  test "representative should be able to refund" do
+    active_merchant_stubs
+    setup_member
+    @admin_agent.update_attribute(:roles, ["representative"])
+    bill_member(@saved_member, true)
+  end 
 end
 
 
