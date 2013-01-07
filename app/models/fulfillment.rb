@@ -14,6 +14,12 @@ class Fulfillment < ActiveRecord::Base
 
   before_create :set_default_values
 
+  SLOOPS_HEADER = ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
+              'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
+  KIT_CARD_HEADER = ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
+                'ADDRESS','CITY','ZIP','Product','Charter Member Status' ]
+
+
   scope :where_undeliverable, lambda { where("status = 'undeliverable'") }
   scope :where_processing, lambda { where("status = 'processing'") }
   scope :where_not_processed, lambda { where("status = 'not_processed'") }
@@ -142,58 +148,52 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def self.generateCSV(fulfillments, type_others = true)
+  def self.generateCSV(fulfillments, change_status = false, type_others = true)
     CSV.generate do |csv| 
       if type_others
-        csv << ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
-              'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
+        csv << Fulfillment::SLOOPS_HEADER
       else
-        csv << ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
-                'ADDRESS','CITY','ZIP','Product','Charter Member Status' ]
+        csv << Fulfillment::KIT_CARD_HEADER
       end
 
       fulfillments.each do |fulfillment|
-        Fulfillment.find(fulfillment.id).set_as_processing unless fulfillment.processing? or fulfillment.renewed?
-        member = fulfillment.member
-        if type_others
-          csv << [fulfillment.tracking_code, fulfillment.product_sku, member.full_name, member.address, member.city,
-                member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
-                fulfillment.product.weight, 'MID']
-        else
-          csv << [member.visible_id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
-                  (I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at), member.address, member.city,
-                  member.zip, fulfillment.product_sku, ('C' if member.member_group_type_id) ]
-        end
+        r = fulfillment.get_file_line(true, type_others)
+        csv << r unless r.empty?
       end
     end
   end
 
-  def self.generateXLS(fulfillments, type_others = true)
+  def get_file_line(change_status = false, type_others = true)
+    return [] if product.nil?
+    if change_status
+      Fulfillment.find(self.id).set_as_processing unless self.processing? or self.renewed?
+    end
+    member = self.member
+    if type_others
+      [ self.tracking_code, self.product_sku, member.full_name, member.address, member.city,
+            member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
+            self.product.weight, 'MID']
+    else
+      [ member.visible_id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
+              (I18n.l self.renewable_at, :format => :only_date_short if self.renewable_at), member.address, member.city,
+              member.zip, self.product_sku, ('C' if member.member_group_type_id) ]
+    end
+  end
+
+  def self.generateXLS(fulfillments, change_status = false, type_others = true)
     package = Axlsx::Package.new
     package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
       if type_others
-        sheet.add_row ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
-              'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
+        sheet.add_row Fulfillment::SLOOPS_HEADER
       else
-        sheet.add_row ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
-                'ADDRESS','CITY','ZIP','Product','Charter Member Status' ]
+        sheet.add_row Fulfillment::KIT_CARD_HEADER
       end
       fulfillments.each do |fulfillment|
-        Fulfillment.find(fulfillment.id).set_as_processing unless fulfillment.processing? or fulfillment.renewed?
-        member = fulfillment.member
-        next if fulfillment.product.nil?
-        if type_others
-          sheet.add_row [fulfillment.tracking_code, fulfillment.product_sku, member.full_name, member.address, member.city,
-                member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
-                fulfillment.product.weight, 'MID']
-        else
-          sheet.add_row [member.visible_id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
-                  (I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at), member.address, member.city,
-                  member.zip, fulfillment.product_sku, ('C' if member.member_group_type_id) ]
-        end
+        r = fulfillment.get_file_line(true, type_others)
+        sheet.add_row r unless r.empty?
       end
     end
-    return package
+    package
   end
 
   def product

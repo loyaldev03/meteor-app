@@ -450,7 +450,7 @@ $(document).ready( function() {
     })
   };
 
-  function fulfillments_index_functions(create_xls_file_url){
+  function fulfillments_index_functions(create_xls_file_url, make_report_url){
     $(".datepicker").datepicker({ constrainInput: true, 
                                   dateFormat: "yy-mm-dd", 
                                   showOn: "both", 
@@ -471,8 +471,17 @@ $(document).ready( function() {
       }
     });
 
+    if ($("#all_times").is(':checked')) {
+      $('#td_initial_date').hide();
+      $('#td_end_date').hide();
+    }
+
+
     $("#create_xls_file").click(function() {
       $('#fulfillment_report_form').attr("action", create_xls_file_url);
+    });    
+    $("#make_report").click(function() {
+      $('#fulfillment_report_form').attr("action", make_report_url);
     });    
 
     resend_fulfillment("fulfillments/");

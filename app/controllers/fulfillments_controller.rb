@@ -27,9 +27,9 @@ class FulfillmentsController < ApplicationController
         end
 
         if params[:product_type] == 'KIT' or params[:product_type] == 'CARD' 
-          xls_package = Fulfillment.generateXLS(fulfillments,false)
+          xls_package = Fulfillment.generateXLS(fulfillments, false, false)
         else
-          xls_package = Fulfillment.generateXLS(fulfillments)
+          xls_package = Fulfillment.generateXLS(fulfillments, false)
         end
 
         send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
@@ -81,9 +81,9 @@ class FulfillmentsController < ApplicationController
       end
 
       if params[:product_type] == 'KIT' or params[:product_type] == 'CARD' 
-        xls_package = Fulfillment.send(method, fulfillments, false)
+        xls_package = Fulfillment.send(method, fulfillments, true, false)
       else
-        xls_package = Fulfillment.send(method, fulfillments)
+        xls_package = Fulfillment.send(method, fulfillments, true)
       end
 
       send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
