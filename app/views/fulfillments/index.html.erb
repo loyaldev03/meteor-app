@@ -4,7 +4,7 @@
   </div>
 </section>
 
-<%= form_tag(fulfillments_index_path) do %>
+<%= form_tag(fulfillments_index_path, :id => "fulfillment_report_form") do %>
   <table class="table table-bordered" id ="fulfillments_table">
   	<tr>
       <td>
@@ -24,17 +24,20 @@
         <%= select_tag :status, options_for_select([['not_processed', 'not_processed'],
                                 ['processing', 'processing'],['out_of_stock', 'out_of_stock'], 
                                 ['undeliverable','undeliverable'],['sent','sent']], :selected => params[:status]),
-                                :class => 'select_field input-medium', :name => '[status]' %>	
+                                :class => 'select_field input-medium' %>	
       </td>
       <td>
         <%= label :product_type, t('activerecord.attributes.fulfillment.product_type'), :class => 'help-inline' %>
         <%= select_tag :product_type, options_for_select([['Kit', 'KIT'], ['Card', 'CARD'],
                                 ['Others', 'OTHERS']], :selected => params[:product_type]),
-                                :class => 'select_field input-medium', :name => '[product_type]' %>  
+                                :class => 'select_field input-medium' %>  
       </td>
   	</tr>
   	<tr>
-  		<td colspan="5"><%= submit_tag t('buttons.report'), :class => 'btn btn-primary' %></td>
+  		<td colspan="5">
+        <%= submit_tag t('buttons.report'), :class => 'btn btn-primary', :id => 'make_report' %>
+        <%= submit_tag t('buttons.create_xls_file'), :class => 'btn btn-primary', :id => 'create_xls_file' %>
+      </td>
   	</tr>
   </table>
 <% end %>
@@ -42,7 +45,7 @@
 <%= render :partial => "report_result" %>
 
 <script type="text/javascript">
-  $(document).ready( fulfillments_index_functions() );
+  $(document).ready( fulfillments_index_functions('<%= generate_xls_fulfillments_path %>') );
 </script>
 
 

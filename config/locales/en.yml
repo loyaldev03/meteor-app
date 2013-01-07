@@ -71,6 +71,8 @@ en:
     select_country: 'Select country'
     select_state: 'Select state'
     recover: 'Recover'
+    create_csv_file: 'Create CSV File'
+    create_xls_file: 'Create XLS File'
   admin:
     agents:
       index:
