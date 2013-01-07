@@ -178,12 +178,12 @@ $(document).ready( function() {
         data: $("#new_member").serialize(),
         success: function(data) {
           $('input').parent().parent().removeClass("error");
-          $('#error_explanation').show();
-          $('#error_explanation ul').empty();
           if (data.code == 000) {
             alert (data.message);
             window.location.replace('../member/'+data.v_id);
           }else{
+            $('#error_explanation').show();
+            $('#error_explanation ul').empty();
             $('#submit_button').removeAttr('disabled');
             $('#error_explanation ul').append("<b>"+data.message+"</b>");
             for (var key in data.errors){
