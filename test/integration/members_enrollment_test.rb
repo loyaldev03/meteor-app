@@ -1251,7 +1251,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end 
 
-  #Check active email
+  #Check active email - It is send it by CS inmediate
   test "Check active email" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, 
@@ -1263,7 +1263,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
     @saved_member = Member.find_by_email(unsaved_member.email)
-    @saved_member.set_as_active
+    @saved_member.bill_membership
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     sleep 1
@@ -1281,7 +1281,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#operations_table") do
       wait_until {
         assert page.has_content?("Communication 'Test active' sent")
-      }
+          assert page.has_no_content?("Member enrolled successfully $0.0")
+        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+    }
     end
   end
 
@@ -1309,6 +1311,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#operations_table") do
       wait_until {
         assert page.has_content?("Communication 'Test birthday' sent")
+        assert page.has_no_content?("Member enrolled successfully $0.0")
+        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
       }
     end
   end
@@ -1339,6 +1343,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
       wait_until{
         assert page.has_content?("Day 7 - Trial")
+        assert page.has_no_content?("Member enrolled successfully $0.0")
+        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
       }
     end
   end
@@ -1370,6 +1376,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
       wait_until{
         assert page.has_content?("Day 35 - News")
+        assert page.has_no_content?("Member enrolled successfully $0.0")
+        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
       }
     end
   end
@@ -1400,6 +1408,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
       wait_until{
         assert page.has_content?("Day 40 - Deals")
+        assert page.has_no_content?("Member enrolled successfully $0.0")
+        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
       }
     end
   end
@@ -1429,6 +1439,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
       wait_until{
         assert page.has_content?("Day 45 - Local Chapters")
+        assert page.has_no_content?("Member enrolled successfully $0.0")
+        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
       }
     end
   end
@@ -1458,7 +1470,88 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
       wait_until{
         assert page.has_content?("Day 50 - VIP")
+        assert page.has_no_content?("Member enrolled successfully $0.0")
+        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
       }
     end
   end
+
+  test "Filtering by Communication at Operations tab" do
+    setup_member(false)
+    setup_email_templates
+    unsaved_member = FactoryGirl.build(:active_member, 
+      :club_id => @club.id)
+
+    create_new_member(unsaved_member)
+    created_member = Member.find_by_email(unsaved_member.email)   
+    created_member.current_membership.update_attribute(:join_date, Time.zone.now-50.day)
+
+
+    Settings.operation_types.collect do |key,value| 
+      FactoryGirl.create(:operation, :description => key, :operation_type => value, :member_id => created_member.id, :created_by_id => @admin_agent)
+    end
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+    within("#operations") do
+      wait_until{
+        select 'communications', :from => "operation[operation_type]"
+      }
+      wait_until{
+        assert page.has_no_content?('enrollment_billing')        
+        assert page.has_no_content?('save_the_sale')        
+        assert page.has_content?('prebill_email')        
+        assert page.has_content?('cancellation_email')        
+        assert page.has_content?('refund_email')        
+        assert page.has_no_content?('credit_card_in_use')        
+      }
+    end
+
+    within("#operations") do
+      wait_until{
+        select 'billing', :from => "operation[operation_type]"
+      }
+      wait_until{
+
+        assert page.has_content?('enrollment_billing')        
+        assert page.has_content?('membership_billing')        
+        assert page.has_content?('full_save')        
+        assert page.has_no_content?('save_the_sale')        
+        assert page.has_no_content?('prebill_email')        
+        assert page.has_no_content?('credit_card_in_use')        
+      }
+    end    
+  
+    within("#operations") do
+      wait_until{
+        select 'profile', :from => "operation[operation_type]"
+      }
+      wait_until{
+
+        assert page.has_no_content?('enrollment_billing')        
+        assert page.has_content?('fulfillment_mannualy_mark_as_sent')        
+        assert page.has_content?('blacklisted')        
+        assert page.has_content?('deducted_club_cash')        
+        assert page.has_no_content?('prebill_email')        
+        assert page.has_no_content?('credit_card_in_use')        
+      }
+    end    
+
+    within("#operations") do
+      wait_until{
+        select 'others', :from => "operation[operation_type]"
+      }
+      wait_until{
+        assert page.has_no_content?('enrollment_billing')        
+        assert page.has_no_content?('cancel')        
+        assert page.has_no_content?('prebill_email')        
+        assert page.has_no_content?('credit_card_in_use')        
+        assert page.has_content?('others')           
+      }
+    end    
+  end
+
+
+
 end
+
+  
