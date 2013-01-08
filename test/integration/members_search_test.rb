@@ -323,15 +323,29 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#fulfillments") { assert page.has_content?(fulfillments_table_empty_text) }
 
     within("#communication") { assert page.has_content?(communication_table_empty_text) }
-
   end
 
-
+  #Search member with duplicated letters at Last Name
   test "search by last name" do
     setup_search
     active_member = Member.where(:status => 'active').first
     provisional_member = Member.where(:status => 'provisional').first
     lapsed_member = Member.where(:status => 'lapsed').first
+    duplicated_name_member = Member.last
+    duplicated_name_member.update_attribute(:last_name, "Elwood")
+
+    sleep 1
+    within("#personal_details")do
+      wait_until{
+        fill_in "member[last_name]", :with => "Elwood"
+      }
+    end
+    click_link_or_button 'Search'
+    within("#members")do
+      wait_until{
+        assert page.has_content?(duplicated_name_member.full_name)
+      }
+    end
 
     within("#personal_details")do
       wait_until{

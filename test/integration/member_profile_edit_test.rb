@@ -752,10 +752,23 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
   end
 
+  # Do not allow to remove credit card from members that are Blacklisted
+  # Do not see Destroy button at Credit Card tab
   test "Delete credit card only when member is lapsed and is not blacklisted (and credit card is not the last one)" do
     setup_member
     second_credit_card = FactoryGirl.create(:credit_card_american_express , :member_id => @saved_member.id, :active => false)
 
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within(".nav-tabs")do
+      click_on("Credit Cards")
+    end 
+    within("#credit_cards")do
+      wait_until { assert page.has_no_selector?("#destroy") }
+    end
+
+    @saved_member.update_attribute(:status, "provisional")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
@@ -779,7 +792,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
 
     @saved_member.update_attribute(:blacklisted, false)
-
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
@@ -792,5 +804,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       click_link_or_button("Destroy")
     end
     wait_until{ assert page.has_content?("Credit Card #{second_credit_card.last_digits} was successfully destroyed") }
+  
+
   end
+
 end

@@ -384,7 +384,7 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-  test "Representative should see full breadcrumb" do
+  test "Representative should not see full breadcrumb" do
     setup_admin
     setup_member
     @admin_agent.update_attribute(:roles, ['representative'])
@@ -428,8 +428,8 @@ class RolesTest < ActionController::IntegrationTest
       wait_until{ assert page.has_selector?("#destroy") }
     end
   end
-
-  test "Representative should not be able to destroy a credit card" do
+ 
+  test "Profile Representative - Delete Credit Card" do
     setup_admin
     setup_member
     @admin_agent.update_attribute(:roles, ['representative'])
@@ -444,7 +444,7 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-  test "Supervisor should be able to destroy a credit card" do
+  test "Profile Supervisor - Delete Credit Card" do
     setup_admin
     setup_member
     @admin_agent.update_attribute(:roles, ['supervisor'])
@@ -458,7 +458,7 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-  test "Agency should be able to destroy a credit card" do
+  test "Agency should not be able to destroy a credit card" do
     setup_admin
     setup_member
     @admin_agent.update_attribute(:roles, ['agency'])
