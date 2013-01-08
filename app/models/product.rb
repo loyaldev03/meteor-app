@@ -3,7 +3,8 @@ class Product < ActiveRecord::Base
 
   attr_accessible :name, :recurrent, :sku, :stock, :weight, :package
 
-  validates :sku, :uniqueness => {:scope => :club_id}, :presence => true, :format => /^[a-zA-Z\-_]+$/
+  validates :sku, :uniqueness => {:scope => :club_id}, :presence => true, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2, :maximum => 19 }
+  validates :package, :length => { :minimum => 2, :maximum => 30 }
   validates :stock, :numericality => { :only_integer => true, :greater_than_or_equal_to => 0, :less_than => 1999999}
   validates :package, :format => /^[a-zA-Z\-_]+$/
 
