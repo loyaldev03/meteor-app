@@ -415,20 +415,6 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-  test "Admin should be able to destroy a credit card" do
-    setup_admin
-    setup_member
-    @saved_member.set_as_canceled!
-    credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
-
-    within("#credit_cards")do
-      wait_until{ assert page.has_selector?("#destroy") }
-    end
-  end
- 
   test "Profile Representative - Delete Credit Card" do
     setup_admin
     setup_member
