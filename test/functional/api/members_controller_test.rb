@@ -676,6 +676,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.number, @active_credit_card.number)
   end
 
+  # Update a member with different CC 
+  # Update same CC with dashes
   test "Update a profile with CC with dashes" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
@@ -697,6 +699,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.number, @credit_card.number.gsub(/\D/,''))
   end
 
+  # Update a member with different CC 
   test "Update a profile with CC with '/'" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
@@ -718,6 +721,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.number, @credit_card.number.gsub(/\D/,''))
   end
 
+  # Update a member with different CC 
+  # Update same CC with spaces 
   test "Update a profile with CC with white spaces" do
     sign_in @admin_user
     @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1

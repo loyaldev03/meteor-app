@@ -25,6 +25,11 @@ class CreditCard < ActiveRecord::Base
       errors[:credit_card] << "The member should have at least one credit card."
       return false
     end
+
+    if member.is_chargeback?
+      errors[:member] << "The member was chargebacked. It cannot be destroyed."
+      return false
+    end
   end
 
   def accepted_on_billing
