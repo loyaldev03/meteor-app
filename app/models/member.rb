@@ -410,6 +410,11 @@ class Member < ActiveRecord::Base
   def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = false, skip_api_sync = false)
     credit_card_params = {} if credit_card_params.blank? # might be [], we expect a Hash
     club = tom.club
+
+    unless club.billing_enable
+      return { :message => Settings.error_messages.club_is_not_enable_for_new_enrollments, :code => Settings.error_codes.club_is_not_enable_for_new_enrollments }      
+    end
+
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
       # credit card exist?

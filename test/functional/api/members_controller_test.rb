@@ -79,12 +79,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
-      Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
-                                      :auth_code => '111', :duplicate => false, 
-                                      :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
-          ) 
-    )
+    active_merchant_stubs
     assert_difference('Membership.count')do
       assert_difference('EnrollmentInfo.count')do
         assert_difference('Transaction.count')do
@@ -106,6 +101,30 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
   end
 
+  test "If billing is disabled member cant be enrolled." do
+    sign_in @admin_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_club.update_attribute :billing_enable, false
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count', 0)do
+      assert_difference('EnrollmentInfo.count', 0)do
+        assert_difference('Transaction.count', 0)do
+          assert_difference('MemberPreference.count', 0) do 
+            assert_difference('Member.count', 0) do
+              generate_post_message
+              assert_response :success
+            end
+          end
+        end
+      end
+    end
+  end
+
+
   test "Representative should enroll/create member" do
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card
@@ -113,12 +132,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
-      Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
-                                      :auth_code => '111', :duplicate => false, 
-                                      :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
-          ) 
-    )
+    active_merchant_stubs
     assert_difference('Member.count') do
       generate_post_message
       assert_response :success
@@ -132,12 +146,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
-      Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
-                                      :auth_code => '111', :duplicate => false, 
-                                      :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
-          ) 
-    )
+    active_merchant_stubs
     assert_difference('Member.count') do
       generate_post_message
       assert_response :success
@@ -160,12 +169,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
-      Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
-                                      :auth_code => '111', :duplicate => false, 
-                                      :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
-          ) 
-    )
+    active_merchant_stubs
     assert_difference('Member.count',0) do
       generate_post_message
       assert_response :unauthorized
