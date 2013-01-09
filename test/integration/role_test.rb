@@ -527,11 +527,7 @@ class RolesTest < ActionController::IntegrationTest
     wait_until{ assert page.has_selector?("#new_member") } 
   end
 
-  # Profile Representative - "Add a Credit Card" 
-  test "Profile Representative - Add a Credit Card" do
-    setup_admin
-    setup_member
-    @admin  test "Admin should be able to destroy a credit card" do
+  test "Admin should be able to destroy a credit card" do
     setup_admin
     setup_member
     @saved_member.set_as_canceled!
@@ -543,7 +539,13 @@ class RolesTest < ActionController::IntegrationTest
     within("#credit_cards")do
       wait_until{ assert page.has_selector?("#destroy") }
     end
-  end_agent.update_attribute(:roles, ['representative'])
+  end
+
+  # Profile Representative - "Add a Credit Card" 
+  test "Profile Representative - Add a Credit Card" do
+    setup_admin
+    setup_member
+    @admin_agent.update_attribute(:roles, ['representative'])
     credit_card = FactoryGirl.build(:credit_card_american_express)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
