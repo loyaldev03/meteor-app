@@ -298,6 +298,13 @@ class Member < ActiveRecord::Base
     self.lapsed? and reactivation_times < Settings.max_reactivations and not self.blacklisted
   end
 
+  def is_chargeback?
+    self.operations.each do |operation|
+      return true if operation.operation_type == 110
+    end
+    false
+  end
+
   # refs #21919
   def can_renew_fulfillment?
     self.active? and 

@@ -448,6 +448,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_admin
     setup_member
     @admin_agent.update_attribute(:roles, ['supervisor'])
+    @saved_member.set_as_canceled!
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -456,6 +457,32 @@ class RolesTest < ActionController::IntegrationTest
     within("#credit_cards")do
       wait_until{ assert page.has_selector?("#destroy") }
     end
+  end
+
+  # Profile Supervisor - "Add a Credit Card" 
+  test "Profile Supervisor - Add a Credit Card" do
+    setup_admin
+    setup_member
+    @admin_agent.update_attribute(:roles, ['supervisor'])
+    credit_card = FactoryGirl.build(:credit_card_american_express)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#table_active_credit_card")do
+      wait_until{ assert page.has_selector?("#add_credit_card") }
+      click_link_or_button("Add a credit card")
+    end
+
+    wait_until{ 
+      fill_in 'credit_card[number]', :with => credit_card.number 
+      fill_in 'credit_card[expire_month]', :with => credit_card.expire_month
+      fill_in 'credit_card[expire_year]', :with => credit_card.expire_year
+    }
+    click_link_or_button 'Save credit card'
+
+    credit_card = CreditCard.last
+    wait_until{ page.has_content?("Credit card #{credit_card.last_digits} added and activated.") }
   end
 
   test "Agency should not be able to destroy a credit card" do
@@ -471,4 +498,89 @@ class RolesTest < ActionController::IntegrationTest
       wait_until{ assert page.has_no_selector?("#destroy") }
     end
   end 
+  
+  # Profile representative
+  test "Representative should only see credit card last digits" do
+    setup_admin
+    setup_member
+    @admin_agent.update_attribute(:roles, ['representative'])
+    credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#table_active_credit_card") do
+      wait_until{ 
+        assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
+        assert page.has_no_content?("#{@saved_member.active_credit_card.number}") 
+      }
+    end
+
+    within("#credit_cards")do
+      wait_until{ 
+        assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
+        assert page.has_no_content?("#{@saved_member.active_credit_card.number}") 
+      }
+    end
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    wait_until{ assert page.has_selector?("#new_member") } 
+  end
+
+  test "Admin should be able to destroy a credit card" do
+    setup_admin
+    setup_member
+    @saved_member.set_as_canceled!
+    credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#credit_cards")do
+      wait_until{ assert page.has_selector?("#destroy") }
+    end
+  end
+
+  # Profile Representative - "Add a Credit Card" 
+  test "Profile Representative - Add a Credit Card" do
+    setup_admin
+    setup_member
+    @admin_agent.update_attribute(:roles, ['representative'])
+    credit_card = FactoryGirl.build(:credit_card_american_express)
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#table_active_credit_card")do
+      wait_until{ assert page.has_selector?("#add_credit_card") }
+      click_link_or_button("Add a credit card")
+    end
+
+    wait_until{ 
+      fill_in 'credit_card[number]', :with => credit_card.number 
+      fill_in 'credit_card[expire_month]', :with => credit_card.expire_month
+      fill_in 'credit_card[expire_year]', :with => credit_card.expire_year
+    }
+    click_link_or_button 'Save credit card'
+
+    credit_card = CreditCard.last
+    wait_until{ page.has_content?("Credit card #{credit_card.last_digits} added and activated.") }
+  end
+
+  test "Should not be able to destroy a credit card when member was chargebacked" do
+    setup_admin
+    setup_member
+    @saved_member.set_as_canceled!
+    credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
+    FactoryGirl.create(:operation, :member_id => @saved_member.id, :operation_type => Settings.operation_types.chargeback )
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#credit_cards")do
+      wait_until{ assert page.has_no_selector?("#destroy") }
+    end
+  end
+
+
 end

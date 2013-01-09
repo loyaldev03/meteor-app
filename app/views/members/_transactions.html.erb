@@ -2,7 +2,7 @@
 <table id="transactions_table" class="table table-bordered table-condensed dataTable" data-source="<%= transactions_url(format: "json") %>">
   <thead>
     <tr>
-      <th> <%= t('activerecord.attributes.transaction.date') %> </th>
+      <th id="th_date"> <%= t('activerecord.attributes.transaction.date') %> </th>
       <th> <%= t('activerecord.attributes.transaction.description') %> </th>
       <th> <%= t('activerecord.attributes.transaction.amount') %> </th>
       <th> <%= t('activerecord.attributes.transaction.refundable') %> </th>

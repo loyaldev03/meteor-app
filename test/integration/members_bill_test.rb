@@ -119,7 +119,10 @@ class MembersBillTest < ActionController::IntegrationTest
     end
     
     if do_refund
-      visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id, :transaction_id => Transaction.last.id)
+      transaction = Transaction.last
+      visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id, :transaction_id => transaction.id)
+
+      wait_until{ assert page.has_content?(transaction.amount_available_to_refund.to_s) }
 
       final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
       final_amount = refund_amount.to_s if not refund_amount.nil?
@@ -592,18 +595,11 @@ test "Partial refund from CS" do
     end
   end
 
-  test "representative should not be able to refund" do
+  test "representative should be able to refund" do
     active_merchant_stubs
     setup_member
     @admin_agent.update_attribute(:roles, ["representative"])
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-
-    within("#transactions") do
-      wait_until {
-        assert page.has_no_selector?("refund")
-      }
-    end
+    bill_member(@saved_member, true)
   end 
 
   test "supervisor should be able to refund" do
@@ -614,7 +610,3 @@ test "Partial refund from CS" do
   end 
 
 end
-
-
-
-

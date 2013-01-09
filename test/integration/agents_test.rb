@@ -3,13 +3,14 @@ require 'test_helper'
 class AgentsTest < ActionController::IntegrationTest
  
 
-  setup do
+  def setup_environment
     init_test_setup
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     sign_in_as(@admin_agent)
   end
 
   test "create empty agent" do
+    setup_environment
     visit admin_agents_path
     assert page.has_content?('Agents')
     click_link_or_button 'New Agent'
@@ -22,7 +23,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "create agent" do
-    
+    setup_environment
     visit new_admin_agent_path
     unsaved_agent = FactoryGirl.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
@@ -38,6 +39,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "create duplicated agent" do
+    setup_environment
     visit new_admin_agent_path
     fill_in 'agent[email]', :with => @admin_agent.email
     fill_in 'agent[username]', :with => @admin_agent.username
@@ -50,6 +52,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "view agent" do
+    setup_environment
     visit admin_agents_path
     within("#agents_table") do
       wait_until {
@@ -64,6 +67,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "update agent" do
+    setup_environment
     confirmed_agent = FactoryGirl.create(:confirmed_agent)
     visit admin_agents_path
     within("#agents_table .even") do
@@ -82,6 +86,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "destroy agent" do
+    setup_environment
     confirmed_agent = FactoryGirl.create(:confirmed_agent)
     visit admin_agents_path
     confirm_ok_js
@@ -95,6 +100,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "search agent" do
+    setup_environment
     visit admin_agents_path
 
     10.times{ FactoryGirl.create(:confirmed_agent) }
@@ -113,6 +119,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "create admin agent" do
+    setup_environment
     visit new_admin_agent_path
     unsaved_agent = FactoryGirl.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
@@ -129,6 +136,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "do not allow to create new agent with special characters" do
+    setup_environment
     visit new_admin_agent_path
     fill_in 'agent[email]', :with => "&%$"
     click_link_or_button 'Create Agent'
@@ -136,6 +144,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
   
   test "create an agent with different password confirmation" do
+    setup_environment
     visit new_admin_agent_path
     fill_in 'agent[email]', :with => 'testing@email.com'
     fill_in 'agent[password]', :with => "password"
@@ -147,6 +156,7 @@ class AgentsTest < ActionController::IntegrationTest
   end 
 
   test "should display agents in order" do
+    setup_environment
     10.times{ FactoryGirl.create(:confirmed_agent) }
     visit admin_agents_path
   
@@ -165,6 +175,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "create agent with supervisor role" do
+    setup_environment
     visit new_admin_agent_path
     unsaved_agent = FactoryGirl.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
@@ -185,6 +196,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "create agent with representative role" do
+    setup_environment
     visit new_admin_agent_path
     unsaved_agent = FactoryGirl.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
@@ -205,6 +217,7 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "create agent with api role" do
+    setup_environment
     visit new_admin_agent_path
     unsaved_agent = FactoryGirl.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
@@ -224,10 +237,8 @@ class AgentsTest < ActionController::IntegrationTest
     assert_equal saved_agent.roles, ['api']
   end
 
-
-
-
   test "create agent like Administrator, Supervisor and representative" do
+    setup_environment
     visit new_admin_agent_path
     unsaved_agent = FactoryGirl.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
@@ -239,9 +250,29 @@ class AgentsTest < ActionController::IntegrationTest
       click_link_or_button 'Create Agent'
     end
     
-    assert page.has_content?("Agent was successfully created")
-    
-    
+    assert page.has_content?("Agent was successfully created")    
   end
 
+  test "Reset Password at CS" do
+    init_test_setup
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+   
+    visit '/'
+    click_link_or_button("Forgot your password?")
+    wait_until{ fill_in "agent[login]", :with => @admin_agent.email }
+    click_link_or_button("Send me reset password instructions")
+
+    wait_until{ page.has_content?("You will receive an email with instructions about how to reset your password in a few minutes.") }
+
+    @admin_agent.reload
+    puts edit_agent_password_path
+    visit edit_agent_password_path(:reset_password_token => @admin_agent.reset_password_token )
+
+    fill_in "agent[password]", :with => "newpassword"
+    fill_in "agent[password_confirmation]", :with => "newpassword"
+
+    click_link_or_button "Change my password"
+
+    wait_until{ page.has_content?("Your password was changed successfully. You are now signed in.") }
+  end
 end

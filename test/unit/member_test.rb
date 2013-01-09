@@ -101,7 +101,7 @@ class MemberTest < ActiveSupport::TestCase
     member = create_active_member(@terms_of_membership_with_gateway)
     tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway)
     answer = member.recover(tom_dup)
-    assert answer[:code] == Settings.error_codes.cant_recover_member, answer[:message]
+    assert answer[:code] == Settings.error_codes.member_already_active, answer[:message]
   end
 
   test "Lapsed member with reactivation_times = 5 cant be recovered" do
