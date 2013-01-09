@@ -119,7 +119,10 @@ class MembersBillTest < ActionController::IntegrationTest
     end
     
     if do_refund
-      visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id, :transaction_id => Transaction.last.id)
+      transaction = Transaction.last
+      visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id, :transaction_id => transaction.id)
+
+      wait_until{ assert page.has_content?(transaction.amount_available_to_refund.to_s) }
 
       final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
       final_amount = refund_amount.to_s if not refund_amount.nil?
@@ -607,7 +610,3 @@ test "Partial refund from CS" do
   end 
 
 end
-
-
-
-
