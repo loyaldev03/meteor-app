@@ -171,8 +171,9 @@ class CreditCardsControllerTest < ActionController::TestCase
     
     @credit_card = FactoryGirl.build :credit_card_american_express
     @credit_card.number = @saved_member.active_credit_card.number
-    @credit_card.expire_month = @saved_member.active_credit_card.expire_month == 1 ? 11 : 1 # january will be always an expired month if year is today.year
-    @credit_card.expire_year = Time.zone.now.year 
+    expire_month = Time.zone.now - 1.month
+    @credit_card.expire_month = expire_month.month
+    @credit_card.expire_year = expire_month.year 
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
