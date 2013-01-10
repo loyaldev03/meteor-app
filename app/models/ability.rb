@@ -63,13 +63,14 @@ class Ability
       can :refund, Transaction
     elsif agent.has_role_with_club? 'supervisor', club_id
       can :manage, Member
+      cannot :api_profile, Member
       can :manage, Operation
       can :read, Membership
       can :manage, MemberNote
       can :manage, CreditCard
+      can :manage, MemberNote
       can :show, TermsOfMembership
       can :manage, Transaction
-      cannot :api_profile, Member
     elsif agent.has_role_with_club? 'api', club_id
       can :api_enroll, Member
       can :api_update, Member
