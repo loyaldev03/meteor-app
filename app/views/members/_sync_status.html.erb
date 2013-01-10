@@ -20,26 +20,9 @@
           <%= t('buttons.login_remotely_as_member') %>
         <% end %>
       <% end %>
-      <% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
-        <%= 
-          link_to "#", 
-            method: :post, 
-            class: "btn btn-info disabled",
-            id: "resend_welcome_email" do %>
-          <i class='icon-envelope'></i>
-          <%= t('buttons.resend_welcome_email') %>
-        <% end %>      
-      <% else %>
-        <%= 
-          link_to member_resend_welcome_path, 
-            method: :post, 
-            class: "btn btn-info",
-            id: "resend_welcome_email", 
-            confirm: 'Are you sure?' do %>
-          <i class='icon-envelope'></i>
-          <%= t('buttons.resend_welcome_email') %>
-        <% end %>
-      <% end %>
+      
+      <%= render :partial => 'shared/resend_welcome_email_button' %>
+
       <% if @current_member.lapsed? || !@current_member.api_member %>
         <%= 
           link_to "#", 
@@ -60,26 +43,9 @@
           <%= t('buttons.sync_to_remote') %>
         <% end %>
       <% end %>
-      <% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
-        <%= 
-          link_to "#", 
-            method: :post,
-            id: "password_reset",
-            class: "btn btn-warning disabled" do %>
-          <i class='icon-key'></i>
-          <%= t('buttons.password_reset') %>
-        <% end %>
-      <% else %>
-        <%= 
-          link_to member_reset_password_path, 
-            method: :post, 
-            class: "btn btn-warning", 
-            id: "password_reset",
-            confirm: 'Are you sure?' do %>
-          <i class='icon-key'></i>
-          <%= t('buttons.password_reset') %>
-        <% end %>
-      <% end %>
+      
+      <%= render :partial => 'shared/reset_password_button' %>
+
       <% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
         <%= 
           link_to "#", 

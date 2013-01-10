@@ -1,0 +1,20 @@
+<% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
+  <%= 
+    link_to member_resend_welcome_path(@current_partner.prefix, @current_club.name, @current_member.visible_id), 
+      method: :post, 
+      class: "btn btn-info btn-large-w disabled",
+      id: "resend_welcome_email" do %>
+    <i class='icon-envelope'></i>
+    <%= t('buttons.resend_welcome_email') %>
+  <% end %>      
+<% else %>
+  <%= 
+    link_to member_resend_welcome_path(@current_partner.prefix, @current_club.name, @current_member.visible_id), 
+      method: :post, 
+      class: "btn btn-large-w btn-info",
+      id: "resend_welcome_email", 
+      confirm: 'Are you sure?' do %>
+    <i class='icon-envelope'></i>
+    <%= t('buttons.resend_welcome_email') %>
+  <% end %>
+<% end %>
