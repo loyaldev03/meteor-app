@@ -68,7 +68,6 @@ class Ability
       can :read, Membership
       can :manage, MemberNote
       can :manage, CreditCard
-      can :manage, MemberNote
       can :show, TermsOfMembership
       can :manage, Transaction
     elsif agent.has_role_with_club? 'api', club_id
