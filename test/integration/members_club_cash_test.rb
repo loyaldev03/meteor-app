@@ -456,5 +456,16 @@ class MembersClubCashTest < ActionController::IntegrationTest
       end
     end
   end
+
+  test "Check club cash amount on membership show at CS" do
+    setup_member
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within("#table_membership_information")do
+      click_link_or_button(@terms_of_membership_with_gateway.name)
+    end 
+    wait_until{ page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s) }
+  end
+  
 end
 

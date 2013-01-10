@@ -170,4 +170,85 @@ class ProductsTests < ActionController::IntegrationTest
   	wait_until{ assert page.has_content?("has already been taken") }
 	end
 	
+	test "Create a product with sku limit - 19 chars length" do
+		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :sku => "abcdefghijklmnopqrs" )
+		visit products_path(@partner.prefix, @club.name)
+		click_link_or_button 'New Product'
+
+		wait_until{ 
+			fill_in 'product[sku]', :with => unsaved_product.sku	
+			fill_in 'product[name]', :with => unsaved_product.name
+			fill_in 'product[stock]', :with => unsaved_product.stock
+			fill_in 'product[weight]', :with => unsaved_product.weight
+			fill_in 'product[package]', :with => unsaved_product.package
+		}
+		click_link_or_button 'Create Product'
+		wait_until{ assert page.has_content?("Product was successfully created") }
+	end
+
+	test "Create a product with Package limit - 30 chars length" do
+		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :package => "abcdefghijklmnopqrstuvwxyzabcd" )
+		visit products_path(@partner.prefix, @club.name)
+		click_link_or_button 'New Product'
+
+		wait_until{ 
+			fill_in 'product[sku]', :with => unsaved_product.sku	
+			fill_in 'product[name]', :with => unsaved_product.name
+			fill_in 'product[stock]', :with => unsaved_product.stock
+			fill_in 'product[weight]', :with => unsaved_product.weight
+			fill_in 'product[package]', :with => unsaved_product.package
+		}
+		click_link_or_button 'Create Product'
+		wait_until{ assert page.has_content?("Product was successfully created") }
+	end
+
+	test "Create a product with Package more than 30 characters" do
+		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :package => "abcdefghijklmnopqrstuvwxyzabcde" )
+		visit products_path(@partner.prefix, @club.name)
+		click_link_or_button 'New Product'
+
+		wait_until{ 
+			fill_in 'product[package]', :with => unsaved_product.package
+		}
+		click_link_or_button 'Create Product'
+		wait_until{ assert page.has_content?("is too long (maximum is 30 characters)") }
+	end
+
+	test "Create a product with SKU more than 19 characters" do
+		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :sku => "abcdefghijklmnopqrst" )
+		visit products_path(@partner.prefix, @club.name)
+		click_link_or_button 'New Product'
+
+		wait_until{ 
+			fill_in 'product[sku]', :with => unsaved_product.sku
+		}
+		click_link_or_button 'Create Product'
+		sleep 5
+		wait_until{ assert page.has_content?("is too long (maximum is 19 characters)") }
+	end
+
+	test "Create a product with numbers at SKU " do
+		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :sku => "123456789" )
+		visit products_path(@partner.prefix, @club.name)
+		click_link_or_button 'New Product'
+
+		wait_until{ 
+			fill_in 'product[sku]', :with => unsaved_product.sku
+		}
+		click_link_or_button 'Create Product'
+		wait_until{ assert page.has_content?("is invalid") }
+	end
+	
+	test "Create a product with numbers at package " do
+		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :package => "123456789" )
+		visit products_path(@partner.prefix, @club.name)
+		click_link_or_button 'New Product'
+
+		wait_until{ 
+			fill_in 'product[package]', :with => unsaved_product.package
+		}
+		click_link_or_button 'Create Product'
+		wait_until{ assert page.has_content?("is invalid") }
+	end
+
 end
