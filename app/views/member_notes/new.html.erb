@@ -4,8 +4,8 @@
   <table class="table table-bordered" id="member_notes_table">    
     <tr>
       <td> 
-        <%= f.select :disposition_type_id, options_from_collection_for_select(@disposition_types, "id", "name") %> 
         <%= f.select :communication_type_id, options_from_collection_for_select(@communication_types, "id", "name") %>
+        <%= f.select :disposition_type_id, options_from_collection_for_select(@disposition_types, "id", "name") %> 
       </td>
     </tr>
     <tr>
