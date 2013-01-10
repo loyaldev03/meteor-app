@@ -149,7 +149,7 @@
   <thead>
     <tr class="box_title">
       <th><h4>Active Credit Card</h4></th>
-      <td style="border: none; text-align: right;">
+      <td style="border: none; text-align: right;" colspan="3">
         <%= link_to(new_credit_card_path, :class => "btn btn-success", :disabled => (cannot? :create, CreditCard), :id => "add_credit_card") do %> 
           <i class="icon-plus"></i> Add a credit card
         <% end %>
@@ -166,6 +166,8 @@
       <% end %>
       </th>
       <th><%= t("activerecord.attributes.credit_card.expire_date") %></th>
+      <th> <%= t('activerecord.attributes.credit_card.added_at') %> </th>
+      <th> <%= t('activerecord.attributes.credit_card.last_successful_bill_date') %> </th>
     </tr>
     <tr class="<%= (@active_credit_card.am_card.expired? ? "card_expired" : "") %>">
       <% if @active_credit_card %>
@@ -178,7 +180,10 @@
           <% end %>
         </td>
         <td><%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %></td>
+        <td> <%= I18n.l @active_credit_card.created_at, :format => :only_date %></td>
+        <td> <%= I18n.l @active_credit_card.last_successful_bill_date, :format => :only_date if !@active_credit_card.last_successful_bill_date.nil? %> </td>
       <% end %>
+
     </tr>
   </tbody>
 </table>
