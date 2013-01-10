@@ -179,7 +179,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "admin user should update member" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     
     @credit_card = FactoryGirl.create :credit_card_master_card, :active => false
@@ -193,7 +193,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "api_id should be updated if batch_update enabled" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
    
     @credit_card = FactoryGirl.create :credit_card_master_card, :active => false
@@ -219,7 +219,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "representative user should update member" do
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card    
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     @credit_card = active_credit_card
     @credit_card.update_attribute(:number, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}")
@@ -231,7 +231,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "supervisor user should update member" do
     sign_in @supervisor_user
     @credit_card = FactoryGirl.build :credit_card    
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     @credit_card = active_credit_card
     @credit_card.update_attribute(:number, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}")
@@ -243,7 +243,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "api user should update member" do
     sign_in @api_user
     @credit_card = FactoryGirl.build :credit_card    
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     @credit_card = active_credit_card
     @credit_card.update_attribute(:number, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}")
@@ -255,7 +255,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "agency user should not update member" do
     sign_in @agency_agent
     @credit_card = FactoryGirl.build :credit_card    
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @enrollment_info = FactoryGirl.build :enrollment_info
     generate_put_message
     assert_response :unauthorized
@@ -264,7 +264,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Credit card tests.
   test "Should update credit card" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     
     @credit_card = FactoryGirl.build :credit_card_american_express
@@ -280,7 +280,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Multiple same credit cards with different expiration date
   test "Should update credit card only year" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_number = active_credit_card.number
     
@@ -347,7 +347,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Multiple same credit cards with different expiration date
   test "Should update credit card only month" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_number = active_credit_card.number
 
@@ -424,7 +424,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Multiple same credit cards with different expiration date" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_number = active_credit_card.number
     
@@ -443,7 +443,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Should not update credit card when dates are not changed and same number. (With 'X')" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_number = active_credit_card.number
     
@@ -464,7 +464,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Multiple same credit cards with same expiration date
   test "Should not add new credit card with same data as the one active" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_year => (Time.zone.now+1.year).year, :expire_month => (Time.zone.now+1.month).month
     cc_number = active_credit_card.number
     
@@ -474,6 +474,8 @@ class Api::MembersControllerTest < ActionController::TestCase
       @credit_card.expire_year = @member.active_credit_card.expire_year
       @credit_card.expire_month = @member.active_credit_card.expire_month
 
+      active_merchant_stubs_store(@credit_card.number)
+
       assert_difference('Operation.count',1) do
         assert_difference('CreditCard.count',0) do
           generate_put_message
@@ -482,7 +484,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       
       assert_response :success
       @member.reload
-      assert_equal(@member.active_credit_card.number, cc_number)
+      assert_equal(@member.active_credit_card.token, @credit_card.get_token!)
       assert_equal(@member.active_credit_card.expire_year, @credit_card.expire_year)
       assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
     end
@@ -490,7 +492,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Should not update credit card when invalidid credit card number" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
 
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_year => (Time.zone.now+1.year).year, :expire_month => (Time.zone.now+1.month).month
     active_credit_card.update_attribute(:expire_year, (Time.zone.now+1.year).year)
@@ -515,7 +517,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should activate old credit when it is already created, if it is not expired" do
     sign_in @admin_user
     
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_number = @active_credit_card.number
     @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id
@@ -533,7 +535,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should activate old credit when it is already created, if it is not expired (with dashes)" do
     sign_in @admin_user
     number = "340-5043-2363-2976" 
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_number = @active_credit_card.number
     @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id, :number => number.gsub(/\D/,'') 
@@ -551,7 +553,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should activate old credit when it is already created, if it is not expired (with spaces)" do
     sign_in @admin_user
     number = "340 5043 2363 2976"   
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_number = @active_credit_card.number
     @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id, :number => number.gsub(/\D/,'')
@@ -569,7 +571,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should activate old credit when it is already created, if it is not expired (with tabs)" do
     sign_in @admin_user
     number = "340/5043/2363/2976"
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_number = @active_credit_card.number
     @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id, :number => number.gsub(/\D/,'')
@@ -586,7 +588,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not activate old credit card when update only number, if old is expired" do
     sign_in @admin_user
     
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_number = @active_credit_card.number
     @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id
@@ -605,7 +607,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Should not update active credit card with expired month" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_expire_month = @active_credit_card.expire_month
     @credit_card = FactoryGirl.build :credit_card_american_express
@@ -627,7 +629,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Should not update active credit card with expired year" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_expire_year = @active_credit_card.expire_year
     @credit_card = FactoryGirl.build :credit_card_american_express
@@ -647,7 +649,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Update a profile with CC blacklisted" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year
@@ -668,7 +670,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Update a profile with CC used by another member" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year
@@ -691,7 +693,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Update same CC with dashes
   test "Update a profile with CC with dashes" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year
@@ -713,7 +715,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Update a member with different CC 
   test "Update a profile with CC with '/'" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year
@@ -736,7 +738,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Update same CC with spaces 
   test "Update a profile with CC with white spaces" do
     sign_in @admin_user
-    @member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year

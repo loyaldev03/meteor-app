@@ -117,7 +117,7 @@ class CreditCard < ActiveRecord::Base
   end
 
   def expired?
-    Time.new(expire_year, expire_month) < Time.zone.now.beginning_of_month
+    Time.utc(expire_year, expire_month) < Time.now.utc.beginning_of_month
   end
 
   # refs #17832 and #19603

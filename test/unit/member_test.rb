@@ -302,7 +302,7 @@ class MemberTest < ActiveSupport::TestCase
         assert_difference('Transaction.count') do
           answer = member.bill_membership
           member.reload
-          assert_equal answer[:code], Settings.error_codes.invalid_credit_card
+          assert_equal answer[:code], @sd_strategy.response_code
           member.transactions.last.expire_year
           assert_equal original_year+2, member.transactions.last.expire_year
           assert_equal Operation.find_all_by_operation_type(Settings.operation_types.automatic_recycle_credit_card).size, 2

@@ -984,7 +984,8 @@ class Member < ActiveRecord::Base
     CreditCard.transaction do 
       begin
         new_credit_card.member = self
-        if new_credit_card.valid? and new_credit_card.am_card.valid?
+        am_card = CreditCard.am_card(new_credit_card.number, new_credit_card.expire_month, new_credit_card.expire_year, new_credit_card.member.first_name, new_credit_card.member.last_name)
+        if new_credit_card.valid? and am_card.valid?
           new_credit_card.save!
           message = "Credit card #{new_credit_card.last_digits} added and activated."
           Auditory.audit(current_agent, new_credit_card, message, self)
@@ -992,7 +993,7 @@ class Member < ActiveRecord::Base
           new_credit_card.set_as_active!
         else
           errors = new_credit_card.errors.to_hash
-          errors.merge! new_credit_card.am_card.errors.to_hash unless new_credit_card.am_card.errors.empty?
+          errors.merge! am_card.errors.to_hash unless am_card.errors.empty?
           answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => errors }
         end        
       rescue Exception => e
@@ -1112,12 +1113,10 @@ class Member < ActiveRecord::Base
         message = "Billing error. No decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
         self.next_retry_bill_date = Time.zone.now + eval(Settings.next_retry_on_missing_decline)
         self.save(:validate => false)
-        unless trans.response_code == Settings.error_codes.invalid_credit_card 
-          Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
-            :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.cc_type}. " + 
-              "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
-            :parameters => { :member => self.inspect })
-        end
+        Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
+          :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.cc_type}. " + 
+            "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
+          :parameters => { :member => self.inspect })
         if self.recycled_times < Settings.number_of_retries_on_missing_decline
           Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
           increment!(:recycled_times, 1)
