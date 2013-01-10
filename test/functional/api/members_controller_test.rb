@@ -756,6 +756,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
   
   test "Should not create member's record when there is an error on transaction." do
+    active_merchant_stubs_store
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api

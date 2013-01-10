@@ -43,9 +43,9 @@ class Transaction < ActiveRecord::Base
     self.credit_card_id = credit_card.id
     self.token = credit_card.token
     self.cc_type = credit_card.cc_type
+    self.last_digits = credit_card.last_digits
     self.expire_month = credit_card.expire_month
     self.expire_year = credit_card.expire_year
-    verify_card
   end
 
   def payment_gateway_configuration=(pgc)
@@ -105,6 +105,27 @@ class Transaction < ActiveRecord::Base
 
   def mes?
     gateway == "mes"
+  end
+
+  # answer credit card token
+  def self.store!(am_credit_card, pgc)
+    if pgc.production?
+      ActiveMerchant::Billing::Base.mode = :production
+    else
+      ActiveMerchant::Billing::Base.mode = :test
+    end
+    if pgc.mes?
+      gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(
+          :login    => pgc.login,
+          :password => pgc.password,
+          :merchant_key => pgc.merchant_key
+        )
+    elsif litle?
+      # TODO: add litle configuration!!!
+    end
+    answer = gateway.store(am_credit_card)
+    raise answer.params['auth_code'] if Settings.error_codes.success != answer.params['error_code']
+    answer.params['transaction_id']
   end
 
   def self.refund(amount, sale_transaction_id, agent=nil)

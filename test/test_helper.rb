@@ -37,9 +37,18 @@ class ActiveSupport::TestCase
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:refund).returns(answer)
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:credit).returns(answer)
   end
+  def active_merchant_stubs_store(code = "000", message = "This transaction has been approved with stub", success = true)
+    answer = ActiveMerchant::Billing::Response.new(success, message, 
+      { "transaction_id"=>"c25ccfecae10384698a44360444dead8", "error_code"=> code, 
+       "auth_response_text"=>"No Match" })
+    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:store).returns(answer)
+  end
 
   def create_active_member(tom, member_type = :active_member, enrollment_type = :enrollment_info, member_args = {}, membership_args = {}, use_default_active_merchant_stub = true)
-    active_merchant_stubs if use_default_active_merchant_stub
+    if use_default_active_merchant_stub
+      active_merchant_stubs 
+      active_merchant_stubs_store
+    end
     membership = FactoryGirl.create("#{member_type}_membership".to_sym, { terms_of_membership: tom }.merge(membership_args))
     active_member = FactoryGirl.create(member_type, { club: tom.club, current_membership: membership }.merge(member_args))
     active_member.memberships << membership

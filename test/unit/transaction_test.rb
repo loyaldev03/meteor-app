@@ -176,6 +176,7 @@ class TransactionTest < ActiveSupport::TestCase
   ######################################
   ############ DECLINE ###################
   test "Monthly member SD until gets HD" do 
+    active_merchant_stubs_store
     active_merchant_stubs
 
     member = enroll_member(@terms_of_membership)
@@ -224,6 +225,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing with SD is re-scheduled" do 
+    active_merchant_stubs_store
     assert_difference('Operation.count') do
       assert_difference('Transaction.count') do
         active_member = create_active_member(@terms_of_membership)
@@ -258,6 +260,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   end
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 
+    active_merchant_stubs_store
     assert_difference('Operation.count', 4) do
       assert_difference('Communication.count', +1) do
         active_member = create_active_member(@terms_of_membership)
@@ -277,6 +280,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing with HD cancels member" do 
+    active_merchant_stubs_store
     assert_difference('Operation.count', 4) do
       assert_difference('Communication.count', +1) do
         active_member = create_active_member(@terms_of_membership)
@@ -293,6 +297,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing declined, but there is no decline rule. Send email" do 
+    active_merchant_stubs_store
     active_member = create_active_member(@terms_of_membership)
     active_merchant_stubs("34234", "decline stubbed", false) 
     amount = @terms_of_membership.installment_amount

@@ -425,9 +425,9 @@ class Member < ActiveRecord::Base
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
       # credit card exist?
-      credit_card_params[:number] .gsub!(' ', '') # HOT FIX on 
       credit_card = CreditCard.new credit_card_params
-      credit_cards = CreditCard.joins(:member).where( :encrypted_number => credit_card.encrypted_number, :members => { :club_id => club.id } )
+      credit_card.get_token!(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name])
+      credit_cards = CreditCard.joins(:member).where( :token => credit_card.token, :members => { :club_id => club.id } )
 
       if credit_cards.empty? or cc_blank
         member = Member.new
@@ -942,8 +942,9 @@ class Member < ActiveRecord::Base
         { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => { :number => "Credit card do not match the active one." }}
       end
     else # drupal or CS sends the complete credit card number.
-      new_credit_card = CreditCard.new(:number => credit_card[:number].gsub(/\D/,''), :expire_month => new_month, :expire_year => new_year)
-      credit_cards = CreditCard.joins(:member).where( [ " encrypted_number = ? and members.club_id = ? ", new_credit_card.encrypted_number, club.id ] )
+      new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
+      new_credit_card.get_token!(terms_of_membership.payment_gateway_configuration, first_name, last_name)
+      credit_cards = CreditCard.joins(:member).where( [ " token = ? and members.club_id = ? ", new_credit_card.token, club.id ] )
       if credit_cards.empty?
         add_new_credit_card(new_credit_card, current_agent)
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
@@ -982,7 +983,6 @@ class Member < ActiveRecord::Base
     answer = { :message => "There was an error. We could not add the credit card.", :code => Settings.error_codes.invalid_credit_card }
     CreditCard.transaction do 
       begin
-        new_credit_card.number = new_credit_card.number.gsub(/\D/,'')
         new_credit_card.member = self
         if new_credit_card.valid? and new_credit_card.am_card.valid?
           new_credit_card.save!

@@ -4,7 +4,6 @@ class CreditCardNumberRenamedToToken < ActiveRecord::Migration
     remove_column :transactions, :encrypted_number
     add_column :credit_cards, :token, :string
     add_column :transactions, :token, :string
-    add_column :transactions, :cc_type, :string
   end
 
   def down
@@ -12,6 +11,5 @@ class CreditCardNumberRenamedToToken < ActiveRecord::Migration
     add_column :transactions, :encrypted_number, :string
     remove_column :credit_cards, :token
     remove_column :transactions, :token
-    remove_column :transactions, :cc_type
   end
 end

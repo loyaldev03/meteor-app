@@ -10,8 +10,9 @@ class CreditCardsControllerTest < ActionController::TestCase
     @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway
     @club = @terms_of_membership.club
     @partner = @club.partner
-    @saved_member = FactoryGirl.create :member_with_api, :club_id => @terms_of_membership.club.id, :visible_id => 1
+    @saved_member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @saved_member.id
+
     # request.env["devise.mapping"] = Devise.mappings[:agent]
   end
 

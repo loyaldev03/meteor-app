@@ -2,13 +2,20 @@ class CreditCard < ActiveRecord::Base
   belongs_to :member
   has_many :transactions
 
+  attr_accessor :number
+
   attr_accessible :active, :number, :expire_month, :expire_year, :blacklisted
 
   before_create :set_data_before_credit_card_number_disappear
   before_destroy :confirm_presence_of_another_credit_card_related_to_member
+  after_initialize :do_after_initialize_stuff
 
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }
+
+  def do_after_initialize_stuff
+    self.number.gsub!(/\D/,'') unless self.number.nil?
+  end
 
   def confirm_presence_of_another_credit_card_related_to_member
     if self.active 
@@ -67,14 +74,6 @@ class CreditCard < ActiveRecord::Base
   end
 
   def set_data_before_credit_card_number_disappear
-    if self.cc_type.nil?
-      am = CreditCard.am_card(number, expire_month, expire_year, member.first_name, member.last_name)
-      if am.valid?
-        self.cc_type = am.type
-      else
-        self.cc_type = 'unknown'
-      end
-    end
     self.last_digits = self.number.last(4) if self.last_digits.nil? and self.number
   end
 
@@ -93,6 +92,16 @@ class CreditCard < ActiveRecord::Base
     end
     raise exc unless exc.nil?
   end
+
+  def get_token!(pgc = nil, first_name = nil, last_name = nil)
+    am = CreditCard.am_card(number, expire_month, expire_year, first_name || member.first_name, last_name || member.last_name)
+    if am.valid?
+      self.cc_type = am.type
+    else
+      self.cc_type = 'unknown'
+    end
+    self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
+  end
   
   def update_expire(year, month, current_agent = nil)
     if year.to_i == expire_year.to_i and month.to_i == expire_month.to_i
@@ -107,13 +116,17 @@ class CreditCard < ActiveRecord::Base
     end
   end
 
+  def expired?
+    Time.new(expire_year, expire_month) < Time.zone.now.beginning_of_month
+  end
+
   # refs #17832 and #19603
   # 6 Days Later if not successful = (+3), 3/2014
   # 6 Days Later if not successful = (+2), 3/2013
   # 6 Days Later if not successful = (+4) 3/2015
   # 6 Days Later if not successful = (+1) 3/2012
   def self.recycle_expired_rule(acc, times)
-    if acc.am_card.expired?
+    if acc.expired?
       case times
       when 0
         new_year_exp=acc.expire_year + 3
