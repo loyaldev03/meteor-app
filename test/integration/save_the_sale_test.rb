@@ -337,4 +337,20 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     assert_equal @saved_member.current_membership.status, "applied"
     assert_equal @saved_member.status, "applied"
   end
+
+  test "member full save" do
+    setup_member
+    @saved_member.bill_membership
+    
+    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    click_on 'Full save'
+     
+    assert page.has_content?("Full save done")
+    
+    within("#operations_table") do 
+      wait_until {
+        assert page.has_content?("Full save done")
+      }
+    end
+  end 
 end

@@ -195,24 +195,6 @@ class MembersBillTest < ActionController::IntegrationTest
   #     }
   #   end
   # end
-
-  test "member refund full save" do
-    active_merchant_stubs
-    setup_member
-    bill_member(@saved_member, false)
-    
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
-    click_on 'Full save'
-     
-    assert page.has_content?("Full save done")
-    
-    within("#operations_table") do 
-      wait_until {
-        assert page.has_content?("Full save done")
-      }
-    end
-  end
- 
  
   test "uncontrolled refund more than transaction amount" do
     active_merchant_stubs
@@ -346,11 +328,11 @@ class MembersBillTest < ActionController::IntegrationTest
     wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
     page.execute_script("window.jQuery('#next_bill_date').next().click()")
     within("#ui-datepicker-div") do
-      wait_until { click_on("#{Time.zone.now.day+1}") }
+      wait_until { click_on("#{Time.zone.now.day+1.day}") }
     end
     click_link_or_button 'Change next bill date'
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    next_bill_date = Time.zone.now + 1
+    next_bill_date = Time.zone.now + 1.day
     within("#td_mi_next_retry_bill_date")do
       wait_until{ assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date)) }
     end
@@ -370,7 +352,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
   test "Successful payment." do
     setup_member
-    @saved_member.current_membership.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -379,7 +361,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
   test "Provisional member" do
     setup_member
-    @saved_member.current_membership.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3.day
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
@@ -398,7 +380,7 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Lapsed member" do
     setup_member
     @saved_member.set_as_canceled
-    @saved_member.current_membership.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     answer = @saved_member.bill_membership
     assert (answer[:code] == Settings.error_codes.member_status_dont_allow), answer[:message]
@@ -406,7 +388,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
   test "Refund from CS" do
     setup_member
-    @saved_member.current_membership.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -436,7 +418,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
 test "Partial refund from CS" do
     setup_member
-    @saved_member.current_membership.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -527,7 +509,7 @@ test "Partial refund from CS" do
   #See operations on CS
   test "See operations on CS" do
     setup_member
-    @saved_member.current_membership.join_date = Time.zone.now-3
+    @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -546,7 +528,8 @@ test "Partial refund from CS" do
 
     wait_until{ page.has_content?("This transaction has been approved") }
 
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
     click_on 'Full save'
     assert page.has_content?("Full save done")
     
