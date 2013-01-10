@@ -3,11 +3,7 @@
   <thead>
     <tr>
       <th> 
-        <% if can? :see_full_credit_card_number, CreditCard %>
-          <%= t('activerecord.attributes.credit_card.number') %> 
-        <% else %>
-          <%= t('activerecord.attributes.credit_card.last_digits') %> 
-        <% end %> 
+        <%= t('activerecord.attributes.credit_card.last_digits') %> 
       </th>
       <th> <%= t('activerecord.attributes.credit_card.expire_date') %> </th>
       <th> <%= t('activerecord.attributes.credit_card.added_at') %> </th>
@@ -27,11 +23,7 @@
         <% end %>
         >
       <td> 
-        <% if can? :see_full_credit_card_number, cc %>
-          <%= cc.number %>
-        <% else %>
-          <%= cc.last_digits %>
-        <% end %> 
+        <%= cc.last_digits %>
       </td>
       <td> <%= cc.expire_month %> / <%= cc.expire_year %> </td>
       <td> <%= I18n.l cc.created_at, :format => :only_date %></td>
