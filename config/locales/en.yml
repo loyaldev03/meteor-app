@@ -212,6 +212,7 @@ en:
         blacklisted: 'Blacklisted'
         last_digits: 'Last digits'
         active: 'active'
+        type_unknown: 'unknown'
       operation:
         operation_date: 'Operation date'
         description: 'Description'
