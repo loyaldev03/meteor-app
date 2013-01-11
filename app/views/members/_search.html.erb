@@ -21,6 +21,7 @@
     <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
       <td class="<%= menber_status_class(member) %>"> 
       <% if member.blacklisted? %>
+      <%= member.status %>
       <%= t('activerecord.attributes.member.status_blacklisted') %>
       <% else %>
       <%= member.status %>
