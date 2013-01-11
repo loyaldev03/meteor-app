@@ -183,10 +183,10 @@
         <td>
           <% if can? :see_full_credit_card_number, @active_credit_card %>
             <%= @active_credit_card.number %>
-            (<%= @active_credit_card.cc_type.nil? ?  t('activerecord.attributes.credit_card.type_unknown') : @active_credit_card.cc_type %> )
           <% else %>
             <%= @active_credit_card.last_digits %>
           <% end %>
+          (<%= @active_credit_card.cc_type.nil? ?  t('activerecord.attributes.credit_card.type_unknown') : @active_credit_card.cc_type %>)
         </td>
         <td><%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %></td>
         <td> <%= I18n.l @active_credit_card.created_at, :format => :only_date %></td>
