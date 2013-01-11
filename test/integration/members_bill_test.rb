@@ -97,6 +97,11 @@ class MembersBillTest < ActionController::IntegrationTest
     end
     within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
 
+
+    within("#table_membership_information")do
+      wait_until{ assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date ) } 
+    end
+
     #sleep(5)
 
     within("#operations") do
