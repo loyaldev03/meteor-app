@@ -293,10 +293,6 @@
             <th><%= t('activerecord.attributes.member.date_of_active_credit_card') %>: </th>
             <td id="td_mi_credit_cards_first_created_at"><%= @active_credit_card && I18n.l(@active_credit_card.created_at, :format => :only_date) %> </td>
           </tr>
-          <tr>
-            <th><%= t('activerecord.attributes.member.last_successful_bill_date') %>: </th>
-            <td><%= I18n.l(@active_credit_card.last_successful_bill_date, :format => :only_date) if @active_credit_card.try(:last_successful_bill_date) %> </td>
-          </tr>
         </table>        
       </td>
     </tr>
