@@ -158,7 +158,6 @@ class MembersSearchTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
-
   test "search members by next bill date" do
     setup_search
     page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
@@ -873,5 +872,20 @@ class MembersSearchTest < ActionController::IntegrationTest
     click_link_or_button 'Cancel'
     sleep 1 
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+  end
+
+  test "should show status with 'Blisted' on search results, when member is blacklisted." do
+    setup_member
+    cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
+    @saved_member.set_as_canceled!
+    @saved_member.update_attribute(:blacklisted,true)
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    click_link_or_button 'Search'
+
+    within("#members")do
+      wait_until{ assert page.has_content?("Lapsed - Blisted") }
+    end
   end
 end

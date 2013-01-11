@@ -182,6 +182,7 @@ en:
         has_no_preferences_saved: 'There are no preferences saved.'
         last_synced_at: 'Last successful sync'
         last_sync_error: 'Last failed sync'
+        status_blacklisted: 'Lapsed - Blisted'
         sync_status_priorities:
           synced: success
           unsynced: warning
