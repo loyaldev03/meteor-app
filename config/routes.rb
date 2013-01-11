@@ -38,6 +38,7 @@ SacPlatform::Application.routes.draw do
         resources :terms_of_memberships, :only => [ :show ]
         resources :transactions, :only => [ :index ]
         resources :memberships, :only => [ :index ]
+        resources :club_cash_transactions, :only => [:index]
         resources :credit_cards, :only => [ :new, :create, :destroy ] do
           post :activate
         end

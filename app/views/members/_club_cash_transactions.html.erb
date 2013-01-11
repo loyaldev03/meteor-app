@@ -1,0 +1,16 @@
+<table id="club_cash_transactions_table" class="table table-bordered table-condensed dataTable" data-source="<%= club_cash_transactions_path(format: "json") %>">
+  <thead>
+    <tr>
+      <th id="th_id"> <%= t('activerecord.attributes.club_cash_transaction.created_at') %> </th>
+      <th id="th_id"> <%= t('activerecord.attributes.club_cash_transaction.description') %> </th>
+      <th id="th_id"> <%= t('activerecord.attributes.club_cash_transaction.amount') %> </th>
+      <th id="th_id"> <%= t('activerecord.attributes.club_cash_transaction.id') %> </th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<script>
+  $(document).ready(club_cash_transactions_functions(<%= Transaction.datatable_columns.size %>));
+</script>

@@ -397,6 +397,20 @@ $(document).ready( function() {
     });
   }
 
+  
+  function club_cash_transactions_functions(column_count){
+    $('#club_cash_transactions_table').dataTable({
+      "oLanguage": {"sSearch": "Filtered by:"},
+      "bJQueryUI": false,
+      "bProcessing": true,
+      "sPaginationType": "bootstrap",
+      "bServerSide": true,
+      "aaSorting": [[ 0, "desc" ]],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1 ] }],
+      "sAjaxSource": $('#club_cash_transactions_table').data('source')
+    });
+  }
+
   function show_member_functions(){
     $(".btn").live('click',function(event){
       if($(this).attr('disabled') == 'disabled')

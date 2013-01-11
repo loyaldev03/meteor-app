@@ -42,6 +42,7 @@ class Ability
       can :manage, MemberNote
       can :manage, TermsOfMembership
       can :manage, Transaction
+      can :manage, ClubCashTransaction
       can :api_enroll, Member
       can :api_update, Member
       can :api_profile, Member
@@ -61,6 +62,7 @@ class Ability
       can :show, TermsOfMembership
       can :list, Transaction
       can :refund, Transaction
+      can :list, ClubCashTransaction
     elsif agent.has_role_with_club? 'supervisor', club_id
       can :manage, Member
       cannot :api_profile, Member
@@ -70,6 +72,7 @@ class Ability
       can :manage, CreditCard
       can :show, TermsOfMembership
       can :manage, Transaction
+      can :manage, ClubCashTransaction
     elsif agent.has_role_with_club? 'api', club_id
       can :api_enroll, Member
       can :api_update, Member
@@ -88,8 +91,8 @@ class Ability
       can :list, Operation
       can :show, Operation
       can :show, TermsOfMembership
-      can :read, Transaction
-
+      can :list, Transaction
+      can :list, ClubCashTransaction
       # EXAMPLE
       # can :manage, Partner do |partner|
       #   # agent is enabled to manage a specific partner

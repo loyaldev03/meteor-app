@@ -15,4 +15,7 @@ class ClubCashTransaction < ActiveRecord::Base
     errors
   end
 
+  def self.datatable_columns
+    ['created_at', 'description', 'amount', 'id' ]
+  end
 end
