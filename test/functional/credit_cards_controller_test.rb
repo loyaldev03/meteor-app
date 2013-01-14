@@ -208,14 +208,14 @@ class CreditCardsControllerTest < ActionController::TestCase
 
   test "Should not update active credit card with expired year" do
     sign_in @admin_user
+
+    cc_token = @active_credit_card.token
     
     @credit_card = FactoryGirl.build :credit_card_american_express
     @credit_card.number = @credit_card_master_card_number
     @credit_card.expire_year = (Time.zone.now-2.year).year
 
     active_merchant_stubs_store(@credit_card.number)
-
-    token = @credit_card.get_token!(@terms_of_membership.payment_gateway_configuration, @saved_member.first_name, @saved_member.last_name)
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
@@ -225,7 +225,7 @@ class CreditCardsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_equal(@saved_member.active_credit_card.number, nil)
-    assert_equal(@saved_member.active_credit_card.token, token)
+    assert_equal(@saved_member.active_credit_card.token, cc_token)
     assert_not_equal(@saved_member.active_credit_card.expire_year, @credit_card.expire_year)
   end
 
