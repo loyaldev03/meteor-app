@@ -197,24 +197,11 @@ class Admin::AgentsControllerTest < ActionController::TestCase
 
   test "Representative and Api users should not see the enroll button on member#index." do
   	sign_in @representative_user
- 	    ability = Ability.new(@api_user)
-      assert ability.cannot?(:enroll, Member), "#{@api_user.roles} can see member's enroll button on member#index."
+    ability = Ability.new(@api_user)
+    assert ability.cannot?(:enroll, Member), "#{@api_user.roles} can see member's enroll button on member#index."
 
-      ability = Ability.new(@representative_user)
-      assert ability.can?(:enroll, Member), "#{@representative_user.roles} can see member's enroll button on member#index."
+    ability = Ability.new(@representative_user)
+    assert ability.can?(:enroll, Member), "#{@representative_user.roles} can see member's enroll button on member#index."
   end
 
-  test "Admin and supervisor should see full credit card." do
-  	[@admin_user,@supervisor_user].each do |agent|
-	  sign_in agent
-	  ability = Ability.new(agent)
-	  assert ability.can?(:see_credit_card, CreditCard), "#{agent.roles} cant see member's full credit card number."
-	end
-  end
-
-  test "Representative should only see credit card's last digits." do
-  	sign_in @representative_user
-  	ability = Ability.new(@representative_user)
-  	assert ability.cannot?(:see_full_credit_card_number, CreditCard), "Representative cant see member's credit card's las digits."
-  end
 end

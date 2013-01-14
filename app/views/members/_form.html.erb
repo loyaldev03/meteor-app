@@ -186,16 +186,16 @@
     </tr>
   </thead>
   <tbody>
-  <%= f.fields_for :credit_card do |credit_Card| %>
+  <%= f.fields_for :credit_card do |credit_card| %>
     <tr>
       <td style="width: 50%;">
         <table class="hidden_table_border">
           <tr class = "control-group">
             <th>
-              <%= credit_Card.label :encrypted_number, t('activerecord.attributes.credit_card.number'), :class => 'help-inline required_asterick' %>
+              <%= credit_card.label :number, t('activerecord.attributes.credit_card.number'), :class => 'help-inline required_asterick' %>
             </th>
             <td> 
-              <%= credit_Card.text_field :number, :class => 'text_field input-medium', 
+              <%= credit_card.text_field :number, :class => 'text_field input-medium', 
                                       :name => "member[credit_card][number]"%>
             </td>  
           </tr>
@@ -205,19 +205,19 @@
         <table class="hidden_table_border">
           <tr class = "control-group">
             <th>
-              <%= credit_Card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline required_asterick' %> 
+              <%= credit_card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline required_asterick' %> 
             </th>
             <td> 
-              <%=credit_Card.text_field :expire_month, :class => 'text_field input-medium',
+              <%= credit_card.text_field :expire_month, :class => 'text_field input-medium',
                                   :name => "member[credit_card][expire_month]" %>
             </td>  
           </tr>
           <tr class = "control-group">
             <th>
-              <%= credit_Card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline required_asterick' %>
+              <%= credit_card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline required_asterick' %>
             </th>
             <td> 
-              <%= credit_Card.text_field :expire_year, :class => 'text_field input-small',
+              <%= credit_card.text_field :expire_year, :class => 'text_field input-small',
                                    :name => "member[credit_card][expire_year]" %>
             </td>  
           </tr>

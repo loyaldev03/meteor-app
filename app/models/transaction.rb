@@ -12,7 +12,6 @@ class Transaction < ActiveRecord::Base
 
   serialize :response, JSON
 
-  attr_encrypted :number, :key => Settings.cc_encryption_key, :encode => true, :algorithm => 'bf'
   attr_accessor :refund_response_transaction_id
 
   def full_label
@@ -42,10 +41,11 @@ class Transaction < ActiveRecord::Base
 
   def credit_card=(credit_card)
     self.credit_card_id = credit_card.id
-    self.encrypted_number = credit_card.encrypted_number
+    self.token = credit_card.token
+    self.cc_type = credit_card.cc_type
+    self.last_digits = credit_card.last_digits
     self.expire_month = credit_card.expire_month
     self.expire_year = credit_card.expire_year
-    verify_card
   end
 
   def payment_gateway_configuration=(pgc)
@@ -107,6 +107,27 @@ class Transaction < ActiveRecord::Base
     gateway == "mes"
   end
 
+  # answer credit card token
+  def self.store!(am_credit_card, pgc)
+    if pgc.production?
+      ActiveMerchant::Billing::Base.mode = :production
+    else
+      ActiveMerchant::Billing::Base.mode = :test
+    end
+    if pgc.mes?
+      gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(
+          :login    => pgc.login,
+          :password => pgc.password,
+          :merchant_key => pgc.merchant_key
+        )
+    elsif litle?
+      # TODO: add litle configuration!!!
+    end
+    answer = gateway.store(am_credit_card)
+    raise answer.params['auth_code'] if Settings.error_codes.success != answer.params['error_code']
+    answer.params['transaction_id']
+  end
+
   def self.refund(amount, sale_transaction_id, agent=nil)
     amount = amount.to_f
     # Lock transaction, so no one can use this record while we refund this member.
@@ -160,14 +181,10 @@ class Transaction < ActiveRecord::Base
       if payment_gateway_configuration.nil?
         { :message => Settings.error_messages.credit_card_blank_with_grace, :code => Settings.error_codes.credit_card_blank_with_grace }
       else
-        if @cc.valid?
-          load_gateway
-          a = (amount.to_f * 100)
-          credit_response=@gateway.credit(a, @cc, @options)
-          save_response(credit_response)
-        else
-          credit_card_invalid
-        end
+        load_gateway
+        a = (amount.to_f * 100)
+        credit_response=@gateway.credit(a, self.token, @options)
+        save_response(credit_response)
       end
     end
 
@@ -189,22 +206,11 @@ class Transaction < ActiveRecord::Base
       elsif amount.to_f == 0.0
         { :message => "Transaction success. Amount $0.0", :code => Settings.error_codes.success }
       else
-        if @cc.valid?
-          load_gateway
-          a = (amount.to_f * 100)
-          purchase_response = @gateway.purchase(a, @cc, @options)
-          save_response(purchase_response)
-        else
-          credit_card_invalid
-        end
+        load_gateway
+        a = (amount.to_f * 100)
+        purchase_response = @gateway.purchase(a, self.token, @options)
+        save_response(purchase_response)
       end
-    end
-
-    def credit_card_invalid
-      self.response_code = Settings.error_codes.invalid_credit_card 
-      self.response_result = "Credit card not valid: #{@cc.errors}"
-      self.save
-      { :message => self.response_result, :code => self.response_code }
     end
 
     def save_response(answer)
@@ -228,22 +234,6 @@ class Transaction < ActiveRecord::Base
       else
         { :message=>"Error: " + answer.message, :code=>self.response_code }
       end      
-    end
-
-    def verify_card
-      ActiveMerchant::Billing::CreditCard.require_verification_value = false
-      @cc ||= ActiveMerchant::Billing::CreditCard.new(
-        :number     => number,
-        :month      => expire_month,
-        :year       => expire_year,
-        :first_name => first_name,
-        :last_name  => last_name
-      )
-      @cc.valid?
-      # we will use ActiveMerchant::Billing::CreditCardMethods::CARD_COMPANIES.keys
-      # ["switch", "visa", "diners_club", "master", "forbrugsforeningen", "dankort", 
-      #    "laser", "american_express", "solo", "jcb", "discover", "maestro"]
-      self.cc_type = @cc.type
     end
 
     def load_gateway(recurrent = false)
