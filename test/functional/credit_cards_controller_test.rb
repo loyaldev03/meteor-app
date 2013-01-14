@@ -172,6 +172,8 @@ class CreditCardsControllerTest < ActionController::TestCase
     @credit_card.expire_month = (Time.zone.now-1.month).month
     @credit_card.expire_year = (Time.zone.now-1.year).year
 
+    active_merchant_stubs_store(@credit_card.number)
+
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
         generate_post_message
@@ -189,6 +191,8 @@ class CreditCardsControllerTest < ActionController::TestCase
     expire_month = Time.zone.now - 1.month
     @credit_card.expire_month = expire_month.month
     @credit_card.expire_year = expire_month.year 
+
+    active_merchant_stubs_store(@credit_card.number)
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
@@ -208,6 +212,9 @@ class CreditCardsControllerTest < ActionController::TestCase
     @credit_card = FactoryGirl.build :credit_card_american_express
     @credit_card.number = @credit_card_master_card_number
     @credit_card.expire_year = (Time.zone.now-2.year).year
+
+    active_merchant_stubs_store(@credit_card.number)
+
     token = @credit_card.get_token!(@terms_of_membership.payment_gateway_configuration, @saved_member.first_name, @saved_member.last_name)
 
     assert_difference('Operation.count',0) do

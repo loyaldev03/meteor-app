@@ -54,6 +54,8 @@ class MembersBlacklistTest < ActionController::IntegrationTest
       select(new_terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
     }
 
+    active_merchant_stubs_store(bl_credit_card.number)
+
     within("#table_credit_card") {  
       fill_in 'member[credit_card][number]', :with => "#{bl_credit_card.number}"
       fill_in 'member[credit_card][expire_month]', :with => "#{bl_credit_card.expire_month}"

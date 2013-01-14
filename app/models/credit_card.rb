@@ -9,7 +9,6 @@ class CreditCard < ActiveRecord::Base
 
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }
-  validates :token, :presence => true
 
   def number=(x)
     @number = if x.include?('XXXX')
@@ -99,13 +98,13 @@ class CreditCard < ActiveRecord::Base
     raise exc unless exc.nil?
   end
 
-  def get_token!(pgc = nil, first_name = nil, last_name = nil)
+  def get_token!(pgc = nil, first_name = nil, last_name = nil, allow_cc_blank = false)
     am = CreditCard.am_card(number, expire_month, expire_year, first_name || member.first_name, last_name || member.last_name)
     if am.valid?
-      self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
       self.cc_type = am.type
+      self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
     else
-      self.token = nil
+      self.token = "a"
       self.cc_type = 'unknown'
     end
   end
