@@ -19,7 +19,6 @@ FactoryGirl.define do
   factory :product_without_stock_and_recurrent, class: Product do
     name "Kit kard"
     package "NCARFLAG"
-    package "KIT-CARD"
     sku "kit-kard"
     recurrent true
     stock 0
