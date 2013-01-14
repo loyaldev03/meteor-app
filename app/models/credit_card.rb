@@ -2,19 +2,24 @@ class CreditCard < ActiveRecord::Base
   belongs_to :member
   has_many :transactions
 
-  attr_accessor :number
-
   attr_accessible :active, :number, :expire_month, :expire_year, :blacklisted
 
   before_create :set_data_before_credit_card_number_disappear
   before_destroy :confirm_presence_of_another_credit_card_related_to_member
-  after_initialize :do_after_initialize_stuff
 
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }
 
-  def do_after_initialize_stuff
-    self.number.gsub!(/\D/,'') unless self.number.nil?
+  def number=(x)
+    @number = if x.include?('XXXX')
+      x.to_s
+    else
+      x.to_s.gsub(/\D/,'') 
+    end
+  end
+
+  def number
+    @number
   end
 
   def confirm_presence_of_another_credit_card_related_to_member

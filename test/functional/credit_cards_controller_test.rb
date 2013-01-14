@@ -126,11 +126,12 @@ class CreditCardsControllerTest < ActionController::TestCase
 
     @credit_card = FactoryGirl.build :credit_card_american_express, :active => false ,:member_id => @saved_member.id
     number = @credit_card.number
-    active_merchant_stubs_store(number)
-    @credit_card.expire_year = (Time.zone.now + 1.year).year
-    @credit_card.expire_month = Time.zone.now.month
+    cc_token = @credit_card.token
+    @credit_card.expire_year = (@credit_card.expire_year + 1)
+    @credit_card.expire_month = (@credit_card.expire_month + 1)
     @credit_card.save
-    cc_token = @credit_card.get_token!(@terms_of_membership.payment_gateway_configuration, @saved_member.first_name, @saved_member.last_name)
+
+    active_merchant_stubs_store(number)
 
     assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
