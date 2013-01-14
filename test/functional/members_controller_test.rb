@@ -9,7 +9,7 @@ class MembersControllerTest < ActionController::TestCase
     @agency_user = FactoryGirl.create(:confirmed_agency_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:club, :partner_id => @partner.id)
-    @saved_member = FactoryGirl.create(:member_with_api, :club_id => @club.id, :next_retry_bill_date => Time.zone.now+5)
+    @saved_member = FactoryGirl.create(:member_with_api, :club_id => @club.id, :next_retry_bill_date => Time.zone.now+5.day)
   	@saved_member = Member.last
   end
 
@@ -22,7 +22,7 @@ class MembersControllerTest < ActionController::TestCase
 
   test "Change Next Bill Date for yesterday" do
   	correct_date = @saved_member.next_retry_bill_date
-		post :change_next_bill_date, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.visible_id, next_bill_date: Time.zone.now-1
+		post :change_next_bill_date, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.visible_id, next_bill_date: Time.zone.now-1.day
 		@saved_member.reload
 		assert_equal(@saved_member.next_retry_bill_date, correct_date )
 	end
