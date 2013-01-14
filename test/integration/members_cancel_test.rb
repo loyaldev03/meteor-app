@@ -52,6 +52,7 @@ class MembersCancelTest < ActionController::IntegrationTest
         select(@terms_of_membership_with_approval.name, :from => 'member[terms_of_membership_id]')
       }
     end
+    active_merchant_stubs_store(credit_card.number)
     within("#table_credit_card")do
       wait_until{
         fill_in 'member[credit_card][number]', :with => credit_card.number
