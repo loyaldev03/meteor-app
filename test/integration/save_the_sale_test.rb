@@ -60,6 +60,18 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     assert_equal @saved_member.status, "provisional"
   end
 
+  def success_save_the_sale(old_tom, new_tom, operation = nil)
+    assert page.has_content?("Save the sale succesfully applied")
+    within("#operations_table") do
+      wait_until {
+        assert page.has_content?("Save the sale from TOM(#{old_tom}) to TOM(#{new_tom})")
+      }
+    end
+    unless operation.nil?
+      wait_until{ assert_equal(operation.description, "Save the sale from TOM(#{old_tom}) to TOM(#{new_tom})") }
+    end
+  end
+
   test "save the sale from active to provisional" do
     setup_member(false)
 
@@ -80,12 +92,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     @saved_member.reload
     @old_membership.reload
 
-    assert page.has_content?("Save the sale succesfully applied")
+    success_save_the_sale(@terms_of_membership_with_gateway.id, @new_terms_of_membership_with_gateway.id)
     
     within("#operations_table") do
       wait_until {
         assert page.has_content?("Member enrolled successfully")
-        assert page.has_content?("Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@new_terms_of_membership_with_gateway.id}")
       }
     end
 
@@ -139,8 +150,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     @saved_member.reload
     @old_membership.reload
 
-    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
-    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@terms_of_membership_with_gateway2.id}") }
+    success_save_the_sale(@terms_of_membership_with_gateway.id, @terms_of_membership_with_gateway2.id, Operation.last)
 
     assert_equal @old_membership.status, "lapsed"
     assert_equal @saved_member.current_membership.status, "provisional"
@@ -166,8 +176,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     @saved_member.reload
     @old_membership.reload
 
-    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
-    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@terms_of_membership_with_gateway2.id}") }
+    success_save_the_sale(@terms_of_membership_with_gateway.id, @terms_of_membership_with_gateway2.id, Operation.last)
 
     assert_equal @old_membership.status, "lapsed"
     assert_equal @saved_member.current_membership.status, "provisional"
@@ -191,8 +200,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
       end
     end
 
-    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
-    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@terms_of_membership_with_approval.id}") }
+    success_save_the_sale(@terms_of_membership_with_gateway.id, @terms_of_membership_with_approval.id, Operation.last)
 
     @saved_member.reload
     @old_membership.reload
@@ -218,8 +226,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
       end
     end
 
-    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
-    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_gateway.id} to TOMID #{@terms_of_membership_with_approval.id}") }
+    success_save_the_sale(@terms_of_membership_with_gateway.id, @terms_of_membership_with_approval.id, Operation.last)
 
     @saved_member.reload
     @old_membership.reload
@@ -246,8 +253,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
       end
     end
 
-    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
-    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_approval.id} to TOMID #{@terms_of_membership_with_gateway2.id}") }
+    success_save_the_sale(@terms_of_membership_with_approval.id, @terms_of_membership_with_gateway2.id, Operation.last)
 
     @saved_member.reload
     @old_membership.reload
@@ -272,8 +278,8 @@ class SaveTheSaleTest < ActionController::IntegrationTest
         click_on 'Save the sale'
       end
     end
-    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
-    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_approval.id} to TOMID #{@terms_of_membership_with_gateway2.id}") }
+    
+    success_save_the_sale(@terms_of_membership_with_approval.id, @terms_of_membership_with_gateway2.id, Operation.last)
 
     @saved_member.reload
     @old_membership.reload
@@ -300,8 +306,8 @@ class SaveTheSaleTest < ActionController::IntegrationTest
         click_on 'Save the sale'
       end
     end
-    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
-    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_approval.id} to TOMID #{@terms_of_membership_with_approval2.id}") }
+    
+    success_save_the_sale(@terms_of_membership_with_approval.id, @terms_of_membership_with_approval2.id, Operation.last)
 
     @saved_member.reload
     @old_membership.reload
@@ -327,8 +333,8 @@ class SaveTheSaleTest < ActionController::IntegrationTest
         click_on 'Save the sale'
       end
     end
-    wait_until{ assert page.has_content?("Save the sale succesfully applied") }
-    wait_until{ assert_equal(Operation.last.description, "Save the sale from TOMID #{@terms_of_membership_with_approval.id} to TOMID #{@terms_of_membership_with_approval2.id}") }
+    
+    success_save_the_sale(@terms_of_membership_with_approval.id, @terms_of_membership_with_approval2.id, Operation.last)
 
     @saved_member.reload
     @old_membership.reload
