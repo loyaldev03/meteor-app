@@ -71,9 +71,6 @@
 
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
-        <%= render :partial => 'shared/reset_password_button' %>
-      </div>
-      <div class="span4">
         <% if @current_member.can_recover? and can? :recover, Member %>
           <%= link_to "Recover", member_recover_path, :class => "btn btn-success btn-large-w", :id => 'recovery' %>
         <% else %>
@@ -94,6 +91,9 @@
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
         <%= render :partial => 'shared/resend_welcome_email_button' %>
+      </div>
+      <div class="span4">
+        <%= render :partial => 'shared/reset_password_button' %>
       </div>
     </div>
 </div>
