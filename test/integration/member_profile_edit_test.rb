@@ -701,7 +701,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button 'Cancel'
     page.execute_script("window.jQuery('#cancel_date').next().click()")
     within("#ui-datepicker-div") do
-      if (Time.zone.now+1.day).month != Time.zon.now.month)
+      if ((Time.zone.now+1.day).month != Time.zon.now.month)
         within(".ui-datepicker-header")do
           wait_until { find(".ui-icon-circle-triangle-e").click }
         end
@@ -998,7 +998,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
     page.execute_script("window.jQuery('#next_bill_date').next().click()")
     within("#ui-datepicker-div") do
-      if (Time.zone.now+1.day).month != Time.zon.now.month)
+      if ((Time.zone.now+1.day).month != Time.zon.now.month)
         within(".ui-datepicker-header")do
           wait_until { find(".ui-icon-circle-triangle-e").click }
         end
