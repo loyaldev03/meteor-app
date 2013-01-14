@@ -149,6 +149,7 @@ module ActionController
                                         :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
             ) 
       )
+      active_merchant_stubs_store(credit_card.number)
       post( api_members_url , { member: {:first_name => member.first_name, 
                                 :last_name => member.last_name,
                                 :address => member.address,

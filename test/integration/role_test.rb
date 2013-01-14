@@ -498,14 +498,14 @@ class RolesTest < ActionController::IntegrationTest
     within("#table_active_credit_card") do
       wait_until{ 
         assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
-        assert page.has_no_content?("#{@saved_member.active_credit_card.number}") 
+        assert page.has_no_content?("#{@saved_member.active_credit_card.token}") 
       }
     end
 
     within("#credit_cards")do
       wait_until{ 
         assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
-        assert page.has_no_content?("#{@saved_member.active_credit_card.number}") 
+        assert page.has_no_content?("#{@saved_member.active_credit_card.token}") 
       }
     end
 

@@ -426,7 +426,11 @@ class Member < ActiveRecord::Base
     if member.nil?
       # credit card exist?
       credit_card = CreditCard.new credit_card_params
-      credit_card.get_token!(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name])
+      begin
+        credit_card.get_token!(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name])
+      rescue Exception => e
+        return { :message => Settings.error_messages.unrecoverable_error, :code => Settings.error_codes.unrecoverable_error }
+      end
       credit_cards = CreditCard.joins(:member).where( :token => credit_card.token, :members => { :club_id => club.id } )
 
       if credit_cards.empty? or cc_blank
@@ -460,7 +464,7 @@ class Member < ActiveRecord::Base
 
     if not cc_blank and credit_card_params[:number].blank?
       message = Settings.error_messages.credit_card_blank
-      return { :message => message, :code => Settings.error_codes.credit_card_blank }        
+      return { :message => message, :code => Settings.error_codes.credit_card_blank }
     end   
 
     member.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
