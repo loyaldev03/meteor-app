@@ -84,9 +84,7 @@ class MesAccountUpdater
                     (Time.zone.now-1.days).to_date, gateway.club_id ])
       members.each do |member|
         cc = member.active_credit_card
-        credit_card = cc.am_card
-        credit_card.valid?
-        account_type = case credit_card.type
+        account_type = case cc.cc_type
         when 'visa'
           'VISA'
         when 'master'
@@ -101,10 +99,10 @@ class MesAccountUpdater
         cc.save
 
         # add cc line
-        record_type, account_number, expiration_date, descretionary_data = 'D1', "%-32s" % cc.number.strip, 
+        record_type, account_token, expiration_date, descretionary_data = 'D2', "%-32s" % cc.token.strip, 
             cc.expire_year.to_s[2..3]+("%02d" % cc.expire_month), "CC%-30s"% cc.id
 
-        file.write [ record_type, account_type, account_number, expiration_date, descretionary_data ].join + "\n"
+        file.write [ record_type, account_type, account_token, expiration_date, descretionary_data ].join + "\n"
         count += 1
       end
 
@@ -143,10 +141,10 @@ class MesAccountUpdater
         # TODO: IMPROVEMENT: we can add a flag on each credit card to know if it was or nor processed
         record_type = line[0..1]
         old_account_type = line[2..5]
-        old_account_number = line[6..37].strip
+        old_account_token = line[6..37].strip
         old_expiration_date = line[38..41]
         new_account_type = line[42..45]
-        new_account_number = line[46..77].strip
+        new_account_token = line[46..77].strip
         new_expiration_date = line[78..81]
         response_code = line[82..89].strip
         response_source = line[90..91]
@@ -158,7 +156,7 @@ class MesAccountUpdater
         else
           new_expire_year = new_expiration_date[0..1].to_i+2000
           new_expire_month = new_expiration_date[2..3]
-          credit_cards = CreditCard.find_all_by_encrypted_number credit_card.encrypted_number
+          credit_cards = CreditCard.find_all_by_token credit_card.old_account_token
           credit_cards.each do |cc|
             if cc.active 
               if cc.aus_status.nil?
@@ -168,6 +166,7 @@ class MesAccountUpdater
               end
               case response_code
               when 'NEWACCT'
+                # TODO: Asking Sean if token changes after NEWACCT 
                 answer = cc.member.update_credit_card_from_drupal({number: new_account_number, :expire_year => new_expire_year, :expire_month => new_expire_month})
                 unless answer[:code] == Settings.error_codes.success
                   Airbrake.notify(:error_class => "MES::aus_update_process", :parameters => { :credit_card => cc.inspect, :answer => answer, :line => line })
