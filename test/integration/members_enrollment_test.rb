@@ -135,6 +135,17 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end  
   end
 
+  def fill_in_credit_card_info(credit_card)
+    active_merchant_stubs_store(credit_card.number)
+    within("#table_credit_card")do
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+      }
+    end
+  end
+
   def fill_in_member(unsaved_member, credit_card)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
@@ -168,13 +179,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
-    within("#table_credit_card")do
-      wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
-        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
-      }
-    end
+
+    fill_in_credit_card_info(credit_card)
+
     unless unsaved_member.external_id.nil?
       fill_in 'member[external_id]', :with => unsaved_member.external_id
     end 
@@ -214,13 +221,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         select(@terms_of_membership_with_approval.name, :from => 'member[terms_of_membership_id]')
       }
     end
-    within("#table_credit_card")do
-      wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
-        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
-      }
-    end
+    
+    fill_in_credit_card_info(credit_card)
+
     unless unsaved_member.external_id.nil?
       fill_in 'member[external_id]', :with => unsaved_member.external_id
     end 
@@ -283,15 +286,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 			select(@terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
 		}
 
+
     if cc_blank
+      active_merchant_stubs_store("0000000000")
       check('setter[cc_blank]')
     else
-      within("#table_credit_card") {	
-  			fill_in 'member[credit_card][number]', :with => "#{unsaved_member.active_credit_card.number}"
-  			fill_in 'member[credit_card][expire_month]', :with => "#{unsaved_member.active_credit_card.expire_month}"
-  			fill_in 'member[credit_card][expire_year]', :with => "#{unsaved_member.active_credit_card.expire_year}"
-  		}
+      fill_in_credit_card_info(unsaved_member.active_credit_card)
     end      
+
     unless unsaved_member.external_id.nil?
     	fill_in 'member[external_id]', :with => unsaved_member.external_id
     end 
@@ -658,13 +660,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[email]', :with => unsaved_member.email
       }
     end
-    within("#table_credit_card")do
-      wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
-        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
-      }
-    end
+
+    fill_in_credit_card_info(credit_card)
+
     alert_ok_js
     click_link_or_button 'Create Member'
 
