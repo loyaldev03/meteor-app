@@ -27,7 +27,8 @@ class ActiveSupport::TestCase
 
   # Add more helper methods to be used by all tests here...
 
-  CREDIT_CARD_TOKEN = { nil => "c25ccfecae10384698a44360444dea", "4012301230123010" => "c25ccfecae10384698a44360444dead8", "5589548939080095" => "c25ccfecae10384698a44360444dead7",
+  CREDIT_CARD_TOKEN = { nil => "c25ccfecae10384698a44360444dea", "4012301230123010" => "c25ccfecae10384698a44360444dead8", 
+    "5589548939080095" => "c25ccfecae10384698a44360444dead7",
     "340504323632976" => "c25ccfecae10384698a44360444dead6", "123456" => "anytransactioniditsvalid.forinvalidccnumber", 
     "123456789" => "c25ccfecae10384698asddd60444dead6" }
 

@@ -54,10 +54,12 @@ class MembersBlacklistTest < ActionController::IntegrationTest
       select(new_terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
     }
 
-    active_merchant_stubs_store(bl_credit_card.number)
+    @number = "4012301230123010"
+    @last_digits = @number[-4..4]
+    active_merchant_stubs_store(@number)
 
     within("#table_credit_card") {  
-      fill_in 'member[credit_card][number]', :with => "#{bl_credit_card.number}"
+      fill_in 'member[credit_card][number]', :with => @number
       fill_in 'member[credit_card][expire_month]', :with => "#{bl_credit_card.expire_month}"
       fill_in 'member[credit_card][expire_year]', :with => "#{bl_credit_card.expire_year}"
     }
@@ -97,7 +99,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     
     active_credit_card = @saved_member.active_credit_card
     within("#credit_cards") { 
-      assert page.has_content?("#{active_credit_card.number}") 
+      assert page.has_content?("#{@last_digits}") 
       assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
       assert page.has_content?("Blacklisted active")
     }
@@ -139,7 +141,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     
     active_credit_card = @saved_member.active_credit_card
     within("#credit_cards") { 
-      assert page.has_content?("#{active_credit_card.number}") 
+      assert page.has_content?("#{@last_digits}") 
       assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
       assert page.has_content?("Blacklisted active")
     }
@@ -279,7 +281,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     
     active_credit_card = @saved_member.active_credit_card
     within("#credit_cards") { 
-      assert page.has_content?("#{active_credit_card.number}") 
+      assert page.has_content?("#{@last_digits}") 
       assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
       assert page.has_content?("Blacklisted active")
     }
@@ -322,7 +324,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     
     active_credit_card = @saved_member.active_credit_card
     within("#credit_cards") { 
-      assert page.has_content?("#{active_credit_card.number}") 
+      assert page.has_content?("#{active_credit_card.last_digits}") 
       assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
       assert page.has_content?("Blacklisted active")
     }
@@ -365,7 +367,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     
     active_credit_card = @saved_member.active_credit_card
     within("#credit_cards") { 
-      assert page.has_content?("#{active_credit_card.number}") 
+      assert page.has_content?("#{@last_digits}") 
       assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
       assert page.has_content?("Blacklisted active")
     }

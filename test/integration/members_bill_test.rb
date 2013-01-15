@@ -12,6 +12,8 @@ class MembersBillTest < ActionController::IntegrationTest
   end
 
   def setup_member(provisional_days = nil)
+    active_merchant_stubs
+
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
@@ -27,8 +29,11 @@ class MembersBillTest < ActionController::IntegrationTest
     unsaved_member = FactoryGirl.build(:member_with_cc, 
         :club_id => @club.id)
 
+    @number = "4012301230123010"
+    @last_digits = @number[-4..4] 
+
     create_new_member(unsaved_member)
-    
+
     @saved_member = Member.last
   end
 
@@ -72,8 +77,10 @@ class MembersBillTest < ActionController::IntegrationTest
       select(@terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
     }
 
+    active_merchant_stubs_store(unsaved_member.active_credit_card.number)
+
     within("#table_credit_card") {  
-      fill_in 'member[credit_card][number]', :with => "#{unsaved_member.active_credit_card.number}"
+      fill_in 'member[credit_card][number]', :with => "#{@number}"
       fill_in 'member[credit_card][expire_month]', :with => "#{unsaved_member.active_credit_card.expire_month}"
       fill_in 'member[credit_card][expire_year]', :with => "#{unsaved_member.active_credit_card.expire_year}"
     }
@@ -333,7 +340,7 @@ class MembersBillTest < ActionController::IntegrationTest
     wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
     page.execute_script("window.jQuery('#next_bill_date').next().click()")
     within("#ui-datepicker-div") do
-      wait_until { click_on("#{Time.zone.now.day+1.day}") }
+      wait_until { click_on("#{(Time.zone.now+1.day).day}") }
     end
     click_link_or_button 'Change next bill date'
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
@@ -457,7 +464,6 @@ test "Partial refund from CS" do
     @terms_of_membership_with_gateway.update_attribute(:installment_amount, 45.56)
     @saved_member.active_credit_card.update_attribute(:number,'0000000000000000')
 
-
     @saved_member.bill_membership
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
@@ -479,7 +485,6 @@ test "Partial refund from CS" do
 
     next_bill_date = @saved_member.current_membership.join_date + eval(@terms_of_membership_with_gateway.installment_type)
     next_bill_date_after_billing = @saved_member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)
-
 
     Member.bill_all_members_up_today
 
@@ -507,7 +512,7 @@ test "Partial refund from CS" do
     end
 
     within("#transactions_table") do
-     wait_until{ assert page.has_selector?('#refund') }
+      wait_until{ assert page.has_selector?('#refund') }
     end
   end 
 
@@ -558,12 +563,12 @@ test "Partial refund from CS" do
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
     
-    sleep 1   
     Member.find_in_batches(:conditions => [" date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
       group.each do |member| 
         @saved_member.send_pre_bill
       end
     end
+
     sleep 1
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }

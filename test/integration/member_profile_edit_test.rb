@@ -102,8 +102,11 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_on 'Add a credit card'
     
     cc_number = "378282246310005"
+    last_digits = cc_number[-4,4]
     cc_month = Time.new.month.to_s
     cc_year = (Time.new.year + 10).to_s
+
+    active_merchant_stubs_store(cc_number)
 
     fill_in 'credit_card[number]', :with => cc_number
     fill_in 'credit_card[expire_month]', :with => cc_month
@@ -111,23 +114,23 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     
     click_on 'Save credit card'
 
-    assert page.has_content?("Credit card #{cc_number[-4,4]} added and activated")
+    assert page.has_content?("Credit card #{} added and activated")
     
     within("#table_active_credit_card") do
-      assert page.has_content?(cc_number)
+      assert page.has_content?(last_digits)
       assert page.has_content?("#{cc_month} / #{cc_year}")
     end
 
     wait_until {
       within("#operations_table") {
-          assert page.has_content?("Credit card #{cc_number[-4,4]} added and activated") 
+        assert page.has_content?("Credit card #{last_digits} added and activated") 
       }
     }
 
     wait_until {
       within("#credit_cards") {
         within(".ligthgreen") {
-          assert page.has_content?(cc_number) 
+          assert page.has_content?(last_digits) 
           assert page.has_content?("#{cc_month} / #{cc_year}")
           assert page.has_content?("active")
         }

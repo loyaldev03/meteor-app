@@ -66,7 +66,6 @@ class MembersClubCashTest < ActionController::IntegrationTest
     club_cash_transaction = @saved_member.club_cash_transactions.last
     within("#club_cash_transactions_table") do
       wait_until{
-        puts club_cash_transaction.amount.to_s
         assert page.has_content?("15")
         assert page.has_content?(club_cash_transaction.id.to_s)
         assert page.has_content?(club_cash_transaction.description)
