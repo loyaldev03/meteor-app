@@ -256,7 +256,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       wait_until {
         assert page.has_content?("Member recovered successfully $0.0 on TOM(2) -#{@canceled_member.current_membership.terms_of_membership.name}-")
         assert page.has_content?("Member billed successfully $#{@new_terms_of_membership_with_gateway.installment_amount}")
-        assert page.has_content?("Automatic Recycled Expired card from #{Time.zone.now.month}/#{three_years_before} to #{Time.zone.now.month}/#{Time.zone.now.year}")
         assert page.has_content?("Renewal scheduled. NBD set #{I18n.l(next_bill_date, :format => :only_date)}")
         assert page.has_content?("#{@new_terms_of_membership_with_gateway.club_cash_amount} club cash was successfully added. Concept: Adding club cash after billing")
       }
@@ -291,7 +290,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       wait_until {
         assert page.has_content?("Member recovered successfully $0.0 on TOM(2) -#{@canceled_member.current_membership.terms_of_membership.name}-")
         assert page.has_content?('Billing error. No decline rule configured: 9506 mes: Credit card not valid: {"year"=>["expired"], "number"=>[], "type"=>[]}')
-        assert page.has_content?("Automatic Recycled Expired card from #{Time.zone.now.month}/#{three_years_before} to #{Time.zone.now.month}/#{three_years_before+3}")
       }
     end
   end
