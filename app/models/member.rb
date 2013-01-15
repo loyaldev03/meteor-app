@@ -947,7 +947,11 @@ class Member < ActiveRecord::Base
       end
     else # drupal or CS sends the complete credit card number.
       new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
-      new_credit_card.get_token!(terms_of_membership.payment_gateway_configuration, first_name, last_name)
+      begin
+        new_credit_card.get_token!(terms_of_membership.payment_gateway_configuration, first_name, last_name)
+      rescue
+        return { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => { :number => "Error while processing this credit card." }}
+      end
       credit_cards = CreditCard.joins(:member).where( [ " token = ? and members.club_id = ? ", new_credit_card.token, club.id ] )
       if credit_cards.empty?
         add_new_credit_card(new_credit_card, current_agent)

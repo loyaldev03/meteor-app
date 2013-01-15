@@ -124,7 +124,7 @@ class Transaction < ActiveRecord::Base
       # TODO: add litle configuration!!!
     end
     answer = gateway.store(am_credit_card)
-    logger.error answer.inspect
+    logger.error "AM::Store::Answer => " + answer.inspect
     raise answer.params['error_code'] if Settings.error_codes.success != answer.params['error_code']
     answer.params['transaction_id']
   end
