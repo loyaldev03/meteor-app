@@ -49,7 +49,6 @@ defaults: &defaults
     credit_card_in_use: 401
     credit_card_blacklisted: 402
     member_email_blacklisted: 403
-    automatic_recycle_credit_card: 404
     aus_recycle_credit_card: 405
     #communication
     active_email: 300     
