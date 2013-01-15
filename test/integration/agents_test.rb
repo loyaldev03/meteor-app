@@ -265,7 +265,6 @@ class AgentsTest < ActionController::IntegrationTest
     wait_until{ page.has_content?("You will receive an email with instructions about how to reset your password in a few minutes.") }
 
     @admin_agent.reload
-    puts edit_agent_password_path
     visit edit_agent_password_path(:reset_password_token => @admin_agent.reset_password_token )
 
     fill_in "agent[password]", :with => "newpassword"

@@ -68,6 +68,10 @@ class Communication < ActiveRecord::Base
   self.table_name = "communications"
 end
 
+class MemberPreference < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "member_preferences"
+end
 
 ###################################################
 ##### METHODS #####################################
@@ -92,6 +96,15 @@ def delete_member_notes(member)
     member_note.delete
   end
   @log.info "    ... took #{Time.now.utc - tz} to delete member notes."
+end
+
+def delete_member_preferences(member)
+  tz = Time.now.utc
+  member_preferences = MemberPreference.find_all_by_member_id(member.id)
+  member_preferences.each do |member_preference|
+    member_preference.delete
+  end
+  @log.info "    ... took #{Time.now.utc - tz} to delete member preferences."
 end
 
 def delete_credit_cards(member)
@@ -166,11 +179,14 @@ end
 def delete_functions(member)
   delete_operations(member)
   delete_member_notes(member)
+  delete_member_preferences(member)
+  delete_enrollment_infos(member)
   delete_credit_cards(member)
   delete_memberships(member)
   delete_transactions(member)
   delete_fulfillments(member)
   delete_club_cash_transactions(member)
+  delete_communications(member)
   delete_member(member)
 end
 
