@@ -12,10 +12,10 @@ private
   def data
     club_cash_transactions.map do |club_cash_transaction|
       [
+        club_cash_transaction.id,
         I18n.l(club_cash_transaction.created_at, :format => :dashed),
         club_cash_transaction.description,
-        club_cash_transaction.amount,
-        club_cash_transaction.id
+        club_cash_transaction.amount
       ]
     end
   end

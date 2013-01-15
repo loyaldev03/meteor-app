@@ -406,7 +406,7 @@ $(document).ready( function() {
       "sPaginationType": "bootstrap",
       "bServerSide": true,
       "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
       "sAjaxSource": $('#club_cash_transactions_table').data('source')
     });
   }
