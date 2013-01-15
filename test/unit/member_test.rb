@@ -260,10 +260,10 @@ class MemberTest < ActiveSupport::TestCase
           answer = member.bill_membership
           member.reload
           assert_equal answer[:code], Settings.error_codes.success
-          assert_equal original_year+3, member.transactions.last.expire_year
+          assert_equal original_year, member.transactions.last.expire_year
           assert_equal member.recycled_times, 0
           assert_equal member.credit_cards.count, 1 # only one credit card
-          assert_equal member.credit_cards.first.expire_year, original_year+3 # expire_year should be updated.
+          assert_equal member.credit_cards.first.expire_year, original_year # expire_year should not be changed.
         end
       end
     end
@@ -278,13 +278,12 @@ class MemberTest < ActiveSupport::TestCase
     member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
     member.reload
     assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 2) do
+      assert_difference('Operation.count', 1) do
         assert_difference('Transaction.count') do
           assert_equal member.recycled_times, 0
           answer = member.bill_membership
           member.reload
           assert_equal answer[:code], @sd_strategy.response_code
-          assert_equal original_year+3, member.transactions.last.expire_year
           assert_equal member.recycled_times, 1
           assert_equal member.credit_cards.count, 1 # only one credit card
           assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
@@ -296,14 +295,11 @@ class MemberTest < ActiveSupport::TestCase
     # because the created_at of both transactions has the same value!!!
     sleep(1)
     assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 2) do
+      assert_difference('Operation.count', 1) do
         assert_difference('Transaction.count') do
           answer = member.bill_membership
           member.reload
           assert_equal answer[:code], @sd_strategy.response_code
-          member.transactions.last.expire_year
-          assert_equal original_year+2, member.transactions.last.expire_year
-          assert_equal Operation.find_all_by_operation_type(Settings.operation_types.automatic_recycle_credit_card).size, 2
           assert_equal member.recycled_times, 2
           assert_equal member.credit_cards.count, 1 # only one credit card
           assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle

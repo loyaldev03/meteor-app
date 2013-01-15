@@ -433,7 +433,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("zip: The zip code is not valid for the selected country."), "Failure on zip validation message"
       }
     end
- #  end
+  end
 
   test "create member with letter in phone field" do
     setup_member(false)
