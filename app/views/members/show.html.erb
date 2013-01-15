@@ -90,10 +90,10 @@
 
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
-        <%= render :partial => 'shared/resend_welcome_email_button' %>
+        <%= render :partial => 'shared/resend_welcome_email_button', :locals => { use_large_button: true } %>
       </div>
       <div class="span4">
-        <%= render :partial => 'shared/reset_password_button' %>
+        <%= render :partial => 'shared/reset_password_button', :locals => { use_large_button: true } %>
       </div>
     </div>
 </div>
