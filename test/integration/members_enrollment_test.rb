@@ -1056,9 +1056,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "Send Trial email at Day 7" do
+  def confirm_email_is_sent(amount_of_days, template_name, pillar_type, status)
     setup_member(false)
-      setup_email_templates
+    setup_email_templates
 
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -1066,16 +1066,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_member = Member.find_by_email(unsaved_member.email)  
 
-    @saved_member.current_membership.update_attribute(:join_date, Time.zone.now-7.day)
-   
-    Member.send_pillar_emails('pillar_provisional', 'provisional')
+    @saved_member.current_membership.update_attribute(:join_date, Time.zone.now-amount_of_days.day)
+    Member.send_pillar_emails(pillar_type, status)
     sleep 1
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    sleep 1
     within("#communication") do
       wait_until {
-        assert page.has_content?("Day 7 - Trial")
+        assert page.has_content?(template_name)
       }
     end
      within("#operations") do
@@ -1083,142 +1081,31 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         select 'communications', :from => "operation[operation_type]"
       }
       wait_until{
-        assert page.has_content?("Day 7 - Trial")
+        assert page.has_content?(template_name)
         assert page.has_no_content?("Member enrolled successfully $0.0")
         visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
       }
     end
   end
 
+  test "Send Trial email at Day 7" do
+    confirm_email_is_sent 7, "Day 7 - Trial", 'pillar_provisional', 'provisional'
+  end
+
   test "Send News email at Day 35" do
-    setup_member(false)
-    setup_email_templates
-
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
-    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    created_member = Member.find_by_email(unsaved_member.email)  
-
-    created_member.current_membership.update_attribute(:join_date, Time.zone.now-35.day)
-
-    Member.send_pillar_emails('pillar_provisional', 'provisional')
-    sleep 1
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
-    within("#communication") do
-      wait_until {
-        assert page.has_content?("Day 35 - News")
-      }
-    end
-
-    within("#operations") do
-      wait_until{
-        select 'communications', :from => "operation[operation_type]"
-      }
-      wait_until{
-        assert page.has_content?("Day 35 - News")
-        assert page.has_no_content?("Member enrolled successfully $0.0")
-        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
-      }
-    end
+    confirm_email_is_sent 35, "Day 35 - News", 'pillar_provisional', 'provisional'
   end
 
   test "Send Deals email at Day 40" do
-    setup_member(false)
-    setup_email_templates
-
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
-    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    created_member = Member.find_by_email(unsaved_member.email)  
-    created_member.current_membership.update_attribute(:join_date, Time.zone.now-40.day)
-    
-    Member.send_pillar_emails('pillar_provisional', 'provisional')
-    sleep 1
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
-    within("#communication") do
-      wait_until {
-        assert page.has_content?("Day 40 - Deals")
-      }
-    end
-    within("#operations") do
-      wait_until{
-        select 'communications', :from => "operation[operation_type]"
-      }
-      wait_until{
-        assert page.has_content?("Day 40 - Deals")
-        assert page.has_no_content?("Member enrolled successfully $0.0")
-        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
-      }
-    end
+    confirm_email_is_sent 40, "Day 40 - Deals", 'pillar_provisional', 'provisional'
   end
 
   test "Send Local Chapters email at Day 45" do
-    setup_member(false)
-    setup_email_templates
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
-    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    created_member = Member.find_by_email(unsaved_member.email)  
-
-    created_member.current_membership.update_attribute(:join_date, Time.zone.now-45.day)
-
-    Member.send_pillar_emails('pillar_provisional', 'provisional')
-    sleep 1
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
-    within("#communication") do
-      wait_until {
-        assert page.has_content?("Day 45 - Local Chapters")
-      }
-    end
-    within("#operations") do
-      wait_until{
-        select 'communications', :from => "operation[operation_type]"
-      }
-      wait_until{
-        assert page.has_content?("Day 45 - Local Chapters")
-        assert page.has_no_content?("Member enrolled successfully $0.0")
-        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
-      }
-    end
+    confirm_email_is_sent 45, "Day 45 - Local Chapters", 'pillar_provisional', 'provisional'
   end
 
   test "Send VIP email at Day 50" do
-    setup_member(false)
-    setup_email_templates
-
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
-    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    created_member = Member.find_by_email(unsaved_member.email)  
-    
-    created_member.current_membership.update_attribute(:join_date, Time.zone.now-50.day)
-
-    Member.send_pillar_emails('pillar_provisional', 'provisional')
-    sleep 1
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
-    within("#communication") do
-      wait_until {
-        assert page.has_content?("Day 50 - VIP")
-      }
-    end
-    within("#operations") do
-      wait_until{
-        select 'communications', :from => "operation[operation_type]"
-      }
-      wait_until{
-        assert page.has_content?("Day 50 - VIP")
-        assert page.has_no_content?("Member enrolled successfully $0.0")
-        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
-      }
-    end
+    confirm_email_is_sent 50, "Day 50 - VIP", 'pillar_provisional', 'provisional'
   end
 
   test "Filtering by Communication at Operations tab" do
