@@ -105,7 +105,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         wait_until{ assert page.has_content?("#{active_credit_card.cc_type}") }
       end
       wait_until{ assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}") }
-      wait_until{ assert page.has_content?(I18n.l(member.credit_cards.first.created_at, :format => :only_date)) }
+      wait_until{ assert page.has_content?(I18n.l(active_credit_card.created_at, :format => :only_date)) }
       
     end
 
@@ -184,12 +184,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   def fill_in_credit_card_info(credit_card, cc_blank = false)
     if cc_blank 
-    active_merchant_stubs_store("0000000000")
+      active_merchant_stubs_store("0000000000")
       within("#table_credit_card")do
         check "setter[cc_blank]"
       end
     else
-    active_merchant_stubs_store(credit_card.number)
+      active_merchant_stubs_store(credit_card.number)
       within("#table_credit_card")do
         wait_until{
           fill_in 'member[credit_card][number]', :with => credit_card.number

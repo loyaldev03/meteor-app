@@ -262,7 +262,6 @@ class MemberTest < ActiveSupport::TestCase
           assert_equal answer[:code], Settings.error_codes.success
           assert_equal original_year+3, member.transactions.last.expire_year
           assert_equal member.recycled_times, 0
-          assert_equal Operation.find_all_by_operation_type(Settings.operation_types.automatic_recycle_credit_card).size, 1
           assert_equal member.credit_cards.count, 1 # only one credit card
           assert_equal member.credit_cards.first.expire_year, original_year+3 # expire_year should be updated.
         end
@@ -287,7 +286,6 @@ class MemberTest < ActiveSupport::TestCase
           assert_equal answer[:code], @sd_strategy.response_code
           assert_equal original_year+3, member.transactions.last.expire_year
           assert_equal member.recycled_times, 1
-          assert_equal Operation.find_all_by_operation_type(Settings.operation_types.automatic_recycle_credit_card).size, 1
           assert_equal member.credit_cards.count, 1 # only one credit card
           assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
         end
