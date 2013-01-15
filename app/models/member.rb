@@ -374,13 +374,11 @@ class Member < ActiveRecord::Base
           Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
           { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
         else
-          acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
           trans = Transaction.new
           trans.transaction_type = "sale"
-          trans.prepare(self, acc, amount, terms_of_membership.payment_gateway_configuration)
+          trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
           answer = trans.process
           if trans.success?
-            acc.save # lets update year if we recycle this member
             assign_club_cash!
             set_as_active!
             schedule_renewal
