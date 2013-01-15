@@ -425,7 +425,7 @@ class Member < ActiveRecord::Base
       # credit card exist?
       credit_card = CreditCard.new credit_card_params
       begin
-        credit_card.get_token!(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], true)
+        credit_card.get_token!(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], cc_blank)
       rescue Exception => e
         return { :message => Settings.error_messages.unrecoverable_error, :code => Settings.error_codes.unrecoverable_error }
       end
@@ -950,7 +950,7 @@ class Member < ActiveRecord::Base
       begin
         new_credit_card.get_token!(terms_of_membership.payment_gateway_configuration, first_name, last_name)
       rescue
-        return { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => { :number => "Error while processing this credit card." }}
+        return { :code => Settings.error_codes.unrecoverable_error, :message => Settings.error_messages.unrecoverable_error, :errors => { :number => "Error while processing this credit card." }}
       end
       credit_cards = CreditCard.joins(:member).where( [ " token = ? and members.club_id = ? ", new_credit_card.token, club.id ] )
       if credit_cards.empty?

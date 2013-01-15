@@ -104,8 +104,12 @@ class CreditCard < ActiveRecord::Base
       self.cc_type = am.type
       self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
     else
-      self.cc_type = 'unknown'
-      self.token = "a" # fixing this token for blank credit cards
+      if allow_cc_blank
+        self.cc_type = 'unknown'
+        self.token = "a" # fixing this token for blank credit cards
+      else
+        raise am.errors
+      end
     end
   end
   
