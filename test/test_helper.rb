@@ -181,6 +181,81 @@ module ActionController
       assert_response :success
     end
 
+  # Check Refund email -  It is send it by CS inmediate
+  def bill_member(member, do_refund = true, refund_amount = nil)
+    next_bill_date = member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)
+
+    answer = member.bill_membership
+    assert (answer[:code] == Settings.error_codes.success), answer[:message]
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
+    
+    within("#table_membership_information")do
+      within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
+    end
+    within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
+
+
+    within("#table_membership_information")do
+      wait_until{ assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date ) } 
+    end
+
+    #sleep(5)
+
+    within("#operations") do
+      wait_until {
+        assert page.has_selector?("#operations_table")
+        assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
+      }
+    end
+
+    within("#transactions") do 
+      wait_until {
+        assert page.has_selector?("#transactions_table")
+        assert page.has_content?("Sale : This transaction has been approved")
+        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
+      }
+    end
+
+    within("#transactions_table") do
+     wait_until{ assert page.has_selector?('#refund') }
+    end
+    
+    if do_refund
+      transaction = Transaction.last
+      visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id, :transaction_id => transaction.id)
+
+      wait_until{ assert page.has_content?(transaction.amount_available_to_refund.to_s) }
+
+      final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
+      final_amount = refund_amount.to_s if not refund_amount.nil?
+
+      fill_in 'refund_amount', :with => final_amount   
+
+      assert_difference ['Transaction.count'] do 
+        click_on 'Refund'
+      end
+      
+      within("#operations_table") do 
+        wait_until {
+          assert page.has_content?("Communication 'Test refund' sent")
+          assert page.has_content?("Credit success $#{final_amount}")
+        }
+      end
+      within("#transactions_table") do 
+        wait_until {
+          assert page.has_content?("Credit : This transaction has been approved")
+          assert page.has_content?(final_amount)
+        }
+      end
+      within("#communication") do 
+        wait_until {
+          assert page.has_content?("Test refund")
+          assert page.has_content?("refund")
+        }
+      end
+    end
+
+  end
 
     teardown do
       DatabaseCleaner.clean

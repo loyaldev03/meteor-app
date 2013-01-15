@@ -79,36 +79,12 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     confirm_ok_js
     click_on 'Blacklist member'
 
-    @saved_member.reload
-    
-    text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
-    assert page.has_content?(text_reason)
+    confirm_blacklisted_member
 
-    assert page.has_content?("Blacklisted")
-
-    within("#td_mi_cancel_date") do
-      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
-    end
-
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Automatic cancellation")
-        assert page.has_content?(text_reason)
-      }
-    end
-    
-    active_credit_card = @saved_member.active_credit_card
-    within("#credit_cards") { 
-      assert page.has_content?("#{@last_digits}") 
-      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
-      assert page.has_content?("Blacklisted active")
-    }
-
-    assert active_credit_card.blacklisted == true
     assert @saved_member.blacklisted? == true
   end
 
-  test "blacklist member width more CC" do
+  test "blacklist member with more CC" do
     setup_member
     
     credit_card_master_card = FactoryGirl.create(:credit_card_master_card, :member_id => @saved_member.id)
@@ -121,30 +97,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     confirm_ok_js
     click_on 'Blacklist member'
     
-    @saved_member.reload
-    
-    text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
-    assert page.has_content?(text_reason)
-    assert page.has_content?("Blacklisted")
-
-
-    within("#td_mi_cancel_date") do
-      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
-    end
-
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Automatic cancellation")
-        assert page.has_content?(text_reason)
-      }
-    end
-    
-    active_credit_card = @saved_member.active_credit_card
-    within("#credit_cards") { 
-      assert page.has_content?("#{@last_digits}") 
-      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
-      assert page.has_content?("Blacklisted active")
-    }
+    confirm_blacklisted_member
 
     assert @saved_member.blacklisted? == true
     
@@ -154,7 +107,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     
   end
 
-  test "create member width blacklist CC" do
+  test "create member with blacklist CC" do
     setup_member
     
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -240,36 +193,22 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     confirm_ok_js
     click_on 'Blacklist member'
 
+    confirm_blacklisted_member(false)    
+  end
+
+  def confirm_blacklisted_member(validate_cancel_date = false)
     @saved_member.reload
-    
     text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
     wait_until{
       assert page.has_content?(text_reason)
       assert page.has_content?("Blacklisted!!!")
       assert_equal @saved_member.blacklisted, true
     }
-  end
 
-
-  test "Blacklist a member with status Active" do
-    setup_member
-    
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Blacklist'
-
-    select(@member_blacklist_reason.name, :from => 'reason')
-    confirm_ok_js
-    click_on 'Blacklist member'
-
-    @saved_member.reload
-    
-    text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
-    assert page.has_content?(text_reason)
-
-    assert page.has_content?("Blacklisted")
-
-    within("#td_mi_cancel_date") do
-      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
+    if validate_cancel_date
+      within("#td_mi_cancel_date") do
+        assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
+      end
     end
 
     within("#operations_table") do
@@ -285,12 +224,20 @@ class MembersBlacklistTest < ActionController::IntegrationTest
       assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
       assert page.has_content?("Blacklisted active")
     }
+    assert active_credit_card.blacklisted == true
+  end
 
-    wait_until{
-      assert page.has_content?(text_reason)
-      assert page.has_content?("Blacklisted!!!")
-      assert_equal @saved_member.blacklisted, true
-    }
+  test "Blacklist a member with status Active" do
+    setup_member
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    click_on 'Blacklist'
+
+    select(@member_blacklist_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_on 'Blacklist member'
+
+    confirm_blacklisted_member
   end
 
   test "Blacklist a member with status Provisional" do
@@ -304,36 +251,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     confirm_ok_js
     click_on 'Blacklist member'
 
-    @saved_member.reload
-    
-    text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
-    assert page.has_content?(text_reason)
-
-    assert page.has_content?("Blacklisted")
-
-    within("#td_mi_cancel_date") do
-      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
-    end
-
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Automatic cancellation")
-        assert page.has_content?(text_reason)
-      }
-    end
-    
-    active_credit_card = @saved_member.active_credit_card
-    within("#credit_cards") { 
-      assert page.has_content?("#{active_credit_card.last_digits}") 
-      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
-      assert page.has_content?("Blacklisted active")
-    }
-
-    wait_until{
-      assert page.has_content?(text_reason)
-      assert page.has_content?("Blacklisted!!!")
-      assert_equal @saved_member.blacklisted, true
-    }
+    confirm_blacklisted_member
   end
 
   test "Blacklist a member with status Applied" do
@@ -347,36 +265,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     confirm_ok_js
     click_on 'Blacklist member'
 
-    @saved_member.reload
-    
-    text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
-    assert page.has_content?(text_reason)
-
-    assert page.has_content?("Blacklisted")
-
-    within("#td_mi_cancel_date") do
-      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
-    end
-
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Automatic cancellation")
-        assert page.has_content?(text_reason)
-      }
-    end
-    
-    active_credit_card = @saved_member.active_credit_card
-    within("#credit_cards") { 
-      assert page.has_content?("#{@last_digits}") 
-      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
-      assert page.has_content?("Blacklisted active")
-    }
-
-    wait_until{
-      assert page.has_content?(text_reason)
-      assert page.has_content?("Blacklisted!!!")
-      assert_equal @saved_member.blacklisted, true
-    }
+    confirm_blacklisted_member
   end
 
   test "Do not allow recover Blacklist member" do

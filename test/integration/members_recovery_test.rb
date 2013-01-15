@@ -289,7 +289,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     within("#operations_table") do
       wait_until {
         assert page.has_content?("Member recovered successfully $0.0 on TOM(2) -#{@canceled_member.current_membership.terms_of_membership.name}-")
-        assert page.has_content?('Billing error. No decline rule configured: 9506 mes: Credit card not valid: {"year"=>["expired"], "number"=>[], "type"=>[]}')
       }
     end
   end
