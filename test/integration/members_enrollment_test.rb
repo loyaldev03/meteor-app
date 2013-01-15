@@ -70,12 +70,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
  #  ############################################################
 
 
-  def validate_view_member_base(member)
+  def validate_view_member_base(member, status='provisional')
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == member.first_name }
 
     assert find_field('input_visible_id').value == "#{member.visible_id}"
     assert find_field('input_first_name').value == member.first_name
     assert find_field('input_last_name').value == member.last_name
-    assert find_field('input_gender').value == (member.gender == 'F' ? 'Female' : 'Male')
+    assert find_field('input_gender').value == (member.gender == 'F' ? 'Female' : 'Male') unless member.gender.blank?
     assert find_field('input_member_group_type').value == (member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : member.member_group_type.name)
     
     within("#table_demographic_information") do
@@ -96,13 +98,20 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     active_credit_card = member.active_credit_card
     within("#table_active_credit_card") do
-      assert page.has_content?("#{active_credit_card.number}")
-      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
+      wait_until{ assert page.has_content?("#{active_credit_card.last_digits}") }
+      if active_credit_card.cc_type.nil?
+        wait_until{ assert page.has_content?(I18n.t('activerecord.attributes.credit_card.type_unknown')) }
+      else
+        wait_until{ assert page.has_content?("#{active_credit_card.cc_type}") }
+      end
+      wait_until{ assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}") }
+      wait_until{ assert page.has_content?(I18n.l(member.credit_cards.first.created_at, :format => :only_date)) }
+      
     end
 
     within("#table_membership_information") do
       
-      within("#td_mi_status") { assert page.has_content?(member.status) }
+      within("#td_mi_status") { assert page.has_content?(status) }
       
       within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(member.member_since_date, :format => :only_date)) }
       
@@ -120,35 +129,82 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       
       within("#td_mi_join_date") { assert page.has_content?(I18n.l(member.join_date, :format => :only_date)) }
 
-      within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(member.next_retry_bill_date, :format => :only_date)) }
+      within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(member.next_retry_bill_date, :format => :only_date)) } if member.status != 'applied'
 
-      assert page.has_selector?("#link_member_change_next_bill_date")
+      assert page.has_selector?("#link_member_change_next_bill_date") if member.status != 'applied'
 
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{member.club_cash_amount.to_f}") }
 
-			assert page.has_selector?("#link_member_add_club_cash")
+			assert page.has_selector?("#link_member_add_club_cash") if member.status == 'provisional' or member.status == 'active'
 
-      within("#td_mi_credit_cards_first_created_at") { assert page.has_content?(I18n.l(member.credit_cards.first.created_at, :format => :only_date)) }
-
-      within("#td_mi_quota") { assert page.has_content?("#{member.quota}") }
-      
+      within("#td_mi_quota") { assert page.has_content?("#{member.quota}") }      
     end  
-  end
-
-  def fill_in_credit_card_info(credit_card)
-    active_merchant_stubs_store(credit_card.number)
-    within("#table_credit_card")do
+    if not member.current_membership.enrollment_info.product_sku.blank? and not member.status == 'applied'
+      within("#fulfillments") do
+        assert page.has_content?('KIT') 
+        assert page.has_content?('CARD') 
+      end
+    end
+    membership = member.current_membership
+    within("#memberships_table")do
       wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
-        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+        assert page.has_content?(membership.id.to_s)
+        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+        assert page.has_content?(membership.quota.to_s)
+        assert page.has_content?(status)
       }
     end
   end
 
-  def fill_in_member(unsaved_member, credit_card)
+  def validate_terms_of_membership_show_page(saved_member)
+    click_link_or_button("#{saved_member.terms_of_membership.name}")
+    within("#table_information")do
+      wait_until{
+        assert page.has_content?(@terms_of_membership_with_gateway.name) if @terms_of_membership_with_gateway.name
+        assert page.has_content?(@terms_of_membership_with_gateway.description) if @terms_of_membership_with_gateway.description
+        assert page.has_content?(@terms_of_membership_with_gateway.provisional_days.to_s) if @terms_of_membership_with_gateway.provisional_days
+        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s) if @terms_of_membership_with_gateway.installment_amount
+        assert page.has_content?(@terms_of_membership_with_gateway.installment_type) if @terms_of_membership_with_gateway.installment_type
+        assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
+      }
+    end
+    within("#table_email_template")do
+      wait_until{
+        EmailTemplate::TEMPLATE_TYPES.each do |type|
+          assert page.has_content?("Test #{type}")
+        end 
+        EmailTemplate.find_all_by_terms_of_membership_id(saved_member.terms_of_membership.id).each do |et|
+          assert page.has_content?(et.client)
+          assert page.has_content?(et.template_type)
+          assert page.has_content?(et.external_attributes.to_s)
+        end 
+      }
+    end
+  end
+
+  def fill_in_credit_card_info(credit_card, cc_blank = false)
+    if cc_blank 
+    active_merchant_stubs_store("0000000000")
+      within("#table_credit_card")do
+        check "setter[cc_blank]"
+      end
+    else
+    active_merchant_stubs_store(credit_card.number)
+      within("#table_credit_card")do
+        wait_until{
+          fill_in 'member[credit_card][number]', :with => credit_card.number
+          fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
+          fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+        }
+      end
+    end
+  end
+
+  def fill_in_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
+
+    credit_card = FactoryGirl.build(:credit_card_master_card) if credit_card.nil?
 
     type_of_phone_number = (unsaved_member[:type_of_phone_number].blank? ? '' : unsaved_member.type_of_phone_number.capitalize)
 
@@ -157,78 +213,51 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         select(unsaved_member.gender, :from => 'member[gender]')
         fill_in 'member[address]', :with => unsaved_member.address
-        # select_country_and_state(unsaved_member.country) 
-        if unsaved_member.country == "US"
-          select('United States', :from => 'member[country]')
-          within('#states_td'){ select('Alabama', :from => 'member[state]') }
-        else
-          select('Canada', :from => 'member[country]')
-          within('#states_td'){ select('Manitoba', :from => 'member[state]') }
-        end
+        select_country_and_state(unsaved_member.country) 
         fill_in 'member[city]', :with => unsaved_member.city
         fill_in 'member[last_name]', :with => unsaved_member.last_name
         fill_in 'member[zip]', :with => unsaved_member.zip
       }
     end
+
+    page.execute_script("window.jQuery('#member_birth_date').next().click()")
+    within(".ui-datepicker-calendar") do
+      click_on("1")
+    end
+    
     within("#table_contact_information")do
       wait_until{
         fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
         fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
         fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
         select(type_of_phone_number, :from => 'member[type_of_phone_number]')
-        fill_in 'member[email]', :with => unsaved_member.email
+        fill_in 'member[email]', :with => unsaved_member.email 
       }
     end
 
-    fill_in_credit_card_info(credit_card)
+    if approval        
+        within("#table_contact_information")do
+        wait_until{
+          select("test-approval", :from => 'member[terms_of_membership_id]') 
+        }
+      end     
+    end 
+
+    fill_in_credit_card_info(credit_card, cc_blank)
 
     unless unsaved_member.external_id.nil?
       fill_in 'member[external_id]', :with => unsaved_member.external_id
     end 
 
     alert_ok_js
-    click_link_or_button 'Create Member'  	
+
+    click_link_or_button 'Create Member'
   end
 
-  def fill_in_member_approval(unsaved_member, credit_card)
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New Member'
-
-    within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        fill_in 'member[address]', :with => unsaved_member.address
-        # select_country_and_state(unsaved_member.country)
-        if unsaved_member.country == "US"
-          select('United States', :from => 'member[country]')
-          within('#states_td'){ select('Alabama', :from => 'member[state]') }
-        else
-          select('Canada', :from => 'member[country]')
-          within('#states_td'){ select('Manitoba', :from => 'member[state]') }
-        end
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
-    end
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
-        fill_in 'member[email]', :with => unsaved_member.email
-        select(@terms_of_membership_with_approval.name, :from => 'member[terms_of_membership_id]')
-      }
-    end
-    
-    fill_in_credit_card_info(credit_card)
-
-    unless unsaved_member.external_id.nil?
-      fill_in 'member[external_id]', :with => unsaved_member.external_id
-    end 
-    alert_ok_js
-    click_link_or_button 'Create Member'    
+  def create_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
+    fill_in_member(unsaved_member,credit_card,approval,cc_blank)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    Member.find_by_email(unsaved_member.email)
   end
 
   def generate_operations(member)
@@ -249,64 +278,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
  		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'Member',
   										 :member_id => member.id, :operation_type => Settings.operation_types.others, :description => 'Member was recovered' )
   end
-
-	def create_new_member(unsaved_member, cc_blank = false)
-		visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-
-		click_on 'New Member'
-
-  	within("#table_demographic_information") {
-      fill_in 'member[first_name]', :with => unsaved_member.first_name
-      fill_in 'member[last_name]', :with => unsaved_member.last_name
-      fill_in 'member[city]', :with => unsaved_member.city
-      fill_in 'member[address]', :with => unsaved_member.address
-      fill_in 'member[zip]', :with => unsaved_member.zip
-      # select_country_and_state(unsaved_member.country)
-      if unsaved_member.country == "US"
-        select('United States', :from => 'member[country]')
-        within('#states_td'){ select('Alabama', :from => 'member[state]') }
-      else
-        select('Canada', :from => 'member[country]')
-        within('#states_td'){ select('Manitoba', :from => 'member[state]') }
-      end
-      select('M', :from => 'member[gender]') 
-		}
-
-		page.execute_script("window.jQuery('#member_birth_date').next().click()")
-	  within(".ui-datepicker-calendar") do
-	  	click_on("1")
-	  end
-
-		within("#table_contact_information") {
-			fill_in 'member[email]', :with => unsaved_member.email
-			fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-			fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-			fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-			select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
-			select(@terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
-		}
-
-
-    if cc_blank
-      active_merchant_stubs_store("0000000000")
-      check('setter[cc_blank]')
-    else
-      fill_in_credit_card_info(unsaved_member.active_credit_card)
-    end      
-
-    unless unsaved_member.external_id.nil?
-    	fill_in 'member[external_id]', :with => unsaved_member.external_id
-    end 
-
-    alert_ok_js
-
-    assert_difference ['Member.count', 'CreditCard.count'] do 
-    	click_link_or_button 'Create Member'
-    	sleep(5) #Wait for API response
-    end
-    assert page.has_content?("#{unsaved_member.first_name} #{unsaved_member.last_name}")
-
-	end
 
   # When creating member from web, should add KIT and CARD fulfillments 
 
@@ -329,72 +300,41 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create member" do
   	setup_member(false)
 
-  	unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id)
+  	unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+	  created_member = create_member(unsaved_member)
 
-	  create_new_member(unsaved_member)
-    created_member = Member.find_by_email(unsaved_member.email)   
-    sleep 1
     validate_view_member_base(created_member)
 
-    within("#td_mi_status") { assert page.has_content?("provisional") }
-      
     within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
-
     within("#table_enrollment_info") { wait_until{ assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) } }
-
-    active_credit_card = created_member.active_credit_card
-    within("#credit_cards") { 
-      assert page.has_content?("#{active_credit_card.number}") 
-      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
-    }
-
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
     wait_until { assert_equal(Fulfillment.count,2) }
-    within("#fulfillments") do
-      assert page.has_content?('KIT') 
-      assert page.has_content?('CARD') 
-    end
   end
 
   test "Create a member with CC blank" do
     setup_member(false)
 
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    created_member = create_member(unsaved_member,nil,false,true)
 
-    create_new_member(unsaved_member, true)
-    created_member = Member.find_by_email(unsaved_member.email)    
-    
     validate_view_member_base(created_member)
 
     within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
-
-    active_credit_card = created_member.active_credit_card
-    within("#credit_cards") { 
-      assert page.has_content?("#{active_credit_card.number}") 
-      assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
-    }
-
   end
 
+  # Display external_id at member search
   test "create a member inside a club with external_id in true" do
   	setup_member(false)
   	@club.requires_external_id = true
   	@club.save!
 
-  	unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, :external_id => "9876543210")
+  	unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id, :external_id => "9876543210")
+    created_member = create_member(unsaved_member)
 
-  	visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_on 'New Member'
-    create_new_member(unsaved_member)
+    within("#td_mi_external_id") { assert page.has_content?(unsaved_member.external_id) }
 
-    member = Member.last
-
-    within("#td_mi_external_id") { 
-    	assert page.has_content?(member.external_id) 
-    }
-      
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
+    search_member("member[member_id]", "#{created_member.visible_id}", created_member)
   end
 
 	test "new member for with external_id not requiered" do
@@ -403,28 +343,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   	@club.save!
 
   	unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-
-  	visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_on 'New Member'
-    create_new_member(unsaved_member)
-  end
-
-  test "display external_id at member search" do
-  	setup_member(false)
-  	@club.requires_external_id = true
-  	@club.save!
-
-  	unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, :external_id => "9876543210")
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    
-    fill_in_member(unsaved_member, credit_card)
-
-    member = Member.last
-
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
-    search_member("member[member_id]", "#{member.visible_id}", member)
-
+    created_member = create_member(unsaved_member)
   end
 
   test "show dates according to club timezones" do
@@ -454,6 +373,24 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("state: can't be blank,is invalid"), "Failure on state validation message"
         assert page.has_content?("city: can't be blank,is invalid"), "Failure on city validation message"
         assert page.has_content?("zip: can't be blank,The zip code is not valid for the selected country."), "Failure on zip validation message"
+      }
+    end
+  end
+
+  test "create member without information and with MeS internar error" do
+    setup_member
+    active_merchant_stubs_store( nil, code = "999", message = "internal server error", false )
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+    within("#table_demographic_information") {
+      select('United States', :from => 'member[country]')
+    }
+    alert_ok_js
+    click_link_or_button 'Create Member'
+    within("#error_explanation")do
+      wait_until{
+        assert page.has_content?(Settings.error_messages.unrecoverable_error)
       }
     end
   end
@@ -496,7 +433,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("zip: The zip code is not valid for the selected country."), "Failure on zip validation message"
       }
     end
-  end
+ #  end
 
   test "create member with letter in phone field" do
     setup_member(false)
@@ -543,77 +480,20 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
     end    
   end
-
+  
+  # return to member's profile from terms of membership
   test "show terms of membership" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_link_or_button("#{@saved_member.terms_of_membership.name}")
-    within("#table_information")do
-      wait_until{
-        assert page.has_content?(@terms_of_membership_with_gateway.name) if @terms_of_membership_with_gateway.name
-        assert page.has_content?(@terms_of_membership_with_gateway.description) if @terms_of_membership_with_gateway.description
-        assert page.has_content?(@terms_of_membership_with_gateway.provisional_days.to_s) if @terms_of_membership_with_gateway.provisional_days
-        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s) if @terms_of_membership_with_gateway.installment_amount
-        assert page.has_content?(@terms_of_membership_with_gateway.installment_type) if @terms_of_membership_with_gateway.installment_type
-        assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
-      }
-    end
-    within("#table_email_template")do
-      wait_until{
-        EmailTemplate::TEMPLATE_TYPES.each do |type|
-          assert page.has_content?("Test #{type}")
-        end 
-        EmailTemplate.find_all_by_terms_of_membership_id(@saved_member.terms_of_membership.id).each do |et|
-          assert page.has_content?(et.client)
-          assert page.has_content?(et.template_type)
-          assert page.has_content?(et.external_attributes.to_s)
-        end 
-      }
-    end    
-  end
-
-  test "return to member's profile from terms of membership" do
-    setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_link_or_button("#{@saved_member.terms_of_membership.name}")
-    within("#table_information")do
-      wait_until{
-        assert page.has_content?(@terms_of_membership_with_gateway.name) if @terms_of_membership_with_gateway.name
-        assert page.has_content?(@terms_of_membership_with_gateway.description) if @terms_of_membership_with_gateway.description
-        assert page.has_content?(@terms_of_membership_with_gateway.provisional_days.to_s) if @terms_of_membership_with_gateway.provisional_days
-        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s) if @terms_of_membership_with_gateway.installment_amount
-        assert page.has_content?(@terms_of_membership_with_gateway.installment_type) if @terms_of_membership_with_gateway.installment_type
-        assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
-      }
-    end
-    within("#table_email_template")do
-      wait_until{
-        EmailTemplate::TEMPLATE_TYPES.each do |type|
-          assert page.has_content?("Test #{type}")
-        end 
-        EmailTemplate.find_all_by_terms_of_membership_id(@saved_member.terms_of_membership.id).each do |et|
-          assert page.has_content?(et.client)
-          assert page.has_content?(et.template_type)
-          assert page.has_content?(et.external_attributes.to_s)
-        end 
-      }
-    end 
+    validate_terms_of_membership_show_page(@saved_member) 
     click_link_or_button('Return to member show')
-    wait_until{
-      assert find_field('input_visible_id').value == "#{@saved_member.visible_id}"
-      assert find_field('input_first_name').value == @saved_member.first_name
-      assert find_field('input_last_name').value == @saved_member.last_name
-      assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
-      assert find_field('input_member_group_type').value == (@saved_member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : @saved_member.member_group_type.name)
-    }
+    wait_until{ assert find_field('input_visible_id').value == "#{@saved_member.visible_id}" }
   end
 
   test "create member with gender male" do
     setup_member
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    fill_in_member(unsaved_member,credit_card)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    fill_in_member(unsaved_member)
 
     wait_until{
       assert find_field('input_gender').value == ('Male')
@@ -622,49 +502,18 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   test "create member with gender female" do
     setup_member
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id, :gender => 'F')
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id, :gender => 'F')
     
-    fill_in_member(unsaved_member,credit_card)
-    wait_until{
-      assert find_field('input_first_name').value == unsaved_member.first_name
-    }
-    wait_until{
-      assert find_field('input_gender').value == ('Female')
-    }
+    fill_in_member(unsaved_member)
+    wait_until{ assert find_field('input_gender').value == ('Female') }
   end
 
   test "create member without phone number" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id, 
+                                        :phone_country_code => nil, :phone_area_code => nil, :phone_local_number => nil)
 
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New Member'
-
-    within("#table_demographic_information") do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select('M', :from => 'member[gender]')
-        fill_in 'member[address]', :with => unsaved_member.address
-        select_country_and_state
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
-    end
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[email]', :with => unsaved_member.email
-      }
-    end
-
-    fill_in_credit_card_info(credit_card)
-
-    alert_ok_js
-    click_link_or_button 'Create Member'
+    fill_in_member(unsaved_member)
 
     within("#error_explanation")do
       wait_until{
@@ -682,16 +531,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id, :type_of_phone_number => 'home')
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
-    fill_in_member(unsaved_member, credit_card)
-    member = Member.find_by_email(unsaved_member.email)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-
-    within("#table_contact_information")do
-      wait_until{
-        assert page.has_content?(unsaved_member.full_phone_number)
-        assert page.has_content?(unsaved_member.type_of_phone_number.capitalize)
-      }
-    end
+    saved_member = create_member(unsaved_member, credit_card)
+    validate_view_member_base(saved_member)
   end
 
   test "create member with canadian zip" do
@@ -702,19 +543,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                          :state => 'QC',
                                          :zip => 'H3G 1M8',
                                          :country => 'Canada')
-    credit_card = FactoryGirl.build(:credit_card_master_card)
     
-    fill_in_member(unsaved_member,credit_card)
-    wait_until{
-      assert find_field('input_first_name').value == unsaved_member.first_name
-    }
-    saved_member = Member.find_by_email(unsaved_member.email)
-
-    assert find_field('input_visible_id').value == saved_member.visible_id.to_s
-    assert find_field('input_first_name').value == saved_member.first_name
-    assert find_field('input_last_name').value == saved_member.last_name
-    assert find_field('input_gender').value == (saved_member.gender == 'F' ? 'Female' : 'Male')
-    assert find_field('input_member_group_type').value == (saved_member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : saved_member.member_group_type.name)
+    saved_member = create_member(unsaved_member)
+    validate_view_member_base(saved_member)
   end
 
   test "create member with invalid canadian zip" do
@@ -725,10 +556,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                          :state => 'QC',
                                          :zip => '%^tYU2123',
                                          :country => 'CA')
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    
-    fill_in_member(unsaved_member,credit_card)
 
+    fill_in_member(unsaved_member)
     within('#error_explanation')do
     	wait_until{
     		assert page.has_content?('zip: The zip code is not valid for the selected country.')
@@ -756,17 +585,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   test "display all operations on member profile" do
   	setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     
-    fill_in_member(unsaved_member,credit_card)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-
-    saved_member = Member.find_by_email(unsaved_member.email)
+    saved_member = create_member(unsaved_member)
     generate_operations(saved_member)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == saved_member.first_name }
+
 
     within("#operations_table")do
     	wait_until{
@@ -787,10 +613,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     sleep(5) #Wait for chronological difference
     10.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id, 
                                 :resource_type => 'Member', :member_id => @saved_member.id, 
-                                :description => 'Member updated succesfully last' )
+                                :description => 'Member updated succesfully before' )
     }
+    FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id, 
+                                :resource_type => 'Member', :member_id => @saved_member.id, 
+                                :description => 'Member updated succesfully last' )
+
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    sleep(2) #Wait to the profile.
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within("#operations_table")do
       wait_until{
         assert page.has_content?('Member updated succesfully last')
@@ -801,7 +631,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "see operations grouped by billing from lastest to newest" do
     setup_member
     generate_operations(@saved_member)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 100,
@@ -822,6 +651,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :operation_type => 104,
                                 :description => 'Member enrolled - 103')
     }
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
     within("#dataTableSelect")do
       wait_until{
         select('billing', :from => 'operation[operation_type]')
@@ -834,6 +665,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?('Member enrolled - 101')
         assert page.has_content?('Member enrolled - 102')
         assert page.has_content?('Member enrolled - 103')
+        assert page.has_content?('Member enrolled - 103')
       }
     end
   end
@@ -841,7 +673,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "see operations grouped by profile from lastest to newest" do
     setup_member
     generate_operations(@saved_member)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 200,
@@ -862,6 +693,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :operation_type => 203,
                                 :description => 'Blacklisted member. Reason: Too much spam - 203')
     }
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     within("#dataTableSelect")do
       wait_until{
         select('profile', :from => 'operation[operation_type]')
@@ -881,7 +713,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "see operations grouped by communication from lastest to newest" do
     setup_member
     generate_operations(@saved_member)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 300,
@@ -902,6 +733,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :operation_type => 303,
                                 :description => 'Communication sent - 303')
     }
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     within("#dataTableSelect")do
       wait_until{
         select('communications', :from => 'operation[operation_type]')
@@ -926,7 +758,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :operation_type => 1000,
                                 :description => 'Member was updated successfully - 1000')
     }
-
+    FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id,
+                                :resource_type => 'Member', :member_id => @saved_member.id,
+                                :operation_type => 1000,
+                                :description => 'Member was updated successfully last - 1000')
     within("#dataTableSelect")do
       wait_until{
         select('others', :from => 'operation[operation_type]')
@@ -934,7 +769,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     within("#operations_table")do
       wait_until{
-        assert page.has_content?('Member was updated successfully - 1000')
+        assert page.has_content?('Member was updated successfully last - 1000')
       }
     end
   end
@@ -973,39 +808,19 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @saved_member.recovered
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
-      assert find_field('input_last_name').value == @saved_member.last_name
-      assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
-      assert find_field('input_member_group_type').value == (@saved_member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : @saved_member.member_group_type.name)
-    }
+    validate_view_member_base(@saved_member)
   end
 
   #Recovery time on approval members
   test "Approve member" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     
-    fill_in_member_approval(unsaved_member,credit_card)
-
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member = create_member(unsaved_member,nil,true,false)
     reactivation_times = @saved_member.reactivation_times
     membership = @saved_member.current_membership
-    within(".nav-tabs") do
-      click_on("Memberships")
-    end
-    within("#memberships_table")do
-      wait_until{
-        assert page.has_content?(membership.id.to_s)
-        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-        assert page.has_content?(membership.quota.to_s)
-        assert page.has_content?('applied')
-      }
-    end
+
+    validate_view_member_base(@saved_member,'applied')
 
     confirm_ok_js
     click_link_or_button 'Approve'
@@ -1057,16 +872,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   test "Reject member" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     
-    fill_in_member_approval(unsaved_member,credit_card)
-
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member = create_member(unsaved_member,nil,true,false)
     membership = @saved_member.current_membership
+
     within(".nav-tabs") do
       click_on("Memberships")
     end
@@ -1108,128 +918,65 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create member without gender" do
     setup_member(false)
 
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id, :gender => '')
-    unsaved_member.gender = ''
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    fill_in_member(unsaved_member,credit_card)
-    @saved_member = Member.find_by_email(unsaved_member.email)
-    wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
-      assert find_field('input_last_name').value == @saved_member.last_name
-      assert find_field('input_gender').value == I18n.t('activerecord.attributes.member.no_gender')
-      assert find_field('input_member_group_type').value == (@saved_member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : @saved_member.member_group_type.name)
-    }
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id, :gender => '')
+    @saved_member = create_member(unsaved_member)
+
+    validate_view_member_base(@saved_member)
   end
 
   test "Create a member without Telephone Type" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member,
-                                         :gender => '', 
-                                         :club_id => @club.id)
+    unsaved_member =  FactoryGirl.build(:active_member, :type_of_phone_number => '', :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
 
-    fill_in_member(unsaved_member, credit_card)
-    saved_member = Member.find_by_email(unsaved_member.email)
+    saved_member = create_member(unsaved_member)
 
     within("#table_contact_information")do
       wait_until{
-        assert page.has_content?('')
+        assert page.has_no_content?('Home')
+        assert page.has_no_content?('Mobile')
+        assert page.has_no_content?('Other')
       }
     end
   end
 
   test "Enroll a member with member approval TOM" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     
-    fill_in_member_approval(unsaved_member,credit_card)
-
-    wait_until{
-      assert find_field('input_first_name').value == unsaved_member.first_name
-    }
-
-    @saved_member = Member.find_by_email(unsaved_member.email)
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    @saved_member = create_member(unsaved_member,nil,true,false)
     wait_until{ page.has_selector?('#approve') }
     wait_until{ page.has_selector?('#reject') }
+    validate_view_member_base(@saved_member, 'applied')
 
-    within("#td_mi_status")do
-      wait_until{ assert page.has_content?('applied') }
-    end
-    within("#td_mi_join_date")do
-      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
-    end
-    within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
-    end
+    within("#td_mi_status"){ wait_until{ assert page.has_content?('applied') }}
+    within("#td_mi_join_date"){ wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }}
+    within("#td_mi_next_retry_bill_date"){ wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }}
     within("#operations_table") { assert page.has_content?("Member enrolled pending approval successfully $0.0 on TOM(2) -#{@terms_of_membership_with_approval.name}-") }
-    
-    membership = @saved_member.current_membership
-    within(".nav-tabs") do
-      click_on("Memberships")
-    end
-    within("#memberships_table")do
-      wait_until{
-        assert page.has_content?(membership.id.to_s)
-        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-        assert page.has_content?(membership.quota.to_s)
-        assert page.has_content?('applied')
-      }
-    end   
   end
 
   test "Enroll a member should create membership" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     
-    fill_in_member(unsaved_member,credit_card)
-
-    wait_until{
-      assert find_field('input_first_name').value == unsaved_member.first_name
-    }
-
-    @saved_member = Member.find_by_email(unsaved_member.email)
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-
-    within("#td_mi_status")do
-      wait_until{ assert page.has_content?('provisional') }
-    end
-    within("#td_mi_join_date")do
-      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
-    end
+    @saved_member = create_member(unsaved_member)
+    validate_view_member_base(@saved_member)
     
     membership = @saved_member.current_membership
-    within(".nav-tabs") do
-      click_on("Memberships")
-    end
-    within("#memberships_table")do
-      wait_until{
-        assert page.has_content?(membership.id.to_s)
-        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-        assert page.has_content?(membership.quota.to_s)
-        assert page.has_content?('provisional')
-      }
-    end
+    
   end 
 
   test "Update Birthday after 12 like a day" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    
-    fill_in_member(unsaved_member,credit_card)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_member = Member.find_by_email(unsaved_member.email)  
+
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     click_link_or_button 'Edit'
     page.execute_script("window.jQuery('#member_birth_date').next().click()")
@@ -1252,16 +999,13 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   #Check active email - It is send it by CS inmediate
   test "Check active email" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    
-    fill_in_member(unsaved_member,credit_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_member = Member.find_by_email(unsaved_member.email)  
+    @saved_member.set_as_active
 
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-
-    @saved_member = Member.find_by_email(unsaved_member.email)
-    @saved_member.bill_membership
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     sleep 1
@@ -1279,8 +1023,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#operations_table") do
       wait_until {
         assert page.has_content?("Communication 'Test active' sent")
-          assert page.has_no_content?("Member enrolled successfully $0.0")
-        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     }
     end
   end
@@ -1288,9 +1031,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "Check Birthday email -  It is send it by CS at night" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
     
-    fill_in_member(unsaved_member,credit_card)
+    @saved_member = create_member(unsaved_member)
 
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
     @saved_member = Member.find_by_email(unsaved_member.email)
@@ -1309,26 +1051,27 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#operations_table") do
       wait_until {
         assert page.has_content?("Communication 'Test birthday' sent")
-        assert page.has_no_content?("Member enrolled successfully $0.0")
-        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
       }
     end
   end
 
   test "Send Trial email at Day 7" do
     setup_member(false)
+      setup_email_templates
 
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_member = Member.find_by_email(unsaved_member.email)  
 
-    create_new_member(unsaved_member)
-    created_member = Member.find_by_email(unsaved_member.email)
-    created_member.current_membership.update_attribute(:join_date, Time.zone.now-7.day)
+    @saved_member.current_membership.update_attribute(:join_date, Time.zone.now-7.day)
    
     Member.send_pillar_emails('pillar_provisional', 'provisional')
     sleep 1
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     sleep 1
     within("#communication") do
       wait_until {
@@ -1342,7 +1085,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{
         assert page.has_content?("Day 7 - Trial")
         assert page.has_no_content?("Member enrolled successfully $0.0")
-        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+        visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
       }
     end
   end
@@ -1351,11 +1094,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
     setup_email_templates
 
-    unsaved_member = FactoryGirl.build(:active_member, 
-    :club_id => @club.id)
-    create_new_member(unsaved_member)
-  
-    created_member = Member.find_by_email(unsaved_member.email)   
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    created_member = Member.find_by_email(unsaved_member.email)  
+
     created_member.current_membership.update_attribute(:join_date, Time.zone.now-35.day)
 
     Member.send_pillar_emails('pillar_provisional', 'provisional')
@@ -1384,11 +1128,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
     setup_email_templates
 
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id)
-    create_new_member(unsaved_member)
-
-    created_member = Member.find_by_email(unsaved_member.email)   
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    created_member = Member.find_by_email(unsaved_member.email)  
     created_member.current_membership.update_attribute(:join_date, Time.zone.now-40.day)
     
     Member.send_pillar_emails('pillar_provisional', 'provisional')
@@ -1415,11 +1159,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "Send Local Chapters email at Day 45" do
     setup_member(false)
     setup_email_templates
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    created_member = Member.find_by_email(unsaved_member.email)  
 
-    create_new_member(unsaved_member)
-    created_member = Member.find_by_email(unsaved_member.email)   
     created_member.current_membership.update_attribute(:join_date, Time.zone.now-45.day)
 
     Member.send_pillar_emails('pillar_provisional', 'provisional')
@@ -1446,11 +1191,13 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "Send VIP email at Day 50" do
     setup_member(false)
     setup_email_templates
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id)
 
-    create_new_member(unsaved_member)
-    created_member = Member.find_by_email(unsaved_member.email)   
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    created_member = Member.find_by_email(unsaved_member.email)  
+    
     created_member.current_membership.update_attribute(:join_date, Time.zone.now-50.day)
 
     Member.send_pillar_emails('pillar_provisional', 'provisional')
@@ -1477,13 +1224,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "Filtering by Communication at Operations tab" do
     setup_member(false)
     setup_email_templates
-    unsaved_member = FactoryGirl.build(:active_member, 
-      :club_id => @club.id)
 
-    create_new_member(unsaved_member)
-    created_member = Member.find_by_email(unsaved_member.email)   
-    created_member.current_membership.update_attribute(:join_date, Time.zone.now-50.day)
-
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    created_member = Member.find_by_email(unsaved_member.email)  
 
     Settings.operation_types.collect do |key,value| 
       FactoryGirl.create(:operation, :description => key, :operation_type => value, :member_id => created_member.id, :created_by_id => @admin_agent)
@@ -1547,9 +1293,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
     end    
   end
-
-
-
 end
 
   
