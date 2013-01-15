@@ -10,7 +10,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     init_test_setup
   end
 
-  def setup_member
+  def setup_member(cancel = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
@@ -20,31 +20,30 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
     FactoryGirl.create(:batch_agent)
     saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
-    
-    cancel_date = Time.zone.now + 1.days
-    message = "Member cancellation scheduled to #{cancel_date} - Reason: #{@member_cancel_reason.name}"
-    saved_member.cancel! cancel_date, message, @admin_agent
-    saved_member.set_as_canceled!
 
-    @canceled_member = Member.first
-	
+    if cancel    
+      cancel_date = Time.zone.now + 1.days
+      message = "Member cancellation scheduled to #{cancel_date} - Reason: #{@member_cancel_reason.name}"
+      saved_member.cancel! cancel_date, message, @admin_agent
+      saved_member.set_as_canceled!
+	  end
+    @saved_member = Member.first
+
     sign_in_as(@admin_agent)
+  end
+
+  def recover_member(member, tom)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    click_on 'Recover'
+    wait_until{ select(tom.name, :from => 'terms_of_membership_id') }
+    confirm_ok_js
+    click_on 'Recover'
   end
 
   test "recovery a member with provisional TOM" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @canceled_member.visible_id)
-    click_on 'Recover'
-    
-    wait_until{
-      select(@new_terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
-    }
-    confirm_ok_js
-    click_on 'Recover'
-
+    recover_member(@saved_member,@new_terms_of_membership_with_gateway)
     wait_until{ assert find_field('input_first_name').value == @canceled_member.first_name }
-    @canceled_member.reload
-
     wait_until{ page.has_content? "Member recovered successfully $0.0 on TOM(2) -#{@canceled_member.current_membership.terms_of_membership.name}-"}
 
     within("#td_mi_status") do
