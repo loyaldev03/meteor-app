@@ -427,7 +427,7 @@ class Member < ActiveRecord::Base
       # credit card exist?
       credit_card = CreditCard.new credit_card_params
       begin
-        credit_card.get_token!(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name])
+        credit_card.get_token!(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], true)
       rescue Exception => e
         return { :message => Settings.error_messages.unrecoverable_error, :code => Settings.error_codes.unrecoverable_error }
       end

@@ -188,7 +188,7 @@
   <tbody>
   <%= f.fields_for :credit_card do |credit_card| %>
     <tr>
-      <td style="width: 50%;">
+      <td>
         <table class="hidden_table_border">
           <tr class = "control-group">
             <th>
@@ -198,12 +198,6 @@
               <%= credit_card.text_field :number, :class => 'text_field input-medium', 
                                       :name => "member[credit_card][number]"%>
             </td>  
-          </tr>
-        </table>
-      </td>
-      <td style="width: 50%;">
-        <table class="hidden_table_border">
-          <tr class = "control-group">
             <th>
               <%= credit_card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline required_asterick' %> 
             </th>
@@ -211,8 +205,6 @@
               <%= credit_card.text_field :expire_month, :class => 'text_field input-medium',
                                   :name => "member[credit_card][expire_month]" %>
             </td>  
-          </tr>
-          <tr class = "control-group">
             <th>
               <%= credit_card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline required_asterick' %>
             </th>
