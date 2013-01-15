@@ -108,7 +108,10 @@ class CreditCard < ActiveRecord::Base
         self.cc_type = 'unknown'
         self.token = "a" # fixing this token for blank credit cards
       else
-        raise am.errors
+        self.errors[:number] << am.errors["number"].join(", ") unless am.errors["number"].empty?
+        self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
+        self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
+        raise "Credit card invalid"
       end
     end
   end

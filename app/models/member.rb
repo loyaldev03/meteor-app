@@ -426,17 +426,17 @@ class Member < ActiveRecord::Base
       credit_card = CreditCard.new credit_card_params
       begin
         credit_card.get_token!(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], cc_blank)
+        credit_cards = CreditCard.joins(:member).where( :token => credit_card.token, :members => { :club_id => club.id } )
       rescue Exception => e
-        return { :message => Settings.error_messages.unrecoverable_error, :code => Settings.error_codes.unrecoverable_error }
+        credit_cards = []
       end
-      credit_cards = CreditCard.joins(:member).where( :token => credit_card.token, :members => { :club_id => club.id } )
 
       if credit_cards.empty? or cc_blank
         member = Member.new
         member.update_member_data_by_params member_params
         member.skip_api_sync! if member.api_id.present? || skip_api_sync
         member.club = club
-        unless member.valid? and credit_card.valid?
+        unless member.valid? and credit_card.errors.size == 0
           return { :message => Settings.error_messages.member_data_invalid, :code => Settings.error_codes.member_data_invalid, 
                    :errors => member.errors_merged(credit_card) }
         end
@@ -949,10 +949,10 @@ class Member < ActiveRecord::Base
       new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
       begin
         new_credit_card.get_token!(terms_of_membership.payment_gateway_configuration, first_name, last_name)
+        credit_cards = CreditCard.joins(:member).where( [ " token = ? and members.club_id = ? ", new_credit_card.token, club.id ] )
       rescue
-        return { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => { :number => "Error while processing this credit card." }}
+        credit_cards = []
       end
-      credit_cards = CreditCard.joins(:member).where( [ " token = ? and members.club_id = ? ", new_credit_card.token, club.id ] )
       if credit_cards.empty?
         add_new_credit_card(new_credit_card, current_agent)
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
@@ -992,17 +992,14 @@ class Member < ActiveRecord::Base
     CreditCard.transaction do 
       begin
         new_credit_card.member = self
-        am_card = CreditCard.am_card(new_credit_card.number, new_credit_card.expire_month, new_credit_card.expire_year, new_credit_card.member.first_name, new_credit_card.member.last_name)
-        if new_credit_card.valid? and am_card.valid?
+        if new_credit_card.errors.size == 0
           new_credit_card.save!
           message = "Credit card #{new_credit_card.last_digits} added and activated."
           Auditory.audit(current_agent, new_credit_card, message, self)
           answer = { :code => Settings.error_codes.success, :message => message }
           new_credit_card.set_as_active!
         else
-          errors = new_credit_card.errors.to_hash
-          errors.merge! am_card.errors.to_hash unless am_card.errors.empty?
-          answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => errors }
+          answer = { :code => Settings.error_codes.invalid_credit_card, :message => Settings.error_messages.invalid_credit_card, :errors => new_credit_card.errors.to_hash }
         end        
       rescue Exception => e
         answer.merge!({:errors => e})

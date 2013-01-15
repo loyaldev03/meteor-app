@@ -536,7 +536,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card.expire_month = (Time.zone.now-1.month).month
     @credit_card.expire_year = (Time.zone.now-1.year).year
 
-    active_merchant_stubs_store(cc_number)
+    active_merchant_stubs_store(@credit_card.number)
 
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
@@ -553,6 +553,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     cc_expire_month = @active_credit_card.expire_month
+
     @credit_card = FactoryGirl.build :credit_card_american_express
     @credit_card.number = @active_credit_card.number
     expired_month = Time.zone.now-1.month
