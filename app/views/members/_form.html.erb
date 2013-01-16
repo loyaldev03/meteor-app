@@ -130,9 +130,9 @@
             <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline required_asterick' %>
           </th>
           <td> 
-            <%= f.text_field :phone_country_code, :class => 'text_field input-mini' %> 
-            <%= f.text_field :phone_area_code, :class => 'text_field input-mini' %> 
-            <%= f.text_field :phone_local_number, :class => 'text_field input-mini' %> 
+            <%= f.text_field :phone_country_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.member.phone_country_code') %> 
+            <%= f.text_field :phone_area_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.member.phone_area_code') %> 
+            <%= f.text_field :phone_local_number, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.member.phone_local_number') %> 
             <% if !@member.new_record? && !@member.wrong_phone_number.nil? %>
             <br><%= t('activerecord.attributes.member.unset_wrong_phone_number') %>
                 <%= check_box :setter, :wrong_phone_number %>
@@ -179,9 +179,11 @@
 <table id="table_credit_card" class="table table-bordered table-condensed table-nohover">
   <thead>
     <tr class="box_title">
-      <th colspan="2"><h4>Credit Card</h4>
+      <th colspan="2">
+        <h4>Credit Card
         <%= f.label :allow_cc_blank,t('Allow blank credit card?'), :class => 'help-inline' %>
         <%= check_box :setter, :cc_blank %>
+        </h4>
       </th>
     </tr>
   </thead>
