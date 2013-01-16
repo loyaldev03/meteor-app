@@ -746,4 +746,27 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
   end
 
+  test "Should not create member's record when there is an error on MeS get token." do
+    active_merchant_stubs_store
+    sign_in @admin_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs_store(@credit_card.number, "117", "decline stubbed")
+    assert_difference('Membership.count', 0) do
+      assert_difference('EnrollmentInfo.count', 0)do
+        assert_difference('Transaction.count',0)do
+          assert_difference('MemberPreference.count',0) do 
+            assert_difference('Member.count',0) do
+              generate_post_message
+              assert_response :success
+            end
+          end
+        end
+      end
+    end
+  end
+
 end

@@ -98,21 +98,22 @@ class CreditCard < ActiveRecord::Base
     raise exc unless exc.nil?
   end
 
-  def get_token!(pgc = nil, first_name = nil, last_name = nil, allow_cc_blank = false)
+  def get_token(pgc = nil, first_name = nil, last_name = nil, allow_cc_blank = false)
     am = CreditCard.am_card(number, expire_month, expire_year, first_name || member.first_name, last_name || member.last_name)
     if am.valid?
       self.cc_type = am.type
-      self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
-    else
-      if allow_cc_blank
-        self.cc_type = 'unknown'
-        self.token = "a" # fixing this token for blank credit cards
-      else
-        self.errors[:number] << am.errors["number"].join(", ") unless am.errors["number"].empty?
-        self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
-        self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
-        raise "Credit card invalid"
+      begin
+        self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
+      rescue
+        self.errors[:number] << "An error was encountered while processing your request."
       end
+    elsif allow_cc_blank
+      self.cc_type = 'unknown'
+      self.token = "a" # fixing this token for blank credit cards
+    else
+      self.errors[:number] << am.errors["number"].join(", ") unless am.errors["number"].empty?
+      self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
+      self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
     end
   end
   
