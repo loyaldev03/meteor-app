@@ -420,17 +420,17 @@ class Member < ActiveRecord::Base
       return { :message => Settings.error_messages.club_is_not_enable_for_new_enrollments, :code => Settings.error_codes.club_is_not_enable_for_new_enrollments }      
     end
 
+    # credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
+    credit_card = CreditCard.new credit_card_params
+    begin
+      credit_card.get_token!(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], cc_blank)
+      credit_cards = CreditCard.joins(:member).where( :token => credit_card.token, :members => { :club_id => club.id } )
+    rescue Exception => e
+      credit_cards = []
+    end
+
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
-      # credit card exist?
-      credit_card = CreditCard.new credit_card_params
-      begin
-        credit_card.get_token!(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], cc_blank)
-        credit_cards = CreditCard.joins(:member).where( :token => credit_card.token, :members => { :club_id => club.id } )
-      rescue Exception => e
-        credit_cards = []
-      end
-
       if credit_cards.empty? or cc_blank
         member = Member.new
         member.update_member_data_by_params member_params
@@ -455,15 +455,9 @@ class Member < ActiveRecord::Base
       Auditory.audit(current_agent, tom, message, member, Settings.operation_types.member_email_blacklisted)
       return { :message => message, :code => Settings.error_codes.member_email_blacklisted, :errors => {:blacklisted => "Member is blacklisted"} }
     else
-      credit_card = CreditCard.new credit_card_params
       member.skip_api_sync! if member.api_id.present? || skip_api_sync
       member.update_member_data_by_params member_params
     end
-
-    if not cc_blank and credit_card_params[:number].blank?
-      message = Settings.error_messages.credit_card_blank
-      return { :message => message, :code => Settings.error_codes.credit_card_blank }
-    end   
 
     member.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
   end
