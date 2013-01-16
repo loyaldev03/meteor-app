@@ -43,7 +43,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     click_on 'Add club cash'
     
     alert_ok_js
-    fill_in '[amount]', :with => "15"  
+    fill_in 'club_cash_transaction[amount]', :with => "15"  
     click_on 'Save club cash transaction'
     within("#td_mi_club_cash_amount") { assert page.has_content?("15") }
 
@@ -54,7 +54,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     click_on 'Add club cash'
     
     alert_ok_js
-    fill_in '[amount]', :with => "-5"  
+    fill_in 'club_cash_transaction[amount]', :with => "-5"  
     click_on 'Save club cash transaction'
     within("#td_mi_club_cash_amount") { assert page.has_content?("10") }
 
@@ -81,13 +81,13 @@ class MembersClubCashTest < ActionController::IntegrationTest
     click_on 'Add club cash'
     
     alert_ok_js
-    fill_in '[amount]', :with => "15"  
+    fill_in 'club_cash_transaction[amount]', :with => "15"  
     click_on 'Save club cash transaction'
     
     within("#td_mi_club_cash_amount") { assert page.has_content?("15") }
 
     click_on 'Add club cash'
-    fill_in '[amount]', :with => "-20"
+    fill_in 'club_cash_transaction[amount]', :with => "-20"
     alert_ok_js
     click_on 'Save club cash transaction'
 
@@ -100,7 +100,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     click_on 'Add club cash'
 
-    fill_in '[amount]', :with => "random text"
+    fill_in 'club_cash_transaction[amount]', :with => "random text"
     alert_ok_js
     click_on 'Save club cash transaction'
 
@@ -114,7 +114,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     click_on 'Add club cash'
 
-    fill_in '[amount]', :with => "0"
+    fill_in 'club_cash_transaction[amount]', :with => "0"
     alert_ok_js
     click_on 'Save club cash transaction'
 
@@ -127,7 +127,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     click_on 'Add club cash'
-    fill_in '[amount]', :with => "0.99"
+    fill_in 'club_cash_transaction[amount]', :with => "0.99"
     alert_ok_js
     click_on 'Save club cash transaction'
 
@@ -166,7 +166,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     click_on 'Add club cash'
-    fill_in '[amount]', :with => "99"
+    fill_in 'club_cash_transaction[amount]', :with => "99"
     alert_ok_js
     click_on 'Save club cash transaction'
 
@@ -193,7 +193,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     click_on 'Add club cash'
-    fill_in '[amount]', :with => "99"
+    fill_in 'club_cash_transaction[amount]', :with => "99"
     alert_ok_js
     click_on 'Save club cash transaction'
 

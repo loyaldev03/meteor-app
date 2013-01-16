@@ -650,7 +650,7 @@ class Member < ActiveRecord::Base
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
     if amount.to_f == 0
       answer[:message] = "Can not process club cash transaction with amount 0 or letters." 
-      answer[:errors] = {:number => "Invalid number"} 
+      answer[:errors] = {:amount => "Invalid amount"} 
     elsif (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
       ClubCashTransaction.transaction do 
         cct = ClubCashTransaction.new(:amount => amount, :description => description)
