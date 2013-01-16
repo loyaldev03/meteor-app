@@ -150,10 +150,10 @@ class Transaction < ActiveRecord::Base
     if trans.success?
       sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
       sale_transaction.save
-      Auditory.audit(agent, trans, "Credit success $#{amount}", sale_transaction.member, Settings.operation_types.credit)
+      Auditory.audit(agent, trans, "Refund success $#{amount}", sale_transaction.member, Settings.operation_types.credit)
       Communication.deliver!(:refund, sale_transaction.member)
     else
-      Auditory.audit(agent, trans, "Credit $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
+      Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
     end
     answer
   end
