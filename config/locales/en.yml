@@ -143,6 +143,9 @@ en:
         gender: 'Gender'
         no_gender: 'No gender selected'
         member_notes: 'Member Notes'
+        phone_country_code: Country
+        phone_local_number: Number
+        phone_area_code: Area
         phone_number: 'Phone Number'
         type_of_phone_number: 'Type of phone number'
         id: 'Member id'
