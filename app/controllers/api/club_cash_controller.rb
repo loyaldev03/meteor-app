@@ -21,7 +21,7 @@ class Api::ClubCashController < ApplicationController
   def create
     member = Member.find(params[:member_id])
     my_authorize! :manage_club_cash_api, Member, member.club_id
-    render json: member.add_club_cash(current_agent,params[:amount],params[:description])
+    render json: member.add_club_cash(current_agent,params[:club_cash_transaction][:amount],params[:club_cash_transaction][:description])
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end
