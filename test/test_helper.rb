@@ -211,7 +211,10 @@ module ActionController
     within("#transactions") do 
       wait_until {
         assert page.has_selector?("#transactions_table")
-        assert page.has_content?("Sale : This transaction has been approved")
+        Transaction.all.each do |transaction|
+          assert page.has_content?(transaction.full_label.truncate(50))
+        end
+        # assert page.has_content?("Sale : This transaction has been approved")
         assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
       }
     end
@@ -238,7 +241,7 @@ module ActionController
       within("#operations_table") do 
         wait_until {
           assert page.has_content?("Communication 'Test refund' sent")
-          assert page.has_content?("Credit success $#{final_amount}")
+          assert page.has_content?("Refund success $#{final_amount}")
         }
       end
       within("#transactions_table") do 
