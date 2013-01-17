@@ -52,6 +52,5 @@ def load_reactivations
   end
 end
 
-
 load_save_the_sales
 load_reactivations

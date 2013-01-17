@@ -16,7 +16,7 @@ def load_refunds
         tz = Time.now.utc
         @log.info "  * processing Chargeback ##{refund.id}"
         begin
-# TODO: update refunded $$ on transactions
+          # TODO: update refunded $$ on transactions
           transaction = PhoenixTransaction.new
           transaction.member_id = @member.uuid
           transaction.terms_of_membership_id = @member.terms_of_membership_id
@@ -35,10 +35,10 @@ def load_refunds
           transaction.save!
 
           if refund.result == "Success"
-            add_operation(transaction.created_at, 'Transaction', transaction.id, "Credit success $#{transaction.amount}",
+            add_operation(transaction.created_at, 'Transaction', transaction.id, "Refund success $#{transaction.amount}",
                               Settings.operation_types.credit, transaction.created_at, transaction.updated_at)
           else
-            add_operation(transaction.created_at, 'Transaction', transaction.id, "Credit $#{transaction.amount} error: #{refund.result}",
+            add_operation(transaction.created_at, 'Transaction', transaction.id, "Refund $#{transaction.amount} error: #{refund.result}",
                               Settings.operation_types.credit_error, transaction.created_at, transaction.updated_at)
           end
           refund.update_attribute :imported_at, Time.now.utc

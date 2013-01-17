@@ -10,6 +10,7 @@ ActiveRecord::Base.logger = @log
 today = Date.today.year
 
 ActiveRecord::Base.connection.execute "update members set club_cash_amount = 0, club_cash_expire_date = NULL where club_id = #{CLUB}"
+ActiveRecord::Base.connection.execute "delete from club_cash_transactions where description = 'Imported club cash'"
 
 PhoenixMember.where(" status IN ('provisional', 'active') ").find_in_batches do |group|
   puts "cant #{group.count}"

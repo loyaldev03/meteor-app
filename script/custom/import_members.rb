@@ -14,13 +14,12 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.city = member.city
   phoenix.state = member.state
   phoenix.zip = member.zip
-  phoenix.country = (member.country.nil? ? 'US' : member.country)
-  phoenix.joint = member.joint
+  phoenix.country = member.country
   phoenix.birth_date = member.birth_date
-  if member.birth_date + 13.years > Date.today
-    phoenix.birth_date = nil
-  end
   phoenix.phone_number = member.phone
+  # phoenix.type_of_phone_number
+  phoenix.reactivation_times = member.phoenix_reactivations
+  # phoenix.gender
   phoenix.blacklisted = member.blacklisted
   phoenix.api_id = member.drupal_user_api_id
   phoenix.club_cash_expire_date = nil
@@ -36,10 +35,11 @@ def set_member_data(phoenix, member, merge_member = false)
     phoenix.member_since_date = convert_from_date_to_time(member.member_since_date)
   end
 end
+
 def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   e_info = PhoenixEnrollmentInfo.find_or_create_by_member_id(phoenix.id)
   campaign = BillingCampaign.find_by_id(member.campaign_id) if campaign.nil?
-  e_info.enrollment_amount = member.enrollment_amount_to_import2
+  e_info.enrollment_amount = member.enrollment_amount_to_import
   e_info.product_sku = campaign.product_sku
   e_info.product_description = campaign.product_description
   e_info.mega_channel = campaign.phoenix_mega_channel
@@ -48,6 +48,7 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   e_info.referral_host = campaign.referral_host
   e_info.landing_url = campaign.landing_url
   e_info.terms_of_membership_id = tom_id
+  # TODO: define preferences!!!! and desnormalize them
   e_info.preferences = {}.to_json
   e_info.created_at = member.created_at
   e_info.updated_at = member.updated_at
@@ -64,6 +65,7 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   e_info.joint = campaign.is_joint
   e_info.save
 end
+
 
 def fill_aus_attributes(cc, member)
   cc.aus_status = member.aus_status
@@ -82,9 +84,6 @@ def set_membership_data(tom_id, member)
   membership.updated_at = member.updated_at
   membership.member_id = @member.id
   membership.cancel_date = member.cancelled_at if @member.status == "lapsed"
-  if membership.changed.include?('status') and membership.status == "lapsed"
-    load_cancellation(membership.cancel_date)
-  end  
   membership.save!
   @member.current_membership_id = membership.id
   @member.save
@@ -93,15 +92,38 @@ def set_membership_data(tom_id, member)
   e_info.save
 end
 
+def set_member_bill_dates(member, phoenix)
+  next_bill_date = convert_from_date_to_time(member.cs_next_bill_date)
+  original_bill_date = member.original_next_bill_date.nil? ? next_bill_date : convert_from_date_to_time(member.original_next_bill_date)
+
+  if member.phoenix_status == 'active'
+    phoenix.bill_date, phoenix.next_retry_bill_date = original_bill_date, next_bill_date 
+  elsif member.phoenix_status == 'provisional'
+    phoenix.bill_date = original_bill_date 
+    phoenix.next_retry_bill_date = next_bill_date 
+    if @campaign.terms_of_membership_id.to_i == 365 
+      phoenix.bill_date = member.original_next_bill_date.nil? ? phoenix.join_date : convert_from_date_to_time(member.original_next_bill_date) 
+    end
+  else
+    phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
+  end  
+end
+
 
 # 1- update existing members
-def update_members(cid)
-  BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) and campaign_id = #{cid}" + 
-    " and is_prospect = false and phoenix_status IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
+def update_members
+  BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) " + 
+    " and is_prospect = false ").find_in_batches do |group|
     group.each do |member| 
     puts "cant #{group.count}"
       tz = Time.now.utc
       PhoenixProspect.transaction do 
+        get_campaign_and_tom_id(member.campaign_id)
+        if @tom_id.nil?
+          puts "CDId #{member.campaign_id} does not exist or TOM is empty"
+          next
+        end
+
         @log.info "  * processing member ##{member.id}"
         begin
           phoenix = PhoenixMember.find_by_club_id_and_visible_id(CLUB, member.id)
@@ -112,28 +134,12 @@ def update_members(cid)
           
           @member = phoenix
           set_member_data(phoenix, member)
-          add_enrollment_info(phoenix, member, tom_id)
-
-          if member.original_next_bill_date.nil?
-            phoenix.bill_date = convert_from_date_to_time(member.cs_next_bill_date)
-          else
-            phoenix.bill_date = convert_from_date_to_time(member.original_next_bill_date)
-          end
-          phoenix.next_retry_bill_date = convert_from_date_to_time(member.cs_next_bill_date)
-          if phoenix.status != "lapsed" and member.phoenix_status == "lapsed"
-            load_cancellation(@member.cancel_date)
-          end        
-          phoenix.status = member.phoenix_status
-          if member.phoenix_status == 'lapsed'
-            phoenix.recycled_times = 0
-            phoenix.cancel_date = convert_from_date_to_time(member.cancelled_at)
-            phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
-          end
-
+          add_enrollment_info(phoenix, member, @tom_id)
+          set_member_bill_dates(member, phoenix)
           phoenix.save!
 
           # create Membership data
-          set_membership_data(tom_id, member)
+          set_membership_data(@tom_id, member)
 
           unless TEST
             phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
@@ -144,11 +150,9 @@ def update_members(cid)
             if phoenix_cc.nil?
               @log.info "  * member ##{member.id} does not have Credit Card active"
               new_phoenix_cc.save!
-              set_last_digits(new_phoenix_cc.id)
-            elsif phoenix_cc.encrypted_number != member.encrypted_cc_number
+            elsif phoenix_cc.token != member.credit_card_token
               phoenix_cc.active = false
               new_phoenix_cc.save!
-              set_last_digits(new_phoenix_cc.id)
               phoenix_cc.save!
             else
               phoenix_cc.expire_month = member.cc_month_exp 
@@ -157,10 +161,9 @@ def update_members(cid)
               phoenix_cc.save!
             end
           end
-          if member.blacklisted
-            ccs = PhoenixCreditCard.find_by_member_id_and_blacklisted(phoenix.uuid, false)
-            ccs.each {|s| s.update_attribute :blacklisted, true }
-          end
+          
+          blacklist_ccs(member, phoenix)
+
           member.update_attribute :imported_at, Time.now.utc
         rescue Exception => e
           @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
@@ -175,32 +178,25 @@ end
 
 
 # 2- import new members.
-def add_new_members(cid)
-  @campaign = BillingCampaign.find_by_id(cid)
-  return if @campaign.nil?
+def add_new_members
 
-  if @campaign.phoenix_tom_id.nil?
-    tom_id = get_terms_of_membership_id(cid)
-    @campaign = BillingCampaign.find_by_id(cid)
-  else
-    tom_id = @campaign.phoenix_tom_id
-  end
-  if tom_id.nil?
-    puts "CDId #{cid} does not exist or TOM is empty"
-    return
-  end
-
-  BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0 and campaign_id = #{cid} " + 
+  BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0 " + 
      # " and id <= 13771771004 " + # uncomment this line if you want to import a single member.
-      " and (( phoenix_status = 'lapsed' and cancelled_at IS NOT NULL ) OR (phoenix_status != 'lapsed')) " +
-      " and phoenix_status IS NOT NULL and member_since_date IS NOT NULL and phoenix_join_date IS NOT NULL ").find_in_batches do |group|
+      " and credit_card_token IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
+      get_campaign_and_tom_id(member.campaign_id)
+      if @tom_id.nil?
+        puts "CDId #{member.campaign_id} does not exist or TOM is empty"
+        next
+      end
+
       tz = Time.now.utc
       # transactions between databases does not work
       #PhoenixMember.transaction do 
       @log.info "  * processing member ##{member.id}"
       begin
+
         # validate if email already exist
         phoenix = PhoenixMember.find_by_email_and_club_id member.email_to_import, CLUB
         unless phoenix.nil?
@@ -212,37 +208,24 @@ def add_new_members(cid)
         phoenix.club_id = CLUB
         phoenix.visible_id = member.id
         set_member_data(phoenix, member)
-        next_bill_date = convert_from_date_to_time(member.cs_next_bill_date)
         phoenix.status = member.phoenix_status
-        if member.phoenix_status == 'active'
-          phoenix.bill_date = next_bill_date 
-          phoenix.next_retry_bill_date = next_bill_date 
-        elsif member.phoenix_status == 'provisional'
-          phoenix.bill_date = next_bill_date 
-          phoenix.next_retry_bill_date = next_bill_date 
-        else
-          phoenix.recycled_times = 0
-          phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
-        end
+        phoenix.recycled_times = 0
+        set_member_bill_dates(member, phoenix)
         phoenix.save!
 
         @member = phoenix
-        add_enrollment_info(phoenix, member, tom_id, @campaign)
+        add_enrollment_info(phoenix, member,@tom_id, @campaign)
         add_operation(Time.now.utc, nil, nil, "Member imported into phoenix!", nil)  
 
         # create CC
         phoenix_cc = PhoenixCreditCard.new 
         fill_credit_card(phoenix_cc, member, phoenix)
         phoenix_cc.save!
-        set_last_digits(phoenix_cc.id)
 
         # create Membership data
-        set_membership_data(tom_id, member)
+        set_membership_data(@tom_id, member)
 
-        if member.blacklisted
-          ccs = PhoenixCreditCard.find_by_member_id_and_blacklisted(phoenix.uuid, false)
-          ccs.each {|s| s.update_attribute :blacklisted, true }
-        end
+        blacklist_ccs(member, phoenix)
 
         member.update_attribute :imported_at, Time.now.utc
         print "."
@@ -257,32 +240,31 @@ def add_new_members(cid)
   end
 end
 
-# the only way I found to set correctly the last digits of the cc number
-def set_last_digits(id)
-  c = PhoenixCreditCard.find id
-  c.last_digits = c.number[-4..-1]
-  c.save
+def blacklist_ccs(member, phoenix)
+  if member.blacklisted
+    ccs = PhoenixCreditCard.find_by_member_id_and_blacklisted(phoenix.uuid, false)
+    ccs.each {|s| s.update_attribute :blacklisted, true }
+  end  
 end
 
-
 def fill_credit_card(phoenix_cc, member, phoenix)
-  phoenix_cc.number = CREDIT_CARD_NULL
-  if not TEST and not member.encrypted_cc_number.nil?
-    phoenix_cc.encrypted_number = member.encrypted_cc_number
+  phoenix_cc.token = CREDIT_CARD_NULL
+  if not TEST and not member.credit_card_token.nil?
+    phoenix_cc.token = member.credit_card_token
   end
   phoenix_cc.expire_month = member.cc_month_exp
   phoenix_cc.expire_year = member.cc_year_exp
   phoenix_cc.created_at = member.created_at
+  phoenix_cc.cc_type = member.credit_card_type
+  phoenix_cc.last_digits = member.credit_card_last_digits
   phoenix_cc.updated_at = member.updated_at
   fill_aus_attributes(phoenix_cc, member)
   phoenix_cc.member_id = phoenix.uuid
 end
 
 
-@cids.each do |cid|
-  # if we use load_duplicated_emails , update_members will override changes.
-  # update_members
+# if we use load_duplicated_emails , update_members will override changes.
+# update_members
 
-  add_new_members(cid)
-end
+add_new_members
 

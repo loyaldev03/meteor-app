@@ -1085,7 +1085,7 @@ class Member < ActiveRecord::Base
       self.recycled_times = 0
       self.save(:validate => false)
       Communication.deliver!(:cancellation, self)
-      Auditory.audit(nil, self, "Member canceled", self, Settings.operation_types.cancel)
+      Auditory.audit(nil, current_membership, "Member canceled", self, Settings.operation_types.cancel)
     end
 
     def propagate_membership_data
