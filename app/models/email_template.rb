@@ -10,7 +10,9 @@ class EmailTemplate < ActiveRecord::Base
     :refund, # sent when CS does a refund.
     :birthday, # sent if birthday is on enrollment_info
     :pillar, # emails sent after join date and active status. they use days_after_join_date attribute
-    :pillar_provisional # emails sent after join date and provisional status. they use days_after_join_date attribute
+    :pillar_provisional, # emails sent after join date and provisional status. they use days_after_join_date attribute
+    :hard_decline, # emails sent when hard decline happens
+    :soft_decline # emails sent when soft decline happens  
   ]
 
   validates :name, :template_type, :terms_of_membership_id, :presence => :true

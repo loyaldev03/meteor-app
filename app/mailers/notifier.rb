@@ -56,5 +56,15 @@ class Notifier < ActionMailer::Base
     mail :to => Settings.email_to_use_on_duplicated_email_sync_error,
          :subject => "[#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )} - Duplicated email sync error."
   end
+
+  def hard_decline(member)
+    @member = member
+    mail :to => member.email, :subject => "Membership cancellation [#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )}"
+  end
+
+  def soft_decline(member)
+    @member = member
+    mail :to => member.email, :subject => "Membership cancellation [#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )}"
+  end
 end
  
