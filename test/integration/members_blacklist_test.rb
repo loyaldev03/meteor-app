@@ -60,8 +60,8 @@ class MembersBlacklistTest < ActionController::IntegrationTest
 
     within("#table_credit_card") {  
       fill_in 'member[credit_card][number]', :with => @number
-      fill_in 'member[credit_card][expire_month]', :with => "#{bl_credit_card.expire_month}"
-      fill_in 'member[credit_card][expire_year]', :with => "#{bl_credit_card.expire_year}"
+      select bl_credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
+      select bl_credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
     }
     
     alert_ok_js
