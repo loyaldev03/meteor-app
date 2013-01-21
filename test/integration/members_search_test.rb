@@ -145,8 +145,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#table_credit_card")do
       wait_until{
         fill_in 'member[credit_card][number]', :with => credit_card.number
-        fill_in 'member[credit_card][expire_year]', :with => credit_card.expire_year
-        fill_in 'member[credit_card][expire_month]', :with => credit_card.expire_month
+        select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
+        select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
       }
     end
     alert_ok_js

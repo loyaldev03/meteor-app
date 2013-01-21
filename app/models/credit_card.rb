@@ -105,7 +105,7 @@ class CreditCard < ActiveRecord::Base
       begin
         self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
       rescue
-        self.errors[:number] << "An error was encountered while processing your request."
+        self.errors[:number] << Settings.error_messages.get_token_mes_error
       end
     elsif allow_cc_blank
       self.cc_type = 'unknown'

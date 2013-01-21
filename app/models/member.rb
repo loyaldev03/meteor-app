@@ -1139,9 +1139,11 @@ class Member < ActiveRecord::Base
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_hard_decline)
         self.cancel! Time.zone.now, "HD cancellation"
         set_as_canceled!
+        Communication.deliver!(:hard_decline, self)
       else
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_soft_decline)
         increment!(:recycled_times, 1)
+        Communication.deliver!(:soft_decline, self)
       end
       message
     end

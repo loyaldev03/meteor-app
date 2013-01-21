@@ -6,11 +6,15 @@ class CreditCardsController < ApplicationController
   def new
     @credit_card = CreditCard.new
     @actual_credit_card = @current_member.active_credit_card
+    @months = 1..12
+    @years = Time.zone.now.year.upto(Time.zone.now.year+20).to_a
   end
 
   def create
     @credit_card = CreditCard.new(params[:credit_card])
     @credit_card.member_id = @current_member.id
+    @months = 1..12
+    @years = Time.zone.now.year.upto(Time.zone.now.year+20).to_a
 
     response = @current_member.update_credit_card_from_drupal(params[:credit_card], @current_agent)
 

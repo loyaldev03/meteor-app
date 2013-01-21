@@ -57,12 +57,16 @@ class MembersController < ApplicationController
     @credit_card = @member.credit_cards.build
     @terms_of_memberships = TermsOfMembership.where(:club_id => @current_club )
     @enrollment_info = @member.enrollment_infos.build
+    @months = 1..12
+    @years = Time.zone.now.year.upto(Time.zone.now.year+20).to_a
   end
 
   def edit  
     @member = @current_member
     @member_group_types = MemberGroupType.find_all_by_club_id(@current_club)
     @country = Carmen::Country.coded(@member.country)
+    @months = 1..12
+    @years = Time.zone.now.year.upto(Time.zone.now.year+20).to_a
   end
 
   def save_the_sale

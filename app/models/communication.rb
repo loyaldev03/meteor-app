@@ -80,6 +80,10 @@ class Communication < ActiveRecord::Base
       Notifier.pillar(email).deliver!
     when :pillar_provisional
       Notifier.pillar_provisional(email).deliver!
+    when :hard_decline
+      Notifier.hard_decline(member).deliver!
+    when :soft_decline
+      Notifier.soft_decline(member).deliver!
     else
       message = "Deliver action could not be done."
       Airbrake.notify(:error_class => "Communication Delivery", :error_message => message, :parameters => { :member => member.inspect, :communication => self.inspect })

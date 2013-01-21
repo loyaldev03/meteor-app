@@ -26,70 +26,128 @@ class MembersBillTest < ActionController::IntegrationTest
     
     sign_in_as(@admin_agent)
 
-    unsaved_member = FactoryGirl.build(:member_with_cc, 
-        :club_id => @club.id)
-
-    @number = "4012301230123010"
-    @last_digits = @number[-4..4] 
-
-    create_new_member(unsaved_member)
-
-    @saved_member = Member.last
+    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
+    @saved_member = create_member(unsaved_member)
   end
 
   ############################################################
   # UTILS
   ############################################################
 
-  def create_new_member(unsaved_member)
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_on 'New Member'
-
-    within("#table_demographic_information") {
-      fill_in 'member[first_name]', :with => unsaved_member.first_name
-      fill_in 'member[last_name]', :with => unsaved_member.last_name
-      fill_in 'member[city]', :with => unsaved_member.city
-      fill_in 'member[address]', :with => unsaved_member.address
-      fill_in 'member[zip]', :with => unsaved_member.zip
-      # select_country_and_state(unsaved_member.country)
-      if unsaved_member.country == "US"
-        select('United States', :from => 'member[country]')
-        within('#states_td'){ select('Alabama', :from => 'member[state]') }
-      else
-        select('Canada', :from => 'member[country]')
-        within('#states_td'){ select('Manitoba', :from => 'member[state]') }
+  def fill_in_credit_card_info(credit_card, cc_blank = false)
+    if cc_blank 
+      active_merchant_stubs_store("0000000000")
+      within("#table_credit_card")do
+        check "setter[cc_blank]"
       end
-      select('M', :from => 'member[gender]')
-      select('United States', :from => 'member[country]')
-    }
+    else
+      active_merchant_stubs_store(credit_card.number)
+      within("#table_credit_card")do
+        wait_until{
+          fill_in 'member[credit_card][number]', :with => credit_card.number
+          select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
+          select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
+        }
+      end
+    end
+  end
+
+  def fill_in_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
+    credit_card = FactoryGirl.build(:credit_card_master_card) if credit_card.nil?
+
+    type_of_phone_number = (unsaved_member[:type_of_phone_number].blank? ? '' : unsaved_member.type_of_phone_number.capitalize)
+
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select(unsaved_member.gender, :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        select_country_and_state(unsaved_member.country) 
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
 
     page.execute_script("window.jQuery('#member_birth_date').next().click()")
     within(".ui-datepicker-calendar") do
       click_on("1")
     end
-
-    within("#table_contact_information") {
-      fill_in 'member[email]', :with => unsaved_member.email
-      fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-      fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-      fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-      select('Home', :from => 'member[type_of_phone_number]')
-      select(@terms_of_membership_with_gateway.name, :from => 'member[terms_of_membership_id]')
-    }
-
-    active_merchant_stubs_store(unsaved_member.active_credit_card.number)
-
-    within("#table_credit_card") {  
-      fill_in 'member[credit_card][number]', :with => "#{@number}"
-      fill_in 'member[credit_card][expire_month]', :with => "#{unsaved_member.active_credit_card.expire_month}"
-      fill_in 'member[credit_card][expire_year]', :with => "#{unsaved_member.active_credit_card.expire_year}"
-    }
     
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(type_of_phone_number, :from => 'member[type_of_phone_number]')
+        fill_in 'member[email]', :with => unsaved_member.email 
+      }
+    end
+
+    if approval        
+        within("#table_contact_information")do
+        wait_until{
+          select("test-approval", :from => 'member[terms_of_membership_id]') 
+        }
+      end     
+    end 
+
+    fill_in_credit_card_info(credit_card, cc_blank)
+
+    unless unsaved_member.external_id.nil?
+      fill_in 'member[external_id]', :with => unsaved_member.external_id
+    end 
+
     alert_ok_js
 
     click_link_or_button 'Create Member'
-    sleep(5) #Wait for API response
   end
+
+  def create_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
+    fill_in_member(unsaved_member,credit_card,approval,cc_blank)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    Member.find_by_email(unsaved_member.email)
+  end
+
+  def make_a_refund(transaction, amount, check_refund = true)
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => transaction.id)
+    fill_in 'refund_amount', :with => amount.to_s  
+  
+    alert_ok_js      
+    click_on 'Refund'
+
+    if check_refund
+      wait_until{ page.has_content?("This transaction has been approved") }
+      within(".nav-tabs") do
+        click_on("Operations")
+      end
+      within("#operations_table")do
+        assert page.has_content?("Communication 'Test refund' sent")
+        wait_until{ assert page.has_content?("Refund success $#{amount.to_f}") }
+      end
+    end
+
+  end
+
+  def change_next_bill_date(date)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    click_link_or_button 'Change'
+    wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
+
+    unless date.nil?
+      page.execute_script("window.jQuery('#next_bill_date').next().click()")
+
+      within("#ui-datepicker-div") do
+        wait_until { click_on(date.to_s) }
+      end
+    end
+    click_link_or_button 'Change next bill date'
+  end
+
 
 
 #   ############################################################
@@ -115,20 +173,21 @@ class MembersBillTest < ActionController::IntegrationTest
     bill_member(@saved_member, false)
   end 
 
+  # Does not work. We have to check fulfillment first. 
   # test "create a member + bill + check fultillment" do
   #   active_merchant_stubs
   #   setup_member
   #   @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-  #   @saved_member.current_membership.enrollment_info.update_attribute(:product_sku, "kit-card")
+  #   @saved_member.current_membership.enrollment_info.update_attribute(:product_sku, "kit-kard")
   #   @saved_member.send_fulfillment
 
   #   bill_member(@saved_member, false)
-    
+  #   within(".nav-tabs") do
+  #     click_on("Fulfillments")
+  #   end
   #   within("#fulfillments") do 
   #     wait_until {
-  #       puts @saved_member.current_membership.enrollment_info.product_sku 
-  #       assert page.has_content?("not_processed")
-  #       assert page.has_content?("kit-card")
+  #       assert page.has_content?("kit-kard")
   #     }
   #   end
   # end
@@ -138,10 +197,9 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     bill_member(@saved_member, false)
     
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
-    fill_in 'refund_amount', :with => "99999999"   
-      
-    click_on 'Refund'
+    assert_difference('Transaction.count', 0) do 
+      make_a_refund(Transaction.last, 999999, false)
+    end
     assert page.has_content?("Cant credit more $ than the original transaction amount")
   end
  
@@ -151,11 +209,9 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     bill_member(@saved_member, true, (@terms_of_membership_with_gateway.installment_amount / 2))
     
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
-    fill_in 'refund_amount', :with => ((@terms_of_membership_with_gateway.installment_amount / 2) + 1).to_s      
-    
+    amount_to_refund = (@terms_of_membership_with_gateway.installment_amount / 2) + 1
     assert_difference('Transaction.count', 0) do 
-      click_on 'Refund'
+      make_a_refund(Transaction.last, amount_to_refund, false)
     end
     assert page.has_content?("Cant credit more $ than the original transaction amount")
   end
@@ -172,17 +228,8 @@ class MembersBillTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
 
     bill_member(@saved_member, true, final_amount)
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
-    fill_in 'refund_amount', :with => final_amount.to_s
     assert_difference('Transaction.count') do 
-      click_on 'Refund'
-    end
-    
-    within("#operations_table") do 
-      wait_until {
-        assert page.has_content?("Communication 'Test refund' sent")
-        assert page.has_content?("Credit success $#{final_amount}")
-      }
+      make_a_refund(Transaction.last, final_amount)
     end
   end 
 
@@ -191,13 +238,9 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     bill_member(@saved_member, false)
     
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
-    fill_in 'refund_amount', :with => "&%$"
-    alert_ok_js
     assert_difference('Transaction.count', 0) do 
-      click_on 'Refund'
+      make_a_refund(Transaction.last, "&%$", false)
     end
-    
   end
 
   test "Change member from Provisional (trial) status to Lapse (inactive) status" do
@@ -242,34 +285,22 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled
     @saved_member.recover(@terms_of_membership_with_gateway)
     @saved_member.set_as_active
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
-    click_link_or_button 'Change'
-    wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
+    change_next_bill_date(nil)
 
-    click_link_or_button 'Change next bill date'
     wait_until{ assert page.has_content?(Settings.error_messages.next_bill_date_blank) }
   end  
-
 
   test "Change Next Bill Date for tomorrow" do
     setup_member
     @saved_member.set_as_canceled
-    @saved_member.recover(@terms_of_membership_with_gateway)
-    @saved_member.set_as_active
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    @saved_member.recover(@terms_of_membership_with_gateway) 
+   @saved_member.set_as_active
+
+    next_bill_date = Time.zone.now + 1.day
+    change_next_bill_date(next_bill_date.day)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
-    click_link_or_button 'Change'
-    wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
-    page.execute_script("window.jQuery('#next_bill_date').next().click()")
-    within("#ui-datepicker-div") do
-      wait_until { click_on("#{(Time.zone.now+1.day).day}") }
-    end
-    click_link_or_button 'Change next bill date'
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    next_bill_date = Time.zone.now + 1.day
     within("#td_mi_next_retry_bill_date")do
       wait_until{ assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
     end
@@ -290,10 +321,18 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Successful payment." do
     setup_member
     @saved_member.current_membership.join_date = Time.zone.now-3.day
+    
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within(".nav-tabs") do
+      click_on("Operations")
+    end
+    within("#operations_table")do
+      wait_until{ assert page.has_content?("Member billed successfully $100.0 Transaction id: #{Transaction.last.id}") }
+    end
   end  
 
   test "Provisional member" do
@@ -334,23 +373,9 @@ class MembersBillTest < ActionController::IntegrationTest
       click_on("Transactions")
     end
     within("#transactions_table_wrapper")do
-      wait_until{
-        assert page.has_selector?('#refund')
-        click_link_or_button("Refund")
-      }
-    end
-    wait_until{ fill_in 'refund_amount', :with => final_amount }
-    click_link_or_button 'Refund'
-
-    wait_until{ page.has_content?("This transaction has been approved") }
-
-    within(".nav-tabs") do
-      click_on("Operations")
-    end
-    within("#operations_table")do
-      wait_until{ assert page.has_content?("Credit success $#{final_amount.to_f}") }
-      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed)) }
-    end
+      wait_until{ assert page.has_selector?('#refund') }
+    end    
+    make_a_refund(Transaction.last, final_amount)
   end 
 
   test "Partial refund from CS" do
@@ -364,26 +389,13 @@ class MembersBillTest < ActionController::IntegrationTest
       click_on("Transactions")
     end
     within("#transactions_table_wrapper")do
-      wait_until{
-        assert page.has_selector?('#refund')
-        click_link_or_button("Refund")
-      }
+      wait_until{ assert page.has_selector?('#refund') }
     end
-    wait_until{ fill_in 'refund_amount', :with => final_amount }
-    click_link_or_button 'Refund'
+    make_a_refund(Transaction.last, final_amount)
 
     wait_until{ page.has_content?("This transaction has been approved") }
-
-    within(".nav-tabs") do
-      click_on("Operations")
-    end
-    within("#operations_table")do
-      wait_until{ assert page.has_content?("Credit success $#{final_amount.to_f}") }
-      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed)) }
-    end
   end 
 
-  #Refund a transaction with error
   test "Refund a transaction with error" do
     setup_member
     @terms_of_membership_with_gateway.update_attribute(:installment_amount, 45.56)
@@ -441,7 +453,6 @@ class MembersBillTest < ActionController::IntegrationTest
     end
   end 
 
-  #See operations on CS
   test "See operations on CS" do
     setup_member
     @saved_member.current_membership.join_date = Time.zone.now-3.day
@@ -455,13 +466,9 @@ class MembersBillTest < ActionController::IntegrationTest
     within("#transactions_table_wrapper")do
       wait_until{
         assert page.has_selector?('#refund')
-        click_link_or_button("Refund")
       }
     end
-    wait_until{ fill_in 'refund_amount', :with => final_amount }
-    click_link_or_button 'Refund'
-
-    wait_until{ page.has_content?("This transaction has been approved") }
+    make_a_refund(Transaction.last, final_amount, true)
 
     visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
 
@@ -474,13 +481,12 @@ class MembersBillTest < ActionController::IntegrationTest
     within("#operations_table")do
       wait_until{ assert page.has_content?("Member enrolled successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-") }
       wait_until{ assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") }
-      wait_until{ assert page.has_content?("Credit success $#{final_amount.to_f}") }
+      wait_until{ assert page.has_content?("Refund success $#{final_amount.to_f}") }
       wait_until{ assert page.has_content?("Full save done") }
       wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed)) }
     end
   end 
 
-  #Send Prebill email (7 days before NBD)
   test "Send Prebill email (7 days before NBD)" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)

@@ -82,6 +82,7 @@ defaults: &defaults
     next_bill_date_blank: "Next bill date should not be blank."
     member_already_active: "Membership already exists for this email address. Contact Member Services if you would like more information at: xxx-xxx-xxxx."
     unrecoverable_error: "We cant process your join now. Contact Member Services if you would like more information at: xxx-xxx-xxxx."
+    get_token_mes_error: "An error was encountered while processing your request."
     club_is_not_enable_for_new_enrollments: "We are not accepting new enrollments at this time. Please call member services at: xxx-xxx-xxxx."
   error_codes:
     success: '000'

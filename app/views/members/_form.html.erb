@@ -204,15 +204,13 @@
               <%= credit_card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline required_asterick' %> 
             </th>
             <td> 
-              <%= credit_card.text_field :expire_month, :class => 'text_field input-medium',
-                                  :name => "member[credit_card][expire_month]" %>
+              <%= credit_card.select :expire_month, @months, :class => 'text_field input-small', :name => "member[credit_card][expire_month]", :include_blank => true  %>
             </td>  
             <th>
               <%= credit_card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline required_asterick' %>
             </th>
             <td> 
-              <%= credit_card.text_field :expire_year, :class => 'text_field input-small',
-                                   :name => "member[credit_card][expire_year]" %>
+              <%= credit_card.select :expire_year, @years, :class => 'text_field input-small', :name => "member[credit_card][expire_year]", :include_blank => true  %>
             </td>  
           </tr>
         </table>
