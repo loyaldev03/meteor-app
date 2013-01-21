@@ -13,6 +13,7 @@ class Club < ActiveRecord::Base
   has_many :agents,
     through: :club_roles,
     uniq: true
+  has_many :fulfillment_files
 
   belongs_to :api_domain,
     class_name:  'Domain',

@@ -16,6 +16,7 @@ class Agent < ActiveRecord::Base
 
   has_many :created_members, :class_name => 'Membership'
   has_many :operations
+  has_many :fulfillment_files
 
   # Virtual attribute for authenticating by either username or email
   # This is in addition to a real persisted field like 'username'

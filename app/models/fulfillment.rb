@@ -11,6 +11,7 @@ class Fulfillment < ActiveRecord::Base
   attr_accessible :product_sku
 
   belongs_to :member
+  has_and_belongs_to_many :fulfillment_files
 
   before_create :set_default_values
 
