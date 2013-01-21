@@ -135,7 +135,7 @@ class Transaction < ActiveRecord::Base
     sale_transaction = Transaction.find_by_uuid sale_transaction_id, :lock => true
     trans = Transaction.new
     if amount <= 0.0
-      return { :message => Settings.error_messages.credit_amount_invalid, :code => Settings.error_codes.credit_amount_invalid }
+      return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
     elsif sale_transaction.amount == amount
       trans.transaction_type = "refund"
       trans.refund_response_transaction_id = sale_transaction.response_transaction_id
@@ -143,7 +143,7 @@ class Transaction < ActiveRecord::Base
       trans.transaction_type = "credit"
     end
     if sale_transaction.amount_available_to_refund < amount
-      return { :message => Settings.error_messages.refund_invalid, :code => Settings.error_codes.refund_invalid }
+      return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
     end
     trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
     answer = trans.process
@@ -180,7 +180,7 @@ class Transaction < ActiveRecord::Base
 
     def credit
       if payment_gateway_configuration.nil?
-        { :message => Settings.error_messages.credit_card_blank_with_grace, :code => Settings.error_codes.credit_card_blank_with_grace }
+        { :message => I18n.t('error_messages.credit_card_blank_with_grace'), :code => Settings.error_codes.credit_card_blank_with_grace }
       else
         load_gateway
         a = (amount.to_f * 100)
@@ -226,7 +226,7 @@ class Transaction < ActiveRecord::Base
       if answer.params and answer.params[:duplicate]=="true"
         # we keep this if, just because it was on Litle version (compatibility).
         # MeS seems to not send this param
-        { :message => "#{Settings.error_messages.duplicate_transaction} #{response.params[:response]}", :code => Settings.error_codes.duplicate_transaction }
+        { :message => I18n.t('error_messages.duplicate_transaction', :response => response.params[:response]), :code => Settings.error_codes.duplicate_transaction }
       elsif answer.success?
         unless self.credit_card.nil?
           self.credit_card.accepted_on_billing

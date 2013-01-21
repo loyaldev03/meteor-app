@@ -59,31 +59,6 @@ defaults: &defaults
     pillar_provisional_email: 305
     #other
     others: 1000
-  error_messages:
-    member_data_invalid: "Member data is invalid."
-    credit_card_blacklisted: "Unfortunately, there was a problem processing your credit card. Please call member services at: xxx-xxx-xxxx."
-    member_email_blacklisted: "There was a problem processing your enrollment. Please call member services at: xxx-xxx-xxxx."
-    credit_card_blank: "There was an error with your credit card information. Please verify your information and resubmit."
-    cant_recover_member: "There was a problem processing your enrollment. Please call member services at: xxx-xxx-xxxx."
-    invalid_credit_card: "There was an error with your credit card information. Please verify your information and resubmit."
-    blacklisted: "There was a problem processing your enrollment. Please call member services at: xxx-xxx-xxxx."
-    member_not_saved: "There was a problem processing your enrollment. Please call member services at: xxx-xxx-xxxx."
-    member_set_wrong_address_error: "Could not set member's address as undeliverable."
-    member_already_set_wrong_address: "Member's address already set as wrong address."
-    member_set_as_blacklisted: "Operation cannot be done. Member is set as blacklisted"
-    credit_card_in_use: "We're sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: xxx-xxx-xxxx."
-    expired_credit_card: "Credit card to activate is expired."
-    fulfillment_out_of_stock: "Product does not have stock."
-    fulfillment_error: "Could not be marked as sent."
-    credit_amount_invalid: "Credit amount must be a positive number."
-    refund_invalid: "Cant credit more $ than the original transaction amount"
-    credit_card_blank_with_grace: "Payment gateway not found."
-    duplicate_transaction: "Duplicated Transaction:"
-    next_bill_date_blank: "Next bill date should not be blank."
-    member_already_active: "Membership already exists for this email address. Contact Member Services if you would like more information at: xxx-xxx-xxxx."
-    unrecoverable_error: "We cant process your join now. Contact Member Services if you would like more information at: xxx-xxx-xxxx."
-    get_token_mes_error: "An error was encountered while processing your request."
-    club_is_not_enable_for_new_enrollments: "We are not accepting new enrollments at this time. Please call member services at: xxx-xxx-xxxx."
   error_codes:
     success: '000'
     not_found: '401'
