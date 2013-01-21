@@ -108,7 +108,6 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     assert active_credit_card.blacklisted == true
   end
 
-
   test "blacklist member with CC" do
     setup_member
     blacklist_member(@saved_member,@member_blacklist_reason.name)
@@ -133,7 +132,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     create_new_member(unsaved_member, bl_credit_card, unsaved_member.email, @partner, @club, @terms_of_membership_with_gateway)
 
-    wait_until { assert page.has_content?(Settings.error_messages.credit_card_blacklisted) }
+    wait_until { assert page.has_content?(I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => @club.cs_phone_number)) }
     assert Member.count == 1
   end
 
@@ -146,7 +145,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id, :email => bl_email)
     create_new_member(unsaved_member, unsaved_member.credit_cards.first, bl_email, @partner, @club, @terms_of_membership_with_gateway)
 
-    wait_until { assert page.has_content?(Settings.error_messages.member_email_blacklisted) }
+    wait_until { assert page.has_content?(I18n.t('error_messages.member_email_blacklisted', :cs_phone_number => @club.cs_phone_number)) }
     assert Member.count == 1
   end
 
@@ -204,5 +203,4 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     wait_until { assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
     wait_until { assert find(:xpath, "//a[@id='blacklist_btn' and @disabled='disabled']") }
   end
-
 end

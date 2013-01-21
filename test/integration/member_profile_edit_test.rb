@@ -995,7 +995,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
 
     click_link_or_button 'Change next bill date'
-    wait_until{ assert page.has_content?(Settings.error_messages.next_bill_date_blank) }
+    wait_until{ assert page.has_content?(I18n.t('error_messages.next_bill_date_blank')) }
   end  
 
   test "Change Next Bill Date for tomorrow" do
