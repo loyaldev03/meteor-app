@@ -3,10 +3,7 @@ class FulfillmentsController < ApplicationController
 
   def index
     my_authorize! :report, Fulfillment, @current_club.id
-    # TODO: remove canceeled
-    @possible_status = Fulfillment.state_machines[:status].states.map(&:name)
     if request.post?
-
     	if params[:all_times] == '1'
         if params[:product_type] == 'KIT-CARD'
     		  @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_kit_card
@@ -51,6 +48,12 @@ class FulfillmentsController < ApplicationController
   #   render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
   # end
 
+
+  def list_for_file
+    @file = FulfillmentFile.find(params[:fulfillment_file_id])
+    @fulfillments = @file.fulfillments
+    render :index
+  end
 
   def generate_xls
     my_authorize! :report, Fulfillment, @current_club.id

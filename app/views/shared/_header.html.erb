@@ -33,6 +33,29 @@
             </li>
           </ul>
 
+          <% unless @current_club.nil? %>
+            <ul class="nav pull-right">
+              <li class="divider-vertical"></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= @current_club.name %><b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <% if @current_agent.can? :read, Member, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.members'), members_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, Product, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.products'), products_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, Fulfillment, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.fulfillments'), fulfillments_index_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, Fulfillment, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.fulfillment_files'), list_fulfillment_files_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                </ul>
+              </li>
+            </ul>
+          <% end %>
+
 
           <ul class="nav">
             <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
@@ -49,7 +72,6 @@
                 <%=  %>
             </li>
           </ul>
-
 
         </div><!--/.nav-collapse -->
       <% end %>           

@@ -111,6 +111,7 @@ en:
       members: 'Members'
       products: 'Products'
       fulfillments: 'Fulfillments'
+      fulfillment_files: 'Fulfillment Files'
     member: 'Member'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'

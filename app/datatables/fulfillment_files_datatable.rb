@@ -13,8 +13,13 @@ private
     files.map do |file|
       [ 
         file.id, 
+        link_to( I18n.l(file.created_at.to_date), @url_helpers.download_xls_fulfillments_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn"),
+        link_to("View", @url_helpers.fulfillment_list_for_file_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn"),
         file.status, 
-        file.product
+        file.product,
+        file.dates,
+        file.fulfillments_processed,
+        "button to mark as sent :)"
       ]
     end
   end
@@ -24,12 +29,7 @@ private
   end
 
   def fetch_files
-    files = FulfillmentFile.order("#{sort_column} #{sort_direction}").where('agent_id' => @current_agent)
+    files = FulfillmentFile.order("status ASC, created_at DESC").where('agent_id' => @current_agent)
     files.page(page).per_page(per_page)
   end
-
-  def sort_column
-    FulfillmentFile.datatable_columns[params[:iSortCol_0].to_i]
-  end
-
 end    

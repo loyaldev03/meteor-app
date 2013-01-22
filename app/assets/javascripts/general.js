@@ -397,15 +397,15 @@ $(document).ready( function() {
     });
   }
 
-  function fulfillment_files_functions(column_count) {
+  function fulfillment_files_functions() {
     $('#fulfillment_files_table').dataTable({
       "oLanguage": {"sSearch": "Filtered by:"},
       "bJQueryUI": false,
       "bProcessing": true,
       "sPaginationType": "bootstrap",
       "bServerSide": true,
-      "aaSorting": [[ 0, "desc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
+      "bSort": false,
+      "bFilter": false,
       "sAjaxSource": $('#fulfillment_files_table').data('source')
     });
     $('.dataTables_filter').hide();
@@ -503,7 +503,7 @@ $(document).ready( function() {
           // update status 
           $.ajax({
             type: 'PUT',
-            url: "fulfillments/"+fuls[x].value+"/update_status",
+            url: "/fulfillment/"+fuls[x].value+"/update_status",
             data: $(this).serialize(),
             dataType: 'json',
             success: function(data) {

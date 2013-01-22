@@ -6,8 +6,7 @@
       <tr>
         <td colspan="8">
           <%= label :status, t('activerecord.attributes.fulfillment.new_status'), :class => 'help-inline' %>
-          <%= select_tag :new_status, options_for_select(['']+@possible_status, :selected => params[:new_status]),
-                            :class => 'select_field input-medium' %>  
+          <%= fulfillment_selectable_statuses(:new_status, params[:new_status], true) %>
           <%= text_field_tag "reason", nil, :class => 'text_field input-medium', :placeholder => t('reason') %>
           <%= link_to t('buttons.update_fulfillment_status'), "#", :class => 'btn btn-primary', :id => 'update_fulfillment_status' %>
         </td>

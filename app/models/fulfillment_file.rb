@@ -15,8 +15,12 @@ class FulfillmentFile < ActiveRecord::Base
     state :sent 
   end
 
-  def self.datatable_columns
-    ['id', 'status', 'product' ]
+  def dates
+    self.all_times ? "All times" : "from #{self.initial_date} to #{self.end_date}"
+  end
+
+  def fulfillments_processed
+    [ fulfillments.where_processing.count, fulfillments.count ].join(' / ')
   end
 
 end
