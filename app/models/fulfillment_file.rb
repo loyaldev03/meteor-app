@@ -15,4 +15,8 @@ class FulfillmentFile < ActiveRecord::Base
     state :sent 
   end
 
+  def self.datatable_columns
+    ['id', 'status', 'product' ]
+  end
+
 end

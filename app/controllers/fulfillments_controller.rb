@@ -28,6 +28,14 @@ class FulfillmentsController < ApplicationController
     end
   end
 
+  def files
+    my_authorize! :report, Fulfillment, @current_club.id
+    respond_to do |format|
+      format.html
+      format.json { render json: FulfillmentFilesDatatable.new(view_context,@current_partner,@current_club,@current_member,@current_agent)}
+    end
+  end
+
   def update_status
     my_authorize! :update_status, Fulfillment, @current_club.id
     # render json: Fulfillment.find(params[:id]).update_status(@current_agent, params[:status], params[:reason])

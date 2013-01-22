@@ -40,6 +40,7 @@ en:
     agents: 'Agents'
     partners: 'Partners'
   buttons:
+    list_fulfillments_files: List Fulfillment Files
     update_fulfillment_status: 'Update status'
     return_to_member_show: 'Return to member show'
     add_club_cash_transaction: 'Save club cash transaction'

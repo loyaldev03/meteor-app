@@ -25,6 +25,9 @@
       <% if params[:controller] == 'members' and params[:action] == 'new' %>
         <%= delimiter %><li class="active">New member</li>
       <% end %>
+      <% if params[:controller] == 'fulfillments' %>
+        <%= delimiter %><li class="active">Fulfillments</li>
+      <% end %>
     <% end %>
 
     <% if @current_member %>

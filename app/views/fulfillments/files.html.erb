@@ -1,0 +1,15 @@
+<table id="fulfillment_files_table" class="table table-bordered table-condensed dataTable" data-source="<%= list_fulfillment_files_url(format: "json") %>">
+  <thead>
+    <tr>
+      <th id="th_id"> <%= t('activerecord.attributes.membership.id') %> </th>
+      <th> <%= t('activerecord.attributes.membership.status') %> </th>
+      <th> <%= t('activerecord.attributes.membership.tom') %> </th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<script>
+  $(document).ready(fulfillment_files_functions(<%= FulfillmentFile.datatable_columns.size %>));
+</script>

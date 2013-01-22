@@ -70,6 +70,7 @@ SacPlatform::Application.routes.draw do
 
       match '/fulfillments' => 'fulfillments#index', as: 'fulfillments_index', :via => [:post, :get]
       scope '/fulfillments' do
+        get '/files' => 'fulfillments#files', as: 'list_fulfillment_files'
         post '/generate_xls' => 'fulfillments#generate_xls', as: 'generate_xls_fulfillments'
         get '/download_xls/:fulfillment_file_id' => 'fulfillments#download_xls', as: 'download_xls_fulfillments'
       end

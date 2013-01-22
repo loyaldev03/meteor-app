@@ -397,6 +397,21 @@ $(document).ready( function() {
     });
   }
 
+  function fulfillment_files_functions(column_count) {
+    $('#fulfillment_files_table').dataTable({
+      "oLanguage": {"sSearch": "Filtered by:"},
+      "bJQueryUI": false,
+      "bProcessing": true,
+      "sPaginationType": "bootstrap",
+      "bServerSide": true,
+      "aaSorting": [[ 0, "desc" ]],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
+      "sAjaxSource": $('#fulfillment_files_table').data('source')
+    });
+    $('.dataTables_filter').hide();
+
+  }
+
   
   function club_cash_transactions_functions(column_count){
     $('#club_cash_transactions_table').dataTable({
