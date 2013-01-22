@@ -42,7 +42,6 @@ defaults: &defaults
     recovery_needs_approval: 205
     enrollment_needs_approval: 206
     blacklisted: 207
-    fulfillment_mannualy_mark_as_sent: 208
     add_club_cash: 209
     deducted_club_cash: 210
     reset_club_cash: 211
@@ -90,7 +89,6 @@ defaults: &defaults
     tom_wihtout_gateway_configured: '9789'
     club_cash_transaction_not_successful: '9791'
     fulfillment_error: '9801'
-    fulfillment_out_of_stock: '9802'
   fulfillment_products:
     all: All
     kit_card: Kit - Card

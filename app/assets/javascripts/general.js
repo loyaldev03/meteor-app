@@ -488,13 +488,13 @@ $(document).ready( function() {
           // update status 
           $.ajax({
             type: 'PUT',
-            url: "fulfillments/"+$(this).attr("value")+"/update_status",
+            url: "fulfillments/"+fuls[x].value+"/update_status",
             data: $(this).serialize(),
             dataType: 'json',
             success: function(data) {
               if (data.code == "000"){
-                $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().children().hide();
-                $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().append("<div class='alert-info alert'>"+data.message+"</div>")
+                $("[name='fulfillment_selected["+data.id+"]']").parent().children().hide();
+                $("[name='fulfillment_selected["+data.id+"]']").parent().append("<div class='alert-info alert'>"+data.message+"</div>")
               }else{
                 alert(data.message);
               };

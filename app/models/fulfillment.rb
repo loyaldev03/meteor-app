@@ -106,13 +106,17 @@ class Fulfillment < ActiveRecord::Base
 
   def update_status(agent, status, reason)
     message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{self.status} to #{status}"
-    # member.set_wrong_address(@current_agent, params[:reason])
-    # mark_as_sent
-    Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_status_changed)
+    # if status == 'undeliverable' or status == 'returned'
+    #   member.set_wrong_address(agent, reason)
+    # else
+    #   self.status = status
+    #   self.save
+    # end
+    Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{self.status}_to_#{status}"])
     { :message => message, :code => Settings.error_codes.success }
   rescue 
-    Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_out_of_stock )
-    { :message => I18n.t('error_messages.fulfillment_out_of_stock'), :code => Settings.error_codes.fulfillment_out_of_stock }
+    Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_error )
+    { :message => I18n.t('error_messages.fulfillment_error'), :code => Settings.error_codes.fulfillment_error }
 
   end
 
@@ -135,16 +139,6 @@ class Fulfillment < ActiveRecord::Base
   #   { :message => I18n.t('error_messages.fulfillment_out_of_stock'), :code => Settings.error_codes.fulfillment_out_of_stock }
   # end
 
-  # def mark_as_sent(agent)
-  #   if self.set_as_sent
-  #     message = "Fulfillment #{self.product_sku} was set as sent."
-  #     Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_mannualy_mark_as_sent)
-  #     { :message => message, :code => Settings.error_codes.success }
-  #   else
-  #     message = I18n.t('error_messages.fulfillment_error')
-  #     { :message => message, :code => Settings.error_codes.fulfillment_error }
-  #   end
-  # end
 
   def self.process_fulfillments_up_today
     Fulfillment.to_be_renewed.find_in_batches do |group|

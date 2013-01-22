@@ -40,7 +40,9 @@
     			<td> <%= fulfillment.tracking_code %> </td>
     			<td> <%= fulfillment.status %> </td>
           <td> 
-            <%= check_box_tag "fulfillment_selected[#{fulfillment.id}]", fulfillment.id, false, :class => 'fulfillment_selected' %> 
+            <div id=<%= "div_fulfillment_selected_#{fulfillment.id}" %>>
+              <%= check_box_tag "fulfillment_selected[#{fulfillment.id}]", fulfillment.id, false, :class => 'fulfillment_selected' %> 
+            </div>
           </td>
     		</tr>
   		<% end %>
