@@ -76,7 +76,7 @@ class ClubsControllerTest < ActionController::TestCase
     sign_in @admin_user
     @club = FactoryGirl.build(:club, :partner_id => @partner.id)
     assert_difference('Club.count') do
-      post :create, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name }
+      post :create, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name, cs_phone_number: @club.cs_phone_number }
     end
     assert_redirected_to club_path(assigns(:club), partner_prefix: @partner_prefix)
   end
