@@ -28,6 +28,7 @@ wait $WAIT_PIDS
 
 # cd /var/www/$2/current && RAILS_ENV=$1 rake members:sync_members_to_pardot  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:send_happy_birthday  >> $LOGFILE 2>&1 &
+cd /var/www/$2/current && RAILS_ENV=$1 rake products:send_product_list_email  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:send_pillar_emails  >> $LOGFILE 2>&1 &
 # club cash should be processed before billing. Because if we reset club cash and then we bill, new CC should not be resetted
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_club_cash  >> $LOGFILE 2>&1 &

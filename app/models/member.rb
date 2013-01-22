@@ -945,7 +945,7 @@ class Member < ActiveRecord::Base
       if credit_cards.empty?
         add_new_credit_card(new_credit_card, current_agent)
       elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-        { :message => I18n.t('error_messages.credit_card_blacklisted,', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_blacklisted, :errors => { :number => "Credit card is blacklisted" }}
+        { :message => I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_blacklisted, :errors => { :number => "Credit card is blacklisted" }}
       elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? # is this credit card already of this member and its already active?
         active_credit_card.update_expire(new_year, new_month) # lets update expire month
       elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?

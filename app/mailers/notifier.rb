@@ -66,5 +66,13 @@ class Notifier < ActionMailer::Base
     @member = member
     mail :to => member.email, :subject => "Membership cancellation [#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )}"
   end
+
+  def product_list(product_xls_file)
+    attachments["product_list_#{Date.today}.xls"] = File.read(product_xls_file)
+    mail :to => Settings.email_to_send_product_list, 
+         :subject => "[#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )} - Product list"
+  end
+
 end
  
+

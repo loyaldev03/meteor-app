@@ -20,8 +20,6 @@
       <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.product.sku_help')} %> 
     </div>
   </div>
-
-
   <div class="control-group">
     <%= f.label :recurrent, :class => 'control-label' %>
     <div class="controls">
@@ -38,6 +36,12 @@
     <%= f.label :weight, :class => 'control-label' %>
     <div class="controls">
       <%= f.number_field :weight, :class => 'number_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :allow_backorder, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.check_box :allow_backorder, :class => 'check_box' %>
     </div>
   </div>
 
