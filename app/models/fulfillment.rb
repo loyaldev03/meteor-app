@@ -25,9 +25,8 @@ class Fulfillment < ActiveRecord::Base
   scope :where_processing, lambda { where("status = 'processing'") }
   scope :where_not_processed, lambda { where("status = 'not_processed'") }
   scope :where_cancellable, lambda { where("status IN ('not_processed','processing','out_of_stock','undeliverable')") }
-  scope :type_card, lambda { where("product_sku = 'CARD'")}
-  scope :type_kit, lambda { where("product_sku = 'KIT'")}
-  scope :type_others, lambda { where("product_sku NOT IN ('KIT','CARD')")}
+  scope :type_kit_card, lambda { where("product_sku = 'KIT-CARD'")}
+  scope :type_others, lambda { where("product_sku NOT IN ('KIT-CARD')")}
 
   scope :not_renewed, lambda { where("renewed = false") }
 
@@ -105,35 +104,47 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def resend(agent)
-    if product.nil? 
-      raise "Product does not have stock."
-    end
-    if undeliverable?
-      raise "Fulfillment is undeliverable"
-    end
-
-    self.decrease_stock!
-    self.assigned_at = Time.zone.now
-    self.save
-    message = "Fulfillment #{self.product_sku} was marked to be delivered next time."
-    Auditory.audit(agent, self, message, member, Settings.operation_types.resend_fulfillment)
+  def update_status(agent, status, reason)
+    message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{self.status} to #{status}"
+    # member.set_wrong_address(@current_agent, params[:reason])
+    # mark_as_sent
+    Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_status_changed)
     { :message => message, :code => Settings.error_codes.success }
   rescue 
     Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_out_of_stock )
     { :message => I18n.t('error_messages.fulfillment_out_of_stock'), :code => Settings.error_codes.fulfillment_out_of_stock }
+
   end
 
-  def mark_as_sent(agent)
-    if self.set_as_sent
-      message = "Fulfillment #{self.product_sku} was set as sent."
-      Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_mannualy_mark_as_sent)
-      { :message => message, :code => Settings.error_codes.success }
-    else
-      message = I18n.t('error_messages.fulfillment_error')
-      { :message => message, :code => Settings.error_codes.fulfillment_error }
-    end
-  end
+  # def resend(agent)
+  #   if product.nil? 
+  #     raise "Product does not have stock."
+  #   end
+  #   if undeliverable?
+  #     raise "Fulfillment is undeliverable"
+  #   end
+
+  #   self.decrease_stock!
+  #   self.assigned_at = Time.zone.now
+  #   self.save
+  #   message = "Fulfillment #{self.product_sku} was marked to be delivered next time."
+  #   Auditory.audit(agent, self, message, member, Settings.operation_types.resend_fulfillment)
+  #   { :message => message, :code => Settings.error_codes.success }
+  # rescue 
+  #   Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_out_of_stock )
+  #   { :message => I18n.t('error_messages.fulfillment_out_of_stock'), :code => Settings.error_codes.fulfillment_out_of_stock }
+  # end
+
+  # def mark_as_sent(agent)
+  #   if self.set_as_sent
+  #     message = "Fulfillment #{self.product_sku} was set as sent."
+  #     Auditory.audit(agent, self, message, member, Settings.operation_types.fulfillment_mannualy_mark_as_sent)
+  #     { :message => message, :code => Settings.error_codes.success }
+  #   else
+  #     message = I18n.t('error_messages.fulfillment_error')
+  #     { :message => message, :code => Settings.error_codes.fulfillment_error }
+  #   end
+  # end
 
   def self.process_fulfillments_up_today
     Fulfillment.to_be_renewed.find_in_batches do |group|
@@ -145,21 +156,6 @@ class Fulfillment < ActiveRecord::Base
           Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :fulfillment => fulfillment.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
-      end
-    end
-  end
-
-  def self.generateCSV(fulfillments, change_status = false, type_others = true)
-    CSV.generate do |csv| 
-      if type_others
-        csv << Fulfillment::SLOOPS_HEADER
-      else
-        csv << Fulfillment::KIT_CARD_HEADER
-      end
-
-      fulfillments.each do |fulfillment|
-        r = fulfillment.get_file_line(true, type_others)
-        csv << r unless r.empty?
       end
     end
   end

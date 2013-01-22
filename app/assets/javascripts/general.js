@@ -458,11 +458,52 @@ $(document).ready( function() {
       if ($("#refunded_amount").val().match(/^[0-9 .]+$/)){
 
       }else{
-      alert("Incorrect refund value.")
-      event.preventDefault(); 
+        alert("Incorrect refund value.")
+        event.preventDefault(); 
       };
     })
   };
+
+  function fulfillments_not_processed_function(){
+    $('#reason').hide();
+    $('#new_status').change(function (value){
+      // TODO: bad address and returned
+      if (this.options[this.selectedIndex].value == "undeliverable")
+        $('#reason').show();
+      else
+        $('#reason').hide();
+
+    });
+    $("#fulfillment_select_all").click(function (){
+      if ($("#fulfillment_select_all").is(':checked')) {
+        $('.fulfillment_selected').attr('checked', true);
+      } else {
+        $('.fulfillment_selected').attr('checked', false);
+      }
+    });
+    $("#update_fulfillment_status").click(function() {
+      var fuls = $('.fulfillment_selected');
+      for (x in fuls) {
+        if (fuls[x].checked) {
+          // update status 
+          $.ajax({
+            type: 'PUT',
+            url: "fulfillments/"+$(this).attr("value")+"/update_status",
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(data) {
+              if (data.code == "000"){
+                $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().children().hide();
+                $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().append("<div class='alert-info alert'>"+data.message+"</div>")
+              }else{
+                alert(data.message);
+              };
+            },
+          });  
+        }
+      }      
+    });     
+  }
 
   function fulfillments_index_functions(create_xls_file_url, make_report_url){
     $(".datepicker").datepicker({ constrainInput: true, 
@@ -490,43 +531,51 @@ $(document).ready( function() {
       $('#td_end_date').hide();
     }
 
-
     $("#create_xls_file").click(function() {
+      var fuls = $('.fulfillment_selected');
+      for (x in fuls) {
+        if (fuls[x].checked) {
+          $('<input>').attr({ type: 'hidden', name: fuls[x].name, value: fuls[x].value }).appendTo($('#fulfillment_report_form'));
+        }
+      }
+
       $('#fulfillment_report_form').attr("action", create_xls_file_url);
+      $('#fulfillment_report_form').submit();
     });    
+
     $("#make_report").click(function() {
       $('#fulfillment_report_form').attr("action", make_report_url);
     });    
 
-    resend_fulfillment("fulfillments/");
+    // resend_fulfillment("fulfillments/");
     
-    mark_as_sent_fulfillment("fulfillments/");
+    // mark_as_sent_fulfillment("fulfillments/");
 
-    $('*#set_as_wrong_address').click( function(event){
-      $(this).hide();
-      append = $(this).parent();
-      $.get(this.action, {member_prefix:$(this).attr("name")}, null, 'script'); 
-      return false;
-    });
+    // $('*#set_as_wrong_address').click( function(event){
+    //   $(this).hide();
+    //   append = $(this).parent();
+    //   $.get(this.action, {member_prefix:$(this).attr("name")}, null, 'script'); 
+    //   return false;
+    // });
 
-    $("#set_undeliverable").live("submit", function(event){
-      event.preventDefault();
-      this_form = $(this);
-      $.ajax({
-        type: 'POST',
-        url: "member/"+$(this).attr("name")+"/set_undeliverable",
-        data: $(this).serialize(),
-        dataType: 'json',
-        success: function(data) {
-          if (data.code == "000"){
-            $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().children().hide();
-            $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().append("<div class='alert-info alert'>"+data.message+"</div>")
-          }else{
-            alert(data.message);
-          };
-        },
-      });  
-    });
+    // $("#set_undeliverable").live("submit", function(event){
+    //   event.preventDefault();
+    //   this_form = $(this);
+    //   $.ajax({
+    //     type: 'POST',
+    //     url: "member/"+$(this).attr("name")+"/set_undeliverable",
+    //     data: $(this).serialize(),
+    //     dataType: 'json',
+    //     success: function(data) {
+    //       if (data.code == "000"){
+    //         $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().children().hide();
+    //         $("[id='set_as_wrong_address'][name='"+this_form.attr("name")+"']").parent().append("<div class='alert-info alert'>"+data.message+"</div>")
+    //       }else{
+    //         alert(data.message);
+    //       };
+    //     },
+    //   });  
+    // });
 
   };
 

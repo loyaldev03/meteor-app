@@ -67,17 +67,15 @@ SacPlatform::Application.routes.draw do
       end
 
       resources :products
+
       match '/fulfillments' => 'fulfillments#index', as: 'fulfillments_index', :via => [:post, :get]
-      
       scope '/fulfillments' do
-        post '/generate_csv' => 'fulfillments#generate_csv', as: 'generate_csv_fulfillments'
         post '/generate_xls' => 'fulfillments#generate_xls', as: 'generate_xls_fulfillments'
+        get '/download_xls/:fulfillment_file_id' => 'fulfillments#download_xls', as: 'download_xls_fulfillments'
       end
 
       scope '/fulfillments/:id' do
-        put '/resend' => 'fulfillments#resend', as: 'resend_fulfillment'
-        put '/mark_as_sent' => 'fulfillments#mark_as_sent', as: 'mark_as_sent_fulfillment'
-        put '/mark_as_wrong_address' => 'fulfillments#mark_as_wrong_address', as: 'mark_as_wrong_address_fulfillment'
+        put '/update_status' => 'fulfillments#update_status', as: 'update_fulfillment_status'
       end
     end
 

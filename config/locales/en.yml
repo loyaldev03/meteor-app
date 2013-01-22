@@ -40,6 +40,7 @@ en:
     agents: 'Agents'
     partners: 'Partners'
   buttons:
+    update_fulfillment_status: 'Update status'
     return_to_member_show: 'Return to member show'
     add_club_cash_transaction: 'Save club cash transaction'
     blacklist_member: 'Blacklist member'
@@ -270,6 +271,7 @@ en:
         renewable_at: 'Renewable at'
         not_found: 'No fulfillments were found.'
         status: 'Status'
+        new_status: 'New status'
         product_type: 'Product type'
         renewed: 'Renewed'
       communication:

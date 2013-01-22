@@ -1,19 +1,19 @@
 <% if @fulfillments %>
-  
-  <% if @status == 'processing' %>
-    <%= form_tag(generate_csv_fulfillments_path, :style => "float:left") do %>
-      <%= hidden_field :status, nil, :value => 'processing' %>
-      <%= hidden_field :product_type, nil, :value => "#{params[:product_type]}" %>
-      <%= submit_tag t('buttons.generate_csv'), :class => 'btn btn-primary' %> 
-    <% end %>
-    <%= form_tag(generate_xls_fulfillments_path) do %>
-      <%= hidden_field :status, nil, :value => 'processing' %>
-      <%= hidden_field :product_type, nil, :value => "#{params[:product_type]}" %>
-      <%= submit_tag t('buttons.generate_xls'), :class => 'btn btn-primary' %>
-    <% end %>
-  <% end %>
 
   <table class="table table-bordered table-condensed" id="report_results">
+    <thead>
+    <% if @status != 'not_processed' %>
+      <tr>
+        <td colspan="8">
+          <%= label :status, t('activerecord.attributes.fulfillment.new_status'), :class => 'help-inline' %>
+          <%= select_tag :new_status, options_for_select(['']+@possible_status, :selected => params[:new_status]),
+                            :class => 'select_field input-medium' %>  
+          <%= text_field_tag "reason", nil, :class => 'text_field input-medium', :placeholder => t('reason') %>
+          <%= link_to t('buttons.update_fulfillment_status'), "#", :class => 'btn btn-primary', :id => 'update_fulfillment_status' %>
+        </td>
+      </tr>
+    <% end %>
+    </thead>
   	<thead>
   	  <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
       <th> <%= t('activerecord.attributes.fulfillment.member') %> </th>
@@ -22,12 +22,17 @@
   	  <th> <%= t('activerecord.attributes.fulfillment.product_sku') %> </th>
   	  <th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th>    
       <th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
-  	  <th> <%= t('actions') %> </th>    
+  	  <th> 
+        <%= check_box_tag "fulfillment_select_all", 1, false, :id => 'fulfillment_select_all' %> Select All
+        <% if @status == 'not_processed' %>
+          <%= link_to t('buttons.create_xls_file'), "#", :class => 'btn btn-primary', :id => 'create_xls_file' %>
+        <% end %>
+      </th>    
   	</thead>
   	<tbody>
   		<% @fulfillments.each do |fulfillment| %>
     		<tr>
-    			<td> <%= fulfillment.member.visible_id %> </td>
+    			<td> <a href="<%= show_member_path(:member_prefix => fulfillment.member.visible_id) %>" > <%= fulfillment.member.visible_id %></a></td>
           <td> <%= fulfillment.member.full_name %> </td>
           <td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
           <td> <%= I18n.l fulfillment.renewable_at, :format => :long unless fulfillment.renewable_at.nil? %> </td>
@@ -35,10 +40,15 @@
     			<td> <%= fulfillment.tracking_code %> </td>
     			<td> <%= fulfillment.status %> </td>
           <td> 
-            <%= render :partial => "shared/fulfillment_actions", :locals => {:fulfillment => fulfillment, :member_show => false } %>
+            <%= check_box_tag "fulfillment_selected[#{fulfillment.id}]", fulfillment.id, false, :class => 'fulfillment_selected' %> 
           </td>
     		</tr>
   		<% end %>
   	</tbody>
   </table>
+
+  <script type="text/javascript">
+    $(document).ready( fulfillments_not_processed_function() );
+  </script>
+
 <% end %>
