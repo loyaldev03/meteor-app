@@ -81,11 +81,23 @@ class FulfillmentsController < ApplicationController
 
   def download_xls
     my_authorize! :report, Fulfillment, @current_club.id
-    fulfillments = FulfillmentFile.find(params[:fulfillment_file_id]).fulfillments
+    fulfillments = FulfillmentFile.find(params[:fulfillment_file_id]).fulfillments.where_processing
     xls_package = Fulfillment.generateXLS(fulfillments, false, fulfillments.product == 'OTHERS')
     send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
              :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
              :disposition => "attachment; filename=miworkingfile2.xlsx"
+  end
+
+  def mark_file_as_sent
+    my_authorize! :report, Fulfillment, @current_club.id
+    file = FulfillmentFile.find(params[:fulfillment_file_id])
+    file.processed!
+    flash[:notice] = "Fulfillment file marked as sent successfully"
+  rescue
+    flash[:error] = "We could not mark as sent the Fulfillment File. An error message was sent to IT."
+    Airbrake.notify(:error_class => "FulfillmentFile:mark_file_as_sent", :parameters => { :file => file.inspect })
+  ensure
+    redirect_to list_fulfillment_files_path
   end
 
 end

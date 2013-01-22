@@ -74,6 +74,7 @@ SacPlatform::Application.routes.draw do
         post '/generate_xls' => 'fulfillments#generate_xls', as: 'generate_xls_fulfillments'
         get '/download_xls/:fulfillment_file_id' => 'fulfillments#download_xls', as: 'download_xls_fulfillments'
         get '/list_for_file/:fulfillment_file_id' => 'fulfillments#list_for_file', as: 'fulfillment_list_for_file'
+        get '/mark_file_as_sent/:fulfillment_file_id' => 'fulfillments#mark_file_as_sent', as: 'fulfillment_file_mark_as_sent'
       end
 
       scope '/fulfillment/:id' do

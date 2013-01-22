@@ -13,13 +13,14 @@ private
     files.map do |file|
       [ 
         file.id, 
-        link_to( I18n.l(file.created_at.to_date), @url_helpers.download_xls_fulfillments_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn"),
+        I18n.l(file.created_at.to_date),
+        link_to('<i class="icon-file"></i>'.html_safe, @url_helpers.download_xls_fulfillments_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn"),
         link_to("View", @url_helpers.fulfillment_list_for_file_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn"),
         file.status, 
         file.product,
         file.dates,
         file.fulfillments_processed,
-        "button to mark as sent :)"
+        (file.sent? ? '' : link_to("Mark as sent", @url_helpers.fulfillment_file_mark_as_sent_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn btn-warning", :confirm => "Are you sure you want to mark all the fulfillments that are in progress as sent?"))
       ]
     end
   end
