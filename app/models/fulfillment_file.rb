@@ -5,6 +5,8 @@ class FulfillmentFile < ActiveRecord::Base
   belongs_to :club
 
   state_machine :status, :initial => :in_process do
+    after_transition :in_process => :sent, :do => :mark_fulfillments_as_sent
+
     event :processed do
       transition :in_process => :sent
     end
@@ -15,8 +17,16 @@ class FulfillmentFile < ActiveRecord::Base
     state :sent 
   end
 
-  def self.datatable_columns
-    ['id', 'status', 'product' ]
+  def dates
+    self.all_times ? "All times" : "from #{self.initial_date} to #{self.end_date}"
+  end
+
+  def fulfillments_processed
+    [ fulfillments.where_processing.count, fulfillments.count ].join(' / ')
+  end
+
+  def mark_fulfillments_as_sent
+    self.fulfillments.where_processing.each { |x| x.set_as_sent! }
   end
 
 end
