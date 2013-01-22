@@ -497,26 +497,23 @@ $(document).ready( function() {
       }
     });
     $("#update_fulfillment_status").click(function() {
-      var fuls = $('.fulfillment_selected');
-      for (x in fuls) {
-        if (fuls[x].checked) {
-          // update status 
-          $.ajax({
-            type: 'PUT',
-            url: "/fulfillment/"+fuls[x].value+"/update_status",
-            data: $(this).serialize(),
-            dataType: 'json',
-            success: function(data) {
-              if (data.code == "000"){
-                $("[name='fulfillment_selected["+data.id+"]']").parent().children().hide();
-                $("[name='fulfillment_selected["+data.id+"]']").parent().append("<div class='alert-info alert'>"+data.message+"</div>")
-              }else{
-                alert(data.message);
-              };
-            },
-          });  
-        }
-      }      
+      $('.fulfillment_selected:checked').each(function(index){
+        $.ajax({
+          type: 'PUT',
+          url: $(this).data('url'),
+          data: { new_status: $('#new_status').val(), reason: $('#reason').val() },
+          dataType: 'json',
+          success: function(data) {
+            if (data.code == "000"){
+              $("[name='fulfillment_selected["+data.id+"]']").parent().children().hide();
+              $("[name='fulfillment_selected["+data.id+"]']").parent().append("<div class='alert-info alert'>"+data.message+"</div>")
+            }else{
+              alert(data.message);
+            };
+          },
+        });  
+
+      });
     });     
   }
 

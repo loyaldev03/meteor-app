@@ -40,7 +40,7 @@
     			<td> <%= fulfillment.status %> </td>
           <td> 
             <div id=<%= "div_fulfillment_selected_#{fulfillment.id}" %>>
-              <%= check_box_tag "fulfillment_selected[#{fulfillment.id}]", fulfillment.id, false, :class => 'fulfillment_selected' %> 
+              <%= check_box_tag "fulfillment_selected[#{fulfillment.id}]", fulfillment.id, false, :class => 'fulfillment_selected', 'data-url' => update_fulfillment_status_path(:id => fulfillment.id) %> 
             </div>
           </td>
     		</tr>
