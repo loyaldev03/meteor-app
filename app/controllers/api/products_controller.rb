@@ -22,7 +22,7 @@ class Api::ProductsController < ApplicationController
     if product.nil?
       render json: { code: Settings.error_codes.not_found, message: 'Product not found' }
     else
-      render json: { code: Settings.error_codes.success, stock: product.stock }
+      render json: { code: Settings.error_codes.success, stock: product.stock, allow_backorder: product.allow_backorder }
     end
   end
 
