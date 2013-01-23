@@ -464,7 +464,7 @@ class Member < ActiveRecord::Base
     club = tom.club
 
     if not self.new_record? and recovery_check and not self.lapsed? 
-      return { :message => I18n.t('error_messages.member_already_active'), :code => Settings.error_codes.member_already_active, :errors => { :status => "Already active." } }
+      return { :message => I18n.t('error_messages.member_already_active', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.member_already_active, :errors => { :status => "Already active." } }
     elsif recovery_check and not self.new_record? and not self.can_recover?
       return { :message => I18n.t('error_messages.cant_recover_member', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.cant_recover_member, :errors => {:reactivation_times => "Max reactivation times reached."} }
     elsif credit_card.blacklisted? or self.blacklisted?
