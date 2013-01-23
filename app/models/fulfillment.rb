@@ -37,35 +37,46 @@ class Fulfillment < ActiveRecord::Base
   delegate :club, :to => :member
 
   state_machine :status, :initial => :not_processed do
+
     event :set_as_not_processed do
-      transition [:sent, :out_of_stock, :undeliverable, :not_processed] => :not_processed
+      transition all => :not_processed
     end
     event :set_as_processing do
-      transition :not_processed => :processing
+      transition all => :processing
+    end
+    event :set_as_on_hold do
+      transition all => :on_hold
     end
     event :set_as_sent do
-      transition :processing => :sent
+      transition all => :sent
     end
     event :set_as_out_of_stock do
-      transition [:not_processed, :undeliverable] => :out_of_stock
+      transition all => :out_of_stock
+    end
+    event :set_as_returned do
+      transition all => :returned
     end
     event :set_as_canceled do
-      transition [:not_processed,:processing,:out_of_stock, :undeliverable] => :canceled
+      transition all => :canceled
     end
     event :set_as_undeliverable do
-      transition [:not_processed, :processing] => :undeliverable
+      transition all => :undeliverable
     end
-    
+  
     #First status. fulfillment is waiting to be processed.
     state :not_processed
     #This status will be automatically set after the new fulfillment list is downloaded. Only if magento 
     #has stock. Stock will be decreased in one.
     state :processing
+    #Used due to some type of error
+    state :on_hold
     #Manually set through CS, by selecting all or some fulfillments in processing status.
     state :sent 
     #Set automatically using Magento, when a representative or supervisor downloads the file with 
     #fulfillments in not_processed status
     state :out_of_stock 
+    #Will be similar than Bad address
+    state :returned
     #when member gets lapsed status, all not_processed / processing / Out of stock fulfillments gets this status.
     state :canceled
     #if delivery fail this status is set and wrong address on member file should be filled with the reason
@@ -96,23 +107,26 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def decrease_stock!
+    former_status = self.status
     if product.nil? or not product.has_stock?
       set_as_out_of_stock!
     else
       set_as_not_processed!
       product.decrease_stock
     end
+    audit_status_transition(nil,former_status,nil)
   end
 
-  def update_status(agent, status, reason)
-    message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{self.status} to #{status}"
+  def audit_status_transition(agent, status, reason)
+    self.reload
+    message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{status} to #{self.status}"
     # if status == 'undeliverable' or status == 'returned'
     #   member.set_wrong_address(agent, reason)
     # else
     #   self.status = status
     #   self.save
     # end
-    Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{self.status}_to_#{status}"])
+    Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{status}_to_#{self.status}"])
     { :message => message, :code => Settings.error_codes.success }
   rescue 
     Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_error )

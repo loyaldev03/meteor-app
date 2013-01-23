@@ -33,11 +33,13 @@ private
     
     if params[:sSearch].present?
       if params[:sSearch] == 'billing'
-        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 100 and 199",@current_member.id]).order("#{sort_column} #{sort_direction}")
-      elsif params[:sSearch] == 'communications'
-        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 300 and 399",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 100 and 199",@current_member.id]).order("#{sort_column} #{sort_direction}")    
       elsif params[:sSearch] == 'profile'
         operations = Operation.where(["member_id = ? AND operation_type BETWEEN 200 and 299",@current_member.id]).order("#{sort_column} #{sort_direction}")
+      elsif params[:sSearch] == 'communications'
+        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 300 and 399",@current_member.id]).order("#{sort_column} #{sort_direction}")
+      elsif params[:sSearch] == 'fulfillments'
+        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 400 and 499",@current_member.id]).order("#{sort_column} #{sort_direction}")          
       elsif params[:sSearch] == 'others'
         operations = Operation.where('member_id' => @current_member.id,'operation_type' => Settings.operation_types.others).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'all'

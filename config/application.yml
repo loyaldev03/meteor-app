@@ -45,10 +45,10 @@ defaults: &defaults
     add_club_cash: 209
     deducted_club_cash: 210
     reset_club_cash: 211
-    credit_card_in_use: 401
-    credit_card_blacklisted: 402
-    member_email_blacklisted: 403
-    aus_recycle_credit_card: 405
+    credit_card_in_use: 212
+    credit_card_blacklisted: 213
+    member_email_blacklisted: 213
+    aus_recycle_credit_card: 215
     #communication
     active_email: 300     
     prebill_email: 301    
@@ -56,6 +56,63 @@ defaults: &defaults
     refund_email: 303 
     pillar_email: 304
     pillar_provisional_email: 305
+    #fulfillments
+    from_not_processed_to_processing: 400
+    from_not_processed_to_on_hold: 401
+    from_not_processed_to_sent: 402
+    from_not_processed_to_out_of_stock: 403
+    from_not_processed_to_returned: 404
+    from_not_processed_to_canceled: 405
+    from_not_processed_to_undeliverable: 406
+    from_processing_to_not_processed: 407
+    from_processing_to_on_hold: 408
+    from_processing_to_sent: 409
+    from_processing_to_out_of_stock: 410
+    from_processing_to_returned: 411
+    from_processing_to_canceled: 412
+    from_processing_to_undeliverable: 413
+    from_on_hold_to_not_processed: 414
+    from_on_hold_to_processing: 415
+    from_on_hold_to_sent: 416
+    from_on_hold_to_out_of_stock: 417
+    from_on_hold_to_returned: 418
+    from_on_hold_to_canceled: 419
+    from_on_hold_to_undeliverable: 420
+    from_sent_to_not_processed: 421
+    from_sent_to_processing: 422
+    from_sent_to_on_hold: 423
+    from_sent_to_out_of_stock: 424
+    from_sent_to_returned: 425
+    from_sent_to_canceled: 426
+    from_sent_to_undeliverable: 427
+    from_out_of_stock_to_not_processed: 428
+    from_out_of_stock_to_processing: 429
+    from_out_of_stock_to_on_hold: 430
+    from_out_of_stock_to_sent: 431
+    from_out_of_stock_to_returned: 432
+    from_out_of_stock_to_canceled: 433
+    from_out_of_stock_to_undeliverable: 434
+    from_returned_to_not_processed: 435
+    from_returned_to_processing: 436
+    from_returned_to_on_hold: 437
+    from_returned_to_sent: 438
+    from_returned_to_out_of_stock: 439
+    from_returned_to_canceled: 440
+    from_returned_to_undeliverable: 441
+    from_canceled_to_not_processed: 442
+    from_canceled_to_processing: 443
+    from_canceled_to_on_hold: 444
+    from_canceled_to_sent: 445
+    from_canceled_to_out_of_stock: 446
+    from_canceled_to_returned: 447
+    from_canceled_to_undeliverable: 448
+    from_undeliverable_to_not_processed: 449
+    from_undeliverable_to_processing: 450
+    from_undeliverable_to_on_hold: 451
+    from_undeliverable_to_sent: 452
+    from_undeliverable_to_out_of_stock: 453
+    from_undeliverable_to_returned: 454
+    from_undeliverable_to_canceled: 455
     #other
     others: 1000
   error_codes:

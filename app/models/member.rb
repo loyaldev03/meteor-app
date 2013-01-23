@@ -736,8 +736,13 @@ class Member < ActiveRecord::Base
   def set_wrong_address(agent, reason)
     if self.wrong_address.nil?
       if self.update_attribute(:wrong_address, reason)
-        self.fulfillments.where_processing.not_renewed.each { |s| s.set_as_undeliverable }
-        self.fulfillments.where_not_processed.not_renewed.each { |s| s.set_as_undeliverable }
+        fulfillments = self.fulfillments.where_processing.not_renewed + self.fulfillments.where_not_processed.not_renewed
+        
+        fulfillments.each do |fulfillment| 
+          former_status = fulfillment.status
+          fulfillment.set_as_undeliverable
+          fulfillment.audit_status_transition(agent,former_status,nil)
+        end
         message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
         Auditory.audit(agent, self, message, self)
         { :message => message, :code => Settings.error_codes.success }
@@ -1080,7 +1085,11 @@ class Member < ActiveRecord::Base
 
     def cancellation
       self.cancel_member_at_remote_domain
-      self.fulfillments.where_cancellable.each &:set_as_canceled
+      self.fulfillments.where_cancellable.each do |fulfillment| 
+        former_status = fulfillment.status
+        fulfillment.set_as_canceled
+        fulfillment.audit_status_transition(nil,former_status,nil)
+      end
       self.next_retry_bill_date = nil
       self.bill_date = nil
       self.recycled_times = 0
