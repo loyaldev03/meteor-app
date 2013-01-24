@@ -344,16 +344,6 @@ class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
   def member
     PhoenixMember.find_by_visible_id_and_club_id(authorization.member_id, CLUB)
   end
-  def capture
-    if authorization.litleTxnId.to_s.size > 2
-     BillingEnrollmentCapture.find_by_member_id_and_litleTxnId(authorization.member_id, authorization.litleTxnId)
-    else
-     nil
-    end
-  end
-  def capture_response
-    capture.nil? ? nil : BillingEnrollmentCaptureResponse.find_by_capture_id(capture.id)
-  end
   def amount
     phoenix_amount
   end
@@ -361,16 +351,6 @@ end
 class BillingEnrollmentAuthorization < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "enrollment_authorizations" 
-  self.record_timestamps = false
-end
-class BillingEnrollmentCapture < ActiveRecord::Base
-  establish_connection "billing" 
-  self.table_name = "enrollment_captures" 
-  self.record_timestamps = false
-end
-class BillingEnrollmentCaptureResponse < ActiveRecord::Base
-  establish_connection "billing" 
-  self.table_name = "enrollment_capt_responses" 
   self.record_timestamps = false
 end
 class BillingMembershipAuthorizationResponse < ActiveRecord::Base
@@ -389,18 +369,8 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
   def billing_member
     BillingMember.find_by_id(authorization.member_id)
   end
-  def capture
-    if authorization.litleTxnId.to_s.size > 2
-      BillingMembershipCapture.find_by_member_id_and_litleTxnId(authorization.member_id, authorization.litleTxnId)
-    else
-      nil
-    end
-  end
   def invoice_number(a)
     "#{self.created_at.to_date}-#{a.member_id}"
-  end
-  def capture_response
-    capture.nil? ? nil : BillingMembershipCaptureResponse.find_by_capture_id(capture.id)
   end
   def amount
     phoenix_amount
@@ -409,16 +379,6 @@ end
 class BillingMembershipAuthorization < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "membership_authorizations" 
-  self.record_timestamps = false
-end
-class BillingMembershipCapture < ActiveRecord::Base
-  establish_connection "billing" 
-  self.table_name = "membership_captures" 
-  self.record_timestamps = false
-end
-class BillingMembershipCaptureResponse < ActiveRecord::Base
-  establish_connection "billing" 
-  self.table_name = "membership_capt_responses" 
   self.record_timestamps = false
 end
 class BillingChargeback < ActiveRecord::Base

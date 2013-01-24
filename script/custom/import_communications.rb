@@ -109,7 +109,7 @@ def upload_email_services(communications, tom_id)
       type = :prebill
     elsif comm[0] == 'Cancellation'
       type = :cancellation
-    elsif comm[0] == 'Cancel with Refund'
+    elsif comm[0] == 'Refund'
       type = :refund
     # we will have prebill renewal on phoenix 1.1
     # elsif comm[0] == 'Renewal Pre Bill'

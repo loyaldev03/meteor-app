@@ -35,8 +35,9 @@ class FulfillmentsController < ApplicationController
 
   def update_status
     my_authorize! :update_status, Fulfillment, @current_club.id
-    # render json: Fulfillment.find(params[:id]).update_status(@current_agent, params[:status], params[:reason])
-    render json: { :message => "Not developed", :code => Settings.error_codes.not_found, :id => params[:id] }
+    fulfillment = Fulfillment.find(params[:id])
+    fulfillment.update_status(@current_agent, params[:status], params[:reason])
+    render json: { :message => "Fulfilment updated succesfully", :code => Settings.error_codes.not_found, :id => params[:id] }
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found, :id => params[:id] }
   end
