@@ -127,7 +127,9 @@ sent when member changes its status to active
 </span>  <span class='symbol'>:refund</span><span class='comma'>,</span> <span class='comment'># sent when CS does a refund.
 </span>  <span class='symbol'>:birthday</span><span class='comma'>,</span> <span class='comment'># sent if birthday is on enrollment_info
 </span>  <span class='symbol'>:pillar</span><span class='comma'>,</span> <span class='comment'># emails sent after join date and active status. they use days_after_join_date attribute
-</span>  <span class='symbol'>:pillar_provisional</span> <span class='comment'># emails sent after join date and provisional status. they use days_after_join_date attribute
+</span>  <span class='symbol'>:pillar_provisional</span><span class='comma'>,</span> <span class='comment'># emails sent after join date and provisional status. they use days_after_join_date attribute
+</span>  <span class='symbol'>:hard_decline</span><span class='comma'>,</span> <span class='comment'># emails sent when hard decline happens
+</span>  <span class='symbol'>:soft_decline</span> <span class='comment'># emails sent when soft decline happens  
 </span><span class='rbracket'>]</span></pre></dd>
       
         <dt id="CLIENTS-constant" class="">CLIENTS =
@@ -243,12 +245,12 @@ sent when member changes its status to active
       <pre class="lines">
 
 
-24
-25
-26</pre>
+26
+27
+28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/email_template.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'app/models/email_template.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_action_mailer?'>action_mailer?</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_client'>client</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>action_mailer</span><span class='tstring_end'>'</span></span>
@@ -295,12 +297,12 @@ sent when member changes its status to active
       <pre class="lines">
 
 
-20
-21
-22</pre>
+22
+23
+24</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/email_template.rb', line 20</span>
+      <pre class="code"><span class="info file"># File 'app/models/email_template.rb', line 22</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lyris?'>lyris?</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_client'>client</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>lyris</span><span class='tstring_end'>'</span></span>
@@ -315,7 +317,7 @@ sent when member changes its status to active
 </div>
 
     <div id="footer">
-  Generated on Thu Dec 20 12:17:03 2012 by
+  Generated on Thu Jan 24 10:28:51 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

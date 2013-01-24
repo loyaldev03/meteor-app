@@ -14,7 +14,8 @@ class Api::ProductsController < ApplicationController
   # @param [String] *sku*
   # @param [String] *club_id* 
   # @return [Integer] *code*: Code related to the method result.
-  # @return [Integer] *stock*: Information of member's profile.
+  # @return [Integer] *stock*: Stock available.
+  # @return [Boolean] *allow_backorder*: Flag to inform that product allow negative stocks.  
   #
   def get_stock
     my_authorize! :manage_product_api, Product, params[:club_id]
