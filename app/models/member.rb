@@ -736,11 +736,11 @@ class Member < ActiveRecord::Base
   def set_wrong_address(agent, reason)
     if self.wrong_address.nil?
       if self.update_attribute(:wrong_address, reason)
-        fulfillments = self.fulfillments.where_processing.not_renewed + self.fulfillments.where_not_processed.not_renewed
+        fulfillments = self.fulfillments.where_in_process.not_renewed + self.fulfillments.where_not_processed.not_renewed
         
         fulfillments.each do |fulfillment| 
           former_status = fulfillment.status
-          fulfillment.set_as_undeliverable
+          fulfillment.set_as_bad_address
           fulfillment.audit_status_transition(agent,former_status,nil)
         end
         message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
@@ -1164,7 +1164,7 @@ class Member < ActiveRecord::Base
 
     def wrong_address_logic
       if self.changed.include?('wrong_address') and self.wrong_address.nil?
-        self.fulfillments.where_undeliverable.each { |s| s.decrease_stock! }
+        self.fulfillments.where_bad_address.each { |s| s.decrease_stock! }
       end
     end
 

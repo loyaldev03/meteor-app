@@ -1,7 +1,7 @@
 class Product < ActiveRecord::Base
   belongs_to :club
 
-  attr_accessible :name, :recurrent, :sku, :stock, :weight, :package
+  attr_accessible :name, :recurrent, :sku, :stock, :weight, :package, :allow_backorder
 
   validates :sku, :uniqueness => {:scope => :club_id}, :presence => true, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2, :maximum => 19 }
 
@@ -23,12 +23,12 @@ class Product < ActiveRecord::Base
   end
 
   def decrease_stock(quantity=1)
-    self.stock = self.stock-quantitystt
+    self.stock = self.stock-quantity
     self.save 
   end
 
   def has_stock?
-    stock > 0
+    allow_backorder? ? true : stock>0
   end
 
   def self.generate_xls

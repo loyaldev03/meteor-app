@@ -34,6 +34,8 @@ class Club < ActiveRecord::Base
                            :url => "/system/:attachment/:id/:style/:filename",
                            :styles => { :header => "120x40", :thumb => "100x100#", :small  => "150x150>" }
 
+  DEFAULT_PRODUCT = ['KIT-CARD']
+
   def full_name
     [ partner.name, name ].join(' ')
   end
@@ -62,7 +64,7 @@ class Club < ActiveRecord::Base
     end
 
     def add_default_product
-      ['KIT','CARD'].each do |sku|
+      Club::DEFAULT_PRODUCT.each do |sku|
         p = Product.new 
         p.sku = sku
         p.package = sku

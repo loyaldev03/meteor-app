@@ -14,7 +14,7 @@
       <tr> <td colspan="5"> <%= t('activerecord.attributes.fulfillment.not_found') %> </td> </tr>
     <% end %> 
     <% @fulfillments.each do |fulfillment| %>
-  		<tr <% if fulfillment.processing? %> 
+  		<tr <% if fulfillment.in_process? %> 
         	  class="ligthgreen" 
        		 <% end %> >
         <td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>

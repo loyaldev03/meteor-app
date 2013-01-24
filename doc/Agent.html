@@ -407,12 +407,12 @@ addition to a real persisted field like &#8216;username&#8217;
       <pre class="lines">
 
 
-22
 23
-24</pre>
+24
+25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 22</span>
+      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_login'>login</span>
   <span class='ivar'>@login</span>
@@ -444,12 +444,12 @@ addition to a real persisted field like &#8216;username&#8217;
       <pre class="lines">
 
 
-40
 41
-42</pre>
+42
+43</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 40</span>
+      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 41</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_datatable_columns'>datatable_columns</span>
   <span class='lbracket'>[</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>id</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>email</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>username</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>created_at</span><span class='tstring_end'>'</span></span> <span class='rbracket'>]</span>
@@ -474,14 +474,14 @@ addition to a real persisted field like &#8216;username&#8217;
       <pre class="lines">
 
 
-34
 35
 36
 37
-38</pre>
+38
+39</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 34</span>
+      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 35</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_find_for_database_authentication'>find_for_database_authentication</span><span class='lparen'>(</span><span class='id identifier rubyid_warden_conditions'>warden_conditions</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_conditions'>conditions</span> <span class='op'>=</span> <span class='id identifier rubyid_warden_conditions'>warden_conditions</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
@@ -514,7 +514,6 @@ addition to a real persisted field like &#8216;username&#8217;
       <pre class="lines">
 
 
-70
 71
 72
 73
@@ -522,10 +521,11 @@ addition to a real persisted field like &#8216;username&#8217;
 75
 76
 77
-78</pre>
+78
+79</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 70</span>
+      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 71</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_role_with_club'>add_role_with_club</span><span class='lparen'>(</span><span class='id identifier rubyid_role'>role</span><span class='comma'>,</span> <span class='id identifier rubyid_club'>club</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_club'>club</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span> 
@@ -578,13 +578,13 @@ addition to a real persisted field like &#8216;username&#8217;
       <pre class="lines">
 
 
-81
 82
 83
-84</pre>
+84
+85</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 81</span>
+      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 82</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_can?'>can?</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='ivar'>@ability</span> <span class='op'>=</span> <span class='const'>Ability</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>2</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -610,12 +610,12 @@ addition to a real persisted field like &#8216;username&#8217;
       <pre class="lines">
 
 
-86
 87
-88</pre>
+88
+89</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 86</span>
+      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 87</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_club_roles_without_api'>club_roles_without_api</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_club_roles'>club_roles</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span><span class='lparen'>(</span><span class='symbol'>:club_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>role != 'api'</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_collect'>collect</span> <span class='op'>&amp;</span><span class='symbol'>:club_id</span>
@@ -662,12 +662,12 @@ addition to a real persisted field like &#8216;username&#8217;
       <pre class="lines">
 
 
-66
 67
-68</pre>
+68
+69</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_has_club_roles?'>has_club_roles?</span>
   <span class='op'>!</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_clubs'>clubs</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -714,12 +714,12 @@ addition to a real persisted field like &#8216;username&#8217;
       <pre class="lines">
 
 
-62
 63
-64</pre>
+64
+65</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 62</span>
+      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 63</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_has_global_role?'>has_global_role?</span>
   <span class='op'>!</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_roles'>roles</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -766,14 +766,14 @@ addition to a real persisted field like &#8216;username&#8217;
       <pre class="lines">
 
 
-51
 52
 53
 54
-55</pre>
+55
+56</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 51</span>
+      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_has_role_with_club?'>has_role_with_club?</span><span class='lparen'>(</span><span class='id identifier rubyid_role'>role</span><span class='comma'>,</span> <span class='id identifier rubyid_club_id'>club_id</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>role: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_role'>role</span><span class='rbrace'>}</span><span class='tstring_content'> club_id: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_club_id'>club_id</span><span class='rbrace'>}</span><span class='tstring_content'>        </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_has_role_without_club?'>has_role_without_club?</span><span class='lparen'>(</span><span class='id identifier rubyid_role'>role</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_club_id'>club_id</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_role_for'>role_for</span><span class='lparen'>(</span><span class='id identifier rubyid_role'>role</span><span class='comma'>,</span> <span class='id identifier rubyid_club_id'>club_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -800,12 +800,12 @@ addition to a real persisted field like &#8216;username&#8217;
       <pre class="lines">
 
 
-58
 59
-60</pre>
+60
+61</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 58</span>
+      <pre class="code"><span class="info file"># File 'app/models/agent.rb', line 59</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_role_for'>role_for</span><span class='lparen'>(</span><span class='id identifier rubyid_role'>role</span><span class='comma'>,</span> <span class='id identifier rubyid_club'>club</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_club_roles'>club_roles</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='label'>role:</span> <span class='id identifier rubyid_role'>role</span><span class='comma'>,</span> <span class='label'>club_id:</span> <span class='id identifier rubyid_club'>club</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
@@ -820,7 +820,7 @@ addition to a real persisted field like &#8216;username&#8217;
 </div>
 
     <div id="footer">
-  Generated on Thu Dec 20 12:17:01 2012 by
+  Generated on Thu Jan 24 10:28:49 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

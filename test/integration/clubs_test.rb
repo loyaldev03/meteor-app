@@ -17,6 +17,7 @@ class ClubTest < ActionController::IntegrationTest
     fill_in 'club[description]', :with => unsaved_club.description
     fill_in 'club[api_username]', :with => unsaved_club.api_username
     fill_in 'club[api_password]', :with => unsaved_club.api_password
+    fill_in 'club[cs_phone_number]', :with => unsaved_club.cs_phone_number
     attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
     check('club[requires_external_id]')
     select('application', :from => 'club[theme]')
@@ -92,6 +93,7 @@ class ClubTest < ActionController::IntegrationTest
     fill_in 'club[description]', :with => unsaved_club.description
     fill_in 'club[api_username]', :with => unsaved_club.api_username
     fill_in 'club[api_password]', :with => unsaved_club.api_password
+    fill_in 'club[cs_phone_number]', :with => unsaved_club.cs_phone_number
     attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
     check('club[requires_external_id]')
     select('application', :from => 'club[theme]')
@@ -107,8 +109,9 @@ class ClubTest < ActionController::IntegrationTest
     end
     within("#products_table") do
       wait_until{
-        assert page.has_content?('KIT')
-        assert page.has_content?('CARD')
+        Club::DEFAULT_PRODUCT.each do |sku|
+          assert page.has_content?(sku)
+        end
       }
     end
   end

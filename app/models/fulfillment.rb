@@ -21,17 +21,17 @@ class Fulfillment < ActiveRecord::Base
                 'ADDRESS','CITY','ZIP','Product','Charter Member Status' ]
 
 
-  scope :where_undeliverable, lambda { where("status = 'undeliverable'") }
-  scope :where_processing, lambda { where("status = 'processing'") }
+  scope :where_bad_address, lambda { where("status = 'bad_address'") }
+  scope :where_in_process, lambda { where("status = 'in_process'") }
   scope :where_not_processed, lambda { where("status = 'not_processed'") }
-  scope :where_cancellable, lambda { where("status IN ('not_processed','processing','out_of_stock','undeliverable')") }
+  scope :where_cancellable, lambda { where("status IN ('not_processed','in_process','out_of_stock','bad_address')") }
   scope :type_kit_card, lambda { where("product_sku = 'KIT-CARD'")}
   scope :type_others, lambda { where("product_sku NOT IN ('KIT-CARD')")}
 
   scope :not_renewed, lambda { where("renewed = false") }
 
   scope :to_be_renewed, lambda { where([ " date(renewable_at) <= ? " + 
-    " AND fulfillments.status NOT IN ('canceled', 'processing') " + 
+    " AND fulfillments.status NOT IN ('canceled', 'in_process') " + 
     " AND recurrent = true AND renewed = false ", Time.zone.now.to_date]) }
 
   delegate :club, :to => :member
@@ -41,8 +41,8 @@ class Fulfillment < ActiveRecord::Base
     event :set_as_not_processed do
       transition all => :not_processed
     end
-    event :set_as_processing do
-      transition all => :processing
+    event :set_as_in_process do
+      transition all => :in_process
     end
     event :set_as_on_hold do
       transition all => :on_hold
@@ -59,34 +59,34 @@ class Fulfillment < ActiveRecord::Base
     event :set_as_canceled do
       transition all => :canceled
     end
-    event :set_as_undeliverable do
-      transition all => :undeliverable
+    event :set_as_bad_address do
+      transition all => :bad_address
     end
   
     #First status. fulfillment is waiting to be processed.
     state :not_processed
     #This status will be automatically set after the new fulfillment list is downloaded. Only if magento 
     #has stock. Stock will be decreased in one.
-    state :processing
+    state :in_process
     #Used due to some type of error
     state :on_hold
-    #Manually set through CS, by selecting all or some fulfillments in processing status.
+    #Manually set through CS, by selecting all or some fulfillments in in_process status.
     state :sent 
     #Set automatically using Magento, when a representative or supervisor downloads the file with 
     #fulfillments in not_processed status
     state :out_of_stock 
     #Will be similar than Bad address
     state :returned
-    #when member gets lapsed status, all not_processed / processing / Out of stock fulfillments gets this status.
+    #when member gets lapsed status, all not_processed / in_process / Out of stock fulfillments gets this status.
     state :canceled
     #if delivery fail this status is set and wrong address on member file should be filled with the reason
-    state :undeliverable
+    state :bad_address
   end
 
   def renew!
     if recurrent and member.can_renew_fulfillment? and not renewed?
-      if self.undeliverable?
-        self.new_fulfillment('undeliverable')
+      if self.bad_address?
+        self.new_fulfillment('bad_address')
       else
         self.new_fulfillment
       end
@@ -143,8 +143,8 @@ class Fulfillment < ActiveRecord::Base
   #   if product.nil? 
   #     raise "Product does not have stock."
   #   end
-  #   if undeliverable?
-  #     raise "Fulfillment is undeliverable"
+  #   if bad_address?
+  #     raise "Fulfillment is bad_address"
   #   end
 
   #   self.decrease_stock!
@@ -176,7 +176,7 @@ class Fulfillment < ActiveRecord::Base
   def get_file_line(change_status = false, type_others = true)
     return [] if product.nil?
     if change_status
-      Fulfillment.find(self.id).set_as_processing unless self.processing? or self.renewed?
+      Fulfillment.find(self.id).set_as_in_process unless self.in_process? or self.renewed?
     end
     member = self.member
     if type_others
