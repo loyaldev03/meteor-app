@@ -22,11 +22,11 @@ class FulfillmentFile < ActiveRecord::Base
   end
 
   def fulfillments_processed
-    [ fulfillments.where_processing.count, fulfillments.count ].join(' / ')
+    [ fulfillments.where_in_process.count, fulfillments.count ].join(' / ')
   end
 
   def mark_fulfillments_as_sent
-    self.fulfillments.where_processing.each { |x| x.set_as_sent! }
+    self.fulfillments.where_in_process.each { |x| x.set_as_sent! }
   end
 
 end
