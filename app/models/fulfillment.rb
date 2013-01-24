@@ -107,19 +107,22 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def decrease_stock!
-    former_status = self.status
-    if product.nil? or not product.has_stock?
-      set_as_out_of_stock!
+    old_status = self.status
+    if product.nil? 
+      return {:message => I18n.t('error_messages.product_empty'), :code => Settings.operation_types.product_empty}
+    elsif not product.has_stock?
+      return {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.operation_types.product_out_of_stock}
     else
       set_as_not_processed!
       product.decrease_stock
+      audit_status_transition(nil,old_status,nil)
+      return {:message => "Fulfillment set as not processed successfully.", :code => Settings.operation_types.success}
     end
-    audit_status_transition(nil,former_status,nil)
   end
 
   def update_status(agent, status, reason)
     old_status = self.status
-    if status == 'undeliverable' or status == 'returned'
+    if status == 'bad_address' or status == 'returned'
       member.set_wrong_address(agent, reason)
     else
       self.status = status

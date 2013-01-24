@@ -545,7 +545,12 @@ class Member < ActiveRecord::Base
         end
         f.member_id = self.uuid
         f.save
-        f.decrease_stock!
+        answer = f.decrease_stock!
+
+        if not answer.code == Settings.operation_types.success
+          f.set_as_not_processed!
+          Airbrake.notify(:error_class => answer.message, :error_message => answer.message, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
+        end
       end
     end
   end
