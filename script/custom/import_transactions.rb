@@ -140,7 +140,6 @@ def load_membership_transactions
             transaction.transaction_type = 'authorization_capture'
             transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
-            capture_response = response.capture_response
             transaction.response = { :authorization => response.message }
             transaction.response_code = response.code
             transaction.response_result = transaction.response

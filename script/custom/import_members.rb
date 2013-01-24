@@ -21,7 +21,7 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.reactivation_times = member.phoenix_reactivations
   # phoenix.gender
   phoenix.blacklisted = member.blacklisted
-  phoenix.api_id = member.drupal_user_api_id
+  phoenix.api_id = member.drupal_user_id
   phoenix.club_cash_expire_date = nil
   phoenix.club_cash_amount = 0
   if member.is_chapter_member
@@ -83,7 +83,7 @@ def set_membership_data(tom_id, member)
   membership.created_at = member.created_at
   membership.updated_at = member.updated_at
   membership.member_id = @member.id
-  membership.cancel_date = member.cancelled_at if @member.status == "lapsed"
+  membership.cancel_date = member.cancelled_at
   membership.save!
   @member.current_membership_id = membership.id
   @member.save
