@@ -117,16 +117,21 @@ class Fulfillment < ActiveRecord::Base
     audit_status_transition(nil,former_status,nil)
   end
 
-  def audit_status_transition(agent, status, reason)
+  def update_status(agent, status, reason)
+    old_status = self.status
+    if status == 'undeliverable' or status == 'returned'
+      member.set_wrong_address(agent, reason)
+    else
+      self.status = status
+      self.save
+    end
+    fulfillment.audit_status_transition(@current_agent, old_status, reason)
+  end
+
+  def audit_status_transition(agent, old_status, reason)
     self.reload
-    message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{status} to #{self.status}"
-    # if status == 'undeliverable' or status == 'returned'
-    #   member.set_wrong_address(agent, reason)
-    # else
-    #   self.status = status
-    #   self.save
-    # end
-    Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{status}_to_#{self.status}"])
+    message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}"
+    Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
     { :message => message, :code => Settings.error_codes.success }
   rescue 
     Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_error )
