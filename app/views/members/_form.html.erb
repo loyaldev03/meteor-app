@@ -261,6 +261,6 @@ Please, have in mind that fields with ' * ' are required.
 
 <% if @member.new_record? %>
   <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
-  <%= f.hidden_field :product_sku, :value => "KIT,CARD" %>
+  <%= f.hidden_field :product_sku, :value => Club::DEFAULT_PRODUCT.join(',') %>
 <% end %>
 
