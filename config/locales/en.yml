@@ -108,7 +108,7 @@ en:
     club_is_not_enable_for_new_enrollments: "We are not accepting new enrollments at this time. Please call member services at: %{cs_phone_number}"
     product_empty: "The product does not exists."
     product_out_of_stock: "you are trying to move a member to a fulfillment queue for a product that has no stock. Add stock or set to allow backorders"
-    fulfillment_new_status_equal_to_old: "Nothing to change on fulfillment %{fulfillment_sku}."
+    fulfillment_new_status_equal_to_old: "Nothing to change on %{fulfillment_sku} fulfillment."
   activerecord:
     model:
       members: 'Members'

@@ -483,7 +483,7 @@ $(document).ready( function() {
     $('#reason').hide();
     $('#new_status').change(function (value){
       // TODO: bad address and returned
-      if (this.options[this.selectedIndex].value == "undeliverable")
+      if (this.options[this.selectedIndex].value == "bad_address" || this.options[this.selectedIndex].value == "returned" )
         $('#reason').show();
       else
         $('#reason').hide();
@@ -509,6 +509,7 @@ $(document).ready( function() {
               $("[name='fulfillment_selected["+data.id+"]']").parent().append("<div class='alert-info alert'>"+data.message+"</div>")
             }else{
               alert(data.message);
+              $("[name='fulfillment_selected["+data.id+"]']").parent().append("<div class='error-info error'>"+data.message+"</div>")
             };
           },
         });  
