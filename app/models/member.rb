@@ -741,9 +741,7 @@ class Member < ActiveRecord::Base
   def set_wrong_address(agent, reason)
     if self.wrong_address.nil?
       if self.update_attribute(:wrong_address, reason)
-        fulfillments = self.fulfillments.where_in_process.not_renewed + self.fulfillments.where_not_processed.not_renewed
-        
-        fulfillments.each do |fulfillment| 
+        self.fulfillments.where_to_set_bad_address.each do |fulfillment| 
           former_status = fulfillment.status
           fulfillment.set_as_bad_address
           fulfillment.audit_status_transition(agent,former_status,nil)

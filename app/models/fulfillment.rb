@@ -24,6 +24,7 @@ class Fulfillment < ActiveRecord::Base
   scope :where_bad_address, lambda { where("status = 'bad_address'") }
   scope :where_in_process, lambda { where("status = 'in_process'") }
   scope :where_not_processed, lambda { where("status = 'not_processed'") }
+  scope :where_to_set_bad_address, lambda { where("status IN ('not_processed','in_process','out_of_stock','returned')") }
   scope :where_cancellable, lambda { where("status IN ('not_processed','in_process','out_of_stock','bad_address')") }
   scope :type_kit_card, lambda { where("product_sku = 'KIT-CARD'")}
   scope :type_others, lambda { where("product_sku NOT IN ('KIT-CARD')")}
@@ -147,10 +148,9 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def audit_status_transition(agent, old_status, reason)
+  def audit_status_transition(agent, old_status, reason = nil)
     self.reload
-    message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}"
-    message + " - Reason: #{reason}" if not reason.nil?  
+    message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
     Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
     return { :message => message, :code => Settings.error_codes.success }
   rescue 

@@ -53,6 +53,7 @@ class Ability
     elsif agent.has_role_with_club? 'representative', club_id
       can :manage, Member
       cannot :api_profile, Member
+      cannot :set_undeliverable, Member
       can :manage, Operation
       can :read, Membership
       can :manage, CreditCard
