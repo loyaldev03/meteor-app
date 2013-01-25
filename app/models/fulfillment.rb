@@ -109,37 +109,53 @@ class Fulfillment < ActiveRecord::Base
   def decrease_stock!
     old_status = self.status
     if product.nil? 
-      return {:message => I18n.t('error_messages.product_empty'), :code => Settings.operation_types.product_empty}
+      return {:message => I18n.t('error_messages.product_empty'), :code => Settings.error_codes.product_empty}
     elsif not product.has_stock?
-      return {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.operation_types.product_out_of_stock}
+      return {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.error_codes.product_out_of_stock}
     else
       set_as_not_processed!
       product.decrease_stock
       audit_status_transition(nil,old_status,nil)
-      return {:message => "Fulfillment set as not processed successfully.", :code => Settings.operation_types.success}
+      return {:message => "Fulfillment set as not processed successfully.", :code => Settings.error_codes.success}
     end
   end
 
   def update_status(agent, status, reason)
     old_status = self.status
-    if status == 'bad_address' or status == 'returned'
-      member.set_wrong_address(agent, reason)
+    if old_status == status
+      return {:message => I18n.t("error_messages.fulfillment_new_status_equal_to_old", :fulfillment_sku => self.product_sku) , :code => Settings.error_codes.fulfillment_error }
+    elsif status == 'bad_address' or status == 'returned'
+      if not member.wrong_address?
+        answer = member.set_wrong_address(agent, reason)
+      else
+        self.status = status
+        self.save
+        answer = {:code => Settings.error_codes.success}
+      end
+    elsif status == 'not_processed'
+      answer = decrease_stock! 
     else
       self.status = status
       self.save
+      answer = {:code => Settings.error_codes.success}
     end
-    fulfillment.audit_status_transition(@current_agent, old_status, reason)
+
+    if answer[:code] == Settings.error_codes.success
+      self.audit_status_transition(@current_agent, old_status, reason)
+    else
+      answer
+    end
   end
 
   def audit_status_transition(agent, old_status, reason)
     self.reload
     message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}"
+    message + " - Reason: #{reason}" if not reason.nil?  
     Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
-    { :message => message, :code => Settings.error_codes.success }
+    return { :message => message, :code => Settings.error_codes.success }
   rescue 
     Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_error )
-    { :message => I18n.t('error_messages.fulfillment_error'), :code => Settings.error_codes.fulfillment_error }
-
+    return { :message => I18n.t('error_messages.fulfillment_error'), :code => Settings.error_codes.fulfillment_error }
   end
 
   # def resend(agent)

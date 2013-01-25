@@ -16,7 +16,7 @@ module ApplicationHelper
 
   def fulfillment_selectable_statuses(name, selected = nil, allow_blank = false)
     # TODO: remove canceeled
-    @possible_status = (allow_blank ? [''] : []) + Fulfillment.state_machines[:status].states.map(&:name)
+    @possible_status = (allow_blank ? [''] : []) + Fulfillment.state_machines[:status].states.map(&:name).delete_if{ |state| state == :canceled }
     select_tag name, options_for_select(@possible_status, :selected => selected), :class => 'select_field input-medium' 
   end
 end
