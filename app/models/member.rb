@@ -523,7 +523,7 @@ class Member < ActiveRecord::Base
       Airbrake.notify(:error_class => error_message, :error_message => e, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing)
-      { :message => message, :code => Settings.error_codes.member_not_saved }
+      return { :message => I18n.t('error_messages.member_not_saved', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.member_not_saved }
     end
   end
 
@@ -547,7 +547,7 @@ class Member < ActiveRecord::Base
         f.save
         answer = f.decrease_stock!
 
-        if not answer.code == Settings.operation_types.success
+        if not answer[:code] == Settings.error_codes.success
           f.set_as_not_processed!
           Airbrake.notify(:error_class => answer.message, :error_message => answer.message, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
         end
