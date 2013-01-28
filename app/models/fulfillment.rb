@@ -127,7 +127,7 @@ class Fulfillment < ActiveRecord::Base
       return {:message => I18n.t("error_messages.fulfillment_new_status_equal_to_old", :fulfillment_sku => self.product_sku) , :code => Settings.error_codes.fulfillment_error }
     elsif status == 'bad_address' or status == 'returned'
       if not member.wrong_address?
-        answer = member.set_wrong_address(agent, reason)
+        answer = member.set_wrong_address(agent, reason, false)
       else
         self.status = status
         self.save

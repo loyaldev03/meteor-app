@@ -739,13 +739,15 @@ class Member < ActiveRecord::Base
     end
   end
   
-  def set_wrong_address(agent, reason)
+  def set_wrong_address(agent, reason, set_fulfillments = true)
     if self.wrong_address.nil?
       if self.update_attribute(:wrong_address, reason)
-        self.fulfillments.where_to_set_bad_address.each do |fulfillment| 
-          former_status = fulfillment.status
-          fulfillment.set_as_bad_address
-          fulfillment.audit_status_transition(agent,former_status,nil)
+        if set_fulfillments
+          self.fulfillments.where_to_set_bad_address.each do |fulfillment| 
+            former_status = fulfillment.status
+            fulfillment.set_as_bad_address
+            fulfillment.audit_status_transition(agent,former_status,nil)
+          end
         end
         message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
         Auditory.audit(agent, self, message, self)
