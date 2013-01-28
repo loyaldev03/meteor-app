@@ -152,7 +152,7 @@ class Member < ActiveRecord::Base
     event :set_as_active do
       transition [:provisional, :active] => :active
     end
-    event :set_as_canceled doset_as_provisional
+    event :set_as_canceled do
       transition [:provisional, :active, :applied] => :lapsed
     end
     event :recovered do 
