@@ -1169,7 +1169,20 @@ class Member < ActiveRecord::Base
     def wrong_address_logic
       if self.changed.include?('wrong_address') and self.wrong_address.nil?
         self.fulfillments.where_bad_address.each { |s| s.decrease_stock! }
-      elsif self.changed.include?('address') and not self.wrong_address.nil?
+      end
+      if self.changed.include?('address') and not self.wrong_address.nil?
+        self.wrong_address = nil
+      end
+      if self.changed.include?('state') and not self.wrong_address.nil?
+        self.wrong_address = nil
+      end
+      if self.changed.include?('city') and not self.wrong_address.nil?
+        self.wrong_address = nil
+      end
+      if self.changed.include?('zip') and not self.wrong_address.nil?
+        self.wrong_address = nil
+      end      
+      if self.changed.include?('country') and not self.wrong_address.nil?
         self.wrong_address = nil
       end
     end
