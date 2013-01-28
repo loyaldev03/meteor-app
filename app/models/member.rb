@@ -43,7 +43,8 @@ class Member < ActiveRecord::Base
   after_destroy :cancel_member_at_remote_domain
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
-  
+
+
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
     api_member.destroy! unless api_member.nil? || api_id.nil?
@@ -1168,8 +1169,8 @@ class Member < ActiveRecord::Base
     def wrong_address_logic
       if self.changed.include?('wrong_address') and self.wrong_address.nil?
         self.fulfillments.where_bad_address.each { |s| s.decrease_stock! }
+      elsif self.changed.include?('address') and not self.wrong_address.nil?
+        self.wrong_address = nil
       end
     end
-
-
 end

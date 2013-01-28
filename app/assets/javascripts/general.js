@@ -482,12 +482,10 @@ $(document).ready( function() {
   function fulfillments_not_processed_function(){
     $('#reason').hide();
     $('#new_status').change(function (value){
-      // TODO: bad address and returned
       if (this.options[this.selectedIndex].value == "bad_address" || this.options[this.selectedIndex].value == "returned" )
         $('#reason').show();
       else
         $('#reason').hide();
-
     });
     $("#fulfillment_select_all").click(function (){
       if ($("#fulfillment_select_all").is(':checked')) {
