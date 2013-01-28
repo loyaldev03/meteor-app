@@ -152,7 +152,7 @@ class Member < ActiveRecord::Base
     event :set_as_active do
       transition [:provisional, :active] => :active
     end
-    event :set_as_canceled do
+    event :set_as_canceled doset_as_provisional
       transition [:provisional, :active, :applied] => :lapsed
     end
     event :recovered do 
@@ -550,7 +550,7 @@ class Member < ActiveRecord::Base
 
         if not answer[:code] == Settings.error_codes.success
           f.set_as_not_processed!
-          Airbrake.notify(:error_class => answer.message, :error_message => answer.message, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
+          Airbrake.notify(:error_class => answer[:message], :error_message => answer[:message], :parameters => { :member => self.inspect, :credit_card => self.active_credit_card, :enrollment_info => self.current_membership.enrollment_info })
         end
       end
     end
