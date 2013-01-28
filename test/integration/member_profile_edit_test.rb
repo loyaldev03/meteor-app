@@ -288,6 +288,133 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     assert_equal @saved_member.wrong_phone_number, nil
   end
 
+  test "change unreachable address to undeliverable when changeing address" do
+    setup_member
+    set_as_undeliverable_member(@saved_member,'reason')
+
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, 'Undeliverable'
+
+    click_link_or_button "Edit"
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[address]', :with => 'another address'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    within("#table_demographic_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+  test "change unreachable address to undeliverable when changeing city" do
+    setup_member
+    set_as_undeliverable_member(@saved_member,'reason')
+
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, 'Undeliverable'
+
+    click_link_or_button "Edit"
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[city]', :with => 'another city'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    within("#table_demographic_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+  test "change unreachable address to undeliverable when changeing zip" do
+    setup_member
+    set_as_undeliverable_member(@saved_member,'reason')
+
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, 'Undeliverable'
+
+    click_link_or_button "Edit"
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[zip]', :with => '12345'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    within("#table_demographic_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+  test "change unreachable address to undeliverable when changeing state" do
+    setup_member
+    set_as_undeliverable_member(@saved_member,'reason')
+
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, 'Undeliverable'
+
+    click_link_or_button "Edit"
+    within("#table_demographic_information")do
+      wait_until{
+        within('#states_td'){ select('Colorado', :from => 'member[state]') }
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    within("#table_demographic_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+  test "change unreachable address to undeliverable when changeing country" do
+    setup_member
+    set_as_undeliverable_member(@saved_member,'reason')
+
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_address, 'Undeliverable'
+
+    click_link_or_button "Edit"
+    within("#table_demographic_information")do
+      wait_until{
+        select('Canada', :from => 'member[country]')
+        within('#states_td'){ select('Ontario', :from => 'member[state]') }
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    within("#table_demographic_information")do
+      assert !page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    assert_equal @saved_member.wrong_phone_number, nil
+  end
+
+
   test "change unreachable address to undeliverable by check" do
     setup_member
     set_as_undeliverable_member(@saved_member,'reason')
@@ -312,7 +439,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.reload
     assert_equal @saved_member.wrong_phone_number, nil
   end
-
 
   test "change unreachable phone number to reachable by changeing phone" do
     setup_member
