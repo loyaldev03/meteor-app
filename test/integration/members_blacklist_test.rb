@@ -137,8 +137,16 @@ class MembersBlacklistTest < ActionController::IntegrationTest
       create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     end
     @saved_member.reload
+    
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
-    assert_equal @saved_member.status, "lapsed"
+    within("#td_mi_status") do
+      assert page.has_content?('lapsed')
+    end
+    within("#td_mi_reactivation_times") do
+      assert page.has_content?("0")
+    end
   end
 
 
