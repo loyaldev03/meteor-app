@@ -427,6 +427,12 @@ class Member < ActiveRecord::Base
 
     credit_cards = credit_card.token.nil? ? [] : CreditCard.joins(:member).where( :token => credit_card.token, :members => { :club_id => club.id } )
 
+    unless credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
+      message = I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => club.cs_phone_number)
+      Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
+      return { :message => message, :code => Settings.error_codes.credit_card_blacklisted, :errors => {:credit_card => {:number => "Number is blacklisted"}} }
+    end
+
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
       if credit_cards.empty? or cc_blank
@@ -439,10 +445,6 @@ class Member < ActiveRecord::Base
                    :errors => member.errors_merged(credit_card) }
         end
         # enroll allowed
-      elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-        message = I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => club.cs_phone_number)
-        Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
-        return { :message => message, :code => Settings.error_codes.credit_card_blacklisted, :errors => {:credit_card => {:number => "Number is blacklisted"}} }
       elsif not (cc_blank or credit_card_params[:number].blank?)
         message = I18n.t('error_messages.credit_card_in_use', :cs_phone_number => club.cs_phone_number)
         Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_in_use)

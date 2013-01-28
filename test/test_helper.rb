@@ -186,6 +186,85 @@ module ActionController
       assert_response :success
     end
 
+
+  def fill_in_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
+    credit_card = FactoryGirl.build(:credit_card_master_card) if credit_card.nil?
+
+    type_of_phone_number = (unsaved_member[:type_of_phone_number].blank? ? '' : unsaved_member.type_of_phone_number.capitalize)
+
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select(unsaved_member.gender, :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        select_country_and_state(unsaved_member.country) 
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
+
+    page.execute_script("window.jQuery('#member_birth_date').next().click()")
+    within(".ui-datepicker-calendar") do
+      click_on("1")
+    end
+    
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(type_of_phone_number, :from => 'member[type_of_phone_number]')
+        # TODO: select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]') Do we need capitalize ???
+        fill_in 'member[email]', :with => unsaved_member.email 
+      }
+    end
+
+    if approval        
+        within("#table_contact_information")do
+        wait_until{
+          select("test-approval", :from => 'member[terms_of_membership_id]') 
+        }
+      end     
+    end 
+
+    fill_in_credit_card_info(credit_card, cc_blank)
+
+    unless unsaved_member.external_id.nil?
+      fill_in 'member[external_id]', :with => unsaved_member.external_id
+    end 
+
+    alert_ok_js
+    click_link_or_button 'Create Member'
+  end
+
+  def fill_in_credit_card_info(credit_card, cc_blank = false)
+    if cc_blank 
+      active_merchant_stubs_store("0000000000")
+      within("#table_credit_card")do
+        check "setter[cc_blank]"
+      end
+    else
+      active_merchant_stubs_store(credit_card.number)
+      within("#table_credit_card")do
+        wait_until{
+          fill_in 'member[credit_card][number]', :with => credit_card.number
+          select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
+          select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
+        }
+      end
+    end
+  end
+
+  def create_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
+    fill_in_member(unsaved_member,credit_card,approval,cc_blank)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    Member.find_by_email(unsaved_member.email)
+  end
+
   # Check Refund email -  It is send it by CS inmediate
   def bill_member(member, do_refund = true, refund_amount = nil)
     next_bill_date = member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)

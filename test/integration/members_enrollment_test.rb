@@ -182,82 +182,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  def fill_in_credit_card_info(credit_card, cc_blank = false)
-    if cc_blank 
-      active_merchant_stubs_store("0000000000")
-      within("#table_credit_card")do
-        check "setter[cc_blank]"
-      end
-    else
-      active_merchant_stubs_store(credit_card.number)
-      within("#table_credit_card")do
-        wait_until{
-          fill_in 'member[credit_card][number]', :with => credit_card.number
-          select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
-          select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
-        }
-      end
-    end
-  end
 
-  def fill_in_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New Member'
 
-    credit_card = FactoryGirl.build(:credit_card_master_card) if credit_card.nil?
-
-    type_of_phone_number = (unsaved_member[:type_of_phone_number].blank? ? '' : unsaved_member.type_of_phone_number.capitalize)
-
-    within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select(unsaved_member.gender, :from => 'member[gender]')
-        fill_in 'member[address]', :with => unsaved_member.address
-        select_country_and_state(unsaved_member.country) 
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
-    end
-
-    page.execute_script("window.jQuery('#member_birth_date').next().click()")
-    within(".ui-datepicker-calendar") do
-      click_on("1")
-    end
-    
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(type_of_phone_number, :from => 'member[type_of_phone_number]')
-        fill_in 'member[email]', :with => unsaved_member.email 
-      }
-    end
-
-    if approval        
-        within("#table_contact_information")do
-        wait_until{
-          select("test-approval", :from => 'member[terms_of_membership_id]') 
-        }
-      end     
-    end 
-
-    fill_in_credit_card_info(credit_card, cc_blank)
-
-    unless unsaved_member.external_id.nil?
-      fill_in 'member[external_id]', :with => unsaved_member.external_id
-    end 
-
-    alert_ok_js
-    click_link_or_button 'Create Member'
-  end
-
-  def create_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
-    fill_in_member(unsaved_member,credit_card,approval,cc_blank)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-    Member.find_by_email(unsaved_member.email)
-  end
 
   def generate_operations(member)
   	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'Member',
@@ -934,6 +860,45 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       wait_until{ assert page.has_content?("1")}
     end
   end
+
+  test "Recover member from sloop with the same credit card" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    active_merchant_stubs_store(credit_card.number)    
+    @saved_member = create_member(unsaved_member,credit_card,true,false)
+    reactivation_times = @saved_member.reactivation_times
+    membership = @saved_member.current_membership
+
+    @saved_member.reload
+
+    @saved_member.set_as_canceled!
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+
+    # reactivate member using sloop form
+    assert_difference('Member.count', 0) do
+      assert_difference('CreditCard.count', 0) do
+        create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+      end
+    end
+    @saved_member.reload
+
+    assert_not_equal @saved_member.status, "lapsed"
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within("#td_mi_reactivation_times")do
+      wait_until{ assert page.has_content?("1")}
+    end
+
+    # TODO: confirm we have only 1 credit card
+
+  end
+
 
   test "Reject member" do
     setup_member(false)

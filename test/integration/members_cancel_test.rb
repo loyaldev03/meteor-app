@@ -27,43 +27,6 @@ class MembersCancelTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-  def fill_in_member_approval(unsaved_member, credit_card)
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New Member'
-
-    within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select(unsaved_member.gender, :from => 'member[gender]')
-        fill_in 'member[address]', :with => unsaved_member.address
-        select_country_and_state(unsaved_member.country)
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
-    end
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
-        fill_in 'member[email]', :with => unsaved_member.email
-        select(@terms_of_membership_with_approval.name, :from => 'member[terms_of_membership_id]')
-      }
-    end
-    active_merchant_stubs_store(credit_card.number)
-    within("#table_credit_card")do
-      wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
-        select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
-      }
-    end
-    alert_ok_js
-    click_link_or_button 'Create Member'
-  end
-
   #Check cancel email - It is send it by CS inmediate after member is lapsed
   test "cancel member" do
     setup_member
@@ -123,6 +86,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     fill_in_member_approval(unsaved_member, credit_card)
+    select(@terms_of_membership_with_approval.name, :from => 'member[terms_of_membership_id]')
 
     wait_until { assert find_field('input_first_name').value == unsaved_member.first_name }
     @saved_member = Member.find_by_email(unsaved_member.email)

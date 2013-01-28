@@ -114,6 +114,34 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     validate_blacklisted_member(@saved_member)
   end
 
+  test "blacklist member with CC and then reactivate a new member with the prev cc blacklisted" do
+    setup_member
+    blacklist_member(@saved_member,@member_blacklist_reason.name)
+    validate_blacklisted_member(@saved_member)
+
+    blacklisted_credit_card_number = "4012301230123010"
+
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    active_merchant_stubs_store(credit_card.number)    
+    @saved_member = create_member(unsaved_member,credit_card,false,false)
+    @saved_member.reload
+    @saved_member.set_as_canceled!
+
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    credit_card.number = blacklisted_credit_card_number
+    active_merchant_stubs_store(credit_card.number)    
+
+    assert_difference('Member.count', 0) do 
+      create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    end
+    @saved_member.reload
+
+    assert_equal @saved_member.status, "lapsed"
+  end
+
+
   test "blacklist member with more CC" do
     setup_member
     FactoryGirl.create(:credit_card_master_card, :member_id => @saved_member.id)
