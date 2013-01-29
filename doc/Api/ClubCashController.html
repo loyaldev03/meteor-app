@@ -166,19 +166,32 @@ Method : POST.
 Method : POST
 </p>
 <p>
-This method adds an specific amount of cash, as club cash to the member.
+This method adds or remove an specific amount of club cash on a member. In
+case you want to add club cash, the amount value  has to be a positive
+number, while if you want to remove club cash, the amount value has to be
+negative.  
 </p>
 <dl>
 <dt>member_id</dt><dd><p>
-ID of the member inside the club. This id is an integer value. With this
-value and the club id we can search for the memeber.
+ID of the member. This ID is unique for each member. (32 characters
+string). This value is used by platform. API users dont 
 </p>
 </dd>
+</dl>
+<p>
+know the member id at this moment.
+</p>
+<dl>
 <dt>amount</dt><dd><p>
-Amount of the club cash to add. It should be float and only number. We
-accept a maximun of two digits after the comma.
+Amount of the club cash to add or It. deduct should be float and only
+number. We accept a maximun of two digits after the comma.
 </p>
 </dd>
+</dl>
+<p>
+(Example: 2.50 , -10.99, 25)
+</p>
+<dl>
 <dt>description</dt><dd><p>
 Description of the club cash. (Eg. why we are adding club cash to the
 member.)
@@ -297,16 +310,16 @@ on club cash cs web page.
       <pre class="lines">
 
 
-21
-22
-23
 24
 25
 26
-27</pre>
+27
+28
+29
+30</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/club_cash_controller.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/club_cash_controller.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -325,7 +338,7 @@ on club cash cs web page.
 </div>
 
     <div id="footer">
-  Generated on Thu Jan 24 10:28:53 2013 by
+  Generated on Tue Jan 29 12:03:09 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
