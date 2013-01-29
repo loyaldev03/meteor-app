@@ -4,13 +4,13 @@ class FulfillmentsController < ApplicationController
   def index
     my_authorize! :report, Fulfillment, @current_club.id
     if request.post?
+      @status = params[:status]
     	if params[:all_times] == '1'
         if params[:product_type] == 'KIT-CARD'
     		  @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_kit_card
         else
           @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_others
         end
-        @status = params[:status]
         @product_type = params[:product_type]
       else
         if params[:product_type] == 'KIT-CARD'
@@ -20,7 +20,6 @@ class FulfillmentsController < ApplicationController
           @fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false', 
             params[:status], params[:initial_date], params[:end_date], @current_club.id]).type_others
         end
-
       end  
     end
   end
