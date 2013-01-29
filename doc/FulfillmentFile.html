@@ -245,7 +245,7 @@
       <pre class="code"><span class="info file"># File 'app/models/fulfillment_file.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fulfillments_processed'>fulfillments_processed</span>
-  <span class='lbracket'>[</span> <span class='id identifier rubyid_fulfillments'>fulfillments</span><span class='period'>.</span><span class='id identifier rubyid_where_processing'>where_processing</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span><span class='comma'>,</span> <span class='id identifier rubyid_fulfillments'>fulfillments</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'> / </span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
+  <span class='lbracket'>[</span> <span class='id identifier rubyid_fulfillments'>fulfillments</span><span class='period'>.</span><span class='id identifier rubyid_where_in_process'>where_in_process</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span><span class='comma'>,</span> <span class='id identifier rubyid_fulfillments'>fulfillments</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'> / </span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -275,7 +275,7 @@
       <pre class="code"><span class="info file"># File 'app/models/fulfillment_file.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mark_fulfillments_as_sent'>mark_fulfillments_as_sent</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_fulfillments'>fulfillments</span><span class='period'>.</span><span class='id identifier rubyid_where_processing'>where_processing</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_x'>x</span><span class='op'>|</span> <span class='id identifier rubyid_x'>x</span><span class='period'>.</span><span class='id identifier rubyid_set_as_sent!'>set_as_sent!</span> <span class='rbrace'>}</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_fulfillments'>fulfillments</span><span class='period'>.</span><span class='id identifier rubyid_where_in_process'>where_in_process</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_x'>x</span><span class='op'>|</span> <span class='id identifier rubyid_x'>x</span><span class='period'>.</span><span class='id identifier rubyid_set_as_sent!'>set_as_sent!</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -287,9 +287,9 @@
 </div>
 
     <div id="footer">
-  Generated on Thu Jan 24 10:28:51 2013 by
+  Generated on Tue Jan 29 12:55:35 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.2.1 (ruby-1.9.2).
+  0.8.2.1 (ruby-1.9.3).
 </div>
 
   </body>

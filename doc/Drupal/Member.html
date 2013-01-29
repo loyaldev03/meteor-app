@@ -109,7 +109,7 @@
         <dt id="OBSERVED_FIELDS-constant" class="">OBSERVED_FIELDS =
           
         </dt>
-        <dd><pre class="code"><span class='qwords_beg'>%w(</span><span class='tstring_content'>first_name</span><span class='words_sep'> </span><span class='tstring_content'>last_name</span><span class='words_sep'> </span><span class='tstring_content'>gender</span><span class='words_sep'> </span><span class='tstring_content'>address</span><span class='words_sep'> </span><span class='tstring_content'>city</span><span class='words_sep'> </span><span class='tstring_content'>email</span><span class='words_sep'> </span><span class='tstring_content'>phone_country_code</span><span class='words_sep'> </span><span class='tstring_content'>phone_area_code</span><span class='words_sep'> </span><span class='tstring_content'>phone_local_number</span><span class='words_sep'> </span><span class='tstring_content'>state</span><span class='words_sep'> </span><span class='tstring_content'>zip</span><span class='words_sep'> </span><span class='tstring_content'>country</span><span class='words_sep'> </span><span class='tstring_content'>visible_id</span><span class='words_sep'> </span><span class='tstring_content'>type_of_phone_number</span><span class='words_sep'> </span><span class='tstring_content'>birth_date</span><span class='words_sep'> </span><span class='tstring_content'>type_of_phone_number</span><span class='words_sep'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+        <dd><pre class="code"><span class='qwords_beg'>%w(</span><span class='tstring_content'>first_name</span><span class='words_sep'> </span><span class='tstring_content'>last_name</span><span class='words_sep'> </span><span class='tstring_content'>gender</span><span class='words_sep'> </span><span class='tstring_content'>address</span><span class='words_sep'> </span><span class='tstring_content'>city</span><span class='words_sep'> </span><span class='tstring_content'>email</span><span class='words_sep'> </span><span class='tstring_content'>phone_country_code</span><span class='words_sep'> </span><span class='tstring_content'>phone_area_code</span><span class='words_sep'> </span><span class='tstring_content'>phone_local_number</span><span class='words_sep'> </span><span class='tstring_content'>state</span><span class='words_sep'> </span><span class='tstring_content'>zip</span><span class='words_sep'> </span><span class='tstring_content'>country</span><span class='words_sep'> </span><span class='tstring_content'>visible_id</span><span class='words_sep'> </span><span class='tstring_content'>type_of_phone_number</span><span class='words_sep'> </span><span class='tstring_content'>birth_date</span><span class='words_sep'> </span><span class='tstring_content'>type_of_phone_number</span><span class='words_sep'> </span><span class='tstring_content'>club_cash_amount</span><span class='words_sep'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
     </dl>
   
@@ -140,9 +140,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>
-Returns the value of attribute member.
-</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute member.</p>
 </div></span>
   
 </li>
@@ -380,9 +379,8 @@ Returns the value of attribute member.
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>
-Returns the value of attribute member
-</p>
+    
+<p>Returns the value of attribute member</p>
 
 
   </div>
@@ -400,9 +398,8 @@ Returns the value of attribute member
       
       
         &mdash;
-        <div class='inline'><p>
-the current value of member
-</p>
+        <div class='inline'>
+<p>the current value of member</p>
 </div>
       
     </li>
@@ -537,10 +534,10 @@ the current value of member
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get'>get</span>
   <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/api/user/%{drupal_id}</span><span class='tstring_end'>'</span></span> <span class='op'>%</span> <span class='lbrace'>{</span> <span class='label'>drupal_id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_api_id'>api_id</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_new_record?'>new_record?</span>
-  <span class='kw'>rescue</span> <span class='const'>Faraday</span><span class='op'>::</span><span class='const'>Error</span><span class='op'>::</span><span class='const'>ParsingError</span> <span class='comment'># Drupal sends invalid application/json when something goes wrong
-</span>    <span class='const'>Drupal</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>  =&gt; </span><span class='embexpr_beg'>#{</span><span class='gvar'>$!</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>ensure</span>
-    <span class='id identifier rubyid_res'>res</span>
+<span class='kw'>rescue</span> <span class='const'>Faraday</span><span class='op'>::</span><span class='const'>Error</span><span class='op'>::</span><span class='const'>ParsingError</span> <span class='comment'># Drupal sends invalid application/json when something goes wrong
+</span>  <span class='const'>Drupal</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>  =&gt; </span><span class='embexpr_beg'>#{</span><span class='gvar'>$!</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>ensure</span>
+  <span class='id identifier rubyid_res'>res</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -571,7 +568,10 @@ the current value of member
 54
 55
 56
-57</pre>
+57
+58
+59
+60</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 48</span>
@@ -581,10 +581,13 @@ the current value of member
     <span class='ivar'>@token</span> <span class='op'>=</span> <span class='const'>Hashie</span><span class='op'>::</span><span class='const'>Mash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/api/urllogin/%{drupal_id}</span><span class='tstring_end'>'</span></span> <span class='op'>%</span> <span class='lbrace'>{</span> <span class='label'>drupal_id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_api_id'>api_id</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_new_record?'>new_record?</span>
   <span class='kw'>end</span>
 
-  <span class='id identifier rubyid_uri'>uri</span> <span class='op'>=</span> <span class='ivar'>@token</span><span class='period'>.</span><span class='id identifier rubyid_url'>url</span> <span class='op'>&amp;&amp;</span> <span class='const'>URI</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='ivar'>@token</span><span class='period'>.</span><span class='id identifier rubyid_url'>url</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_uri'>uri</span> <span class='op'>=</span> <span class='ivar'>@token</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@token</span><span class='period'>.</span><span class='id identifier rubyid_url'>url</span> <span class='op'>&amp;&amp;</span> <span class='const'>URI</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='ivar'>@token</span><span class='period'>.</span><span class='id identifier rubyid_url'>url</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_update_column'>update_column</span> <span class='symbol'>:autologin_url</span><span class='comma'>,</span> <span class='id identifier rubyid_uri'>uri</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span> <span class='kw'>if</span> <span class='id identifier rubyid_uri'>uri</span>
 
   <span class='ivar'>@token</span>
+<span class='kw'>rescue</span>
+  <span class='const'>Airbrake</span><span class='period'>.</span><span class='id identifier rubyid_notify'>notify</span><span class='lparen'>(</span><span class='symbol'>:error_class</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Drupal:Member:login_token</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:parameters</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:member</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='kw'>nil</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -658,13 +661,13 @@ the current value of member
       <pre class="lines">
 
 
-64
-65
-66
-67</pre>
+67
+68
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 64</span>
+      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resend_welcome_email!'>resend_welcome_email!</span>
   <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_post'>post</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/api/user/%{drupal_id}/resend_welcome_email</span><span class='tstring_end'>'</span></span> <span class='op'>%</span> <span class='lbrace'>{</span> <span class='label'>drupal_id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_api_id'>api_id</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
@@ -690,13 +693,13 @@ the current value of member
       <pre class="lines">
 
 
-59
-60
-61
-62</pre>
+62
+63
+64
+65</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 59</span>
+      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset_password!'>reset_password!</span>
   <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_post'>post</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/api/user/%{drupal_id}/password_reset</span><span class='tstring_end'>'</span></span> <span class='op'>%</span> <span class='lbrace'>{</span> <span class='label'>drupal_id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_api_id'>api_id</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
@@ -790,9 +793,9 @@ the current value of member
 </div>
 
     <div id="footer">
-  Generated on Thu Oct 25 08:50:12 2012 by
+  Generated on Tue Jan 29 12:55:35 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.2.1 (ruby-1.9.2).
+  0.8.2.1 (ruby-1.9.3).
 </div>
 
   </body>

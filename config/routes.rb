@@ -5,7 +5,7 @@ SacPlatform::Application.routes.draw do
     scope 'v1' do
       resources :tokens,:only => [:create, :destroy]
       resources :members, :only => [:create, :show, :update] do
-        resources :club_cash, only: :create
+        resources :club_cash_transaction, only: [:create]
       end
       match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get]
       resources :prospects, :only => [:create]      
