@@ -67,10 +67,12 @@ class FulfillmentsController < ApplicationController
     end
     ff.product = params[:product_type]
     if ff.save
-      params[:fulfillment_selected].each do |fs|
-        fulfillment = Fulfillment.find(fs.first)
-        ff.fulfillments << fulfillment
-        fulfillment.set_as_in_process
+      if not params[:fulfillment_selected].nil?
+        params[:fulfillment_selected].each do |fs|
+          fulfillment = Fulfillment.find(fs.first)
+          ff.fulfillments << fulfillment
+          fulfillment.set_as_in_process
+        end
       end
       flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
     else
@@ -81,7 +83,11 @@ class FulfillmentsController < ApplicationController
 
   def download_xls
     my_authorize! :report, Fulfillment, @current_club.id
-    fulfillments = FulfillmentFile.find(params[:fulfillment_file_id]).fulfillments.where_in_process
+    if params[:all_fulfillments]
+      fulfillments = FulfillmentFile.find(params[:fulfillment_file_id]).fulfillments
+    else
+      fulfillments = FulfillmentFile.find(params[:fulfillment_file_id]).fulfillments.where_in_process
+    end
     xls_package = Fulfillment.generateXLS(fulfillments, false, fulfillments.product == 'OTHERS')
     send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
              :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

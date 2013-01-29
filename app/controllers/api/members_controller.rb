@@ -9,7 +9,7 @@ class Api::MembersController < ApplicationController
   # It will also send a welcome email and charge the enrollment to the member's credit card.  
   #
   # [url] /api/v1/members
-  # [current_agent] The agent's ID that will be enrolling the member.  #
+  # [current_agent] The agent's ID that will be enrolling the member. 
   # [member] Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info).
   #          Here is a list of the regex we are using to validate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
