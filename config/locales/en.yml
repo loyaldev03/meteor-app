@@ -278,6 +278,15 @@ en:
         new_status: 'New status'
         product_type: 'Product type'
         renewed: 'Renewed'
+      fulfillment_files:
+        id: 'ID'
+        created_at: 'Created at'
+        working_file: 'Working file'
+        view: 'View'
+        status: 'Status'
+        product: 'Product'
+        date: 'Date'
+        processed: 'Processed'
       communication:
         response: 'Response'
         template_name: 'Template name'

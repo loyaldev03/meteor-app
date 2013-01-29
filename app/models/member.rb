@@ -688,7 +688,7 @@ class Member < ActiveRecord::Base
       end
     else
       answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
-      answer[:errors] = { :number => "Club cash amount is greater that member's actual club cash." }
+      answer[:errors] = { :amount => "Club cash amount is greater that member's actual club cash." }
     end
     answer
   end

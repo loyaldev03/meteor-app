@@ -1,5 +1,7 @@
 <% if @fulfillments %>
 
+
+
   <table class="table table-bordered table-condensed" id="report_results">
     <thead>
     <% if @status != 'not_processed' %>
@@ -9,6 +11,9 @@
           <%= fulfillment_selectable_statuses(:new_status, params[:new_status], true) %>
           <%= text_field_tag "reason", nil, :class => 'text_field input-medium', :placeholder => t('reason') %>
           <%= link_to t('buttons.update_fulfillment_status'), "#", :class => 'btn btn-primary', :id => 'update_fulfillment_status' %>
+          <% if @file %>
+            <%= link_to 'Export all to XLS', download_xls_fulfillments_path, :class => 'btn btn-primary' %>
+          <% end %>
         </td>
       </tr>
     <% end %>
