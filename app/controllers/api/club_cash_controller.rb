@@ -2,10 +2,13 @@ class Api::ClubCashController < ApplicationController
 
   # Method : POST
   #
-  # This method adds an specific amount of cash, as club cash to the member.
+  # This method adds or remove an specific amount of club cash on a member. In case you want to add club cash, the amount value 
+  # has to be a positive number, while if you want to remove club cash, the amount value has to be negative.  
   #
-  # [member_id] ID of the member inside the club. This id is an integer value. With this value and the club id we can search for the memeber.
-  # [amount] Amount of the club cash to add. It should be float and only number. We accept a maximun of two digits after the comma.
+  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont 
+  # know the member id at this moment.
+  # [amount] Amount of the club cash to add or It. deduct should be float and only number. We accept a maximun of two digits after the comma.
+  # (Example: 2.50 , -10.99, 25)
   # [description] Description of the club cash. (Eg. why we are adding club cash to the member.)
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
@@ -18,6 +21,7 @@ class Api::ClubCashController < ApplicationController
   # @return [Integer] *code*
   # @return [Hash] *errors*
   #
+  
   def create
     member = Member.find(params[:member_id])
     my_authorize! :manage_club_cash_api, Member, member.club_id
