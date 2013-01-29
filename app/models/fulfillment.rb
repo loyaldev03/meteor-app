@@ -126,22 +126,18 @@ class Fulfillment < ActiveRecord::Base
     if old_status == new_status
       return {:message => I18n.t("error_messages.fulfillment_new_status_equal_to_old", :fulfillment_sku => self.product_sku) , :code => Settings.error_codes.fulfillment_error }
     elsif new_status == 'bad_address' or new_status == 'returned'
-      if member.wrong_address.nil?
-        answer = member.set_wrong_address(agent, reason, false)
-      else
-        self.status = new_status
-        self.save
-        answer = {:code => Settings.error_codes.success}
-      end
+      answer = ( member.wrong_address.nil? ? member.set_wrong_address(agent, reason, false) : {:code => Settings.error_codes.success} )
+      self.status = new_status
+      self.save
     elsif new_status == 'not_processed'
       answer = decrease_stock! 
     else
       self.status = new_status
       self.save
-      answer = {:code => Settings.error_codes.success}
+      answer = {:code => Settings.error_codes.success }
     end
 
-    if answer[:code] == Settings.error_codes.success
+    if answer[:code] == Settings.error_codes.success        
       self.audit_status_transition(@current_agent, old_status, reason)
     else
       answer
