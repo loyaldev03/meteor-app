@@ -7,7 +7,7 @@ class Api::ClubCashTransactionController < ApplicationController
   #
   # [url] /api/v1/members/:member_id/club_cash_transaction
   # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
-  # [amount] Amount of the club cash to add or deduct. This value should be float and only number. We accept a maximun of two digits after the comma. (Eg: 2.50 , -10.99, 25)
+  # [amount] Amount of the club cash to add or deduct. We only accept numbers with up to two digits after the comma. (Eg: 2.50 , -10.99, 25)
   # [description] Description of the club cash. (Eg. why we are adding or deducting club cash to the member.)
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
