@@ -174,24 +174,16 @@ negative.
 <dl>
 <dt>member_id</dt><dd><p>
 ID of the member. This ID is unique for each member. (32 characters
-string). This value is used by platform. API users dont 
+string). This value is used by platform. API users dont know the member id
+at this moment.
 </p>
 </dd>
-</dl>
-<p>
-know the member id at this moment.
-</p>
-<dl>
 <dt>amount</dt><dd><p>
 Amount of the club cash to add or It. deduct should be float and only
-number. We accept a maximun of two digits after the comma.
+number. We accept a maximun of two digits after the comma. (Example: 2.50 ,
+-10.99, 25)
 </p>
 </dd>
-</dl>
-<p>
-(Example: 2.50 , -10.99, 25)
-</p>
-<dl>
 <dt>description</dt><dd><p>
 Description of the club cash. (Eg. why we are adding club cash to the
 member.)
@@ -310,16 +302,16 @@ on club cash cs web page.
       <pre class="lines">
 
 
+23
 24
 25
 26
 27
 28
-29
-30</pre>
+29</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/club_cash_controller.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/club_cash_controller.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -338,7 +330,7 @@ on club cash cs web page.
 </div>
 
     <div id="footer">
-  Generated on Tue Jan 29 12:03:09 2013 by
+  Generated on Tue Jan 29 12:11:27 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
