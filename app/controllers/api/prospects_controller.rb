@@ -6,6 +6,7 @@ class Api::ProspectsController < ApplicationController
   # Method  : POST
   # Creates prospect with data that we recieve. We don't validate this data.
   #
+  # [url] /api/v1/prospects
   # [prospect] Information related to the prospect.
   #                             *terms_of_membership_id: 
   #                             *first_name: Prospect's first name.

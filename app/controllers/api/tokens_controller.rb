@@ -6,6 +6,8 @@ class Api::TokensController < ApplicationController
   respond_to :json
 
   # Method  : POST
+  # 
+  # [url] /api/v1/tokens
   #
   # @param [Hash] email
   # @param [Hash] password

@@ -6,6 +6,7 @@ class Api::ProductsController < ApplicationController
   # Method : GET
   # Returns the stock available for a product. 
   # 
+  # [url] /api/v1/products/get_stock
   # [sku] Sku of the product we are interested in. This parameter is the product description. 
   # [club_id] Id of the club the product belongs to. 
   # [stock] Actual stock of the product. This value is an integer type.

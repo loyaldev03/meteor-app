@@ -8,8 +8,8 @@ class Api::MembersController < ApplicationController
   # the member's data (including its credit card) and, in case it is correct, it will create and save the member.
   # It will also send a welcome email and charge the enrollment to the member's credit card.  
   #
-  # [current_agent] The agent's ID that will be enrolling the member.
-  #
+  # [url] /api/v1/members
+  # [current_agent] The agent's ID that will be enrolling the member.  #
   # [member] Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info).
   #          Here is a list of the regex we are using to validate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
@@ -98,7 +98,10 @@ class Api::MembersController < ApplicationController
 
   # Method : PUT
   # Updates member's data.
-  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment.
+  #
+  # [url] /api/v1/members/:id
+  # [id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment.
+  #      Have in mind that this value is part of the url.
   # [member] Information related to the member that is being updated.. Here is a list of the regex we are using to validate. {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 
@@ -177,7 +180,9 @@ class Api::MembersController < ApplicationController
   # Method : GET
   # Returns information related to member and its credit card.
   #
+  # [url] /api/v1/members/:id
   # [id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
+  #      Have in mind that this value is part of the url.  
   # [member] Information related to the member that is sumbitting the enroll. Here is a list of the regex we are using to validate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
