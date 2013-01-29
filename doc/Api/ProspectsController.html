@@ -167,6 +167,10 @@ Method  : POST Creates prospect with data that we recieve. We don&#8217;t
 validate this data.
 </p>
 <dl>
+<dt>url</dt><dd><p>
+/api/v1/prospects
+</p>
+</dd>
 <dt>prospect</dt><dd><p>
 Information related to the prospect.
 </p>
@@ -299,7 +303,6 @@ string)
       <pre class="lines">
 
 
-53
 54
 55
 56
@@ -309,10 +312,11 @@ string)
 60
 61
 62
-63</pre>
+63
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/prospects_controller.rb', line 53</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/prospects_controller.rb', line 54</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:manage_prospects_api</span><span class='comma'>,</span> <span class='const'>Prospect</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:club_id</span><span class='rbracket'>]</span>
@@ -335,7 +339,7 @@ string)
 </div>
 
     <div id="footer">
-  Generated on Tue Jan 29 12:11:27 2013 by
+  Generated on Tue Jan 29 13:11:44 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

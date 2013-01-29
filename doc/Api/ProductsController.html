@@ -166,6 +166,10 @@ Method : GET Returns the stock available for a product.
 Method : GET Returns the stock available for a product. 
 </p>
 <dl>
+<dt>url</dt><dd><p>
+/api/v1/products/get_stock
+</p>
+</dd>
 <dt>sku</dt><dd><p>
 Sku of the product we are interested in. This parameter is the product
 description. 
@@ -272,7 +276,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-20
 21
 22
 23
@@ -280,10 +283,11 @@ Code related to the method result.
 25
 26
 27
-28</pre>
+28
+29</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/products_controller.rb', line 20</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/products_controller.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_stock'>get_stock</span>
   <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:manage_product_api</span><span class='comma'>,</span> <span class='const'>Product</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:club_id</span><span class='rbracket'>]</span>
@@ -304,7 +308,7 @@ Code related to the method result.
 </div>
 
     <div id="footer">
-  Generated on Tue Jan 29 12:11:27 2013 by
+  Generated on Tue Jan 29 13:11:44 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

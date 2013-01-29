@@ -223,8 +223,12 @@ member. It will also send a welcome email and charge the enrollment to the
 member&#8217;s credit card.  
 </p>
 <dl>
+<dt>url</dt><dd><p>
+/api/v1/members
+</p>
+</dd>
 <dt>current_agent</dt><dd><p>
-The agent&#8217;s ID that will be enrolling the member.
+The agent&#8217;s ID that will be enrolling the member.  #
 </p>
 </dd>
 <dt>member</dt><dd><p>
@@ -495,9 +499,13 @@ on members creation page.
 Method : GET Returns information related to member and its credit card.
 </p>
 <dl>
+<dt>url</dt><dd><p>
+/api/v1/members/:id
+</p>
+</dd>
 <dt>id</dt><dd><p>
 Members ID. This id is a string type ID (lenght 32 characters.). This ID is
-unique for each member.
+unique for each member. Have in mind that this value is part of the url.  
 </p>
 </dd>
 <dt>member</dt><dd><p>
@@ -656,11 +664,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-227
-228
-229
-230
-231
 232
 233
 234
@@ -709,10 +712,15 @@ Code related to the method result.
 277
 278
 279
-280</pre>
+280
+281
+282
+283
+284
+285</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 227</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 232</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_show'>show</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -788,10 +796,14 @@ Code related to the method result.
 Method : PUT Updates member&#8217;s data.
 </p>
 <dl>
-<dt>member_id</dt><dd><p>
+<dt>url</dt><dd><p>
+/api/v1/members/:id
+</p>
+</dd>
+<dt>id</dt><dd><p>
 ID of the member. This ID is unique for each member. (32 characters
 string). This value is used by platform. API users dont know the member id
-at this moment.
+at this moment. Have in mind that this value is part of the url.
 </p>
 </dd>
 <dt>member</dt><dd><p>
@@ -962,9 +974,6 @@ page.
       <pre class="lines">
 
 
-140
-141
-142
 143
 144
 145
@@ -997,10 +1006,13 @@ page.
 172
 173
 174
-175</pre>
+175
+176
+177
+178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 140</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 143</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -1048,7 +1060,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Tue Jan 29 12:11:27 2013 by
+  Generated on Tue Jan 29 13:11:43 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

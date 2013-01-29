@@ -190,6 +190,12 @@ Method  : PUT.
     <p>
 Method  : POST
 </p>
+<dl>
+<dt>url</dt><dd><p>
+/api/v1/tokens
+</p>
+</dd>
+</dl>
 
 
   </div>
@@ -293,8 +299,6 @@ Method  : POST
       <pre class="lines">
 
 
-16
-17
 18
 19
 20
@@ -324,10 +328,12 @@ Method  : POST
 44
 45
 46
-47</pre>
+47
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/tokens_controller.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/tokens_controller.rb', line 18</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_email'>email</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:email</span><span class='rbracket'>]</span>
@@ -457,8 +463,6 @@ Method  : PUT
       <pre class="lines">
 
 
-56
-57
 58
 59
 60
@@ -466,10 +470,12 @@ Method  : PUT
 62
 63
 64
-65</pre>
+65
+66
+67</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/tokens_controller.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/tokens_controller.rb', line 58</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroy'>destroy</span>
   <span class='ivar'>@user</span><span class='op'>=</span><span class='const'>Agent</span><span class='period'>.</span><span class='id identifier rubyid_find_by_authentication_token'>find_by_authentication_token</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -491,7 +497,7 @@ Method  : PUT
 </div>
 
     <div id="footer">
-  Generated on Tue Jan 29 12:11:26 2013 by
+  Generated on Tue Jan 29 13:11:43 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
