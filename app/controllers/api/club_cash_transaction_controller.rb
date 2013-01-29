@@ -1,4 +1,4 @@
-class Api::ClubCashController < ApplicationController
+class Api::ClubCashTransactionController < ApplicationController
 
   # Method : POST
   #

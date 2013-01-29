@@ -300,7 +300,7 @@ $(document).ready( function() {
       event.preventDefault(); 
         $.ajax({
           type: 'POST',
-          url: "/api/v1/members/"+member_id+"/club_cash",
+          url: "/api/v1/members/"+member_id+"/club_cash_transaction",
           data: $("form").serialize(),
           success: function(data) {
             if (data.code == 000)
