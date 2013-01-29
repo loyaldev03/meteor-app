@@ -121,22 +121,22 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def update_status(agent, status, reason)
+  def update_status(agent, new_status, reason)
     old_status = self.status
-    if old_status == status
+    if old_status == new_status
       return {:message => I18n.t("error_messages.fulfillment_new_status_equal_to_old", :fulfillment_sku => self.product_sku) , :code => Settings.error_codes.fulfillment_error }
-    elsif status == 'bad_address' or status == 'returned'
-      if not member.wrong_address?
+    elsif new_status == 'bad_address' or new_status == 'returned'
+      if member.wrong_address.nil?
         answer = member.set_wrong_address(agent, reason, false)
       else
-        self.status = status
+        self.status = new_status
         self.save
         answer = {:code => Settings.error_codes.success}
       end
-    elsif status == 'not_processed'
+    elsif new_status == 'not_processed'
       answer = decrease_stock! 
     else
-      self.status = status
+      self.status = new_status
       self.save
       answer = {:code => Settings.error_codes.success}
     end
