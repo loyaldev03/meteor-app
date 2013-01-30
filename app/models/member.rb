@@ -425,30 +425,15 @@ class Member < ActiveRecord::Base
     credit_card = CreditCard.new credit_card_params
     credit_card.get_token(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], cc_blank)
 
-    credit_cards = credit_card.token.nil? ? [] : CreditCard.joins(:member).where( :token => credit_card.token, :members => { :club_id => club.id } )
-
-    unless credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-      message = I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => club.cs_phone_number)
-      Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_blacklisted)
-      return { :message => message, :code => Settings.error_codes.credit_card_blacklisted, :errors => {:credit_card => {:number => "Number is blacklisted"}} }
-    end
-
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
-      if credit_cards.empty? or cc_blank
-        member = Member.new
-        member.update_member_data_by_params member_params
-        member.skip_api_sync! if member.api_id.present? || skip_api_sync
-        member.club = club
-        unless member.valid? and credit_card.errors.size == 0
-          return { :message => I18n.t('error_messages.member_data_invalid'), :code => Settings.error_codes.member_data_invalid, 
-                   :errors => member.errors_merged(credit_card) }
-        end
-        # enroll allowed
-      elsif not (cc_blank or credit_card_params[:number].blank?)
-        message = I18n.t('error_messages.credit_card_in_use', :cs_phone_number => club.cs_phone_number)
-        Auditory.audit(current_agent, tom, message, credit_cards.first.member, Settings.operation_types.credit_card_in_use)
-        return { :message => message, :code => Settings.error_codes.credit_card_in_use, :errors => {:credit_card => {:number => "Number already in use"}} }
+      member = Member.new
+      member.update_member_data_by_params member_params
+      member.skip_api_sync! if member.api_id.present? || skip_api_sync
+      member.club = club
+      unless member.valid? and credit_card.errors.size == 0
+        return { :message => I18n.t('error_messages.member_data_invalid'), :code => Settings.error_codes.member_data_invalid, 
+                 :errors => member.errors_merged(credit_card) }
       end
     elsif member.blacklisted
       message = I18n.t('error_messages.member_email_blacklisted', :cs_phone_number => club.cs_phone_number)
@@ -457,6 +442,12 @@ class Member < ActiveRecord::Base
     else
       member.skip_api_sync! if member.api_id.present? || skip_api_sync
       member.update_member_data_by_params member_params
+      # first update first name and last name, then validate credti card
+    end
+
+    answer = member.validate_if_credit_card_already_exist(tom, credit_card_params[:number], credit_card_params[:expire_year], credit_card_params[:expire_month], true, cc_blank, current_agent)
+    unless answer[:code] == Settings.error_codes.success
+      return answer
     end
 
     member.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
@@ -481,15 +472,9 @@ class Member < ActiveRecord::Base
       return { :message => I18n.t('error_messages.member_already_active', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.member_already_active, :errors => { :status => "Already active." } }
     elsif recovery_check and not self.new_record? and not self.can_recover?
       return { :message => I18n.t('error_messages.cant_recover_member', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.cant_recover_member, :errors => {:reactivation_times => "Max reactivation times reached."} }
-    elsif credit_card.blacklisted? or self.blacklisted?
-      return { :message => I18n.t('error_messages.blacklisted', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.blacklisted, :errors => {:number => "Credit card number is blacklisted"} }
-    else
-      c_card = CreditCard.am_card(credit_card.number, credit_card.expire_month, credit_card.expire_year, first_name, last_name)
-      unless c_card.valid?
-        return { :message => I18n.t('error_messages.invalid_credit_card'), :code => Settings.error_codes.invalid_credit_card, :errors => c_card.errors } if not allow_cc_blank
-      end
     end
 
+    # CLEAN ME: => This validation is done at self.enroll
     unless self.valid? 
       return { :message => I18n.t('error_messages.member_data_invalid'), :code => Settings.error_codes.member_data_invalid, 
                :errors => self.errors_merged(credit_card) }
@@ -512,7 +497,12 @@ class Member < ActiveRecord::Base
     end
     
     begin
-      self.credit_cards << credit_card
+      if self.new_record?
+        self.credit_cards << credit_card
+      else
+        validate_if_credit_card_already_exist(tom, credit_card.number, credit_card.expire_year, credit_card.expire_month, false, cc_blank, agent)
+        credit_card = active_credit_card
+      end
       self.enrollment_infos << enrollment_info
       self.memberships << membership
       self.save!
@@ -942,6 +932,52 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def validate_if_credit_card_already_exist(tom, number, new_year, new_month, only_validate = true, allow_cc_blank = false, current_agent = nil)
+    answer = { :message => "Credit card valid", :code => Settings.error_codes.success}
+    new_credit_card = CreditCard.new(:number => number, :expire_month => new_month, :expire_year => new_year)
+    new_credit_card.get_token(tom.payment_gateway_configuration, first_name, last_name)
+    credit_cards = new_credit_card.token.nil? ? [] : CreditCard.joins(:member).where(:token => new_credit_card.token, :members => { :club_id => club.id } )
+
+    if credit_cards.empty? or allow_cc_blank
+      unless only_validate
+        answer = add_new_credit_card(new_credit_card, current_agent)
+      end
+    elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
+      answer = { :message => I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_blacklisted, :errors => { :number => "Credit card is blacklisted" }}
+    elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? # is this credit card already of this member and its already active?
+      unless only_validate
+        answer = active_credit_card.update_expire(new_year, new_month) # lets update expire month
+      end
+    elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
+      # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
+      answer = { :message => I18n.t('error_messages.credit_card_in_use', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
+    elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
+      unless only_validate
+        # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
+        new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
+        CreditCard.transaction do 
+          begin
+            answer = new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
+            if answer[:code] == Settings.error_codes.success
+              # activate new credit card ONLY if expire date was updated.
+              new_active_credit_card.set_as_active!
+            end
+          rescue Exception => e
+            Airbrake.notify(:error_class => "Members::update_credit_card_from_drupal", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :new_active_credit_card => new_active_credit_card.inspect, :member => self.inspect })
+            raise ActiveRecord::Rollback
+          end
+        end
+      end
+    elsif credit_cards.select { |cc| cc.active }.empty? # its not my credit card. its from another member. the question is. can I use it?
+      unless only_validate
+        answer = add_new_credit_card(new_credit_card, current_agent)
+      end
+    else
+      answer = { :message => I18n.t('error_messages.credit_card_in_use', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
+    end
+    answer
+  end
+
   def update_credit_card_from_drupal(credit_card, current_agent = nil)
     return { :code => Settings.error_codes.success } if credit_card.nil? || credit_card.empty?
     new_year, new_month, new_number = credit_card[:expire_year], credit_card[:expire_month], nil
@@ -960,41 +996,7 @@ class Member < ActiveRecord::Base
         { :code => Settings.error_codes.invalid_credit_card, :message => I18n.t('error_messages.invalid_credit_card'), :errors => { :number => "Credit card do not match the active one." }}
       end
     else # drupal or CS sends the complete credit card number.
-      new_credit_card = CreditCard.new(:number => credit_card[:number], :expire_month => new_month, :expire_year => new_year)
-      new_credit_card.get_token(terms_of_membership.payment_gateway_configuration, first_name, last_name)
-      credit_cards = new_credit_card.token.nil? ? [] : CreditCard.joins(:member).where(:token => new_credit_card.token, :members => { :club_id => club.id } )
-
-      if credit_cards.empty?
-        add_new_credit_card(new_credit_card, current_agent)
-      elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
-        { :message => I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_blacklisted, :errors => { :number => "Credit card is blacklisted" }}
-      elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? # is this credit card already of this member and its already active?
-        active_credit_card.update_expire(new_year, new_month) # lets update expire month
-      elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
-        # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
-        { :message => I18n.t('error_messages.credit_card_in_use', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
-      elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
-        # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
-        new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
-        answer = {}
-        CreditCard.transaction do 
-          begin
-            answer = new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
-            if answer[:code] == Settings.error_codes.success
-              # activate new credit card ONLY if expire date was updated.
-              new_active_credit_card.set_as_active!
-            end
-          rescue Exception => e
-            Airbrake.notify(:error_class => "Members::update_credit_card_from_drupal", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :new_active_credit_card => new_active_credit_card.inspect, :member => self.inspect })
-            raise ActiveRecord::Rollback
-          end
-        end
-        answer
-      elsif credit_cards.select { |cc| cc.active }.empty? # its not my credit card. its from another member. the question is. can I use it?
-        add_new_credit_card(new_credit_card, current_agent)
-      else
-        { :message => I18n.t('error_messages.credit_card_in_use', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
-      end
+      validate_if_credit_card_already_exist(terms_of_membership, credit_card[:number], new_year, new_month, false, false, current_agent)
     end
   end
 
