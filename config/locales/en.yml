@@ -98,6 +98,7 @@ en:
     credit_card_blacklisted: "There was an error with your credit card information. Please call member services at: %{cs_phone_number}."
     expired_credit_card: "Credit card to activate is expired."
     fulfillment_error: "Could not update fulfillment status."
+    fulfillment_new_status_blank: "New status is blank. Please, select a new status to be applied."
     credit_amount_invalid: "Credit amount must be a positive number."
     refund_invalid: "Cant credit more $ than the original transaction amount"
     credit_card_blank_with_grace: "Payment gateway not found."
