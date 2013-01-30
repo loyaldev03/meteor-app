@@ -109,7 +109,8 @@ en:
     get_token_mes_error: "An error was encountered while processing your request."
     club_is_not_enable_for_new_enrollments: "We are not accepting new enrollments at this time. Please call member services at: %{cs_phone_number}"
     product_empty: "The product does not exists."
-    product_out_of_stock: "you are trying to move a member to a fulfillment queue for a product that has no stock. Add stock or set to allow backorders"
+    product_out_of_stock: "You are trying to move a member to a fulfillment queue for a product that has no stock. Add stock or set to allow backorders"
+    product_does_not_exists: "We do not have the product."
     fulfillment_new_status_equal_to_old: "Nothing to change on %{fulfillment_sku} fulfillment."
   activerecord:
     model:

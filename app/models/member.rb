@@ -421,12 +421,6 @@ class Member < ActiveRecord::Base
       return { :message => I18n.t('error_messages.club_is_not_enable_for_new_enrollments', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.club_is_not_enable_for_new_enrollments }      
     end
     
-    member_params[:product_sku].split(',').each do |sku|
-      unless Product.find_by_club_id_and_sku(club.id,sku).has_stock?
-        return {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.error_codes.product_out_of_stock}
-      end
-    end
-
     # credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
     credit_card = CreditCard.new credit_card_params
     credit_card.get_token(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], cc_blank)
@@ -471,6 +465,17 @@ class Member < ActiveRecord::Base
   def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, member_params = nil)
     allow_cc_blank = (amount.to_f == 0.0 and cc_blank)
     club = tom.club
+
+    member_params[:product_sku].split(',').each do |sku|
+      product = Product.find_by_club_id_and_sku(club.id,sku)
+      if product.nil?
+        return { :message => I18n.t('error_messages.product_does_not_exists'), :code => Settings.error_codes.product_does_not_exists }
+      else
+        if not product.has_stock?
+          return { :message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.error_codes.product_out_of_stock }
+        end
+      end
+    end
 
     if not self.new_record? and recovery_check and not self.lapsed? 
       return { :message => I18n.t('error_messages.member_already_active', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.member_already_active, :errors => { :status => "Already active." } }
@@ -1177,19 +1182,7 @@ class Member < ActiveRecord::Base
     end
 
     def wrong_address_logic
-      if self.changed.include?('address') and not self.wrong_address.nil?
-        self.wrong_address = nil
-      end
-      if self.changed.include?('state') and not self.wrong_address.nil?
-        self.wrong_address = nil
-      end
-      if self.changed.include?('city') and not self.wrong_address.nil?
-        self.wrong_address = nil
-      end
-      if self.changed.include?('zip') and not self.wrong_address.nil?
-        self.wrong_address = nil
-      end      
-      if self.changed.include?('country') and not self.wrong_address.nil?
+      if not (self.changed & ['address', 'state', 'city', 'zip', 'country']).empty? and not self.wrong_address.nil?
         self.wrong_address = nil
       end
       if self.changed.include?('wrong_address') and self.wrong_address.nil?

@@ -131,6 +131,7 @@ defaults: &defaults
     not_supported: '902'
     product_empty: '903'
     product_out_of_stock: '904'
+    product_does_not_exists: '905'
     invalid_credit_card: '9506'
     credit_card_in_use: '9507'
     credit_card_blacklisted: '9508'
