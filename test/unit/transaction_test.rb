@@ -226,7 +226,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing with SD is re-scheduled" do 
     active_merchant_stubs_store
-    assert_difference('Operation.count') do
+    assert_difference('Operation.count', 2) do
       assert_difference('Transaction.count') do
         active_member = create_active_member(@terms_of_membership)
         active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
@@ -261,8 +261,8 @@ class TransactionTest < ActiveSupport::TestCase
   end
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 
     active_merchant_stubs_store
-    assert_difference('Operation.count', 4) do
-      assert_difference('Communication.count', +1) do
+    assert_difference('Operation.count', 5) do
+      assert_difference('Communication.count', 2) do
         active_member = create_active_member(@terms_of_membership)
         active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
         amount = @terms_of_membership.installment_amount
@@ -281,8 +281,8 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing with HD cancels member" do 
     active_merchant_stubs_store
-    assert_difference('Operation.count', 4) do
-      assert_difference('Communication.count', +1) do
+    assert_difference('Operation.count', 5) do
+      assert_difference('Communication.count', 2) do
         active_member = create_active_member(@terms_of_membership)
         active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
         amount = @terms_of_membership.installment_amount
