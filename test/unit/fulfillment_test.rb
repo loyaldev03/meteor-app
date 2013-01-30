@@ -64,7 +64,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     fulfillment.renewable_at = Time.zone.now - 3.days
     fulfillment.recurrent = true
     fulfillment.save
-    fulfillment.set_as_processing!
+    fulfillment.set_as_in_process
     assert_equal Fulfillment.to_be_renewed.count, 0
   end
 
@@ -77,8 +77,8 @@ class FulfillmentTest < ActiveSupport::TestCase
     fulfillment.renewable_at = Time.zone.now - 3.days
     fulfillment.recurrent = true
     fulfillment.save
-    fulfillment.set_as_processing!
-    fulfillment.set_as_sent!
+    fulfillment.set_as_in_process
+    fulfillment.set_as_sent
     assert_equal Fulfillment.to_be_renewed.count, 1
     assert_difference('Fulfillment.count') do  
       fulfillment.renew!
@@ -99,18 +99,14 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Should send fulfillments on acepted applied member and set correct status on fulfillments" do
     setup_products
-    member = create_active_member(@terms_of_membership_with_gateway, :applied_member, :enrollment_info_with_product_without_stock)
-    assert_difference('Fulfillment.count',2) do
+    member = create_active_member(@terms_of_membership_with_gateway, :applied_member, :enrollment_info_with_product_recurrent)
+    assert_difference('Fulfillment.count') do
       member.set_as_provisional!
     end
-    fulfillment_out_of_stock = Fulfillment.find_by_product_sku('circlet')
-    assert_equal fulfillment_out_of_stock.status, 'out_of_stock', "Status is #{fulfillment_out_of_stock.status} should be 'out_of_stock'"
-    product = Product.find_by_sku('circlet')
-    assert_equal fulfillment_out_of_stock.product_package, product.package
-    assert_equal fulfillment_out_of_stock.tracking_code, product.package + member.visible_id.to_s
+    product = Product.find_by_sku('kit-kard')
+    fulfillment_with_stock = Fulfillment.find_by_product_sku('kit-kard')
 
-    fulfillment_with_stock = Fulfillment.find_by_product_sku('Bracelet')
-    assert_equal fulfillment_with_stock.status, 'not_processed', "Status is #{fulfillment_out_of_stock.status} should be 'not_processed'"          
+    assert_equal fulfillment_with_stock.status, 'not_processed'
   end
 
   test "Should create new fulfillment with recurrent and renewable_date" do
@@ -123,15 +119,4 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert_equal fulfillment_out_of_stock.recurrent, true, "Recurrent on fulfillment is not recurrent when it should be."
     assert_equal fulfillment_out_of_stock.renewable_at, fulfillment_out_of_stock.assigned_at + 1.year, "Renewable date was not set properly."
   end
-
-  test "When resending fulfillment has stock, it should be set as not_processed" do
-    setup_products
-    agent = FactoryGirl.create(:confirmed_admin_agent)
-    member = create_active_member(@terms_of_membership_with_gateway, :applied_member)
-    fulfillment = FactoryGirl.create(:fulfillment_undeliverable_with_stock, :member_id => member.id)
-    stock = fulfillment.product.stock
-    fulfillment.resend(agent)
-    assert_equal fulfillment.product.stock, stock, "Stock was decreased."
-    assert_equal fulfillment.status, 'undeliverable', "Status should not be changed, since member's is undeliverable."
-  end 
 end
