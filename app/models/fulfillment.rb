@@ -110,14 +110,12 @@ class Fulfillment < ActiveRecord::Base
   def decrease_stock!
     old_status = self.status
     if product.nil? 
-      return {:message => I18n.t('error_messages.product_empty'), :code => Settings.error_codes.product_empty}
+      {:message => I18n.t('error_messages.product_empty'), :code => Settings.error_codes.product_empty}
     elsif not product.has_stock?
-      return {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.error_codes.product_out_of_stock}
+      {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.error_codes.product_out_of_stock}
     else
-      set_as_not_processed!
       product.decrease_stock
-      audit_status_transition(nil,old_status,nil)
-      return {:message => "Fulfillment set as not processed successfully.", :code => Settings.error_codes.success}
+      {:message => "Stock reduced with success", :code => Settings.error_codes.success}
     end
   end
 
@@ -129,16 +127,13 @@ class Fulfillment < ActiveRecord::Base
       return {:message => I18n.t("error_messages.fulfillment_new_status_equal_to_old", :fulfillment_sku => self.product_sku) , :code => Settings.error_codes.fulfillment_error }
     elsif new_status == 'bad_address' or new_status == 'returned'
       answer = ( member.wrong_address.nil? ? member.set_wrong_address(agent, reason, false) : {:code => Settings.error_codes.success} )
-      self.status = new_status
-      self.save
     elsif new_status == 'not_processed'
       answer = decrease_stock! 
     else
-      self.status = new_status
-      self.save
-      answer = {:code => Settings.error_codes.success }
+      answer = { :code => Settings.error_codes.success }
     end
-
+    self.status = new_status
+    self.save
     if answer[:code] == Settings.error_codes.success        
       self.audit_status_transition(@current_agent, old_status, reason)
     else
