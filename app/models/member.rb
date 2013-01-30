@@ -555,9 +555,7 @@ class Member < ActiveRecord::Base
         f.member_id = self.uuid
         f.save
         answer = f.decrease_stock!
-
-        if not answer[:code] == Settings.error_codes.success
-          f.set_as_not_processed!
+        unless answer[:code] == Settings.error_codes.success
           Airbrake.notify(:error_class => answer[:message], :error_message => answer[:message], :parameters => { :member => self.inspect, :credit_card => self.active_credit_card, :enrollment_info => self.current_membership.enrollment_info })
         end
       end
@@ -1193,7 +1191,16 @@ class Member < ActiveRecord::Base
         self.wrong_address = nil
       end
       if self.changed.include?('wrong_address') and self.wrong_address.nil?
-        self.fulfillments.where_bad_address.each { |s| s.decrease_stock! }
+        self.fulfillments.where_bad_address.each do |s| 
+          answer = s.decrease_stock! 
+          if answer[:code] == Settings.error_codes.success
+            # TODO: seba add this logic
+            # s.update_status(agent, new_status, reason)
+          else
+            # TODO: seba  add this logic
+            # s.update_status(agent, new_status, reason)
+          end
+        end
       end
     end
 end
