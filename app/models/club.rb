@@ -71,6 +71,7 @@ class Club < ActiveRecord::Base
         p.name = sku
         p.stock = 100
         p.recurrent = true
+        p.allow_backorder = true
         p.club_id = self.id
         p.save
       end

@@ -65,17 +65,19 @@ class FulfillmentsController < ApplicationController
       ff.initial_date, ff.end_date, ff.all_times = params[:initial_date], params[:end_date], false
     end
     ff.product = params[:product_type]
-    if ff.save
-      if not params[:fulfillment_selected].nil?
+    if not params[:fulfillment_selected].nil?
+      if ff.save
         params[:fulfillment_selected].each do |fs|
           fulfillment = Fulfillment.find(fs.first)
           ff.fulfillments << fulfillment
           fulfillment.set_as_in_process
         end
+        flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
+      else
+        flash.now[:error] = "Error while processing this fulfillment. Contact the administrator."
       end
-      flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
     else
-      flash.now[:error] = "Error while processing this fulfillment. Contact the administrator."
+      flash.now[:error] = "No fulfillments selected. Please, select fulfillments in order to crate XLS file."
     end
     render :index
   end

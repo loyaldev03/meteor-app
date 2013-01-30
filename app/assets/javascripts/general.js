@@ -495,7 +495,10 @@ $(document).ready( function() {
       }
     });
     $("#update_fulfillment_status").click(function() {
-      $('.fulfillment_selected:checked').each(function(index){
+      if($('.fulfillment_selected:checked').length == 0){
+      alert("Select a fulfillment to apply status.");
+      } else{
+        $('.fulfillment_selected:checked').each(function(index){
         $.ajax({
           type: 'PUT',
           url: $(this).data('url'),
@@ -511,8 +514,8 @@ $(document).ready( function() {
             };
           },
         });  
-
       });
+      }
     });     
   }
 
