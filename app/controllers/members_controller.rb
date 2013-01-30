@@ -96,7 +96,7 @@ class MembersController < ApplicationController
         if answer[:code] == Settings.error_codes.success
           flash[:notice] = answer[:message]
         else
-          flash[:error] = answer[:message] + " " + answer[:errors].collect {|attr, message| "#{attr}: #{message}" }.join(' ')
+          flash[:error] = answer[:message] + " " + ( answer[:errors].nil? ? " " : answer[:errors].collect {|attr, message| "#{attr}: #{message}" }.join(' ') )
         end
       end
       redirect_to show_member_path
