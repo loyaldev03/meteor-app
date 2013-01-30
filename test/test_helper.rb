@@ -344,6 +344,93 @@ module ActionController
 
   end
 
+  def validate_view_member_base(member, status='provisional')
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == member.first_name }
+
+    assert find_field('input_visible_id').value == "#{member.visible_id}"
+    assert find_field('input_first_name').value == member.first_name
+    assert find_field('input_last_name').value == member.last_name
+    assert find_field('input_gender').value == (member.gender == 'F' ? 'Female' : 'Male') unless member.gender.blank?
+    assert find_field('input_member_group_type').value == (member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : member.member_group_type.name)
+    
+    within("#table_demographic_information") do
+      assert page.has_content?(member.address)
+      assert page.has_content?(member.city)
+      assert page.has_content?(member.state)
+      assert page.has_content?(member.country)
+      assert page.has_content?(member.zip)
+      assert page.has_selector?('#link_member_set_undeliverable')     
+    end
+
+    within("#table_contact_information") do
+      assert page.has_content?(member.full_phone_number)
+      assert page.has_content?(member.type_of_phone_number.capitalize)
+      assert page.has_content?("#{member.birth_date}")
+      assert page.has_selector?('#link_member_set_unreachable')     
+    end
+
+    active_credit_card = member.active_credit_card
+    within("#table_active_credit_card") do
+      wait_until{ assert page.has_content?("#{active_credit_card.last_digits}") }
+      if active_credit_card.cc_type.nil?
+        wait_until{ assert page.has_content?(I18n.t('activerecord.attributes.credit_card.type_unknown')) }
+      else
+        wait_until{ assert page.has_content?("#{active_credit_card.cc_type}") }
+      end
+      wait_until{ assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}") }
+      wait_until{ assert page.has_content?(I18n.l(active_credit_card.created_at, :format => :only_date)) }
+      
+    end
+
+    within("#table_membership_information") do
+      
+      within("#td_mi_status") { assert page.has_content?(status) }
+      
+      within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(member.member_since_date, :format => :only_date)) }
+      
+      assert page.has_content?(member.terms_of_membership.name)
+      
+      within("#td_mi_reactivation_times") { assert page.has_content?("#{member.reactivation_times}") }
+      
+      assert page.has_content?(member.current_membership.created_by.username)
+
+      within("#td_mi_reactivation_times") { assert page.has_content?("#{member.reactivation_times}") }
+      
+      within("#td_mi_recycled_times") { assert page.has_content?("#{member.recycled_times}") }
+      
+      assert page.has_no_selector?("#td_mi_external_id")
+      
+      within("#td_mi_join_date") { assert page.has_content?(I18n.l(member.join_date, :format => :only_date)) }
+
+      within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(member.next_retry_bill_date, :format => :only_date)) } if member.status != 'applied'
+
+      assert page.has_selector?("#link_member_change_next_bill_date") if member.status != 'applied'
+
+      within("#td_mi_club_cash_amount") { assert page.has_content?("#{member.club_cash_amount.to_f}") }
+
+      assert page.has_selector?("#link_member_add_club_cash") if member.status == 'provisional' or member.status == 'active'
+
+      within("#td_mi_quota") { assert page.has_content?("#{member.quota}") }      
+    end  
+    if not member.current_membership.enrollment_info.product_sku.blank? and not member.status == 'applied'
+      within("#fulfillments") do
+        assert page.has_content?('KIT') 
+        assert page.has_content?('CARD') 
+      end
+    end
+    membership = member.current_membership
+    within("#memberships_table")do
+      wait_until{
+        assert page.has_content?(membership.id.to_s)
+        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+        assert page.has_content?(membership.quota.to_s)
+        assert page.has_content?(status)
+      }
+    end
+  end
+
+
     teardown do
       DatabaseCleaner.clean
       Capybara.reset_sessions!  
