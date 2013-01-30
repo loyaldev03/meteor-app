@@ -192,7 +192,7 @@ class Fulfillment < ActiveRecord::Base
     end
     member = self.member
     if type_others
-      [ self.tracking_code, self.product_sku, member.full_name, member.address, member.city,
+      [ self.tracking_code, self.product.cost_center, member.full_name, member.address, member.city,
             member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
             self.product.weight, 'MID']
     else

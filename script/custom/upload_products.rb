@@ -29,6 +29,7 @@ end
       product.name = row[0]
       product.sku = row[0]+row[1]  #product + driver name
       product.stock = row[2].to_i  #stock
+      product.cost_center = row[3] #cost center
       product.club_id = club_id
       product.save
     end

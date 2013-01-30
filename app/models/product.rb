@@ -1,16 +1,22 @@
 class Product < ActiveRecord::Base
   belongs_to :club
 
-  attr_accessible :name, :recurrent, :sku, :stock, :weight, :package, :allow_backorder
+  attr_accessible :name, :recurrent, :sku, :stock, :weight, :package, :allow_backorder, :cost_center
 
-  validates :sku, :uniqueness => {:scope => :club_id}, :presence => true, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2, :maximum => 19 }
+  validates :sku, :uniqueness => {:scope => :club_id}, :presence => true, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2 }
+  validates :cost_center, :presence => true, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2, :maximum => 19 }
 
   validates :package, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2, :maximum => 30 }
   validates :stock, :numericality => { :only_integer => true, :less_than => 1999999}
 
+  before_save :apply_upcase_to_sku
 
   def self.datatable_columns
     ['id', 'name', 'recurrent', 'stock', 'weight' ]
+  end
+
+  def apply_upcase_to_sku
+    self.sku = self.sku.upcase
   end
 
   def update_product_data_by_params(params)
