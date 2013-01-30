@@ -1187,11 +1187,9 @@ class Member < ActiveRecord::Base
         self.fulfillments.where_bad_address.each do |s| 
           answer = s.decrease_stock! 
           if answer[:code] == Settings.error_codes.success
-            # TODO: seba add this logic
-            # s.update_status(agent, new_status, reason)
+            s.update_status( nil, 'not_processed', "Recovered from member unseted wrong address" )
           else
-            # TODO: seba  add this logic
-            # s.update_status(agent, new_status, reason)
+            s.update_status( nil, 'out_of_stock', "Recovered from member unseted wrong address" )
           end
         end
       end
