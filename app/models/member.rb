@@ -420,6 +420,12 @@ class Member < ActiveRecord::Base
     unless club.billing_enable
       return { :message => I18n.t('error_messages.club_is_not_enable_for_new_enrollments', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.club_is_not_enable_for_new_enrollments }      
     end
+    
+    member_params[:product_sku].split(',').each do |sku|
+      unless Product.find_by_club_id_and_sku(club.id,sku).has_stock?
+        return {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.error_codes.product_out_of_stock}
+      end
+    end
 
     # credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
     credit_card = CreditCard.new credit_card_params
