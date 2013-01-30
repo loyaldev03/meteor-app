@@ -599,14 +599,11 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update a profile with CC blacklisted" do
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
-    cc_expire_year = @active_credit_card.expire_year
-    @credit_card = FactoryGirl.build :credit_card_american_express
-    @credit_card.number = @blacklisted_credit_card.number
-    @credit_card.expire_year = @blacklisted_credit_card.expire_year
-    @credit_card.expire_month = @blacklisted_credit_card.expire_month
+    @member2 = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member.id
+    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member2.id, :blacklisted => true
 
+    @credit_card = FactoryGirl.build :credit_card_master_card
     active_merchant_stubs_store(@credit_card.number)
 
     assert_difference('Operation.count',0) do
@@ -622,15 +619,13 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update a profile with CC used by another member" do
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member2 = create_active_member(@terms_of_membership, :member_with_api)
+
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
-    cc_expire_year = @active_credit_card.expire_year
+    token = @active_credit_card.token
+    @active_credit_card2 = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member2.id
 
     @credit_card = FactoryGirl.build :credit_card_american_express
-    @credit_card.number = "5589548939080095"
-    @credit_card.expire_year = @blacklisted_credit_card.expire_year
-    @credit_card.expire_month = @blacklisted_credit_card.expire_month
-
     active_merchant_stubs_store(@credit_card.number)
 
     assert_difference('Operation.count',0) do
@@ -641,7 +636,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member.reload
     assert_response :success
     assert_equal(@member.active_credit_card.number, nil)
-    assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
+    assert_equal(@member.active_credit_card.token, token)
   end
 
   # Update a member with different CC 

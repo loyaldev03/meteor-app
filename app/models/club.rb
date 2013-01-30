@@ -55,7 +55,7 @@ class Club < ActiveRecord::Base
 
   private
     def add_default_member_groups
-      ['VIP', 'Celebrity', 'Notable'].each do |name|
+      ['VIP', 'Celebrity', 'Notable', 'Charter Member'].each do |name|
         m = MemberGroupType.new
         m.name= name
         m.club_id = self.id
@@ -79,7 +79,7 @@ class Club < ActiveRecord::Base
     def add_default_disposition_type
       ['Website Question', 'Technical Support', 'Benefits Question', 'Pre-Bill Cancellation',
       'Pre-Bill Save', 'Product Questions', 'Deals and Discounts', 'VIP Question', 'Club Cash Question',
-      'Local Chapter Question'].each do |name|
+      'Local Chapter Question', "Postbill Cancellation", "Postbill Save", "Confirm"].each do |name|
         d = DispositionType.new
         d.name = name
         d.club_id = self.id

@@ -278,7 +278,7 @@ class MemberTest < ActiveSupport::TestCase
     member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
     member.reload
     assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 1) do
+      assert_difference('Operation.count', 2) do
         assert_difference('Transaction.count') do
           assert_equal member.recycled_times, 0
           answer = member.bill_membership
@@ -295,7 +295,7 @@ class MemberTest < ActiveSupport::TestCase
     # because the created_at of both transactions has the same value!!!
     sleep(1)
     assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 1) do
+      assert_difference('Operation.count', 2) do
         assert_difference('Transaction.count') do
           answer = member.bill_membership
           member.reload
