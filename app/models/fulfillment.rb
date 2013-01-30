@@ -214,8 +214,8 @@ class Fulfillment < ActiveRecord::Base
         sheet.add_row Fulfillment::KIT_CARD_HEADER
       end
       fulfillments.each do |fulfillment|
-        r = fulfillment.get_file_line(true, type_others)
-        sheet.add_row r unless r.empty?
+        row = fulfillment.get_file_line(true, type_others)
+        sheet.add_row row unless row.empty?
       end
     end
     package

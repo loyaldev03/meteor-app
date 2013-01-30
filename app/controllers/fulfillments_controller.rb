@@ -82,10 +82,10 @@ class FulfillmentsController < ApplicationController
 
   def download_xls
     my_authorize! :report, Fulfillment, @current_club.id
-    if params[:all_fulfillments]
-      fulfillments = FulfillmentFile.find(params[:fulfillment_file_id]).fulfillments
-    else
+    if params[:only_in_progress]
       fulfillments = FulfillmentFile.find(params[:fulfillment_file_id]).fulfillments.where_in_process
+    else
+      fulfillments = FulfillmentFile.find(params[:fulfillment_file_id]).fulfillments
     end
     xls_package = Fulfillment.generateXLS(fulfillments, false, fulfillments.product == 'OTHERS')
     send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",

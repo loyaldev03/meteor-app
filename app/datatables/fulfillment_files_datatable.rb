@@ -14,7 +14,7 @@ private
       [ 
         file.id, 
         I18n.l(file.created_at.to_date),
-        link_to('<i class="icon-file"></i>'.html_safe, @url_helpers.download_xls_fulfillments_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn"),
+        file.status=='sent' ? "" : link_to('<i class="icon-file"></i>'.html_safe, @url_helpers.download_xls_fulfillments_path(@current_partner.prefix,@current_club.name,file.id, :only_in_progress => true), :class => "btn"),
         link_to("View", @url_helpers.fulfillment_list_for_file_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn"),
         file.status, 
         file.product,

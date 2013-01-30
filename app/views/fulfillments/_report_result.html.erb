@@ -1,17 +1,20 @@
 <% if @fulfillments %>
 
+
+
   <table class="table table-bordered table-condensed" id="report_results">
     <thead>
-    <% if @status != 'not_processed' %>
-      <tr>
-        <td colspan="8">
-          <%= label :status, t('activerecord.attributes.fulfillment.new_status'), :class => 'help-inline' %>
-          <%= fulfillment_selectable_statuses(:new_status, params[:new_status], true) %>
-          <%= text_field_tag "reason", nil, :class => 'text_field input-medium', :placeholder => t('reason') %>
-          <%= link_to t('buttons.update_fulfillment_status'), "#", :class => 'btn btn-primary', :id => 'update_fulfillment_status' %>
-        </td>
-      </tr>
-    <% end %>
+    <tr>
+      <td colspan="8">
+        <% if @status != 'not_processed' %>
+            <%= label :status, t('activerecord.attributes.fulfillment.new_status'), :class => 'help-inline' %>
+            <%= fulfillment_selectable_statuses(:new_status, params[:new_status], true) %>
+            <%= text_field_tag "reason", nil, :class => 'text_field input-medium', :placeholder => t('reason') %>
+            <%= link_to t('buttons.update_fulfillment_status'), "#", :class => 'btn btn-primary', :id => 'update_fulfillment_status' %>
+        <% end %>
+        <%= (link_to t('buttons.export_all_to_xls'), download_xls_fulfillments_path, :class => 'btn btn-primary' ) if @file %>
+      </td>
+    </tr>
     </thead>
   	<thead>
   	  <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
