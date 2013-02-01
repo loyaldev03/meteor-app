@@ -126,7 +126,11 @@ class Fulfillment < ActiveRecord::Base
     elsif old_status == new_status
       return {:message => I18n.t("error_messages.fulfillment_new_status_equal_to_old", :fulfillment_sku => self.product_sku) , :code => Settings.error_codes.fulfillment_error }
     elsif new_status == 'bad_address' or new_status == 'returned'
-      answer = ( member.wrong_address.nil? ? member.set_wrong_address(agent, reason, false) : {:code => Settings.error_codes.success, :message => "Member already set as wrong address."} )
+      if reason.blank?
+        return {:message => I18n.t("error_messages.fulfillment_reason_blank"), :code => Settings.error_codes.fulfillment_reason_blank}
+      else
+        answer = ( member.wrong_address.nil? ? member.set_wrong_address(agent, reason, false) : {:code => Settings.error_codes.success, :message => "Member already set as wrong address."} )
+      end
     elsif new_status == 'not_processed'
       answer = decrease_stock! 
     else

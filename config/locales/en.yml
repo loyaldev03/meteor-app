@@ -112,6 +112,7 @@ en:
     product_out_of_stock: "You are trying to move a member to a fulfillment queue for a product that has no stock. Add stock or set to allow backorders"
     product_does_not_exists: "We do not have the product."
     fulfillment_new_status_equal_to_old: "Nothing to change on %{fulfillment_sku} fulfillment."
+    fulfillment_reason_blank: "Reason is blank, please enter a reason."
   activerecord:
     model:
       members: 'Members'

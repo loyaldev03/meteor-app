@@ -150,6 +150,7 @@ defaults: &defaults
     tom_wihtout_gateway_configured: '9789'
     club_cash_transaction_not_successful: '9791'
     fulfillment_error: '9801'
+    fulfillment_reason_blank: '9802'
   fulfillment_products:
     all: All
     kit_card: Kit - Card

@@ -496,7 +496,7 @@ $(document).ready( function() {
     });
     $("#update_fulfillment_status").click(function() {
       if($('.fulfillment_selected:checked').length == 0){
-      alert("Select a fulfillment to apply status.");
+        alert("Select a fulfillment to apply status.");
       } else{
         $('.fulfillment_selected:checked').each(function(index){
         $.ajax({
