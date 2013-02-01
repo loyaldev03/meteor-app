@@ -2,57 +2,57 @@
 
 
 
-  <table class="table table-bordered table-condensed" id="report_results">
-    <thead>
-    <tr>
-      <td colspan="8">
-        <% if @status != 'not_processed' %>
-            <%= label :status, t('activerecord.attributes.fulfillment.new_status'), :class => 'help-inline' %>
-            <%= fulfillment_selectable_statuses(:new_status, params[:new_status], true) %>
-            <%= text_field_tag "reason", nil, :class => 'text_field input-medium', :placeholder => t('reason') %>
-            <%= link_to t('buttons.update_fulfillment_status'), "#", :class => 'btn btn-primary', :id => 'update_fulfillment_status' %>
-        <% end %>
-        <%= (link_to t('buttons.export_all_to_xls'), download_xls_fulfillments_path, :class => 'btn btn-primary' ) if @file %>
-      </td>
-    </tr>
-    </thead>
-  	<thead>
-  	  <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
-      <th> <%= t('activerecord.attributes.fulfillment.member') %> </th>
-      <th> <%= t('activerecord.attributes.fulfillment.assigned_at') %> </th>
-      <th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>   
-  	  <th> <%= t('activerecord.attributes.fulfillment.product_sku') %> </th>
-  	  <th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th>    
-      <th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
-  	  <th> 
-        <%= check_box_tag "fulfillment_select_all", 1, false, :id => 'fulfillment_select_all' %> Select All
-        <% if @status == 'not_processed' %>
-          <%= link_to t('buttons.create_xls_file'), "#", :class => 'btn btn-primary', :id => 'create_xls_file' %>
-        <% end %>
-      </th>    
-  	</thead>
-  	<tbody>
-  		<% @fulfillments.each do |fulfillment| %>
-    		<tr>
-    			<td> <a href="<%= show_member_path(:member_prefix => fulfillment.member.visible_id) %>" > <%= fulfillment.member.visible_id %></a></td>
-          <td> <%= fulfillment.member.full_name %> </td>
-          <td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
-          <td> <%= I18n.l fulfillment.renewable_at, :format => :long unless fulfillment.renewable_at.nil? %> </td>
-    			<td> <%= fulfillment.product_sku %> </td>
-    			<td> <%= fulfillment.tracking_code %> </td>
-    			<td> <%= fulfillment.status %> </td>
-          <td> 
-            <div id=<%= "div_fulfillment_selected_#{fulfillment.id}" %>>
-              <%= check_box_tag "fulfillment_selected[#{fulfillment.id}]", fulfillment.id, false, :class => 'fulfillment_selected', 'data-url' => update_fulfillment_status_path(:id => fulfillment.id) %> 
-            </div>
-          </td>
-    		</tr>
-  		<% end %>
-  	</tbody>
-  </table>
+	<table class="table table-bordered table-condensed" id="report_results">
+		<thead>
+		<tr>
+			<td colspan="8">
+				<% if @status != 'not_processed' %>
+						<%= label :status, t('activerecord.attributes.fulfillment.new_status'), :class => 'help-inline' %>
+						<%= fulfillment_selectable_statuses(:new_status, params[:new_status], true) %>
+						<%= text_field_tag "reason", nil, :class => 'text_field input-medium', :placeholder => t('reason') %>
+						<%= link_to t('buttons.update_fulfillment_status'), "#", :class => 'btn btn-primary', :id => 'update_fulfillment_status' %>
+				<% end %>
+				<%= (link_to t('buttons.export_all_to_xls'), download_xls_fulfillments_path, :class => 'btn btn-primary' ) if @file %>
+			</td>
+		</tr>
+		</thead>
+		<thead>
+			<th> <%= t('activerecord.attributes.member.visible_id') %> </th>
+			<th> <%= t('activerecord.attributes.fulfillment.member') %> </th>
+			<th> <%= t('activerecord.attributes.fulfillment.assigned_at') %> </th>
+			<th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>   
+			<th> <%= t('activerecord.attributes.fulfillment.product_sku') %> </th>
+			<th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th>    
+			<th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
+			<th> 
+				<%= check_box_tag "fulfillment_select_all", 1, false, :id => 'fulfillment_select_all' %> Select All
+				<% if @status == 'not_processed' %>
+					<%= link_to t('buttons.create_xls_file'), "#", :class => 'btn btn-primary', :id => 'create_xls_file' %>
+				<% end %>
+			</th>    
+		</thead>
+		<tbody>
+			<% @fulfillments.each do |fulfillment| %>
+				<tr>
+					<td> <a href="<%= show_member_path(:member_prefix => fulfillment.member.visible_id) %>" > <%= fulfillment.member.visible_id %></a></td>
+					<td> <%= fulfillment.member.full_name %> </td>
+					<td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
+					<td> <%= I18n.l fulfillment.renewable_at, :format => :long unless fulfillment.renewable_at.nil? %> </td>
+					<td> <%= fulfillment.product_sku %> </td>
+					<td> <%= fulfillment.tracking_code %> </td>
+					<td> <%= fulfillment.status %> </td>
+					<td> 
+						<div id=<%= "div_fulfillment_selected_#{fulfillment.id}" %>>
+							<%= check_box_tag "fulfillment_selected[#{fulfillment.id}]", fulfillment.id, false, :class => 'fulfillment_selected', 'data-url' => update_fulfillment_status_path(:id => fulfillment.id) %> 
+						</div>
+					</td>
+				</tr>
+			<% end %>
+		</tbody>
+	</table>
 
-  <script type="text/javascript">
-    $(document).ready( fulfillments_not_processed_function() );
-  </script>
+	<script type="text/javascript">
+		$(document).ready( fulfillments_not_processed_function() );
+	</script>
 
 <% end %>
