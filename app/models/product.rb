@@ -4,10 +4,10 @@ class Product < ActiveRecord::Base
   attr_accessible :name, :recurrent, :sku, :stock, :weight, :package, :allow_backorder, :cost_center
 
   validates :sku, :uniqueness => {:scope => :club_id}, :presence => true, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2 }
-  validates :cost_center, :presence => true, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2, :maximum => 19 }
+  validates :cost_center, :format => /^[a-zA-Z\-_]+$/, :length => { :maximum => 19 }, :allow_nil => true
 
   validates :package, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2, :maximum => 30 }
-  validates :stock, :numericality => { :only_integer => true, :less_than => 1999999}
+  validates :stock, :numericality => { :only_integer => true, :less_than => 1999999 }, :allow_backorder => true
 
   before_save :apply_upcase_to_sku
 
