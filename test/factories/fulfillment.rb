@@ -6,16 +6,16 @@ FactoryGirl.define do
     status 'not_processed'
   end
 
-  factory :fulfillment_undeliverable_with_stock, class: Fulfillment do
+  factory :fulfillment_bad_address_with_stock, class: Fulfillment do
     product_sku "Bracelet"
     assigned_at DateTime.now
-    status 'undeliverable'
+    status 'bad_address'
   end
 
-  factory :fulfillment_undeliverable_without_stock, class: Fulfillment do
+  factory :fulfillment_bad_address_without_stock, class: Fulfillment do
     product_sku "circlet"
     assigned_at DateTime.now
-    status 'undeliverable'
+    status 'bad_address'
   end
 
   factory :fulfillment_processing, class: Fulfillment do

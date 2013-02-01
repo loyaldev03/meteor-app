@@ -1,4 +1,4 @@
-require 'test_helper'
+  require 'test_helper'
 
 class TransactionTest < ActiveSupport::TestCase
   setup do
@@ -18,7 +18,7 @@ class TransactionTest < ActiveSupport::TestCase
         zip: @member.zip, state: @member.state, email: @member.email, type_of_phone_number: @member.type_of_phone_number,
         phone_country_code: @member.phone_country_code, phone_area_code: @member.phone_area_code,
         type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US', 
-        product_sku: 'Circlet' }, 
+        product_sku: 'KIT-CARD' }, 
       { number: @credit_card.number, 
         expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
 
@@ -45,7 +45,7 @@ class TransactionTest < ActiveSupport::TestCase
             last_name: @member.last_name, address: @member.address, city: @member.city, gender: 'M',
             zip: @member.zip, state: @member.state, email: @member.email, type_of_phone_number: @member.type_of_phone_number,
             phone_country_code: @member.phone_country_code, phone_area_code: @member.phone_area_code,
-            type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US' }, 
+            type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US', :product_sku => 'KIT-CARD' }, 
           { number: @credit_card.number, 
             expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
         assert (answer[:code] == Settings.error_codes.success), answer[:message]

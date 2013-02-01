@@ -6,6 +6,7 @@ class MemberTest < ActiveSupport::TestCase
   setup do
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
     @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+
   end
 
   test "Should create a member" do
@@ -100,19 +101,23 @@ class MemberTest < ActiveSupport::TestCase
   test "active member cant be recovered" do
     member = create_active_member(@terms_of_membership_with_gateway)
     tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway)
+    
     answer = member.recover(tom_dup)
     assert answer[:code] == Settings.error_codes.member_already_active, answer[:message]
   end
 
   test "Lapsed member with reactivation_times = 5 cant be recovered" do
-    member = create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, { reactivation_times: 5 })
+    member = create_active_member(@terms_of_membership_with_gateway)
+    member.set_as_canceled!
+    member.update_attribute( :reactivation_times, 5 )
     tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway)
+
     answer = member.recover(tom_dup)
     assert answer[:code] == Settings.error_codes.cant_recover_member, answer[:message]
   end
 
   test "Lapsed member can be recovered" do
-    assert_difference('Fulfillment.count',2) do
+    assert_difference('Fulfillment.count',Club::DEFAULT_PRODUCT.count) do
       member = create_active_member(@terms_of_membership_with_gateway, :lapsed_member)
       answer = member.recover(@terms_of_membership_with_gateway)
       assert answer[:code] == Settings.error_codes.success, answer[:message]
@@ -383,6 +388,7 @@ class MemberTest < ActiveSupport::TestCase
     @club = @terms_of_membership_with_gateway.club
     @saved_member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
     @saved_member.set_as_canceled
+
     @saved_member.recover(@terms_of_membership_with_gateway)
 
     next_bill_date = @saved_member.bill_date + 1.month
