@@ -393,7 +393,7 @@ class MemberTest < ActiveSupport::TestCase
 
     next_bill_date = @saved_member.bill_date + 1.month
 
-    Timecop.freeze(Time.zone.now + 1.month) do
+    Timecop.freeze( @saved_member.bill_date ) do
       Member.bill_all_members_up_today
       @saved_member.reload
 
