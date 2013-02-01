@@ -7,18 +7,18 @@ class FulfillmentsController < ApplicationController
       @status = params[:status]
     	if params[:all_times] == '1'
         if params[:product_type] == 'KIT-CARD'
-    		  @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_kit_card
+    		  @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_kit_card.not_renewed
         else
-          @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_others
+          @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_others.not_renewed
         end
         @product_type = params[:product_type]
       else
         if params[:product_type] == 'KIT-CARD'
           @fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false', 
-            params[:status], params[:initial_date], params[:end_date], @current_club.id]).type_kit_card
+            params[:status], params[:initial_date], params[:end_date], @current_club.id]).type_kit_card.not_renewed
         else
           @fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false', 
-            params[:status], params[:initial_date], params[:end_date], @current_club.id]).type_others
+            params[:status], params[:initial_date], params[:end_date], @current_club.id]).type_others.not_renewed
         end
       end  
     end
@@ -47,7 +47,6 @@ class FulfillmentsController < ApplicationController
   #   render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found }
   # end
 
-
   def list_for_file
     @file = FulfillmentFile.find(params[:fulfillment_file_id])
     @fulfillments = @file.fulfillments
@@ -69,7 +68,7 @@ class FulfillmentsController < ApplicationController
       if ff.save
         params[:fulfillment_selected].each do |fs|
           fulfillment = Fulfillment.find(fs.first)
-          ff.fulfillments << fulfillment
+          ff.fulfillments << fulfillment 
           fulfillment.set_as_in_process
         end
         flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe

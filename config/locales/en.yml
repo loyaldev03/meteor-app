@@ -113,6 +113,7 @@ en:
     product_does_not_exists: "We do not have the product."
     fulfillment_new_status_equal_to_old: "Nothing to change on %{fulfillment_sku} fulfillment."
     fulfillment_reason_blank: "Reason is blank, please enter a reason."
+    fulfillment_is_renwed: "Fulfillment is renewed. No operation can be done."
   activerecord:
     model:
       members: 'Members'

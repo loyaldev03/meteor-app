@@ -121,7 +121,9 @@ class Fulfillment < ActiveRecord::Base
 
   def update_status(agent, new_status, reason)
     old_status = self.status
-    if new_status.blank?
+    if renewed?
+      return {:message => I18n.t("error_messages.fulfillment_is_renwed") , :code => Settings.error_codes.fulfillment_error }
+    elsif new_status.blank?
       return {:message => I18n.t("error_messages.fulfillment_new_status_blank") , :code => Settings.error_codes.fulfillment_error }
     elsif old_status == new_status
       return {:message => I18n.t("error_messages.fulfillment_new_status_equal_to_old", :fulfillment_sku => self.product_sku) , :code => Settings.error_codes.fulfillment_error }
