@@ -52,10 +52,6 @@
           </th>
           <td> 
             <%= f.text_field :address, :class => 'text_field' %> 
-            <% if !@member.new_record? && !@member.wrong_address.nil? %>
-              <br><%= t('activerecord.attributes.member.unset_wrong_address') %>
-              <%= check_box :setter, :wrong_address %>
-            <% end %>
           </td>  
         </tr>
         <tr class = "control-group">

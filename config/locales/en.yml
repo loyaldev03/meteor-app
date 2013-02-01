@@ -213,7 +213,6 @@ en:
         club_cash_amount: 'Club cash amount'
         add_club_cash_transaction: 'Add club cash'
         needs_approval: 'Needs approval'
-        unset_wrong_address: 'Address setted as wrong. Would you like to unset it?'
         unset_wrong_phone_number: 'Phone setted as wrong. Would you like to unset it?'
         has_no_preferences_saved: 'There are no preferences saved.'
         last_synced_at: 'Last successful sync'
