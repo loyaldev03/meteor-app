@@ -1770,15 +1770,6 @@ Method used from rake task and also from tests!
       <pre class="lines">
 
 
-786
-787
-788
-789
-790
-791
-792
-793
-794
 795
 796
 797
@@ -1790,10 +1781,19 @@ Method used from rake task and also from tests!
 803
 804
 805
-806</pre>
+806
+807
+808
+809
+810
+811
+812
+813
+814
+815</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 786</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 795</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_bill_all_members_up_today'>bill_all_members_up_today</span>
   <span class='id identifier rubyid_file'>file</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_open'>open</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/tmp/bill_all_members_up_today_</span><span class='embexpr_beg'>#{</span><span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_env'>env</span><span class='rbrace'>}</span><span class='tstring_content'>.lock</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>File</span><span class='op'>::</span><span class='const'>RDWR</span><span class='op'>|</span><span class='const'>File</span><span class='op'>::</span><span class='const'>CREAT</span><span class='comma'>,</span> <span class='int'>0644</span><span class='rparen'>)</span>
@@ -1848,15 +1848,6 @@ Method used from rake task and also from tests!
       <pre class="lines">
 
 
-856
-857
-858
-859
-860
-861
-862
-863
-864
 865
 866
 867
@@ -1864,10 +1855,19 @@ Method used from rake task and also from tests!
 869
 870
 871
-872</pre>
+872
+873
+874
+875
+876
+877
+878
+879
+880
+881</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 856</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 865</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_cancel_all_member_up_today'>cancel_all_member_up_today</span>
   <span class='id identifier rubyid_base'>base</span> <span class='op'>=</span>  <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_joins'>joins</span><span class='lparen'>(</span><span class='symbol'>:current_membership</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> date(memberships.cancel_date) &lt;= ? AND memberships.status != ? </span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_date'>to_date</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>lapsed</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
@@ -1965,7 +1965,7 @@ Method used from rake task and also from tests!
   <span class='kw'>unless</span> <span class='id identifier rubyid_club'>club</span><span class='period'>.</span><span class='id identifier rubyid_billing_enable'>billing_enable</span>
     <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='const'>I18n</span><span class='period'>.</span><span class='id identifier rubyid_t'>t</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>error_messages.club_is_not_enable_for_new_enrollments</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:cs_phone_number</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_club'>club</span><span class='period'>.</span><span class='id identifier rubyid_cs_phone_number'>cs_phone_number</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_club_is_not_enable_for_new_enrollments'>club_is_not_enable_for_new_enrollments</span> <span class='rbrace'>}</span>      
   <span class='kw'>end</span>
-
+  
   <span class='comment'># credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
 </span>  <span class='id identifier rubyid_credit_card'>credit_card</span> <span class='op'>=</span> <span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='id identifier rubyid_credit_card_params'>credit_card_params</span>
   <span class='id identifier rubyid_credit_card'>credit_card</span><span class='period'>.</span><span class='id identifier rubyid_get_token'>get_token</span><span class='lparen'>(</span><span class='id identifier rubyid_tom'>tom</span><span class='period'>.</span><span class='id identifier rubyid_payment_gateway_configuration'>payment_gateway_configuration</span><span class='comma'>,</span> <span class='id identifier rubyid_member_params'>member_params</span><span class='lbracket'>[</span><span class='symbol'>:first_name</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_member_params'>member_params</span><span class='lbracket'>[</span><span class='symbol'>:last_name</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_cc_blank'>cc_blank</span><span class='rparen'>)</span>
@@ -2026,18 +2026,18 @@ Method used from rake task and also from tests!
       <pre class="lines">
 
 
-896
-897
-898
-899
-900
-901
-902
-903
-904</pre>
+905
+906
+907
+908
+909
+910
+911
+912
+913</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 896</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 905</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_process_email_sync_error'>process_email_sync_error</span>
   <span class='id identifier rubyid_member_list'>member_list</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -2068,15 +2068,6 @@ Method used from rake task and also from tests!
       <pre class="lines">
 
 
-874
-875
-876
-877
-878
-879
-880
-881
-882
 883
 884
 885
@@ -2088,10 +2079,19 @@ Method used from rake task and also from tests!
 891
 892
 893
-894</pre>
+894
+895
+896
+897
+898
+899
+900
+901
+902
+903</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 874</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 883</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_process_sync'>process_sync</span> 
   <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find_in_batches'>find_in_batches</span><span class='lparen'>(</span> <span class='symbol'>:conditions</span> <span class='op'>=&gt;</span> <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>sync_status IN ('with_error', 'not_synced')</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_group'>group</span><span class='op'>|</span>
@@ -2146,24 +2146,24 @@ Method used from rake task and also from tests!
       <pre class="lines">
 
 
-839
-840
-841
-842
-843
-844
-845
-846
-847
 848
 849
 850
 851
 852
-853</pre>
+853
+854
+855
+856
+857
+858
+859
+860
+861
+862</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 839</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 848</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_reset_club_cash_up_today'>reset_club_cash_up_today</span>
   <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find_in_batches'>find_in_batches</span><span class='lparen'>(</span><span class='symbol'>:conditions</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> date(club_cash_expire_date) &lt;= ? </span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_date'>to_date</span> <span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_group'>group</span><span class='op'>|</span>
@@ -2200,15 +2200,6 @@ Method used from rake task and also from tests!
       <pre class="lines">
 
 
-906
-907
-908
-909
-910
-911
-912
-913
-914
 915
 916
 917
@@ -2218,10 +2209,19 @@ Method used from rake task and also from tests!
 921
 922
 923
-924</pre>
+924
+925
+926
+927
+928
+929
+930
+931
+932
+933</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 906</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 915</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_send_happy_birthday'>send_happy_birthday</span>
   <span class='id identifier rubyid_today'>today</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_date'>to_date</span>
@@ -2262,15 +2262,6 @@ Method used from rake task and also from tests!
       <pre class="lines">
 
 
-808
-809
-810
-811
-812
-813
-814
-815
-816
 817
 818
 819
@@ -2290,10 +2281,19 @@ Method used from rake task and also from tests!
 833
 834
 835
-836</pre>
+836
+837
+838
+839
+840
+841
+842
+843
+844
+845</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 808</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 817</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_send_pillar_emails'>send_pillar_emails</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_status'>status</span><span class='rparen'>)</span>
   <span class='comment'># TODO: join EmailTemplate and Member querys
@@ -2344,18 +2344,18 @@ Method used from rake task and also from tests!
       <pre class="lines">
 
 
-926
-927
-928
-929
-930
-931
-932
-933
-934</pre>
+935
+936
+937
+938
+939
+940
+941
+942
+943</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 926</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 935</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_supported_states'>supported_states</span><span class='lparen'>(</span><span class='id identifier rubyid_country'>country</span><span class='op'>=</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>US</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_country'>country</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>US</span><span class='tstring_end'>'</span></span>
@@ -2386,15 +2386,6 @@ Method used from rake task and also from tests!
       <pre class="lines">
 
 
-767
-768
-769
-770
-771
-772
-773
-774
-775
 776
 777
 778
@@ -2402,10 +2393,19 @@ Method used from rake task and also from tests!
 780
 781
 782
-783</pre>
+783
+784
+785
+786
+787
+788
+789
+790
+791
+792</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 767</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 776</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_sync_members_to_pardot'>sync_members_to_pardot</span>
   <span class='id identifier rubyid_base'>base</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> date(updated_at) &gt;= ? </span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_yesterday'>yesterday</span><span class='period'>.</span><span class='id identifier rubyid_to_date'>to_date</span><span class='rparen'>)</span>
@@ -2504,15 +2504,6 @@ Adds club cash transaction.
       <pre class="lines">
 
 
-655
-656
-657
-658
-659
-660
-661
-662
-663
 664
 665
 666
@@ -2543,10 +2534,19 @@ Adds club cash transaction.
 691
 692
 693
-694</pre>
+694
+695
+696
+697
+698
+699
+700
+701
+702
+703</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 655</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 664</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_club_cash'>add_club_cash</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='comma'>,</span> <span class='id identifier rubyid_amount'>amount</span> <span class='op'>=</span> <span class='int'>0</span><span class='comma'>,</span><span class='id identifier rubyid_description'>description</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_answer'>answer</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_club_cash_transaction_not_successful'>club_cash_transaction_not_successful</span>  <span class='rbrace'>}</span>
@@ -2608,15 +2608,6 @@ Adds club cash transaction.
       <pre class="lines">
 
 
-992
-993
-994
-995
-996
-997
-998
-999
-1000
 1001
 1002
 1003
@@ -2630,10 +2621,19 @@ Adds club cash transaction.
 1011
 1012
 1013
-1014</pre>
+1014
+1015
+1016
+1017
+1018
+1019
+1020
+1021
+1022
+1023</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 992</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 1001</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_new_credit_card'>add_new_credit_card</span><span class='lparen'>(</span><span class='id identifier rubyid_new_credit_card'>new_credit_card</span><span class='comma'>,</span> <span class='id identifier rubyid_current_agent'>current_agent</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_answer'>answer</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>There was an error. We could not add the credit card.</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_invalid_credit_card'>invalid_credit_card</span> <span class='rbrace'>}</span>
@@ -2732,16 +2732,16 @@ Adds club cash transaction.
       <pre class="lines">
 
 
-565
-566
-567
-568
-569
-570
-571</pre>
+574
+575
+576
+577
+578
+579
+580</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 565</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 574</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_api_member'>api_member</span>
   <span class='ivar'>@api_member</span> <span class='op'>||=</span> <span class='kw'>if</span> <span class='op'>!</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_sync?'>sync?</span>
@@ -2782,17 +2782,17 @@ Adds club cash when membership billing is success.
       <pre class="lines">
 
 
-645
-646
-647
-648
-649
-650
-651
-652</pre>
+654
+655
+656
+657
+658
+659
+660
+661</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 645</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 654</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_assign_club_cash!'>assign_club_cash!</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Adding club cash after billing</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_amount'>amount</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member_group_type_id'>member_group_type_id</span> <span class='op'>?</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_club_cash_for_members_who_belongs_to_group'>club_cash_for_members_who_belongs_to_group</span> <span class='op'>:</span> <span class='id identifier rubyid_terms_of_membership'>terms_of_membership</span><span class='period'>.</span><span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='rparen'>)</span>
@@ -2948,15 +2948,6 @@ Adds club cash when membership billing is success.
       <pre class="lines">
 
 
-696
-697
-698
-699
-700
-701
-702
-703
-704
 705
 706
 707
@@ -2971,10 +2962,19 @@ Adds club cash when membership billing is success.
 716
 717
 718
-719</pre>
+719
+720
+721
+722
+723
+724
+725
+726
+727
+728</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 696</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 705</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_blacklist'>blacklist</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='comma'>,</span> <span class='id identifier rubyid_reason'>reason</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_answer'>answer</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Member already blacklisted</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:success</span> <span class='op'>=&gt;</span> <span class='kw'>false</span> <span class='rbrace'>}</span>
@@ -3532,15 +3532,15 @@ Returns true if member is active or provisional.
       <pre class="lines">
 
 
-737
-738
-739
-740
-741
-742</pre>
+746
+747
+748
+749
+750
+751</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 737</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 746</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_cancel!'>cancel!</span><span class='lparen'>(</span><span class='id identifier rubyid_cancel_date'>cancel_date</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='id identifier rubyid_current_agent'>current_agent</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_can_be_canceled?'>can_be_canceled?</span>
@@ -3667,13 +3667,13 @@ Changes next bill date.
       <pre class="lines">
 
 
-732
-733
-734
-735</pre>
+741
+742
+743
+744</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 732</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 741</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_chargeback!'>chargeback!</span><span class='lparen'>(</span><span class='id identifier rubyid_transaction_chargebacked'>transaction_chargebacked</span><span class='comma'>,</span> <span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_trans'>trans</span> <span class='op'>=</span> <span class='const'>Transaction</span><span class='period'>.</span><span class='id identifier rubyid_new_chargeback'>new_chargeback</span><span class='lparen'>(</span><span class='id identifier rubyid_transaction_chargebacked'>transaction_chargebacked</span><span class='comma'>,</span> <span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
@@ -3729,18 +3729,18 @@ Changes next bill date.
       <pre class="lines">
 
 
-1016
-1017
-1018
-1019
-1020
-1021
-1022
-1023
-1024</pre>
+1025
+1026
+1027
+1028
+1029
+1030
+1031
+1032
+1033</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 1016</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 1025</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_desnormalize_preferences'>desnormalize_preferences</span>
   <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_preferences'>preferences</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
@@ -3837,7 +3837,18 @@ Changes next bill date.
 528
 529
 530
-531</pre>
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/models/member.rb', line 465</span>
@@ -3845,6 +3856,17 @@ Changes next bill date.
 <span class='kw'>def</span> <span class='id identifier rubyid_enroll'>enroll</span><span class='lparen'>(</span><span class='id identifier rubyid_tom'>tom</span><span class='comma'>,</span> <span class='id identifier rubyid_credit_card'>credit_card</span><span class='comma'>,</span> <span class='id identifier rubyid_amount'>amount</span><span class='comma'>,</span> <span class='id identifier rubyid_agent'>agent</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_recovery_check'>recovery_check</span> <span class='op'>=</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_cc_blank'>cc_blank</span> <span class='op'>=</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='id identifier rubyid_member_params'>member_params</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_allow_cc_blank'>allow_cc_blank</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_amount'>amount</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span> <span class='op'>==</span> <span class='float'>0.0</span> <span class='kw'>and</span> <span class='id identifier rubyid_cc_blank'>cc_blank</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_club'>club</span> <span class='op'>=</span> <span class='id identifier rubyid_tom'>tom</span><span class='period'>.</span><span class='id identifier rubyid_club'>club</span>
+
+  <span class='id identifier rubyid_member_params'>member_params</span><span class='lbracket'>[</span><span class='symbol'>:product_sku</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>,</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_sku'>sku</span><span class='op'>|</span>
+    <span class='id identifier rubyid_product'>product</span> <span class='op'>=</span> <span class='const'>Product</span><span class='period'>.</span><span class='id identifier rubyid_find_by_club_id_and_sku'>find_by_club_id_and_sku</span><span class='lparen'>(</span><span class='id identifier rubyid_club'>club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span><span class='id identifier rubyid_sku'>sku</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_product'>product</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+      <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='const'>I18n</span><span class='period'>.</span><span class='id identifier rubyid_t'>t</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>error_messages.product_does_not_exists</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_product_does_not_exists'>product_does_not_exists</span> <span class='rbrace'>}</span>
+    <span class='kw'>else</span>
+      <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_product'>product</span><span class='period'>.</span><span class='id identifier rubyid_has_stock?'>has_stock?</span>
+        <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='const'>I18n</span><span class='period'>.</span><span class='id identifier rubyid_t'>t</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>error_messages.product_out_of_stock</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_product_out_of_stock'>product_out_of_stock</span> <span class='rbrace'>}</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
 
   <span class='kw'>if</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_new_record?'>new_record?</span> <span class='kw'>and</span> <span class='id identifier rubyid_recovery_check'>recovery_check</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_lapsed?'>lapsed?</span> 
     <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='const'>I18n</span><span class='period'>.</span><span class='id identifier rubyid_t'>t</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>error_messages.member_already_active</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:cs_phone_number</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_club'>club</span><span class='period'>.</span><span class='id identifier rubyid_cs_phone_number'>cs_phone_number</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_member_already_active'>member_already_active</span><span class='comma'>,</span> <span class='symbol'>:errors</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:status</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Already active.</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
@@ -4035,19 +4057,19 @@ Returns a string with address, city and state concatenated.
       <pre class="lines">
 
 
-617
-618
-619
-620
-621
-622
-623
-624
-625
-626</pre>
+626
+627
+628
+629
+630
+631
+632
+633
+634
+635</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 617</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 626</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_full_autologin_url'>full_autologin_url</span>
   <span class='id identifier rubyid_c'>c</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_club'>club</span>
@@ -4151,20 +4173,20 @@ Returns a string with first and last name concatenated.
       <pre class="lines">
 
 
-601
-602
-603
-604
-605
-606
-607
-608
-609
 610
-611</pre>
+611
+612
+613
+614
+615
+616
+617
+618
+619
+620</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 601</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 610</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_sync_status'>get_sync_status</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_synced_with_error?'>synced_with_error?</span>
@@ -4310,14 +4332,14 @@ Resets member club cash in case of a cancelation.
       <pre class="lines">
 
 
-631
-632
-633
-634
-635</pre>
+640
+641
+642
+643
+644</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 631</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 640</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_nillify_club_cash'>nillify_club_cash</span>
   <span class='id identifier rubyid_add_club_cash'>add_club_cash</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>-</span><span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Removing club cash because of member cancellation</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
@@ -4344,16 +4366,16 @@ Resets member club cash in case of a cancelation.
       <pre class="lines">
 
 
-581
-582
-583
-584
-585
-586
-587</pre>
+590
+591
+592
+593
+594
+595
+596</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 581</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 590</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_pardot_member'>pardot_member</span>
   <span class='ivar'>@pardot_member</span> <span class='op'>||=</span> <span class='kw'>if</span> <span class='op'>!</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_pardot_sync?'>pardot_sync?</span>
@@ -4404,12 +4426,12 @@ Resets member club cash in case of a cancelation.
       <pre class="lines">
 
 
-577
-578
-579</pre>
+586
+587
+588</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 577</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 586</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_pardot_sync?'>pardot_sync?</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_club'>club</span><span class='period'>.</span><span class='id identifier rubyid_pardot_sync?'>pardot_sync?</span>
@@ -4477,12 +4499,12 @@ Recovers the member. Changes status from lapsed to applied or provisional
       <pre class="lines">
 
 
-613
-614
-615</pre>
+622
+623
+624</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 613</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 622</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_refresh_autologin_url!'>refresh_autologin_url!</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_api_member'>api_member</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_api_member'>api_member</span><span class='period'>.</span><span class='id identifier rubyid_login_token'>login_token</span> <span class='kw'>rescue</span> <span class='kw'>nil</span>
@@ -4519,14 +4541,14 @@ Resets member club cash in case the club cash has expired.
       <pre class="lines">
 
 
-638
-639
-640
-641
-642</pre>
+647
+648
+649
+650
+651</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 638</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 647</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset_club_cash'>reset_club_cash</span>
   <span class='id identifier rubyid_add_club_cash'>add_club_cash</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>-</span><span class='id identifier rubyid_club_cash_amount'>club_cash_amount</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Removing expired club cash.</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
@@ -4798,17 +4820,6 @@ Sends the request mail to every representative to accept/reject the member.
       <pre class="lines">
 
 
-537
-538
-539
-540
-541
-542
-543
-544
-545
-546
-547
 548
 549
 550
@@ -4820,10 +4831,19 @@ Sends the request mail to every representative to accept/reject the member.
 556
 557
 558
-559</pre>
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 537</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 548</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_send_fulfillment'>send_fulfillment</span>
   <span class='comment'># we always send fulfillment to new members or members that do not have 
@@ -4840,9 +4860,7 @@ Sends the request mail to every representative to accept/reject the member.
       <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_member_id'>member_id</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_uuid'>uuid</span>
       <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_save'>save</span>
       <span class='id identifier rubyid_answer'>answer</span> <span class='op'>=</span> <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_decrease_stock!'>decrease_stock!</span>
-
-      <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_answer'>answer</span><span class='lbracket'>[</span><span class='symbol'>:code</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span>
-        <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_set_as_not_processed!'>set_as_not_processed!</span>
+      <span class='kw'>unless</span> <span class='id identifier rubyid_answer'>answer</span><span class='lbracket'>[</span><span class='symbol'>:code</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span>
         <span class='const'>Airbrake</span><span class='period'>.</span><span class='id identifier rubyid_notify'>notify</span><span class='lparen'>(</span><span class='symbol'>:error_class</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_answer'>answer</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:error_message</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_answer'>answer</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:parameters</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:member</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='comma'>,</span> <span class='symbol'>:credit_card</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_active_credit_card'>active_credit_card</span><span class='comma'>,</span> <span class='symbol'>:enrollment_info</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_current_membership'>current_membership</span><span class='period'>.</span><span class='id identifier rubyid_enrollment_info'>enrollment_info</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
       <span class='kw'>end</span>
     <span class='kw'>end</span>
@@ -4868,12 +4886,12 @@ Sends the request mail to every representative to accept/reject the member.
       <pre class="lines">
 
 
-533
-534
-535</pre>
+544
+545
+546</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 533</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 544</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_send_pre_bill'>send_pre_bill</span>
   <span class='const'>Communication</span><span class='period'>.</span><span class='id identifier rubyid_deliver!'>deliver!</span><span class='lparen'>(</span><span class='symbol'>:prebill</span><span class='comma'>,</span> <span class='kw'>self</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_can_bill_membership?'>can_bill_membership?</span>
@@ -5020,15 +5038,6 @@ Sets join date. It is called multiple times.
       <pre class="lines">
 
 
-744
-745
-746
-747
-748
-749
-750
-751
-752
 753
 754
 755
@@ -5041,10 +5050,19 @@ Sets join date. It is called multiple times.
 762
 763
 764
-765</pre>
+765
+766
+767
+768
+769
+770
+771
+772
+773
+774</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 744</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 753</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_set_wrong_address'>set_wrong_address</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='comma'>,</span> <span class='id identifier rubyid_reason'>reason</span><span class='comma'>,</span> <span class='id identifier rubyid_set_fulfillments'>set_fulfillments</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_wrong_address'>wrong_address</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -5088,12 +5106,12 @@ Sets join date. It is called multiple times.
       <pre class="lines">
 
 
-573
-574
-575</pre>
+582
+583
+584</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 573</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 582</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_skip_api_sync!'>skip_api_sync!</span>
   <span class='ivar'>@skip_api_sync</span> <span class='op'>=</span> <span class='kw'>true</span>
@@ -5118,12 +5136,12 @@ Sets join date. It is called multiple times.
       <pre class="lines">
 
 
-589
-590
-591</pre>
+598
+599
+600</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 589</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 598</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_skip_pardot_sync!'>skip_pardot_sync!</span>
   <span class='ivar'>@skip_pardot_sync</span> <span class='op'>=</span> <span class='kw'>true</span>
@@ -5170,12 +5188,12 @@ Sets join date. It is called multiple times.
       <pre class="lines">
 
 
-561
-562
-563</pre>
+570
+571
+572</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 561</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 570</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sync?'>sync?</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_club'>club</span><span class='period'>.</span><span class='id identifier rubyid_sync?'>sync?</span>
@@ -5200,17 +5218,17 @@ Sets join date. It is called multiple times.
       <pre class="lines">
 
 
-1027
-1028
-1029
-1030
-1031
-1032
-1033
-1034</pre>
+1036
+1037
+1038
+1039
+1040
+1041
+1042
+1043</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 1027</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 1036</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sync_to_pardot'>sync_to_pardot</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_time_elapsed'>time_elapsed</span> <span class='op'>=</span> <span class='const'>Benchmark</span><span class='period'>.</span><span class='id identifier rubyid_ms'>ms</span> <span class='kw'>do</span>
@@ -5262,12 +5280,12 @@ Sets join date. It is called multiple times.
       <pre class="lines">
 
 
-593
-594
-595</pre>
+602
+603
+604</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 593</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 602</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_synced?'>synced?</span>
   <span class='id identifier rubyid_sync_status'>sync_status</span><span class='op'>==</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>synced</span><span class='tstring_end'>&quot;</span></span>
@@ -5314,12 +5332,12 @@ Sets join date. It is called multiple times.
       <pre class="lines">
 
 
-597
-598
-599</pre>
+606
+607
+608</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 597</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 606</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_synced_with_error?'>synced_with_error?</span>
   <span class='id identifier rubyid_sync_status'>sync_status</span><span class='op'>==</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>with_error</span><span class='tstring_end'>&quot;</span></span>
@@ -5344,15 +5362,6 @@ Sets join date. It is called multiple times.
       <pre class="lines">
 
 
-936
-937
-938
-939
-940
-941
-942
-943
-944
 945
 946
 947
@@ -5398,10 +5407,19 @@ Sets join date. It is called multiple times.
 987
 988
 989
-990</pre>
+990
+991
+992
+993
+994
+995
+996
+997
+998
+999</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 936</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 945</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_credit_card_from_drupal'>update_credit_card_from_drupal</span><span class='lparen'>(</span><span class='id identifier rubyid_credit_card'>credit_card</span><span class='comma'>,</span> <span class='id identifier rubyid_current_agent'>current_agent</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_credit_card'>credit_card</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_credit_card'>credit_card</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -5478,18 +5496,18 @@ Sets join date. It is called multiple times.
       <pre class="lines">
 
 
-722
-723
-724
-725
-726
-727
-728
-729
-730</pre>
+731
+732
+733
+734
+735
+736
+737
+738
+739</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 722</span>
+      <pre class="code"><span class="info file"># File 'app/models/member.rb', line 731</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_member_data_by_params'>update_member_data_by_params</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span> <span class='symbol'>:first_name</span><span class='comma'>,</span> <span class='symbol'>:last_name</span><span class='comma'>,</span> <span class='symbol'>:address</span><span class='comma'>,</span> <span class='symbol'>:state</span><span class='comma'>,</span> <span class='symbol'>:city</span><span class='comma'>,</span> <span class='symbol'>:country</span><span class='comma'>,</span> <span class='symbol'>:zip</span><span class='comma'>,</span>
@@ -5510,7 +5528,7 @@ Sets join date. It is called multiple times.
 </div>
 
     <div id="footer">
-  Generated on Tue Jan 29 13:57:59 2013 by
+  Generated on Fri Feb  1 12:50:18 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

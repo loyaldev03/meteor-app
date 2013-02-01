@@ -235,7 +235,7 @@ The agent&#8217;s ID that will be enrolling the member.
 Information related to the member that is sumbitting the enroll. It also
 contains information related to the enrollment (this will be stored as
 enrollment_info). Here is a list of the regex we are using to validate
-show.
+<span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -283,7 +283,7 @@ show.
 </code></pre>
 </dd>
 <dt>credit_card</dt><dd><p>
-Information related to member&#8217;s credit card. show
+Information related to member&#8217;s credit card. <span class='object_link'><a href="../CreditCard.html" title="CreditCard (class)">show</a></span>
 </p>
 <pre class="code ruby"><code>
   *number: Number of member's credit card, from where we will charge the membership or any other service.  
@@ -510,7 +510,7 @@ unique for each member. Have in mind that this value is part of the url.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is sumbitting the enroll. Here is a
-list of the regex we are using to validate show.
+list of the regex we are using to validate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -664,6 +664,8 @@ Code related to the method result.
       <pre class="lines">
 
 
+230
+231
 232
 233
 234
@@ -715,12 +717,10 @@ Code related to the method result.
 280
 281
 282
-283
-284
-285</pre>
+283</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 232</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 230</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_show'>show</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -808,7 +808,7 @@ at this moment. Have in mind that this value is part of the url.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is being updated.. Here is a list of
-the regex we are using to validate. show.
+the regex we are using to validate. <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -835,7 +835,6 @@ Variable used to pass some boolean values as &#8220;cc_blank&#8221; for
 enrolling or &#8220;wrong_address&#8221; for update.
 </p>
 <pre class="code ruby"><code>
- * wrong_address: Boolean value that (if it is true) it will tell us to unset member's addres as wrong. (It will set wrong_address as nil)
  * wrong_phone_number: Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set 
                        wrong_phone_number as nil)
  * batch_update: Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) (optional)
@@ -974,6 +973,7 @@ page.
       <pre class="lines">
 
 
+142
 143
 144
 145
@@ -1007,12 +1007,10 @@ page.
 173
 174
 175
-176
-177
-178</pre>
+176</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 143</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 142</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -1022,7 +1020,6 @@ page.
   <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:api_update</span><span class='comma'>,</span> <span class='const'>Member</span><span class='comma'>,</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_club_id'>club_id</span>
   <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_skip_api_sync!'>skip_api_sync!</span> <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:skip_api_sync</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:skip_api_sync</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_to_bool'>to_bool</span>
   <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_api_id'>api_id</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:api_id</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:api_id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span> <span class='kw'>and</span> <span class='id identifier rubyid_batch_update'>batch_update</span>
-  <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_wrong_address'>wrong_address</span> <span class='op'>=</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:wrong_address</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_to_bool'>to_bool</span> <span class='kw'>unless</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
   <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_wrong_phone_number'>wrong_phone_number</span> <span class='op'>=</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:wrong_phone_number</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_to_bool'>to_bool</span> <span class='kw'>unless</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:setter</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
   <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_wrong_phone_number'>wrong_phone_number</span> <span class='op'>=</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_phone_country_code'>phone_country_code</span> <span class='op'>!=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:phone_country_code</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>||</span> 
                                                         <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_phone_area_code'>phone_area_code</span> <span class='op'>!=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:phone_area_code</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>||</span>
@@ -1060,7 +1057,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Tue Jan 29 14:28:59 2013 by
+  Generated on Fri Feb  1 12:50:20 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
