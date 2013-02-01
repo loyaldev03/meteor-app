@@ -26,6 +26,8 @@ class Product < ActiveRecord::Base
     self.package = params[:package]
   	self.stock = params[:stock]
   	self.weight = params[:weight]
+    self.cost_center = params[:cost_center]
+    self.allow_backorder = params[:allow_backorder]
   end
 
   def decrease_stock(quantity=1)
