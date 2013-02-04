@@ -10,6 +10,8 @@ class CreditCard < ActiveRecord::Base
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }
 
+  BLANK_CREDIT_CARD_TOKEN = 'a'
+
   def number=(x)
     @number = if x.include?('XXXX')
       x.to_s
@@ -109,7 +111,7 @@ class CreditCard < ActiveRecord::Base
       end
     elsif allow_cc_blank
       self.cc_type = 'unknown'
-      self.token = "a" # fixing this token for blank credit cards
+      self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards
     else
       self.errors[:number] << am.errors["number"].join(", ") unless am.errors["number"].empty?
       self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
