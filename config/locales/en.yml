@@ -241,6 +241,7 @@ en:
         name: 'Name'
         description: 'Description'
         members_count: 'Members count'
+        family_memberships_allowed: Family memberships allowed
       credit_card:
         number: 'Number'
         expire_date: 'Expire date'
