@@ -488,4 +488,18 @@ def convert_from_date_to_time(x)
   end
 end
 
-require 'import_communications'
+
+# "CID ","TOM PROVISIONAL_DAYS","Mega Channel","TOM Membership_amount","Tom Membership_Type","Campaign Description","Campaign Medium","Campaign Medium Version ","Referral Host","Marketing Code","fulfillment_code","Product Description","Product ID ","Landing URL  ","Notes","Joint"
+def get_terms_of_membership_id(campaign_id)
+  if campaign_id.nil?
+    # refs #18932 , members without CID are complementary. This means we have to set them a lifetime TOM.
+  end
+  campaign = BillingCampaign.find_by_id(campaign_id)
+  return nil if campaign.nil? or campaign.phoenix_tom_id.nil?
+  campaign.phoenix_tom_id
+end
+
+def get_terms_of_membership_name(tom_id)
+  PhoenixTermsOfMembership.find_by_id(tom_id).name
+end
+
