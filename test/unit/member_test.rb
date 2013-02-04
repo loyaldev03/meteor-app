@@ -345,43 +345,48 @@ class MemberTest < ActiveSupport::TestCase
   test "Member should not be billed if club's billing_enable is set as false" do
     @club = @terms_of_membership_with_gateway.club
     @club.update_attribute(:billing_enable, false)
-    @member = create_active_member(@terms_of_membership_with_gateway, :provisional_member)
+    @member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
 
     @member.current_membership.update_attribute(:quota, 2)
     quota_before = @member.quota
     next_bill_date_before = @member.next_retry_bill_date
     bill_date_before = @member.bill_date
 
-    assert_difference('Operation.count', 0) do
-      assert_difference('Transaction.count', 0) do
-        Member.bill_all_members_up_today
+    Timecop.freeze( @member.next_retry_bill_date ) do
+      assert_difference('Operation.count', 0) do
+        assert_difference('Transaction.count', 0) do
+          Member.bill_all_members_up_today
+        end
       end
+      @member.reload
+      assert_equal(quota_before,@member.quota)
+      assert_equal(next_bill_date_before,@member.next_retry_bill_date)
+      assert_equal(bill_date_before,@member.bill_date)
     end
-    @member.reload
-    assert_equal(quota_before,@member.quota)
-    assert_equal(next_bill_date_before,@member.next_retry_bill_date)
-    assert_equal(bill_date_before,@member.bill_date)
   end
 
   # Prevent club to be billed
   test "Member should be billed if club's billing_enable is set as true" do
     @club = @terms_of_membership_with_gateway.club
-    @member = create_active_member(@terms_of_membership_with_gateway, :provisional_member)
+    @member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
 
     @member.current_membership.update_attribute(:quota, 2)
     quota_before = @member.quota
     next_bill_date_before = @member.next_retry_bill_date
     bill_date_before = @member.bill_date
 
-    assert_difference('Operation.count', 0) do
-      assert_difference('Transaction.count', 0) do
-        Member.bill_all_members_up_today
+    Timecop.freeze( @member.next_retry_bill_date ) do
+      assert_difference('Operation.count', 4) do
+        assert_difference('Transaction.count', 1) do
+          Member.bill_all_members_up_today
+        end
       end
+
+      @member.reload
+      assert_not_equal(quota_before, @member.quota)
+      assert_not_equal(next_bill_date_before,@member.next_retry_bill_date)
+      assert_not_equal(bill_date_before,@member.bill_date)
     end
-    @member.reload
-    assert_equal(quota_before,@member.quota)
-    assert_equal(next_bill_date_before,@member.next_retry_bill_date)
-    assert_equal(bill_date_before,@member.bill_date)
   end
 
   test "Change member from Lapsed status to active status" do

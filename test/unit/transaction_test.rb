@@ -9,6 +9,8 @@ class TransactionTest < ActiveSupport::TestCase
     @credit_card = FactoryGirl.build(:credit_card)
     @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
     @hd_strategy = FactoryGirl.create(:hard_decline_strategy)
+    FactoryGirl.create(:without_grace_period_decline_strategy_monthly)
+    FactoryGirl.create(:without_grace_period_decline_strategy_yearly)
   end
 
   def enroll_member(tom)
@@ -240,25 +242,22 @@ class TransactionTest < ActiveSupport::TestCase
       end
     end
   end
-  test "Billing with grace period enabled on tom and missing CC" do
-    @grace_strategy = FactoryGirl.create(:grace_period_decline_strategy)
-    active_member = create_active_member(@terms_of_membership, :active_member_without_cc)
-    nbd = active_member.bill_date
-    @terms_of_membership.grace_period = 15
-    @terms_of_membership.save
-    answer = active_member.bill_membership
-#TODO
 
-  end
   test "Billing with grace period disable on tom and missing CC" do
     active_member = create_active_member(@terms_of_membership, :active_member_without_cc)
     nbd = active_member.bill_date
-    @terms_of_membership.grace_period = 0
-    @terms_of_membership.save
-    answer = active_member.bill_membership
-#TODO
-
+    assert_difference('Operation.count', 5) do
+      assert_difference('Communication.count', 2) do
+        assert_difference('Transaction.count', 1) do
+          answer = active_member.bill_membership
+          active_member.reload
+          assert_equal active_member.status, "lapsed"
+          assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
+        end
+      end
+    end
   end
+
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 
     active_merchant_stubs_store
     assert_difference('Operation.count', 5) do

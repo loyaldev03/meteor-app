@@ -355,21 +355,7 @@ class Member < ActiveRecord::Base
     if can_bill_membership?
       amount = terms_of_membership.installment_amount
       if amount.to_f > 0.0
-        # Grace period
-        # why cero times? Because only 1 time must be Billed.
-        # Before we were using times = 1. Problem is that times = 1, on case logic will allow times values [0,1].
-        # So grace period will be granted twice.
-        #        limit = 0 
-        #        days  = campaign.grace_period
-        if active_credit_card.nil?
-          if terms_of_membership.grace_period > 0
-            { :code => Settings.error_codes.credit_card_blank_with_grace, 
-              :message => "Credit card is blank. Allowing grace period" }
-          else
-            { :code => Settings.error_codes.credit_card_blank_without_grace,
-              :message => "Credit card is blank and grace period is disabled" }
-          end
-        elsif terms_of_membership.payment_gateway_configuration.nil?
+        if terms_of_membership.payment_gateway_configuration.nil?
           message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
           Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
           Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
@@ -1157,11 +1143,7 @@ class Member < ActiveRecord::Base
           cancel_member = true
         else
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-          if trans.response_code == Settings.error_codes.credit_card_blank_with_grace
-            self.next_retry_bill_date = terms_of_membership.grace_period.to_i.days.from_now
-          else
-            self.next_retry_bill_date = decline.days.days.from_now
-          end
+          self.next_retry_bill_date = decline.days.days.from_now
           if self.recycled_times > (decline.limit-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
             cancel_member = true
