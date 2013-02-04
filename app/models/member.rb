@@ -332,7 +332,7 @@ class Member < ActiveRecord::Base
       else
         old_tom_id = terms_of_membership.id
         prev_membership_id = current_membership.id
-        res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info)
+        res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true)
         if res[:code] == Settings.error_codes.success
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
             "Save the sale from TOM(#{old_tom_id}) to TOM(#{new_tom_id})", self, Settings.operation_types.save_the_sale)
@@ -348,7 +348,7 @@ class Member < ActiveRecord::Base
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
   def recover(new_tom, agent = nil)
-    enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, self.current_membership.enrollment_info)
+    enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, self.current_membership.enrollment_info, true)
   end
 
   def bill_membership
@@ -450,10 +450,10 @@ class Member < ActiveRecord::Base
       return answer
     end
 
-    member.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, member_params)
+    member.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, member_params, false)
   end
 
-  def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, member_params = nil)
+  def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, member_params = nil, skip_credit_card_validation = false)
     allow_cc_blank = (amount.to_f == 0.0 and cc_blank)
     club = tom.club
 
@@ -499,7 +499,7 @@ class Member < ActiveRecord::Base
     begin
       if self.new_record?
         self.credit_cards << credit_card
-      else
+      elsif not skip_credit_card_validation
         validate_if_credit_card_already_exist(tom, credit_card.number, credit_card.expire_year, credit_card.expire_month, false, cc_blank, agent)
         credit_card = active_credit_card
       end
@@ -523,6 +523,7 @@ class Member < ActiveRecord::Base
 
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
     rescue Exception => e
+      logger.error e.inspect
       error_message = (self.id.nil? ? "Member:enroll" : "Member:recovery/save the sale") + " -- member turned invalid while enrolling"
       Airbrake.notify(:error_class => error_message, :error_message => e, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
