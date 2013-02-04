@@ -935,6 +935,7 @@ class Member < ActiveRecord::Base
 
   def validate_if_credit_card_already_exist(tom, number, new_year, new_month, only_validate = true, allow_cc_blank = false, current_agent = nil)
     answer = { :message => "Credit card valid", :code => Settings.error_codes.success}
+    family_memberships_allowed = tom.club.family_memberships_allowed
     new_credit_card = CreditCard.new(:number => number, :expire_month => new_month, :expire_year => new_year)
     new_credit_card.get_token(tom.payment_gateway_configuration, first_name, last_name)
     credit_cards = new_credit_card.token.nil? ? [] : CreditCard.joins(:member).where(:token => new_credit_card.token, :members => { :club_id => club.id } )
@@ -952,10 +953,10 @@ class Member < ActiveRecord::Base
         answer = active_credit_card.update_expire(new_year, new_month) # lets update expire month
       end
     # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
-    elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
+    elsif not family_memberships_allowed and not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
       answer = { :message => I18n.t('error_messages.credit_card_in_use', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
     # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in inactive status?
-    elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
+    elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and (family_memberships_allowed or credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?)
       unless only_validate
         new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
         CreditCard.transaction do 
@@ -971,7 +972,8 @@ class Member < ActiveRecord::Base
           end
         end
       end
-    elsif credit_cards.select { |cc| cc.active }.empty? # its not my credit card. its from another member. the question is. can I use it?
+    # its not my credit card. its from another member. the question is. can I use it?
+    elsif family_memberships_allowed or credit_cards.select { |cc| cc.active }.empty? 
       unless only_validate
         answer = add_new_credit_card(new_credit_card, current_agent)
       end

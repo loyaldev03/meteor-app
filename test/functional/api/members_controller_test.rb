@@ -8,6 +8,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @api_user = FactoryGirl.create(:confirmed_api_agent)
     @agency_agent = FactoryGirl.create(:confirmed_agency_agent)
     @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway
+    @terms_of_membership_with_family = FactoryGirl.create :terms_of_membership_with_gateway_with_family
     @preferences = {'color' => 'green','car'=> 'dodge'}
     # request.env["devise.mapping"] = Devise.mappings[:agent]
   end
@@ -616,7 +617,32 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@active_credit_card.number])
   end
 
-  test "Update a profile with CC used by another member" do
+  test "Update a profile with CC used by another member. club with family memberships" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership_with_family, :member_with_api)
+    @member2 = create_active_member(@terms_of_membership_with_family, :member_with_api)
+
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    old_token = @active_credit_card.token
+    @active_credit_card2 = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member2.id
+
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    token = @credit_card.token
+    active_merchant_stubs_store(@credit_card.number)
+
+    assert_difference('Operation.count',3) do
+      assert_difference('CreditCard.count',1) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, nil)
+    assert_equal(@member.active_credit_card.token, token)
+    assert_not_equal(old_token, token)
+  end
+
+  test "Update a profile with CC used by another member. club does not allow family memberships" do
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @member2 = create_active_member(@terms_of_membership, :member_with_api)

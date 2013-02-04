@@ -28,6 +28,18 @@ FactoryGirl.define do
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end  
 
+  factory :simple_club_with_gateway_with_family, class: Club do
+    sequence(:name) {|n| "club#{n}" }
+    description "My description"
+    cs_phone_number "123 456 7891"
+    billing_enable true
+    family_memberships_allowed true
+    time_zone { TZInfo::Timezone.all.sample.name }
+    association :partner
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
+  end  
+
+
   factory :club_with_api, class: Club do
     sequence(:name) {|n| "#{Faker::Name.name}#{n}" }
     description "My description"

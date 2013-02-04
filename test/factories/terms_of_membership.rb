@@ -50,6 +50,16 @@ FactoryGirl.define do
     association :club, factory: :simple_club_with_gateway
   end
 
+  factory :terms_of_membership_with_gateway_with_family, class: TermsOfMembership do
+    name "test"
+    installment_amount 100
+    installment_type '1.month'
+    needs_enrollment_approval false
+    club_cash_amount 150
+    provisional_days 30
+    association :club, factory: :simple_club_with_gateway_with_family
+  end
+
   factory :terms_of_membership_with_gateway_and_external_id, class: TermsOfMembership do
     name "test"
     installment_amount 100
