@@ -85,19 +85,9 @@ class CreditCard < ActiveRecord::Base
   end
 
   def set_as_active!
-    exc = nil
-    CreditCard.transaction do 
-      begin
-        self.member.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
-        self.update_attribute :active , true
-        Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member)
-      rescue Exception => e
-        exc = e
-        Airbrake.notify(:error_class => "CreditCard::set_as_active!", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :credit_card => self.inspect, :member => self.member.inspect })
-        raise ActiveRecord::Rollback
-      end
-    end
-    raise exc unless exc.nil?
+    self.member.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
+    self.update_attribute :active , true
+    Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member)
   end
 
   def get_token(pgc = nil, first_name = nil, last_name = nil, allow_cc_blank = false)

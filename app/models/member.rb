@@ -942,18 +942,20 @@ class Member < ActiveRecord::Base
       unless only_validate
         answer = add_new_credit_card(new_credit_card, current_agent)
       end
-    elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? # credit card is blacklisted
+    # credit card is blacklisted
+    elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? 
       answer = { :message => I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_blacklisted, :errors => { :number => "Credit card is blacklisted" }}
-    elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? # is this credit card already of this member and its already active?
+    # is this credit card already of this member and its already active?
+    elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? 
       unless only_validate
         answer = active_credit_card.update_expire(new_year, new_month) # lets update expire month
       end
+    # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
     elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
-      # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
       answer = { :message => I18n.t('error_messages.credit_card_in_use', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
+    # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in inactive status?
     elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
       unless only_validate
-        # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
         new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
         CreditCard.transaction do 
           begin
