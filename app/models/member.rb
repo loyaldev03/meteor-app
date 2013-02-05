@@ -934,7 +934,7 @@ class Member < ActiveRecord::Base
     # is this credit card already of this member and its already active?
     elsif not credit_cards.select { |cc| cc.member_id == self.id and cc.active }.empty? 
       unless only_validate
-        answer = active_credit_card.update_expire(new_year, new_month) # lets update expire month
+        answer = active_credit_card.update_expire(new_year, new_month, current_agent) # lets update expire month
       end
     # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in active status?
     elsif not family_memberships_allowed and not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?
@@ -945,7 +945,7 @@ class Member < ActiveRecord::Base
         new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
         CreditCard.transaction do 
           begin
-            answer = new_active_credit_card.update_expire(new_year, new_month) # lets update expire month
+            answer = new_active_credit_card.update_expire(new_year, new_month, current_agent) # lets update expire month
             if answer[:code] == Settings.error_codes.success
               # activate new credit card ONLY if expire date was updated.
               new_active_credit_card.set_as_active!
@@ -980,7 +980,7 @@ class Member < ActiveRecord::Base
       { :code => Settings.error_codes.invalid_credit_card, :message => I18n.t('error_messages.invalid_credit_card'), :errors => { :number => "Credit card is blank." }}
     elsif credit_card[:number].include?('X')
       if active_credit_card.last_digits.to_s == credit_card[:number][-4..-1].to_s # lets update expire month
-        active_credit_card.update_expire(new_year, new_month)
+        active_credit_card.update_expire(new_year, new_month, current_agent)
       else # do not update nothing, credit cards do not match or its expired
         { :code => Settings.error_codes.invalid_credit_card, :message => I18n.t('error_messages.invalid_credit_card'), :errors => { :number => "Credit card do not match the active one." }}
       end
