@@ -19,7 +19,7 @@ class MemberNotesController < ApplicationController
     member_note.member_id = @current_member.id
     
     if member_note.save
-      Auditory.audit(@current_agent, member_note, "Note added", @current_member)
+      Auditory.audit(@current_agent, member_note, "Note added", @current_member, Settings.operation_types.note_added)
       redirect_to show_member_path, notice: "The note was added successfuly"
     else
       render action: "new"

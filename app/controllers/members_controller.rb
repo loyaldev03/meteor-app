@@ -208,7 +208,7 @@ class MembersController < ApplicationController
       if @current_member.update_attribute(:wrong_phone_number, params[:reason])
         message = "Phone number #{@current_member.full_phone_number} is #{params[:reason]}."
         flash[:notice] = message
-        Auditory.audit(@current_agent,@current_member,message,@current_member)
+        Auditory.audit(@current_agent,@current_member,message,@current_member, Settings.operation_types.phone_number_set_unreachable)
         redirect_to show_member_path
       else
         flash.now[:error] = "Could not set phone number as unreachable."
@@ -220,7 +220,7 @@ class MembersController < ApplicationController
     if @current_member.can_be_approved?
       @current_member.set_as_provisional!
       message = "Member approved"
-      Auditory.audit(@current_agent, @current_member, message, @current_member)
+      Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_approved)
       flash[:notice] = message
     else
       flash[:error] = "Member cannot be approved. It must be applied."
@@ -232,7 +232,7 @@ class MembersController < ApplicationController
     if @current_member.can_be_rejected?
       @current_member.set_as_canceled!
       message = "Member was rejected and now its lapsed."
-      Auditory.audit(@current_agent, @current_member, message, @current_member)
+      Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_rejected)
       flash[:notice] = message
     else
       flash[:error] = "Member cannot be rejected. It must be applied."
@@ -262,7 +262,7 @@ class MembersController < ApplicationController
       @current_member.api_id = params[:member][:api_id] 
       if @current_member.save
         message = "Member's api_id changed from #{old_id.inspect} to #{@current_member.api_id.inspect}"
-        Auditory.audit(@current_agent, @current_member, message, @current_member)
+        Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_drupal_remote_id_set)
         redirect_to show_member_path, notice: 'Sync data updated'
       else
         redirect_to show_member_path, notice: "Sync data cannot be updated #{@current_member.errors.to_hash}"
@@ -279,12 +279,11 @@ class MembersController < ApplicationController
       else
         message = "Member synchronized to pardot"
       end
-      Auditory.audit(@current_agent, @current_member, message, @current_member)
+      Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_manually_synced_to_pardot)
       redirect_to show_member_path, notice: message    
     end
   rescue
     message = "Error on members#pardot_sync: #{$!}"
-    Auditory.audit(@current_agent, @current_member, message, @current_member)
     Airbrake.notify(:error_class => "Member:pardot_sync", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message
   end
@@ -298,12 +297,12 @@ class MembersController < ApplicationController
       else
         message = "Member synchronized"
       end
-      Auditory.audit(@current_agent, @current_member, message, @current_member)
+      Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_manually_synced_to_drupal)
       redirect_to show_member_path, notice: message    
     end
   rescue
     message = "Error on members#sync: #{$!}"
-    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_manually_synced_to_drupal_error)
     Airbrake.notify(:error_class => "Member:sync", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message.html_safe
   end
@@ -323,11 +322,11 @@ class MembersController < ApplicationController
     else
       message = "Remote password could not be reset"
     end
-    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.reset_password)
     redirect_to show_member_path, notice: message
   rescue
     message = "Error on members#reset_password: #{$!}"
-    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.reset_password_error)
     Airbrake.notify(:error_class => "Member:reset_password", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message
   end
@@ -339,11 +338,11 @@ class MembersController < ApplicationController
     else
       message = "Welcome email could not be resent"
     end
-    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.resend_welcome)
     redirect_to show_member_path, notice: message
   rescue
     message = "Error on members#resend_welcome: #{$!}"
-    Auditory.audit(@current_agent, @current_member, message, @current_member)
+    Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.resend_welcome_error)
     Airbrake.notify(:error_class => "Member:resend_welcome", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path, notice: message
   end

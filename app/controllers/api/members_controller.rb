@@ -158,14 +158,14 @@ class Api::MembersController < ApplicationController
       member.update_member_data_by_params(params[:member])
       if member.save
         message = "Member updated successfully"
-        Auditory.audit(current_agent, member, message, member) unless batch_update
+        Auditory.audit(current_agent, member, message, member, Settings.operation_types.profile_updated) unless batch_update
         response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
       else
         message = "Member could not be updated, #{member.error_to_s}"
         if batch_update
           logger.error "Remote batch update message: #{message}"
         else
-          Auditory.audit(current_agent, member, message, member)
+          Auditory.audit(current_agent, member, message, member, Settings.operation_types.profile_update_error)
         end
         response = { :message => I18n.t('error_messages.member_data_invalid'), :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
       end

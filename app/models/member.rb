@@ -736,7 +736,7 @@ class Member < ActiveRecord::Base
           end
         end
         message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
-        Auditory.audit(agent, self, message, self)
+        Auditory.audit(agent, self, message, self, Settings.operation_types.member_address_set_as_undeliverable)
         { :message => message, :code => Settings.error_codes.success }
       else
         message = I18n.t('error_messages.member_set_wrong_address_error', :errors => self.errors.inspect)
@@ -859,7 +859,7 @@ class Member < ActiveRecord::Base
     Member.find_in_batches( :conditions => ("status = 'lapsed' AND api_id IS NOT NULL") ) do |group|
       group.each do |member|
         member.api_member.destroy!
-        Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member)
+        Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
       end
     end
     Member.find_in_batches( :conditions => ("sync_status IN ('with_error', 'not_synced')") ) do |group|
@@ -869,7 +869,7 @@ class Member < ActiveRecord::Base
         unless api_m.nil?
           if api_m.save!(force: true)
             unless member.last_sync_error_at
-              Auditory.audit(nil, member, "Member synchronized by batch script", member)
+              Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
             end
           end
         end
@@ -997,7 +997,7 @@ class Member < ActiveRecord::Base
         if new_credit_card.errors.size == 0
           new_credit_card.save!
           message = "Credit card #{new_credit_card.last_digits} added and activated."
-          Auditory.audit(current_agent, new_credit_card, message, self)
+          Auditory.audit(current_agent, new_credit_card, message, self, Settings.operation_types.credit_card_added)
           answer = { :code => Settings.error_codes.success, :message => message }
           new_credit_card.set_as_active!
         else
@@ -1049,7 +1049,7 @@ class Member < ActiveRecord::Base
       self.bill_date = new_bill_date
       self.next_retry_bill_date = new_bill_date
       self.save(:validate => false)
-      Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date.to_date}", self)
+      Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date.to_date}", self, Settings.operation_types.renewal_scheduled)
     end
 
     def set_status_on_enrollment!(agent, trans, amount, info)

@@ -87,7 +87,7 @@ class CreditCard < ActiveRecord::Base
   def set_as_active!
     self.member.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
     self.update_attribute :active , true
-    Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member)
+    Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member, Settings.operation_types.credit_card_activated)
   end
 
   def get_token(pgc = nil, first_name = nil, last_name = nil, allow_cc_blank = false)
@@ -115,7 +115,7 @@ class CreditCard < ActiveRecord::Base
     elsif Time.new(year, month) >= Time.zone.now.beginning_of_month
       message = "Changed credit card XXXX-XXXX-XXXX-#{last_digits} from #{expire_month}/#{expire_year} to #{month}/#{year}"
       update_attributes(:expire_month => month, :expire_year => year)
-      Auditory.audit(current_agent, self, message, self.member)
+      Auditory.audit(current_agent, self, message, self.member, Settings.operation_types.credit_card_updated)
       { :code => Settings.error_codes.success, :message => message }
     else
       { :code => Settings.error_codes.invalid_credit_card, :message => I18n.t('error_messages.invalid_credit_card') + " Expiration date could be wrong.", :errors => { :number => "New expiration date is expired." }}

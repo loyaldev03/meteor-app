@@ -48,8 +48,31 @@ defaults: &defaults
     reset_club_cash: 211
     credit_card_in_use: 212
     credit_card_blacklisted: 213
-    member_email_blacklisted: 213
+    member_email_blacklisted: 214
     aus_recycle_credit_card: 215
+    credit_card_updated: 216
+    credit_card_activated: 217
+    member_address_set_as_undeliverable: 218
+    member_drupal_account_destroyed_batch: 219
+    member_drupal_account_synced_batch: 220
+    credit_card_added: 221
+    renewal_scheduled: 222
+    profile_updated: 223
+    profile_update_error: 224
+    phone_number_set_unreachable: 225
+    member_approved: 226
+    member_rejected: 227
+    member_manually_synced_to_drupal: 228
+    member_manually_synced_to_pardot: 229
+    member_drupal_remote_id_set: 230
+    member_manually_synced_to_drupal_error: 231
+    reset_password: 232
+    reset_password_error: 233
+    resend_welcome: 234
+    resend_welcome_error: 235
+    credit_card_deleted: 236
+    operation_updated: 237
+    note_added: 238
     #communication
     active_email: 300     
     prebill_email: 301    

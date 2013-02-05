@@ -20,7 +20,7 @@ class CreditCardsController < ApplicationController
 
     if response[:code] == Settings.error_codes.success
       @current_member.api_member.save!(force: true) rescue nil
-      redirect_to show_member_path(:id => @current_member), notice: response[:message]
+      redirect_to show_member_path, notice: response[:message]
     else
       flash.now[:error] = "#{response[:message]} #{response[:errors].to_s}"
       render "new"
@@ -31,7 +31,7 @@ class CreditCardsController < ApplicationController
     @credit_card = CreditCard.find(params[:id])
     if @credit_card.destroy
       message = "Credit Card #{@credit_card.last_digits} was successfully destroyed"
-      Auditory.audit(@current_agent, @credit_card, message, @current_member)
+      Auditory.audit(@current_agent, @credit_card, message, @current_member, Settings.operation_types.credit_card_deleted)
       redirect_to show_member_path, notice: message
     else
       error = @credit_card.errors.collect {|attr, message| "#{message}" }.join("")
@@ -46,12 +46,10 @@ class CreditCardsController < ApplicationController
         new_credit_card = CreditCard.find(params[:credit_card_id])
         new_credit_card.set_as_active!
         @current_member.api_member.save!(force: true) rescue nil
-        message = "Credit card #{new_credit_card.last_digits} activated."
-        Auditory.audit(@current_agent, new_credit_card, message, @current_member)
-        redirect_to show_member_path(:id => @current_member), notice: message
+        redirect_to show_member_path, notice: "Credit card #{new_credit_card.last_digits} activated."
       rescue Exception => e
-        Airbrake.notify(:error_class => "CreditCardsController::activate", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :params => params.inspect })
-        redirect_to show_member_path(:id => @current_member), error: e
+        Airbrake.notify(:error_class => "CreditCardsController::activate", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :params => params.inspect, :member => current_member })
+        redirect_to show_member_path, error: e
         logger.error e.inspect
         raise ActiveRecord::Rollback
       end

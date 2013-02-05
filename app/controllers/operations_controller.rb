@@ -26,7 +26,7 @@ class OperationsController < ApplicationController
     @link = (view_context.link_to "#{operation.id}", operation_path(@current_partner.prefix,@current_club.name,@current_member.visible_id,operation.id))
     if operation.update_attributes(params[:operation])
       message = "Edited operation note #{@link}".html_safe
-      Auditory.audit(@current_agent, operation, message, @current_member)
+      Auditory.audit(@current_agent, operation, message, @current_member, Settings.operation_types.operation_updated)
       redirect_to operation_path(:id => operation), notice: message
     else
       render action: "show" 

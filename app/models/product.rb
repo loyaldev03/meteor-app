@@ -41,23 +41,17 @@ class Product < ActiveRecord::Base
 
   def self.generate_xls
     header = ['Name', 'Sku']
-    status_list = []
-    Fulfillment.state_machines[:status].states.map(&:name).each{|x| status_list << x.to_s unless x.to_s == "sent"}
+    status_list = Fulfillment.state_machines[:status].states.map(&:name).select {|x| x != :sent }
     status_list.each{|x| header << x}
 
     package = Axlsx::Package.new
     Club.all.each do |club|
       package.workbook.add_worksheet(:name => club.name) do |sheet|
         sheet.add_row header
-        Product.find_all_by_club_id(club.id).each do |product|
-          row = []
-          row << product.name
-          row << product.sku
-          # TODO: improve this SQL query
-          status_list.each {|status| row << Fulfillment.where(["product_sku = ? AND member_id IN (?) 
-                                                                 AND status = ?", product.sku, 
-                                                                 Member.find_all_by_club_id(club.id).map(&:id), 
-                                                                 status]).count }
+        club.products.each do |product|
+          row = [ product.name, product.sku ]
+          status_list.each {|status| row << Fulfillment.joins(:member).where([ "fulfillments.product_sku = ? AND fulfillments.status = ? AND members.club_id = ?", 
+                                                product.sku, status.to_s, club.id ]).count }
           sheet.add_row row
         end
       end
