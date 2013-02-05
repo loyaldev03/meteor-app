@@ -53,6 +53,7 @@ class Product < ActiveRecord::Base
           row = []
           row << product.name
           row << product.sku
+          # TODO: improve this SQL query
           status_list.each {|status| row << Fulfillment.where(["product_sku = ? AND member_id IN (?) 
                                                                  AND status = ?", product.sku, 
                                                                  Member.find_all_by_club_id(club.id).map(&:id), 

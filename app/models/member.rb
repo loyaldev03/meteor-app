@@ -56,13 +56,11 @@ class Member < ActiveRecord::Base
   end
 
   def after_save_sync_to_remote_domain(type)
-    if can_be_synced_to_remote? # Bug #23017 - skip sync if lapsed or applied.
-      unless @skip_api_sync || api_member.nil?
-        time_elapsed = Benchmark.ms do
-          api_member.save!
-        end
-        logger.info "Drupal::sync took #{time_elapsed}ms"
+    unless @skip_api_sync || api_member.nil?
+      time_elapsed = Benchmark.ms do
+        api_member.save!
       end
+      logger.info "Drupal::sync took #{time_elapsed}ms"
     end
   rescue Exception => e
     # refs #21133
@@ -858,6 +856,12 @@ class Member < ActiveRecord::Base
   end
 
   def self.process_sync 
+    Member.find_in_batches( :conditions => ("status = 'lapsed' AND api_id IS NOT NULL") ) do |group|
+      group.each do |member|
+        member.api_member.destroy!
+        Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member)
+      end
+    end
     Member.find_in_batches( :conditions => ("sync_status IN ('with_error', 'not_synced')") ) do |group|
       group.each do |member|
         Rails.logger.info "  * processing member ##{member.uuid}"
@@ -871,12 +875,6 @@ class Member < ActiveRecord::Base
         end
       end
     end       
-    Member.find_in_batches( :conditions => ("status = 'lapsed' AND api_id IS NOT NULL") ) do |group|
-      group.each do |member|
-        member.api_member.destroy!
-        Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member)
-      end
-    end
   end
 
   def self.process_email_sync_error

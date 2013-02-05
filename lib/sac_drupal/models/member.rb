@@ -29,7 +29,9 @@ module Drupal
     end
 
     def save!(options = {})
-      self.new_record? ? self.create!(options) : self.update!(options)
+      if self.member.can_be_synced_to_remote? # Bug #23017 - skip sync if lapsed or applied.
+        self.new_record? ? self.create!(options) : self.update!(options)
+      end
     end
 
     def destroy!

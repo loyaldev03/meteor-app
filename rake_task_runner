@@ -9,6 +9,7 @@ LOGFILE="/tmp/cron_rake.log"
 echo "PATH variable => `printenv PATH`"
 
 cd /var/www/$2/current && RAILS_ENV=$1 rake members:cancel  >> $LOGFILE 2>&1
+cd /var/www/$2/current && RAILS_ENV=$1 rake members:process_sync  >> $LOGFILE 2>&1
 
 if [ "$1" == "production" ]; then
   cd /var/www/$2/current && RAILS_ENV=$1 rake mes:chargeback_report  >> $LOGFILE 2>&1 
