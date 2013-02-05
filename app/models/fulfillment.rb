@@ -20,14 +20,13 @@ class Fulfillment < ActiveRecord::Base
   KIT_CARD_HEADER = ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
                 'ADDRESS','CITY','ZIP','Product','Charter Member Status' ]
 
-
   scope :where_bad_address, lambda { where("status = 'bad_address'") }
   scope :where_in_process, lambda { where("status = 'in_process'") }
   scope :where_not_processed, lambda { where("status = 'not_processed'") }
   scope :where_to_set_bad_address, lambda { where("status IN ('not_processed','in_process','out_of_stock','returned')") }
   scope :where_cancellable, lambda { where("status IN ('not_processed','in_process','out_of_stock','bad_address')") }
-  scope :type_kit_card, lambda { where("product_sku = 'KIT-CARD'")}
-  scope :type_others, lambda { where("product_sku NOT IN ('KIT-CARD')")}
+  scope :type_kit_card, lambda { where("product_sku = '#{Settings.kit_card_product}'")}
+  scope :type_others, lambda { where("product_sku NOT IN ('#{Settings.kit_card_product}')")}
 
   scope :not_renewed, lambda { where("renewed = false") }
 
