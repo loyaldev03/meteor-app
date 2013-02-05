@@ -9,7 +9,7 @@ class Member < ActiveRecord::Base
   has_many :credit_cards
   has_many :transactions, :order => "created_at ASC"
   has_many :operations
-  has_many :communications
+  has_many :communications, :order => "created_at DESC"
   has_many :fulfillments
   has_many :club_cash_transactions
   has_many :enrollment_infos, :order => "created_at DESC"
