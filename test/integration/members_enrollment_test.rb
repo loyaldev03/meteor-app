@@ -34,31 +34,31 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
    end
 
   def setup_email_templates
-    et = EmailTemplate.new :name => "Day 7 - Trial", :client => :lyris, :template_type => :pillar_provisional
+    et = EmailTemplate.new :name => "Day 7 - Trial", :client => :lyris, :template_type => :pillar
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27648, :mlid => 226095, :site_id => 123 }
     et.days_after_join_date = 7
     et.save!
 
-    et = EmailTemplate.new :name => "Day 35 - News", :client => :lyris, :template_type => :pillar_provisional
+    et = EmailTemplate.new :name => "Day 35 - News", :client => :lyris, :template_type => :pillar
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27647, :mlid => 226095, :site_id => 123 }
     et.days_after_join_date = 35
     et.save!
 
-    et = EmailTemplate.new :name => "Day 40 - Deals", :client => :lyris, :template_type => :pillar_provisional 
+    et = EmailTemplate.new :name => "Day 40 - Deals", :client => :lyris, :template_type => :pillar
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27651, :mlid => 226095, :site_id => 123 }
     et.days_after_join_date = 40
     et.save!
     
-    et = EmailTemplate.new :name => "Day 45 - Local Chapters", :client => :lyris, :template_type => :pillar_provisional 
+    et = EmailTemplate.new :name => "Day 45 - Local Chapters", :client => :lyris, :template_type => :pillar
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27650, :mlid => 226095, :site_id => 123 }
     et.days_after_join_date = 45
     et.save!
     
-    et = EmailTemplate.new :name => "Day 50 - VIP", :client => :lyris, :template_type => :pillar_provisional
+    et = EmailTemplate.new :name => "Day 50 - VIP", :client => :lyris, :template_type => :pillar
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27649, :mlid => 226095, :site_id => 123 }
     et.days_after_join_date = 50
@@ -133,7 +133,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#td_mi_credit_cards_first_created_at") { assert page.has_content?(I18n.l(@saved_member.credit_cards.first.created_at, :format => :only_date)) }    
   end
 
-  def confirm_email_is_sent(amount_of_days, template_name, pillar_type, status)
+  def confirm_email_is_sent(amount_of_days, template_name)
     setup_member(false)
     setup_email_templates
 
@@ -144,7 +144,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @saved_member = Member.find_by_email(unsaved_member.email)  
 
     @saved_member.current_membership.update_attribute(:join_date, Time.zone.now-amount_of_days.day)
-    Member.send_pillar_emails(pillar_type, status)
+    Member.send_pillar_emails
     sleep 1
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -1003,23 +1003,23 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   
 
   test "Send Trial email at Day 7" do
-    confirm_email_is_sent 7, "Day 7 - Trial", 'pillar_provisional', 'provisional'
+    confirm_email_is_sent 7, "Day 7 - Trial"
   end
 
   test "Send News email at Day 35" do
-    confirm_email_is_sent 35, "Day 35 - News", 'pillar_provisional', 'provisional'
+    confirm_email_is_sent 35, "Day 35 - News"
   end
 
   test "Send Deals email at Day 40" do
-    confirm_email_is_sent 40, "Day 40 - Deals", 'pillar_provisional', 'provisional'
+    confirm_email_is_sent 40, "Day 40 - Deals"
   end
 
   test "Send Local Chapters email at Day 45" do
-    confirm_email_is_sent 45, "Day 45 - Local Chapters", 'pillar_provisional', 'provisional'
+    confirm_email_is_sent 45, "Day 45 - Local Chapters"
   end
 
   test "Send VIP email at Day 50" do
-    confirm_email_is_sent 50, "Day 50 - VIP", 'pillar_provisional', 'provisional'
+    confirm_email_is_sent 50, "Day 50 - VIP"
   end
 
   test "Filtering by Communication at Operations tab" do

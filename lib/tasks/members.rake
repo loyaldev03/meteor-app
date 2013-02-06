@@ -93,8 +93,7 @@ namespace :members do
   task :send_pillar_emails => :environment do 
     tall = Time.zone.now
     begin
-      Member.send_pillar_emails('pillar', 'active')
-      Member.send_pillar_emails('pillar_provisional', 'provisional')
+      Member.send_pillar_emails
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end

@@ -789,17 +789,17 @@ class Member < ActiveRecord::Base
     file.flock(File::LOCK_UN)
   end
 
-  def self.send_pillar_emails(type, status)
+  def self.send_pillar_emails
     # TODO: join EmailTemplate and Member querys
-    EmailTemplate.find_in_batches(:conditions => [" template_type = ? ", type]) do |group|
+    EmailTemplate.find_in_batches(:conditions => [" template_type = ? ", :pillar]) do |group|
       group.each do |template| 
         tz = Time.zone.now
         begin
           Rails.logger.info "  * processing template ##{template.id}"
           Membership.find_in_batches(:conditions => 
-              [ " date(join_date) = ? AND terms_of_membership_id = ? AND status = ? ", 
+              [ " date(join_date) = ? AND terms_of_membership_id = ? AND status IN (?) ", 
                 (Time.zone.now - template.days_after_join_date.days).to_date, 
-                template.terms_of_membership_id, status ]) do |group1|
+                template.terms_of_membership_id, ['active', 'provisional'] ]) do |group1|
             group1.each do |membership| 
               begin
                 Rails.logger.info "  * processing member ##{membership.member_id}"

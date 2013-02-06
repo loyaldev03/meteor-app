@@ -103,10 +103,8 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert_difference('Fulfillment.count') do
       member.set_as_provisional!
     end
-    product = Product.find_by_sku('kit-kard')
-    fulfillment_with_stock = Fulfillment.find_by_product_sku('kit-kard')
-
-    assert_equal fulfillment_with_stock.status, 'not_processed'
+    ff = member.fulfillments.first
+    assert_equal ff.status, 'not_processed'
   end
 
   test "Should create new fulfillment with recurrent and renewable_date" do
@@ -115,7 +113,8 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert_difference('Fulfillment.count') do
       member.set_as_provisional!
     end
-    fulfillment_out_of_stock = Fulfillment.find_by_product_sku('kit-kard')
+
+    fulfillment_out_of_stock = member.fulfillments.first
     assert_equal fulfillment_out_of_stock.recurrent, true, "Recurrent on fulfillment is not recurrent when it should be."
     assert_equal fulfillment_out_of_stock.renewable_at, fulfillment_out_of_stock.assigned_at + 1.year, "Renewable date was not set properly."
   end

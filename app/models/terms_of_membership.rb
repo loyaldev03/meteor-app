@@ -34,7 +34,7 @@ class TermsOfMembership < ActiveRecord::Base
   end
 
   def lifetime?
-    installment_type == "lifetime"
+    installment_type == "1000.years"
   end
   #################################
   

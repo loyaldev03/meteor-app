@@ -27,11 +27,6 @@ class Notifier < ActionMailer::Base
     mail :to => to, :subject => "pillar to #{email}"
   end
 
-  def pillar_provisional(email)
-    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
-    mail :to => to, :subject => "pillar_provisional to #{email}"
-  end
-
   def active_with_approval(agent,member)
     @agent = agent
     @member = member

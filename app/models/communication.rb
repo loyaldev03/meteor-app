@@ -78,8 +78,6 @@ class Communication < ActiveRecord::Base
       Notifier.refund(email).deliver!
     when :pillar
       Notifier.pillar(email).deliver!
-    when :pillar_provisional
-      Notifier.pillar_provisional(email).deliver!
     when :hard_decline
       Notifier.hard_decline(member).deliver!
     when :soft_decline

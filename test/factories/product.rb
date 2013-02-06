@@ -19,7 +19,7 @@ FactoryGirl.define do
   factory :product_without_stock_and_recurrent, class: Product do
     name "Kit kard"
     package "NCARFLAG"
-    sku "kit-kard"
+    sequence(:sku) {|n| Settings.kit_card_product+"#{n}" }
     recurrent true
     stock 0
   end 
@@ -27,7 +27,7 @@ FactoryGirl.define do
   factory :product_with_recurrent, class: Product do
     name "Kit kard"
     package "KIT-CARD"
-    sku "kit-kard"
+    sequence(:sku) {|n| Settings.kit_card_product+"#{n}" }
     recurrent true
     stock 10
   end  
@@ -35,7 +35,7 @@ FactoryGirl.define do
   factory :product_without_recurrent, class: Product do
     name "Kit kard"
     package "KIT-CARD"
-    sku "kit-kard"
+    sequence(:sku) {|n| Settings.kit_card_product+"#{n}" }
     recurrent false
     stock 10
   end  
