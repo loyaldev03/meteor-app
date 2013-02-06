@@ -16,8 +16,9 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.zip = member.zip
   phoenix.country = member.country
   phoenix.birth_date = member.birth_date
-  phoenix.phone_number = member.phone
-  # phoenix.type_of_phone_number
+  phoenix.phone_country_code = member.phone_country_code
+  phoenix.phone_area_code = member.phone_area_code
+  phoenix.phone_local_number = member.phone_local_number
   phoenix.reactivation_times = member.phoenix_reactivations
   # phoenix.gender
   phoenix.blacklisted = member.blacklisted
@@ -48,24 +49,20 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   e_info.referral_host = campaign.referral_host
   e_info.landing_url = campaign.landing_url
   e_info.terms_of_membership_id = tom_id
-  # TODO: define preferences!!!! and desnormalize them
-  e_info.preferences = {}.to_json
+  e_info.preferences = { :driver_1 => member.fav_driver1, :driver_2 => member.fav_driver2, :track => member.fav_track, :car => member.fav_car }.to_json
   e_info.created_at = member.created_at
   e_info.updated_at = member.updated_at
-
-  # e_info.preferences.each do |key, value|
-  #   pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(phoenix.id, phoenix.club_id, key)
-  #   pref.value = value
-  #   pref.save
-  # end
-
+  e_info.preferences.each do |key, value|
+    pref = MemberPreference.find_or_create_by_member_id_and_club_id_and_param(phoenix.id, phoenix.club_id, key)
+    pref.value = value
+    pref.save
+  end
   e_info.campaign_medium = campaign.campaign_medium
   e_info.campaign_description = campaign.campaign_description
   e_info.campaign_medium_version = campaign.campaign_medium_version
   e_info.joint = campaign.is_joint
   e_info.save
 end
-
 
 def fill_aus_attributes(cc, member)
   cc.aus_status = member.aus_status
@@ -141,25 +138,23 @@ def update_members
           # create Membership data
           set_membership_data(@tom_id, member)
 
-          unless TEST
-            phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
+          phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
 
-            new_phoenix_cc = PhoenixCreditCard.new 
-            fill_credit_card(new_phoenix_cc, member, phoenix)
+          new_phoenix_cc = PhoenixCreditCard.new 
+          fill_credit_card(new_phoenix_cc, member, phoenix)
 
-            if phoenix_cc.nil?
-              @log.info "  * member ##{member.id} does not have Credit Card active"
-              new_phoenix_cc.save!
-            elsif phoenix_cc.token != member.credit_card_token
-              phoenix_cc.active = false
-              new_phoenix_cc.save!
-              phoenix_cc.save!
-            else
-              phoenix_cc.expire_month = member.cc_month_exp 
-              phoenix_cc.expire_year = member.cc_year_exp
-              fill_aus_attributes(phoenix_cc, member)
-              phoenix_cc.save!
-            end
+          if phoenix_cc.nil?
+            @log.info "  * member ##{member.id} does not have Credit Card active"
+            new_phoenix_cc.save!
+          elsif phoenix_cc.token != member.credit_card_token
+            phoenix_cc.active = false
+            new_phoenix_cc.save!
+            phoenix_cc.save!
+          else
+            phoenix_cc.expire_month = member.cc_month_exp 
+            phoenix_cc.expire_year = member.cc_year_exp
+            fill_aus_attributes(phoenix_cc, member)
+            phoenix_cc.save!
           end
           
           blacklist_ccs(member, phoenix)
@@ -248,10 +243,7 @@ def blacklist_ccs(member, phoenix)
 end
 
 def fill_credit_card(phoenix_cc, member, phoenix)
-  phoenix_cc.token = CREDIT_CARD_NULL
-  if not TEST and not member.credit_card_token.nil?
-    phoenix_cc.token = member.credit_card_token
-  end
+  phoenix_cc.token = member.credit_card_token
   phoenix_cc.expire_month = member.cc_month_exp
   phoenix_cc.expire_year = member.cc_year_exp
   phoenix_cc.created_at = member.created_at

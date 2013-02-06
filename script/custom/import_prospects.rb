@@ -25,7 +25,9 @@ ProspectProspect.where(" imported_at IS NULL and campaign_id = #{cid} ").find_in
       phoenix.zip = prospect.zip
       phoenix.country = prospect.country
       phoenix.email = prospect.email_to_import
-      phoenix.phone_number = prospect.phone
+      phoenix.phone_country_code = prospect.phone_country_code
+      phoenix.phone_area_code = prospect.phone_area_code
+      phoenix.phone_local_number = prospect.phone_local_number
       phoenix.created_at = prospect.created_at
       phoenix.updated_at = prospect.created_at # It has a reason. updated_at was modified by us ^_^
       phoenix.birth_date = prospect.birth_date
@@ -41,11 +43,9 @@ ProspectProspect.where(" imported_at IS NULL and campaign_id = #{cid} ").find_in
       phoenix.campaign_medium = @campaign.campaign_medium
       phoenix.campaign_description = @campaign.campaign_description
       phoenix.campaign_medium_version = @campaign.campaign_medium_version
-      # TODO => define preferences!
-      phoenix.preferences = { :old_id => prospect.id, :fav_driver => prospect.fav_driver }.to_json
+      phoenix.preferences = { :old_id => prospect.id }.to_json
       phoenix.referral_parameters = {}.to_json
       phoenix.gender = prospect.gender
-      # phoenix.type_of_phone_number
       phoenix.save!
 
       prospect.update_attribute :imported_at, Time.now.utc

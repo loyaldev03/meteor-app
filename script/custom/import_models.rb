@@ -31,8 +31,8 @@ CLUB = 1 # ONMC
 DEFAULT_CREATED_BY = 1 # batch
 PAYMENT_GW_CONFIGURATION_LITLE = 2 
 PAYMENT_GW_CONFIGURATION_MES = 3
-TEST = false # if true email will be replaced with a fake one
-USE_PROD_DB = true
+TEST_EMAIL = false # if true email will be replaced with a fake one
+USE_PROD_DB = false
 SITE_ID = 2010001547 # lyris site id
 MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
 TIMEZONE = 'Eastern Time (US & Canada)'
@@ -124,7 +124,7 @@ class ProspectProspect < ActiveRecord::Base
   self.record_timestamps = false
 
   def email_to_import
-    TEST ? "test#{member.id}@xagax.com" : email
+    TEST_EMAIL ? "test#{member.id}@xagax.com" : email
   end  
 end
 
@@ -137,45 +137,6 @@ class PhoenixMember < ActiveRecord::Base
   def terms_of_membership_id
     PhoenixMembership.find_by_member_id(self.id).terms_of_membership_id rescue nil
   end
-
-  def phone_number=(phone)
-    return if phone.nil?
-    p = phone.gsub(/[\s~\(\/\-=\)"\_\.\[\]+]/, '')
-    p = p.split('ext')[0] if p.split('ext').size == 2
-
-    if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
-    elsif p.size == 7  || p.size == 8 || p.size == 6
-      self.phone_country_code = '1'
-      self.phone_local_number = p
-    elsif p.size >= 20
-      self.phone_country_code = '1'
-      self.phone_area_code = p[0..2]
-      self.phone_local_number = p[3..9]
-    elsif p.size == 10 || p.size == 9
-      self.phone_country_code = '1'
-      self.phone_area_code = p[0..2]
-      self.phone_local_number = p[3..-1]
-    elsif p.size == 11
-      self.phone_country_code = p[0..0]
-      self.phone_area_code = p[1..3]
-      self.phone_local_number = p[4..-1]
-    elsif p.size == 12
-      self.phone_country_code = p[0..1]
-      self.phone_area_code = p[2..4]
-      self.phone_local_number = p[5..-1]
-    elsif p.size == 13
-      self.phone_country_code = p[0..1]
-      self.phone_area_code = p[2..5]
-      self.phone_local_number = p[6..-1]
-    elsif 
-      num = p.split('ext')[0]
-      self.phone_country_code = p[0..1]
-      self.phone_area_code = p[2..5]
-      self.phone_local_number = p[6..-1]
-    else
-      #raise "Dont know how to parse -#{p}-"
-    end
-  end
 end
 
 class PhoenixProspect < ActiveRecord::Base
@@ -183,47 +144,6 @@ class PhoenixProspect < ActiveRecord::Base
   self.table_name = "prospects" 
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
-
-# 3304940833ext412
-
-  def phone_number=(phone)
-    return if phone.nil?
-    p = phone.gsub(/[\s~\(\/\-=\)"\_\.\[\]+]/, '')
-    p = p.split('ext')[0] if p.split('ext').size == 2
-
-    if p.size < 6 || p.include?('@') || !p.match(/^[a-z]/i).nil? || p.include?('SOAP::Mapping')
-    elsif p.size == 7  || p.size == 8 || p.size == 6
-      self.phone_country_code = '1'
-      self.phone_local_number = p
-    elsif p.size >= 20
-      self.phone_country_code = '1'
-      self.phone_area_code = p[0..2]
-      self.phone_local_number = p[3..9]
-    elsif p.size == 10 || p.size == 9
-      self.phone_country_code = '1'
-      self.phone_area_code = p[0..2]
-      self.phone_local_number = p[3..-1]
-    elsif p.size == 11
-      self.phone_country_code = p[0..0]
-      self.phone_area_code = p[1..3]
-      self.phone_local_number = p[4..-1]
-    elsif p.size == 12
-      self.phone_country_code = p[0..1]
-      self.phone_area_code = p[2..4]
-      self.phone_local_number = p[5..-1]
-    elsif p.size == 13
-      self.phone_country_code = p[0..1]
-      self.phone_area_code = p[2..5]
-      self.phone_local_number = p[6..-1]
-    elsif 
-      num = p.split('ext')[0]
-      self.phone_country_code = p[0..1]
-      self.phone_area_code = p[2..5]
-      self.phone_local_number = p[6..-1]
-    else
-      raise "Dont know how to parse -#{p}-"
-    end
-  end
 end
 class PhoenixCreditCard < ActiveRecord::Base
   establish_connection "phoenix" 
@@ -317,7 +237,7 @@ class BillingMember < ActiveRecord::Base
   self.record_timestamps = false
 
   def email_to_import
-    TEST ? "test#{member.id}@xagax.com" : email
+    TEST_EMAIL ? "test#{member.id}@xagax.com" : email
   end
 end
 class BillingCampaign < ActiveRecord::Base
