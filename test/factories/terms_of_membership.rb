@@ -4,6 +4,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_type '1.month'
+    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -14,6 +15,7 @@ FactoryGirl.define do
     name "test Hold card 004"
     installment_amount 0.04 
     installment_type '1.month'
+    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -24,6 +26,7 @@ FactoryGirl.define do
     name "test do not honor 0045"
     installment_amount 0.05 
     installment_type '1.month'
+    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -34,6 +37,7 @@ FactoryGirl.define do
     name "test insuf funds"
     installment_amount 0.51 
     installment_type '1.month'
+    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -44,6 +48,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_type '1.month'
+    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -54,6 +59,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_type '1.month'
+    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -64,6 +70,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_type '1.month'
+    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -74,6 +81,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_type '1.month'
+    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -85,6 +93,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_type '1.year'
+    quota 12
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -95,6 +104,7 @@ FactoryGirl.define do
     name "test-approval"
     installment_amount 100
     installment_type '1.month'
+    quota 1
     needs_enrollment_approval true
     club_cash_amount 150
     provisional_days 30
@@ -105,6 +115,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_type '1.month'
+    quota 1
     needs_enrollment_approval false
     club_cash_amount 0
     provisional_days 30

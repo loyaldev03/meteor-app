@@ -20,6 +20,7 @@ class TermsOfMembership < ActiveRecord::Base
   validates :provisional_days, :presence => true
   validates :installment_amount, :presence => true
   validates :installment_type, :presence => true
+  validates :quota, :presence => true
   validates :club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validate :validate_payment_gateway_configuration
 

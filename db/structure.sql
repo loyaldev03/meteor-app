@@ -486,8 +486,9 @@ CREATE TABLE `terms_of_memberships` (
   `updated_at` datetime NOT NULL,
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `club_cash_amount` float DEFAULT '0',
+  `quota` int(11) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `transactions` (
   `uuid` varchar(36) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -779,3 +780,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130122140509');
 INSERT INTO schema_migrations (version) VALUES ('20130130193551');
 
 INSERT INTO schema_migrations (version) VALUES ('20130204122406');
+
+INSERT INTO schema_migrations (version) VALUES ('20130206214043');
