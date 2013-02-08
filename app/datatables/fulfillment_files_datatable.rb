@@ -30,7 +30,7 @@ private
   end
 
   def fetch_files
-    files = FulfillmentFile.order("status ASC, created_at DESC").where('agent_id' => @current_agent)
+    files = @current_club.fulfillment_files.order("status ASC, created_at DESC").where('agent_id' => @current_agent)
     files.page(page).per_page(per_page)
   end
 end    
