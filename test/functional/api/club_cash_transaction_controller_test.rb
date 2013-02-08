@@ -12,12 +12,28 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
     @partner = @club.partner
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway
 
   end
 
-  test "admin should add credit card" do
+  test "admin should add club cash transaction if test is drupal" do
     sign_in @admin_user
     @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) 
+
+    assert_difference('ClubCashTransaction.count', 0) do
+      result = post(:create, { :member_id => @saved_member.id, 
+                                club_cash_transaction: {
+                                  :amount => 100, 
+                                  :description => "adding club cash"
+                                }, :format => :json })
+    end
+    assert_response :success
+  end
+
+
+  test "admin should add club cash transaction" do
+    sign_in @admin_user
+    @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
 
     assert_difference('ClubCashTransaction.count') do
       result = post(:create, { :member_id => @saved_member.id, 
@@ -29,9 +45,9 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "representative should not add credit card" do
+  test "representative should not add club cash transaction" do
     sign_in @representative_user
-    @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
 
     assert_difference('ClubCashTransaction.count',0) do
       result = post(:create, { :member_id => @saved_member.id, 
@@ -43,9 +59,9 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
-  test "supervisor should not add credit card" do
+  test "supervisor should add club cash transaction" do
     sign_in @supervisor_user
-    @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
 
     assert_difference('ClubCashTransaction.count') do
       result = post(:create, { :member_id => @saved_member.id, 
@@ -57,9 +73,9 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "agency should not add credit card" do
+  test "agency should not add club cash transaction" do
     sign_in @agency_user
-    @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
 
     assert_difference('ClubCashTransaction.count',0) do
       result = post(:create, { :member_id => @saved_member.id, 

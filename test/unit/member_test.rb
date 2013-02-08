@@ -253,8 +253,8 @@ class MemberTest < ActiveSupport::TestCase
 
 
   test "Recycle credit card with billing success" do
-    @club = @terms_of_membership_with_gateway.club
-    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+    @club = @wordpress_terms_of_membership.club
+    member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)
     original_year = (Time.zone.now - 2.years).year
     member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
     member.reload
@@ -314,8 +314,8 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Billing for renewal amount" do
-    @club = @terms_of_membership_with_gateway.club
-    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+    @club = @wordpress_terms_of_membership.club
+    member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)
 
     assert_difference('Operation.count', 4) do
       prev_bill_date = member.next_retry_bill_date

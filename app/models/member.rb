@@ -680,11 +680,13 @@ class Member < ActiveRecord::Base
       end
     else
       Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
+      message = last_sync_error || "Club cash processed at drupal correctly."
       if self.last_sync_error.nil?
-        answer = { :message => "Club cash processed at drupal correctly.", :code => Settings.error_codes.success }
+        answer = { :message => message, :code => Settings.error_codes.success }
       else
         answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
       end
+      Auditory.audit(agent, self, message, self, Settings.operation_types.remote_club_cash_transaction)
     end
     answer
   end

@@ -74,6 +74,7 @@ defaults: &defaults
     credit_card_deleted: 236
     operation_updated: 237
     note_added: 238
+    remote_club_cash_transaction: 239
     #communication
     active_email: 300     
     prebill_email: 301    
