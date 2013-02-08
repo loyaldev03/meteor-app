@@ -309,7 +309,9 @@
   <li><a href="#notes" data-toggle="tab">Notes</a></li>
   <li><a href="#credit_cards" data-toggle="tab">Credit Cards</a></li>
   <li><a href="#transactions" data-toggle="tab">Transactions</a></li>
-  <li><a href="#club_cash_transactions" data-toggle="tab">Club Cash</a></li>
+  <% if @current_club.club_cash_transactions_enabled %>
+    <li><a href="#club_cash_transactions" data-toggle="tab">Club Cash</a></li>
+  <% end %>
   <li><a href="#fulfillments" data-toggle="tab">Fulfillments</a></li>
   <li><a href="#communication" data-toggle="tab">Communications</a></li>
   <% if @current_member.api_member and can? :see_sync_status, Member %>
@@ -339,11 +341,13 @@
       <%= render :partial => 'transactions' %>
     </div>
   </div>
-  <div class="tab-pane" id="club_cash_transactions">
-    <div class="tab_body_padding">
-      <%= render :partial => 'club_cash_transactions' %>
+  <% if @current_club.club_cash_transactions_enabled %>
+    <div class="tab-pane" id="club_cash_transactions">
+      <div class="tab_body_padding">
+        <%= render :partial => 'club_cash_transactions' %>
+      </div>
     </div>
-  </div>
+  <% end %>
   <div class="tab-pane" id="fulfillments">
     <div class="tab_body_padding">
       <%= render :partial => 'fulfillments', :locals => { :fulfillments => @fulfillments} %>

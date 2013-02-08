@@ -9,6 +9,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     @agency_agent = FactoryGirl.create(:confirmed_agency_agent)
     @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway
     @terms_of_membership_with_family = FactoryGirl.create :terms_of_membership_with_gateway_with_family
+    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway
+
     @preferences = {'color' => 'green','car'=> 'dodge'}
     # request.env["devise.mapping"] = Devise.mappings[:agent]
   end
@@ -788,6 +790,30 @@ class Api::MembersControllerTest < ActionController::TestCase
         end
       end
     end
+  end
+
+  test "Update club cash if club is not Drupal" do
+    sign_in @admin_user
+    @member = create_active_member(@wordpress_terms_of_membership, :member_with_api)
+    new_amount, new_expire_date = 34, Date.today
+    put( :club_cash, { member_id: @member.id, amount: new_amount, expire_date: new_expire_date , :format => :json })
+    @member.reload
+    assert_response :success
+    assert_equal(@member.club_cash_amount, new_amount)
+    assert_equal(@member.club_cash_expire_date, new_expire_date)
+  end
+
+  test "Update club cash if club is Drupal" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    new_amount, new_expire_date = 34, Date.today
+    old_amount, old_expire_date = @member.club_cash_amount, @member.club_cash_expire_date
+    put( :club_cash, member_id: @member.id, amount: new_amount, expire_date: new_expire_date, :format => :json )
+    # put( :club_cash, member_id: @member.id :format => :json )
+    @member.reload
+    assert_response :success
+    assert_equal(@member.club_cash_amount, old_amount)
+    assert_equal(@member.club_cash_expire_date, old_expire_date)
   end
 
 end

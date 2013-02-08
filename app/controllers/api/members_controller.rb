@@ -281,4 +281,44 @@ class Api::MembersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
   end    
+
+  # Method : PUT
+  # Updates club cash's data.
+  #
+  # [url] /api/v1/members/:id/club_cash
+  # [id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
+  # [amount] club cash amount to be set on this member profile +required+
+  # [expire date] club cash expiration date +required+
+  #
+  # [message] Shows the method results and also informs the errors.
+  # [code] Code related to the method result.
+  # [v_id] Visible id of the member that was updated.
+  # [errors] A hash with members errors. This will be use to show errors on members edit page. 
+  #
+  # @param [String] id
+  # @param [Hash] member
+  # @return [String] *message*
+  # @return [Integer] *member_id*  
+  # @return [Integer] *code*
+  # @return [Hash] *errors*
+  # 
+  def club_cash
+    member = Member.find(params[:id])
+    my_authorize! :api_update_club_cash, Member, member.club_id
+    response = { :message => "This club is not allowed to fix the amount of the club cash on members.", :code => Settings.error_codes.club_cash_cant_be_fixed, :member_id => member.id }
+    unless member.club.club_cash_transactions_enabled
+      member.skip_api_sync!
+      member.club_cash_amount = params[:amount]
+      member.club_cash_expire_date = params[:expire_date]
+      member.save(:validate => false)
+      message = "Member updated successfully"
+      Auditory.audit(current_agent, member, message, member, Settings.operation_types.profile_updated)
+      response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id }
+    end
+    render json: response
+  rescue ActiveRecord::RecordNotFound
+    render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
+  end
+
+
 end

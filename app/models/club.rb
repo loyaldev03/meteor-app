@@ -52,6 +52,10 @@ class Club < ActiveRecord::Base
     [self.pardot_email, self.pardot_password, self.pardot_user_key].none?(&:blank?)
   end
 
+  # Improvements #25771 - Club cash transactions will be managed by Drupal User Points plugin. 
+  def club_cash_transactions_enabled
+    api_type != 'Drupal::Member'
+  end
 
   private
     def add_default_member_groups

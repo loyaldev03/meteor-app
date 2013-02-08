@@ -54,6 +54,20 @@ FactoryGirl.define do
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end
 
+  factory :club_with_wordpress_api, class: Club do
+    sequence(:name) {|n| "#{Faker::Name.name}#{n}" }
+    description "My description"
+    cs_phone_number "123 456 7891"
+    billing_enable true
+    time_zone { TZInfo::Timezone.all.sample.name }
+    association :partner
+    api_type 'Wordpress::Member'
+    association :api_domain, factory: :domain
+    api_username { Faker::Internet.user_name }
+    api_password { Faker::Internet.user_name }
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
+  end
+
   factory :club_with_gateway, class: Club do
     sequence(:name) {|n| "#{Faker::Name.name}#{n}" }
     time_zone { TZInfo::Timezone.all.sample.name }

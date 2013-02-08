@@ -152,6 +152,7 @@ defaults: &defaults
     member_already_active: '409'
     club_is_not_enable_for_new_enrollments: '410'
     unrecoverable_error: '411'
+    club_cash_cant_be_fixed: '412'
     duplicate_transaction: '900'
     not_supported: '902'
     product_empty: '903'

@@ -5,8 +5,8 @@ class MemberTest < ActiveSupport::TestCase
 
   setup do
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
+    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway
     @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
-
   end
 
   test "Should create a member" do

@@ -611,42 +611,51 @@ class Member < ActiveRecord::Base
 
   ##################### Club cash ####################################
 
+  delegate :club_cash_transactions_enabled, :to => :club
+
   # Resets member club cash in case of a cancelation.
   def nillify_club_cash
     add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation')
-    self.club_cash_expire_date = nil
-    self.save(:validate => false)
+    if club_cash_transactions_enabled
+      self.club_cash_expire_date = nil
+      self.save(:validate => false)
+    end
   end
 
   # Resets member club cash in case the club cash has expired.
   def reset_club_cash
     add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.')
-    self.club_cash_expire_date = self.club_cash_expire_date + 12.months
-    self.save(:validate => false)
+    if club_cash_transactions_enabled
+      self.club_cash_expire_date = self.club_cash_expire_date + 12.months
+      self.save(:validate => false)
+    end
   end
 
   # Adds club cash when membership billing is success.
   def assign_club_cash!(message = "Adding club cash after billing")
     amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
     self.add_club_cash(nil, amount, message)
-    if self.club_cash_expire_date.nil? # first club cash assignment
-      self.club_cash_expire_date = join_date + 1.year
+    if club_cash_transactions_enabled
+      if self.club_cash_expire_date.nil? # first club cash assignment
+        self.club_cash_expire_date = join_date + 1.year
+      end
+      self.save(:validate => false)
     end
-    self.save(:validate => false)
   end
   
   # Adds club cash transaction. 
   def add_club_cash(agent, amount = 0,description = nil)
-    answer = { :code => Settings.error_codes.club_cash_transaction_not_successful  }
+    answer = { :code => Settings.error_codes.club_cash_transaction_not_successful, :message => "Could not save club cash transaction"  }
     if amount.to_f == 0
       answer[:message] = "Can not process club cash transaction with amount 0 or letters." 
       answer[:errors] = {:amount => "Invalid amount"} 
-    elsif (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
-      ClubCashTransaction.transaction do 
-        cct = ClubCashTransaction.new(:amount => amount, :description => description)
-        begin
-          cct.member = self
-          if cct.valid? and self.valid?
+    elsif club_cash_transactions_enabled
+      if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
+        ClubCashTransaction.transaction do 
+          cct = ClubCashTransaction.new(:amount => amount, :description => description)
+          begin
+            cct.member = self
+            raise "Could not save club cash transaction" if cct.valid? and self.valid?
             cct.save!
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save(:validate => false)
@@ -659,20 +668,23 @@ class Member < ActiveRecord::Base
               Auditory.audit(agent, cct, message, self, Settings.operation_types.deducted_club_cash)
             end
             answer = { :message => message, :code => Settings.error_codes.success }
-          else
-            answer[:message] = "Could not save club cash transaction." 
-            answer[:errors] = cct.errors_merged(self) 
+          rescue Exception => e
+            answer[:errors] = cct.errors_merged(self)
+            Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message], :parameters => { :club_cash => cct.inspect, :member => self.inspect })
+            raise ActiveRecord::Rollback
           end
-        rescue Exception => e
-          answer[:message] = "Could not save club cash transaction"
-          answer[:errors] = e
-          Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message], :parameters => { :club_cash => cct.inspect, :member => self.inspect })
-          raise ActiveRecord::Rollback
         end
+      else
+        answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
+        answer[:errors] = { :amount => "Club cash amount is greater that member's actual club cash." }
       end
     else
-      answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
-      answer[:errors] = { :amount => "Club cash amount is greater that member's actual club cash." }
+      Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
+      if self.last_sync_error.nil?
+        answer = { :message => "Club cash processed at drupal correctly.", :code => Settings.error_codes.success }
+      else
+        answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
+      end
     end
     answer
   end
@@ -826,6 +838,7 @@ class Member < ActiveRecord::Base
         tz = Time.zone.now
         begin
           Rails.logger.info "  * processing member ##{member.uuid}"
+          # TODO: esto no lo tenemos que hacer para members de drupla!!
           member.reset_club_cash
         rescue Exception => e
           Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
