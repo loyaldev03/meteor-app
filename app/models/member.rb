@@ -655,7 +655,7 @@ class Member < ActiveRecord::Base
           cct = ClubCashTransaction.new(:amount => amount, :description => description)
           begin
             cct.member = self
-            raise "Could not save club cash transaction" if cct.valid? and self.valid?
+            raise "Could not save club cash transaction" unless cct.valid? and self.valid?
             cct.save!
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save(:validate => false)

@@ -60,7 +60,7 @@ class MemberTest < ActiveSupport::TestCase
 
   test "Monthly member should be billed if it is active or provisional" do
     assert_difference('Operation.count', 4) do
-      member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+      member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
       member.reload
@@ -174,7 +174,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should reset club_cash when member is canceled" do
-    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc, nil, { :club_cash_amount => 200 })
+    member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc, nil, { :club_cash_amount => 200 })
     member.set_as_canceled
     assert_equal 0, member.club_cash_amount, "The member is #{member.status} with #{member.club_cash_amount}"
   end
@@ -367,8 +367,8 @@ class MemberTest < ActiveSupport::TestCase
 
   # Prevent club to be billed
   test "Member should be billed if club's billing_enable is set as true" do
-    @club = @terms_of_membership_with_gateway.club
-    @member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
+    @club = @wordpress_terms_of_membership.club
+    @member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)
 
     @member.current_membership.update_attribute(:quota, 2)
     quota_before = @member.quota
