@@ -481,17 +481,17 @@
       <pre class="lines">
 
 
-35
-36
 37
 38
 39
 40
 41
-42</pre>
+42
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 35</span>
+      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 37</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroy!'>destroy!</span>
   <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/api/user/%{drupal_id}</span><span class='tstring_end'>'</span></span> <span class='op'>%</span> <span class='lbrace'>{</span> <span class='label'>drupal_id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_api_id'>api_id</span> <span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_new_record?'>new_record?</span>
@@ -559,8 +559,6 @@
       <pre class="lines">
 
 
-48
-49
 50
 51
 52
@@ -571,10 +569,12 @@
 57
 58
 59
-60</pre>
+60
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_login_token'>login_token</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='ivar'>@token</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:force</span><span class='rbracket'>]</span>
@@ -631,12 +631,12 @@
       <pre class="lines">
 
 
-44
-45
-46</pre>
+46
+47
+48</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 44</span>
+      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 46</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_new_record?'>new_record?</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_api_id'>api_id</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -661,13 +661,13 @@
       <pre class="lines">
 
 
-67
-68
 69
-70</pre>
+70
+71
+72</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resend_welcome_email!'>resend_welcome_email!</span>
   <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_post'>post</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/api/user/%{drupal_id}/resend_welcome_email</span><span class='tstring_end'>'</span></span> <span class='op'>%</span> <span class='lbrace'>{</span> <span class='label'>drupal_id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_api_id'>api_id</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
@@ -693,13 +693,13 @@
       <pre class="lines">
 
 
-62
-63
 64
-65</pre>
+65
+66
+67</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 62</span>
+      <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 64</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset_password!'>reset_password!</span>
   <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_post'>post</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/api/user/%{drupal_id}/password_reset</span><span class='tstring_end'>'</span></span> <span class='op'>%</span> <span class='lbrace'>{</span> <span class='label'>drupal_id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_api_id'>api_id</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
@@ -727,13 +727,17 @@
 
 31
 32
-33</pre>
+33
+34
+35</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/sac_drupal/models/member.rb', line 31</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_save!'>save!</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_new_record?'>new_record?</span> <span class='op'>?</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_create!'>create!</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_update!'>update!</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_can_be_synced_to_remote?'>can_be_synced_to_remote?</span> <span class='comment'># Bug #23017 - skip sync if lapsed or applied.
+</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_new_record?'>new_record?</span> <span class='op'>?</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_create!'>create!</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_update!'>update!</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -793,7 +797,7 @@
 </div>
 
     <div id="footer">
-  Generated on Tue Jan 29 13:42:00 2013 by
+  Generated on Fri Feb  8 14:47:53 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.3).
 </div>

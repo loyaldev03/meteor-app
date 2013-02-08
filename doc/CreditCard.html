@@ -102,6 +102,18 @@
 <div class="clear"></div>
 
 
+  <h2>Constant Summary</h2>
+  
+    <dl class="constants">
+      
+        <dt id="BLANK_CREDIT_CARD_TOKEN-constant" class="">BLANK_CREDIT_CARD_TOKEN =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>a</span><span class='tstring_end'>'</span></span></pre></dd>
+      
+    </dl>
+  
+
 
 
 
@@ -502,8 +514,6 @@
       <pre class="lines">
 
 
-70
-71
 72
 73
 74
@@ -511,10 +521,12 @@
 76
 77
 78
-79</pre>
+79
+80
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 70</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 72</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_year'>expire_year</span><span class='comma'>,</span> <span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span> <span class='id identifier rubyid_last_name'>last_name</span><span class='rparen'>)</span>
   <span class='const'>ActiveMerchant</span><span class='op'>::</span><span class='const'>Billing</span><span class='op'>::</span><span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_require_verification_value'>require_verification_value</span> <span class='op'>=</span> <span class='kw'>false</span>
@@ -552,12 +564,12 @@
       <pre class="lines">
 
 
-42
-43
-44</pre>
+44
+45
+46</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 44</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_accepted_on_billing'>accepted_on_billing</span>
   <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:last_successful_bill_date</span><span class='comma'>,</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span>
@@ -582,12 +594,12 @@
       <pre class="lines">
 
 
-50
-51
-52</pre>
+52
+53
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_activate'>activate</span>
   <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:active</span><span class='comma'>,</span> <span class='kw'>true</span> <span class='kw'>unless</span> <span class='id identifier rubyid_blacklisted'>blacklisted</span>
@@ -612,12 +624,12 @@
       <pre class="lines">
 
 
-46
-47
-48</pre>
+48
+49
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_blacklist'>blacklist</span>
   <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:blacklisted</span><span class='comma'>,</span> <span class='kw'>true</span>
@@ -664,12 +676,12 @@
       <pre class="lines">
 
 
-66
-67
-68</pre>
+68
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_can_be_activated?'>can_be_activated?</span>
   <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_active'>active</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_lapsed?'>lapsed?</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_blacklisted'>blacklisted</span>
@@ -716,12 +728,12 @@
       <pre class="lines">
 
 
-62
-63
-64</pre>
+64
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 62</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 64</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_can_be_blacklisted?'>can_be_blacklisted?</span>
   <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_lapsed?'>lapsed?</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_blacklisted'>blacklisted</span> 
@@ -746,8 +758,6 @@
       <pre class="lines">
 
 
-25
-26
 27
 28
 29
@@ -761,10 +771,12 @@
 37
 38
 39
-40</pre>
+40
+41
+42</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 25</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 27</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_confirm_presence_of_another_credit_card_related_to_member'>confirm_presence_of_another_credit_card_related_to_member</span>
   <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_active'>active</span> 
@@ -802,12 +814,12 @@
       <pre class="lines">
 
 
-54
-55
-56</pre>
+56
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 56</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_deactivate'>deactivate</span>
   <span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:active</span><span class='comma'>,</span> <span class='kw'>false</span>
@@ -832,12 +844,12 @@
       <pre class="lines">
 
 
-58
-59
-60</pre>
+60
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 58</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_error_to_s'>error_to_s</span><span class='lparen'>(</span><span class='id identifier rubyid_delimiter'>delimiter</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_collect'>collect</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_attr'>attr</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_attr'>attr</span><span class='rbrace'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_message'>message</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_delimiter'>delimiter</span><span class='rparen'>)</span>
@@ -884,12 +896,12 @@
       <pre class="lines">
 
 
-133
-134
-135</pre>
+125
+126
+127</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 133</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 125</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_expired?'>expired?</span>
   <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_utc'>utc</span><span class='lparen'>(</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='rparen'>)</span> <span class='op'>&lt;</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_utc'>utc</span><span class='period'>.</span><span class='id identifier rubyid_beginning_of_month'>beginning_of_month</span>
@@ -914,6 +926,14 @@
       <pre class="lines">
 
 
+93
+94
+95
+96
+97
+98
+99
+100
 101
 102
 103
@@ -923,18 +943,10 @@
 107
 108
 109
-110
-111
-112
-113
-114
-115
-116
-117
-118</pre>
+110</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 101</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 93</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_token'>get_token</span><span class='lparen'>(</span><span class='id identifier rubyid_pgc'>pgc</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_first_name'>first_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_last_name'>last_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_allow_cc_blank'>allow_cc_blank</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_am'>am</span> <span class='op'>=</span> <span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_am_card'>am_card</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='comma'>,</span> <span class='id identifier rubyid_expire_year'>expire_year</span><span class='comma'>,</span> <span class='id identifier rubyid_first_name'>first_name</span> <span class='op'>||</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span> <span class='id identifier rubyid_last_name'>last_name</span> <span class='op'>||</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_last_name'>last_name</span><span class='rparen'>)</span>
@@ -947,7 +959,7 @@
     <span class='kw'>end</span>
   <span class='kw'>elsif</span> <span class='id identifier rubyid_allow_cc_blank'>allow_cc_blank</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_cc_type'>cc_type</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>unknown</span><span class='tstring_end'>'</span></span>
-    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_token'>token</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a</span><span class='tstring_end'>&quot;</span></span> <span class='comment'># fixing this token for blank credit cards
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_token'>token</span> <span class='op'>=</span> <span class='const'>BLANK_CREDIT_CARD_TOKEN</span> <span class='comment'># fixing this token for blank credit cards
 </span>  <span class='kw'>else</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='lbracket'>[</span><span class='symbol'>:number</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_am'>am</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>number</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_am'>am</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>number</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='lbracket'>[</span><span class='symbol'>:expire_month</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_am'>am</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>month</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_am'>am</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>month</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -974,12 +986,12 @@
       <pre class="lines">
 
 
-21
-22
-23</pre>
+23
+24
+25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_number'>number</span>
   <span class='ivar'>@number</span>
@@ -1004,16 +1016,16 @@
       <pre class="lines">
 
 
-13
-14
 15
 16
 17
 18
-19</pre>
+19
+20
+21</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 13</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_number='>number=</span><span class='lparen'>(</span><span class='id identifier rubyid_x'>x</span><span class='rparen'>)</span>
   <span class='ivar'>@number</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_x'>x</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>XXXX</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
@@ -1042,39 +1054,19 @@
       <pre class="lines">
 
 
-85
-86
 87
 88
 89
 90
-91
-92
-93
-94
-95
-96
-97
-98
-99</pre>
+91</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 87</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_set_as_active!'>set_as_active!</span>
-  <span class='id identifier rubyid_exc'>exc</span> <span class='op'>=</span> <span class='kw'>nil</span>
-  <span class='const'>CreditCard</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span> 
-    <span class='kw'>begin</span>
-      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_credit_cards'>credit_cards</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='lbracket'>[</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'> id != ? </span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_update_all'>update_all</span><span class='lparen'>(</span><span class='lbrace'>{</span> <span class='label'>active:</span> <span class='kw'>false</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
-      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:active</span> <span class='comma'>,</span> <span class='kw'>true</span>
-      <span class='const'>Auditory</span><span class='period'>.</span><span class='id identifier rubyid_audit'>audit</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Credit card </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_digits'>last_digits</span><span class='rbrace'>}</span><span class='tstring_content'> marked as active.</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='rparen'>)</span>
-    <span class='kw'>rescue</span> <span class='const'>Exception</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
-      <span class='id identifier rubyid_exc'>exc</span> <span class='op'>=</span> <span class='id identifier rubyid_e'>e</span>
-      <span class='const'>Airbrake</span><span class='period'>.</span><span class='id identifier rubyid_notify'>notify</span><span class='lparen'>(</span><span class='symbol'>:error_class</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>CreditCard::set_as_active!</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:error_message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_content'>\n\n</span><span class='embexpr_beg'>#{</span><span class='gvar'>$@</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>9</span><span class='rbracket'>]</span> <span class='op'>*</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n\t</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:parameters</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:credit_card</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='comma'>,</span> <span class='symbol'>:member</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Rollback</span>
-    <span class='kw'>end</span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='id identifier rubyid_exc'>exc</span> <span class='kw'>unless</span> <span class='id identifier rubyid_exc'>exc</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_credit_cards'>credit_cards</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='lbracket'>[</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'> id != ? </span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_update_all'>update_all</span><span class='lparen'>(</span><span class='lbrace'>{</span> <span class='label'>active:</span> <span class='kw'>false</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_update_attribute'>update_attribute</span> <span class='symbol'>:active</span> <span class='comma'>,</span> <span class='kw'>true</span>
+  <span class='const'>Auditory</span><span class='period'>.</span><span class='id identifier rubyid_audit'>audit</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Credit card </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_digits'>last_digits</span><span class='rbrace'>}</span><span class='tstring_content'> marked as active.</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='comma'>,</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_operation_types'>operation_types</span><span class='period'>.</span><span class='id identifier rubyid_credit_card_activated'>credit_card_activated</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1096,12 +1088,12 @@
       <pre class="lines">
 
 
-81
-82
-83</pre>
+83
+84
+85</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 81</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 83</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_set_data_before_credit_card_number_disappear'>set_data_before_credit_card_number_disappear</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_last_digits'>last_digits</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_number'>number</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='lparen'>(</span><span class='int'>4</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_last_digits'>last_digits</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='kw'>and</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_number'>number</span>
@@ -1126,21 +1118,21 @@
       <pre class="lines">
 
 
+112
+113
+114
+115
+116
+117
+118
+119
 120
 121
 122
-123
-124
-125
-126
-127
-128
-129
-130
-131</pre>
+123</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 120</span>
+      <pre class="code"><span class="info file"># File 'app/models/credit_card.rb', line 112</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_expire'>update_expire</span><span class='lparen'>(</span><span class='id identifier rubyid_year'>year</span><span class='comma'>,</span> <span class='id identifier rubyid_month'>month</span><span class='comma'>,</span> <span class='id identifier rubyid_current_agent'>current_agent</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_year'>year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>==</span> <span class='id identifier rubyid_expire_year'>expire_year</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='kw'>and</span> <span class='id identifier rubyid_month'>month</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>==</span> <span class='id identifier rubyid_expire_month'>expire_month</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
@@ -1148,7 +1140,7 @@
   <span class='kw'>elsif</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_year'>year</span><span class='comma'>,</span> <span class='id identifier rubyid_month'>month</span><span class='rparen'>)</span> <span class='op'>&gt;=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_beginning_of_month'>beginning_of_month</span>
     <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Changed credit card XXXX-XXXX-XXXX-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_digits'>last_digits</span><span class='rbrace'>}</span><span class='tstring_content'> from </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_expire_month'>expire_month</span><span class='rbrace'>}</span><span class='tstring_content'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_expire_year'>expire_year</span><span class='rbrace'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_month'>month</span><span class='rbrace'>}</span><span class='tstring_content'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_year'>year</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
     <span class='id identifier rubyid_update_attributes'>update_attributes</span><span class='lparen'>(</span><span class='symbol'>:expire_month</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_month'>month</span><span class='comma'>,</span> <span class='symbol'>:expire_year</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_year'>year</span><span class='rparen'>)</span>
-    <span class='const'>Auditory</span><span class='period'>.</span><span class='id identifier rubyid_audit'>audit</span><span class='lparen'>(</span><span class='id identifier rubyid_current_agent'>current_agent</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='rparen'>)</span>
+    <span class='const'>Auditory</span><span class='period'>.</span><span class='id identifier rubyid_audit'>audit</span><span class='lparen'>(</span><span class='id identifier rubyid_current_agent'>current_agent</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='comma'>,</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_operation_types'>operation_types</span><span class='period'>.</span><span class='id identifier rubyid_credit_card_updated'>credit_card_updated</span><span class='rparen'>)</span>
     <span class='lbrace'>{</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span><span class='comma'>,</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span>
   <span class='kw'>else</span>
     <span class='lbrace'>{</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_invalid_credit_card'>invalid_credit_card</span><span class='comma'>,</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='const'>I18n</span><span class='period'>.</span><span class='id identifier rubyid_t'>t</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>error_messages.invalid_credit_card</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> Expiration date could be wrong.</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:errors</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:number</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>New expiration date is expired.</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='rbrace'>}</span>
@@ -1164,9 +1156,9 @@
 </div>
 
     <div id="footer">
-  Generated on Fri Feb  1 12:50:18 2013 by
+  Generated on Fri Feb  8 14:47:52 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.2.1 (ruby-1.9.2).
+  0.8.2.1 (ruby-1.9.3).
 </div>
 
   </body>

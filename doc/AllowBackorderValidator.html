@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>
-  Class: NameIsNotAdminValidator
+  Class: AllowBackorderValidator
   
     &mdash; Documentation by YARD 0.8.2.1
   
@@ -31,10 +31,10 @@
     <div id="header">
       <div id="menu">
   
-    <a href="_index.html">Index (N)</a> &raquo;
+    <a href="_index.html">Index (A)</a> &raquo;
     
     
-    <span class="title">NameIsNotAdminValidator</span>
+    <span class="title">AllowBackorderValidator</span>
   
 
   <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
@@ -63,7 +63,7 @@
 
     <iframe id="search_frame"></iframe>
 
-    <div id="content"><h1>Class: NameIsNotAdminValidator
+    <div id="content"><h1>Class: AllowBackorderValidator
   
   
   
@@ -80,7 +80,7 @@
           
             <li class="next">ActiveModel::EachValidator</li>
           
-            <li class="next">NameIsNotAdminValidator</li>
+            <li class="next">AllowBackorderValidator</li>
           
         </ul>
         <a href="#" class="inheritanceTree">show all</a>
@@ -96,7 +96,7 @@
   
   
     <dt class="r2 last">Defined in:</dt>
-    <dd class="r2 last">lib/validators/name_is_not_admin_validator.rb</dd>
+    <dd class="r2 last">lib/validators/allow_backorder_validator.rb</dd>
   
 </dl>
 <div class="clear"></div>
@@ -167,19 +167,15 @@
 3
 4
 5
-6
-7
-8</pre>
+6</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/validators/name_is_not_admin_validator.rb', line 2</span>
+      <pre class="code"><span class="info file"># File 'lib/validators/allow_backorder_validator.rb', line 2</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate'>validate</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
-	<span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>admin</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>The admin word is reserved!</span><span class='tstring_end'>'</span></span>
-    <span class='kw'>end</span>
-  <span class='kw'>end</span>
+ <span class='kw'>if</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_allow_backorder'>allow_backorder</span> <span class='op'>==</span> <span class='kw'>false</span> <span class='kw'>and</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_stock'>stock</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+	  <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='lbracket'>[</span><span class='symbol'>:stock</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Stock cannot be negative. Enter positive stock, or allow backorder </span><span class='tstring_end'>'</span></span>
+	<span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -191,7 +187,7 @@
 </div>
 
     <div id="footer">
-  Generated on Fri Feb  8 14:47:56 2013 by
+  Generated on Fri Feb  8 14:47:55 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.3).
 </div>

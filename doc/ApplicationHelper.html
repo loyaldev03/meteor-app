@@ -170,15 +170,13 @@
 17
 18
 19
-20
-21</pre>
+20</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/helpers/application_helper.rb', line 17</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fulfillment_selectable_statuses'>fulfillment_selectable_statuses</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_selected'>selected</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_allow_blank'>allow_blank</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
-  <span class='comment'># TODO: remove canceeled
-</span>  <span class='ivar'>@possible_status</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_allow_blank'>allow_blank</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_state_machines'>state_machines</span><span class='lbracket'>[</span><span class='symbol'>:status</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_delete_if'>delete_if</span><span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_state'>state</span><span class='op'>|</span> <span class='id identifier rubyid_state'>state</span> <span class='op'>==</span> <span class='symbol'>:canceled</span> <span class='rbrace'>}</span>
+  <span class='ivar'>@possible_status</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_allow_blank'>allow_blank</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_state_machines'>state_machines</span><span class='lbracket'>[</span><span class='symbol'>:status</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_delete_if'>delete_if</span><span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_state'>state</span><span class='op'>|</span> <span class='id identifier rubyid_state'>state</span> <span class='op'>==</span> <span class='symbol'>:canceled</span> <span class='rbrace'>}</span>
   <span class='id identifier rubyid_select_tag'>select_tag</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_options_for_select'>options_for_select</span><span class='lparen'>(</span><span class='ivar'>@possible_status</span><span class='comma'>,</span> <span class='symbol'>:selected</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_selected'>selected</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='symbol'>:class</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>select_field input-medium</span><span class='tstring_end'>'</span></span> 
 <span class='kw'>end</span></pre>
     </td>
@@ -243,9 +241,9 @@
 </div>
 
     <div id="footer">
-  Generated on Fri Feb  1 12:50:16 2013 by
+  Generated on Fri Feb  8 14:47:50 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.2.1 (ruby-1.9.2).
+  0.8.2.1 (ruby-1.9.3).
 </div>
 
   </body>
