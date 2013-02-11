@@ -16,7 +16,7 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
 
   end
 
-  test "admin should add club cash transaction if test is drupal" do
+  test "admin should not add club cash transaction if domain is drupal" do
     sign_in @admin_user
     @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) 
 
@@ -26,6 +26,8 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
                                   :amount => 100, 
                                   :description => "adding club cash"
                                 }, :format => :json })
+      require 'ruby-debug'
+      debugger
     end
     assert_response :success
   end

@@ -4,7 +4,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
   setup do
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     @representative_user = FactoryGirl.create(:confirmed_representative_agent)
-    @fulfillment_manager_user = FactoryGirl.create(:confirmed_fulfillment_manager)
+    @fulfillment_manager_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @api_user = FactoryGirl.create(:confirmed_api_agent)
     @agent = FactoryGirl.create(:agent)

@@ -34,12 +34,12 @@ FactoryGirl.define do
   end
 
   factory :confirmed_fulfillment_manager_agent, class: Agent do
-    sequence(:username) {|n| "Representative#{n}" }
+    sequence(:username) {|n| "Fulfillment#{n}" }
     password "secret"
     password_confirmation { password }
     sequence(:email) {|n| "fulfillment_manager#{n}@test.no" }
     confirmed_at Date.today-1.month
-    roles ["fulfillment_manager"]
+    roles ["fulfillment_managment"]
   end
 
   factory :confirmed_supervisor_agent, class: Agent do
