@@ -83,6 +83,7 @@ class Ability
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent
+    # Agency role: Team de acquisicion 
     elsif agent.has_role_with_club? 'agency', club_id
       can :manage, Product
       can :read, Fulfillment
@@ -95,11 +96,21 @@ class Ability
       can :show, TermsOfMembership
       can :list, Transaction
       can :list, ClubCashTransaction
-      # EXAMPLE
-      # can :manage, Partner do |partner|
-      #   # agent is enabled to manage a specific partner
-      #   agent.partners.include? partner
-      # end
+    # Fulfillment Managment role: Team de Fulfillment
+    elsif agent.has_role_with_club? 'fulfillment_managment', club_id
+      can :manage, Member
+      cannot :api_profile, Member
+      can :manage, Operation
+      can :read, Membership
+      can :manage, CreditCard
+      cannot :destroy, CreditCard
+      can :manage, MemberNote
+      can :show, TermsOfMembership
+      can :list, Transaction
+      can :refund, Transaction
+      can :list, ClubCashTransaction
+      can :manage, Product
+      can :manage, Fulfillment
     end
 
 
