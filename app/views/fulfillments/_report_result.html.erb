@@ -1,7 +1,4 @@
 <% if @fulfillments %>
-
-
-
 	<table class="table table-bordered table-condensed" id="report_results">
 		<thead>
 		<tr>
@@ -32,6 +29,11 @@
 			</th>    
 		</thead>
 		<tbody>
+			<% if @fulfillments.empty? %>
+				<tr>
+					<td colspan="8"><div class="alert">No results were found for this filter.</div></td>
+				</tr>
+			<% end %>
 			<% @fulfillments.each do |fulfillment| %>
 				<tr>
 					<td> <a href="<%= show_member_path(:member_prefix => fulfillment.member.visible_id) %>" > <%= fulfillment.member.visible_id %></a></td>
@@ -54,5 +56,4 @@
 	<script type="text/javascript">
 		$(document).ready( fulfillments_not_processed_function() );
 	</script>
-
 <% end %>
