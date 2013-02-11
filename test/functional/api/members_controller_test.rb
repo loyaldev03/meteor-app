@@ -4,6 +4,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   setup do
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     @representative_user = FactoryGirl.create(:confirmed_representative_agent)
+    @fulfillment_manager_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @api_user = FactoryGirl.create(:confirmed_api_agent)
     @agency_agent = FactoryGirl.create(:confirmed_agency_agent)
@@ -142,6 +143,22 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
+
+  test "Fulfillment mamager should enroll/create member" do
+    sign_in @fulfillment_manager_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    active_merchant_stubs_store(@credit_card.number)
+    assert_difference('Member.count') do
+      generate_post_message
+      assert_response :success
+    end
+  end
+
 
   test "Supervisor should enroll/create member" do
     sign_in @supervisor_user

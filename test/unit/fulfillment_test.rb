@@ -91,7 +91,7 @@ class FulfillmentTest < ActiveSupport::TestCase
   end
 
   test "Should send fulfillments on acepted applied member" do
-    member = create_active_member(@terms_of_membership_with_gateway)
+    member = create_active_member(@terms_of_membership_with_gateway, :applied_member)
     assert_difference('Fulfillment.count') do
       member.set_as_provisional!
     end

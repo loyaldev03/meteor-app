@@ -4,6 +4,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
   setup do
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     @representative_user = FactoryGirl.create(:confirmed_representative_agent)
+    @fulfillment_manager_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @api_user = FactoryGirl.create(:confirmed_api_agent)
     @agency_user = FactoryGirl.create(:confirmed_agency_agent)
@@ -22,6 +23,12 @@ class FulfillmentsControllerTest < ActionController::TestCase
     sign_in @representative_user
     get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
     assert_response :unauthorized
+  end
+
+  test "Fulfillment manager should get index" do
+    sign_in @fulfillment_manager_user
+    get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
+    assert_response :success
   end
 
   test "Supervisor should not get index" do

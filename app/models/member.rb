@@ -128,7 +128,7 @@ class Member < ActiveRecord::Base
     after_transition [ :none, :lapsed ] => # enroll and reactivation
                         :provisional, :do => 'schedule_first_membership(true)'
     after_transition [ :provisional, :active ] => 
-                        :provisional, :do => 'schedule_first_membership(true)' # save the sale
+                        :provisional, :do => 'schedule_first_membership(true, true)' # save the sale
     after_transition :applied => 
                         :provisional, :do => 'schedule_first_membership(false)'
     ###### <<<<<<========
@@ -215,8 +215,8 @@ class Member < ActiveRecord::Base
   end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
-  def schedule_first_membership(set_join_date)
-    send_fulfillment
+  def schedule_first_membership(set_join_date, skip_send_fulfillment = false)
+    send_fulfillment unless skip_send_fulfillment
     membership = current_membership
     membership.join_date = Time.zone.now if set_join_date
     membership.save

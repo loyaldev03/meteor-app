@@ -56,7 +56,7 @@ class Api::ProductsControllerTest < ActionController::TestCase
     result = get(:get_stock, { :club_id => @product.club_id, :sku => @product.sku, :format => :json} )
     assert_response :unauthorized
   end
-
+  
   test "representative should not answer product not found if invalid id is used." do
     sign_in @representative_user
     result = get(:get_stock, { :club_id => @product.club_id, :sku => 'Bracelet34', :format => :json} )
