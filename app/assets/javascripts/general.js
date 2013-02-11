@@ -519,7 +519,7 @@ $(document).ready( function() {
     });     
   }
 
-  function fulfillments_index_functions(create_xls_file_url, make_report_url){
+  function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message){
     $(".datepicker").datepicker({ constrainInput: true, 
                                   dateFormat: "yy-mm-dd", 
                                   showOn: "both", 
@@ -549,15 +549,16 @@ $(document).ready( function() {
     }
 
     $("#create_xls_file").click(function() {
-      var fuls = $('.fulfillment_selected');
+      var fuls = $('.fulfillment_selected:checked');
       for (x in fuls) {
-        if (fuls[x].checked) {
-          $('<input>').attr({ type: 'hidden', name: fuls[x].name, value: fuls[x].value }).appendTo($('#fulfillment_report_form'));
-        }
+        $('<input>').attr({ type: 'hidden', name: fuls[x].name, value: fuls[x].value }).appendTo($('#fulfillment_report_form'));
       }
-
-      $('#fulfillment_report_form').attr("action", create_xls_file_url);
-      $('#fulfillment_report_form').submit();
+      if (fuls.length != 0) {
+        $('#fulfillment_report_form').attr("action", create_xls_file_url);
+        $('#fulfillment_report_form').submit();
+      } else {
+        alert(fulfillment_file_cant_be_empty_message);
+      }
     });    
 
     $("#make_report").click(function() {

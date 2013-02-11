@@ -73,10 +73,11 @@ class FulfillmentsController < ApplicationController
         end
         flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
       else
+        # TODO: add Airbrake.
         flash.now[:error] = "Error while processing this fulfillment. Contact the administrator."
       end
     else
-      flash.now[:error] = "No fulfillments selected. Please, select fulfillments in order to crate XLS file."
+      flash.now[:error] = t('error_messages.fulfillment_file_cant_be_empty')
     end
     render :index
   end

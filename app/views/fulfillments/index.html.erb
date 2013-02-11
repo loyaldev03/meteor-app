@@ -49,7 +49,7 @@
 <%= render :partial => "report_result" %>
 
 <script type="text/javascript">
-  $(document).ready( fulfillments_index_functions('<%= generate_xls_fulfillments_path %>', '<%= fulfillments_index_path %>') );
+  $(document).ready( fulfillments_index_functions('<%= generate_xls_fulfillments_path %>', '<%= fulfillments_index_path %>', '<%= t("error_messages.fulfillment_file_cant_be_empty") %>') );
 </script>
 
 
