@@ -7,7 +7,7 @@
         <span class="icon-bar"></span>
       </a>
 
-      <a class="brand" href="<%= root_path %>">SacPlatform</a>
+      <a class="brand" href="<%= root_path %>">SacPlatform <%= Rails.env if Rails.env != 'production' %></a>
 
       <% if current_agent %>
         <div class="container nav-collapse">
