@@ -8,26 +8,25 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @agency_user = FactoryGirl.create(:confirmed_agency_agent)
     # request.env["devise.mapping"] = Devise.mappings[:agent]
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @club = FactoryGirl.create(:club_with_api)
     @partner = @club.partner
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway
-
+    Drupal.enable_integration!
+    Drupal.test_mode!
+    Drupal::UserPoints.any_instance.stubs(:create!).returns('true')
   end
 
   test "admin should not add club cash transaction if domain is drupal" do
     sign_in @admin_user
     @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) 
-
     assert_difference('ClubCashTransaction.count', 0) do
       result = post(:create, { :member_id => @saved_member.id, 
                                 club_cash_transaction: {
                                   :amount => 100, 
                                   :description => "adding club cash"
                                 }, :format => :json })
-      require 'ruby-debug'
-      debugger
     end
     assert_response :success
   end

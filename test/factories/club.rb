@@ -9,7 +9,7 @@ FactoryGirl.define do
   end
 
   factory :simple_club, class: Club do
-    sequence(:name) {|n| "club#{n}" }
+    sequence(:name) {|n| "#{Faker::Name.name}#{n}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -19,7 +19,7 @@ FactoryGirl.define do
   end
 
   factory :simple_club_with_gateway, class: Club do
-    sequence(:name) {|n| "club#{n}" }
+    sequence(:name) {|n| "#{Faker::Name.name}#{n}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -29,7 +29,7 @@ FactoryGirl.define do
   end  
 
   factory :simple_club_with_gateway_with_family, class: Club do
-    sequence(:name) {|n| "club#{n}" }
+    sequence(:name) {|n| "#{Faker::Name.name}#{n}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -79,7 +79,7 @@ FactoryGirl.define do
   end  
 
   factory :simple_club_with_require_external_id, class: Club do
-    sequence(:name) {|n| "club_with_external_id#{n}" }
+    sequence(:name) {|n| "#{Faker::Name.name}#{n}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true

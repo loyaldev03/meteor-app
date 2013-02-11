@@ -16,11 +16,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     # request.env["devise.mapping"] = Devise.mappings[:agent]
   end
 
-# test "should not accept HTML request" do
-#    @current_agent = @admin_user
-#    post(:create, {}, :format => :html)
-#    assert_response 406
-#  end
 
   def generate_put_message(options = {})
     put( :update, { id: @member.id, member: { :first_name => @member.first_name, 
@@ -813,11 +808,12 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @member = create_active_member(@wordpress_terms_of_membership, :member_with_api)
     new_amount, new_expire_date = 34, Date.today
+    old_amount, old_expire_date = @member.club_cash_amount, @member.club_cash_expire_date
     put( :club_cash, { member_id: @member.id, amount: new_amount, expire_date: new_expire_date , :format => :json })
     @member.reload
     assert_response :success
-    assert_equal(@member.club_cash_amount, new_amount)
-    assert_equal(@member.club_cash_expire_date, new_expire_date)
+    assert_equal(@member.club_cash_amount, old_amount)
+    assert_equal(@member.club_cash_expire_date, old_expire_date)
   end
 
   test "Update club cash if club is Drupal" do
@@ -826,7 +822,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     new_amount, new_expire_date = 34, Date.today
     old_amount, old_expire_date = @member.club_cash_amount, @member.club_cash_expire_date
     put( :club_cash, member_id: @member.id, amount: new_amount, expire_date: new_expire_date, :format => :json )
-    # put( :club_cash, member_id: @member.id :format => :json )
     @member.reload
     assert_response :success
     assert_equal(@member.club_cash_amount, old_amount)
