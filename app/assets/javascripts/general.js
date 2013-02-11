@@ -526,9 +526,12 @@ $(document).ready( function() {
                                   buttonImage: "/icon-calendar.png", 
                                   buttonImageOnly: true });
     
-    $("#initial_date").datepicker( "setDate", '-1w' );
-    
-    $("#end_date").datepicker( "setDate", '0' );
+    if ($("#initial_date").val() == ""){
+      $("#initial_date").datepicker( "setDate", '-1w' );
+    }
+    if ($("#end_date").val() == ""){
+      $("#end_date").datepicker( "setDate", '0' );
+    }
 
     $("#all_times").click (function (){
       if ($("#all_times").is(':checked')) {
