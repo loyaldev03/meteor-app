@@ -1,4 +1,4 @@
-set :stages, %w(production prototype staging)
+set :stages, %w(production prototype staging demo)
 set :default_stage, "prototype"
 default_run_options[:pty] = true
 require 'capistrano/ext/multistage'
