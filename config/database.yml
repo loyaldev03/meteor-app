@@ -15,10 +15,18 @@ test:
   encoding: utf8
   user: root
 
+demo:
+  adapter: mysql2
+  database: sac_platform_demo
+  host: localhost
+  encoding: utf8
+  user: root
+  password: pH03n[xk1{{s
+
 production:
   adapter: mysql2
   database: sac_production
-  host: 50.116.17.164
+  host: localhost
   encoding: utf8
   user: root
   password: pH03n[xk1{{s

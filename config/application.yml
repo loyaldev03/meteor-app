@@ -5,6 +5,7 @@ defaults: &defaults
   number_of_retries_on_missing_decline: 4
   club_cash_for_members_who_belongs_to_group: 200
   call_these_members_recipients: platformadmins@xagax.com
+  email_to_send_product_list: 'platformadmins@xagax.com'
   email_to_use_on_action_mailer_as_recipient: platformadmins@xagax.com
   email_to_use_on_duplicated_email_sync_error: platformadmins@xagax.com
   others_product: "SLOOPS"
@@ -299,6 +300,8 @@ test:
 production:
   <<: *defaults
   call_these_members_recipients: 'rmosher@stoneacreinc.com,wbryant@stoneacreinc.com,mfulginiti@stoneacreinc.com,kflynn@stoneacreinc.com,jsmith@stoneacreinc.com'
+  email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
+  email_to_send_product_list: 'ddanch@stoneacreinc.com,tbrady@stoneacreinc.com'
   mes_report_service:
     user: Stoneacrereports
     password: do3!lAjo5
@@ -311,7 +314,6 @@ production:
 
 prototype:
   <<: *defaults
-  email_to_send_product_list: 'platformadmins@xagax.com'
 
 staging:
   <<: *defaults
