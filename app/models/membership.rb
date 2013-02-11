@@ -7,8 +7,6 @@ class Membership < ActiveRecord::Base
 
   attr_accessible :created_by, :join_date, :status, :cancel_date, :quota, :terms_of_membership_id
 
-  before_create :set_default_quota
-
   # validates :terms_of_membership, :presence => true
   # validates :member, :presence => true
 
@@ -19,11 +17,5 @@ class Membership < ActiveRecord::Base
   def cancel_because_of_save_the_sale
     self.update_attributes :cancel_date => Time.zone.now, :status => 'lapsed'
   end
-
-  private 
-    def set_default_quota
-      quota = (terms_of_membership.monthly? ? 1 :  0)
-    end
-  
 end
 
