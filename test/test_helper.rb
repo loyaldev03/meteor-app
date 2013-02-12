@@ -8,7 +8,7 @@ require 'rails/test_help'
 require 'capybara/rails'
 require 'capybara/dsl'
 require 'database_cleaner'
-require 'mocha'
+require 'mocha/setup'
 
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
