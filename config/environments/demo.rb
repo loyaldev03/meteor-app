@@ -31,7 +31,7 @@ SacPlatform::Application.configure do
   config.force_ssl = true
 
   # See everything in the log (default is :info)
-  config.log_level = :debug
+  # config.log_level = :debug
 
   # Prepend all log lines with the following tags
   # config.log_tags = [ :subdomain, :uuid ]
@@ -46,7 +46,6 @@ SacPlatform::Application.configure do
   # config.action_controller.asset_host = "http://assets.example.com"
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-  # config.assets.precompile += %w( search.js )
   config.assets.precompile += %w( readable.css united.css )
 
   # Disable delivery errors, bad email addresses will be ignored
@@ -78,7 +77,5 @@ SacPlatform::Application.configure do
     :user_name      => 'platform@xagax.com',
     :password       => 'a4my0fm3'
   }
-
-  config.filter_parameters -= [:number]
 
 end
