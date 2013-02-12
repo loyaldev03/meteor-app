@@ -61,6 +61,14 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   e_info.campaign_description = campaign.campaign_description
   e_info.campaign_medium_version = campaign.campaign_medium_version
   e_info.joint = campaign.is_joint
+  if e_info.prospect_id.nil?
+    prospect = ProspectProspect.where(" member_id = '#{member.id}' ")
+    if prospect.nil? #https://redmine.xagax.com/issues/25731#note-7
+      e_info.prospect_id = new_prospect(member, campaign, tom_id).id
+    else
+      e_info.prospect_id = new_prospect(prospect, campaign, tom_id).id
+    end
+  end
   e_info.save
 end
 
@@ -114,69 +122,65 @@ def update_members
     group.each do |member| 
     puts "cant #{group.count}"
       tz = Time.now.utc
-      PhoenixProspect.transaction do 
-        get_campaign_and_tom_id(member.campaign_id)
-        if @tom_id.nil?
-          puts "CDId #{member.campaign_id} does not exist or TOM is empty"
+      get_campaign_and_tom_id(member.campaign_id)
+      if @tom_id.nil?
+        puts "CDId #{member.campaign_id} does not exist or TOM is empty"
+        next
+      end
+
+      @log.info "  * processing member ##{member.id}"
+      begin
+        phoenix = PhoenixMember.find_by_club_id_and_visible_id(CLUB, member.id)
+        if phoenix.nil?
+          puts "  * member ##{member.id} not found on phoenix ?? "
           next
         end
+        
+        @member = phoenix
+        set_member_data(phoenix, member)
+        add_enrollment_info(phoenix, member, @tom_id)
+        set_member_bill_dates(member, phoenix)
+        phoenix.save!
 
-        @log.info "  * processing member ##{member.id}"
-        begin
-          phoenix = PhoenixMember.find_by_club_id_and_visible_id(CLUB, member.id)
-          if phoenix.nil?
-            @log.info "  * member ##{member.id} not found on phoenix ?? "
-            next
-          end
-          
-          @member = phoenix
-          set_member_data(phoenix, member)
-          add_enrollment_info(phoenix, member, @tom_id)
-          set_member_bill_dates(member, phoenix)
-          phoenix.save!
+        # create Membership data
+        set_membership_data(@tom_id, member)
 
-          # create Membership data
-          set_membership_data(@tom_id, member)
+        phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
 
-          phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
-
-          new_phoenix_cc = PhoenixCreditCard.new 
-          fill_credit_card(new_phoenix_cc, member, phoenix)
-
-          if phoenix_cc.nil?
-            @log.info "  * member ##{member.id} does not have Credit Card active"
-            new_phoenix_cc.save!
-          elsif phoenix_cc.token != member.credit_card_token
-            phoenix_cc.active = false
-            new_phoenix_cc.save!
-            phoenix_cc.save!
-          else
-            phoenix_cc.expire_month = member.cc_month_exp 
-            phoenix_cc.expire_year = member.cc_year_exp
-            fill_aus_attributes(phoenix_cc, member)
-            phoenix_cc.save!
-          end
-          
-          blacklist_ccs(member, phoenix)
-
-          member.update_attribute :imported_at, Time.now.utc
-        rescue Exception => e
-          @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          raise ActiveRecord::Rollback
+        new_phoenix_cc = PhoenixCreditCard.new 
+        fill_credit_card(new_phoenix_cc, member, phoenix)
+        if phoenix_cc.nil?
+          @log.info "  * member ##{member.id} does not have Credit Card active"
+          new_phoenix_cc.save!
+        elsif phoenix_cc.token != member.credit_card_token
+          phoenix_cc.active = false
+          new_phoenix_cc.save!
+          phoenix_cc.save!
+        else
+          phoenix_cc.expire_month = member.cc_month_exp 
+          phoenix_cc.expire_year = member.cc_year_exp
+          fill_aus_attributes(phoenix_cc, member)
+          phoenix_cc.save!
         end
+        
+        blacklist_ccs(member, phoenix)
+
+        member.update_attribute :imported_at, Time.now.utc
+        print "."
+      rescue Exception => e
+        @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        exit
       end
-      @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
+    @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
   end
 end
 
 
 # 2- import new members.
 def add_new_members
-
   BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0 " + 
-     # " and id <= 13771771004 " + # uncomment this line if you want to import a single member.
       " and credit_card_token IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
@@ -188,7 +192,6 @@ def add_new_members
 
       tz = Time.now.utc
       # transactions between databases does not work
-      #PhoenixMember.transaction do 
       @log.info "  * processing member ##{member.id}"
       begin
 
@@ -209,7 +212,7 @@ def add_new_members
         phoenix.save!
 
         @member = phoenix
-        add_enrollment_info(phoenix, member,@tom_id, @campaign)
+        add_enrollment_info(phoenix, member, @tom_id, @campaign)
         add_operation(Time.now.utc, nil, nil, "Member imported into phoenix!", nil)  
 
         # create CC
@@ -227,9 +230,9 @@ def add_new_members
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        raise ActiveRecord::Rollback
+        exit
+        return
       end
-      #end
       @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
   end

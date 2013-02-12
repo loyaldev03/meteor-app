@@ -3,17 +3,27 @@
 # UPDATE billing_component.members set imported_at = NULL where imported_at IS NOT NULL
 # UPDATE notes set imported_at = NULL where imported_at IS NOT NULL
 # UPDATE operations set imported_at = NULL where imported_at IS NOT NULL
-# 2- Import new prospects into phoenix
-#     ruby script/custom/import_prospects.rb  
-# 3- Update members already imported and Load new members 
+#
+# 1.1- Load toms (only once)
+#     ruby script/custom/import_load_toms.rb  
+#
+# 2- Update members already imported and Load new members 
 #     ruby script/custom/import_members.rb  
-# 4- Import operations.
+#
+# 3- Import operations.
 #     ruby script/custom/import_operations.rb  
-# 5- Import member notes.
+#
+# 4- Import member notes.
 #     ruby script/custom/import_member_notes.rb  
-# 6- Import transactions.
+#
+# 5- Import transactions.
 #     ruby script/custom/import_transactions.rb  
 #
+# 6- Import transactions.
+#     ruby script/custom/import_migration_day.rb  
+#
+# 7- Import new prospects into phoenix (only if required)
+#     ruby script/custom/import_prospects.rb  
 #
 # 3- set campaign_id on every membership authorization, to get the amount. 
 #   UPDATE onmc_billing.membership_authorizations SET campaign_id = 
@@ -423,3 +433,38 @@ def get_terms_of_membership_name(tom_id)
   PhoenixTermsOfMembership.find_by_id(tom_id).name
 end
 
+
+def new_prospect(object, campaign, tom_id)
+  phoenix = PhoenixProspect.new 
+  phoenix.first_name = object.first_name
+  phoenix.last_name = object.last_name
+  phoenix.address = object.address
+  phoenix.city = object.city
+  phoenix.state = object.state
+  phoenix.zip = object.zip
+  phoenix.country = object.country
+  phoenix.email = object.email_to_import
+  phoenix.phone_country_code = object.phone_country_code
+  phoenix.phone_area_code = object.phone_area_code
+  phoenix.phone_local_number = object.phone_local_number
+  phoenix.created_at = object.created_at
+  phoenix.updated_at = object.created_at # It has a reason. updated_at was modified by us ^_^
+  phoenix.birth_date = object.birth_date
+  phoenix.joint = campaign.is_joint
+  phoenix.marketing_code = campaign.marketing_code
+  phoenix.terms_of_membership_id = tom_id
+  phoenix.referral_host = campaign.referral_host
+  phoenix.landing_url = campaign.landing_url
+  phoenix.mega_channel = campaign.phoenix_mega_channel
+  phoenix.product_sku = campaign.product_sku
+  phoenix.fulfillment_code = campaign.fulfillment_code
+  phoenix.product_description = campaign.product_description
+  phoenix.campaign_medium = campaign.campaign_medium
+  phoenix.campaign_description = campaign.campaign_description
+  phoenix.campaign_medium_version = campaign.campaign_medium_version
+  phoenix.preferences = { :old_id => object.id }.to_json
+  phoenix.referral_parameters = {}.to_json
+  phoenix.gender = object.gender
+  phoenix.save!
+  phoenix
+end
