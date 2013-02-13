@@ -83,6 +83,8 @@ defaults: &defaults
     refund_email: 303 
     pillar_email: 304
     pillar_provisional_email: 305
+    hard_decline_email: 306
+    soft_decline_email: 307
     #fulfillments
     from_not_processed_to_in_process: 400
     from_not_processed_to_on_hold: 401
