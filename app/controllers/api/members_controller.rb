@@ -296,7 +296,8 @@ class Api::MembersController < ApplicationController
   # [errors] A hash with members errors. This will be use to show errors on members edit page. 
   #
   # @param [String] id
-  # @param [Hash] member
+  # @param [Integer] amount
+  # @param [String] expire_date
   # @return [String] *message*
   # @return [Integer] *member_id*  
   # @return [Integer] *code*
