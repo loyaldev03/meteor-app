@@ -285,8 +285,8 @@ class Api::MembersController < ApplicationController
   # Method : PUT
   # Updates club cash's data.
   #
-  # [url] /api/v1/members/:id/club_cash
-  # [id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
+  # [url] /api/v1/members/:member_id/club_cash
+  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
   # [amount] club cash amount to be set on this member profile +required+
   # [expire date] club cash expiration date +required+
   #
@@ -303,7 +303,7 @@ class Api::MembersController < ApplicationController
   # @return [Hash] *errors*
   # 
   def club_cash
-    member = Member.find(params[:id])
+    member = Member.find(params[:member_id])
     my_authorize! :api_update_club_cash, Member, member.club_id
     response = { :message => "This club is not allowed to fix the amount of the club cash on members.", :code => Settings.error_codes.club_cash_cant_be_fixed, :member_id => member.id }
     unless member.club.club_cash_transactions_enabled
