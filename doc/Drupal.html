@@ -203,7 +203,8 @@
 23
 24
 25
-26</pre>
+26
+27</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/sac_drupal/drupal.rb', line 4</span>
@@ -212,6 +213,7 @@
   <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> ** Initializing SAC Drupal integration</span><span class='tstring_end'>&quot;</span></span>
 
   <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sac_drupal/models/member</span><span class='tstring_end'>'</span></span>
+  <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sac_drupal/models/user_points</span><span class='tstring_end'>'</span></span>
   <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sac_drupal/models/club_extensions</span><span class='tstring_end'>'</span></span>
   <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sac_drupal/faraday_middleware/full_logger</span><span class='tstring_end'>'</span></span>
   <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sac_drupal/faraday_middleware/drupal_authentication</span><span class='tstring_end'>'</span></span>
@@ -251,12 +253,12 @@
       <pre class="lines">
 
 
-28
 29
-30</pre>
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/sac_drupal/drupal.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'lib/sac_drupal/drupal.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_test_mode!'>test_mode!</span>
   <span class='const'>Club</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span> <span class='symbol'>:include</span><span class='comma'>,</span> <span class='const'>Drupal</span><span class='op'>::</span><span class='const'>ClubTestExtensions</span>
@@ -271,7 +273,7 @@
 </div>
 
     <div id="footer">
-  Generated on Fri Feb  8 14:47:49 2013 by
+  Generated on Wed Feb 13 10:15:56 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.3).
 </div>

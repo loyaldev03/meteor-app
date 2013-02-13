@@ -167,14 +167,18 @@
 3
 4
 5
-6</pre>
+6
+7
+8</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/validators/allow_backorder_validator.rb', line 2</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate'>validate</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
- <span class='kw'>if</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_allow_backorder'>allow_backorder</span> <span class='op'>==</span> <span class='kw'>false</span> <span class='kw'>and</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_stock'>stock</span> <span class='op'>&lt;</span> <span class='int'>0</span>
-	  <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='lbracket'>[</span><span class='symbol'>:stock</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Stock cannot be negative. Enter positive stock, or allow backorder </span><span class='tstring_end'>'</span></span>
+	<span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_stock'>stock</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_allow_backorder'>allow_backorder</span> <span class='op'>==</span> <span class='kw'>false</span> <span class='kw'>and</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_stock'>stock</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+ 	  <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='lbracket'>[</span><span class='symbol'>:stock</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Stock cannot be negative. Enter positive stock, or allow backorder </span><span class='tstring_end'>'</span></span>
+ 	<span class='kw'>end</span>
 	<span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -187,7 +191,7 @@
 </div>
 
     <div id="footer">
-  Generated on Fri Feb  8 14:47:55 2013 by
+  Generated on Wed Feb 13 10:16:03 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.3).
 </div>
