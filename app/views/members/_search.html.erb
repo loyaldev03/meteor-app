@@ -1,60 +1,60 @@
 <% if @members %>
-<p> <h1> <%= t('search_result') %> </h1> </p>
-<table class="table table-bordered table-condensed">
-  <thead>
-  	<tr>
-      <th style="width: 110px;"> <%= t('activerecord.attributes.member.status') %> </th>
-      <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
-      <% if @current_club.requires_external_id %>
-        <th> <%= t('activerecord.attributes.member.external_id') %> </th>
-      <% end %>
-      <th> <%= t('activerecord.attributes.member.full_name') %> </th>
-      <th> <%= t('activerecord.attributes.member.full_address') %> </th>
-      <th style="width: 20px;">View</th>
-      <th style="width: 20px;">Edit</th>
-      <th style="width: 80px;">&nbsp;</th>
-  	</tr>
-    <% if @members.count == 0 %>
-      <tr> <td colspan="8"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
-    <% end %> 
-    <% @members.each do |member| %>
-    <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
-      <td class="<%= menber_status_class(member) %>"> 
-      <% if member.blacklisted? %>
-      <%= member.status %>
-      <%= t('activerecord.attributes.member.status_blacklisted') %>
-      <% else %>
-      <%= member.status %>
-      <% end %>
-      </td>
-      <td> <%= member.visible_id %> </td>
-      <% if @current_club.requires_external_id %>
-        <td> <%= member.external_id if !member.external_id.nil? %> </td>
-      <% end %>
-      <td> <%= member.full_name %> </td>
-      <td> <%= member.full_address %> </td>
-      <td><a href="<%= show_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
-      <td>
-        <% if can? :edit, Member %>
-          <a href="<%= edit_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a>
+  <p> <h1> <%= t('search_results') %> </h1> </p>
+  <table class="table table-bordered table-condensed">
+    <thead>
+    	<tr>
+        <th style="width: 110px;"> <%= t('activerecord.attributes.member.status') %> </th>
+        <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
+        <% if @current_club.requires_external_id %>
+          <th> <%= t('activerecord.attributes.member.external_id') %> </th>
         <% end %>
-      </td>
-      <td>
-        <% if can? :edit, Member %> 
-          <%= member_action_drop_menu(member) %>
+        <th> <%= t('activerecord.attributes.member.full_name') %> </th>
+        <th> <%= t('activerecord.attributes.member.full_address') %> </th>
+        <th style="width: 20px;">View</th>
+        <th style="width: 20px;">Edit</th>
+        <th style="width: 80px;">&nbsp;</th>
+    	</tr>
+      <% if @members.count == 0 %>
+        <tr> <td colspan="8"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
+      <% end %> 
+      <% @members.each do |member| %>
+      <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
+        <td class="<%= menber_status_class(member) %>"> 
+        <% if member.blacklisted? %>
+        <%= member.status %>
+        <%= t('activerecord.attributes.member.status_blacklisted') %>
+        <% else %>
+        <%= member.status %>
         <% end %>
-      </td>
-    </tr>
-  <% end %>
-  </thead>  
-</table>
-
+        </td>
+        <td> <%= member.visible_id %> </td>
+        <% if @current_club.requires_external_id %>
+          <td> <%= member.external_id if !member.external_id.nil? %> </td>
+        <% end %>
+        <td> <%= member.full_name %> </td>
+        <td> <%= member.full_address %> </td>
+        <td><a href="<%= show_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
+        <td>
+          <% if can? :edit, Member %>
+            <a href="<%= edit_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a>
+          <% end %>
+        </td>
+        <td>
+          <% if can? :edit, Member %> 
+            <%= member_action_drop_menu(member) %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+    </thead>  
+  </table>
 <% end %>
 
 <%= will_paginate @members if @members %>
 
 
-
 <script type="text/javascript">
   $('.dropdown-toggle').dropdown();
+  var new_position = $('#members').offset();
+  window.scrollTo(new_position.left,new_position.top);
 </script>

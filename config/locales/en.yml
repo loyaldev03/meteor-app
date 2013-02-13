@@ -15,6 +15,7 @@ en:
   cancel: 'Cancel'
   actions: 'Actions'
   url: 'Url'
+  clear: 'Clear'
   email: 'Email'
   show_on_map: 'map'
   reason: 'Reason'

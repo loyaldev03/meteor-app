@@ -74,7 +74,7 @@ div.dataTables_length select {
 div.dataTables_filter label{
     text-align:left;
     vertical-align:text-top;
-    width:270px;
+    width: 300px;
 }
 
 div.dataTables_filter input {

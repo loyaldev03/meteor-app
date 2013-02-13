@@ -145,7 +145,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td><%= t('activerecord.credit_card') %> <%= t('activerecord.attributes.credit_card.last_digits') %></td>
+                    <td>CC <%= t('activerecord.attributes.credit_card.last_digits') %></td>
                     <td>
                       <%= text_field :member, :last_digits, :class => 'text_field',
                                      :value => (params[:member][:last_digits] if params[:member]) %> 
