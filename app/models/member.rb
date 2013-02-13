@@ -364,9 +364,11 @@ class Member < ActiveRecord::Base
           trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
           answer = trans.process
           if trans.success?
-            assign_club_cash!
-            set_as_active!
+            unless set_as_active
+              Airbrake.notify(:error_class => "Billing::set_as_active", :error_message => "we cant set as active this member.", :parameters => { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+            end
             schedule_renewal
+            assign_club_cash
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
             Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
             { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
@@ -632,7 +634,7 @@ class Member < ActiveRecord::Base
   end
 
   # Adds club cash when membership billing is success.
-  def assign_club_cash!(message = "Adding club cash after billing")
+  def assign_club_cash(message = "Adding club cash after billing")
     amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
     self.add_club_cash(nil, amount, message)
     if club_cash_transactions_enabled
@@ -641,6 +643,10 @@ class Member < ActiveRecord::Base
       end
       self.save(:validate => false)
     end
+  rescue Exception => e
+    # refs #21133
+    # If there is connectivity problems or data errors with drupal. Do not stop billing!! 
+    Airbrake.notify(:error_class => "Member:assign_club_cash:sync", :error_message => e, :parameters => { :member => self.inspect, :amount => amount, :message => message })
   end
   
   # Adds club cash transaction. 
