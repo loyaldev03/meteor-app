@@ -6,22 +6,23 @@ class FulfillmentsController < ApplicationController
     if request.post?
       @status = params[:status]
     	if params[:all_times] == '1'
-        if params[:product_type] == Settings.kit_card_product
-    		  @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_kit_card.not_renewed
-        else
+        if params[:product_type] == Settings.others_product
           @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_others.not_renewed
+        else
+          @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ? and product_sku = ? ', params[:status], @current_club.id, params[:product_type]).not_renewed
         end
         @product_type = params[:product_type]
       else
-        if params[:product_type] == Settings.kit_card_product
-          @fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false', 
-            params[:status], params[:initial_date], params[:end_date], @current_club.id]).type_kit_card.not_renewed
-        else
-          @fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false', 
+        if params[:product_type] == Settings.others_product
+          @fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? ', 
             params[:status], params[:initial_date], params[:end_date], @current_club.id]).type_others.not_renewed
+        else
+          @fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND product_sku = ? ', 
+            params[:status], params[:initial_date], params[:end_date], @current_club.id, params[:product_type]]).not_renewed
         end
       end  
     end
+    params[:product_type] = params[:product_type] || Settings.kit_card_product
   end
 
   def files

@@ -23,22 +23,20 @@ $(document).ready( function() {
 
   $(".alert").alert();
 
-
-
   // taken fom https://makandracards.com/makandra/1383
   $(function() {
     $('[data-remote][data-replace]')
       .data('type', 'html')
-      .live('ajax:success', function(evt, data) {
+      .on('ajax:success', function(evt, data) {
         var self = $(this);
         $(self.data('replace')).html(data);
         self.trigger('ajax:replaced');
       })
-      .live('ajax:beforeSend', function(evt, data) {
+      .on('ajax:beforeSend', function(evt, data) {
         var self = $(this);
         $(self.data('replace')).html("<div class='progress progress-striped active'><div class='bar' style='width: 100%;' /></div>");
       })
-      .live('ajax:error', function(evt, data) {
+      .on('ajax:error', function(evt, data) {
         var self = $(this);
         $(self.data('replace')).find('> .progress').addClass('progress-danger').removeClass('active');
       });
@@ -139,7 +137,7 @@ $(document).ready( function() {
     $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
                                              showOn: "both", buttonImage: "/icon-calendar.png", 
                                              buttonImageOnly: true});
-    $('#members .pagination a').live('click', function () {  
+    $('#members .pagination a').on('click', function () {  
       update_select_only = false;
       $.getScript(this.href);  
       return false;  
@@ -149,7 +147,7 @@ $(document).ready( function() {
       $("#index_search_form input[type=text]").each(function() { $(this).val(''); }); 
     });
 
-    $('#member_country').live('change',  function(){
+    $('#member_country').on('change',  function(){
       country = $('#member_country').val();
       update_select_only = true;
       $.get(this.action, { country_code:country, only_select:update_select_only }, null, 'script'); 
@@ -230,7 +228,7 @@ $(document).ready( function() {
     $('#zip_help').popover({offset: 10});
     $('.help').popover({offset: 10});
     
-    $('#member_country').live('change',  function(){
+    $('#member_country').on('change',  function(){
       country = $('#member_country').val();
       $.get(this.action, { country_code:country }, null, 'script'); 
     })
@@ -280,14 +278,14 @@ $(document).ready( function() {
     });
     $('.help').popover({offset: 10});
 
-    $('#member_country').live('change',  function(){
+    $('#member_country').on('change',  function(){
       country = $('#member_country').val();
       $.get('', { country_code:country }, null, 'script'); 
     })
   };
 
   function club_cash_functions(){
-    $('#_amount').live('change', function(){
+    $('#_amount').on('change', function(){
       amount = $('#_amount').val().substring(0,15);
       var num = parseFloat(amount);
       if(num!=0)
@@ -427,7 +425,7 @@ $(document).ready( function() {
   }
 
   function show_member_functions(){
-    $(".btn").live('click',function(event){
+    $(".btn").on('click',function(event){
       if($(this).attr('disabled') == 'disabled')
         event.preventDefault(); 
     })
@@ -519,7 +517,16 @@ $(document).ready( function() {
     });     
   }
 
-  function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message){
+  function set_product_type_at_fulfillments_index(settings_kit_card_product, settings_others_product) {
+    var radio_product_type = $('[name=radio_product_type]:checked');
+    if (radio_product_type.val() == settings_kit_card_product || radio_product_type.val() == settings_others_product) {
+      $('#product_type').val(radio_product_type.val());
+    } else {
+      $('#product_type').val($('#input_product_type').val());
+    }
+  }
+
+  function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message, settings_kit_card_product, settings_others_product){
     $(".datepicker").datepicker({ constrainInput: true, 
                                   dateFormat: "yy-mm-dd", 
                                   showOn: "both", 
@@ -533,7 +540,7 @@ $(document).ready( function() {
       $("#end_date").datepicker( "setDate", '0' );
     }
 
-    $("#all_times").click (function (){
+    $("#all_times").click(function (){
       if ($("#all_times").is(':checked')) {
         $('#td_initial_date').hide();
         $('#td_end_date').hide();
@@ -554,14 +561,20 @@ $(document).ready( function() {
         $('<input>').attr({ type: 'hidden', name: fuls[x].name, value: fuls[x].value }).appendTo($('#fulfillment_report_form'));
       }
       if (fuls.length != 0) {
+        set_product_type_at_fulfillments_index(settings_kit_card_product, settings_others_product)
         $('#fulfillment_report_form').attr("action", create_xls_file_url);
         $('#fulfillment_report_form').submit();
       } else {
         alert(fulfillment_file_cant_be_empty_message);
       }
-    });    
+    });  
+
+    $('#input_product_type').blur(function() {
+      $('#radio_product_type_'+settings_others_product+'_others').attr('checked', true);
+    });
 
     $("#make_report").click(function() {
+      set_product_type_at_fulfillments_index(settings_kit_card_product, settings_others_product);
       $('#fulfillment_report_form').attr("action", make_report_url);
     });    
 
@@ -576,7 +589,7 @@ $(document).ready( function() {
     //   return false;
     // });
 
-    // $("#set_undeliverable").live("submit", function(event){
+    // $("#set_undeliverable").on("submit", function(event){
     //   event.preventDefault();
     //   this_form = $(this);
     //   $.ajax({
