@@ -88,40 +88,61 @@ pgc.save!
 
 
     # pillar emails
-
-
     et = EmailTemplate.new :name => "Deals & Discounts - Pillar Email", :client => :lyris
     et.terms_of_membership_id = tom.id
+    et.template_type = :pillar
     et.external_attributes = { :trigger_id => 6418, :mlid => 47386, :site_id => site_id }
     if [6,7,8,9,10,11,12,13,14,15,16,17,18].include?(internal_tom_id.to_i)
-      et.days_after_join_date = 30
-      et.template_type = :pillar
+      et.days_after_join_date = 35
     else
       et.days_after_join_date = 3
-      et.template_type = :pillar
     end
     et.save!
 
 
-    # et = EmailTemplate.new :name => "Day 35 - News", :client => :lyris, :template_type => :pillar
-    # et.terms_of_membership_id = tom.id
-    # et.external_attributes = { :trigger_id => 27647, :mlid => 226095, :site_id => site_id }
-    # et.days_after_join_date = 35
-    # et.save!
-    # et = EmailTemplate.new :name => "Day 40 - Deals", :client => :lyris, :template_type => :pillar 
-    # et.terms_of_membership_id = tom.id
-    # et.external_attributes = { :trigger_id => 27651, :mlid => 226095, :site_id => site_id }
-    # et.days_after_join_date = 40
-    # et.save!
-    # et = EmailTemplate.new :name => "Day 45 - Local Chapters", :client => :lyris, :template_type => :pillar 
-    # et.terms_of_membership_id = tom.id
-    # et.external_attributes = { :trigger_id => 27650, :mlid => 226095, :site_id => site_id }
-    # et.days_after_join_date = 45
-    # et.save!
-    # et = EmailTemplate.new :name => "Day 50 - VIP", :client => :lyris, :template_type => :pillar
-    # et.terms_of_membership_id = tom.id
-    # et.external_attributes = { :trigger_id => 27649, :mlid => 226095, :site_id => site_id }
-    # et.days_after_join_date = 50
-    # et.save!
+    et = EmailTemplate.new :name => "Content - Pillar Email", :client => :lyris
+    et.terms_of_membership_id = tom.id
+    et.template_type = :pillar
+    et.external_attributes = { :trigger_id => 6419, :mlid => 47386, :site_id => site_id }
+    if [6,7,8,9,10,11,12,13,14,15,16,17,18].include?(internal_tom_id.to_i)
+      et.days_after_join_date = 40
+    else
+      et.days_after_join_date = 7
+    end
+    et.save!
+
+    et = EmailTemplate.new :name => "VIP - Pillar Email", :client => :lyris
+    et.terms_of_membership_id = tom.id
+    et.template_type = :pillar
+    et.external_attributes = { :trigger_id => 6420, :mlid => 47386, :site_id => site_id }
+    if [6,7,8,9,10,11,12,13,14,15,16,17,18].include?(internal_tom_id.to_i)
+      et.days_after_join_date = 45
+    else
+      et.days_after_join_date = 11
+    end
+    et.save!
+
+    et = EmailTemplate.new :name => "Local Chapters - Pillar Email", :client => :lyris
+    et.terms_of_membership_id = tom.id
+    et.template_type = :pillar
+    et.external_attributes = { :trigger_id => 6421, :mlid => 47386, :site_id => site_id }
+    if [6,7,8,9,10,11,12,13,14,15,16,17,18].include?(internal_tom_id.to_i)
+      et.days_after_join_date = 50
+    else
+      et.days_after_join_date = 15
+    end
+    et.save!
+
+    et = EmailTemplate.new :name => "Trial Comm", :client => :lyris
+    et.terms_of_membership_id = tom.id
+    et.template_type = :pillar
+    et.external_attributes = { :trigger_id => 6417, :mlid => 47386, :site_id => site_id }
+    if [6,7,8,9,10,11,12,13,14,15,16,17,18].include?(internal_tom_id.to_i)
+      et.days_after_join_date = 7
+    else
+      et.days_after_join_date = 19
+    end
+    et.save!
+
   end
 end

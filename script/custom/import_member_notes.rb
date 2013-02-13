@@ -62,6 +62,7 @@ def import_customer_notes
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         exit
+        return
       end
     end
   end

@@ -31,7 +31,7 @@ group :assets do
   gem 'therubyracer', :platform => :ruby
 
   gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
-  gem 'jquery-ui-rails'
+  gem 'jquery-ui-rails', '1.1.0'
   gem 'uglifier', '>= 1.0.3'
 end
 
@@ -54,9 +54,9 @@ gem "axlsx"
 
 gem 'twitter-bootstrap-rails', '2.0.6'
 
-gem 'jquery-rails'
+gem 'jquery-rails', '2.0.3'
 
-gem 'rails3_acts_as_paranoid'
+gem 'acts_as_paranoid'
 
 gem "airbrake"
 
