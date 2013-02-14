@@ -246,9 +246,8 @@ Method : PUT Updates member&#8217;s club cash&#8217;s data.
 </p>
 </dd>
 <dt>member_id</dt><dd><p>
-ID of the member. This ID is unique for each member. (32 characters
-string). This value is used by platform. Have in mind that this value is
-part of the url.
+Members ID. This id is a string type ID (lenght 32 characters.). This ID is
+unique for each member. Have in mind that this value is part of the url.
 </p>
 </dd>
 <dt>amount</dt><dd><p>
@@ -369,7 +368,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-304
 305
 306
 307
@@ -385,10 +383,11 @@ Code related to the method result.
 317
 318
 319
-320</pre>
+320
+321</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 304</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 305</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_club_cash'>club_cash</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -446,7 +445,7 @@ The agent&#8217;s ID that will be enrolling the member.
 Information related to the member that is sumbitting the enroll. It also
 contains information related to the enrollment (this will be stored as
 enrollment_info). Here is a list of the regex we are using to validate
-<span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+show.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -494,7 +493,7 @@ enrollment_info). Here is a list of the regex we are using to validate
 </code></pre>
 </dd>
 <dt>credit_card</dt><dd><p>
-Information related to member&#8217;s credit card. <span class='object_link'><a href="../CreditCard.html" title="CreditCard (class)">show</a></span>
+Information related to member&#8217;s credit card. show
 </p>
 <pre class="code ruby"><code>
   *number: Number of member's credit card, from where we will charge the membership or any other service.  
@@ -721,7 +720,7 @@ unique for each member. Have in mind that this value is part of the url.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is sumbitting the enroll. Here is a
-list of the regex we are using to validate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+list of the regex we are using to validate show.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -1034,7 +1033,7 @@ part of the url.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is being updated.. Here is a list of
-the regex we are using to validate. <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+the regex we are using to validate. show.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -1283,7 +1282,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Thu Feb 14 09:51:51 2013 by
+  Generated on Thu Feb 14 10:12:06 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

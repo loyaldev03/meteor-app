@@ -287,7 +287,8 @@ class Api::MembersController < ApplicationController
   # Updates member's club cash's data.
   #
   # [url] /api/v1/members/:member_id/club_cash
-  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
+  # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
+  #             Have in mind that this value is part of the url.
   # [amount] club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma. (required)
   # [expire_date] club cash expiration date. This date is sotred with datetime format. (required)
   #
