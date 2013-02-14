@@ -69,7 +69,7 @@ class Api::MembersController < ApplicationController
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
   # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment.
-  # [v_id] Visible id of the member that was enrolled or recovered, or updated.
+  # [v_id] Visible id of the member that was enrolled or recovered, or updated. This id is unique within each club.
   # [errors] A hash with members and credit card errors. This will be use to show errors on members creation page.
   #
   # @param [Hash] member
@@ -128,10 +128,8 @@ class Api::MembersController < ApplicationController
   #
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
-  # [v_id] Visible id of the member that was updated.
   # [errors] A hash with members errors. This will be use to show errors on members edit page. 
   #
-  # @param [String] id
   # @param [Hash] member
   # @param [Hash] setter
   # @return [String] *message*
@@ -221,7 +219,6 @@ class Api::MembersController < ApplicationController
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
   #
-  # @param [String] *id*
   # @return [String] *message* 
   # @return [Hash] *member*
   # @return [Hash] *credit_card*
@@ -295,7 +292,6 @@ class Api::MembersController < ApplicationController
   # [message] Shows the method result.
   # [code] Code related to the method result.
   #
-  # @param [String] member_id
   # @param [Float] amount
   # @param [String] expire_date
   # @return [String] *message*

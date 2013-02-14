@@ -9,12 +9,14 @@ class Api::ProductsController < ApplicationController
   # [url] /api/v1/products/get_stock
   # [sku] Sku of the product we are interested in. This parameter is the product description. 
   # [club_id] Id of the club the product belongs to. 
-  # [stock] Actual stock of the product. This value is an integer type.
+  # [stock] Actual stock of the product. This value is an integer type. This value is returned if there was no error.
   # [code] Code related to the method result.
-  # [allow_backorder] Flag to inform that product allow negative stocks. 
+  # [allow_backorder] Flag to inform that product allow negative stocks. This flag is returned if there was no error. 
+  # [message] Shows the method results and also informs the errors. When an error is returned, we do not return stock or allow_backorder flag. 
   #
   # @param [String] *sku*
   # @param [Integer] *club_id* 
+  # @return [String] *message*
   # @return [Integer] *code*
   # @return [Integer] *stock*
   # @return [Boolean] *allow_backorder*
