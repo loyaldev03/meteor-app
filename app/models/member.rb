@@ -1006,7 +1006,6 @@ class Member < ActiveRecord::Base
   end
 
   def add_new_credit_card(new_credit_card, current_agent = nil)
-    answer = { :message => "There was an error. We could not add the credit card.", :code => Settings.error_codes.invalid_credit_card }
     CreditCard.transaction do 
       begin
         new_credit_card.member = self
@@ -1020,10 +1019,8 @@ class Member < ActiveRecord::Base
           answer = { :code => Settings.error_codes.invalid_credit_card, :message => I18n.t('error_messages.invalid_credit_card'), :errors => new_credit_card.errors.to_hash }
         end        
       rescue Exception => e
-        answer.merge!({:errors => e})
-        answer[:message] = I18n.t('error_messages.airbrake_error_message')
+        answer = { :errors => e, :message => I18n.t('error_messages.airbrake_error_message', :code => Settings.error_codes.invalid_credit_card }
         Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card.inspect })
-        logger.error e.inspect
         raise ActiveRecord::Rollback
       end
     end
