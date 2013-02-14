@@ -357,7 +357,7 @@ class Member < ActiveRecord::Base
           message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
           Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
           Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
-          { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
+          { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => I18n.t('error_messages.airbrake_error_message') }
         else
           trans = Transaction.new
           trans.transaction_type = "sale"
@@ -460,12 +460,6 @@ class Member < ActiveRecord::Base
       return { :message => I18n.t('error_messages.cant_recover_member', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.cant_recover_member, :errors => {:reactivation_times => "Max reactivation times reached."} }
     end
 
-    # CLEAN ME: => This validation is done at self.enroll
-    unless self.valid? 
-      return { :message => I18n.t('error_messages.member_data_invalid'), :code => Settings.error_codes.member_data_invalid, 
-               :errors => self.errors_merged(credit_card) }
-    end
-        
     enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => tom.id
     enrollment_info.update_enrollment_info_by_hash member_params
     membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent)
@@ -677,6 +671,7 @@ class Member < ActiveRecord::Base
           rescue Exception => e
             answer[:errors] = cct.errors_merged(self)
             Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message], :parameters => { :club_cash => cct.inspect, :member => self.inspect })
+            answer[:message] = I18n.t('error_messages.airbrake_error_message')
             raise ActiveRecord::Rollback
           end
         end
@@ -714,7 +709,7 @@ class Member < ActiveRecord::Base
           answer = { :message => message, :success => true }
         rescue Exception => e
           Airbrake.notify(:error_class => "Member::blacklist", :error_message => e, :parameters => { :member => self.inspect })
-          answer = { :message => "Could not blacklist this member.", :success => false }
+          answer = { :message => I18n.t('error_messages.airbrake_error_message'), :success => false }
           raise ActiveRecord::Rollback
         end
       end
@@ -1026,6 +1021,7 @@ class Member < ActiveRecord::Base
         end        
       rescue Exception => e
         answer.merge!({:errors => e})
+        answer[:message] = I18n.t('error_messages.airbrake_error_message')
         Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card.inspect })
         logger.error e.inspect
         raise ActiveRecord::Rollback

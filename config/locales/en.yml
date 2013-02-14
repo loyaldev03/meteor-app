@@ -116,6 +116,7 @@ en:
     fulfillment_reason_blank: "Reason is blank, please enter a reason."
     fulfillment_is_renwed: "Fulfillment is renewed. No operation can be done."
     fulfillment_file_cant_be_empty: "No fulfillments selected. Please, select fulfillments in order to crate XLS file."
+    airbrake_error_message: "Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience."
   activerecord:
     model:
       members: 'Members'
