@@ -16,19 +16,7 @@ namespace :billing do
     tall = Time.zone.now
     begin
       # We use bill_date because we will only send this email once!
-      Member.find_in_batches(:conditions => [" date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
-        group.each do |member| 
-          tz = Time.zone.now
-          begin
-            Rails.logger.info "  * processing member ##{member.uuid}"
-            member.send_pre_bill
-          rescue Exception => e
-            Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
-        end
-      end
+      Member.send_prebill
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}"
     end
