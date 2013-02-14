@@ -155,8 +155,8 @@ class MembersController < ApplicationController
     @blacklist_reasons = MemberBlacklistReason.all
     if request.post? 
       response = @current_member.blacklist(@current_agent, params[:reason])
-      if response[:success]
-        flash[:notice] = response[:message]
+      if response[:code] == Settings.error_codes.success
+        flash[:notice] = response[:message] 
       else
         flash[:error] = response[:message]
       end
