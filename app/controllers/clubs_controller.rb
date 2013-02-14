@@ -14,6 +14,7 @@ class ClubsController < ApplicationController
   # GET /clubs/1
   def show
     @club = Club.find(params[:id])
+    @drupal_domain = Domain.find(@club.drupal_domain_id) if @club.drupal_domain_id
   end
 
   # GET /clubs/new

@@ -14,6 +14,10 @@
   <%= @product.sku %>
 </p>
 <p>
+  <strong><%= model_class.human_attribute_name(:cost_center) %>:</strong><br>
+  <%= @product.cost_center %>
+</p>
+<p>
   <strong><%= model_class.human_attribute_name(:recurrent) %>:</strong><br>
   <%= @product.recurrent %>
 </p>

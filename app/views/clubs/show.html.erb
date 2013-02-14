@@ -11,13 +11,68 @@
   <%= @club.description %>
 </p>
 <p>
-  <strong><%= model_class.human_attribute_name(:drupal_username) %>:</strong><br>
-  <%= @club.api_type %>
+  <strong><%= model_class.human_attribute_name(:cs_phone_number) %>:</strong><br>
+  <%= @club.cs_phone_number %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:theme) %>:</strong><br>
+  <%= @club.theme %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:requires_external_id) %>:</strong><br>
   <%= @club.requires_external_id %>
 </p>
+<p>
+  <strong><%= model_class.human_attribute_name(:family_memberships_allowed) %>:</strong><br>
+  <%= @club.family_memberships_allowed %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:time_zone) %>:</strong><br>
+  <%= @club.time_zone %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:logo) %>:</strong><br>
+  <%= image_tag(@club.logo(:small)) %>
+</p>
+
+
+
+<h3>Remote domain</h3>
+<p>
+  <strong><%= model_class.human_attribute_name(:drupal_domain_id) %>:</strong><br>
+  <%= @drupal_domain.nil? ? "It has no drupal domain assosiated" : @drupal_domain.url %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:api_type) %>:</strong><br>
+  <%= @club.api_type %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:api_username) %>:</strong><br>
+  <%= @club.api_username %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:api_password) %>:</strong><br>
+  <%= @club.api_password %>
+</p>
+
+
+
+<h3>Pardot</h3>
+<p>
+  <strong><%= model_class.human_attribute_name(:pardot_email) %>:</strong><br>
+  <%= @club.pardot_email.blank? ? "It has no pardot email assosiated" : @club.pardot_email %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:pardot_user_key) %>:</strong><br>
+  <%= @club.pardot_user_key %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:pardot_password) %>:</strong><br>
+  <%= @club.pardot_password %>
+</p>
+
+
+
 
 <div class="form-actions">
   <%= link_to t(:back),
