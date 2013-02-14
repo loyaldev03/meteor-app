@@ -16,14 +16,15 @@ private
         club.name, 
         club.description,
         club.members.count,
-        (link_to(I18n.t('show'), @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id), :class => 'btn btn-mini') if @current_agent.can? :read, Club)+
-        (link_to(I18n.t(:edit), @url_helpers.edit_club_path(:partner_prefix => @current_partner.prefix,:id => club.id), :class => 'btn btn-mini')if @current_agent.can? :update, Club)+
-        (link_to(I18n.t('activerecord.model.members'), @url_helpers.members_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')if @current_agent.can? :read, Member, club.id)+
-        (link_to(I18n.t('activerecord.model.products'), @url_helpers.products_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')if @current_agent.can? :read, Product,club.id )+
-        (link_to(I18n.t('activerecord.model.fulfillments'), @url_helpers.fulfillments_index_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')if @current_agent.can? :read, Product,club.id )+
+        (link_to(I18n.t('show'), @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id), :class => 'btn btn-mini') if @current_agent.can? :read, Club).to_s+
+        (link_to(I18n.t(:edit), @url_helpers.edit_club_path(:partner_prefix => @current_partner.prefix,:id => club.id), :class => 'btn btn-mini')if @current_agent.can? :update, Club).to_s+
+        (link_to(I18n.t('activerecord.model.members'), @url_helpers.members_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')if @current_agent.can? :read, Member, club.id).to_s+
+        (link_to(I18n.t('activerecord.model.products'), @url_helpers.products_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')if @current_agent.can? :read, Product,club.id ).to_s+
+        (link_to(I18n.t('activerecord.model.fulfillments'), @url_helpers.fulfillments_index_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')if @current_agent.can? :read, Product,club.id ).to_s+
+        (link_to(I18n.t('activerecord.model.fulfillment_files'), @url_helpers.list_fulfillment_files_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :report, Fulfillment, club.id).to_s+
         (link_to(I18n.t(:destroy), @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id), :method => :delete,
                         :confirm => I18n.t("are_you_sure"),
-                        :class => 'btn btn-mini btn-danger') if @current_agent.can? :update, Club)
+                        :class => 'btn btn-mini btn-danger') if @current_agent.can? :update, Club).to_s
       ]
     end
   end
