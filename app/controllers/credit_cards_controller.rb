@@ -48,8 +48,9 @@ class CreditCardsController < ApplicationController
         @current_member.api_member.save!(force: true) rescue nil
         redirect_to show_member_path, notice: "Credit card #{new_credit_card.last_digits} activated."
       rescue Exception => e
-        Airbrake.notify(:error_class => "CreditCardsController::activate", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :params => params.inspect, :member => current_member })
-        redirect_to show_member_path, error: e
+        Airbrake.notify(:error_class => "CreditCardsController::activate", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :params => params.inspect, :member => @current_member })
+        flash[:error] = t('error_messages.airbrake_error_message')
+        redirect_to show_member_path
         logger.error e.inspect
         raise ActiveRecord::Rollback
       end
