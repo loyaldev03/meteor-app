@@ -223,8 +223,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>def resend.</p>
+    <span class="summary_desc"><div class='inline'><p>
+def resend.
+</p>
 </div></span>
   
 </li>
@@ -310,7 +311,6 @@
       <pre class="lines">
 
 
-85
 86
 87
 88
@@ -322,10 +322,11 @@
 94
 95
 96
-97</pre>
+97
+98</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_download_xls'>download_xls</span>
   <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:report</span><span class='comma'>,</span> <span class='const'>Fulfillment</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
@@ -360,16 +361,16 @@
       <pre class="lines">
 
 
-27
 28
 29
 30
 31
 32
-33</pre>
+33
+34</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 27</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_files'>files</span>
   <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:report</span><span class='comma'>,</span> <span class='const'>Fulfillment</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
@@ -398,7 +399,6 @@
       <pre class="lines">
 
 
-56
 57
 58
 59
@@ -425,10 +425,11 @@
 80
 81
 82
-83</pre>
+83
+84</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_xls'>generate_xls</span>
   <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:report</span><span class='comma'>,</span> <span class='const'>Fulfillment</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
@@ -499,7 +500,8 @@
 22
 23
 24
-25</pre>
+25
+26</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 4</span>
@@ -509,22 +511,23 @@
   <span class='kw'>if</span> <span class='id identifier rubyid_request'>request</span><span class='period'>.</span><span class='id identifier rubyid_post?'>post?</span>
     <span class='ivar'>@status</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:status</span><span class='rbracket'>]</span>
   	<span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:all_times</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>1</span><span class='tstring_end'>'</span></span>
-      <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:product_type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_kit_card_product'>kit_card_product</span>
-  		  <span class='ivar'>@fulfillments</span> <span class='op'>=</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_joins'>joins</span><span class='lparen'>(</span><span class='symbol'>:member</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>fulfillments.status = ? and club_id = ?</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:status</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_type_kit_card'>type_kit_card</span><span class='period'>.</span><span class='id identifier rubyid_not_renewed'>not_renewed</span>
-      <span class='kw'>else</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:product_type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_others_product'>others_product</span>
         <span class='ivar'>@fulfillments</span> <span class='op'>=</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_joins'>joins</span><span class='lparen'>(</span><span class='symbol'>:member</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>fulfillments.status = ? and club_id = ?</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:status</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_type_others'>type_others</span><span class='period'>.</span><span class='id identifier rubyid_not_renewed'>not_renewed</span>
+      <span class='kw'>else</span>
+        <span class='ivar'>@fulfillments</span> <span class='op'>=</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_joins'>joins</span><span class='lparen'>(</span><span class='symbol'>:member</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>fulfillments.status = ? and club_id = ? and product_sku = ? </span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:status</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:product_type</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_not_renewed'>not_renewed</span>
       <span class='kw'>end</span>
       <span class='ivar'>@product_type</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:product_type</span><span class='rbracket'>]</span>
     <span class='kw'>else</span>
-      <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:product_type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_kit_card_product'>kit_card_product</span>
-        <span class='ivar'>@fulfillments</span> <span class='op'>=</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_joins'>joins</span><span class='lparen'>(</span><span class='symbol'>:member</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> 
-          <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:status</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:initial_date</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_date</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_type_kit_card'>type_kit_card</span><span class='period'>.</span><span class='id identifier rubyid_not_renewed'>not_renewed</span>
-      <span class='kw'>else</span>
-        <span class='ivar'>@fulfillments</span> <span class='op'>=</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_joins'>joins</span><span class='lparen'>(</span><span class='symbol'>:member</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND renewed = false</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> 
+      <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:product_type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_others_product'>others_product</span>
+        <span class='ivar'>@fulfillments</span> <span class='op'>=</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_joins'>joins</span><span class='lparen'>(</span><span class='symbol'>:member</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? </span><span class='tstring_end'>'</span></span><span class='comma'>,</span> 
           <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:status</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:initial_date</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_date</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_type_others'>type_others</span><span class='period'>.</span><span class='id identifier rubyid_not_renewed'>not_renewed</span>
+      <span class='kw'>else</span>
+        <span class='ivar'>@fulfillments</span> <span class='op'>=</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_joins'>joins</span><span class='lparen'>(</span><span class='symbol'>:member</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND product_sku = ? </span><span class='tstring_end'>'</span></span><span class='comma'>,</span> 
+          <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:status</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:initial_date</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_date</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:product_type</span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_not_renewed'>not_renewed</span>
       <span class='kw'>end</span>
     <span class='kw'>end</span>  
   <span class='kw'>end</span>
+  <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:product_type</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:product_type</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_kit_card_product'>kit_card_product</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -542,18 +545,22 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>def resend</p>
-
-<pre class="code ruby"><code><span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:resend</span><span class='comma'>,</span> <span class='const'>Fulfillment</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
-<span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_resend'>resend</span><span class='lparen'>(</span><span class='ivar'>@current_agent</span><span class='rparen'>)</span></code></pre>
-
-<p>rescue ActiveRecord::RecordNotFound</p>
-
-<pre class="ruby"><span class="ruby-identifier">render</span> <span class="ruby-identifier">json</span><span class="ruby-operator">:</span> { :<span class="ruby-identifier">message</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;Could not found the fulfillment.&quot;</span>, :<span class="ruby-identifier">code</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">error_codes</span>.<span class="ruby-identifier">not_found</span> }
-</pre>
-
-<p>end</p>
+    <p>
+def resend
+</p>
+<pre class="code ruby"><code>
+  <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:resend</span><span class='comma'>,</span> <span class='const'>Fulfillment</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_resend'>resend</span><span class='lparen'>(</span><span class='ivar'>@current_agent</span><span class='rparen'>)</span>
+</code></pre>
+<p>
+rescue ActiveRecord::RecordNotFound
+</p>
+<pre class="code ruby"><code>
+  <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='lbrace'>{</span> <span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not found the fulfillment.</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_not_found'>not_found</span> <span class='rbrace'>}</span>
+</code></pre>
+<p>
+end
+</p>
 
 
   </div>
@@ -567,14 +574,14 @@
       <pre class="lines">
 
 
-50
 51
 52
 53
-54</pre>
+54
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_list_for_file'>list_for_file</span>
   <span class='ivar'>@file</span> <span class='op'>=</span> <span class='const'>FulfillmentFile</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:fulfillment_file_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -601,7 +608,6 @@
       <pre class="lines">
 
 
-99
 100
 101
 102
@@ -611,10 +617,11 @@
 106
 107
 108
-109</pre>
+109
+110</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 99</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 100</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mark_file_as_sent'>mark_file_as_sent</span>
   <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:report</span><span class='comma'>,</span> <span class='const'>Fulfillment</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
@@ -647,16 +654,16 @@
       <pre class="lines">
 
 
-35
 36
 37
 38
 39
 40
-41</pre>
+41
+42</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 35</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/fulfillments_controller.rb', line 36</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_status'>update_status</span>
   <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:update_status</span><span class='comma'>,</span> <span class='const'>Fulfillment</span><span class='comma'>,</span> <span class='ivar'>@current_club</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
@@ -675,9 +682,9 @@
 </div>
 
     <div id="footer">
-  Generated on Wed Feb 13 10:16:02 2013 by
+  Generated on Thu Feb 14 09:51:51 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.2.1 (ruby-1.9.3).
+  0.8.2.1 (ruby-1.9.2).
 </div>
 
   </body>

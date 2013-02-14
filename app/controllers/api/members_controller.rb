@@ -76,7 +76,7 @@ class Api::MembersController < ApplicationController
   # @param [Hash] setter
   # @return [String] *message*
   # @return [Integer] *code*
-  # @return [Integer] *member_id*
+  # @return [String] *member_id*
   # @return [Integer] *v_id*
   # @return [Hash] *errors*
   # 
@@ -100,7 +100,7 @@ class Api::MembersController < ApplicationController
   # Updates member's data.
   #
   # [url] /api/v1/members/:id
-  # [id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment.
+  # [id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform.
   #      Have in mind that this value is part of the url.
   # [member] Information related to the member that is being updated.. Here is a list of the regex we are using to validate. {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
@@ -180,7 +180,7 @@ class Api::MembersController < ApplicationController
   #
   # [url] /api/v1/members/:id
   # [id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
-  #      Have in mind that this value is part of the url.  
+  #      Have in mind that this value is part of the url.
   # [member] Information related to the member that is sumbitting the enroll. Here is a list of the regex we are using to validate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
   #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
@@ -225,6 +225,7 @@ class Api::MembersController < ApplicationController
   # @return [String] *message* 
   # @return [Hash] *member*
   # @return [Hash] *credit_card*
+  # @return [Hash] *enrollment_info*
   # @return [Integer] *code*
   #
   def show
@@ -283,25 +284,22 @@ class Api::MembersController < ApplicationController
   end    
 
   # Method : PUT
-  # Updates club cash's data.
+  # Updates member's club cash's data.
   #
   # [url] /api/v1/members/:member_id/club_cash
   # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
-  # [amount] club cash amount to be set on this member profile +required+
-  # [expire date] club cash expiration date +required+
+  # [amount] club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma. (required)
+  # [expire_date] club cash expiration date. This date is sotred with datetime format. (required)
   #
-  # [message] Shows the method results and also informs the errors.
+  # [message] Shows the method result.
   # [code] Code related to the method result.
-  # [v_id] Visible id of the member that was updated.
-  # [errors] A hash with members errors. This will be use to show errors on members edit page. 
   #
-  # @param [String] id
-  # @param [Integer] amount
+  # @param [String] member_id
+  # @param [Float] amount
   # @param [String] expire_date
   # @return [String] *message*
-  # @return [Integer] *member_id*  
+  # @return [String] *member_id*  
   # @return [Integer] *code*
-  # @return [Hash] *errors*
   # 
   def club_cash
     member = Member.find(params[:member_id])
@@ -320,6 +318,5 @@ class Api::MembersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end
-
 
 end

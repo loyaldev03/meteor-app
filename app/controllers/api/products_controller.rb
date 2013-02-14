@@ -14,7 +14,7 @@ class Api::ProductsController < ApplicationController
   # [allow_backorder] Flag to inform that product allow negative stocks. 
   #
   # @param [String] *sku*
-  # @param [String] *club_id* 
+  # @param [Integer] *club_id* 
   # @return [Integer] *code*
   # @return [Integer] *stock*
   # @return [Boolean] *allow_backorder*

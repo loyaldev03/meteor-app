@@ -103,17 +103,22 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    
-<p>assigned_at =&gt; The day this fulfillment is assigned to our member.</p>
-
-<pre class="code ruby"><code>If fulfillment is resend it is because of a wrong address. 
-this value will be updated.</code></pre>
-
-<p>renewable_at =&gt; This day is assigned_at + 1.year (at first time).</p>
-
-<pre class="code ruby"><code><span class='const'>Will</span> <span class='id identifier rubyid_be'>be</span> <span class='id identifier rubyid_used'>used</span> <span class='id identifier rubyid_by'>by</span> <span class='id identifier rubyid_fulfillment'>fulfillment</span> <span class='id identifier rubyid_script'>script</span> <span class='id identifier rubyid_to'>to</span> <span class='id identifier rubyid_check'>check</span> <span class='id identifier rubyid_which'>which</span> <span class='id identifier rubyid_members'>members</span> <span class='id identifier rubyid_need'>need</span> <span class='id identifier rubyid_a'>a</span> <span class='id identifier rubyid_new'>new</span> <span class='id identifier rubyid_fulfillment'>fulfillment</span></code></pre>
-
-<p>status =&gt; open , archived</p>
+    <p>
+assigned_at => The day this fulfillment is assigned to our member.
+</p>
+<pre class="code ruby"><code>
+    If fulfillment is resend it is because of a wrong address. 
+    this value will be updated.
+</code></pre>
+<p>
+renewable_at => This day is assigned_at + 1.year (at first time). 
+</p>
+<pre class="code ruby"><code>
+    <span class='const'>Will</span> <span class='id identifier rubyid_be'>be</span> <span class='id identifier rubyid_used'>used</span> <span class='id identifier rubyid_by'>by</span> <span class='id identifier rubyid_fulfillment'>fulfillment</span> <span class='id identifier rubyid_script'>script</span> <span class='id identifier rubyid_to'>to</span> <span class='id identifier rubyid_check'>check</span> <span class='id identifier rubyid_which'>which</span> <span class='id identifier rubyid_members'>members</span> <span class='id identifier rubyid_need'>need</span> <span class='id identifier rubyid_a'>a</span> <span class='id identifier rubyid_new'>new</span> <span class='id identifier rubyid_fulfillment'>fulfillment</span>
+</code></pre>
+<p>
+status => open , archived
+</p>
 
 
   </div>
@@ -387,6 +392,7 @@ this value will be updated.</code></pre>
       <pre class="lines">
 
 
+209
 210
 211
 212
@@ -400,11 +406,10 @@ this value will be updated.</code></pre>
 220
 221
 222
-223
-224</pre>
+223</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 210</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 209</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_generateXLS'>generateXLS</span><span class='lparen'>(</span><span class='id identifier rubyid_fulfillments'>fulfillments</span><span class='comma'>,</span> <span class='id identifier rubyid_change_status'>change_status</span> <span class='op'>=</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='id identifier rubyid_type_others'>type_others</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_package'>package</span> <span class='op'>=</span> <span class='const'>Axlsx</span><span class='op'>::</span><span class='const'>Package</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -441,6 +446,7 @@ this value will be updated.</code></pre>
       <pre class="lines">
 
 
+178
 179
 180
 181
@@ -452,11 +458,10 @@ this value will be updated.</code></pre>
 187
 188
 189
-190
-191</pre>
+190</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 179</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 178</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_process_fulfillments_up_today'>process_fulfillments_up_today</span>
   <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_to_be_renewed'>to_be_renewed</span><span class='period'>.</span><span class='id identifier rubyid_find_in_batches'>find_in_batches</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_group'>group</span><span class='op'>|</span>
@@ -497,6 +502,7 @@ this value will be updated.</code></pre>
       <pre class="lines">
 
 
+148
 149
 150
 151
@@ -504,11 +510,10 @@ this value will be updated.</code></pre>
 153
 154
 155
-156
-157</pre>
+156</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 149</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 148</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_audit_status_transition'>audit_status_transition</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='comma'>,</span> <span class='id identifier rubyid_old_status'>old_status</span><span class='comma'>,</span> <span class='id identifier rubyid_reason'>reason</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_reload'>reload</span>
@@ -539,6 +544,7 @@ this value will be updated.</code></pre>
       <pre class="lines">
 
 
+108
 109
 110
 111
@@ -548,11 +554,10 @@ this value will be updated.</code></pre>
 115
 116
 117
-118
-119</pre>
+118</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 109</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 108</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_decrease_stock!'>decrease_stock!</span>
   <span class='id identifier rubyid_old_status'>old_status</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_status'>status</span>
@@ -585,6 +590,7 @@ this value will be updated.</code></pre>
       <pre class="lines">
 
 
+192
 193
 194
 195
@@ -599,11 +605,10 @@ this value will be updated.</code></pre>
 204
 205
 206
-207
-208</pre>
+207</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 193</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 192</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_file_line'>get_file_line</span><span class='lparen'>(</span><span class='id identifier rubyid_change_status'>change_status</span> <span class='op'>=</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='id identifier rubyid_type_others'>type_others</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_product'>product</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -641,6 +646,7 @@ this value will be updated.</code></pre>
       <pre class="lines">
 
 
+97
 98
 99
 100
@@ -649,11 +655,10 @@ this value will be updated.</code></pre>
 103
 104
 105
-106
-107</pre>
+106</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 98</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 97</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_new_fulfillment'>new_fulfillment</span><span class='lparen'>(</span><span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_f'>f</span> <span class='op'>=</span> <span class='const'>Fulfillment</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> 
@@ -685,12 +690,12 @@ this value will be updated.</code></pre>
       <pre class="lines">
 
 
+225
 226
-227
-228</pre>
+227</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 226</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 225</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_product'>product</span>
   <span class='ivar'>@product</span> <span class='op'>||=</span> <span class='const'>Product</span><span class='period'>.</span><span class='id identifier rubyid_find_by_sku_and_club_id'>find_by_sku_and_club_id</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_product_sku'>product_sku</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_club_id'>club_id</span><span class='rparen'>)</span>
@@ -715,6 +720,7 @@ this value will be updated.</code></pre>
       <pre class="lines">
 
 
+85
 86
 87
 88
@@ -724,11 +730,10 @@ this value will be updated.</code></pre>
 92
 93
 94
-95
-96</pre>
+95</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 86</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 85</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_renew!'>renew!</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_recurrent'>recurrent</span> <span class='kw'>and</span> <span class='id identifier rubyid_member'>member</span><span class='period'>.</span><span class='id identifier rubyid_can_renew_fulfillment?'>can_renew_fulfillment?</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='id identifier rubyid_renewed?'>renewed?</span>
@@ -761,6 +766,7 @@ this value will be updated.</code></pre>
       <pre class="lines">
 
 
+120
 121
 122
 123
@@ -786,11 +792,10 @@ this value will be updated.</code></pre>
 143
 144
 145
-146
-147</pre>
+146</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 121</span>
+      <pre class="code"><span class="info file"># File 'app/models/fulfillment.rb', line 120</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_status'>update_status</span><span class='lparen'>(</span><span class='id identifier rubyid_agent'>agent</span><span class='comma'>,</span> <span class='id identifier rubyid_new_status'>new_status</span><span class='comma'>,</span> <span class='id identifier rubyid_reason'>reason</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_old_status'>old_status</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_status'>status</span>
@@ -829,9 +834,9 @@ this value will be updated.</code></pre>
 </div>
 
     <div id="footer">
-  Generated on Wed Feb 13 10:15:59 2013 by
+  Generated on Thu Feb 14 09:51:49 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.2.1 (ruby-1.9.3).
+  0.8.2.1 (ruby-1.9.2).
 </div>
 
   </body>

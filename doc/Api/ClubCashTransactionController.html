@@ -133,8 +133,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Method : POST.</p>
+    <span class="summary_desc"><div class='inline'><p>
+Method : POST.
+</p>
 </div></span>
   
 </li>
@@ -161,38 +162,48 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Method : POST</p>
-
-<p>This method adds or deducts an specific amount of club cash on a member. In
+    <p>
+Method : POST
+</p>
+<p>
+This method adds or deducts an specific amount of club cash on a member. In
 case you want to add club cash, the amount value  has to be a positive
 number, while if you want to remove club cash, the amount value has to be
-negative.</p>
-<dl class="rdoc-list label-list"><dt>url
-<dd>
-<p>/api/v1/members/:member_id/club_cash_transaction</p>
-</dd><dt>member_id
-<dd>
-<p>ID of the member. This ID is unique for each member. (32 characters
+negative.  
+</p>
+<dl>
+<dt>url</dt><dd><p>
+/api/v1/members/:member_id/club_cash_transaction
+</p>
+</dd>
+<dt>member_id</dt><dd><p>
+ID of the member. This ID is unique for each member. (32 characters
 string). This value is used by platform. Have in mind that this value is
-part of the url.</p>
-</dd><dt>club_cash_transaction
-<dd>
-<p>Hash with necessary information to create the  club cash transaction.</p>
-
-<pre class="code ruby"><code>*amount (required): Amount of the club cash to add or deduct. We only accept numbers with up to two digits after the comma. (Eg: 2.50 , -10.99, 25)
-*description (optional): Description of the club cash. (Eg. why we are adding or deducting club cash to the member.)</code></pre>
-</dd><dt>message
-<dd>
-<p>Shows the method results and also informs the errors.</p>
-</dd><dt>code
-<dd>
-<p>Code related to the method result.</p>
-</dd><dt>errors
-<dd>
-<p>A hash with club cash and members errors. This will be use to show errors
-on club cash cs web page.</p>
-</dd></dl>
+part of the url.
+</p>
+</dd>
+<dt>club_cash_transaction</dt><dd><p>
+Hash with necessary information to create the  club cash transaction. 
+</p>
+<pre class="code ruby"><code>
+  *amount: Amount of the club cash to add or deduct. We only accept numbers with up to two digits after the comma. (required) (Eg: 2.50 , -10.99, 25)
+  *description: Description of the club cash. (Eg. why we are adding or deducting club cash to the member.)
+</code></pre>
+</dd>
+<dt>message</dt><dd><p>
+Shows the method results and also informs the errors.
+</p>
+</dd>
+<dt>code</dt><dd><p>
+Code related to the method result.
+</p>
+</dd>
+<dt>errors</dt><dd><p>
+A hash with club cash and members errors. This will be use to show errors
+on club cash cs web page.
+</p>
+</dd>
+</dl>
 
 
   </div>
@@ -225,8 +236,9 @@ on club cash cs web page.</p>
       
       
         &mdash;
-        <div class='inline'>
-<p><strong>message</strong></p>
+        <div class='inline'><p>
+<b>message</b>
+</p>
 </div>
       
     </li>
@@ -239,8 +251,9 @@ on club cash cs web page.</p>
       
       
         &mdash;
-        <div class='inline'>
-<p><strong>code</strong></p>
+        <div class='inline'><p>
+<b>code</b>
+</p>
 </div>
       
     </li>
@@ -253,8 +266,9 @@ on club cash cs web page.</p>
       
       
         &mdash;
-        <div class='inline'>
-<p><strong>errors</strong></p>
+        <div class='inline'><p>
+<b>errors</b>
+</p>
 </div>
       
     </li>
@@ -295,9 +309,9 @@ on club cash cs web page.</p>
 </div>
 
     <div id="footer">
-  Generated on Wed Feb 13 10:16:03 2013 by
+  Generated on Thu Feb 14 09:51:52 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.2.1 (ruby-1.9.3).
+  0.8.2.1 (ruby-1.9.2).
 </div>
 
   </body>
