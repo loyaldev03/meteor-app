@@ -245,6 +245,11 @@ Method : PUT Updates member&#8217;s club cash&#8217;s data.
 /api/v1/members/:member_id/club_cash
 </p>
 </dd>
+<dt>api_key</dt><dd><p>
+Agent&#8217;s authentication token. This token allows us to check if the
+agent is allowed to request this action. 
+</p>
+</dd>
 <dt>member_id</dt><dd><p>
 Members ID. This id is a string type ID (lenght 32 characters.). This ID is
 unique for each member. Have in mind that this value is part of the url.
@@ -256,7 +261,7 @@ with up to two digits after the comma. (required)
 </p>
 </dd>
 <dt>expire_date</dt><dd><p>
-club cash expiration date. This date is sotred with datetime format.
+club cash expiration date. This date is stored with datetime format.
 (required)
 </p>
 </dd>
@@ -276,6 +281,17 @@ Code related to the method result.
 <div class="tags">
   <p class="tag_title">Parameters:</p>
 <ul class="param">
+  
+    <li>
+      
+        <span class='name'>api_key</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
   
     <li>
       
@@ -357,14 +373,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-301
-302
-303
-304
-305
-306
-307
-308
 309
 310
 311
@@ -373,10 +381,18 @@ Code related to the method result.
 314
 315
 316
-317</pre>
+317
+318
+319
+320
+321
+322
+323
+324
+325</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 301</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 309</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_club_cash'>club_cash</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -415,7 +431,7 @@ Code related to the method result.
 Method : POST
 </p>
 <p>
-Submits a member to be created. THis method will call the method enroll on
+Submits a member to be created. This method will call the method enroll on
 member model. It will validate the member&#8217;s data (including its
 credit card) and, in case it is correct, it will create and save the
 member. It will also send a welcome email and charge the enrollment to the
@@ -426,15 +442,16 @@ member&#8217;s credit card.
 /api/v1/members
 </p>
 </dd>
-<dt>current_agent</dt><dd><p>
-The agent&#8217;s ID that will be enrolling the member. 
+<dt>api_key</dt><dd><p>
+Agent&#8217;s authentication token. This token allows us to check if the
+agent is allowed to request this action.
 </p>
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is sumbitting the enroll. It also
 contains information related to the enrollment (this will be stored as
 enrollment_info). Here is a list of the regex we are using to validate
-<span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+show.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -482,7 +499,7 @@ enrollment_info). Here is a list of the regex we are using to validate
 </code></pre>
 </dd>
 <dt>credit_card</dt><dd><p>
-Information related to member&#8217;s credit card. <span class='object_link'><a href="../CreditCard.html" title="CreditCard (class)">show</a></span>
+Information related to member&#8217;s credit card. show
 </p>
 <pre class="code ruby"><code>
   *number: Number of member's credit card, from where we will charge the membership or any other service.  
@@ -513,12 +530,14 @@ Code related to the method result.
 <dt>member_id</dt><dd><p>
 ID of the member. This ID is unique for each member. (32 characters
 string). This value is used by platform. API users dont know the member id
-at this moment.
+at this moment. This value will be returned only if the member is enrolled
+successfully.
 </p>
 </dd>
 <dt>v_id</dt><dd><p>
 Visible id of the member that was enrolled or recovered, or updated. This
-id is unique within each club.
+id is unique within each club. This value will be returned only if the
+member is enrolled successfully.
 </p>
 </dd>
 <dt>errors</dt><dd><p>
@@ -534,6 +553,17 @@ on members creation page.
 <div class="tags">
   <p class="tag_title">Parameters:</p>
 <ul class="param">
+  
+    <li>
+      
+        <span class='name'>api_key</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
   
     <li>
       
@@ -645,7 +675,6 @@ on members creation page.
       <pre class="lines">
 
 
-83
 84
 85
 86
@@ -659,10 +688,11 @@ on members creation page.
 94
 95
 96
-97</pre>
+97
+98</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 83</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 84</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_tom'>tom</span> <span class='op'>=</span> <span class='const'>TermsOfMembership</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:terms_of_membership_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>  
@@ -703,6 +733,11 @@ Method : GET Returns information related to member and its credit card.
 /api/v1/members/:id
 </p>
 </dd>
+<dt>api_key</dt><dd><p>
+Agent&#8217;s authentication token. This token allows us to check if the
+agent is allowed to request this action.
+</p>
+</dd>
 <dt>id</dt><dd><p>
 Members ID. This id is a string type ID (lenght 32 characters.). This ID is
 unique for each member. Have in mind that this value is part of the url.
@@ -710,7 +745,7 @@ unique for each member. Have in mind that this value is part of the url.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is sumbitting the enroll. Here is a
-list of the regex we are using to validate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+list of the regex we are using to validate show.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -764,7 +799,8 @@ Information obtained from the member&#8217;s enrollment
 </code></pre>
 <dl>
 <dt>message</dt><dd><p>
-Shows the method results and also informs the errors.
+Shows the method errors. This message will be only shown when there was an
+error.
 </p>
 </dd>
 <dt>code</dt><dd><p>
@@ -777,7 +813,22 @@ Code related to the method result.
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>api_key</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
   
@@ -864,12 +915,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-228
-229
-230
-231
-232
-233
 234
 235
 236
@@ -917,10 +962,16 @@ Code related to the method result.
 278
 279
 280
-281</pre>
+281
+282
+283
+284
+285
+286
+287</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 228</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 234</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_show'>show</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -1000,6 +1051,11 @@ Method : PUT Updates member&#8217;s data.
 /api/v1/members/:id
 </p>
 </dd>
+<dt>api_key</dt><dd><p>
+Agent&#8217;s authentication token. This token allows us to check if the
+agent is allowed to request this action.
+</p>
+</dd>
 <dt>id</dt><dd><p>
 ID of the member. This ID is unique for each member. (32 characters
 string). This value is used by platform. Have in mind that this value is
@@ -1008,7 +1064,7 @@ part of the url.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is being updated.. Here is a list of
-the regex we are using to validate. <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+the regex we are using to validate. show.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -1041,6 +1097,13 @@ enrolling or &#8220;wrong_address&#8221; for update.
  * skip_api_sync: Boolean variable which tell us if we have to sync or not user to remote api. Send 1 if you want to skip sync otherwise dont send this attribute. (optional) (e.g drupal)
 </code></pre>
 </dd>
+<dt>member_id</dt><dd><p>
+ID of the member. This ID is unique for each member. (32 characters
+string). This value is used by platform. API users dont know the member id
+at this moment. This value will be returned only if the member was updated
+successfully.
+</p>
+</dd>
 <dt>message</dt><dd><p>
 Shows the method results and also informs the errors.
 </p>
@@ -1062,6 +1125,17 @@ page.
 <div class="tags">
   <p class="tag_title">Parameters:</p>
 <ul class="param">
+  
+    <li>
+      
+        <span class='name'>api_key</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
   
     <li>
       
@@ -1158,10 +1232,6 @@ page.
       <pre class="lines">
 
 
-140
-141
-142
-143
 144
 145
 146
@@ -1192,10 +1262,14 @@ page.
 171
 172
 173
-174</pre>
+174
+175
+176
+177
+178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 140</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 144</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -1242,7 +1316,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Thu Feb 14 13:39:54 2013 by
+  Generated on Fri Feb 15 12:25:30 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
