@@ -178,7 +178,6 @@ end
 
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
-# after "deploy:update", 'envfile', "foreman:restart"
 after "deploy:update_code", "link_config_files"
 after "deploy:update_code", "assets"
 after "deploy:update", "bundle_install", "deploy:migrate"

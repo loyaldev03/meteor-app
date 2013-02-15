@@ -163,8 +163,8 @@ end
   end
 end
 
-[ 'didnt know I enrolled' ,  'cant afford' ,  'Did not use benefits' ,  'did not want' , 
-  'only wanted product', 'cant afford now (possible future call back)', 'CHARGEBACK', 'others' ].each do |name|
+[ 'Didnt know I enrolled' ,  'Cant afford' ,  'Did not use benefits' ,  'Did not want' , 
+  'Only wanted product', 'Cant afford now (possible future call back)', 'CHARGEBACK', 'Others' ].each do |name|
   m = MemberCancelReason.new
   m.name = name
   m.save
