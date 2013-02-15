@@ -357,7 +357,7 @@ class Member < ActiveRecord::Base
           message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
           Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
           Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
-          { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => I18n.t('error_messages.airbrake_error_message') }
+          { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
         else
           trans = Transaction.new
           trans.transaction_type = "sale"
@@ -458,6 +458,12 @@ class Member < ActiveRecord::Base
       return { :message => I18n.t('error_messages.member_already_active', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.member_already_active, :errors => { :status => "Already active." } }
     elsif recovery_check and not self.new_record? and not self.can_recover?
       return { :message => I18n.t('error_messages.cant_recover_member', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.cant_recover_member, :errors => {:reactivation_times => "Max reactivation times reached."} }
+    end
+
+    # CLEAN ME: => This validation is done at self.enroll
+    unless self.valid? 
+      return { :message => I18n.t('error_messages.member_data_invalid'), :code => Settings.error_codes.member_data_invalid, 
+               :errors => self.errors_merged(credit_card) }
     end
 
     enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => tom.id
@@ -683,7 +689,7 @@ class Member < ActiveRecord::Base
       Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
       message = last_sync_error || "Club cash processed at drupal correctly."
       if self.last_sync_error.nil?
-        answer = { :message => message, :code => Settings.error_codes.success }
+        answer = { :message => message, :code => Settings.error_codes.successfully }
       else
         answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
       end
@@ -706,10 +712,10 @@ class Member < ActiveRecord::Base
             self.cancel! Time.zone.now, "Automatic cancellation"
             self.set_as_canceled!
           end
-          answer = { :message => message, :success => true }
+          answer = { :message => message, :code => Settings.error_codes.success }
         rescue Exception => e
           Airbrake.notify(:error_class => "Member::blacklist", :error_message => e, :parameters => { :member => self.inspect })
-          answer = { :message => I18n.t('error_messages.airbrake_error_message'), :success => false }
+          answer = { :message => I18n.t('error_messages.airbrake_error_message'), :success => Settings.error_codes.member_could_no_be_blacklisted }
           raise ActiveRecord::Rollback
         end
       end
@@ -916,6 +922,22 @@ class Member < ActiveRecord::Base
           Communication.deliver!(:birthday, member)
         rescue Exception => e
           Airbrake.notify(:error_class => "Members::send_happy_birthday", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+      end
+    end
+  end
+
+  def self.send_prebill
+    Member.find_in_batches(:conditions => [" date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
+      group.each do |member| 
+        tz = Time.zone.now
+        begin
+          Rails.logger.info "  * processing member ##{member.uuid}"
+          member.send_pre_bill
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
