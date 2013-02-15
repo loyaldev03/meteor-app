@@ -6,6 +6,7 @@ class Api::ClubCashTransactionController < ApplicationController
   # has to be a positive number, while if you want to remove club cash, the amount value has to be negative.  
   #
   # [url] /api/v1/members/:member_id/club_cash_transaction
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
   # [club_cash_transaction] Hash with necessary information to create the club cash transaction. 
   #                           *amount: Amount of the club cash to add or deduct. We only accept numbers with up to two digits after the comma. (required) (Eg: 2.50 , -10.99, 25)
@@ -14,6 +15,7 @@ class Api::ClubCashTransactionController < ApplicationController
   # [code] Code related to the method result.
   # [errors] A hash with club cash and members errors. This will be use to show errors on club cash cs web page.
   #
+  # @param [String] api_key
   # @param [Hash] club_cash_transaction
   # @return [String] *message*
   # @return [Integer] *code*

@@ -726,8 +726,8 @@
   <span class='ivar'>@blacklist_reasons</span> <span class='op'>=</span> <span class='const'>MemberBlacklistReason</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_request'>request</span><span class='period'>.</span><span class='id identifier rubyid_post?'>post?</span> 
     <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='ivar'>@current_member</span><span class='period'>.</span><span class='id identifier rubyid_blacklist'>blacklist</span><span class='lparen'>(</span><span class='ivar'>@current_agent</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:reason</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_response'>response</span><span class='lbracket'>[</span><span class='symbol'>:success</span><span class='rbracket'>]</span>
-      <span class='id identifier rubyid_flash'>flash</span><span class='lbracket'>[</span><span class='symbol'>:notice</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_response'>response</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_response'>response</span><span class='lbracket'>[</span><span class='symbol'>:code</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span>
+      <span class='id identifier rubyid_flash'>flash</span><span class='lbracket'>[</span><span class='symbol'>:notice</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_response'>response</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span> 
     <span class='kw'>else</span>
       <span class='id identifier rubyid_flash'>flash</span><span class='lbracket'>[</span><span class='symbol'>:error</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_response'>response</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span>
     <span class='kw'>end</span>
@@ -1585,9 +1585,9 @@
   <span class='kw'>if</span> <span class='id identifier rubyid_request'>request</span><span class='period'>.</span><span class='id identifier rubyid_post?'>post?</span>
     <span class='id identifier rubyid_answer'>answer</span> <span class='op'>=</span> <span class='ivar'>@current_member</span><span class='period'>.</span><span class='id identifier rubyid_set_wrong_address'>set_wrong_address</span><span class='lparen'>(</span><span class='ivar'>@current_agent</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:reason</span><span class='rbracket'>]</span><span class='rparen'>)</span>
     <span class='kw'>if</span> <span class='id identifier rubyid_answer'>answer</span><span class='lbracket'>[</span><span class='symbol'>:code</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span>
-      <span class='id identifier rubyid_flash'>flash</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='lbracket'>[</span><span class='symbol'>:notice</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_answer'>answer</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_flash'>flash</span><span class='lbracket'>[</span><span class='symbol'>:notice</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_answer'>answer</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span>
     <span class='kw'>else</span>
-      <span class='id identifier rubyid_flash'>flash</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='lbracket'>[</span><span class='symbol'>:error</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_answer'>answer</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_flash'>flash</span><span class='lbracket'>[</span><span class='symbol'>:error</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_answer'>answer</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span>
     <span class='kw'>end</span>
     <span class='id identifier rubyid_respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_format'>format</span><span class='op'>|</span>
       <span class='id identifier rubyid_format'>format</span><span class='period'>.</span><span class='id identifier rubyid_html'>html</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_redirect_to'>redirect_to</span> <span class='id identifier rubyid_show_member_path'>show_member_path</span> <span class='rbrace'>}</span>
@@ -1844,7 +1844,7 @@
 </div>
 
     <div id="footer">
-  Generated on Thu Feb 14 13:39:54 2013 by
+  Generated on Fri Feb 15 11:46:35 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

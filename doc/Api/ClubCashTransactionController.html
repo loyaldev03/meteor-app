@@ -176,6 +176,11 @@ negative.
 /api/v1/members/:member_id/club_cash_transaction
 </p>
 </dd>
+<dt>api_key</dt><dd><p>
+Agent&#8217;s authentication token. This token allows us to check if the
+agent is allowed to request this action.
+</p>
+</dd>
 <dt>member_id</dt><dd><p>
 ID of the member. This ID is unique for each member. (32 characters
 string). This value is used by platform. Have in mind that this value is
@@ -211,6 +216,17 @@ on club cash cs web page.
 <div class="tags">
   <p class="tag_title">Parameters:</p>
 <ul class="param">
+  
+    <li>
+      
+        <span class='name'>api_key</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
   
     <li>
       
@@ -281,16 +297,16 @@ on club cash cs web page.
       <pre class="lines">
 
 
-23
-24
 25
 26
 27
 28
-29</pre>
+29
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/club_cash_transaction_controller.rb', line 23</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/club_cash_transaction_controller.rb', line 25</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -309,7 +325,7 @@ on club cash cs web page.
 </div>
 
     <div id="footer">
-  Generated on Thu Feb 14 13:39:55 2013 by
+  Generated on Fri Feb 15 11:46:37 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

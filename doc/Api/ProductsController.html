@@ -119,7 +119,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#get_stock-instance_method" title="#get_stock (instance method)">- (String, ...) <strong>get_stock</strong> </a>
+      <a href="#get_stock-instance_method" title="#get_stock (instance method)">- (String, Integer) <strong>get_stock</strong> </a>
     
 
     
@@ -154,7 +154,7 @@ Method : GET Returns the stock available for a product.
       <div class="method_details first">
   <h3 class="signature first" id="get_stock-instance_method">
   
-    - (<tt>String</tt>, ...) <strong>get_stock</strong> 
+    - (<tt>String</tt>, <tt>Integer</tt>) <strong>get_stock</strong> 
   
 
   
@@ -168,6 +168,11 @@ Method : GET Returns the stock available for a product.
 <dl>
 <dt>url</dt><dd><p>
 /api/v1/products/get_stock
+</p>
+</dd>
+<dt>api_key</dt><dd><p>
+Agent&#8217;s authentication token. This token allows us to check if the
+agent is allowed to request this action.
 </p>
 </dd>
 <dt>sku</dt><dd><p>
@@ -184,18 +189,17 @@ Actual stock of the product. This value is an integer type. This value is
 returned if there was no error.
 </p>
 </dd>
-<dt>code</dt><dd><p>
-Code related to the method result.
-</p>
-</dd>
 <dt>allow_backorder</dt><dd><p>
-Flag to inform that product allow negative stocks. This flag is returned if
-there was no error. 
+Flag to inform that product allow negative stocks. It returns 1 for true
+value, and 0 for false value. This flag is returned if there was no error. 
 </p>
 </dd>
 <dt>message</dt><dd><p>
-Shows the method results and also informs the errors. When an error is
-returned, we do not return stock or allow_backorder flag.
+Shows the method errors.  
+</p>
+</dd>
+<dt>code</dt><dd><p>
+Code related to the method result.
 </p>
 </dd>
 </dl>
@@ -209,7 +213,7 @@ returned, we do not return stock or allow_backorder flag.
   
     <li>
       
-        <span class='name'>*sku*</span>
+        <span class='name'>api_key</span>
       
       
         <span class='type'>(<tt>String</tt>)</span>
@@ -220,7 +224,18 @@ returned, we do not return stock or allow_backorder flag.
   
     <li>
       
-        <span class='name'>*club_id*</span>
+        <span class='name'>sku</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>club_id</span>
       
       
         <span class='type'>(<tt>Integer</tt>)</span>
@@ -282,7 +297,7 @@ returned, we do not return stock or allow_backorder flag.
     <li>
       
       
-        <span class='type'>(<tt>Boolean</tt>)</span>
+        <span class='type'>(<tt>Integer</tt>)</span>
       
       
       
@@ -302,18 +317,18 @@ returned, we do not return stock or allow_backorder flag.
       <pre class="lines">
 
 
-24
-25
 26
 27
 28
 29
 30
 31
-32</pre>
+32
+33
+34</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/products_controller.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/products_controller.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_stock'>get_stock</span>
   <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:manage_product_api</span><span class='comma'>,</span> <span class='const'>Product</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:club_id</span><span class='rbracket'>]</span>
@@ -334,7 +349,7 @@ returned, we do not return stock or allow_backorder flag.
 </div>
 
     <div id="footer">
-  Generated on Thu Feb 14 13:39:55 2013 by
+  Generated on Fri Feb 15 11:46:36 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

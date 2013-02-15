@@ -7,19 +7,21 @@ class Api::ProductsController < ApplicationController
   # Returns the stock available for a product. 
   # 
   # [url] /api/v1/products/get_stock
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # [sku] Sku of the product we are interested in. This parameter is the product description. 
   # [club_id] Id of the club the product belongs to. 
   # [stock] Actual stock of the product. This value is an integer type. This value is returned if there was no error.
+  # [allow_backorder] Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag is returned if there was no error.  
+  # [message] Shows the method errors.  
   # [code] Code related to the method result.
-  # [allow_backorder] Flag to inform that product allow negative stocks. This flag is returned if there was no error. 
-  # [message] Shows the method results and also informs the errors. When an error is returned, we do not return stock or allow_backorder flag. 
   #
-  # @param [String] *sku*
-  # @param [Integer] *club_id* 
+  # @param [String] api_key
+  # @param [String] sku
+  # @param [Integer] club_id 
   # @return [String] *message*
   # @return [Integer] *code*
   # @return [Integer] *stock*
-  # @return [Boolean] *allow_backorder*
+  # @return [Integer] *allow_backorder*
   #
   def get_stock
     my_authorize! :manage_product_api, Product, params[:club_id]

@@ -4,12 +4,12 @@ class Api::MembersController < ApplicationController
 
   # Method : POST
   #
-  # Submits a member to be created. THis method will call the method enroll on member model. It will validate
+  # Submits a member to be created. This method will call the method enroll on member model. It will validate
   # the member's data (including its credit card) and, in case it is correct, it will create and save the member.
   # It will also send a welcome email and charge the enrollment to the member's credit card.  
   #
   # [url] /api/v1/members
-  # [current_agent] The agent's ID that will be enrolling the member. 
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # [member] Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info).
   #          Here is a list of the regex we are using to validate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
@@ -72,6 +72,7 @@ class Api::MembersController < ApplicationController
   # [v_id] Visible id of the member that was enrolled or recovered, or updated. This id is unique within each club.
   # [errors] A hash with members and credit card errors. This will be use to show errors on members creation page.
   #
+  # @param [String] api_key
   # @param [Hash] member
   # @param [Hash] setter
   # @return [String] *message*
@@ -100,6 +101,7 @@ class Api::MembersController < ApplicationController
   # Updates member's data.
   #
   # [url] /api/v1/members/:id
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # [id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform.
   #      Have in mind that this value is part of the url.
   # [member] Information related to the member that is being updated.. Here is a list of the regex we are using to validate. {Member show}.
@@ -130,6 +132,7 @@ class Api::MembersController < ApplicationController
   # [code] Code related to the method result.
   # [errors] A hash with members errors. This will be use to show errors on members edit page. 
   #
+  # @param [String] api_key
   # @param [Hash] member
   # @param [Hash] setter
   # @return [String] *message*
@@ -177,6 +180,7 @@ class Api::MembersController < ApplicationController
   # Returns information related to member and its credit card.
   #
   # [url] /api/v1/members/:id
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # [id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
   #      Have in mind that this value is part of the url.
   # [member] Information related to the member that is sumbitting the enroll. Here is a list of the regex we are using to validate {Member show}.
@@ -216,9 +220,10 @@ class Api::MembersController < ApplicationController
   #              *campaign_medium_version 
   #              *joint 
   #              *prospect_id
-  # [message] Shows the method results and also informs the errors.
+  # [message] Shows the method errors. This message will be only shown when there was an error.
   # [code] Code related to the method result.
   #
+  # @param [String] api_key
   # @return [String] *message* 
   # @return [Hash] *member*
   # @return [Hash] *credit_card*
@@ -284,14 +289,16 @@ class Api::MembersController < ApplicationController
   # Updates member's club cash's data.
   #
   # [url] /api/v1/members/:member_id/club_cash
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
   # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
   #             Have in mind that this value is part of the url.
   # [amount] club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma. (required)
-  # [expire_date] club cash expiration date. This date is sotred with datetime format. (required)
+  # [expire_date] club cash expiration date. This date is stored with datetime format. (required)
   #
   # [message] Shows the method result.
   # [code] Code related to the method result.
   #
+  # @param [String] api_key
   # @param [Float] amount
   # @param [String] expire_date
   # @return [String] *message*
