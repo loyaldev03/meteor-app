@@ -191,9 +191,9 @@ class MembersController < ApplicationController
     if request.post?
       answer = @current_member.set_wrong_address(@current_agent, params[:reason])
       if answer[:code] == Settings.error_codes.success
-        flash.now[:notice] = answer[:message]
+        flash[:notice] = answer[:message]
       else
-        flash.now[:error] = answer[:message]
+        flash[:error] = answer[:message]
       end
       respond_to do |format|
         format.html { redirect_to show_member_path }
