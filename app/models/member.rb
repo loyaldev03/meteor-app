@@ -1028,6 +1028,7 @@ class Member < ActiveRecord::Base
   end
 
   def add_new_credit_card(new_credit_card, current_agent = nil)
+    answer = {}
     CreditCard.transaction do 
       begin
         new_credit_card.member = self
