@@ -104,7 +104,7 @@ class FulfillmentsController < ApplicationController
     file.processed!
     flash[:notice] = "Fulfillment file marked as sent successfully"
   rescue
-    flash.now[:error] = t('error_messages.airbrake_error_message')
+    flash[:error] = t('error_messages.airbrake_error_message')
     Airbrake.notify(:error_class => "FulfillmentFile:mark_file_as_sent", :parameters => { :file => file.inspect })
   ensure
     redirect_to list_fulfillment_files_path
