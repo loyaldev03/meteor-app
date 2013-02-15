@@ -373,7 +373,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-308
 309
 310
 311
@@ -389,10 +388,11 @@ Code related to the method result.
 321
 322
 323
-324</pre>
+324
+325</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 308</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 309</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_club_cash'>club_cash</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -451,7 +451,7 @@ agent is allowed to request this action.
 Information related to the member that is sumbitting the enroll. It also
 contains information related to the enrollment (this will be stored as
 enrollment_info). Here is a list of the regex we are using to validate
-<span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+show.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -499,7 +499,7 @@ enrollment_info). Here is a list of the regex we are using to validate
 </code></pre>
 </dd>
 <dt>credit_card</dt><dd><p>
-Information related to member&#8217;s credit card. <span class='object_link'><a href="../CreditCard.html" title="CreditCard (class)">show</a></span>
+Information related to member&#8217;s credit card. show
 </p>
 <pre class="code ruby"><code>
   *number: Number of member's credit card, from where we will charge the membership or any other service.  
@@ -530,12 +530,14 @@ Code related to the method result.
 <dt>member_id</dt><dd><p>
 ID of the member. This ID is unique for each member. (32 characters
 string). This value is used by platform. API users dont know the member id
-at this moment.
+at this moment. This value will be returned only if the member is enrolled
+successfully.
 </p>
 </dd>
 <dt>v_id</dt><dd><p>
 Visible id of the member that was enrolled or recovered, or updated. This
-id is unique within each club.
+id is unique within each club. This value will be returned only if the
+member is enrolled successfully.
 </p>
 </dd>
 <dt>errors</dt><dd><p>
@@ -743,7 +745,7 @@ unique for each member. Have in mind that this value is part of the url.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is sumbitting the enroll. Here is a
-list of the regex we are using to validate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+list of the regex we are using to validate show.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -913,7 +915,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-233
 234
 235
 236
@@ -966,10 +967,11 @@ Code related to the method result.
 283
 284
 285
-286</pre>
+286
+287</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 233</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 234</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_show'>show</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -1062,7 +1064,7 @@ part of the url.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is being updated.. Here is a list of
-the regex we are using to validate. <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
+the regex we are using to validate. show.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -1094,6 +1096,13 @@ enrolling or &#8220;wrong_address&#8221; for update.
  * batch_update: Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) (optional)
  * skip_api_sync: Boolean variable which tell us if we have to sync or not user to remote api. Send 1 if you want to skip sync otherwise dont send this attribute. (optional) (e.g drupal)
 </code></pre>
+</dd>
+<dt>member_id</dt><dd><p>
+ID of the member. This ID is unique for each member. (32 characters
+string). This value is used by platform. API users dont know the member id
+at this moment. This value will be returned only if the member was updated
+successfully.
+</p>
 </dd>
 <dt>message</dt><dd><p>
 Shows the method results and also informs the errors.
@@ -1223,7 +1232,6 @@ page.
       <pre class="lines">
 
 
-143
 144
 145
 146
@@ -1257,10 +1265,11 @@ page.
 174
 175
 176
-177</pre>
+177
+178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 143</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 144</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -1307,7 +1316,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Fri Feb 15 11:46:36 2013 by
+  Generated on Fri Feb 15 12:25:30 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
