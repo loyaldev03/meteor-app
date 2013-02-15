@@ -689,7 +689,7 @@ class Member < ActiveRecord::Base
       Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
       message = last_sync_error || "Club cash processed at drupal correctly."
       if self.last_sync_error.nil?
-        answer = { :message => message, :code => Settings.error_codes.successfully }
+        answer = { :message => message, :code => Settings.error_codes.success }
       else
         answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
       end
