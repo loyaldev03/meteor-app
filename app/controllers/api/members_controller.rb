@@ -116,12 +116,18 @@ class Api::MembersController < ApplicationController
   #             *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
   #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
   #             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
-  #            *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
+  #             *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
   #             *gender: Gender of the member. The values we are recieving are "M" for male or "F" for female.
   #             *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with the following formats: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   #             *api_id: Send this value with the User Id of your site. This id is used to access your API (e.g. Autologin URL - Update member data). (optional)
+  #             *credit_card  [Hash] 
+  # [credit_card] Information related to member's credit card. {CreditCard show}
+  #                 *number: Number of member's credit card, from where we will charge the membership or any other service.  
+  #                  This number will be stored as a hashed value. This number can have white-spaces or not ()
+  #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
+  #                 *expire_year: The year (in numbers) in which the credit card will expire.
   # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling or "wrong_address" for update.
   #           * wrong_phone_number: Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set 
   #                                 wrong_phone_number as nil)

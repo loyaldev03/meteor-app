@@ -373,12 +373,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-309
-310
-311
-312
-313
-314
 315
 316
 317
@@ -389,10 +383,16 @@ Code related to the method result.
 322
 323
 324
-325</pre>
+325
+326
+327
+328
+329
+330
+331</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 309</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 315</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_club_cash'>club_cash</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -915,12 +915,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-234
-235
-236
-237
-238
-239
 240
 241
 242
@@ -968,10 +962,16 @@ Code related to the method result.
 284
 285
 286
-287</pre>
+287
+288
+289
+290
+291
+292
+293</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 234</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 240</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_show'>show</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -1078,12 +1078,23 @@ the regex we are using to validate. show.
    *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
    *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be &quot;011&quot;). 
    *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
-  *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
+   *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
    *gender: Gender of the member. The values we are recieving are &quot;M&quot; for male or &quot;F&quot; for female.
    *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
    *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
     mails with the following formats: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
    *api_id: Send this value with the User Id of your site. This id is used to access your API (e.g. Autologin URL - Update member data). (optional)
+   *credit_card  [Hash] 
+</code></pre>
+</dd>
+<dt>credit_card</dt><dd><p>
+Information related to member&#8217;s credit card. show
+</p>
+<pre class="code ruby"><code>
+  *number: Number of member's credit card, from where we will charge the membership or any other service.  
+   This number will be stored as a hashed value. This number can have white-spaces or not ()
+  *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
+  *expire_year: The year (in numbers) in which the credit card will expire.
 </code></pre>
 </dd>
 <dt>setter</dt><dd><p>
@@ -1232,12 +1243,6 @@ page.
       <pre class="lines">
 
 
-144
-145
-146
-147
-148
-149
 150
 151
 152
@@ -1266,10 +1271,16 @@ page.
 175
 176
 177
-178</pre>
+178
+179
+180
+181
+182
+183
+184</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 144</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 150</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -1316,7 +1327,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Fri Feb 15 12:25:30 2013 by
+  Generated on Fri Feb 15 13:32:23 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
