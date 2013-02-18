@@ -71,6 +71,7 @@ class Api::MembersController < ApplicationController
   # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment. This value will be returned only if the member is enrolled successfully.
   # [v_id] Visible id of the member that was enrolled or recovered, or updated. This id is unique within each club. This value will be returned only if the member is enrolled successfully.
   # [errors] A hash with members and credit card errors. This will be use to show errors on members creation page.
+  # [autologin_url] Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account.
   #
   # @param [String] api_key
   # @param [Hash] member
@@ -78,8 +79,9 @@ class Api::MembersController < ApplicationController
   # @return [String] *message*
   # @return [Integer] *code*
   # @return [String] *member_id*
-  # @return [Integer] *v_id*
+  # @return [Integer] *v_id*  
   # @return [Hash] *errors*
+  # @return [String] *autologin_url*
   # 
   def create
     tom = TermsOfMembership.find(params[:member][:terms_of_membership_id])  

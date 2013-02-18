@@ -26,6 +26,9 @@ module Drupal
     def create!(options = {})
       res = conn.post '/api/user', fieldmap
       update_member(res)
+
+      @token = Hashie::Mash.new(res.body['urllogin'])
+      login_token
     end
 
     def save!(options = {})
@@ -51,10 +54,8 @@ module Drupal
       if @token.nil? || options[:force]
         @token = Hashie::Mash.new(conn.get('/api/urllogin/%{drupal_id}' % { drupal_id: self.member.api_id }).body) unless self.new_record?
       end
-
       uri = @token && @token.url && URI.parse(@token.url)
       self.member.update_column :autologin_url, uri.path if uri
-
       @token
     rescue
       Airbrake.notify(:error_class => 'Drupal:Member:login_token', :parameters => { :member => self.member.inspect })

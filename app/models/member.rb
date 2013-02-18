@@ -517,11 +517,11 @@ class Member < ActiveRecord::Base
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
 
-      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id }
+      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id, :autologin_url => self.full_autologin_url }
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "Member:enroll" : "Member:recovery/save the sale") + " -- member turned invalid while enrolling"
-      Airbrake.notify(:error_class => error_message, :error_message => e, :parameters => { :member => self.inspect, :credit_card => credit_card, :enrollment_info => enrollment_info })
+      Airbrake.notify(:error_class => error_message, :error_message => e, :parameters => { :member => self.inspect, :credit_card => credit_card.inspect, :enrollment_info => enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing)
       { :message => I18n.t('error_messages.member_not_saved', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.member_not_saved }
@@ -614,7 +614,7 @@ class Member < ActiveRecord::Base
     c = self.club
     d = c.api_domain if c
 
-    if d 
+    if d and self.autologin_url
       URI.parse(d.url) + self.autologin_url
     else
       nil
