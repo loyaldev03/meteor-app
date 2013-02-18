@@ -241,9 +241,8 @@ class Member < ActiveRecord::Base
       answer = {:message => message, :code => Settings.error_codes.success }
     else
       errors = self.errors.to_hash
-      errors = errors.merge!({:credit_card => "Expired"}) if self.active_credit_card.expired?
-      errors = errors.collect{|key,value| "#{key} => #{value}"}.join(', ')
-      answer = {:message => errors, :code => Settings.error_codes.member_data_invalid }
+      errors = errors.merge!({:credit_card => "is expired"}) if self.active_credit_card.expired?
+      answer = {:errors => errors, :code => Settings.error_codes.member_data_invalid }
     end
     answer 
   end

@@ -174,17 +174,17 @@ class MembersController < ApplicationController
               flash[:notice] = answer[:message]
               redirect_to show_member_path
             else
-              flash[:error] = answer[:message]
+              @errors = answer[:errors]
             end
           rescue Exception => e
             flash.now[:error] = t('error_messages.airbrake_error_message')
             Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e)
           end
         else
-          flash.now[:error] = "Next bill date should be older that actual date."
+          @errors = { :next_bill_date => "Next bill date should be older that actual date." }
         end
       else
-        flash.now[:error] = I18n.t('error_messages.next_bill_date_blank')
+        @errors = { :next_bill_date => I18n.t('error_messages.next_bill_date_blank') }
       end
     end
   end
