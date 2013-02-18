@@ -1,3 +1,7 @@
+<% unless @errors.nil? %>
+  <%= render :partial => "shared/flash_error_messages" %>
+<% end %>
+
 <%= render :partial => "shared/member_information" %>
 
 <%= form_tag(member_change_next_bill_date_path) do %>
