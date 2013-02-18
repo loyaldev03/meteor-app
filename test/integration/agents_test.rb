@@ -15,9 +15,7 @@ class AgentsTest < ActionController::IntegrationTest
     assert page.has_content?('Agents')
     click_link_or_button 'New Agent'
     assert page.has_content?('New Agent')     
-    wait_until {
-      assert current_path == new_admin_agent_path
-    }
+    assert current_path == new_admin_agent_path
     click_link_or_button 'Create Agent'
     assert page.has_content?(I18n.t('errors.messages.blank'))
   end
@@ -55,15 +53,12 @@ class AgentsTest < ActionController::IntegrationTest
     setup_environment
     visit admin_agents_path
     within("#agents_table") do
-      wait_until {
-        click_link_or_button "Show" #change for view button
-      }
+      click_link_or_button "Show" #change for view button
     end
 
     assert page.has_content?("Agent")
     assert page.has_content?(@admin_agent.email) 
     assert page.has_content?(@admin_agent.username) 
-   
   end
 
   test "update agent" do
@@ -71,9 +66,7 @@ class AgentsTest < ActionController::IntegrationTest
     confirmed_agent = FactoryGirl.create(:confirmed_agent)
     visit admin_agents_path
     within("#agents_table .even") do
-      wait_until {
-        click_link_or_button 'Edit'
-      }    
+      click_link_or_button 'Edit'
     end
     fill_in 'agent[email]', :with => confirmed_agent.email
     fill_in 'agent[username]', :with => confirmed_agent.username
@@ -91,9 +84,7 @@ class AgentsTest < ActionController::IntegrationTest
     visit admin_agents_path
     confirm_ok_js
     within("#agents_table .even") do
-      wait_until {
-        click_link_or_button 'Destroy'
-      }    
+      click_link_or_button 'Destroy'
     end
     assert page.has_content?("Agent was successfully deleted")
     assert Agent.with_deleted.where(:id => confirmed_agent.id).first
@@ -109,10 +100,9 @@ class AgentsTest < ActionController::IntegrationTest
     do_data_table_search("#agents_table_filter", confirmed_agent.email)
 
     within("#agents_table") do
-      wait_until {
-        assert page.has_content?(confirmed_agent.email)
-        click_link_or_button 'Edit'
-      }    
+      sleep 10
+      assert page.has_content?(confirmed_agent.email)
+      click_link_or_button 'Edit'
     end
 
     assert find_field('agent[email]').value == confirmed_agent.email
@@ -161,16 +151,10 @@ class AgentsTest < ActionController::IntegrationTest
     visit admin_agents_path
   
     within("#agents_table")do
-      wait_until{
-        assert page.has_content?(Agent.first.username)
-      }
-      wait_until{
-        find("#th_created_at").click
-        find("#th_created_at").click
-      }
-      wait_until{
-        assert page.has_content?(Agent.last.username)
-      }
+      assert page.has_content?(Agent.first.username)
+      assert page.has_content?(Agent.last.username)
+      find("#th_created_at").click
+      find("#th_created_at").click
     end
   end
 
@@ -259,10 +243,10 @@ class AgentsTest < ActionController::IntegrationTest
    
     visit '/'
     click_link_or_button("Forgot your password?")
-    wait_until{ fill_in "agent[login]", :with => @admin_agent.email }
+    fill_in "agent[login]", :with => @admin_agent.email
     click_link_or_button("Send me reset password instructions")
 
-    wait_until{ page.has_content?("You will receive an email with instructions about how to reset your password in a few minutes.") }
+    page.has_content?("You will receive an email with instructions about how to reset your password in a few minutes.")
 
     @admin_agent.reload
     visit edit_agent_password_path(:reset_password_token => @admin_agent.reset_password_token )
@@ -272,6 +256,6 @@ class AgentsTest < ActionController::IntegrationTest
 
     click_link_or_button "Change my password"
 
-    wait_until{ page.has_content?("Your password was changed successfully. You are now signed in.") }
+    page.has_content?("Your password was changed successfully. You are now signed in.")
   end
 end

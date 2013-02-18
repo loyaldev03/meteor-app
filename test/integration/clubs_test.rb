@@ -38,11 +38,9 @@ class ClubTest < ActionController::IntegrationTest
     saved_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     visit clubs_path(@partner.prefix)
     within("#clubs_table") do
-      wait_until{
-        assert page.has_content?(saved_club.id.to_s)
-        assert page.has_content?(saved_club.name)
-        assert page.has_content?(saved_club.description)
-      }
+      assert page.has_content?(saved_club.id.to_s)
+      assert page.has_content?(saved_club.name)
+      assert page.has_content?(saved_club.description)
     end
   end
 
@@ -50,24 +48,23 @@ class ClubTest < ActionController::IntegrationTest
     saved_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     visit clubs_path(@partner.prefix)
     within("#clubs_table") do
-      wait_until{
-        click_link_or_button 'Edit'
-      }
+      click_link_or_button 'Edit'
     end
-      fill_in 'club[name]', :with => 'another name'
-      fill_in 'club[api_username]', :with => 'another api username'
-      fill_in 'club[api_password]', :with => 'another api password'
-      fill_in 'club[description]', :with => 'new description'
-      attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
-      check('club[requires_external_id]')
-      select('application', :from => 'club[theme]')
-      click_link_or_button 'Update'
-      saved_club.reload
-      assert page.has_content?(" The club #{saved_club.name} was successfully updated.")
-      assert_equal saved_club.name, 'another name'
-      assert_equal saved_club.api_username, 'another api username'
-      assert_equal saved_club.api_password, 'another api password'
-      assert_equal saved_club.description, 'new description'
+    fill_in 'club[name]', :with => 'another name'
+    fill_in 'club[api_username]', :with => 'another api username'
+    fill_in 'club[api_password]', :with => 'another api password'
+    fill_in 'club[description]', :with => 'new description'
+    attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
+    check('club[requires_external_id]')
+    select('application', :from => 'club[theme]')
+    
+    click_link_or_button 'Update'
+    saved_club.reload
+    
+    assert page.has_content?(" The club #{saved_club.name} was successfully updated.")
+    assert_equal(saved_club.reload.api_username, 'another api username')
+    assert_equal(saved_club.reload.api_password, 'another api password')
+    assert_equal(saved_club.reload.description, 'new description')
   end
 
   test "should delete club" do
@@ -75,14 +72,10 @@ class ClubTest < ActionController::IntegrationTest
     visit clubs_path(@partner.prefix)
     confirm_ok_js
     within("#clubs_table") do
-      wait_until{
-        click_link_or_button 'Destroy'
-      }
+      click_link_or_button 'Destroy'
     end
-    wait_until{
-      assert page.has_content?("Club #{saved_club.name} was successfully destroyed")
-      assert Club.with_deleted.where(:id => saved_club.id).first
-    }
+    assert page.has_content?("Club #{saved_club.name} was successfully destroyed")
+    assert Club.with_deleted.where(:id => saved_club.id).first
   end
 
   test "should create default product when creating club" do
@@ -103,16 +96,12 @@ class ClubTest < ActionController::IntegrationTest
     assert page.has_content?("The club #{unsaved_club.name} was successfully created")
     click_link_or_button 'Back'
     within("#clubs_table") do
-      wait_until{
-        click_link_or_button 'Products'
-      }
+      click_link_or_button 'Products'
     end
     within("#products_table") do
-      wait_until{
-        Club::DEFAULT_PRODUCT.each do |sku|
-          assert page.has_content?(sku)
-        end
-      }
+      Club::DEFAULT_PRODUCT.each do |sku|
+        assert page.has_content?(sku)
+      end
     end
   end
 
@@ -176,5 +165,26 @@ class ClubTest < ActionController::IntegrationTest
       assert page.has_no_content?("Products")
       assert page.has_no_content?("Fulfillments")
     end
-  end   
+  end
+
+  test "Add a contact number by club" do
+    @club = FactoryGirl.create(:simple_club_with_gateway, :name => "new_club", :partner_id => @partner.id)
+    Time.zone = @club.time_zone
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    
+    unsaved_blacklisted_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_blacklisted_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @blacklisted_member = Member.find_by_email(unsaved_blacklisted_member.email)
+    @blacklisted_member.blacklist(@admin_agent,"Testing")
+
+    
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    fill_in_member(unsaved_member, credit_card)
+
+    assert page.has_content?("There was an error with your credit card information. Please call member services at: #{@club.cs_phone_number}.")
+    assert page.has_content?("number: Credit card is blacklisted")
+  end
+
 end
