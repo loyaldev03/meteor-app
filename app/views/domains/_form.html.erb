@@ -30,7 +30,7 @@
       <% if @domain.new_record? || (@domain.club.nil? && params[:action] = :edit) %>
         <%= generate_select_club_id f, @domain, @clubs %>
       <% else %>
-        <%= @domain.club.name %>
+        <%= generate_select_club_id f, @domain, @clubs, true %>
       <% end %>
     </div>
   </div>
