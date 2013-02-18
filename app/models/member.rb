@@ -517,7 +517,7 @@ class Member < ActiveRecord::Base
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
 
-      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id, :autologin_url => self.full_autologin_url }
+      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id, :autologin_url => self.full_autologin_url.to_s }
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "Member:enroll" : "Member:recovery/save the sale") + " -- member turned invalid while enrolling"
