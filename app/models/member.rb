@@ -231,10 +231,21 @@ class Member < ActiveRecord::Base
   end
 
   # Changes next bill date.
-  def change_next_bill_date!(next_bill_date)
-    self.next_retry_bill_date = next_bill_date
-    self.bill_date = next_bill_date
-    self.save!
+  def change_next_bill_date!(next_bill_date, current_agent = nil)
+    if self.valid? and not self.active_credit_card.expired?  
+      self.next_retry_bill_date = next_bill_date
+      self.bill_date = next_bill_date
+      self.save!
+      message = "Next bill date changed to #{next_bill_date}"
+      Auditory.audit(current_agent, self, message, self, Settings.operation_types.change_next_bill_date)
+      answer = {:message => message, :code => Settings.error_codes.success }
+    else
+      errors = self.errors.to_hash
+      errors = errors.merge!({:credit_card => "Expired"}) if self.active_credit_card.expired?
+      errors = errors.collect{|key,value| "#{key} => #{value}"}.join(', ')
+      answer = {:message => errors, :code => Settings.error_codes.member_data_invalid }
+    end
+    answer 
   end
 
   # Returns a string with first and last name concatenated. 

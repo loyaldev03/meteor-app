@@ -160,7 +160,7 @@ class MembersController < ApplicationController
       else
         flash[:error] = response[:message]
       end
-      redirect_to show_member_path
+      redirect_to show_member_path  
     end
   end
 
@@ -169,11 +169,13 @@ class MembersController < ApplicationController
       unless params[:next_bill_date].blank?
         if params[:next_bill_date].to_date > Time.zone.now.to_date
           begin
-            @current_member.change_next_bill_date!(params[:next_bill_date])
-            message = "Next bill date changed to #{params[:next_bill_date]}"
-            Auditory.audit(current_agent, @current_member, message, @current_member, Settings.operation_types.change_next_bill_date)
-            flash[:notice] = message
-            redirect_to show_member_path
+            answer = @current_member.change_next_bill_date!(params[:next_bill_date], @current_agent)
+            if answer[:code] == Settings.error_codes.success
+              flash[:notice] = answer[:message]
+              redirect_to show_member_path
+            else
+              flash[:error] = answer[:message]
+            end
           rescue Exception => e
             flash.now[:error] = t('error_messages.airbrake_error_message')
             Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e)
