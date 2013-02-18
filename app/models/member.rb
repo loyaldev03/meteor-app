@@ -652,14 +652,14 @@ class Member < ActiveRecord::Base
   # Adds club cash transaction. 
   def add_club_cash(agent, amount = 0,description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful, :message => "Could not save club cash transaction"  }
-    if amount.to_f == 0
-      answer[:message] = "Can not process club cash transaction with amount 0 or letters." 
-      answer[:errors] = {:amount => "Invalid amount"} 
-    elsif club_cash_transactions_enabled
-      if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
-        ClubCashTransaction.transaction do 
-          cct = ClubCashTransaction.new(:amount => amount, :description => description)
-          begin
+    ClubCashTransaction.transaction do
+      begin
+        if amount.to_f == 0
+          answer[:message] = "Can not process club cash transaction with amount 0 or letters." 
+          answer[:errors] = { :amount => "Invalid amount" } 
+        elsif club_cash_transactions_enabled
+          if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
+            cct = ClubCashTransaction.new(:amount => amount, :description => description)
             cct.member = self
             raise "Could not save club cash transaction" unless cct.valid? and self.valid?
             cct.save!
@@ -674,26 +674,26 @@ class Member < ActiveRecord::Base
               Auditory.audit(agent, cct, message, self, Settings.operation_types.deducted_club_cash)
             end
             answer = { :message => message, :code => Settings.error_codes.success }
-          rescue Exception => e
-            answer[:errors] = cct.errors_merged(self)
-            Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message], :parameters => { :club_cash => cct.inspect, :member => self.inspect })
-            answer[:message] = I18n.t('error_messages.airbrake_error_message')
-            raise ActiveRecord::Rollback
+          else
+            answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
+            answer[:errors] = { :amount => "Club cash amount is greater that member's actual club cash." }
           end
+        else
+          Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
+          message = last_sync_error || "Club cash processed at drupal correctly."
+          if self.last_sync_error.nil?
+            answer = { :message => message, :code => Settings.error_codes.success }
+          else
+            answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
+          end
+          Auditory.audit(agent, self, message, self, Settings.operation_types.remote_club_cash_transaction)
         end
-      else
-        answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
-        answer[:errors] = { :amount => "Club cash amount is greater that member's actual club cash." }
+      rescue Exception => e
+        answer[:errors] = cct.errors_merged(self) unless cct.nil?
+        Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message], :parameters => { :member => self.inspect, :amount => amount, :description => description, :club_cash_transaction => (cct.inspect unless cct.nil?) })
+        answer[:message] = I18n.t('error_messages.airbrake_error_message')
+        raise ActiveRecord::Rollback
       end
-    else
-      Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
-      message = last_sync_error || "Club cash processed at drupal correctly."
-      if self.last_sync_error.nil?
-        answer = { :message => message, :code => Settings.error_codes.success }
-      else
-        answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
-      end
-      Auditory.audit(agent, self, message, self, Settings.operation_types.remote_club_cash_transaction)
     end
     answer
   end
