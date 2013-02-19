@@ -633,55 +633,56 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # # TODO: FIX THIS TEST
   # # New Member when CC is already used (Sloop) and Family memberships = true
-  # test "New Member when CC is already used (Drupal) and Family memberships = true" do
-  #   sign_in @admin_user
+  test "New Member when CC is already used (Drupal) and Family memberships = true" do
+    sign_in @admin_user
 
-  #   @former_member = create_active_member(@terms_of_membership_with_family, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
-  #   @former_member_credit_card = @active_credit_card.token
+    @former_member = create_active_member(@terms_of_membership_with_family, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+    @former_member_credit_card = @active_credit_card.token
     
-  #   @member = FactoryGirl.build(:member_with_api)
-  #   @credit_card = FactoryGirl.build :credit_card_master_card
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
+    @member = FactoryGirl.build(:member_with_api)
+    @credit_card = FactoryGirl.build :credit_card_master_card
+    @enrollment_info = FactoryGirl.build :enrollment_info
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',1) do
-  #     assert_difference('CreditCard.count',1) do
-  #       generate_post_message
-  #       assert_response :success
-  #     end
-  #   end
-  #   @latter_member = Member.find_by_email(@member.email)
+    assert_difference('Operation.count',1) do
+      assert_difference('CreditCard.count',1) do
+        generate_post_message
+        assert_response :success
+      end
+    end
+    @latter_member = Member.find_by_email(@member.email)
 
-  #   @latter_credit_card = CreditCard.find_by_member_id(@latter_member.id).token 
+    @latter_credit_card = CreditCard.find_by_member_id(@latter_member.id).token 
 
-  #   assert_equal(@latter_member.active_credit_card.token, @former_member.active_credit_card.token)
-  # end
+    assert_equal(@latter_member.active_credit_card.token, @former_member.active_credit_card.token)
+  end
 
   # # TODO: FIX THIS TEST
   # # New Member when CC is already used (Sloop), Family memberships = true and email is duplicated
-  # test "Enroll error when CC is already used (Drupal), Family memberships = true and email is duplicated" do
-  #   sign_in @admin_user
-  #   @terms_of_membership.club.update_attribute(:family_memberships_allowed, true)
+  test "Enroll error when CC is already used (Drupal), Family memberships = true and email is duplicated" do
+    sign_in @admin_user
+    @terms_of_membership.club.update_attribute(:family_memberships_allowed, true)
 
-  #   @former_member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
-  #   @former_member_credit_card_token = @active_credit_card.token
+    @former_member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+    @former_member_credit_card_token = @active_credit_card.token
 
-  #   @member = FactoryGirl.build(:member_with_api, :email => @former_member.email)
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
+    @member = FactoryGirl.build(:member_with_api, :email => @former_member.email)
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @enrollment_info = FactoryGirl.build :enrollment_info
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',0) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_post_message
-  #       assert_response :error
-  #     end
-  #   end
-  # end
+    assert_difference('Member.count',0) do
+      assert_difference('Operation.count',0) do
+        assert_difference('CreditCard.count',0) do
+          generate_post_message
+        end
+      end
+    end
+  end
 
   test "Update a profile with CC used by another member. club with family memberships" do
     sign_in @admin_user
@@ -710,29 +711,29 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # #TODO: FIX THIS TEST!
   # #Update a profile with CC used by another member and Family Membership = False
-  # test "Error Member when CC is already used (Sloop) and Family memberships = false" do
-  #   sign_in @admin_user
-  #   active_merchant_stubs
+  test "Error Member when CC is already used (Sloop) and Family memberships = false" do
+    sign_in @admin_user
+    active_merchant_stubs
     
-  #   @current_agent = @admin_user
-  #   @former_member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @terms_of_membership.club = @former_member.club
-  #   @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
+    @current_agent = @admin_user
+    @former_member = create_active_member(@terms_of_membership, :member_with_api)
+    @terms_of_membership.club = @former_member.club
+    @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
     
-  #   @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
+    @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+    @enrollment_info = FactoryGirl.build :enrollment_info
 
-  #   @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
-  #   @credit_card = FactoryGirl.build :credit_card_master_card
-  #   active_merchant_stubs_store(@credit_card.number)
+    @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
+    @credit_card = FactoryGirl.build :credit_card_master_card
+    active_merchant_stubs_store(@credit_card.number)
   
-    # assert @terms_of_membership.club.family_memberships_allowed, false
-  #   assert_difference("Member.count",0) do
-  #     assert_difference("CreditCard.count",0) do
-  #       generate_post_message
-  #     end
-  #   end
-  # end
+    assert @terms_of_membership.club.family_memberships_allowed
+    assert_difference("Member.count",0) do
+      assert_difference("CreditCard.count",0) do
+        generate_post_message
+      end
+    end
+  end
 
   test "Update a profile with CC used by another member. club does not allow family memberships" do
     sign_in @admin_user
