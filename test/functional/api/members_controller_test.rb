@@ -631,6 +631,58 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@active_credit_card.number])
   end
 
+  # # TODO: FIX THIS TEST
+  # # New Member when CC is already used (Sloop) and Family memberships = true
+  # test "New Member when CC is already used (Drupal) and Family memberships = true" do
+  #   sign_in @admin_user
+
+  #   @former_member = create_active_member(@terms_of_membership_with_family, :member_with_api)
+  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+  #   @former_member_credit_card = @active_credit_card.token
+    
+  #   @member = FactoryGirl.build(:member_with_api)
+  #   @credit_card = FactoryGirl.build :credit_card_master_card
+  #   @enrollment_info = FactoryGirl.build :enrollment_info
+
+  #   active_merchant_stubs_store(@credit_card.number)
+
+  #   assert_difference('Operation.count',1) do
+  #     assert_difference('CreditCard.count',1) do
+  #       generate_post_message
+  #       assert_response :success
+  #     end
+  #   end
+  #   @latter_member = Member.find_by_email(@member.email)
+
+  #   @latter_credit_card = CreditCard.find_by_member_id(@latter_member.id).token 
+
+  #   assert_equal(@latter_member.active_credit_card.token, @former_member.active_credit_card.token)
+  # end
+
+  # # TODO: FIX THIS TEST
+  # # New Member when CC is already used (Sloop), Family memberships = true and email is duplicated
+  # test "Enroll error when CC is already used (Drupal), Family memberships = true and email is duplicated" do
+  #   sign_in @admin_user
+  #   @terms_of_membership.club.update_attribute(:family_memberships_allowed, true)
+
+  #   @former_member = create_active_member(@terms_of_membership, :member_with_api)
+  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+  #   @former_member_credit_card_token = @active_credit_card.token
+
+  #   @member = FactoryGirl.build(:member_with_api, :email => @former_member.email)
+  #   @credit_card = FactoryGirl.build :credit_card_american_express
+  #   @enrollment_info = FactoryGirl.build :enrollment_info
+
+  #   active_merchant_stubs_store(@credit_card.number)
+
+  #   assert_difference('Operation.count',0) do
+  #     assert_difference('CreditCard.count',0) do
+  #       generate_post_message
+  #       assert_response :error
+  #     end
+  #   end
+  # end
+
   test "Update a profile with CC used by another member. club with family memberships" do
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership_with_family, :member_with_api)
@@ -655,6 +707,32 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.token, token)
     assert_not_equal(old_token, token)
   end
+
+  # #TODO: FIX THIS TEST!
+  # #Update a profile with CC used by another member and Family Membership = False
+  # test "Error Member when CC is already used (Sloop) and Family memberships = false" do
+  #   sign_in @admin_user
+  #   active_merchant_stubs
+    
+  #   @current_agent = @admin_user
+  #   @former_member = create_active_member(@terms_of_membership, :member_with_api)
+  #   @terms_of_membership.club = @former_member.club
+  #   @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
+    
+  #   @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+  #   @enrollment_info = FactoryGirl.build :enrollment_info
+
+  #   @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
+  #   @credit_card = FactoryGirl.build :credit_card_master_card
+  #   active_merchant_stubs_store(@credit_card.number)
+  
+    # assert @terms_of_membership.club.family_memberships_allowed, false
+  #   assert_difference("Member.count",0) do
+  #     assert_difference("CreditCard.count",0) do
+  #       generate_post_message
+  #     end
+  #   end
+  # end
 
   test "Update a profile with CC used by another member. club does not allow family memberships" do
     sign_in @admin_user
@@ -826,6 +904,28 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal(@member.club_cash_amount, old_amount)
     assert_equal(@member.club_cash_expire_date, old_expire_date)
+  end
+
+  test "Update Credit Card with expire this current month" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member.id
+
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.expire_year = (Time.zone.now).year
+    @credit_card.expire_month = (Time.zone.now).month 
+
+    active_merchant_stubs_store(@credit_card.number)
+
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@active_credit_card.number])
   end
 
 end

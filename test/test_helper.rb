@@ -100,6 +100,14 @@ module ActionController
       click_link_or_button('Sign in')
     end
 
+    def wait_until
+      require "timeout"
+      Timeout.timeout(Capybara.default_wait_time) do
+        sleep(0.1) until value = yield
+        value
+      end
+    end
+
     def do_data_table_search(selector, value)
       within(selector) do
         find(:css,"input[type='text']").set("XXXXXXXXXXXXXXXXXXX")
@@ -188,7 +196,7 @@ module ActionController
 
 
   def fill_in_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    visit members_path( :partner_prefix => unsaved_member.club.partner.prefix, :club_prefix => unsaved_member.club.name )
     click_link_or_button 'New Member'
 
     credit_card = FactoryGirl.build(:credit_card_master_card) if credit_card.nil?
@@ -196,38 +204,36 @@ module ActionController
     type_of_phone_number = (unsaved_member[:type_of_phone_number].blank? ? '' : unsaved_member.type_of_phone_number.capitalize)
 
     within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select(unsaved_member.gender, :from => 'member[gender]')
-        fill_in 'member[address]', :with => unsaved_member.address
-        select_country_and_state(unsaved_member.country) 
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
+      fill_in 'member[first_name]', :with => unsaved_member.first_name
+      if unsaved_member.gender == "Male" or unsaved_member.gender == "M"
+        select("Male", :from => 'member[gender]')
+      else
+        select("Female", :from => 'member[gender]')
+      end
+      fill_in 'member[address]', :with => unsaved_member.address
+      select_country_and_state(unsaved_member.country) 
+      fill_in 'member[city]', :with => unsaved_member.city
+      fill_in 'member[last_name]', :with => unsaved_member.last_name
+      fill_in 'member[zip]', :with => unsaved_member.zip
     end
 
-    page.execute_script("window.jQuery('#member_birth_date').next().click()")
-    within(".ui-datepicker-calendar") do
-      click_on("1")
-    end
+    # page.execute_script("window.jQuery('#member_birth_date').next().click()")
+    # within(".ui-datepicker-calendar") do
+    #   click_on("1")
+    # end
     
     within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(type_of_phone_number, :from => 'member[type_of_phone_number]')
-        # TODO: select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]') Do we need capitalize ???
-        fill_in 'member[email]', :with => unsaved_member.email 
-      }
+      fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+      fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+      fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+      select(type_of_phone_number, :from => 'member[type_of_phone_number]')
+      # TODO: select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]') Do we need capitalize ???
+      fill_in 'member[email]', :with => unsaved_member.email 
     end
 
     if approval        
-        within("#table_contact_information")do
-        wait_until{
-          select("test-approval", :from => 'member[terms_of_membership_id]') 
-        }
+      within("#table_contact_information")do
+        select("test-approval", :from => 'member[terms_of_membership_id]') 
       end     
     end 
 
@@ -250,11 +256,9 @@ module ActionController
     else
       active_merchant_stubs_store(credit_card.number)
       within("#table_credit_card")do
-        wait_until{
-          fill_in 'member[credit_card][number]', :with => credit_card.number
-          select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
-          select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
-        }
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
+        select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
       end
     end
   end
@@ -344,8 +348,20 @@ module ActionController
 
   end
 
-  def validate_view_member_base(member, status='provisional')
+  def add_credit_card(member,credit_card)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
+    click_on 'Add a credit card'
+    active_merchant_stubs_store(credit_card.number)
+
+    fill_in 'credit_card[number]', :with => credit_card.number
+    select credit_card.expire_month.to_s, :from => 'credit_card[expire_month]'
+    select credit_card.expire_year.to_s, :from => 'credit_card[expire_year]'
+
+    click_on 'Save credit card'
+  end
+
+  def validate_view_member_base(member, status='provisional')
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
     wait_until{ assert find_field('input_first_name').value == member.first_name }
 
     assert find_field('input_visible_id').value == "#{member.visible_id}"
@@ -380,7 +396,6 @@ module ActionController
       end
       wait_until{ assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}") }
       wait_until{ assert page.has_content?(I18n.l(active_credit_card.created_at, :format => :only_date)) }
-      
     end
 
     within("#table_membership_information") do
@@ -414,19 +429,19 @@ module ActionController
       within("#td_mi_quota") { assert page.has_content?("#{member.quota}") }      
     end  
     if not member.current_membership.enrollment_info.product_sku.blank? and not member.status == 'applied'
+      within(".nav-tabs"){ click_on 'Fulfillments' }
       within("#fulfillments") do
-        assert page.has_content?('KIT') 
-        assert page.has_content?('CARD') 
+        assert page.has_content?('KIT-CARD')
       end
     end
     membership = member.current_membership
+
+    within(".nav-tabs"){ click_on 'Memberships' }
     within("#memberships_table")do
-      wait_until{
-        assert page.has_content?(membership.id.to_s)
-        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-        assert page.has_content?(membership.quota.to_s)
-        assert page.has_content?(status)
-      }
+      # assert page.has_content?(membership.id.to_s)
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+      assert page.has_content?(membership.quota.to_s)
+      assert page.has_content?(status)
     end
   end
 

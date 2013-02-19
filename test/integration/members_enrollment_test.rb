@@ -72,7 +72,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
 
   def validate_terms_of_membership_show_page(saved_member)
-    click_link_or_button("#{saved_member.terms_of_membership.name}")
+    within("#table_membership_information")do
+      within("#td_mi_terms_of_membership_name"){ click_link_or_button("#{saved_member.terms_of_membership.name}") }
+    end
     within("#table_information")do
       wait_until{
         assert page.has_content?(@terms_of_membership_with_gateway.name) if @terms_of_membership_with_gateway.name
@@ -176,11 +178,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 	  created_member = create_member(unsaved_member)
 
     validate_view_member_base(created_member)
-
-    within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
+    within(".nav-tabs"){ click_on 'Operations' }
+    within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
     within("#table_enrollment_info") { wait_until{ assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) } }
+    within(".nav-tabs"){ click_on 'Transactions' }
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
-    wait_until { assert_equal(Fulfillment.count,2) }
+    wait_until { assert_equal(Fulfillment.count,Club::DEFAULT_PRODUCT.count) }
   end
 
   test "Create a member with CC blank" do
@@ -191,6 +194,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     validate_view_member_base(created_member)
 
+    within(".nav-tabs"){ click_on 'Operations' }
     within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
   end
 
@@ -681,17 +685,14 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "create a member with an expired credit card" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-    expire_year = Time.zone.now.year - 1.year
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => expire_year)
+    credit_card = FactoryGirl.build(:credit_card_master_card, :expire_month => 1, :expire_year => Time.zone.now.year)
     
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_link_or_button 'New Member'
 
-    within("#member_credit_card_expire_year")do
-      wait_until{
-        assert page.has_no_content?(expire_year.to_s)
-      }
-    end
+    fill_in_member(unsaved_member, credit_card)
+
+    assert page.has_content?("expire_year: expired")
   end
 
   test "create blank member note" do
@@ -1094,6 +1095,89 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
     end    
   end
- end
+ 
+  test "Update a profile with CC used by another member and Family Membership = True" do
+    setup_member(false)
+    @club = FactoryGirl.create(:simple_club_with_gateway_with_family)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
 
-  
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    created_member = Member.find_by_email(unsaved_member.email)  
+
+    visit clubs_path(@partner.prefix)
+    within("#clubs_table"){ click_link_or_button 'Edit' }
+
+    assert find(:xpath, "//input[@id='club_family_memberships_allowed']").set(true)
+
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+  end
+
+  test "Create a member and update a member with letters at Credit Card" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    
+    visit members_path( :partner_prefix => unsaved_member.club.partner.prefix, :club_prefix => unsaved_member.club.name )
+    click_link_or_button 'New Member'
+
+    credit_card = FactoryGirl.build(:credit_card_master_card) if credit_card.nil?
+
+    type_of_phone_number = (unsaved_member[:type_of_phone_number].blank? ? '' : unsaved_member.type_of_phone_number.capitalize)
+
+    within("#table_demographic_information")do
+      fill_in 'member[first_name]', :with => unsaved_member.first_name
+      if unsaved_member.gender == "Male" or unsaved_member.gender == "M"
+        select("Male", :from => 'member[gender]')
+      else
+        select("Female", :from => 'member[gender]')
+      end
+      fill_in 'member[address]', :with => unsaved_member.address
+      select_country_and_state(unsaved_member.country) 
+      fill_in 'member[city]', :with => unsaved_member.city
+      fill_in 'member[last_name]', :with => unsaved_member.last_name
+      fill_in 'member[zip]', :with => unsaved_member.zip
+    end
+
+    within("#table_contact_information")do
+      fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+      fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+      fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+      fill_in 'member[email]', :with => unsaved_member.email 
+    end
+
+    within("#table_credit_card")do
+      fill_in 'member[credit_card][number]', :with => "creditcardnumber"
+      select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
+      select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
+    end
+
+    click_link_or_button 'Create Member'
+    assert page.has_content?("Member iformation is invalid.")
+    assert page.has_content?("number: is required")
+
+    fill_in_member(unsaved_member, credit_card)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+
+    created_member = Member.find_by_email(unsaved_member.email) 
+
+    add_credit_card(created_member, credit_card)
+
+    visit show_member_path(:partner_prefix => created_member.club.partner.prefix, :club_prefix => created_member.club.name, :member_prefix => created_member.visible_id)
+    click_on 'Add a credit card'
+    active_merchant_stubs_store(credit_card.number)
+
+    fill_in 'credit_card[number]', :with => "credit_card_number"
+    select credit_card.expire_month.to_s, :from => 'credit_card[expire_month]'
+    select credit_card.expire_year.to_s, :from => 'credit_card[expire_year]'
+
+    click_on 'Save credit card'
+
+    assert page.has_content?('There was an error with your credit card information. Please verify your information and resubmit. {:number=>["is required"]}')
+  end
+end
+

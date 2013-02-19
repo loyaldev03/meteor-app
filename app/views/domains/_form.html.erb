@@ -27,10 +27,10 @@
   <div class="control-group">
     <%= f.label :club_id, :class => 'control-label' %>
     <div class="controls">
-      <% if @domain.new_record? || (@domain.club.nil? && params[:action] = :edit) %>
+      <% if @domain.new_record? || (@domain.club.nil? && params[:action] == "edit") %>
         <%= generate_select_club_id f, @domain, @clubs %>
       <% else %>
-        <%= generate_select_club_id f, @domain, @clubs, true %>
+        <%= @domain.club.name %>
       <% end %>
     </div>
   </div>

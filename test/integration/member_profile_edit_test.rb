@@ -38,18 +38,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-  def add_credit_card(credit_card)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Add a credit card'
-    active_merchant_stubs_store(credit_card.number)
-
-    fill_in 'credit_card[number]', :with => credit_card.number
-    select credit_card.expire_month.to_s, :from => 'credit_card[expire_month]'
-    select credit_card.expire_year.to_s, :from => 'credit_card[expire_year]'
-
-    click_on 'Save credit card'
-  end
-
   def set_as_undeliverable_member(member,reason)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     click_link_or_button "Set undeliverable"
@@ -144,7 +132,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     new_cc = FactoryGirl.build(:credit_card, :number => "378282246310005", :expire_month => Time.new.month, :expire_year => Time.new.year+10)
 
     last_digits = new_cc.number[-4,4]
-    add_credit_card(new_cc)
+    add_credit_card(actual_member, new_cc)
     actual_member.reload
 
     cc_saved = actual_member.active_credit_card

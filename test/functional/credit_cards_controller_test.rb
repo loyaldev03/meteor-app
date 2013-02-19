@@ -228,5 +228,4 @@ class CreditCardsControllerTest < ActionController::TestCase
     assert_equal(@saved_member.active_credit_card.token, cc_token)
     assert_not_equal(@saved_member.active_credit_card.expire_year, @credit_card.expire_year)
   end
-
 end
