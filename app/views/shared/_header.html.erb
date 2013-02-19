@@ -68,6 +68,7 @@
               <%= select_tag "change_partner",
                 options_for_select((@current_agent.has_global_role? ? Club.includes(:partner).all : Club.includes(:partner).find(@current_agent.club_roles_without_api)).collect{ |u| [ "#{u.partner.prefix} - #{u.name}", members_path(u.partner.prefix, u.name) ]}, 
                   selected ), 
+                :prompt => 'Select Partner-Club',
                 :onchange => "window.open(this.options[this.selectedIndex].value, '_top')", :style => "margin-top: 5px;" %>
                 <%=  %>
             </li>
