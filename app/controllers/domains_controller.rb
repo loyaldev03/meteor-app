@@ -48,7 +48,15 @@ class DomainsController < ApplicationController
     @domain = Domain.find(params[:id])
     @clubs = Club.where(:partner_id => @current_partner)
     
-    if @domain.update_attributes(:url => params[:domain][:url], :data_rights => params[:domain][:data_rights], :description => params[:domain][:description], :hosted => params[:domain][:hosted]) && @domain.update_attribute(:club_id,params[:domain][:club_id])
+    @domain.url = params[:domain][:url]
+    @domain.data_rights = params[:domain][:data_rights]
+    @domain.description = params[:domain][:description]
+    @domain.hosted = params[:domain][:hosted]
+    if not params[:domain][:club_id].nil? and @domain.club.nil?
+      @domain.club_id = params[:domain][:club_id]       
+    end
+
+    if @domain.save
       redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully updated."
     else
       render action: "edit"
