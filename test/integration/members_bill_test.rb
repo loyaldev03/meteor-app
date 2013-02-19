@@ -11,7 +11,7 @@ class MembersBillTest < ActionController::IntegrationTest
     init_test_setup
   end
 
-  def setup_member(provisional_days = nil)
+  def setup_member(provisional_days = nil, create_member = true)
     active_merchant_stubs
 
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
@@ -26,8 +26,10 @@ class MembersBillTest < ActionController::IntegrationTest
     
     sign_in_as(@admin_agent)
 
-    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
-    @saved_member = create_member(unsaved_member)
+    if create_member
+      unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
+      @saved_member = create_member(unsaved_member)
+    end
   end
 
   ############################################################

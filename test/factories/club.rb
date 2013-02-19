@@ -6,7 +6,7 @@ FactoryGirl.define do
     description "My description"
     billing_enable true
     association :partner
-    family_memberships_allowed :false
+    family_memberships_allowed false
   end
 
   factory :simple_club, class: Club do
@@ -17,7 +17,7 @@ FactoryGirl.define do
     time_zone { TZInfo::Timezone.all.sample.name }
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }
-    family_memberships_allowed :false
+    family_memberships_allowed false
   end
 
   factory :simple_club_with_gateway, class: Club do
@@ -28,7 +28,7 @@ FactoryGirl.define do
     time_zone { TZInfo::Timezone.all.sample.name }
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
-    family_memberships_allowed :false
+    family_memberships_allowed false
   end  
 
   factory :simple_club_with_gateway_with_family, class: Club do
@@ -54,7 +54,7 @@ FactoryGirl.define do
     association :api_domain, factory: :domain
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }
-    family_memberships_allowed :false
+    family_memberships_allowed false
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end
 
@@ -69,7 +69,7 @@ FactoryGirl.define do
     association :api_domain, factory: :domain
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }
-    family_memberships_allowed :false
+    family_memberships_allowed false
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end
 
@@ -80,7 +80,7 @@ FactoryGirl.define do
     cs_phone_number "123 456 7891"
     billing_enable true
     association :partner
-    family_memberships_allowed :false
+    family_memberships_allowed false
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end  
 
@@ -94,7 +94,7 @@ FactoryGirl.define do
     api_password { Faker::Internet.user_name }
     association :partner
     requires_external_id true
-    family_memberships_allowed :false
+    family_memberships_allowed false
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end
 end
