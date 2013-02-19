@@ -24,11 +24,12 @@ module Drupal
 
         if res.status == 401 && cookie # retry if cookie is invalid
           Drupal.logger.debug(" ** invalidating %.2f seconds-old cookie" % self.cookie_age)
+          old_body = env[:body] # lets store the first body. because it will be overwritten after token regeneration
           self.invalidate_cookie!
           self.regenerate_cookie!
 
           env[:request_headers]['Cookie'] = self.cookie
-
+          env[:body] = old_body
           res = @app.call(env)
         end
         res
