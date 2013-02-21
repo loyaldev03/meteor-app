@@ -25,10 +25,10 @@ module Drupal
 
     def create!(options = {})
       res = conn.post '/api/user', fieldmap
-      update_member(res)
-
-      @token = Hashie::Mash.new(res.body['urllogin'])
-      login_token
+      if update_member(res)
+        @token = Hashie::Mash.new(res.body['urllogin'])
+        login_token
+      end
     end
 
     def save!(options = {})
@@ -100,6 +100,9 @@ module Drupal
         end
         ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
         self.member.reload rescue self.member
+        true
+      else
+        false
       end
     end
 
