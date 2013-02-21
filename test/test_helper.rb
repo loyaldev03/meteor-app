@@ -156,7 +156,11 @@ module ActionController
       end
     end
         
-    def create_member_by_sloop(agent, member, credit_card, enrollment_info, terms_of_membership)
+    def create_member_by_sloop(agent, member, credit_card, enrollment_info, terms_of_membership, validate = true)
+      
+      credit_card = FactoryGirl.build(:credit_card) if credit_card.nil?
+      enrollment_info = FactoryGirl.build(:enrollment_info) if enrollment_info.nil?
+
       ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
         Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
                                         :auth_code => '111', :duplicate => false, 
@@ -191,11 +195,13 @@ module ActionController
                                 :ip_address => enrollment_info.ip_address
                                 },
                                 :api_key => agent.authentication_token, :format => :json})
-      assert_response :success
+      if validate
+        assert_response :success
+      end
     end
 
 
-  def fill_in_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
+  def fill_in_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
     visit members_path( :partner_prefix => unsaved_member.club.partner.prefix, :club_prefix => unsaved_member.club.name )
     click_link_or_button 'New Member'
 
@@ -217,6 +223,7 @@ module ActionController
       fill_in 'member[zip]', :with => unsaved_member.zip
     end
 
+    # TODO : FIX THIS.
     # page.execute_script("window.jQuery('#member_birth_date').next().click()")
     # within(".ui-datepicker-calendar") do
     #   click_on("1")
@@ -231,9 +238,9 @@ module ActionController
       fill_in 'member[email]', :with => unsaved_member.email 
     end
 
-    if approval        
+    if not tom_type.nil?
       within("#table_contact_information")do
-        select("test-approval", :from => 'member[terms_of_membership_id]') 
+        select(tom_type, :from => 'member[terms_of_membership_id]') 
       end     
     end 
 
@@ -263,8 +270,8 @@ module ActionController
     end
   end
 
-  def create_member(unsaved_member, credit_card = nil, approval = false, cc_blank = false)
-    fill_in_member(unsaved_member,credit_card,approval,cc_blank)
+  def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
+    fill_in_member(unsaved_member, credit_card, tom_type, cc_blank)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
     Member.find_by_email(unsaved_member.email)
   end
@@ -296,6 +303,7 @@ module ActionController
       }
     end
 
+    within(".nav-tabs"){ click_on 'Transactions' }
     within("#transactions") do 
       wait_until {
         assert page.has_selector?("#transactions_table")
@@ -332,12 +340,14 @@ module ActionController
           assert page.has_content?("Refund success $#{final_amount}")
         }
       end
+      within(".nav-tabs"){ click_on 'Transactions' }
       within("#transactions_table") do 
         wait_until {
           assert page.has_content?("Credit : This transaction has been approved")
           assert page.has_content?(final_amount)
         }
       end
+      within(".nav-tabs"){ click_on 'Communications' }
       within("#communication") do 
         wait_until {
           assert page.has_content?("Test refund")
@@ -358,6 +368,39 @@ module ActionController
     select credit_card.expire_year.to_s, :from => 'credit_card[expire_year]'
 
     click_on 'Save credit card'
+  end
+
+  def add_club_cash(member, amount, description, valide = true)
+    previous_amount = member.club_cash_amount
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    within("#table_membership_information"){ click_on 'Add club cash' }
+    
+    alert_ok_js
+    fill_in 'club_cash_transaction[amount]', :with => amount
+    fill_in 'club_cash_transaction[description]', :with => description
+    click_on 'Save club cash transaction'
+
+    within("#operations"){assert page.has_content?("#{amount.to_f} club cash was successfully #{amount>0 ? 'added' : 'deducted'}. Concept: #{description}")}
+    within("#td_mi_club_cash_amount") { assert page.has_content?((previous_amount+amount).to_s) }
+  end
+
+  def save_the_sale(member, new_terms_of_membership, validate = true)
+    old_membership = member.current_membership  
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+
+    click_on 'Save the sale'    
+    select(new_terms_of_membership.name, :from => 'terms_of_membership_id')
+    confirm_ok_js
+    click_on 'Save the sale'
+    if validate
+      assert page.has_content?("Save the sale succesfully applied")
+      member.reload
+      old_membership.reload
+      assert_equal old_membership.status, "lapsed"
+      assert_equal member.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
+      assert_equal member.status, member.current_membership.status
+      within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
+    end
   end
 
   def validate_view_member_base(member, status='provisional')
@@ -418,9 +461,9 @@ module ActionController
       
       within("#td_mi_join_date") { assert page.has_content?(I18n.l(member.join_date, :format => :only_date)) }
 
-      within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(member.next_retry_bill_date, :format => :only_date)) } if member.status != 'applied'
+      within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(member.next_retry_bill_date, :format => :only_date)) } unless ['applied', 'lapsed'].include? member.status 
 
-      assert page.has_selector?("#link_member_change_next_bill_date") if member.status != 'applied'
+      assert page.has_selector?("#link_member_change_next_bill_date") unless ['applied', 'lapsed'].include? member.status 
 
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{member.club_cash_amount.to_f}") }
 
@@ -438,7 +481,7 @@ module ActionController
 
     within(".nav-tabs"){ click_on 'Memberships' }
     within("#memberships_table")do
-      # assert page.has_content?(membership.id.to_s)
+      assert page.has_content?(membership.id.to_s)
       assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
       assert page.has_content?(membership.quota.to_s)
       assert page.has_content?(status)

@@ -40,29 +40,9 @@ class MembersClubCashTest < ActionController::IntegrationTest
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     
-    click_on 'Add club cash'
-    
-    alert_ok_js
-    fill_in 'club_cash_transaction[amount]', :with => "15"  
-    click_on 'Save club cash transaction'
-    within("#td_mi_club_cash_amount") { assert page.has_content?("15") }
+    add_club_cash(member, 15, "Generic description")
+    add_club_cash(member, -5, "Generic description")
 
-    within("#operations_table") do
-      wait_until { assert page.has_content?("15.0 club cash was successfully added") }
-    end
-
-    click_on 'Add club cash'
-    
-    alert_ok_js
-    fill_in 'club_cash_transaction[amount]', :with => "-5"  
-    click_on 'Save club cash transaction'
-    within("#td_mi_club_cash_amount") { assert page.has_content?("10") }
-
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("5.0 club cash was successfully deducted")
-      }
-    end
     club_cash_transaction = @saved_member.club_cash_transactions.last
     within("#club_cash_transactions_table") do
       wait_until{
@@ -78,13 +58,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     
-    click_on 'Add club cash'
-    
-    alert_ok_js
-    fill_in 'club_cash_transaction[amount]', :with => "15"  
-    click_on 'Save club cash transaction'
-    
-    within("#td_mi_club_cash_amount") { assert page.has_content?("15") }
+    add_club_cash(member, 15, "Generic description")
 
     click_on 'Add club cash'
     fill_in 'club_cash_transaction[amount]', :with => "-20"

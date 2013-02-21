@@ -9,8 +9,8 @@ class FulfillmentsTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @partner = @club.partner
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @member = create_active_member(@terms_of_membership_with_gateway)
    

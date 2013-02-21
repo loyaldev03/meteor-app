@@ -40,4 +40,14 @@ FactoryGirl.define do
     limit '1'
   end
 
+  factory :hard_decline_strategy_for_billing, class: DeclineStrategy do
+    notes "Credit card is blank and grace period is disabled"
+    days 0
+    response_code 9997
+    decline_type 'hard'
+    credit_card_type 'all'
+    installment_type "1.month"
+    gateway 'mes'
+    limit '0'
+  end
 end

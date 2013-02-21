@@ -10,7 +10,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     init_test_setup
   end
 
-  def setup_member(create_provisional = true)
+  def setup_member(approval = false, active = false)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
@@ -20,44 +20,29 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     @terms_of_membership_with_approval2 = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id, :name => 'second_tom_aproval')
     @new_terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_hold_card, :club_id => @club.id)
+    @lifetime_terms_of_membership = FactoryGirl.create(:life_time_terms_of_membership, :club_id => @club.id)
     
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
     FactoryGirl.create(:batch_agent)
     
-    @saved_member = nil
-    
-    if create_provisional
-      @saved_member = create_active_member(@terms_of_membership_with_approval, :provisional_member_with_cc, nil, {}, { :created_by => @admin_agent })
+    unsaved_member = FactoryGirl.build(:member_with_api)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+
+    if approval
+      create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_approval)
     else
-      @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })			
-		end
-    @saved_member.reload
+      create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    end
+    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member.set_as_provisional if @saved_member.can_be_approved?
+
+    if active
+		  @saved_member.set_as_active
+    end
+    
     @old_membership = @saved_member.current_membership
     sign_in_as(@admin_agent)
-  end
-
-  test "save the sale from provisional to provisional" do
-    setup_member(true)
-
-    assert_equal @saved_member.status, "provisional"
-    
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'    
-
-    assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        select(@new_terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
-        confirm_ok_js
-        click_on 'Save the sale'
-        assert page.has_content?("Save the sale succesfully applied")
-      end
-    end
-    @saved_member.reload
-    @old_membership.reload
-
-    assert_equal @old_membership.status, "lapsed"
-    assert_equal @saved_member.current_membership.status, "provisional"
-    assert_equal @saved_member.status, "provisional"
   end
 
   def success_save_the_sale(old_tom, new_tom, operation = nil)
@@ -72,276 +57,127 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     end
   end
 
-  test "save the sale from active to provisional" do
-    setup_member(false)
+  ###########################################################
+  # TESTS
+  ###########################################################
 
-    assert_equal @saved_member.status, "active"
+  test "save the sale from provisional to provisional" do
+    setup_member
+    assert_equal @saved_member.status, "provisional"
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'
-
-    select(@new_terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
-    confirm_ok_js
-
-    assert_difference("Membership.count") do
+    assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
-        click_on 'Save the sale'
+        save_the_sale(@saved_member, @new_terms_of_membership_with_gateway)
       end
     end
+  end
 
-    @saved_member.reload
-    @old_membership.reload
-
-    success_save_the_sale(@terms_of_membership_with_gateway.id, @new_terms_of_membership_with_gateway.id)
+  test "save the sale from active to provisional" do
+    setup_member(false, true)
+    assert_equal @saved_member.status, "active"
     
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Member enrolled successfully")
-      }
+    assert_difference('Membership.count') do 
+      assert_difference('EnrollmentInfo.count') do
+        save_the_sale(@saved_member, @new_terms_of_membership_with_gateway)
+      end
     end
-
-    assert_equal @old_membership.status, "lapsed"
-    assert_equal @saved_member.current_membership.status, "provisional"
-    assert_equal @saved_member.status, "provisional"
   end
 
   test "save the sale with the same TOM" do
-    setup_member(false)
-
+    setup_member(false,true)
     assert_equal @saved_member.status, "active"
       
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'    
-
-    select(@terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
-    confirm_ok_js
-
-    assert_difference("Membership.count", 0) do
-      assert_difference('EnrollmentInfo.count', 0) do
-        click_on 'Save the sale'
+    assert_difference('Membership.count',0) do 
+      assert_difference('EnrollmentInfo.count',0) do
+        save_the_sale(@saved_member, @saved_member.current_membership.terms_of_membership, false)
       end
     end
     assert page.has_content?("Nothing to change. Member is already enrolled on that TOM")
-
-    @saved_member.reload
-    @old_membership.reload
-
-    assert_equal @old_membership.status, "active"
-    assert_equal @saved_member.status, "active"
   end
 
   test "Save the sale from TOM without approval to TOM without approval - status active" do
-    setup_member(false)
-    @saved_member.set_as_active
+    setup_member(false,true)
 
-    assert_equal @saved_member.status, "active"
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'   
-
-    select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id')
-    confirm_ok_js
-    assert_difference("Membership.count") do
+    assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
-        click_on 'Save the sale'
+        save_the_sale(@saved_member, @terms_of_membership_with_gateway2)
       end
     end
-
-    @saved_member.reload
-    @old_membership.reload
-
-    success_save_the_sale(@terms_of_membership_with_gateway.id, @terms_of_membership_with_gateway2.id, Operation.last)
-
-    assert_equal @old_membership.status, "lapsed"
-    assert_equal @saved_member.current_membership.status, "provisional"
-    assert_equal @saved_member.status, "provisional"
   end
 
   test "Save the sale from TOM without approval to TOM without approval - status provisional" do
-    setup_member(false)
+    setup_member
+    assert_equal @saved_member.status, "provisional"
 
-    assert_equal @saved_member.status, "active"
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'   
-
-    select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id')
-    confirm_ok_js
-    assert_difference("Membership.count") do
+    assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
-        click_on 'Save the sale'
+        save_the_sale(@saved_member, @terms_of_membership_with_gateway2)
       end
     end
-
-    @saved_member.reload
-    @old_membership.reload
-
-    success_save_the_sale(@terms_of_membership_with_gateway.id, @terms_of_membership_with_gateway2.id, Operation.last)
-
-    assert_equal @old_membership.status, "lapsed"
-    assert_equal @saved_member.current_membership.status, "provisional"
-    assert_equal @saved_member.status, "provisional"
   end
 
   test "Save the sale from TOM without approval to TOM approval - status active" do
-    setup_member(false)
-    @saved_member.set_as_active
+    setup_member(false,true)
 
-    assert_equal @saved_member.status, "active"
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'   
-
-    wait_until{ select(@terms_of_membership_with_approval.name, :from => 'terms_of_membership_id') }
-    confirm_ok_js
-    assert_difference("Membership.count") do
+    assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
-        click_on 'Save the sale'
+        save_the_sale(@saved_member, @terms_of_membership_with_approval)
       end
     end
-
-    success_save_the_sale(@terms_of_membership_with_gateway.id, @terms_of_membership_with_approval.id, Operation.last)
-
-    @saved_member.reload
-    @old_membership.reload
-
-    assert_equal @old_membership.status, "lapsed"
-    assert_equal @saved_member.current_membership.status, "applied"
-    assert_equal @saved_member.status, "applied"
   end
 
   test "Save the sale from TOM without approval to TOM approval - status provisional" do
-    setup_member(false)
+    setup_member
+    assert_equal @saved_member.status, "provisional"
 
-    assert_equal @saved_member.status, "active"
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'   
-
-    wait_until{ select(@terms_of_membership_with_approval.name, :from => 'terms_of_membership_id') }
-    confirm_ok_js
-    assert_difference("Membership.count") do
+    assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
-        click_on 'Save the sale'
+        save_the_sale(@saved_member, @terms_of_membership_with_approval)
       end
     end
-
-    success_save_the_sale(@terms_of_membership_with_gateway.id, @terms_of_membership_with_approval.id, Operation.last)
-
-    @saved_member.reload
-    @old_membership.reload
-
-    assert_equal @old_membership.status, "lapsed"
-    assert_equal @saved_member.current_membership.status, "applied"
-    assert_equal @saved_member.status, "applied"
   end
 
   test "Save the sale from TOM approval to TOM without approval - status active" do
-    setup_member
-    @saved_member.set_as_active
-
+    setup_member(true,true)
     assert_equal @saved_member.status, "active"
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'   
-
-    wait_until{ select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id') }
-    confirm_ok_js
-    assert_difference("Membership.count") do
+    assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
-        click_on 'Save the sale'
+        save_the_sale(@saved_member, @terms_of_membership_with_gateway)
       end
     end
-
-    success_save_the_sale(@terms_of_membership_with_approval.id, @terms_of_membership_with_gateway2.id, Operation.last)
-
-    @saved_member.reload
-    @old_membership.reload
-
-    assert_equal @old_membership.status, "lapsed"
-    assert_equal @saved_member.current_membership.status, "provisional"
-    assert_equal @saved_member.status, "provisional"
   end
 
   test "Save the sale from TOM approval to TOM without approval - status provisional" do
-    setup_member
-
+    setup_member(true,false)
     assert_equal @saved_member.status, "provisional"
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'   
-
-    wait_until{ select(@terms_of_membership_with_gateway2.name, :from => 'terms_of_membership_id') }
-    confirm_ok_js
-    assert_difference("Membership.count") do
+    assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
-        click_on 'Save the sale'
+        save_the_sale(@saved_member, @terms_of_membership_with_gateway2)
       end
     end
-    
-    success_save_the_sale(@terms_of_membership_with_approval.id, @terms_of_membership_with_gateway2.id, Operation.last)
-
-    @saved_member.reload
-    @old_membership.reload
-
-    assert_equal @old_membership.status, "lapsed"
-    assert_equal @saved_member.current_membership.status, "provisional"
-    assert_equal @saved_member.status, "provisional"
   end
 
   test "Save the sale from TOM approval to TOM approval - status active" do
-    setup_member
-    @saved_member.set_as_active
-
+    setup_member(true,true)
     assert_equal @saved_member.status, "active"
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'   
-
-    wait_until{ select(@terms_of_membership_with_approval2.name, :from => 'terms_of_membership_id') }
-    confirm_ok_js
-
-    assert_difference("Membership.count") do
+    assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
-        click_on 'Save the sale'
+        save_the_sale(@saved_member, @terms_of_membership_with_approval2)
       end
     end
-    
-    success_save_the_sale(@terms_of_membership_with_approval.id, @terms_of_membership_with_approval2.id, Operation.last)
-
-    @saved_member.reload
-    @old_membership.reload
-
-    assert_equal @old_membership.status, "lapsed"
-    assert_equal @saved_member.current_membership.status, "applied"
-    assert_equal @saved_member.status, "applied"
   end
 
   test "Save the sale from TOM approval to TOM approval - status provisional" do
-    setup_member
+    setup_member(true,false)
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_on 'Save the sale'   
-
-    assert_equal @saved_member.status, "provisional"
-
-    wait_until{ select(@terms_of_membership_with_approval2.name, :from => 'terms_of_membership_id') }
-    confirm_ok_js
-    
-    assert_difference("Membership.count") do
+    assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
-        click_on 'Save the sale'
+        save_the_sale(@saved_member, @terms_of_membership_with_approval2)
       end
     end
-    
-    success_save_the_sale(@terms_of_membership_with_approval.id, @terms_of_membership_with_approval2.id, Operation.last)
-
-    @saved_member.reload
-    @old_membership.reload
-
-    assert_equal @old_membership.status, "lapsed"
-    assert_equal @saved_member.current_membership.status, "applied"
-    assert_equal @saved_member.status, "applied"
   end
 
   test "member full save" do
@@ -359,4 +195,23 @@ class SaveTheSaleTest < ActionController::IntegrationTest
       }
     end
   end 
+
+  test "Change the user from a lifetime TOM to a another" do
+    setup_member(false)
+
+    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
+    @saved_member = create_member(unsaved_member, nil, @lifetime_terms_of_membership.name, true)
+
+    assert_difference('Membership.count') do 
+      assert_difference('EnrollmentInfo.count') do
+        save_the_sale(@saved_member, @new_terms_of_membership_with_gateway)
+      end
+    end
+
+    validate_view_member_base(@saved_member)
+  end
+
+
+
+
 end

@@ -132,4 +132,15 @@ FactoryGirl.define do
     provisional_days 30
     association :club, factory: :club_with_gateway
   end  
+
+  factory :life_time_terms_of_membership, class: TermsOfMembership do
+    name "test-lifetime"
+    installment_amount 100
+    installment_type '1000.years'
+    quota 1
+    needs_enrollment_approval false
+    club_cash_amount 150
+    provisional_days 30
+    association :club, factory: :simple_club_with_gateway
+  end
 end

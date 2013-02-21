@@ -678,7 +678,6 @@ class Api::MembersControllerTest < ActionController::TestCase
   #   assert_difference('Operation.count',0) do
   #     assert_difference('CreditCard.count',0) do
   #       generate_post_message
-  #       assert_response :error
   #     end
   #   end
   # end

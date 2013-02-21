@@ -15,8 +15,9 @@ class MembersBillTest < ActionController::IntegrationTest
     active_merchant_stubs
 
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @partner = @club.partner
+    
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership_with_gateway.provisional_days = provisional_days unless provisional_days.nil?
@@ -216,13 +217,6 @@ class MembersBillTest < ActionController::IntegrationTest
   end  
 
   test "Change Next Bill Date for tomorrow" do
-    setup_member
-    @saved_member.set_as_canceled
-    @saved_member.recover(@terms_of_membership_with_gateway) 
-    @saved_member.set_as_active
-
-    next_bill_date = Time.zone.now + 1.day
-    change_next_bill_  test "Change Next Bill Date for tomorrow" do
     setup_member
     @saved_member.set_as_canceled
     @saved_member.recover(@terms_of_membership_with_gateway) 
@@ -462,8 +456,8 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     @admin_agent.update_attribute(:roles, ["supervisor"])
     bill_member(@saved_member, true)
-  end 
-date(next_bill_date.day)
+
+    change_next_bill_date(next_bill_date.day)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
     within("#td_mi_next_retry_bill_date")do
@@ -698,4 +692,44 @@ date(next_bill_date.day)
     bill_member(@saved_member, true)
   end 
 
+  test "Hard decline for user without CC information when the billing date arrives" do
+    setup_member(nil,false)
+    @hd_strategy = FactoryGirl.create(:hard_decline_strategy_for_billing)
+    active_merchant_stubs("9997", "This transaction has not been approved with stub", false)
+    
+    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
+    @saved_member = create_member(unsaved_member, nil, nil, true)
+
+    within("#table_active_credit_card")do
+      assert page.has_content?("0000 (unknown)")
+    end
+    @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
+
+    assert_difference("Communication.count",2)do
+      Member.bill_all_members_up_today
+    end
+
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+
+    within("#operations"){ assert page.has_content?("Communication 'Test hard_decline' sent") } 
+    within("#operations"){ assert page.has_content?("Communication 'Test cancellation' sent") } 
+    within("#operations"){ assert page.has_content?("Member canceled") } 
+    within(".nav-tabs"){ click_on 'Communication' }
+    within("#communication"){ assert page.has_content?("hard_decline") }
+    within("#communication"){ assert page.has_content?("cancellation") }
+  end
+
+  # Remove/Add Club Cash on a member with lifetime TOM
+  test "Create a new member in the CS using the Lifetime TOM" do
+    setup_member(nil,false)
+    @lifetime_terms_of_membership = FactoryGirl.create(:life_time_terms_of_membership, :club_id => @club.id)
+
+    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
+    @saved_member = create_member(unsaved_member, nil, @lifetime_terms_of_membership.name, true)
+
+    validate_view_member_base(@saved_member)
+    add_club_cash(@saved_member, 10, "Generic description",true)
+  end
 end
