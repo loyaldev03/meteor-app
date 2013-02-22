@@ -15,8 +15,7 @@ class Communication < ActiveRecord::Base
       end
       if template.nil?
         message = "Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
-        Airbrake.notify(:error_class => "Communication Template", :error_message => message, :parameters => { :member => member.inspect })
-        logger.error "* * * * * Template does not exist"
+        logger.error "* * * * * Template does not exist - message: " + message + " - Params: #{member.inspect}"
       else
         c = Communication.new :email => member.email
         c.member_id = member.id
