@@ -51,7 +51,11 @@
   <div class="control-group">
     <%= f.label :drupal_domain_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.collection_select :drupal_domain_id, @club.domains, :id, :url, include_blank: true %>
+      <% if @club.domains.empty? %>
+        <%= I18n.t("activerecord.attributes.club.club_without_domains") %>
+      <% else %>
+        <%= f.collection_select :drupal_domain_id, @club.domains, :id, :url, include_blank: true %>
+      <% end %>
     </div>
   </div>
   <div class="control-group">

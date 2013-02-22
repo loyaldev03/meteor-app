@@ -246,6 +246,7 @@ en:
         description: 'Description'
         members_count: 'Members count'
         family_memberships_allowed: Family memberships allowed
+        club_without_domains: 'There are no domains related to this club. In order to assign a drupal domain, you should first relate domains to this club. (Once the club is created, you can relate the domain from its edit/creation page).'
       credit_card:
         number: 'Number'
         expire_date: 'Expire date'
