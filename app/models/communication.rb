@@ -14,8 +14,8 @@ class Communication < ActiveRecord::Base
         template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
       end
       if template.nil?
-        message = "Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
-        logger.error "* * * * * Template does not exist - message: " + message + " - Params: #{member.inspect}"
+        message = "'#{template_type}' and TOMID ##{member.terms_of_membership_id}"
+        logger.error "* * * * * Template does not exist - Template missing: " + message + " - Member: #{member.inspect}"
       else
         c = Communication.new :email => member.email
         c.member_id = member.id
