@@ -75,6 +75,8 @@ class Communication < ActiveRecord::Base
       Notifier.pre_bill(email).deliver!
     when :refund
       Notifier.refund(email).deliver!
+    when :birthday
+      Notifier.birthday(email).deliver!
     when :pillar
       Notifier.pillar(email).deliver!
     when :hard_decline

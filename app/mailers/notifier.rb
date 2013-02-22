@@ -19,9 +19,14 @@ class Notifier < ActionMailer::Base
 
   def refund(email)
     to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
-    mail :to => to, :subject => "refund to #{email}"
+    mail :to => to, :subject => "refund to #{email}"   
   end
 
+  def birthday(email)
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "Happy birthday #{email}"
+  end
+  
   def pillar(email)
     to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
     mail :to => to, :subject => "pillar to #{email}"
