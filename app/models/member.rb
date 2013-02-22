@@ -332,7 +332,12 @@ class Member < ActiveRecord::Base
   end
 
   def can_add_club_cash?
-    not self.api_member.nil? and not club_cash_transactions_enabled
+    if club_cash_transactions_enabled
+      return true
+    elsif not (self.api_id.blank? or self.api_id.nil?)
+      return true
+    end
+    false
   end
 
   ###############################################
