@@ -701,7 +701,7 @@ class Member < ActiveRecord::Base
             answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
           end
           answer[:message] = I18n.t('error_messages.drupal_error_sync') if message.blank?
-          Auditory.audit(agent, self, message, self, Settings.operation_types.remote_club_cash_transaction)
+          Auditory.audit(agent, self, answer[:message], self, Settings.operation_types.remote_club_cash_transaction)
         end
       rescue Exception => e
         answer[:errors] = cct.errors_merged(self) unless cct.nil?
