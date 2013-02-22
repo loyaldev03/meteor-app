@@ -267,9 +267,10 @@
             <td id="td_mi_club_cash_amount">
               <%= @current_member.club_cash_amount %>&nbsp;&nbsp;&nbsp;
               <% unless disable_save_sale %>
-                <%= link_to(member_add_club_cash_path, :class => "btn btn-mini btn-success", :id => "link_member_add_club_cash", :disabled => (cannot? :add_club_cash, Member)) do %> 
+                <% disable = (cannot? :add_club_cash, Member or not @current_member.can_add_club_cash?) %>
+                <%= link_to((disable ? "#" : member_add_club_cash_path), :class => "btn btn-mini btn-success #{'disabled' if disable}", :id => "link_member_add_club_cash") do %> 
                   <i class="icon-plus"></i> <%= t('activerecord.attributes.member.add_club_cash_transaction') %>
-                <% end %>
+                <% end %>              
               <% end %>
             </td>  
           </tr>
