@@ -7,6 +7,7 @@ SacPlatform::Application.routes.draw do
       resources :members, :only => [:create, :show, :update] do
         put  :club_cash
         resources :club_cash_transaction, only: [:create]
+        resources :operation, only: [:create]
       end
       match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get]
       resources :prospects, :only => [:create]      

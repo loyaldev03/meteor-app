@@ -21,6 +21,9 @@
     <option value="profile"> profile </option>
     <option value="communications"> communications </option>
     <option value="fulfillments"> fulfillments </option>
+    <% if can? :filter_vip_operations, Operation %>
+      <option value='vip'> vip </option> 
+    <% end %>
     <option value="others"> others </option>
   </select>
 </div>  

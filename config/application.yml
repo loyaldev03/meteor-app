@@ -141,6 +141,9 @@ defaults: &defaults
     from_bad_address_to_out_of_stock: 453
     from_bad_address_to_returned: 454
     from_bad_address_to_canceled: 455
+    #vip
+    vip_event_registration: 900
+    vip_event_cancelation: 901 
     #other
     others: 1000
   error_codes:
@@ -180,6 +183,7 @@ defaults: &defaults
     fulfillment_error: '9801'
     fulfillment_reason_blank: '9802'
     fulfillment_is_renwed: '9803'
+    operation_not_saved: '9900'
   fulfillment_products:
     all: All
     kit_card: Kit - Card

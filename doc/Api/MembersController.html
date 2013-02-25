@@ -373,8 +373,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-315
-316
 317
 318
 319
@@ -389,10 +387,12 @@ Code related to the method result.
 328
 329
 330
-331</pre>
+331
+332
+333</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 315</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 317</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_club_cash'>club_cash</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -451,7 +451,7 @@ agent is allowed to request this action.
 Information related to the member that is sumbitting the enroll. It also
 contains information related to the enrollment (this will be stored as
 enrollment_info). Here is a list of the regex we are using to validate
-show.
+<span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -499,7 +499,7 @@ show.
 </code></pre>
 </dd>
 <dt>credit_card</dt><dd><p>
-Information related to member&#8217;s credit card. show
+Information related to member&#8217;s credit card. <span class='object_link'><a href="../CreditCard.html" title="CreditCard (class)">show</a></span>
 </p>
 <pre class="code ruby"><code>
   *number: Number of member's credit card, from where we will charge the membership or any other service.  
@@ -543,6 +543,11 @@ member is enrolled successfully.
 <dt>errors</dt><dd><p>
 A hash with members and credit card errors. This will be use to show errors
 on members creation page.
+</p>
+</dd>
+<dt>autologin_url</dt><dd><p>
+Url provided by Drupal, used to autologin a member into it. This URL is
+used by campaigns in order to redirect members to their drupal account.
 </p>
 </dd>
 </dl>
@@ -667,6 +672,21 @@ on members creation page.
       
     </li>
   
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>
+<b>autologin_url</b>
+</p>
+</div>
+      
+    </li>
+  
 </ul>
 
 </div><table class="source_code">
@@ -675,8 +695,6 @@ on members creation page.
       <pre class="lines">
 
 
-84
-85
 86
 87
 88
@@ -689,10 +707,12 @@ on members creation page.
 95
 96
 97
-98</pre>
+98
+99
+100</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 84</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
   <span class='id identifier rubyid_tom'>tom</span> <span class='op'>=</span> <span class='const'>TermsOfMembership</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:member</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:terms_of_membership_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>  
@@ -745,7 +765,7 @@ unique for each member. Have in mind that this value is part of the url.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is sumbitting the enroll. Here is a
-list of the regex we are using to validate show.
+list of the regex we are using to validate <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -915,8 +935,6 @@ Code related to the method result.
       <pre class="lines">
 
 
-240
-241
 242
 243
 244
@@ -968,10 +986,12 @@ Code related to the method result.
 290
 291
 292
-293</pre>
+293
+294
+295</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 240</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 242</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_show'>show</span>
   <span class='id identifier rubyid_member'>member</span> <span class='op'>=</span> <span class='const'>Member</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -1064,7 +1084,7 @@ part of the url.
 </dd>
 <dt>member</dt><dd><p>
 Information related to the member that is being updated.. Here is a list of
-the regex we are using to validate. show.
+the regex we are using to validate. <span class='object_link'><a href="../Member.html" title="Member (class)">show</a></span>.
 </p>
 <pre class="code ruby"><code>
    *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$&quot;!#%&amp;%&quot;).
@@ -1088,7 +1108,7 @@ the regex we are using to validate. show.
 </code></pre>
 </dd>
 <dt>credit_card</dt><dd><p>
-Information related to member&#8217;s credit card. show
+Information related to member&#8217;s credit card. <span class='object_link'><a href="../CreditCard.html" title="CreditCard (class)">show</a></span>
 </p>
 <pre class="code ruby"><code>
   *number: Number of member's credit card, from where we will charge the membership or any other service.  
@@ -1243,8 +1263,6 @@ page.
       <pre class="lines">
 
 
-150
-151
 152
 153
 154
@@ -1277,10 +1295,12 @@ page.
 181
 182
 183
-184</pre>
+184
+185
+186</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 150</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/members_controller.rb', line 152</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span>
   <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -1327,7 +1347,7 @@ page.
 </div>
 
     <div id="footer">
-  Generated on Fri Feb 15 13:32:23 2013 by
+  Generated on Mon Feb 25 16:44:59 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

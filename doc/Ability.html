@@ -314,7 +314,9 @@ A new instance of Ability
 137
 138
 139
-140</pre>
+140
+141
+142</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/models/ability.rb', line 5</span>
@@ -345,6 +347,7 @@ A new instance of Ability
   <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage_product_api</span><span class='comma'>,</span> <span class='const'>Product</span>
   <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage_prospects_api</span><span class='comma'>,</span> <span class='const'>Prospect</span>
   <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:manage_token_api</span><span class='comma'>,</span> <span class='const'>Agent</span>
+  <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:filter_vip_operations</span><span class='comma'>,</span> <span class='const'>Operation</span>
 
   <span class='kw'>if</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role_with_club?'>has_role_with_club?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>admin</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_club_id'>club_id</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Member</span>
@@ -368,6 +371,7 @@ A new instance of Ability
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_club_cash_api</span><span class='comma'>,</span> <span class='const'>ClubCashTransaction</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_prospects_api</span><span class='comma'>,</span> <span class='const'>Prospect</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage_token_api</span><span class='comma'>,</span> <span class='const'>Agent</span>
+    <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:filter_vip_operations</span><span class='comma'>,</span> <span class='const'>Operation</span>
   <span class='kw'>elsif</span> <span class='id identifier rubyid_agent'>agent</span><span class='period'>.</span><span class='id identifier rubyid_has_role_with_club?'>has_role_with_club?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>representative</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_club_id'>club_id</span>
     <span class='id identifier rubyid_can'>can</span> <span class='symbol'>:manage</span><span class='comma'>,</span> <span class='const'>Member</span>
     <span class='id identifier rubyid_cannot'>cannot</span> <span class='symbol'>:api_profile</span><span class='comma'>,</span> <span class='const'>Member</span>
@@ -466,7 +470,7 @@ A new instance of Ability
 </div>
 
     <div id="footer">
-  Generated on Fri Feb 15 11:46:33 2013 by
+  Generated on Mon Feb 25 16:44:57 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
