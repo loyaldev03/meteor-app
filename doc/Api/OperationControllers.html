@@ -134,18 +134,8 @@
 
   
     <span class="summary_desc"><div class='inline'><p>
-Creates a new operation related to a member
+Creates a new operation related to a member.
 </p>
-<dl>
-<dt>url</dt><dd><p>
-/api/v1/members/:member_id/operation
-</p>
-</dd>
-<dt>api_key</dt><dd><p>
-Agent&#8217;s authentication token.
-</p>
-</dd>
-</dl>
 </div></span>
   
 </li>
@@ -187,23 +177,30 @@ agent is allowed to request this action.
 </dd>
 <dt>member_id</dt><dd><p>
 ID of the member. This ID is unique for each member. (32 characters
-string). This value is used by platform.
+string). This value is used by platform. Have in mind that this value is
+part of the url.
 </p>
 </dd>
-</dl>
-<pre class="code ruby"><code>
-     Have in mind that this value is part of the url.
-</code></pre>
-<dl>
 <dt>description</dt><dd><p>
 Text that describes the operation in a few words. (Eg. &#8220;VIP event
 number #12 registered for 2013-03-14&#8221; or &#8220;VIP event number #12
 canceled&#8221; )
 </p>
 </dd>
-<dt>operation_type</dt><dd></dd>
+<dt>operation_type</dt><dd><p>
+Type related to the operation. This value is an Integer value.
+</p>
+</dd>
 <dt>operation_date</dt><dd><p>
 If this value is nil we save that operation with Time.zone.now
+</p>
+</dd>
+<dt>message</dt><dd><p>
+Shows the method results and also informs the errors.
+</p>
+</dd>
+<dt>code</dt><dd><p>
+Code related to the method result.
 </p>
 </dd>
 </dl>
@@ -302,18 +299,18 @@ If this value is nil we save that operation with Time.zone.now
       <pre class="lines">
 
 
-21
-22
-23
 24
 25
 26
 27
 28
-29</pre>
+29
+30
+31
+32</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/operation_controller.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/operation_controller.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
 	<span class='kw'>begin</span>
@@ -334,7 +331,7 @@ If this value is nil we save that operation with Time.zone.now
 </div>
 
     <div id="footer">
-  Generated on Mon Feb 25 16:45:00 2013 by
+  Generated on Tue Feb 26 14:34:40 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>
