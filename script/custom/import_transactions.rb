@@ -1,6 +1,6 @@
 #!/bin/ruby
 
-require 'import_models'
+require './import_models'
 
 @log = Logger.new('log/import_transactions.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
@@ -58,7 +58,6 @@ def load_enrollment_transactions
   BillingEnrollmentAuthorizationResponse.
   joins(' JOIN enrollment_authorizations ON enrollment_authorizations.id = enrollment_auth_responses.authorization_id ').
   where(" enrollment_authorizations.campaign_id IS NOT NULL and imported_at IS NULL and phoenix_amount IS NOT NULL " +
-#    " and enrollment_auth_responses.id < 6698 " +
     (USE_MEMBER_LIST ? " and member_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
   ).find_in_batches do |group|
     puts "cant #{group.count}"

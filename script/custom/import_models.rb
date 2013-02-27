@@ -1,10 +1,16 @@
 # 1- Get access to phoenix, billing_component, customer_services and prospect databases
+# Devel database
+# UPDATE onmc_prospects.prospects set imported_at = NULL where imported_at IS NOT NULL;
+# UPDATE onmc_billing.members set imported_at = NULL where imported_at IS NOT NULL;
+# UPDATE onmc_customer_service.notes set imported_at = NULL where imported_at IS NOT NULL;
+# UPDATE onmc_customer_service.operations set imported_at = NULL where imported_at IS NOT NULL
+# production datase
 # UPDATE prospectcomponente.prospects set imported_at = NULL where imported_at IS NOT NULL
 # UPDATE billing_component.members set imported_at = NULL where imported_at IS NOT NULL
 # UPDATE notes set imported_at = NULL where imported_at IS NOT NULL
 # UPDATE operations set imported_at = NULL where imported_at IS NOT NULL
 #
-# 1.1- Load toms (only once)
+# 1.1- Load toms (only once) => Done
 #     ruby script/custom/import_load_toms.rb  
 #
 # 2- Update members already imported and Load new members 
@@ -19,16 +25,13 @@
 # 5- Import transactions.
 #     ruby script/custom/import_transactions.rb  
 #
-# 6- Import transactions.
+# 6- Import .
 #     ruby script/custom/import_migration_day.rb  
 #
 # 7- Import new prospects into phoenix (only if required)
 #     ruby script/custom/import_prospects.rb  
 #
-# 3- set campaign_id on every membership authorization, to get the amount. 
-#   UPDATE onmc_billing.membership_authorizations SET campaign_id = 
-#      (SELECT campaign_id FROM onmc_billing.members WHERE id =  onmc_billing.membership_authorizations.member_id) WHERE
-#       onmc_billing.membership_authorizations campaign_id IS NULL;
+
 
 require 'rubygems'
 require 'rails'
@@ -59,7 +62,7 @@ end
 unless USE_PROD_DB
   ActiveRecord::Base.configurations["phoenix"] = { 
     :adapter => "mysql2",
-    :database => "sac_platform_development",
+    :database => "sac_production_onmc_import",
     :host => "127.0.0.1",
     :username => "root",
     :password => "" 
@@ -137,7 +140,6 @@ class ProspectProspect < ActiveRecord::Base
     TEST_EMAIL ? "test#{member.id}@xagax.com" : email
   end  
 end
-
 class PhoenixMember < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
@@ -148,7 +150,12 @@ class PhoenixMember < ActiveRecord::Base
     PhoenixMembership.find_by_member_id(self.id).terms_of_membership_id rescue nil
   end
 end
-
+class PhoenixMemberPreference < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "member_preferences" 
+  self.primary_key = 'uuid'
+  before_create 'self.id = UUIDTools::UUID.random_create.to_s'
+end
 class PhoenixProspect < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "prospects" 
@@ -426,7 +433,7 @@ def get_terms_of_membership_id(campaign_id)
   end
   campaign = BillingCampaign.find_by_id(campaign_id)
   return nil if campaign.nil? or campaign.phoenix_tom_id.nil?
-  campaign.phoenix_tom_id
+  campaign.phoenix_tom_id.to_i + 18 # adding 18 arbitrary. why? because parrish ids starts from 1. migration id from 19.
 end
 
 def get_terms_of_membership_name(tom_id)

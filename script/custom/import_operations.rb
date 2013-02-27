@@ -1,6 +1,6 @@
 #!/bin/ruby
 
-require 'import_models'
+require './import_models'
 
 @log = Logger.new('log/import_operations.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
@@ -28,8 +28,11 @@ def load_save_the_sales
   end
 end
 
+# Customer Services Reactivate without Billing
+# Customer Services Reactivate
+# Billing Component Reactivate
 def load_reactivations
-  CustomerServicesOperations.where(" name like '%Customer Services Reactivate%' and imported_at IS NULL " +
+  CustomerServicesOperations.where(" name like '%Customer Services Reactivate%' or name = 'Billing Component Reactivate' and imported_at IS NULL " +
     (USE_MEMBER_LIST ? " and contact_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
     ).find_in_batches do |group|
     puts "cant #{group.count}"
