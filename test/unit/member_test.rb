@@ -4,8 +4,12 @@ require 'test_helper'
 class MemberTest < ActiveSupport::TestCase
 
   setup do
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
-    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @partner = @club.partner
+    Time.zone = @club.time_zone
+
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
     @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
   end
 
@@ -405,6 +409,15 @@ class MemberTest < ActiveSupport::TestCase
       assert_equal(@saved_member.current_membership.status, "active")
       assert_equal(I18n.l(@saved_member.next_retry_bill_date, :format => :only_date), I18n.l(next_bill_date, :format => :only_date))
     end
+  end
+
+  test "Add club cash - more than maximum value on a member related to drupal" do
+    agent = FactoryGirl.create(:confirmed_admin_agent)
+    club = FactoryGirl.create(:club_with_api)
+    member = FactoryGirl.create(:member_with_api, :club_id => @club.id)
+
+    answer = member.add_club_cash(agent, 12385243.2)
+    puts answer
   end
 
 end

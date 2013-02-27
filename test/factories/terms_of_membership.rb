@@ -8,7 +8,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club
+    # association :club
   end
 
   factory :terms_of_membership_hold_card, class: TermsOfMembership do
@@ -19,7 +19,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club
+    # association :club
   end
 
   factory :terms_of_membership_do_not_honor, class: TermsOfMembership do
@@ -30,7 +30,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club
+    # association :club
   end
 
   factory :terms_of_membership_insuf_funds, class: TermsOfMembership do
@@ -41,7 +41,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club
+    # association :club
   end
 
   factory :terms_of_membership_with_gateway, class: TermsOfMembership do
@@ -52,7 +52,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club, factory: :simple_club_with_gateway
+    # association :club, factory: :simple_club_with_gateway
   end
 
   factory :wordpress_terms_of_membership_with_gateway, class: TermsOfMembership do
@@ -63,7 +63,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club, factory: :club_with_wordpress_api
+    # association :club, factory: :club_with_wordpress_api
   end
 
   factory :terms_of_membership_with_gateway_with_family, class: TermsOfMembership do
@@ -74,7 +74,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club, factory: :simple_club_with_gateway_with_family
+    # association :club, factory: :simple_club_with_gateway_with_family
   end
 
   factory :terms_of_membership_with_gateway_and_external_id, class: TermsOfMembership do
@@ -85,7 +85,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club, factory: :simple_club_with_require_external_id
+    # association :club, factory: :simple_club_with_require_external_id
   end
 
   factory :terms_of_membership_with_gateway_and_api, class: TermsOfMembership do
@@ -96,7 +96,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club, factory: :club_with_api
+    # association :club, factory: :club_with_api
   end
 
 
@@ -108,7 +108,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club, factory: :club_with_gateway
+    # association :club, factory: :club_with_gateway
   end
 
   factory :terms_of_membership_with_gateway_needs_approval, class: TermsOfMembership do
@@ -119,7 +119,7 @@ FactoryGirl.define do
     needs_enrollment_approval true
     club_cash_amount 150
     provisional_days 30
-    association :club, factory: :simple_club_with_gateway
+    # association :club, factory: :simple_club_with_gateway
   end
 
   factory :terms_of_membership_with_gateway_without_club_cash, class: TermsOfMembership do
@@ -130,7 +130,7 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 0
     provisional_days 30
-    association :club, factory: :club_with_gateway
+    # association :club, factory: :club_with_gateway
   end  
 
   factory :life_time_terms_of_membership, class: TermsOfMembership do
@@ -141,6 +141,6 @@ FactoryGirl.define do
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
-    association :club, factory: :simple_club_with_gateway
+    # association :club, factory: :simple_club_with_gateway
   end
 end

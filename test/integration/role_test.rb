@@ -32,10 +32,17 @@ class RolesTest < ActionController::IntegrationTest
     sign_in_as(@agent)   
   end
 
+  def setup_fulfillment_managment
+    init_test_setup
+    @agent = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
+    sign_in_as(@agent)
+  end
+
   def setup_member(create_new_member = true)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @partner = @club.partner
     Time.zone = @club.time_zone
+
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @communication_type = FactoryGirl.create(:communication_type)
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
@@ -101,27 +108,6 @@ class RolesTest < ActionController::IntegrationTest
       Club.all.each do |club|
         wait_until{ assert page.has_content?("#{club.partner.prefix} - #{club.name}") }
       end
-    end
-  end
-
-  test "Profile supervisor - See full CC" do
-    setup_admin
-    setup_member
-    @admin_agent.roles = ['supervisor']
-    @admin_agent.reload
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
-    within("#table_active_credit_card")do
-      wait_until{ assert page.has_content?(@saved_member.active_credit_card.number.to_s) }
-    end
-    within(".nav-tabs") do
-      click_on("Credit Cards")
-    end
-    within("#credit_cards")do
-      wait_until{
-        assert page.has_content?(@saved_member.active_credit_card.number.to_s)
-      }
     end
   end
 
@@ -425,8 +411,11 @@ class RolesTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
-    within("#credit_cards")do
-      wait_until{ assert page.has_no_selector?("#destroy") }
+    within('.nav-tabs'){ click_on('Credit Cards')}
+    within("#credit_cards") do
+      wait_until{ 
+        wait_until{ assert page.has_no_selector?("#destroy") }
+      }
     end
   end
 
@@ -440,8 +429,11 @@ class RolesTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
-    within("#credit_cards")do
-      wait_until{ assert page.has_selector?("#destroy") }
+    within('.nav-tabs'){ click_on('Credit Cards')}
+    within("#credit_cards") do
+      wait_until{ 
+        wait_until{ assert page.has_selector?("#destroy") }
+      }
     end
   end
 
@@ -462,8 +454,8 @@ class RolesTest < ActionController::IntegrationTest
 
     wait_until{ 
       fill_in 'credit_card[number]', :with => credit_card.number 
-      fill_in 'credit_card[expire_month]', :with => credit_card.expire_month
-      fill_in 'credit_card[expire_year]', :with => credit_card.expire_year
+      select credit_card.expire_month, :from => 'credit_card[expire_month]'
+      select credit_card.expire_year, :from => 'credit_card[expire_year]'
     }
     click_link_or_button 'Save credit card'
 
@@ -480,8 +472,11 @@ class RolesTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
-    within("#credit_cards")do
-      wait_until{ assert page.has_no_selector?("#destroy") }
+    within('.nav-tabs'){ click_on('Credit Cards')}
+    within("#credit_cards") do
+      wait_until{ 
+        wait_until{ assert page.has_no_selector?("#destroy") }
+      }
     end
   end 
   
@@ -502,13 +497,15 @@ class RolesTest < ActionController::IntegrationTest
       }
     end
 
-    within("#credit_cards")do
-      wait_until{ 
-        assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
-        assert page.has_no_content?("#{@saved_member.active_credit_card.token}") 
-      }
+    within('.nav-tabs'){ click_on 'Credit Cards'}
+    within('.tab-content') do
+      within("#credit_cards") do
+        wait_until{ 
+          assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
+          assert page.has_no_content?("#{@saved_member.active_credit_card.token}") 
+        }
+      end
     end
-
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     wait_until{ assert page.has_selector?("#new_member") } 
   end
@@ -522,8 +519,11 @@ class RolesTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
-    within("#credit_cards")do
-      wait_until{ assert page.has_selector?("#destroy") }
+    within('.nav-tabs'){ click_on('Credit Cards')}
+    within("#credit_cards") do
+      wait_until{ 
+        wait_until{ assert page.has_selector?("#destroy") }
+      }
     end
   end
 
@@ -544,8 +544,8 @@ class RolesTest < ActionController::IntegrationTest
 
     wait_until{ 
       fill_in 'credit_card[number]', :with => credit_card.number 
-      fill_in 'credit_card[expire_month]', :with => credit_card.expire_month
-      fill_in 'credit_card[expire_year]', :with => credit_card.expire_year
+      select credit_card.expire_month, :from => 'credit_card[expire_month]'
+      select credit_card.expire_year, :from => 'credit_card[expire_year]'
     }
     click_link_or_button 'Save credit card'
 
@@ -557,16 +557,119 @@ class RolesTest < ActionController::IntegrationTest
     setup_admin
     setup_member
     @saved_member.set_as_canceled!
-    credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
-    FactoryGirl.create(:operation, :member_id => @saved_member.id, :operation_type => Settings.operation_types.chargeback )
+    credit_card = FactoryGirl.create(:credit_card_american_express, 
+                                     :member_id => @saved_member.id, 
+                                     :active => false )
+    FactoryGirl.create(:operation, :member_id => @saved_member.id, 
+                                   :operation_type => Settings.operation_types.chargeback, 
+                                   :created_by_id => @admin_agent.id )
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
-    within("#credit_cards")do
-      wait_until{ assert page.has_no_selector?("#destroy") }
+    within('.nav-tabs'){ click_on('Credit Cards')}
+    within("#credit_cards") do
+      wait_until{ 
+        wait_until{ assert page.has_no_selector?("#destroy") }
+      }
     end
   end
 
+  test "Agency role - Recover a member" do
+    setup_agency
+    setup_member
+    @saved_member.set_as_canceled!
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    wait_until { assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
+  end
+
+  test "Admin role - Recover a member" do
+    setup_admin
+    setup_member
+    @saved_member.set_as_canceled!
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    wait_until { find(:xpath, "//a[@id='recovery']").click }
+    assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
+  end
+
+  test "Supervisor role - Recover a member" do
+    setup_supervisor
+    setup_member
+    @saved_member.set_as_canceled!
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    wait_until { find(:xpath, "//a[@id='recovery']").click }
+    assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
+  end
+
+  test "Representative role - Recover a member" do
+    setup_representative
+    setup_member
+    @saved_member.set_as_canceled!
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+
+    wait_until { find(:xpath, "//a[@id='recovery']").click }
+    assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
+  end
+
+  test "Admin, Supervisor, fulfillment_managment, Representative and Agency role - Display Credit Card type" do
+    setup_admin
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+
+    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    within("#table_active_credit_card")do
+      assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
+      assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
+    end
+
+    @admin_agent.update_attribute(:roles, ['supervisor'])
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within("#table_active_credit_card")do
+      assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
+      assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
+    end
+
+    @admin_agent.update_attribute(:roles, ['fulfillment_managment'])
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within("#table_active_credit_card")do
+      assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
+      assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
+    end 
+
+    @admin_agent.update_attribute(:roles, ['representative'])
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within("#table_active_credit_card")do
+      assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
+      assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
+    end
+
+    @admin_agent.update_attribute(:roles, ['agency'])
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within("#table_active_credit_card")do
+      assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
+      assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
+    end    
+  end
+
+  test "Profile fulfillment_managment" do
+    setup_fulfillment_managment
+    setup_member false
+    unsaved_member = FactoryGirl.build(:member_with_api, :club_id => @club.id)
+    create_member(unsaved_member)
+    saved_member = Member.find_by_email(unsaved_member.email)
+
+    validate_view_member_base(saved_member)
+  end
 
 end

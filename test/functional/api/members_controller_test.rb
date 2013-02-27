@@ -8,9 +8,13 @@ class Api::MembersControllerTest < ActionController::TestCase
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @api_user = FactoryGirl.create(:confirmed_api_agent)
     @agency_agent = FactoryGirl.create(:confirmed_agency_agent)
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway
-    @terms_of_membership_with_family = FactoryGirl.create :terms_of_membership_with_gateway_with_family
-    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway
+    @fulfillment_managment_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent) 
+    
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @club_with_family = FactoryGirl.create(:simple_club_with_gateway_with_family)
+    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @terms_of_membership_with_family = FactoryGirl.create :terms_of_membership_with_gateway_with_family, :club_id => @club_with_family.id
+    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
 
     @preferences = {'color' => 'green','car'=> 'dodge'}
     # request.env["devise.mapping"] = Devise.mappings[:agent]
@@ -123,7 +127,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
 
-
   test "Representative should enroll/create member" do
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card
@@ -153,7 +156,6 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
-
 
   test "Supervisor should enroll/create member" do
     sign_in @supervisor_user
@@ -192,6 +194,20 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
  
+  #Profile fulfillment_managment
+  test "fulfillment_managment should enroll/create member" do
+    sign_in @fulfillment_managment_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Member.count') do
+      generate_post_message
+      assert_response :success
+    end
+  end
 
   test "admin user should update member" do
     sign_in @admin_user
@@ -280,6 +296,19 @@ class Api::MembersControllerTest < ActionController::TestCase
     generate_put_message
     assert_response :unauthorized
   end
+
+  #Profile fulfillment_managment
+  test "fulfillment_managment user should update member" do
+    sign_in @fulfillment_managment_user
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @credit_card = active_credit_card
+    @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    generate_put_message
+    assert_response :success
+  end 
 
   # Credit card tests.
   test "Should update credit card" do
@@ -631,10 +660,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@active_credit_card.number])
   end
 
-  # # TODO: FIX THIS TEST
-  # # New Member when CC is already used (Sloop) and Family memberships = true
+  # New Member when CC is already used (Sloop) and Family memberships = true
   test "New Member when CC is already used (Drupal) and Family memberships = true" do
     sign_in @admin_user
+    @terms_of_membership = @terms_of_membership_with_family
 
     @former_member = create_active_member(@terms_of_membership_with_family, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
@@ -645,22 +674,15 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
 
     active_merchant_stubs_store(@credit_card.number)
-
     assert_difference('Operation.count',1) do
       assert_difference('CreditCard.count',1) do
         generate_post_message
         assert_response :success
       end
     end
-    @latter_member = Member.find_by_email(@member.email)
-
-    @latter_credit_card = CreditCard.find_by_member_id(@latter_member.id).token 
-
-    assert_equal(@latter_member.active_credit_card.token, @former_member.active_credit_card.token)
   end
 
-  # # TODO: FIX THIS TEST
-  # # New Member when CC is already used (Sloop), Family memberships = true and email is duplicated
+  # New Member when CC is already used (Sloop), Family memberships = true and email is duplicated
   test "Enroll error when CC is already used (Drupal), Family memberships = true and email is duplicated" do
     sign_in @admin_user
     @terms_of_membership.club.update_attribute(:family_memberships_allowed, true)
@@ -727,10 +749,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card = FactoryGirl.build :credit_card_master_card
     active_merchant_stubs_store(@credit_card.number)
   
-    assert @terms_of_membership.club.family_memberships_allowed
+    assert_equal @terms_of_membership.club.family_memberships_allowed, false
     assert_difference("Member.count",0) do
       assert_difference("CreditCard.count",0) do
         generate_post_message
+        assert_equal @response.body, '{"message":"We'+"'"+'re sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: 123 456 7891.","code":"9507","errors":{"number":"Credit card is already in use"}}'
       end
     end
   end
