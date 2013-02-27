@@ -188,8 +188,26 @@ canceled&#8221; )
 </p>
 </dd>
 <dt>operation_type</dt><dd><p>
-Type related to the operation. This value is an Integer value.
+Integer value related to the operation type. Options:
 </p>
+<ul>
+<li><dl>
+<dt>900</dt><dd><p>
+vip_event_registration
+</p>
+</dd>
+</dl>
+</li>
+</ul>
+<ul>
+<li><dl>
+<dt>901</dt><dd><p>
+vip_event_cancelation
+</p>
+</dd>
+</dl>
+</li>
+</ul>
 </dd>
 <dt>operation_date</dt><dd><p>
 If this value is nil we save that operation with Time.zone.now
@@ -299,18 +317,18 @@ Code related to the method result.
       <pre class="lines">
 
 
-24
-25
 26
 27
 28
 29
 30
 31
-32</pre>
+32
+33
+34</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/operation_controller.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/operation_controller.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span>
 	<span class='kw'>begin</span>
@@ -331,7 +349,7 @@ Code related to the method result.
 </div>
 
     <div id="footer">
-  Generated on Tue Feb 26 14:34:40 2013 by
+  Generated on Wed Feb 27 10:33:33 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.2).
 </div>

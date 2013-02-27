@@ -9,7 +9,9 @@ class Api::OperationControllers < ApplicationController
   # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
   # [description] Text that describes the operation in a few words. (Eg. "VIP event number #12 registered for 2013-03-14" or "VIP event number #12 canceled" )
-  # [operation_type] Type related to the operation. This value is an Integer value.
+  # [operation_type] Integer value related to the operation type. Options:
+  #                  * [900] vip_event_registration
+  #                  * [901] vip_event_cancelation
   # [operation_date] If this value is nil we save that operation with Time.zone.now
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
