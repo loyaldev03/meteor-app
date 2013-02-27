@@ -28,7 +28,6 @@ class Ability
     cannot :manage_product_api, Product
     cannot :manage_prospects_api, Prospect
     cannot :manage_token_api, Agent
-    cannot :filter_vip_operations, Operation
 
     if agent.has_role_with_club? 'admin', club_id
       can :manage, Member
@@ -52,7 +51,6 @@ class Ability
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent
-      can :filter_vip_operations, Operation
     elsif agent.has_role_with_club? 'representative', club_id
       can :manage, Member
       cannot :api_profile, Member
@@ -70,7 +68,7 @@ class Ability
       can :manage, Member
       cannot :api_profile, Member
       can :manage, Operation
-      can :read, Membership
+      can :list, Membership
       can :manage, MemberNote
       can :manage, CreditCard
       can :show, TermsOfMembership
@@ -92,7 +90,7 @@ class Ability
       can :report, Fulfillment
       can :read, Member
       can :search_result, Member    
-      can :read, Membership
+      can :list, Membership
       can :list, Operation
       can :show, Operation
       can :show, TermsOfMembership
@@ -103,7 +101,7 @@ class Ability
       can :manage, Member
       cannot :api_profile, Member
       can :manage, Operation
-      can :read, Membership
+      can :list, Membership
       can :manage, CreditCard
       cannot :destroy, CreditCard
       can :manage, MemberNote
