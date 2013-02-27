@@ -9,7 +9,7 @@
     </tr>
     <tr>
       <td>
-        <%= label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %> 
+        <%= label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline' %>: 
         <%= select_tag :terms_of_membership_id, options_from_collection_for_select(TermsOfMembership.where(:club_id => @current_club ), "id", "name") %> 
       </td>
     </tr>
