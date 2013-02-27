@@ -28,6 +28,7 @@ class Ability
     cannot :manage_product_api, Product
     cannot :manage_prospects_api, Prospect
     cannot :manage_token_api, Agent
+    cannot :manage_operations_api, Operation
 
     if agent.has_role_with_club? 'admin', club_id
       can :manage, Member
@@ -51,6 +52,7 @@ class Ability
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent
+      can :manage_operations_api, Operation
     elsif agent.has_role_with_club? 'representative', club_id
       can :manage, Member
       cannot :api_profile, Member
@@ -83,6 +85,7 @@ class Ability
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent
+      can :manage_operations_api, Operation
     # Agency role: Team de acquisicion 
     elsif agent.has_role_with_club? 'agency', club_id
       can :manage, Product

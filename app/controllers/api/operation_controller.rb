@@ -1,4 +1,4 @@
-class Api::OperationControllers < ApplicationController
+class Api::OperationController < ApplicationController
 
 	# Method : POST
   #
@@ -24,9 +24,9 @@ class Api::OperationControllers < ApplicationController
   # @return [Integer] *code*
   # 
 	def create
-		begin
-			member = Member.find(params[:member_id])			
-			Auditory.audit(@current_agent, member, params[:description], member, params[:operation_type], params[:operation_date])
+    begin
+    	member = Member.find(params[:member_id])      
+    	Auditory.audit(@current_agent, member, params[:description], member, params[:operation_type], params[:operation_date])
 			render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
 		rescue Exception => e
 			render json: { :message => "Operation was not created. Errors: #{e}", :code => Settings.error_codes.operation_not_saved}
