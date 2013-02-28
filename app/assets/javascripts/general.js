@@ -81,7 +81,8 @@ $(document).ready( function() {
       "bLengthChange": false,
       "iDisplayLength": 25,
       "aaSorting": [[ 0, "asc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count+1, column_count ], "sWidth": "25%", "aTargets": [ 3 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count+1, column_count ] }],
+      "aoColumnDefs": [{ "sWidth": "380px", "aTargets": [ column_count+1 ] }],
       "sAjaxSource": $('#clubs_table').data('source'),
     });
   }
@@ -93,7 +94,8 @@ $(document).ready( function() {
       "bProcessing": true,
       "bServerSide": true,
       "aaSorting": [[ 0, "asc" ]],
-      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ], "sWidth": "20%", "aTargets": [ 3 ] }],
+      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ]}],
+      "aoColumnDefs": [{ "sWidth": "360px", "aTargets": [ column_count+1 ] }],
       "sAjaxSource": $('#my_clubs_table').data('source'),
     });
   }
@@ -107,6 +109,7 @@ $(document).ready( function() {
       "iDisplayLength": 25,
       "aaSorting": [[ 0, "asc" ]],
       "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+      "aoColumnDefs": [{ "sWidth": "190px", "aTargets": [ column_count ] }],
       "sAjaxSource": $('#domains_table').data('source'),
     });   
   }

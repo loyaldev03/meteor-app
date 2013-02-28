@@ -36,8 +36,8 @@
 				<tr>
 					<td> <a href="<%= show_member_path(:member_prefix => fulfillment.member.visible_id) %>" > <%= fulfillment.member.visible_id %></a></td>
 					<td> <%= fulfillment.member.full_name %> </td>
-					<td> <%= I18n.l fulfillment.assigned_at, :format => :long %> </td>
-					<td> <%= I18n.l fulfillment.renewable_at, :format => :long unless fulfillment.renewable_at.nil? %> </td>
+					<td> <%= I18n.l fulfillment.assigned_at, :format => :only_date %> </td>
+					<td> <%= I18n.l fulfillment.renewable_at, :format => :only_date unless fulfillment.renewable_at.nil? %> </td>
 					<td> <%= fulfillment.product_sku %> </td>
 					<td> <%= fulfillment.tracking_code %> </td>
 					<td> <%= fulfillment.status %> </td>

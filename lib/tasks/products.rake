@@ -4,6 +4,8 @@ namespace :products do
   task :send_product_list_email => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/products_send_product_list_email.log")
     tall = Time.zone.now
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting products:send_product_list_email rake task"
+
     begin
       product_xls = Product.generate_xls
       temp = Tempfile.new("posts.xlsx") 

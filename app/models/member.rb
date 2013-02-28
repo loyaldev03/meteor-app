@@ -792,7 +792,7 @@ class Member < ActiveRecord::Base
 
   def self.sync_members_to_pardot
     base = Member.where(" date(updated_at) >= ? ", Time.zone.now.yesterday.to_date)
-    Rails.logger.info " *** Starting members:sync_members_to_pardot, processing #{base.count} members"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_pardot, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each do |member| 
         tz = Time.zone.now
@@ -814,7 +814,7 @@ class Member < ActiveRecord::Base
     file.flock(File::LOCK_EX)
     base = Member.where(" next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status != 'lapsed'", 
                 Time.zone.now)
-    Rails.logger.info " *** Starting members:billing rake task, processing #{base.count} members"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:billing rake task, processing #{base.count} members"
     base.find_in_batches(:batch_size => 60) do |group|
       group.each do |member| 
         tz = Time.zone.now
@@ -834,6 +834,7 @@ class Member < ActiveRecord::Base
   def self.send_pillar_emails
     # TODO: join EmailTemplate and Member querys
     EmailTemplate.find_in_batches(:conditions => [" template_type = ? ", :pillar]) do |group|
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{group.count} templates"
       group.each do |template| 
         tz = Time.zone.now
         begin
@@ -864,6 +865,7 @@ class Member < ActiveRecord::Base
   # Method used from rake task and also from tests!
   def self.reset_club_cash_up_today
     Member.includes(:club).find_in_batches(:conditions => ["date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member'", Time.zone.now.to_date ]) do |group|
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:reset_club_cash_up_today rake task, processing #{group.count} members"
       group.each do |member| 
         tz = Time.zone.now
         begin
@@ -881,7 +883,7 @@ class Member < ActiveRecord::Base
   # Method used from rake task and also from tests!
   def self.cancel_all_member_up_today
     base =  Member.joins(:current_membership).where(" date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
-    Rails.logger.info " *** Starting members:cancel rake task, processing #{base.count} members"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:cancel_all_member_up_today rake task, processing #{group.count} members"
     base.find_in_batches do |group|
       group.each do |member| 
         tz = Time.zone.now
@@ -899,12 +901,14 @@ class Member < ActiveRecord::Base
 
   def self.process_sync 
     Member.find_in_batches( :conditions => ("status = 'lapsed' AND api_id IS NOT NULL") ) do |group|
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members lapsed and api_id not null, processing #{group.count} members"
       group.each do |member|
         member.api_member.destroy!
         Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
       end
     end
     Member.find_in_batches( :conditions => ("sync_status IN ('with_error', 'not_synced')") ) do |group|
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{group.count} members"
       group.each do |member|
         Rails.logger.info "  * processing member ##{member.uuid}"
         api_m = member.api_member
@@ -933,7 +937,7 @@ class Member < ActiveRecord::Base
     today = Time.zone.now.to_date
     base = Member.billable.where(" birth_date IS NOT NULL and DAYOFMONTH(birth_date) = ? and MONTH(birth_date) = ? ", 
       today.day, today.month)
-    Rails.logger.info " *** Starting members:send_happy_birthday rake task, processing #{base.count} members"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_happy_birthday rake task, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each do |member| 
         tz = Time.zone.now
