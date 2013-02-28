@@ -379,7 +379,7 @@ $(document).ready( function() {
 
   function transactions_member_functions(column_count){
     $('#transactions_table').dataTable({
-      "oLanguage": {"sSearch": "Filtered by:"},
+      "oLanguage": {"sSearch": ""},
       "bJQueryUI": false,
       "bProcessing": true,
       "sPaginationType": "bootstrap",

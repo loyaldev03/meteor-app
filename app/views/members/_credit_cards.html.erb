@@ -27,7 +27,7 @@
       </td>
       <td> <%= cc.expire_month %> / <%= cc.expire_year %> </td>
       <td> <%= I18n.l cc.created_at, :format => :only_date %></td>
-      <td> <%= I18n.l cc.last_successful_bill_date, :format => :long if !cc.last_successful_bill_date.nil? %> </td>
+      <td> <%= I18n.l cc.last_successful_bill_date, :format => :dashed if !cc.last_successful_bill_date.nil? %> </td>
       <td>
         <% if cc.blacklisted %>
           <%= t('activerecord.attributes.credit_card.blacklisted') %>

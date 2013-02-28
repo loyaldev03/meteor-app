@@ -12,7 +12,7 @@ private
   def data
     transactions.map do |transaction|
       [
-        I18n.l(transaction.created_at, :format => :long),
+        I18n.l(transaction.created_at, :format => :dashed),
         transaction.full_label.truncate(50)+
         " <i class ='icon-eye-open help' rel= 'popover' data-toggle='modal' href='#myModal"+transaction.id+"' 
              style='cursor: pointer'></i>"+modal(transaction), 
