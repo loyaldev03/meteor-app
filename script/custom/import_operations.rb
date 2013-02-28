@@ -42,7 +42,6 @@ def load_reactivations
         unless @member.nil?
           @log.info "  * processing CS operation ##{op.id}"
           add_operation(op.operation_date, nil, nil, op.name, Settings.operation_types.recovery, op.created_on, op.updated_on, op.author_id)
-          @member.increment!(:reactivation_times)
           op.update_attribute :imported_at, Time.now.utc
           print "."
         end

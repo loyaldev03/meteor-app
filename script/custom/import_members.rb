@@ -7,17 +7,19 @@ ActiveRecord::Base.logger = @log
 
 KIT_CARD_FULFILLMENT = "KIT-CARD"
 
-def add_fulfillment
-  phoenix_f = PhoenixFulfillment.find_or_create_by_member_id @member.uuid
-  phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.visible_id.to_s
-  phoenix_f.product_package = KIT_CARD_FULFILLMENT
-  phoenix_f.product_sku = KIT_CARD_FULFILLMENT
-  phoenix_f.assigned_at = Time.zone.now
-  renewdate = @member.join_date + (Date.today.year - day.year).years
-  phoenix_f.renewable_at = (renewdate > Date.today ? renewdate : renewdate.next_year)
-  phoenix_f.recurrent = true
-  phoenix_f.status = "not_processed"
-  phoenix_f.save!  
+def add_fulfillment(member)
+  unless @campaign.product_sku.empty?
+    phoenix_f = PhoenixFulfillment.find_or_create_by_member_id @member.uuid
+    phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.visible_id.to_s
+    phoenix_f.product_package = KIT_CARD_FULFILLMENT
+    phoenix_f.product_sku = KIT_CARD_FULFILLMENT
+    phoenix_f.assigned_at = Time.now.utc
+    renewdate = member.phoenix_join_date + (Date.today.year - member.phoenix_join_date.year).years
+    phoenix_f.renewable_at = (renewdate > Date.today ? renewdate : renewdate.next_year)
+    phoenix_f.recurrent = true
+    phoenix_f.status = "not_processed"
+    phoenix_f.save!  
+  end
 end
 
 def remove_fulfillment
@@ -40,11 +42,6 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.phone_local_number = member.phone_local_number
   phoenix.reactivation_times = member.phoenix_reactivations
   phoenix.preferences = { :driver_1 => member.fav_driver1, :driver_2 => member.fav_driver2, :track => member.fav_track, :car => member.fav_car }
-  phoenix.preferences.each do |key, value|
-    pref = PhoenixMemberPreference.find_or_create_by_member_id_and_club_id_and_param(phoenix.id, phoenix.club_id, key)
-    pref.value = value
-    pref.save
-  end
   # phoenix.gender
   phoenix.blacklisted = member.blacklisted
   phoenix.api_id = member.api_id
@@ -187,7 +184,7 @@ def update_members
         if member.phoenix_status == 'lapsed'
           remove_fulfillment
         else
-          add_fulfillment
+          add_fulfillment(member)
         end
 
         member.update_attribute :imported_at, Time.now.utc
@@ -205,9 +202,9 @@ end
 
 # 2- import new members.
 def add_new_members
-  BillingMember.where(" imported_at IS NULL and is_prospect = false and LOCATE('@', email) != 0 " + 
-    # " and id <= 60683457 " + 
-      " and credit_card_token IS NOT NULL and phoenix_status = 'active' ").find_in_batches do |group|
+  BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
+     #" and id <= 11325442002 " + 
+      " and credit_card_token IS NOT NULL and phoenix_status IN ('active', 'provisional') ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
       get_campaign_and_tom_id(member.campaign_id)
@@ -255,7 +252,7 @@ def add_new_members
         if member.phoenix_status == 'lapsed'
           remove_fulfillment
         else
-          add_fulfillment
+          add_fulfillment(member)
         end
 
         member.update_attribute :imported_at, Time.now.utc

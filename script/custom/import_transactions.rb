@@ -71,7 +71,8 @@ def load_enrollment_transactions
           unless @member.nil?
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
-            transaction.terms_of_membership_id = get_terms_of_membership_id(authorization.campaign_id)
+            get_campaign_and_tom_id(authorization.campaign_id)
+            transaction.terms_of_membership_id = @tom_id
             next if transaction.terms_of_membership_id.nil?
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
@@ -131,7 +132,8 @@ def load_membership_transactions
             @log.info "  * processing Membership Auth response ##{response.id}"
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
-            transaction.terms_of_membership_id = get_terms_of_membership_id(authorization.campaign_id)
+            get_campaign_and_tom_id(authorization.campaign_id)
+            transaction.terms_of_membership_id = @tom_id
             next if transaction.terms_of_membership_id.nil?
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
