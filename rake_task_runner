@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # needs to find ruby and rake binaries
 export PATH=$PATH:/usr/local/bin
