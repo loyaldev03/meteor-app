@@ -298,7 +298,7 @@ class Member < ActiveRecord::Base
 
   # Returns true if member is active or provisional.
   def can_bill_membership?
-    ( self.active? or self.provisional? ) and self.club.billing_enable and self.next_retry_bill_date <= Time.zone.now
+    ( self.active? or self.provisional? ) and self.club.billing_enable
   end
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
@@ -369,7 +369,7 @@ class Member < ActiveRecord::Base
   end
 
   def bill_membership
-    if can_bill_membership?
+    if can_bill_membership? and self.next_retry_bill_date <= Time.zone.now
       amount = terms_of_membership.installment_amount
       if amount.to_f > 0.0
         if terms_of_membership.payment_gateway_configuration.nil?
