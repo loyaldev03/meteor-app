@@ -399,12 +399,10 @@ class Member < ActiveRecord::Base
       else
         { :message => "Called billing method but no amount on TOM is set.", :code => Settings.error_codes.no_amount }
       end
+    elsif self.club.billing_enable
+      { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
     else
-      if self.club.billing_enable
-        { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
-      else
-        { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
-      end
+      { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
     end
   end
 
