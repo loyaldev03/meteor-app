@@ -16,7 +16,7 @@
   		<tr <% if fulfillment.in_process? %> 
         	  class="ligthgreen" 
        		 <% end %> >
-        <td> <%= I18n.l fulfillment.assigned_at, :format => :dashed %> </td>
+        <td> <%= I18n.l fulfillment.assigned_at, :format => :only_date %> </td>
         <td> <%= fulfillment.product_sku %> </td>
         <td> <%= fulfillment.recurrent ? (fulfillment.renewed ? 'Yes' : 'No') : '-' %> </td>
         <td> <%= fulfillment.renewable_at.nil? ? '-' : I18n.l(fulfillment.renewable_at, :format => :only_date) %> </td>
