@@ -13,7 +13,7 @@ namespace :products do
       temp.close 
       temp.unlink
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run products:send_product_list_email task"
     end
   end
 

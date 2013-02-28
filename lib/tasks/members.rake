@@ -6,7 +6,7 @@ namespace :billing do
     begin
       Member.bill_all_members_up_today
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run billing:for_today task"
     end
   end
 
@@ -18,7 +18,7 @@ namespace :billing do
       # We use bill_date because we will only send this email once!
       Member.send_prebill
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run billing:send_prebill task"
     end
   end
 end
@@ -50,7 +50,7 @@ namespace :members do
     begin
       Member.cancel_all_member_up_today
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:cancel task"
     end
   end
 
@@ -62,7 +62,7 @@ namespace :members do
     begin
       Member.sync_members_to_pardot
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:sync_members_to_pardot task"
     end
   end
 
@@ -73,7 +73,7 @@ namespace :members do
     begin
       Member.send_happy_birthday
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:send_happy_birthday task"
     end
   end
 
@@ -83,7 +83,7 @@ namespace :members do
     begin
       Member.send_pillar_emails
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:send_pillar_emails task"
     end
   end
 
@@ -94,7 +94,7 @@ namespace :members do
     begin
       Member.reset_club_cash_up_today
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_club_cash task"
     end
   end
 
@@ -105,7 +105,7 @@ namespace :members do
     begin
       Fulfillment.process_fulfillments_up_today
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_fulfillments task"
     end
   end
 
@@ -116,7 +116,7 @@ namespace :members do
     begin
       Member.process_sync
     ensure 
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_sync task"
     end
   end
 
@@ -127,7 +127,7 @@ namespace :members do
     begin
       Member.process_email_sync_error
     ensure 
-      Rails.logger.info "It all took #{Time.zone.now - tall}"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_email_sync_error task"
     end 
   end
 end
