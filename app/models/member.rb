@@ -869,8 +869,7 @@ class Member < ActiveRecord::Base
         tz = Time.zone.now
         begin
           Rails.logger.info "  * processing member ##{member.uuid}"
-          # TODO: esto no lo tenemos que hacer para members de drupla!!
-          member.reset_club_cash
+          member.reset_club_cash if club_cash_transactions_enabled
         rescue Exception => e
           Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
