@@ -1,6 +1,6 @@
 #!/bin/ruby
 
-require 'import_models'
+require './import_models'
 
 @log = Logger.new('log/import_prospects.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
@@ -10,7 +10,7 @@ ProspectProspect.where(" imported_at IS NULL and member_id IS NULL ").find_in_ba
   group.each do |prospect| 
     get_campaign_and_tom_id(prospect.campaign_id)
     if @tom_id.nil?
-      puts "CDId #{member.campaign_id} does not exist or TOM is empty"
+      puts "CDId #{prospect.campaign_id} does not exist or TOM is empty"
       next
     end
     tz = Time.now.utc

@@ -16,7 +16,6 @@ def load_refunds
         tz = Time.now.utc
         @log.info "  * processing Chargeback ##{refund.id}"
         begin
-          # TODO: update refunded $$ on transactions
           transaction = PhoenixTransaction.new
           transaction.member_id = @member.uuid
           transaction.terms_of_membership_id = @member.terms_of_membership_id
@@ -81,7 +80,7 @@ def load_enrollment_transactions
             transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
             transaction.response = { :authorization => response.message }
-            transaction.response_code = response.code
+            transaction.response_code = "%03d" % response.code.to_i
             transaction.response_result = transaction.response
             if response.code.to_i == 0
               transaction.response_transaction_id = authorization.litleTxnId
@@ -142,7 +141,7 @@ def load_membership_transactions
             transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
             transaction.response = { :authorization => response.message }
-            transaction.response_code = response.code
+            transaction.response_code = "%03d" % response.code.to_i
             transaction.response_result = transaction.response
             if response.code.to_i == 0
               transaction.response_transaction_id = authorization.litleTxnId
@@ -185,8 +184,7 @@ end
 
 
 
-load_refunds
+
 load_enrollment_transactions
 load_membership_transactions
-
-
+load_refunds
