@@ -2,6 +2,7 @@ namespace :billing do
   desc "Find members that have NBD for today. and bill them all!"
   # This task should be run each day at 3 am ?
   task :for_today => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/billing_for_today.log")
     tall = Time.zone.now
     begin
       Member.bill_all_members_up_today
@@ -13,6 +14,7 @@ namespace :billing do
   desc "Send prebill emails"
   # This task should be run each day at 3 am ?
   task :send_prebill => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/billing_send_prebill.log")
     tall = Time.zone.now
     begin
       # We use bill_date because we will only send this email once!
@@ -26,6 +28,7 @@ end
 namespace :members do
   desc "Refresh autologin_url for ALL members"
   task :Members => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/members_members.log")
     tall = Time.zone.now
     begin
       Rails.logger.info " *** Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
@@ -46,6 +49,7 @@ namespace :members do
   desc "Cancel members"
   # This task should be run each day at 3 am ?
   task :cancel => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/members_cancel.log")
     tall = Time.zone.now
     begin
       Member.cancel_all_member_up_today
@@ -58,6 +62,7 @@ namespace :members do
   desc "Sync members to pardot"
   # This task should be run each day at 3 am ?
   task :sync_members_to_pardot => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/members_sync_members_to_pardot.log")
     tall = Time.zone.now
     begin
       Member.sync_members_to_pardot
@@ -69,6 +74,7 @@ namespace :members do
   desc "Send Happy birthday email to members"
   # This task should be run each day at 3 am ?
   task :send_happy_birthday => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/members_send_happy_birthday.log")
     tall = Time.zone.now
     begin
       Member.send_happy_birthday
@@ -79,6 +85,7 @@ namespace :members do
 
   desc "Send pillar emails"
   task :send_pillar_emails => :environment do 
+    Rails.logger = Logger.new("#{Rails.root}/log/members_send_pillar_emails.log")
     tall = Time.zone.now
     begin
       Member.send_pillar_emails
@@ -90,6 +97,7 @@ namespace :members do
   desc "Process club cash"
   # This task should be run each day at 3 am 
   task :process_club_cash => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/members_process_club_cash.log")
     tall = Time.zone.now
     begin
       Member.reset_club_cash_up_today
@@ -101,6 +109,7 @@ namespace :members do
   desc "Process fulfillments"
   # This task should be run each day at 3 am 
   task :process_fulfillments => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/members_process_fulfillments.log")
     tall = Time.zone.now
     begin
       Fulfillment.process_fulfillments_up_today
@@ -112,6 +121,7 @@ namespace :members do
   desc "Process sync of member"
   # This task should be run every X hours.
   task :process_sync => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/members_process_sync.log")
     tall = Time.zone.now
     begin
       Member.process_sync
@@ -123,6 +133,7 @@ namespace :members do
   desc "Process members with duplicated emails errors on sync"
   # This task should be run every X hours. 
   task :process_email_sync_error => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/members_process_email_sync_error.log")
     tall = Time.zone.now
     begin
       Member.process_email_sync_error

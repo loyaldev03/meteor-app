@@ -2,6 +2,7 @@ namespace :products do
   desc "Sent current product status list."
   # This task should be run each day at 3 am ?
   task :send_product_list_email => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/products_send_product_list_email.log")
     tall = Time.zone.now
     begin
       product_xls = Product.generate_xls
