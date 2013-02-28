@@ -298,7 +298,7 @@ class Member < ActiveRecord::Base
 
   # Returns true if member is active or provisional.
   def can_bill_membership?
-    ( self.active? or self.provisional? ) and self.club.billing_enable and self.next_retry_bill_date <= Time.zone.now
+    ( self.active? or self.provisional? ) and self.club.billing_enable
   end
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
@@ -369,7 +369,7 @@ class Member < ActiveRecord::Base
   end
 
   def bill_membership
-    if can_bill_membership?
+    if can_bill_membership? and self.next_retry_bill_date <= Time.zone.now
       amount = terms_of_membership.installment_amount
       if amount.to_f > 0.0
         if terms_of_membership.payment_gateway_configuration.nil?
@@ -683,7 +683,6 @@ class Member < ActiveRecord::Base
             cct = ClubCashTransaction.new(:amount => amount, :description => description)
             cct.member = self
             raise "Could not save club cash transaction" unless cct.valid? and self.valid?
-            cct.save!
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save(:validate => false)
             message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }. Concept: #{description}"
@@ -864,12 +863,12 @@ class Member < ActiveRecord::Base
 
   # Method used from rake task and also from tests!
   def self.reset_club_cash_up_today
-    Member.find_in_batches(:conditions => [" date(club_cash_expire_date) <= ? ", Time.zone.now.to_date ]) do |group|
+    Member.includes(:club).find_in_batches(:conditions => ["date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member'", Time.zone.now.to_date ]) do |group|
       group.each do |member| 
         tz = Time.zone.now
         begin
           Rails.logger.info "  * processing member ##{member.uuid}"
-          member.reset_club_cash if club_cash_transactions_enabled
+          member.reset_club_cash
         rescue Exception => e
           Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
