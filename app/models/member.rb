@@ -298,7 +298,7 @@ class Member < ActiveRecord::Base
 
   # Returns true if member is active or provisional.
   def can_bill_membership?
-    ( self.active? or self.provisional? ) and self.club.billing_enable
+    ( self.active? or self.provisional? ) and self.club.billing_enable and self.next_retry_bill_date <= Time.zone.now
   end
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
@@ -399,10 +399,14 @@ class Member < ActiveRecord::Base
       else
         { :message => "Called billing method but no amount on TOM is set.", :code => Settings.error_codes.no_amount }
       end
-    elsif self.club.billing_enable
-      { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
     else
-      { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
+      if not self.club.billing_enable
+        { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
+      elsif self.next_retry_bill_date > Time.zone.now 
+        { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
+      else
+        { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+      end
     end
   end
 
@@ -865,8 +869,7 @@ class Member < ActiveRecord::Base
         tz = Time.zone.now
         begin
           Rails.logger.info "  * processing member ##{member.uuid}"
-          # TODO: esto no lo tenemos que hacer para members de drupla!!
-          member.reset_club_cash
+          member.reset_club_cash if club_cash_transactions_enabled
         rescue Exception => e
           Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"

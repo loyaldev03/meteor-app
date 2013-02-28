@@ -33,8 +33,8 @@
   	  </td>
   	  <td> <%= communication.template_name %> </td>
   	  <td> <%= communication.email %> </td>
-  	  <td> <%= I18n.l communication.scheduled_at, :format => :long if communication.scheduled_at %> </td>
-  	  <td> <%= I18n.l communication.processed_at, :format => :long if communication.processed_at %> </td>
+  	  <td> <%= I18n.l communication.scheduled_at, :format => :only_date if communication.scheduled_at %> </td>
+  	  <td> <%= I18n.l communication.processed_at, :format => :only_date if communication.processed_at %> </td>
   	  <td> <%= communication.template_type %> </td>
     <tr>
 	 <% end %>
