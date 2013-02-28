@@ -31,7 +31,7 @@ namespace :members do
     Rails.logger = Logger.new("#{Rails.root}/log/members_members.log")
     tall = Time.zone.now
     begin
-      Rails.logger.info " *** Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
+      Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
       Member.find_each do |member|
         begin
           Rails.logger.info "   * processing member ##{member.uuid}"
