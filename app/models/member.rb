@@ -298,7 +298,7 @@ class Member < ActiveRecord::Base
 
   # Returns true if member is active or provisional.
   def can_bill_membership?
-    ( self.active? or self.provisional? ) and self.club.billing_enable
+    ( self.active? or self.provisional? ) and self.club.billing_enable and self.next_retry_bill_date <= Time.zone.now
   end
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
@@ -400,10 +400,12 @@ class Member < ActiveRecord::Base
         { :message => "Called billing method but no amount on TOM is set.", :code => Settings.error_codes.no_amount }
       end
     else
-      if self.club.billing_enable
-        { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
-      else
+      if not self.club.billing_enable
         { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
+      elsif self.next_retry_bill_date > Time.zone.now 
+        { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
+      else
+        { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
       end
     end
   end
