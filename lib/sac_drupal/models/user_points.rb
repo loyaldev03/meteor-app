@@ -43,7 +43,7 @@ module Drupal
     def fieldmap(options)
       {
         uid: member.api_id,
-        points: options[:amount],
+        points: options[:amount].to_f*100,
         operation: "Add",
         description: options[:description],
         entity_type: "",
