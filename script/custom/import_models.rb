@@ -1,10 +1,16 @@
 # 1- Get access to phoenix, billing_component, customer_services and prospect databases
+# Devel database
+# UPDATE onmc_prospects.prospects set imported_at = NULL where imported_at IS NOT NULL;
+# UPDATE onmc_billing.members set imported_at = NULL where imported_at IS NOT NULL;
+# UPDATE onmc_customer_service.notes set imported_at = NULL where imported_at IS NOT NULL;
+# UPDATE onmc_customer_service.operations set imported_at = NULL where imported_at IS NOT NULL
+# production datase
 # UPDATE prospectcomponente.prospects set imported_at = NULL where imported_at IS NOT NULL
 # UPDATE billing_component.members set imported_at = NULL where imported_at IS NOT NULL
 # UPDATE notes set imported_at = NULL where imported_at IS NOT NULL
 # UPDATE operations set imported_at = NULL where imported_at IS NOT NULL
 #
-# 1.1- Load toms (only once)
+# 1.1- Load toms (only once) => Done
 #     ruby script/custom/import_load_toms.rb  
 #
 # 2- Update members already imported and Load new members 
@@ -19,16 +25,13 @@
 # 5- Import transactions.
 #     ruby script/custom/import_transactions.rb  
 #
-# 6- Import transactions.
+# 6- Import .
 #     ruby script/custom/import_migration_day.rb  
 #
 # 7- Import new prospects into phoenix (only if required)
 #     ruby script/custom/import_prospects.rb  
 #
-# 3- set campaign_id on every membership authorization, to get the amount. 
-#   UPDATE onmc_billing.membership_authorizations SET campaign_id = 
-#      (SELECT campaign_id FROM onmc_billing.members WHERE id =  onmc_billing.membership_authorizations.member_id) WHERE
-#       onmc_billing.membership_authorizations campaign_id IS NULL;
+
 
 require 'rubygems'
 require 'rails'
@@ -52,14 +55,14 @@ USE_MEMBER_LIST = true
 
 
 if USE_PROD_DB
-#  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
-#  exit
+  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
+  exit
 end
 
 unless USE_PROD_DB
   ActiveRecord::Base.configurations["phoenix"] = { 
     :adapter => "mysql2",
-    :database => "sac_platform_development",
+    :database => "sac_production_onmc_import",
     :host => "127.0.0.1",
     :username => "root",
     :password => "" 
@@ -90,41 +93,41 @@ unless USE_PROD_DB
   }
 else
   # PRODUCTION !!!!!!!!!!!!!!!!
-  ActiveRecord::Base.configurations["phoenix"] = { 
-    :adapter => "mysql2",
-    :database => "sac_production",
-    :host => "10.6.0.58",
-    :username => "root",
-    :password => 'pH03n[xk1{{s', 
-    :port => 3306 
-  }
+  # ActiveRecord::Base.configurations["phoenix"] = { 
+  #   :adapter => "mysql2",
+  #   :database => "sac_production",
+  #   :host => "10.6.0.58",
+  #   :username => "root",
+  #   :password => 'pH03n[xk1{{s', 
+  #   :port => 3306 
+  # }
 
-  ActiveRecord::Base.configurations["billing"] = { 
-    :adapter => "mysql2",
-    :database => "billingcomponent_production",
-    :host => "10.6.0.6",
-    :username => "root2",
-    :password => "f4c0n911",
-    :port => 3306
-  }
+  # ActiveRecord::Base.configurations["billing"] = { 
+  #   :adapter => "mysql2",
+  #   :database => "billingcomponent_production",
+  #   :host => "10.6.0.6",
+  #   :username => "root2",
+  #   :password => "f4c0n911",
+  #   :port => 3306
+  # }
 
-  ActiveRecord::Base.configurations["customer_services"] = { 
-    :adapter => "mysql2",
-    :database => "customerservice3",
-    :host => "10.6.0.6",
-    :username => "root2",
-    :password => "f4c0n911",
-    :port => 3308
-  }
+  # ActiveRecord::Base.configurations["customer_services"] = { 
+  #   :adapter => "mysql2",
+  #   :database => "customerservice3",
+  #   :host => "10.6.0.6",
+  #   :username => "root2",
+  #   :password => "f4c0n911",
+  #   :port => 3308
+  # }
 
-  ActiveRecord::Base.configurations["prospect"] = { 
-    :adapter => "mysql2",
-    :database => "prospectcomponent",
-    :host => "10.6.0.6",
-    :username => "root2",
-    :password => "f4c0n911",
-    :port => 3306
-  }
+  # ActiveRecord::Base.configurations["prospect"] = { 
+  #   :adapter => "mysql2",
+  #   :database => "prospectcomponent",
+  #   :host => "10.6.0.6",
+  #   :username => "root2",
+  #   :password => "f4c0n911",
+  #   :port => 3306
+  # }
 end
 
 
@@ -137,22 +140,29 @@ class ProspectProspect < ActiveRecord::Base
     TEST_EMAIL ? "test#{member.id}@xagax.com" : email
   end  
 end
-
 class PhoenixMember < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 
+  serialize :preferences, JSON
+
   def terms_of_membership_id
     PhoenixMembership.find_by_member_id(self.id).terms_of_membership_id rescue nil
   end
 end
-
+class PhoenixMemberPreference < ActiveRecord::Base
+  establish_connection "phoenix" 
+  self.table_name = "member_preferences" 
+  self.primary_key = 'uuid'
+  before_create 'self.id = UUIDTools::UUID.random_create.to_s'
+end
 class PhoenixProspect < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "prospects" 
   self.primary_key = 'uuid'
+  serialize :preferences, JSON
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 end
 class PhoenixCreditCard < ActiveRecord::Base
@@ -171,6 +181,7 @@ end
 class PhoenixEnrollmentInfo < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "enrollment_infos" 
+  serialize :preferences, JSON
 end
 class PhoenixTransaction < ActiveRecord::Base
   establish_connection "phoenix" 
@@ -393,12 +404,7 @@ def get_campaign_and_tom_id(cid)
   @campaign = BillingCampaign.find_by_id(cid)
   @tom_id = nil
   unless @campaign.nil?
-    if @campaign.phoenix_tom_id.nil?
-      @tom_id = get_terms_of_membership_id(cid)
-      @campaign = BillingCampaign.find_by_id(cid)
-    else
-      @tom_id = @campaign.phoenix_tom_id
-    end
+    @tom_id = @campaign.phoenix_tom_id.to_i + 18
   end
 end
 
@@ -416,17 +422,6 @@ def convert_from_date_to_time(x)
   elsif x.class == DateTime || x.class == Time
     x
   end
-end
-
-
-# "CID ","TOM PROVISIONAL_DAYS","Mega Channel","TOM Membership_amount","Tom Membership_Type","Campaign Description","Campaign Medium","Campaign Medium Version ","Referral Host","Marketing Code","fulfillment_code","Product Description","Product ID ","Landing URL  ","Notes","Joint"
-def get_terms_of_membership_id(campaign_id)
-  if campaign_id.nil?
-    # refs #18932 , members without CID are complementary. This means we have to set them a lifetime TOM.
-  end
-  campaign = BillingCampaign.find_by_id(campaign_id)
-  return nil if campaign.nil? or campaign.phoenix_tom_id.nil?
-  campaign.phoenix_tom_id
 end
 
 def get_terms_of_membership_name(tom_id)
@@ -462,7 +457,7 @@ def new_prospect(object, campaign, tom_id)
   phoenix.campaign_medium = campaign.campaign_medium
   phoenix.campaign_description = campaign.campaign_description
   phoenix.campaign_medium_version = campaign.campaign_medium_version
-  phoenix.preferences = { :old_id => object.id }.to_json
+  phoenix.preferences = { :old_id => object.id }
   phoenix.referral_parameters = {}.to_json
   phoenix.gender = object.gender
   phoenix.save!

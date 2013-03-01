@@ -1,6 +1,6 @@
 #!/bin/ruby
 
-require 'import_models'
+require './import_models'
 
 @log = Logger.new('log/import_transactions.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
@@ -16,7 +16,6 @@ def load_refunds
         tz = Time.now.utc
         @log.info "  * processing Chargeback ##{refund.id}"
         begin
-          # TODO: update refunded $$ on transactions
           transaction = PhoenixTransaction.new
           transaction.member_id = @member.uuid
           transaction.terms_of_membership_id = @member.terms_of_membership_id
@@ -58,7 +57,6 @@ def load_enrollment_transactions
   BillingEnrollmentAuthorizationResponse.
   joins(' JOIN enrollment_authorizations ON enrollment_authorizations.id = enrollment_auth_responses.authorization_id ').
   where(" enrollment_authorizations.campaign_id IS NOT NULL and imported_at IS NULL and phoenix_amount IS NOT NULL " +
-#    " and enrollment_auth_responses.id < 6698 " +
     (USE_MEMBER_LIST ? " and member_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
   ).find_in_batches do |group|
     puts "cant #{group.count}"
@@ -72,7 +70,8 @@ def load_enrollment_transactions
           unless @member.nil?
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
-            transaction.terms_of_membership_id = get_terms_of_membership_id(authorization.campaign_id)
+            get_campaign_and_tom_id(authorization.campaign_id)
+            transaction.terms_of_membership_id = @tom_id
             next if transaction.terms_of_membership_id.nil?
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
@@ -81,7 +80,7 @@ def load_enrollment_transactions
             transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
             transaction.response = { :authorization => response.message }
-            transaction.response_code = response.code
+            transaction.response_code = "%03d" % response.code.to_i
             transaction.response_result = transaction.response
             if response.code.to_i == 0
               transaction.response_transaction_id = authorization.litleTxnId
@@ -132,7 +131,8 @@ def load_membership_transactions
             @log.info "  * processing Membership Auth response ##{response.id}"
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
-            transaction.terms_of_membership_id = get_terms_of_membership_id(authorization.campaign_id)
+            get_campaign_and_tom_id(authorization.campaign_id)
+            transaction.terms_of_membership_id = @tom_id
             next if transaction.terms_of_membership_id.nil?
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
@@ -141,7 +141,7 @@ def load_membership_transactions
             transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
             transaction.response = { :authorization => response.message }
-            transaction.response_code = response.code
+            transaction.response_code = "%03d" % response.code.to_i
             transaction.response_result = transaction.response
             if response.code.to_i == 0
               transaction.response_transaction_id = authorization.litleTxnId
@@ -184,8 +184,7 @@ end
 
 
 
-load_refunds
+
 load_enrollment_transactions
 load_membership_transactions
-
-
+load_refunds

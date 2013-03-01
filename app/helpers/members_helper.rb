@@ -23,11 +23,11 @@ module MembersHelper
   def menber_status_class(current_member)
     text = ""
     if current_member.lapsed?
-      text = "red"
+      text = "btn-danger"
     elsif current_member.active?
-      text = "ligthgreen"
+      text = "btn-success"
     else
-      text = "yellow"
+      text = "btn-warning"
     end
   end
 end
