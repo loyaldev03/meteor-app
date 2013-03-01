@@ -52,7 +52,9 @@
   <% end %>
 
 <% end %>
-	
+
+<%= hidden_field_tag :fulfillment_file, nil, :id => 'fulfillment_file',
+                     :value => (@file.nil? ? '' : @file.id),  %>
 <%= render :partial => "report_result" %>
 
 <script type="text/javascript">

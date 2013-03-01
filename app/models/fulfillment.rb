@@ -6,7 +6,6 @@
 #     Will be used by fulfillment script to check which members need a new fulfillment
 # status => open , archived
 #
-
 class Fulfillment < ActiveRecord::Base
   attr_accessible :product_sku
 
@@ -117,7 +116,7 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def update_status(agent, new_status, reason)
+  def update_status(agent, new_status, reason, file = nil)
     old_status = self.status
     if renewed?
       return {:message => I18n.t("error_messages.fulfillment_is_renwed") , :code => Settings.error_codes.fulfillment_error }
@@ -137,22 +136,28 @@ class Fulfillment < ActiveRecord::Base
       answer = { :code => Settings.error_codes.success }
     end
     self.status = new_status
-    self.save
+    self.save    
     if answer[:code] == Settings.error_codes.success        
-      self.audit_status_transition(@current_agent, old_status, reason)
+      self.audit_status_transition(@current_agent, old_status, reason, file)
     else
       answer
     end
   end
 
-  def audit_status_transition(agent, old_status, reason = nil)
+  def audit_status_transition(agent, old_status, reason = nil, file = nil)
     self.reload
-    message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
+    if file.nil?
+      message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
+    else
+      link = "<a href='/partner/#{self.member.club.partner.prefix}/club/#{self.member.club.name}/fulfillments/list_for_file/#{file}'>#{file}</a>"
+      message = "Changed status on File #{link} Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
+    end
     Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
     return { :message => message, :code => Settings.error_codes.success }
   rescue 
+    message = I18n.t('error_messages.fulfillment_error')
     Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_error )
-    return { :message => I18n.t('error_messages.fulfillment_error'), :code => Settings.error_codes.fulfillment_error }
+    return { :message => message, :code => Settings.error_codes.fulfillment_error }
   end
 
   # def resend(agent)
@@ -177,6 +182,7 @@ class Fulfillment < ActiveRecord::Base
 
   def self.process_fulfillments_up_today
     Fulfillment.to_be_renewed.find_in_batches do |group|
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_fulfillments_up_today rake task, processing #{group.count} fulfillments"
       group.each do |fulfillment| 
         begin
           Rails.logger.info "  * processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
@@ -202,7 +208,7 @@ class Fulfillment < ActiveRecord::Base
     else
       [ member.visible_id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
               (I18n.l self.renewable_at, :format => :only_date_short if self.renewable_at), member.address, member.city,
-              member.zip, self.product_sku, ('C' if member.member_group_type_id) ]
+              "=\"#{member.zip}\"", self.product_sku, ('C' if member.member_group_type_id) ]
     end
   end
 

@@ -367,7 +367,7 @@ $(document).ready( function() {
       "bProcessing": true,
       "sPaginationType": "bootstrap",
       "bServerSide": true,
-      "aaSorting": [[ 0, "desc" ]],
+      "aaSorting": [[ 1, "desc" ]],
       "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ] }],
       "sAjaxSource": $('#operations_table').data('source'),
     });
@@ -514,7 +514,7 @@ $(document).ready( function() {
         $.ajax({
           type: 'PUT',
           url: $(this).data('url'),
-          data: { new_status: $('#new_status').val(), reason: $('#reason').val() },
+          data: { new_status: $('#new_status').val(), reason: $('#reason').val(), file: $('#fulfillment_file').val() },
           dataType: 'json',
           success: function(data) {
             if (data.code == "000"){
