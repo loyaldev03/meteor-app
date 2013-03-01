@@ -149,8 +149,7 @@ class Fulfillment < ActiveRecord::Base
     if file.nil?
       message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
     else
-      link = "<a href='/partner/#{self.member.club.partner.prefix}/club/#{self.member.club.name}/fulfillments/list_for_file/#{file}'>#{file}</a>"
-      message = "Changed status on File #{link} Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
+      message = "Changed status on File ##{file} Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
     end
     Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
     return { :message => message, :code => Settings.error_codes.success }
