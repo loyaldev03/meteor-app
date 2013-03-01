@@ -41,8 +41,17 @@ $(document).ready( function() {
         $(self.data('replace')).find('> .progress').addClass('progress-danger').removeClass('active');
       });
   });
-
 });
+
+  function verify_ajax_error(request){
+    request.error(function(httpObj, textStatus) {       
+      if(httpObj.status==401){
+        alert("Agent is not authorized to request this.");
+      }else{
+        alert('An unexpected error occurred.');
+      }
+    });
+  }
 
   function agent_index_functions(column_count){
     $('#agents_table').dataTable({
@@ -218,15 +227,8 @@ $(document).ready( function() {
           }
         },
       });
-      request.error(function(httpObj, textStatus) {       
-        if(httpObj.status==401){
-          alert("Agent is not authorized to request this.");
-        }else{
-          alert('An unexpected error occurred.');
-        }
-        $('#submit_button').removeAttr('disabled');
-        event.preventDefault(); 
-      });
+      verify_ajax_error(request);
+      $('#submit_button').removeAttr('disabled');
     });
     today = new Date()
     $('#setter_cc_blank').click(function(){
@@ -294,15 +296,8 @@ $(document).ready( function() {
           }
         }
       });
-      request.error(function(httpObj, textStatus) {       
-        if(httpObj.status==401){
-          alert("Agent is not authorized to request this.");
-        }else{
-          alert('An unexpected error occurred.');
-        }
-        $('#submit_button').removeAttr('disabled');
-        event.preventDefault(); 
-      });
+      verify_ajax_error(request);
+      $('#submit_button').removeAttr('disabled');
     });
 
     $('.help').popover({offset: 10});
@@ -356,15 +351,8 @@ $(document).ready( function() {
           }
         },
       });
-      request.error(function(httpObj, textStatus) {       
-        if(httpObj.status==401){
-          alert("Agent is not authorized to request this.");
-        }else{
-          alert('An unexpected error occurred.');
-        }
-        $('#submit_button').removeAttr('disabled');
-        event.preventDefault(); 
-      });
+      verify_ajax_error(request);
+      $('#submit_button').removeAttr('disabled');
     });
   }
 
@@ -551,15 +539,7 @@ $(document).ready( function() {
             };
           },
         });  
-        request.error(function(httpObj, textStatus) {       
-          if(httpObj.status==401){
-            alert("Agent is not authorized to request this.");
-          }else{
-            alert('An unexpected error occurred.');
-          }
-          $('#submit_button').removeAttr('disabled');
-          event.preventDefault(); 
-        });
+        verify_ajax_error(request);
       });
       }
     });     
@@ -677,15 +657,7 @@ $(document).ready( function() {
           };
         },
       });
-      request.error(function(httpObj, textStatus) {       
-        if(httpObj.status==401){
-          alert("Agent is not authorized to request this.");
-        }else{
-          alert('An unexpected error occurred.');
-        }
-        $('#submit_button').removeAttr('disabled');
-        event.preventDefault(); 
-      });      
+      verify_ajax_error(request);  
     });
   }
 
@@ -707,14 +679,6 @@ $(document).ready( function() {
           };
         },
       });
-      request.error(function(httpObj, textStatus) {       
-        if(httpObj.status==401){
-          alert("Agent is not authorized to request this.");
-        }else{
-          alert('An unexpected error occurred.');
-        }
-        $('#submit_button').removeAttr('disabled');
-        event.preventDefault(); 
-      });      
+      verify_ajax_error(request);  
     });
   }
