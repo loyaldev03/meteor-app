@@ -47,11 +47,11 @@
     
     <div class="row-fluid">
       <div class="span4">
-        <%= link_to 'Edit', edit_member_path, :class => "btn btn-success btn-large-w", :disabled => (cannot? :api_update, Member) %>
+        <%= link_to 'Edit', edit_member_path, :class => "btn btn-success btn-large-w", :id => 'edit', :disabled => (cannot? :api_update, Member) %>
       </div>
       <div class="span4">
         <% disable_save_sale = @current_member.can_save_the_sale? == false  %>
-        <%= link_to("Save the sale", (!disable_save_sale ? member_save_the_sale_path : "#"), :class => "btn btn-large-w #{(disable_save_sale ? "disabled" : "btn-info")}", :disabled => (cannot? :save_sale, Member)) %>
+        <%= link_to("Save the sale", (!disable_save_sale ? member_save_the_sale_path : "#"), :id => 'save_the_sale' ,:class => "btn btn-large-w #{(disable_save_sale ? "disabled" : "btn-info")}", :disabled => (cannot? :save_sale, Member)) %>
       </div>
       <div class="span4">
         <%= link_to "Blacklist", (@current_member.can_be_blacklisted? ? member_blacklist_path : "#"), :class => "btn btn-large-w #{(@current_member.can_be_blacklisted? ? "btn-danger" : "disabled")}", :disabled => (!@current_member.can_be_blacklisted? or cannot? :blacklist, Member), :id => "blacklist_btn" %>
@@ -60,7 +60,7 @@
 
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
-        <%= link_to "Add a note", new_member_note_path, :class => "btn btn-success btn-large-w", :disabled => (cannot? :add_member_note, MemberNote) %>
+        <%= link_to "Add a note", new_member_note_path, :class => "btn btn-success btn-large-w", :id => "add_member_note" ,:disabled => (cannot? :add_member_note, MemberNote) %>
       </div>
       <div class="span4">
         <% disable_cancel = @current_member.can_be_canceled? == false %>

@@ -58,7 +58,7 @@ class Ability
       cannot :api_profile, Member
       cannot :set_undeliverable, Member
       can :manage, Operation
-      can :read, Membership
+      can :list, Membership
       can :manage, CreditCard
       cannot :destroy, CreditCard
       can :manage, MemberNote

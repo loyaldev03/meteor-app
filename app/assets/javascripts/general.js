@@ -183,7 +183,7 @@ $(document).ready( function() {
       $('#error_explanation').hide();
       $('#submit_button').attr('disabled', 'disabled');
       event.preventDefault();
-      $.ajax({
+      var request = $.ajax({
         type: 'POST',
         url: "/api/v1/members",
         data: $("#new_member").serialize(),
@@ -217,6 +217,15 @@ $(document).ready( function() {
             }
           }
         },
+      });
+      request.error(function(httpObj, textStatus) {       
+        if(httpObj.status==401){
+          alert("Agent is not authorized to request this.");
+        }else{
+          alert('An unexpected error occurred.');
+        }
+        $('#submit_button').removeAttr('disabled');
+        event.preventDefault(); 
       });
     });
     today = new Date()
@@ -262,7 +271,7 @@ $(document).ready( function() {
     $('form').submit( function(event) {
       $('#submit_button').attr('disabled', 'disabled');
       event.preventDefault();
-      $.ajax({
+      var request = $.ajax({
         type: 'PUT',
         url: "/api/v1/members/"+id,
         data: $('form').serialize(),
@@ -285,10 +294,17 @@ $(document).ready( function() {
           }
         }
       });
+      request.error(function(httpObj, textStatus) {       
+        if(httpObj.status==401){
+          alert("Agent is not authorized to request this.");
+        }else{
+          alert('An unexpected error occurred.');
+        }
+        $('#submit_button').removeAttr('disabled');
+        event.preventDefault(); 
+      });
     });
-    $('body').ajaxError(function () {
-      alert('An unexpected error occurred.');
-    });
+
     $('.help').popover({offset: 10});
 
     $('#member_country').on('change',  function(){
@@ -309,37 +325,46 @@ $(document).ready( function() {
     $('form').submit( function(event) {
       $('#submit_button').attr('disabled', 'disabled');
       event.preventDefault(); 
-        $.ajax({
-          type: 'POST',
-          url: "/api/v1/members/"+member_id+"/club_cash_transaction",
-          data: $("form").serialize(),
-          success: function(data) {
-            if (data.code == 000)
-              window.location.replace('../'+visible_id);
-            else{
-              $('#submit_button').removeAttr("disabled");
-              $('#error_explanation').show();
-              $("#error_explanation ul").empty();
-              $('#error_explanation ul').append("<b>"+data.message+"</b>");
-              for (var key in data.errors){
-                if (data.errors.hasOwnProperty(key)){
-                  if (key != 'member'){
-                  $("#error_explanation ul").append("<li>"+key+": "+data.errors[key]+"</li>");
-                   }
-                  else{
-                    for (var key2 in data.errors[key]){
-                      if (data.errors[key].hasOwnProperty(key2)){
-                        if (key2 != 0){
-                          $('#error_explanation ul').append("<li>"+key2+': '+data.errors[key][key2]+"</li>");                       
-                        }
+      var request = $.ajax({
+        type: 'POST',
+        url: "/api/v1/members/"+member_id+"/club_cash_transaction",
+        data: $("form").serialize(),
+        success: function(data) {
+          if (data.code == 000)
+            window.location.replace('../'+visible_id);
+          else{
+            $('#submit_button').removeAttr("disabled");
+            $('#error_explanation').show();
+            $("#error_explanation ul").empty();
+            $('#error_explanation ul').append("<b>"+data.message+"</b>");
+            for (var key in data.errors){
+              if (data.errors.hasOwnProperty(key)){
+                if (key != 'member'){
+                $("#error_explanation ul").append("<li>"+key+": "+data.errors[key]+"</li>");
+                 }
+                else{
+                  for (var key2 in data.errors[key]){
+                    if (data.errors[key].hasOwnProperty(key2)){
+                      if (key2 != 0){
+                        $('#error_explanation ul').append("<li>"+key2+': '+data.errors[key][key2]+"</li>");                       
                       }
-                    } 
-                  }
+                    }
+                  } 
                 }
               }
             }
-          },
-        });
+          }
+        },
+      });
+      request.error(function(httpObj, textStatus) {       
+        if(httpObj.status==401){
+          alert("Agent is not authorized to request this.");
+        }else{
+          alert('An unexpected error occurred.');
+        }
+        $('#submit_button').removeAttr('disabled');
+        event.preventDefault(); 
+      });
     });
   }
 
@@ -511,7 +536,7 @@ $(document).ready( function() {
         alert("Select a fulfillment to apply status.");
       } else{
         $('.fulfillment_selected:checked').each(function(index){
-        $.ajax({
+        var request = $.ajax({
           type: 'PUT',
           url: $(this).data('url'),
           data: { new_status: $('#new_status').val(), reason: $('#reason').val(), file: $('#fulfillment_file').val() },
@@ -526,6 +551,15 @@ $(document).ready( function() {
             };
           },
         });  
+        request.error(function(httpObj, textStatus) {       
+          if(httpObj.status==401){
+            alert("Agent is not authorized to request this.");
+          }else{
+            alert('An unexpected error occurred.');
+          }
+          $('#submit_button').removeAttr('disabled');
+          event.preventDefault(); 
+        });
       });
       }
     });     
@@ -629,7 +663,7 @@ $(document).ready( function() {
       button = $(this)
       button.attr('disabled', 'disabled');
       event.preventDefault();
-      $.ajax({
+      var request = $.ajax({
         type: 'PUT',
         url: url+button.attr("name")+"/mark_as_sent",
         success: function(data) {
@@ -643,6 +677,15 @@ $(document).ready( function() {
           };
         },
       });
+      request.error(function(httpObj, textStatus) {       
+        if(httpObj.status==401){
+          alert("Agent is not authorized to request this.");
+        }else{
+          alert('An unexpected error occurred.');
+        }
+        $('#submit_button').removeAttr('disabled');
+        event.preventDefault(); 
+      });      
     });
   }
 
@@ -651,7 +694,7 @@ $(document).ready( function() {
       button = $(this)
       button.attr('disabled', 'disabled');
       event.preventDefault();
-      $.ajax({
+      var request = $.ajax({
         type: 'PUT',
         url: url+button.attr("name")+"/resend",
         success: function(data) {
@@ -664,5 +707,14 @@ $(document).ready( function() {
           };
         },
       });
+      request.error(function(httpObj, textStatus) {       
+        if(httpObj.status==401){
+          alert("Agent is not authorized to request this.");
+        }else{
+          alert('An unexpected error occurred.');
+        }
+        $('#submit_button').removeAttr('disabled');
+        event.preventDefault(); 
+      });      
     });
   }
