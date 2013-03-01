@@ -2,7 +2,7 @@
 <% notes.each do |note| %>
   <table class="table table-bordered">
     <thead> 
-      <tr>
+      <tr> 
         <th>
           <%= note.disposition_type if !note.disposition_type.nil? %> - 
           <%= note.communication_type if !note.communication_type.nil? %>        
@@ -12,10 +12,9 @@
         </th>
         <td style = "width:300px">
           <%= t('created_at') %>:
-          <%= I18n.l note.created_at, :format => :long %>
+          <%= I18n.l note.created_at, :format => :dashed %>
         </td>
-      </tr>
-      <tr class='comment' >
+      <tr class= "comment <%= cycle("odd", "even", :name => "row_class") -%>" > 
         <td colspan="2">
           <%= note.description %>
         </td>
