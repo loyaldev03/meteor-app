@@ -6,6 +6,7 @@ class Admin::PartnersControllerTest < ActionController::TestCase
     @representative_user = FactoryGirl.create(:confirmed_representative_agent)
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @fulfillment_manager_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
+    @agent = FactoryGirl.create(:agent)
     @partner = FactoryGirl.create(:partner)
     @partner_prefix = @partner.prefix
   end
@@ -194,5 +195,103 @@ class Admin::PartnersControllerTest < ActionController::TestCase
     sign_in @fulfillment_manager_user
     delete :destroy, id: @partner
     assert_response :unauthorized
-  end  
+  end 
+
+  #####################################################
+  # CLUBS ROLES
+  ##################################################### 
+
+  test "agent with club roles should not should not get index" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :index
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not get new" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :new
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not create partner" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    partner = FactoryGirl.build(:partner)
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      post :create, partner: { :prefix => partner.prefix, :name => partner.name, :contract_uri => partner.contract_uri, :website_url => partner.website_url, :description => partner.description }
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not get show partner" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :show, id: @partner.id
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not get edit partner" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :edit, id: @partner.id
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not update partner" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      put :update, id: @partner.id, partner: { :prefix => @partner_prefix, :name => @partner.name, 
+                                          :contract_uri => @partner.contract_uri, :website_url => @partner.website_url, 
+                                          :description => @partner.description }
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not destroy partner" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      delete :destroy, id: @partner
+      assert_response :unauthorized
+    end
+  end
 end

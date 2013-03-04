@@ -187,26 +187,26 @@ class Admin::AgentsControllerTest < ActionController::TestCase
 
   test "Representative should not update agent" do
     sign_in @representative_user
-	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
+  	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
     assert_response :unauthorized
   end
 
   test "Supervisor should not update agent" do
     sign_in @supervisor_user
-	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
+	  put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
     assert_response :unauthorized
   end
 
   test "Api user should not update agent" do
     sign_in @api_user
-	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
+  	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
     assert_response :unauthorized
   end
 
   #Profile fulfillment_managment
   test "fulfillment_managment user should not update agent" do
     sign_in @fulfillment_manager_user
-  put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
+    put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
     assert_response :unauthorized
   end
 
@@ -262,4 +262,99 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     assert ability.can?(:enroll, Member), "#{@representative_user.roles} can see member's enroll button on member#index."
   end
 
+  #####################################################
+  # CLUBS ROLES
+  ##################################################### 
+
+  test "agent with club roles should not should not get index" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :index
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not get new" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :new
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not create agent" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    agent = FactoryGirl.build(:confirmed_admin_agent)
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not get show" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :show, id: @agent.id
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not get edit" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :edit, id: @agent.id
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not update agent" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
+      assert_response :unauthorized
+    end
+  end
+
+  test "agent with club roles should not destroy agent" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      delete :destroy, id: @agent
+      assert_response :unauthorized
+    end
+  end
 end

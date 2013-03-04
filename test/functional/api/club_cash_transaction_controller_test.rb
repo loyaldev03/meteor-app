@@ -12,7 +12,7 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
     @partner = @club.partner
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway
+    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
     Drupal.enable_integration!
     Drupal.test_mode!
     Drupal::UserPoints.any_instance.stubs(:create!).returns('true')
@@ -35,6 +35,7 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
   test "admin should add club cash transaction" do
     sign_in @admin_user
     @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    @club.update_attribute :api_type, ''
 
     assert_difference('ClubCashTransaction.count') do
       result = post(:create, { :member_id => @saved_member.id, 
@@ -63,6 +64,7 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
   test "supervisor should add club cash transaction" do
     sign_in @supervisor_user
     @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    @club.update_attribute :api_type, ''
 
     assert_difference('ClubCashTransaction.count') do
       result = post(:create, { :member_id => @saved_member.id, 

@@ -104,7 +104,7 @@ class MemberTest < ActiveSupport::TestCase
 
   test "active member cant be recovered" do
     member = create_active_member(@terms_of_membership_with_gateway)
-    tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway)
+    tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     
     answer = member.recover(tom_dup)
     assert answer[:code] == Settings.error_codes.member_already_active, answer[:message]
@@ -114,7 +114,7 @@ class MemberTest < ActiveSupport::TestCase
     member = create_active_member(@terms_of_membership_with_gateway)
     member.set_as_canceled!
     member.update_attribute( :reactivation_times, 5 )
-    tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway)
+    tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
 
     answer = member.recover(tom_dup)
     assert answer[:code] == Settings.error_codes.cant_recover_member, answer[:message]
@@ -131,7 +131,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Lapsed member can be recovered unless it needs approval" do
-    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
+    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     member = create_active_member(@tom_approval, :lapsed_member)
     answer = member.recover(@tom_approval)
     member.reload
@@ -141,7 +141,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Recovered member in applied status is rejected. Reactivation times should stay at 0." do
-    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
+    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     member = create_active_member(@tom_approval, :lapsed_member)
     answer = member.recover(@tom_approval)
     member.reload
@@ -397,7 +397,7 @@ class MemberTest < ActiveSupport::TestCase
     @club = @terms_of_membership_with_gateway.club
     @saved_member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
     @saved_member.set_as_canceled
-
+    
     @saved_member.recover(@terms_of_membership_with_gateway)
 
     next_bill_date = @saved_member.bill_date + 1.month

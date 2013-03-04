@@ -38,6 +38,16 @@ class RolesTest < ActionController::IntegrationTest
     sign_in_as(@agent)
   end
 
+  def setup_agent_with_club_role(club, role)
+    init_test_setup
+    @agent = FactoryGirl.create(:agent)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    club_role.role = role
+    club_role.save
+    sign_in_as(@agent)
+  end
+
   def setup_member(create_new_member = true)
     @club = FactoryGirl.create(:simple_club_with_gateway)
     @partner = @club.partner
@@ -672,4 +682,253 @@ class RolesTest < ActionController::IntegrationTest
     validate_view_member_base(saved_member)
   end
 
+  test "club role admin available actions" do
+    setup_member false
+    setup_agent_with_club_role(@club, 'admin')
+    unsaved_member = FactoryGirl.build(:member_with_api, :club_id => @club.id)
+
+    within('#my_clubs_table'){
+      assert page.has_selector?("#members")
+      assert page.has_selector?("#products")
+      assert page.has_selector?("#fulfillments")
+      assert page.has_selector?("#fulfillment_files")
+    }
+
+    @saved_member = create_member(unsaved_member)
+    FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false)
+    validate_view_member_base(@saved_member)
+
+    assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='save_the_sale']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='blacklist_btn']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='add_member_note']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='cancel']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_set_undeliverable']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_set_unreachable']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='add_credit_card']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_change_next_bill_date']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_add_club_cash']")[:disabled] == nil
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:disabled] == nil }
+  
+    @saved_member.update_attribute :next_retry_bill_date, Time.zone.now
+    active_merchant_stubs
+    @saved_member.bill_membership
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within('.nav-tabs'){click_on 'Transactions'}
+    within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
+
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil }
+
+    visit products_path(@partner.prefix, @club.name)
+    assert find(:xpath, "//a[@id='new_product']")[:disabled] == nil
+    within('#products_table')do
+      assert find(:xpath, "//a[@id='show']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil
+    end
+
+    visit fulfillments_index_path(@partner.prefix, @club.name)
+    within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:disabled] == nil}
+  end
+
+  test "club role representative available actions" do
+    setup_member false
+    setup_agent_with_club_role(@club, 'representative')
+    unsaved_member = FactoryGirl.build(:member_with_api, :club_id => @club.id)
+
+    within('#my_clubs_table'){
+      assert page.has_selector?("#members")
+      assert page.has_no_selector?("#products")
+      assert page.has_no_selector?("#fulfillments")
+      assert page.has_no_selector?("#fulfillment_files")
+    }
+
+    @saved_member = create_member(unsaved_member)
+    FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false)
+    validate_view_member_base(@saved_member)
+
+    assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='save_the_sale']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='blacklist_btn']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='add_member_note']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='cancel']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_set_undeliverable' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='link_member_set_unreachable']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='add_credit_card']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_change_next_bill_date']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_add_club_cash']")[:disabled] == nil
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:disabled] == nil }
+  
+    @saved_member.update_attribute :next_retry_bill_date, Time.zone.now
+    active_merchant_stubs
+    @saved_member.bill_membership
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within('.nav-tabs'){click_on 'Transactions'}
+    within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
+
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
+  end
+
+  test "club role supervisor available actions" do
+    setup_member false
+    setup_agent_with_club_role(@club, 'supervisor')
+    unsaved_member = FactoryGirl.build(:member_with_api, :club_id => @club.id)
+
+    within('#my_clubs_table'){
+      assert page.has_selector?("#members")
+      assert page.has_no_selector?("#products")
+      assert page.has_no_selector?("#fulfillments")
+      assert page.has_no_selector?("#fulfillment_files")
+    }
+
+    @saved_member = create_member(unsaved_member)
+    FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false)
+    validate_view_member_base(@saved_member)
+
+    assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='save_the_sale']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='blacklist_btn']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='add_member_note']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='cancel']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_set_undeliverable']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_set_unreachable']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='add_credit_card']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_change_next_bill_date']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_add_club_cash']")[:disabled] == nil
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:disabled] == nil }
+  
+    @saved_member.update_attribute :next_retry_bill_date, Time.zone.now
+    active_merchant_stubs
+    @saved_member.bill_membership
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within('.nav-tabs'){click_on 'Transactions'}
+    within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
+
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil }
+  end
+
+  test "club role agency available actions" do
+    setup_member
+    setup_agent_with_club_role(@club, 'agency')
+    FactoryGirl.create(:credit_card_american_express, :active => false ,:member_id => @saved_member.id)
+
+    within('#my_clubs_table'){
+      assert page.has_selector?("#members")
+      assert page.has_selector?("#products")
+      assert page.has_selector?("#fulfillments")
+      assert page.has_selector?("#fulfillment_files")
+    }
+
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert page.has_no_selector?("#new_member")
+
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+
+    assert find(:xpath, "//a[@id='edit' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='save_the_sale' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='blacklist_btn' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='add_member_note' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='cancel' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='link_member_set_undeliverable' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='link_member_set_unreachable' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='add_credit_card' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='link_member_change_next_bill_date' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='link_member_add_club_cash' and @disabled='disabled']")
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button' and @disabled='disabled']") }
+  
+    @saved_member.update_attribute :next_retry_bill_date, Time.zone.now
+    active_merchant_stubs
+    @saved_member.bill_membership
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within('.nav-tabs'){click_on 'Transactions'}
+    within('#transactions_table'){ assert find(:xpath, "//a[@id='refund' and @disabled='disabled']") }
+
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
+
+
+    visit products_path(@partner.prefix, @club.name)
+    assert find(:xpath, "//a[@id='new_product']")[:disabled] == nil
+    within('#products_table')do
+      assert find(:xpath, "//a[@id='show']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil
+    end
+
+    visit fulfillments_index_path(@partner.prefix, @club.name)
+    within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:disabled] == nil}
+  end
+
+  test "club role fulfillment_managment available actions" do
+    setup_member
+    setup_agent_with_club_role(@club, 'fulfillment_managment')
+    unsaved_member = FactoryGirl.build(:member_with_api, :club_id => @club.id)
+
+    within('#my_clubs_table'){
+      assert page.has_selector?("#members")
+      assert page.has_selector?("#products")
+      assert page.has_selector?("#fulfillments")
+      assert page.has_selector?("#fulfillment_files")
+    }
+
+    @saved_member = create_member(unsaved_member)
+    FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false)
+    validate_view_member_base(@saved_member)
+
+    assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='save_the_sale']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='blacklist_btn']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='add_member_note']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='cancel']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_set_undeliverable']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_set_unreachable']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='add_credit_card']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_change_next_bill_date']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='link_member_add_club_cash']")[:disabled] == nil
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:disabled] == nil }
+  
+    @saved_member.update_attribute :next_retry_bill_date, Time.zone.now
+    active_merchant_stubs
+    @saved_member.bill_membership
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within('.nav-tabs'){click_on 'Transactions'}
+    within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
+
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
+
+    visit products_path(@partner.prefix, @club.name)
+    assert find(:xpath, "//a[@id='new_product']")[:disabled] == nil
+    within('#products_table')do
+      assert find(:xpath, "//a[@id='show']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil
+    end
+
+    visit fulfillments_index_path(@partner.prefix, @club.name)
+    within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:disabled] == nil}
+  end
 end

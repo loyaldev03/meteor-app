@@ -355,7 +355,6 @@ module ActionController
         }
       end
     end
-
   end
 
   def add_credit_card(member,credit_card)

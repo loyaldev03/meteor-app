@@ -1,10 +1,11 @@
-  require 'test_helper'
+    require 'test_helper'
 
 class TransactionTest < ActiveSupport::TestCase
   setup do
     @current_agent = FactoryGirl.create(:agent)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway)
-    @terms_of_membership_with_gateway_yearly = FactoryGirl.create(:terms_of_membership_with_gateway_yearly)
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_gateway_yearly = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     @member = FactoryGirl.build(:member)
     @credit_card = FactoryGirl.build(:credit_card)
     @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
@@ -38,7 +39,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Enrollment with approval" do
-    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval)
+    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     active_merchant_stubs
     assert_difference('Operation.count',1) do
       assert_no_difference('Fulfillment.count') do

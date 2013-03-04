@@ -7,8 +7,8 @@ class CreditCardsControllerTest < ActionController::TestCase
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @api_user = FactoryGirl.create(:confirmed_api_agent)
     @agency_agent = FactoryGirl.create(:confirmed_agency_agent)
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway
-    @club = @terms_of_membership.club
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
     @partner = @club.partner
     @saved_member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @saved_member.id

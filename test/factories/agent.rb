@@ -75,5 +75,4 @@ FactoryGirl.define do
     password  "batch@xagax.com"
     password_confirmation  "batch@xagax.com"
   end
-
 end

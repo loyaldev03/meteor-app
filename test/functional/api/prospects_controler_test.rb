@@ -6,7 +6,8 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     @api_user = FactoryGirl.create(:confirmed_api_agent)
     @representative_user = FactoryGirl.create(:confirmed_representative_agent)
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
     # request.env["devise.mapping"] = Devise.mappings[:agent]
   end
 
@@ -55,7 +56,6 @@ class Api::ProspectsControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
-
 
   test "api user should create a prospect" do
   	sign_in @api_user
