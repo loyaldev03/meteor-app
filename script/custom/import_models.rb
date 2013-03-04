@@ -258,7 +258,7 @@ class BillingMember < ActiveRecord::Base
   self.record_timestamps = false
 
   def email_to_import
-    TEST_EMAIL ? "test#{member.id}@xagax.com" : email
+    TEST_EMAIL ? "test#{member.id}@xagax.com" : phoenix_email
   end
 end
 class BillingCampaign < ActiveRecord::Base
