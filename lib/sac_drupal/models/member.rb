@@ -171,7 +171,7 @@ module Drupal
               administrative_area: m.state,
               locality: m.city,
               postal_code: m.zip,
-              thoroughfare: m.address,
+              thoroughfare: m.address
             } 
           ]
         },
