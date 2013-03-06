@@ -109,13 +109,6 @@ module Drupal
 
       map = { 
         mail: m.email,
-        field_profile_address: { 
-          und: [ 
-            { 
-              value: m.address
-            } 
-          ] 
-        }, 
         field_profile_firstname: { 
           und: [ 
             { 
@@ -130,13 +123,6 @@ module Drupal
             } 
           ] 
         }, 
-        field_profile_city: { 
-          und: [ 
-            { 
-              value: m.city
-            } 
-          ] 
-        },
         field_profile_gender: { 
           und: { select: (m.gender.blank? ? "_none" : m.gender) }
         },
@@ -168,23 +154,6 @@ module Drupal
             } 
           ] 
         },
-        field_profile_stateprovince: { 
-          und: { 
-            select: m.state
-          } 
-        }, 
-        field_profile_zip: { 
-          und: [ 
-            {
-              value: m.zip
-            } 
-          ] 
-        }, 
-        field_profile_country: { 
-          und: {
-            select: m.country
-          } 
-        },
         field_profile_club_cash_amount: { 
           und: [{ value: m.club_cash_amount }]
         },
@@ -194,7 +163,18 @@ module Drupal
               value: { date: (m.birth_date.nil? ? '' : m.birth_date.to_date.strftime("%m/%d/%Y")) }
             }
           ]
-        }
+        },
+        field_profile_address_address:{
+          und:[ 
+            {
+              country: m.country,
+              administrative_area: m.state,
+              locality: m.city,
+              postal_code: m.zip,
+              thoroughfare: m.address,
+            } 
+          ]
+        },
       }
 
       if self.new_record?
