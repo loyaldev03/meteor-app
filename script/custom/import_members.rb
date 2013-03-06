@@ -14,7 +14,7 @@ def add_fulfillment(member)
     phoenix_f.product_package = KIT_CARD_FULFILLMENT
     phoenix_f.product_sku = KIT_CARD_FULFILLMENT
     phoenix_f.assigned_at = Time.now.utc
-    renewdate = member.phoenix_join_date + (Date.today.year - member.phoenix_join_date.year).years
+    renewdate = member.phoenix_join_date_time + (Date.today.year - member.phoenix_join_date_time.year).years
     phoenix_f.renewable_at = (renewdate > Date.today ? renewdate : renewdate.next_year)
     phoenix_f.recurrent = true
     phoenix_f.status = "not_processed"
@@ -98,7 +98,7 @@ def set_membership_data(tom_id, member)
   membership = PhoenixMembership.find_or_create_by_member_id @member.id
   membership.terms_of_membership_id = tom_id
   membership.created_by_id = DEFAULT_CREATED_BY
-  membership.join_date = convert_from_date_to_time(member.phoenix_join_date)
+  membership.join_date = member.phoenix_join_date_time
   membership.status = @member.status
   membership.quota = member.quota
   membership.created_at = member.created_at
@@ -122,7 +122,7 @@ def set_member_bill_dates(member, phoenix)
     phoenix.bill_date = original_bill_date 
     phoenix.next_retry_bill_date = next_bill_date 
     if @campaign.terms_of_membership_id.to_i == 365 
-      phoenix.bill_date = member.original_next_bill_date.nil? ? phoenix.join_date : convert_from_date_to_time(member.original_next_bill_date) 
+      phoenix.bill_date = member.original_next_bill_date.nil? ? phoenix.phoenix_join_date_time : convert_from_date_to_time(member.original_next_bill_date) 
     end
   else
     phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
@@ -204,7 +204,8 @@ end
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
      #" and id <= 11325442002 " + 
-      " and credit_card_token IS NOT NULL and phoenix_status IN ('active', 'provisional') ").find_in_batches do |group|
+      " AND (api_id IS NOT NULL member_since_date OR enrollment_amount_to_import IS NOT NULL campaign_id OR quota IS NOT NULL OR phoenix_join_date IS NOT NULL) " +
+      " AND credit_card_token IS NOT NULL and phoenix_status IN ('active', 'provisional') ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
       get_campaign_and_tom_id(member.campaign_id)
