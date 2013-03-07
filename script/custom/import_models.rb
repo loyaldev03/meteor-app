@@ -234,7 +234,6 @@ end
 class PhoenixEnumeration < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "enumerations" 
-  self.record_timestamps = false
 end
 class DispositionType < PhoenixEnumeration
 end
