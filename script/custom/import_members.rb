@@ -95,7 +95,7 @@ def fill_aus_attributes(cc, member)
 end
 
 def set_membership_data(tom_id, member)
-  membership = PhoenixMembership.find_or_create_by_member_id @member.id
+  membership = PhoenixMembership.find_by_member_id(@member.id) || PhoenixMembership.new(:member_id => @member.id)
   membership.terms_of_membership_id = tom_id
   membership.created_by_id = DEFAULT_CREATED_BY
   membership.join_date = member.phoenix_join_date_time
@@ -146,7 +146,7 @@ def update_members
       @log.info "  * processing member ##{member.id}"
       begin
         phoenix = PhoenixMember.find_by_club_id_and_visible_id(CLUB, member.id)
-        @e_info = PhoenixEnrollmentInfo.find_or_create_by_member_id(phoenix.id)
+        @e_info = PhoenixEnrollmentInfo.find_by_member_id(phoenix.id) || PhoenixEnrollmentInfo.new(:member_id => phoenix.id)
         if phoenix.nil?
           puts "  * member ##{member.id} not found on phoenix ?? "
           next
@@ -203,9 +203,10 @@ end
 # 2- import new members.
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
-     #" and id <= 11325442002 " + 
-      " AND (api_id IS NOT NULL member_since_date OR enrollment_amount_to_import IS NOT NULL campaign_id OR quota IS NOT NULL OR phoenix_join_date IS NOT NULL) " +
-      " AND credit_card_token IS NOT NULL and phoenix_status IN ('active', 'provisional') ").find_in_batches do |group|
+      # " AND id <= 60683457 " + 
+      " AND api_id IS NOT NULL AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND quota IS NOT NULL AND phoenix_join_date IS NOT NULL " +
+      " AND (active = 1 or trial = 1) " +
+      " AND credit_card_token IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
       get_campaign_and_tom_id(member.campaign_id)
@@ -235,7 +236,7 @@ def add_new_members
         set_member_bill_dates(member, phoenix)
         phoenix.save!
 
-        @e_info = PhoenixEnrollmentInfo.find_or_create_by_member_id(phoenix.id)
+        @e_info = PhoenixEnrollmentInfo.find_by_member_id(phoenix.id) || PhoenixEnrollmentInfo.new(:member_id => phoenix.id)
         @member = phoenix
         add_enrollment_info(phoenix, member, @tom_id, @campaign)
         add_operation(Time.now.utc, nil, nil, "Member imported into phoenix!", nil)  
