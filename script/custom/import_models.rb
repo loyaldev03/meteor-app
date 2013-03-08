@@ -1,14 +1,20 @@
 # 1- Get access to phoenix, billing_component, customer_services and prospect databases
 # Devel database
-# UPDATE onmc_prospects.prospects set imported_at = NULL where imported_at IS NOT NULL;
-# UPDATE onmc_billing.members set imported_at = NULL where imported_at IS NOT NULL;
-# UPDATE onmc_customer_service.notes set imported_at = NULL where imported_at IS NOT NULL;
-# UPDATE onmc_customer_service.operations set imported_at = NULL where imported_at IS NOT NULL
+# update onmc_billing.members set imported_at = NULL where imported_at IS NOT NULL;
+# update onmc_billing.chargebacks set imported_at = NULL where imported_at IS NOT NULL;
+# update onmc_billing.enrollment_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
+# update onmc_billing.membership_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
+# update onmc_customer_service.operations set imported_at = NULL where imported_at IS NOT NULL;
+# update onmc_customer_service.notes set imported_at = NULL where imported_at IS NOT NULL;
+# update onmc_prospects.prospects set imported_at = NULL where imported_at IS NOT NULL;
 # production datase
-# UPDATE prospectcomponente.prospects set imported_at = NULL where imported_at IS NOT NULL
-# UPDATE billing_component.members set imported_at = NULL where imported_at IS NOT NULL
-# UPDATE notes set imported_at = NULL where imported_at IS NOT NULL
-# UPDATE operations set imported_at = NULL where imported_at IS NOT NULL
+# update billingcomponent_production.members set imported_at = NULL where imported_at IS NOT NULL;
+# update billingcomponent_production.chargebacks set imported_at = NULL where imported_at IS NOT NULL;
+# update billingcomponent_production.enrollment_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
+# update billingcomponent_production.membership_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
+# update prospectcomponent.prospects set imported_at = NULL where imported_at IS NOT NULL;
+# update customerservice3.operations set imported_at = NULL where imported_at IS NOT NULL;
+# update customerservice3.notes set imported_at = NULL where imported_at IS NOT NULL;
 #
 # 1.1- Load toms (only once) => Done
 #     ruby script/custom/import_load_toms.rb  
@@ -144,6 +150,7 @@ class PhoenixMember < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
   self.primary_key = 'uuid'
+  self.record_timestamps = false
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 
   serialize :preferences, JSON
@@ -157,6 +164,7 @@ class PhoenixMemberPreference < ActiveRecord::Base
   self.table_name = "member_preferences" 
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
+  self.record_timestamps = false
 end
 class PhoenixProspect < ActiveRecord::Base
   establish_connection "phoenix" 
@@ -164,23 +172,28 @@ class PhoenixProspect < ActiveRecord::Base
   self.primary_key = 'uuid'
   serialize :preferences, JSON
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
+  self.record_timestamps = false
 end
 class PhoenixCreditCard < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "credit_cards"
   attr_encrypted :number, :key => 'reibel3y5estrada8', :encode => true, :algorithm => 'bf'
+  self.record_timestamps = false
 end
 class PhoenixOperation < ActiveRecord::Base
   establish_connection "phoenix" 
-  self.table_name = "operations" 
+  self.table_name = "operations"
+  self.record_timestamps = false 
 end
 class PhoenixClubCashTransaction < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "club_cash_transactions" 
+  self.record_timestamps = false
 end
 class PhoenixEnrollmentInfo < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "enrollment_infos" 
+  self.record_timestamps = false
   serialize :preferences, JSON
 end
 class PhoenixTransaction < ActiveRecord::Base
@@ -188,6 +201,7 @@ class PhoenixTransaction < ActiveRecord::Base
   self.table_name = "transactions" 
   self.primary_key = 'uuid'
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
+  self.record_timestamps = false
 
   def set_payment_gateway_configuration(gateway)
     if gateway == 'litle'
@@ -210,10 +224,12 @@ end
 class PhoenixPGC < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "payment_gateway_configurations" 
+  self.record_timestamps = false
 end
 class PhoenixMemberNote < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "member_notes" 
+  self.record_timestamps = false
 end
 class PhoenixEnumeration < ActiveRecord::Base
   establish_connection "phoenix" 
@@ -234,14 +250,17 @@ end
 class PhoenixTermsOfMembership < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "terms_of_memberships" 
+  self.record_timestamps = false
 end
 class PhoenixEmailTemplate < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "email_templates" 
+  self.record_timestamps = false
 end
 class PhoenixMembership < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "memberships" 
+  self.record_timestamps = false
 end
 
 class Settings < Settingslogic
