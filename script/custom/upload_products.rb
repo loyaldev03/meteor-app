@@ -1,4 +1,4 @@
-#!/bin/ruby
+  #!/bin/ruby
 require 'rubygems'
 require 'rails'
 require 'active_record' 
@@ -26,10 +26,14 @@ end
   def generate_products(file, club_id)
     file.each  do |row|
       product = Product.new
-      product.name = row[0]
-      product.sku = row[0]+row[1]  #product + driver name
-      product.stock = row[2].to_i  #stock
-      product.cost_center = row[3] #cost center
+      product.name = row[0] 
+      product.package = row[1]
+      product.sku = row[2]
+      product.recurrent = (row[3].upcase=='YES' ? true : false )
+      product.stock = row[4].to_i
+      product.weight = row[5].to_i
+      product.allow_backorder = (row[6].upcase=='YES' ? true : false )
+      product.cost_center = row[7]
       product.club_id = club_id
       product.save
     end
@@ -42,7 +46,7 @@ end
   end
 
   file_url= ARGV[0]
-  club_id = ARGV[1]
+  club_id = ARGV[1].to_i
   
   if ARGV[0].nil? or ARGV[1].nil?
     puts "Way to use:     $ruby upload_products.rb 'csv file' 'club id'"
