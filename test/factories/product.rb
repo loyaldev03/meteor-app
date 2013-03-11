@@ -4,6 +4,7 @@ FactoryGirl.define do
     name "Bracelet"
     package "NCARFLAG"
     sku "Bracelet"
+    cost_center "Bracelet"
     stock 10
     weight 5
   end
@@ -12,6 +13,7 @@ FactoryGirl.define do
     name "Circlet"
     package "NCARFLAG"
     sku "circlet"
+    cost_center "circlet"
     stock 0
     recurrent false
   end  	
@@ -19,6 +21,7 @@ FactoryGirl.define do
   factory :product_without_stock_and_recurrent, class: Product do
     name "Kit kard"
     package "NCARFLAG"
+    cost_center "kit-card"
     sequence(:sku) {|n| Settings.kit_card_product+"#{n}" }
     recurrent true
     stock 0
@@ -28,6 +31,7 @@ FactoryGirl.define do
     name "Kit kard"
     package "KIT-CARD"
     sequence(:sku) {|n| Settings.kit_card_product+"#{n}" }
+    cost_center "kit-card"
     recurrent true
     stock 10
   end  
@@ -36,6 +40,7 @@ FactoryGirl.define do
     name "Kit kard"
     package "KIT-CARD"
     sequence(:sku) {|n| Settings.kit_card_product+"#{n}" }
+    cost_center "kit-card"
     recurrent false
     stock 10
   end  

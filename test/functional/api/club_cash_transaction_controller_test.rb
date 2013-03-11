@@ -40,7 +40,7 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
     assert_difference('ClubCashTransaction.count') do
       result = post(:create, { :member_id => @saved_member.id, 
                                 club_cash_transaction: {
-                                  :amount => 100, 
+                                    :amount => 100, 
                                   :description => "adding club cash"
                                 }, :format => :json })
     end

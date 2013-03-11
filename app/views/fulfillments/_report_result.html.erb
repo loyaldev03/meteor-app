@@ -7,7 +7,7 @@
 				<%= fulfillment_selectable_statuses(:new_status, params[:new_status], true) %>
 				<%= text_field_tag "reason", nil, :class => 'text_field input-medium', :placeholder => t('reason') %>
 				<%= link_to t('buttons.update_fulfillment_status'), "#", :class => 'btn btn-primary', :id => 'update_fulfillment_status' %>
-				<%= (link_to t('buttons.export_all_to_xls'), download_xls_fulfillments_path, :class => 'btn btn-primary' ) if @file %>
+				<%= (link_to t('buttons.export_all_to_xls'), download_xls_fulfillments_path, :class => 'btn btn-primary', :id => "export_all_to_xls_btn" ) if @file %>
 			</td>
 		</tr>
 		</thead>

@@ -680,7 +680,7 @@ class Member < ActiveRecord::Base
     ClubCashTransaction.transaction do
       begin
         if amount.to_f == 0
-          answer[:message] = "Can not process club cash transaction with amount 0 or letters." 
+          answer[:message] = I18n.t("error_messages.club_cash_transaction_invalid_amount")
           answer[:errors] = { :amount => "Invalid amount" } 
         elsif club_cash_transactions_enabled
           if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0

@@ -147,15 +147,17 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     @saved_member.current_membership.update_attribute(:join_date, Time.zone.now-amount_of_days.day)
     Member.send_pillar_emails
-    sleep 1
+    sleep 3
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    within('.nav-tabs'){ click_on 'Communications' }
     within("#communication") do
       wait_until {
         assert page.has_content?(template_name)
       }
     end
-     within("#operations") do
+      within('.nav-tabs'){ click_on 'Operations' }
+      within("#operations") do
       wait_until{
         select 'communications', :from => "operation[operation_type]"
       }
@@ -184,6 +186,16 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within(".nav-tabs"){ click_on 'Transactions' }
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
     wait_until { assert_equal(Fulfillment.count,Club::DEFAULT_PRODUCT.count) }
+  end
+
+  # Reject new enrollments if billing is disable
+  test "create member with billing disabled" do
+    setup_member(false)
+    @club.update_attribute :billing_enable, false
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    fill_in_member(unsaved_member)
+
+    assert page.has_content? I18n.t('error_messages.club_is_not_enable_for_new_enrollments', :cs_phone_number => @club.cs_phone_number)
   end
 
   test "Create a member with CC blank" do
@@ -252,8 +264,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       }
     end
   end
-
-
 
   # TODO: FIX THIS TEST!
   # test "create member without information and with MeS internar error" do
@@ -762,7 +772,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     @saved_member.set_as_canceled!
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
     click_link_or_button "Recover"
@@ -1178,6 +1187,18 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     click_on 'Save credit card'
 
     assert page.has_content?('There was an error with your credit card information. Please verify your information and resubmit. {:number=>["is required"]}')
+  end
+
+  # Remove/Add Club Cash on a member with lifetime TOM
+  test "Create a new member in the CS using the Lifetime TOM" do
+    setup_member(nil,false)
+    @lifetime_terms_of_membership = FactoryGirl.create(:life_time_terms_of_membership, :club_id => @club.id)
+
+    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
+    @saved_member = create_member(unsaved_member, nil, @lifetime_terms_of_membership.name, true)
+
+    validate_view_member_base(@saved_member)
+    add_club_cash(@saved_member, 10, "Generic description",true)
   end
 end
 

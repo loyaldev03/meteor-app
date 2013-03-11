@@ -12,8 +12,9 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
   def setup_member(create_new_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
-    @club = @terms_of_membership_with_gateway.club
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    
     @partner = @club.partner
     Time.zone = @club.time_zone
     
@@ -32,11 +33,54 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
     create_member_by_sloop(@admin_agent, @member, @credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_member = Member.last
   end
 
-  # ###########################################################
-  # # TESTS
-  # ###########################################################
+  def generate_fulfillment_files(all_times = true, fulfillments = nil ,initial_date = nil, end_date = nil, status = 'not_processed', type = nil, validate = true)
+    search_fulfillments(all_times,initial_date,end_date,'not_processed', type)
+    within("#report_results")do
+      assert page.has_selector?("#create_xls_file")
+      if fulfillments.nil?
+        check "fulfillment_select_all"
+      else 
+        fulfillments.each do |fulfillment|
+          check "fulfillment_selected[#{fulfillment.id}]"
+        end
+      end
+      click_link_or_button 'Create XLS File'
+    end
+    if validate 
+      assert page.has_content?("File created succesfully.")
+      fulfillment_file = FulfillmentFile.last
+      visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+      
+      within("#fulfillment_files_table") do
+        assert page.has_content?(fulfillment_file.id.to_s)
+        assert page.has_content?(fulfillment_file.status)
+        assert page.has_content?(fulfillment_file.product)
+        assert page.has_content?(fulfillment_file.dates)
+        assert page.has_content?(fulfillment_file.fulfillments_processed)
+        assert page.has_selector?("#mark_as_sent") if fulfillment_file.status == 'in_process'
+        assert page.has_selector?("#download_xls_#{fulfillment_file.id}")
+        click_link_or_button 'View'
+      end
+
+      # See "export all to xls" button at fulfillment file
+      within("#report_results"){ assert page.has_selector?("#export_all_to_xls_btn") }
+
+      fulfillments.each do |fulfillment| 
+        fulfillment.reload
+        assert_equal fulfillment.status, 'in_process'
+      end
+
+      assert_equal fulfillments.count, fulfillment_file.fulfillments.count
+    end
+
+  end
+
+  ###########################################################
+  # TESTS
+  ###########################################################
 
   test "cancel member and check if not_processed fulfillments were updated to canceled" do
     setup_member
@@ -2337,5 +2381,1124 @@ test "Enroll a member with recurrent product and it on the list" do
             'processing', Date.today, Date.today, @club.id]).type_card
     csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  test "Pass product to Not Processed status with stock" do
+    setup_member(false)
+    product = FactoryGirl.create(:product, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+
+    create_member_throught_sloop(enrollment_info)
+    @saved_member = Member.find_by_email(@member.email)
+
+    visit clubs_path(@partner.prefix)
+
+    within("#clubs_table")do
+      wait_until{ click_link_or_button 'Products' }
+    end
+
+    within("#products_table")do
+      wait_until{
+        assert page.has_content?((product.stock-1).to_s)
+      }
+    end
+    search_fulfillments(false, nil, nil, nil, 'sloops')
+    within("#report_results"){
+      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.full_name)
+    }
+  end
+
+  test "Pass product to Not Processed status without stock" do
+    setup_member(false)
+    product = Product.find_by_sku('KIT-CARD')
+    product.update_attribute :stock , 0
+    product.update_attribute :allow_backorder , false
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+
+    assert_difference("Member.count",0)do
+      create_member_throught_sloop(enrollment_info)
+    end
+    assert_equal @response.body, '{"message":"You are trying to move a member to a fulfillment queue for a product that has no stock. Add stock or set to allow backorders","code":"'+Settings.error_codes.product_out_of_stock+'"}'
+  end
+
+  #Search fulfillment at "Not Processed" status from Initial Date to End Date
+  test "Search fulfillment at Not Processed status by 'all times' checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    search_fulfillments(true)
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+
+    search_fulfillments
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+  end
+
+  #Search fulfillment at "In Process" status from Initial Date to End Date
+  test "Search fulfillment at 'In Process' status by 'all times' checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    @saved_member.fulfillments.each &:set_as_in_process
+
+    search_fulfillments(true,nil,nil,'in_process')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+
+    search_fulfillments(false,nil,nil,'in_process')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+  end 
+
+  #Search fulfillment at "On Hold" status from Initial Date to End Date
+  test "Search fulfillment at 'On Hold' status by 'all times' checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    @saved_member.fulfillments.each &:set_as_on_hold
+
+    search_fulfillments(true,nil,nil,'on_hold')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+
+    search_fulfillments(false,nil,nil,'on_hold')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+  end 
+
+  #Search fulfillment at "Sent" status from Initial Date to End Date
+  test "Search fulfillment at 'Sent' status by 'all times' checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    @saved_member.fulfillments.each &:set_as_sent
+
+    search_fulfillments(true,nil,nil,'sent')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+
+    search_fulfillments(false,nil,nil,'sent')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+  end 
+
+  # Search fulfillment at "Out of Stock" status from Initial Date to End Date
+  test "Search fulfillment at 'Out of Stock' status by 'all times' checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    @saved_member.fulfillments.each &:set_as_out_of_stock
+
+    search_fulfillments(true,nil,nil,'out_of_stock')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+  end
+
+  # Search fulfillment at "Returned" status from Initial Date to End Date
+  test "Search fulfillment at 'Returned' status by 'all times' checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    @saved_member.fulfillments.each &:set_as_returned
+
+    search_fulfillments(true,nil,nil,'returned')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+
+    search_fulfillments(false,nil,nil,'returned')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+  end
+
+  # Search fulfillment at "Bad address" status from Initial Date to End Date
+  test "Search fulfillment at 'Bad address' status by 'all times' checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    @saved_member.fulfillments.each &:set_as_bad_address
+
+    search_fulfillments(true,nil,nil,'bad_address')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+
+    search_fulfillments(false,nil,nil,'bad_address')
+    within("#report_results")do
+      @saved_member.fulfillments.each do |fulfillment|
+        assert page.has_content?(fulfillment.product_sku)
+        assert page.has_content?(fulfillment.tracking_code)
+      end
+      assert page.has_content?(@saved_member.full_name)
+      assert page.has_content?(@saved_member.visible_id.to_s)
+    end
+  end
+
+  test "Update the status of all the fulfillments - In Process selecting the All results checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_in_process
+
+    search_fulfillments(false,nil,nil,'in_process')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'not_processed', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_in_process
+
+    search_fulfillments(false,nil,nil,'in_process')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'on_hold', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_in_process
+    
+    search_fulfillments(false,nil,nil,'in_process')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'sent', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_in_process
+    
+    search_fulfillments(false,nil,nil,'in_process')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'returned', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_in_process
+    
+    search_fulfillments(false,nil,nil,'in_process')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'bad_address', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_in_process
+    
+    search_fulfillments(false,nil,nil,'in_process')
+    @saved_member.reload
+    update_status_on_fulfillments(@saved_member.fulfillments, 'out_of_stock', true)
+  end
+
+  test "Update the status of all the fulfillments - Not processed selecting the All results checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    search_fulfillments(false,nil,nil,'not_processed')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'in_process', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_not_processed
+
+    search_fulfillments(false,nil,nil,'not_processed')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'on_hold', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_not_processed
+    
+    search_fulfillments(false,nil,nil,'not_processed')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'sent', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_not_processed
+    
+    search_fulfillments(false,nil,nil,'not_processed')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'returned', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_not_processed
+    
+    search_fulfillments(false,nil,nil,'not_processed')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'bad_address', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_not_processed
+    
+    search_fulfillments(false,nil,nil,'not_processed')
+    @saved_member.reload
+    update_status_on_fulfillments(@saved_member.fulfillments, 'out_of_stock', true)
+  end
+
+  test "Update the status of all the fulfillments - On Hold selecting the All results checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_on_hold
+
+    search_fulfillments(false,nil,nil,'on_hold')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'in_process', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_on_hold
+
+    search_fulfillments(false,nil,nil,'on_hold')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'not_processed', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_on_hold
+    
+    search_fulfillments(false,nil,nil,'on_hold')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'sent', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_on_hold
+    
+    search_fulfillments(false,nil,nil,'on_hold')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'returned', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_on_hold
+    
+    search_fulfillments(false,nil,nil,'on_hold')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'bad_address', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_on_hold
+    
+    search_fulfillments(false,nil,nil,'on_hold')
+    @saved_member.reload
+    update_status_on_fulfillments(@saved_member.fulfillments, 'out_of_stock', true)
+  end
+
+test "Update the status of all the fulfillments - Sent selecting the All results checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_sent
+
+    search_fulfillments(false,nil,nil,'sent')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'in_process', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_sent
+
+    search_fulfillments(false,nil,nil,'sent')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'not_processed', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_sent
+    
+    search_fulfillments(false,nil,nil,'sent')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'on_hold', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_sent
+    
+    search_fulfillments(false,nil,nil,'sent')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'returned', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_sent
+    
+    search_fulfillments(false,nil,nil,'sent')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'bad_address', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_sent
+    
+    search_fulfillments(false,nil,nil,'sent')
+    @saved_member.reload
+    update_status_on_fulfillments(@saved_member.fulfillments, 'out_of_stock', true)
+  end
+
+  test "Update the status of all the fulfillments - Out of Stock selecting the All results checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_out_of_stock
+
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'in_process', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_out_of_stock
+
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'not_processed', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_out_of_stock
+    
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'on_hold', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_out_of_stock
+    
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'returned', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_out_of_stock
+    
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'bad_address', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_out_of_stock
+    
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    @saved_member.reload
+    update_status_on_fulfillments(@saved_member.fulfillments, 'sent', true)
+  end
+
+  test "Update the status of all the fulfillments - Returned selecting the All results checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_returned
+
+    search_fulfillments(false,nil,nil,'returned')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'in_process', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_returned
+
+    search_fulfillments(false,nil,nil,'returned')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'not_processed', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_returned
+    
+    search_fulfillments(false,nil,nil,'returned')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'on_hold', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_returned
+    
+    search_fulfillments(false,nil,nil,'returned')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'out_of_stock', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_returned
+    
+    search_fulfillments(false,nil,nil,'returned')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'bad_address', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_returned
+    
+    search_fulfillments(false,nil,nil,'returned')
+    @saved_member.reload
+    update_status_on_fulfillments(@saved_member.fulfillments, 'sent', true)
+  end
+
+  test "Update the status of all the fulfillments - Bad address selecting the All results checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_bad_address
+
+    search_fulfillments(false,nil,nil,'bad_address')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'in_process', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_bad_address
+
+    search_fulfillments(false,nil,nil,'bad_address')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'not_processed', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_bad_address
+    
+    search_fulfillments(false,nil,nil,'bad_address')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'on_hold', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_bad_address
+    
+    search_fulfillments(false,nil,nil,'bad_address')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'out_of_stock', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_bad_address
+    
+    search_fulfillments(false,nil,nil,'bad_address')
+    update_status_on_fulfillments(@saved_member.fulfillments, 'returned', true)
+    @saved_member.reload
+    @saved_member.fulfillments.each &:set_as_bad_address
+    
+    search_fulfillments(false,nil,nil,'bad_address')
+    @saved_member.reload
+    update_status_on_fulfillments(@saved_member.fulfillments, 'sent', true)
+  end
+
+  test "Update the status of the fulfillments - Not processed using individual checkboxes" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    fulfillments = @saved_member.fulfillments
+    search_fulfillments(false,nil,nil,'not_processed')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[0]
+    update_status_on_fulfillments(fulfillment_to_update, 'in_process')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[1]
+    update_status_on_fulfillments(fulfillment_to_update, 'on_hold')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[2]
+    update_status_on_fulfillments(fulfillment_to_update, 'out_of_stock')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[3]
+    update_status_on_fulfillments(fulfillment_to_update, 'returned')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[4]
+    update_status_on_fulfillments(fulfillment_to_update, 'sent')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[5]
+    update_status_on_fulfillments(fulfillment_to_update, 'bad_address')
+  end
+
+test "Update the status of all the fulfillments - In process using individual checkboxes" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_in_process
+
+    fulfillments = @saved_member.fulfillments
+    search_fulfillments(false,nil,nil,'in_process')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[0]
+    update_status_on_fulfillments(fulfillment_to_update, 'not_processed')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[1]
+    update_status_on_fulfillments(fulfillment_to_update, 'on_hold')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[2]
+    update_status_on_fulfillments(fulfillment_to_update, 'out_of_stock')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[3]
+    update_status_on_fulfillments(fulfillment_to_update, 'returned')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[4]
+    update_status_on_fulfillments(fulfillment_to_update, 'sent')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[5]
+    update_status_on_fulfillments(fulfillment_to_update, 'bad_address')
+  end
+
+  test "Update the status of all the fulfillments - On hold using individual checkboxes" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_on_hold
+
+    fulfillments = @saved_member.fulfillments
+    search_fulfillments(false,nil,nil,'on_hold')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[0]
+    update_status_on_fulfillments(fulfillment_to_update, 'not_processed')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[1]
+    update_status_on_fulfillments(fulfillment_to_update, 'in_process')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[2]
+    update_status_on_fulfillments(fulfillment_to_update, 'out_of_stock')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[3]
+    update_status_on_fulfillments(fulfillment_to_update, 'returned')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[4]
+    update_status_on_fulfillments(fulfillment_to_update, 'sent')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[5]
+    update_status_on_fulfillments(fulfillment_to_update, 'bad_address')
+  end
+
+  test "Update the status of all the fulfillments - Sent using individual checkboxes" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_sent
+
+    fulfillments = @saved_member.fulfillments
+    search_fulfillments(false,nil,nil,'sent')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[0]
+    update_status_on_fulfillments(fulfillment_to_update, 'not_processed')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[1]
+    update_status_on_fulfillments(fulfillment_to_update, 'in_process')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[2]
+    update_status_on_fulfillments(fulfillment_to_update, 'out_of_stock')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[3]
+    update_status_on_fulfillments(fulfillment_to_update, 'returned')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[4]
+    update_status_on_fulfillments(fulfillment_to_update, 'on_hold')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[5]
+    update_status_on_fulfillments(fulfillment_to_update, 'bad_address')
+  end
+
+  test "Update the status of all the fulfillments - Out of Stock using individual checkboxes" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_out_of_stock
+
+    fulfillments = @saved_member.fulfillments
+    search_fulfillments(false,nil,nil,'out_of_stock')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[0]
+    update_status_on_fulfillments(fulfillment_to_update, 'not_processed')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[1]
+    update_status_on_fulfillments(fulfillment_to_update, 'in_process')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[2]
+    update_status_on_fulfillments(fulfillment_to_update, 'sent')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[3]
+    update_status_on_fulfillments(fulfillment_to_update, 'returned')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[4]
+    update_status_on_fulfillments(fulfillment_to_update, 'on_hold')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[5]
+    update_status_on_fulfillments(fulfillment_to_update, 'bad_address')
+  end
+
+  test "Update the status of all the fulfillments - Returned using individual checkboxes" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_returned
+
+    fulfillments = @saved_member.fulfillments
+    search_fulfillments(false,nil,nil,'returned')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[0]
+    update_status_on_fulfillments(fulfillment_to_update, 'not_processed')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[1]
+    update_status_on_fulfillments(fulfillment_to_update, 'in_process')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[2]
+    update_status_on_fulfillments(fulfillment_to_update, 'sent')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[3]
+    update_status_on_fulfillments(fulfillment_to_update, 'out_of_stock')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[4]
+    update_status_on_fulfillments(fulfillment_to_update, 'on_hold')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[5]
+    update_status_on_fulfillments(fulfillment_to_update, 'bad_address')
+  end
+
+  test "Update the status of all the fulfillments - Bad address using individual checkboxes" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_bad_address
+
+    fulfillments = @saved_member.fulfillments
+    search_fulfillments(false,nil,nil,'bad_address')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[0]
+    update_status_on_fulfillments(fulfillment_to_update, 'not_processed')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[1]
+    update_status_on_fulfillments(fulfillment_to_update, 'in_process')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[2]
+    update_status_on_fulfillments(fulfillment_to_update, 'sent')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[3]
+    update_status_on_fulfillments(fulfillment_to_update, 'out_of_stock')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[4]
+    update_status_on_fulfillments(fulfillment_to_update, 'on_hold')
+
+    fulfillment_to_update = []
+    fulfillment_to_update << fulfillments[5]
+    update_status_on_fulfillments(fulfillment_to_update, 'returned')
+  end
+
+  test "Error message if changing from one status to same status" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    fulfillments = @saved_member.fulfillments
+    search_fulfillments(false,nil,nil,'not_processed')
+
+    alert_ok_js
+    update_status_on_fulfillments(@saved_member.fulfillments, 'not_processed', false, 'KIT-CARD', false)
+    within("#report_results"){ assert page.has_content?("Nothing to change on KIT-CARD fulfillment.") }
+  end
+  
+  test "Error message if changing from one status to 'blank' status" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    fulfillments = @saved_member.fulfillments
+    search_fulfillments(false,nil,nil,'not_processed')
+
+    alert_ok_js
+    
+    within("#report_results")do
+      check "fulfillment_selected[#{fulfillments[0].id}]"
+      click_link_or_button 'Update status'
+    end
+
+    within("#report_results"){ assert page.has_content?("New status is blank. Please, select a new status to be applied.") }
+  end
+
+  test "Search fulfillments with Initial Date > End Date" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    fulfillments = @saved_member.fulfillments
+    search_fulfillments(false,nil,nil,'not_processed')
+
+    alert_ok_js
+    update_status_on_fulfillments(@saved_member.fulfillments, 'not_processed', false, 'KIT-CARD', false)
+    within("#report_results"){ assert page.has_content?("Nothing to change on KIT-CARD fulfillment.") }
+  end
+
+  # Create a fulfillment file with all times and with kit-card product
+  # See "Create XLS file" button - All time checkbox
+  test "Create file at 'all time' checkbox" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    fulfillments = []
+    fulfillments << @saved_member.fulfillments.first
+    fulfillments << @saved_member.fulfillments.last
+
+    generate_fulfillment_files(true, fulfillments)
+    
+    fulfillments = @saved_member.fulfillments
+  end
+
+  test "Create file at Date range" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    fulfillments = []
+    fulfillments << @saved_member.fulfillments.first
+    fulfillments << @saved_member.fulfillments.last
+
+    generate_fulfillment_files(false, fulfillments)
+  end
+
+  test "Create a fulfillment file with all times and with sloop product" do
+    setup_member(false)
+    active_merchant_stubs
+    product = FactoryGirl.create(:product, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+    create_member_throught_sloop(enrollment_info)
+    fulfillments = []
+    fulfillments << @saved_member.fulfillments.first
+    
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    generate_fulfillment_files(true, fulfillments,nil, nil, nil, 'sloops')
+  end
+
+  test "Create a fulfillment file with initial-end dates and with sloop product" do
+    setup_member(false)
+    active_merchant_stubs
+    product = FactoryGirl.create(:product, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    fulfillments = []
+    fulfillments << @saved_member.fulfillments.first
+
+    generate_fulfillment_files(false, fulfillments, nil, nil, nil, 'sloops')
+  end
+
+  test "Create a fulfillment file with initial-end dates and with sloop product" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    all_fulfillments = @saved_member.fulfillments
+    fulfillments = []
+    fulfillments << @saved_member.fulfillments.first
+    generate_fulfillment_files(false, fulfillments, nil, nil, 'not_processed', nil, false)
+
+    fulfillments = []
+    fulfillments << @saved_member.fulfillments[1]
+    fulfillments << @saved_member.fulfillments[2]
+    generate_fulfillment_files(false, fulfillments, nil, nil, 'not_processed', nil, false)
+
+    fulfillments = []
+    fulfillments << @saved_member.fulfillments[3]
+    fulfillments << @saved_member.fulfillments[4]
+    generate_fulfillment_files(false, fulfillments, nil, nil, 'not_processed', nil, false)
+
+    visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    
+
+    fulfillment_files = FulfillmentFile.all
+    assert_equal fulfillment_files.count, 3
+
+    within("#fulfillment_files_table") do
+      fulfillment_files.each do |fulfillment_file|
+        assert page.has_content?(fulfillment_file.id.to_s)
+        assert page.has_content?(fulfillment_file.status)
+        assert page.has_content?(fulfillment_file.product)
+        assert page.has_content?(fulfillment_file.dates)
+        assert page.has_content?(fulfillment_file.fulfillments_processed)
+      end
+    end
+  end
+
+  # Mark as sent - fulfillment file
+  test "Check fulfillment file at sent status" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    generate_fulfillment_files(false, @saved_member.fulfillments, nil, nil, 'not_processed', nil, false)
+    
+    visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+
+    within("#fulfillment_files_table")do
+      confirm_ok_js
+      click_link_or_button 'Mark as sent'
+    end
+    assert page.has_content?("Fulfillment file marked as sent successfully")
+
+    within("#fulfillment_files_table")do
+      assert page.has_content?("sent")
+      assert page.has_no_selector?("#mark_as_sent")
+    end
+
+    file = FulfillmentFile.last
+    assert_equal file.status, "sent"
+  end  
+
+  test "Agents can not change fulfillment status from Member Profile" do
+    setup_member(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within('.nav-tabs'){ click_on 'Fulfillments'}
+    within('#fulfillments'){ assert page.has_no_selector?("#mark_as_sent")}
+    within('#fulfillments'){ assert page.has_no_selector?("#update_fulfillment_status")}
+  end
+
+  test "Mark a member as 'wrong address' - Admin Role - not_processed status" do
+    setup_member(true)
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+
+    set_as_undeliverable_member(@saved_member,'reason')
+
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+
+    @saved_member.fulfillments do |fulfillment|
+      assert_equal fulfillment.status, 'bad_address'
+    end
+  end 
+
+  test "Mark a member as 'wrong address' - In Process status" do
+    setup_member(true)
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_in_process
+
+    set_as_undeliverable_member(@saved_member,'reason')
+
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+
+    @saved_member.fulfillments do |fulfillment|
+      assert_equal fulfillment.status, 'bad_address'
+    end
+  end
+
+  test "Mark a member as 'wrong address' - Out of stock status" do
+    setup_member(true)
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_out_of_stock
+
+    set_as_undeliverable_member(@saved_member,'reason')
+
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+
+    @saved_member.fulfillments do |fulfillment|
+      assert_equal fulfillment.status, 'bad_address'
+    end
+  end
+
+  test "Mark a member as 'wrong address' - Returned status" do
+    setup_member(true)
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    @saved_member.fulfillments.each &:set_as_returned
+
+    set_as_undeliverable_member(@saved_member,'reason')
+
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+
+    @saved_member.fulfillments do |fulfillment|
+      assert_equal fulfillment.status, 'bad_address'
+    end
+  end  
+
+  test "Fulfillments file page should filter the results by Club" do
+    setup_member(false)
+    @club2 = FactoryGirl.create(:simple_club_with_gateway)
+
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_throught_sloop(enrollment_info)
+
+    FactoryGirl.create(:fulfillment_file, :agent_id => @admin_agent.id, :club_id => @club.id, :created_at => Time.zone.now-2.days )
+    FactoryGirl.create(:fulfillment_file, :agent_id => @admin_agent.id, :club_id => @club.id, :created_at => Time.zone.now-1.days )
+    FactoryGirl.create(:fulfillment_file, :agent_id => @admin_agent.id, :club_id => @club2.id, :created_at => Time.zone.now+1.days )
+    FactoryGirl.create(:fulfillment_file, :agent_id => @admin_agent.id, :club_id => @club2.id, :created_at => Time.zone.now+2.days)
+    
+    visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    fulfillment_file = FulfillmentFile.find_all_by_club_id(@club.id)
+    fulfillment_file2 = FulfillmentFile.find_all_by_club_id(@club2.id)
+    within("#fulfillment_files_table")do
+      assert page.has_content?( I18n.l(fulfillment_file.first.created_at.to_date) )     
+      assert page.has_content?( I18n.l(fulfillment_file.last.created_at.to_date) )
+      assert page.has_no_content?( I18n.l(fulfillment_file2.first.created_at.to_date) )     
+      assert page.has_no_content?( I18n.l(fulfillment_file2.last.created_at.to_date) )
+    end
   end
 end

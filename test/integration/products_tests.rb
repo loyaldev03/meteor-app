@@ -10,57 +10,53 @@ class ProductsTests < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-	test "product list" do
-		unsaved_product = FactoryGirl.build(:product)
+  def create_product(unsaved_product, validate = true)
 		visit products_path(@partner.prefix, @club.name)
-
 		click_link_or_button 'New Product'
 
+		fill_in 'product[sku]', :with => unsaved_product.sku	
 		fill_in 'product[name]', :with => unsaved_product.name
-		fill_in 'product[sku]', :with => unsaved_product.sku
 		fill_in 'product[stock]', :with => unsaved_product.stock
 		fill_in 'product[weight]', :with => unsaved_product.weight
+		fill_in 'product[package]', :with => unsaved_product.package
+		fill_in 'product[cost_center]', :with => unsaved_product.cost_center
+		check 'product[allow_backorder]' if unsaved_product.allow_backorder
 
-   	click_link_or_button 'Create Product'
+		click_link_or_button 'Create Product'
+		if validate
+			wait_until{ assert page.has_content?("Product was successfully created") }
+			Product.find_by_sku(unsaved_product.sku)
+  	end
+  end
+
+	test "product list" do
+		unsaved_product = FactoryGirl.build(:product)
+		saved_product = create_product unsaved_product
 		visit products_path(@partner.prefix, @club.name)
 
 		within("#products_table") do
 			wait_until {
-	      assert page.has_content?(unsaved_product.name)
-	      assert page.has_content?(unsaved_product.recurrent.to_s)
-	   		assert page.has_content?(unsaved_product.stock.to_s)
-				assert page.has_content?(unsaved_product.weight.to_s)
+	      assert page.has_content?(saved_product.name)
+	      assert page.has_content?(saved_product.recurrent.to_s)
+	   		assert page.has_content?(saved_product.stock.to_s)
+				assert page.has_content?(saved_product.weight.to_s)
 	    }
   	end
 	end
 
+	# Create a member with Allow backorder at false
 	test "create, update, delete a product" do
-		unsaved_product = FactoryGirl.build(:product)
-		visit products_path(@partner.prefix, @club.name)
-
-		click_link_or_button 'New Product'
-
-		fill_in 'product[name]', :with => unsaved_product.name
-		fill_in 'product[sku]', :with => unsaved_product.sku
-		fill_in 'product[stock]', :with => unsaved_product.stock
-		fill_in 'product[weight]', :with => unsaved_product.weight
-
-		assert_difference('Product.count') do
-    	click_link_or_button 'Create Product'
-    end
+		unsaved_product = FactoryGirl.build(:product, :allow_backorder => false)
+		saved_product = create_product unsaved_product
 		
-		assert page.has_content?("Product was successfully created")
-		
-		assert page.has_content?(unsaved_product.name)
-		assert page.has_content?(unsaved_product.sku)
-		assert page.has_content?(unsaved_product.stock.to_s)
-		assert page.has_content?(unsaved_product.weight.to_s)
+		assert page.has_content?(saved_product.name)
+		assert page.has_content?(saved_product.sku)
+		assert page.has_content?(saved_product.stock.to_s)
+		assert page.has_content?(saved_product.weight.to_s)
 
 		click_link_or_button 'Edit'
 		assert page.has_content?('Edit Product')
 
-		saved_product = Product.find_by_name(unsaved_product.name)
-		
 		fill_in 'product[stock]', :with => saved_product.stock + 1
 		fill_in 'product[weight]', :with => saved_product.weight + 1
 
@@ -80,25 +76,13 @@ class ProductsTests < ActionController::IntegrationTest
 		assert_difference('Product.count', -1) do
 			click_link_or_button 'Destroy'
 		end
-
-		assert page.has_content?("Product #{saved_product.name} was successfully destroyed")
+		wait_until{ assert page.has_content?("Product #{saved_product.sku} was successfully destroyed") }
 
 	end
 
 	test "all links in product show must work" do
 		unsaved_product = FactoryGirl.build(:product)
-		visit products_path(@partner.prefix, @club.name)
-
-		click_link_or_button 'New Product'
-
-		fill_in 'product[name]', :with => unsaved_product.name
-		fill_in 'product[sku]', :with => unsaved_product.sku
-		fill_in 'product[stock]', :with => unsaved_product.stock
-		fill_in 'product[weight]', :with => unsaved_product.weight
-
-		click_link_or_button 'Create Product'
-
-		saved_product = Product.find_by_name(unsaved_product.name)
+		saved_product = create_product unsaved_product
 
 		click_link_or_button 'Edit'
 		assert page.has_content?('Edit Product')
@@ -120,7 +104,7 @@ class ProductsTests < ActionController::IntegrationTest
 		visit products_path(@partner.prefix, @club.name)
 		within("#products_table") do
 			wait_until { assert page.has_content?(unsaved_product.name) }
-			click_link_or_button 'Edit'
+			first(:link, 'Edit').click 
   	end
 
   	wait_until{ assert page.has_content?('Edit Product') }
@@ -151,104 +135,53 @@ class ProductsTests < ActionController::IntegrationTest
 	end
 
 	test "Create a product with negative stock" do
-		unsaved_product = FactoryGirl.create(:product, :club_id => @club.id )
-		visit products_path(@partner.prefix, @club.name)
-
-		click_link_or_button 'New Product'
-		fill_in 'product[stock]', :with => '-3'
-  	click_link_or_button 'Create Product'
-  	wait_until{ assert page.has_content?("must be greater than or equal to 0") }
+		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :stock => -3 )
+		create_product unsaved_product, false
+  	wait_until{ assert page.has_content?("Stock cannot be negative. Enter positive stock, or allow backorder") }
 	end
 
 	test "Duplicate product in the same club" do
 		unsaved_product = FactoryGirl.create(:product, :club_id => @club.id )
-		visit products_path(@partner.prefix, @club.name)
-
-		click_link_or_button 'New Product'
-		fill_in 'product[sku]', :with => 'KIT'
-  	click_link_or_button 'Create Product'
-  	wait_until{ assert page.has_content?("has already been taken") }
+		create_product unsaved_product, false
+		wait_until{ assert page.has_content?("has already been taken") }
 	end
 	
-	test "Create a product with sku limit - 19 chars length" do
-		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :sku => "abcdefghijklmnopqrs" )
-		visit products_path(@partner.prefix, @club.name)
-		click_link_or_button 'New Product'
-
-		wait_until{ 
-			fill_in 'product[sku]', :with => unsaved_product.sku	
-			fill_in 'product[name]', :with => unsaved_product.name
-			fill_in 'product[stock]', :with => unsaved_product.stock
-			fill_in 'product[weight]', :with => unsaved_product.weight
-			fill_in 'product[package]', :with => unsaved_product.package
-		}
-		click_link_or_button 'Create Product'
-		wait_until{ assert page.has_content?("Product was successfully created") }
+	test "Create a product with cost_center limit - 19 chars length" do
+		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :cost_center => "abcdefghijklmnopqrs" )
+		create_product unsaved_product
 	end
 
 	test "Create a product with Package limit - 30 chars length" do
 		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :package => "abcdefghijklmnopqrstuvwxyzabcd" )
-		visit products_path(@partner.prefix, @club.name)
-		click_link_or_button 'New Product'
-
-		wait_until{ 
-			fill_in 'product[sku]', :with => unsaved_product.sku	
-			fill_in 'product[name]', :with => unsaved_product.name
-			fill_in 'product[stock]', :with => unsaved_product.stock
-			fill_in 'product[weight]', :with => unsaved_product.weight
-			fill_in 'product[package]', :with => unsaved_product.package
-		}
-		click_link_or_button 'Create Product'
-		wait_until{ assert page.has_content?("Product was successfully created") }
+		create_product unsaved_product
 	end
 
 	test "Create a product with Package more than 30 characters" do
 		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :package => "abcdefghijklmnopqrstuvwxyzabcde" )
-		visit products_path(@partner.prefix, @club.name)
-		click_link_or_button 'New Product'
-
-		wait_until{ 
-			fill_in 'product[package]', :with => unsaved_product.package
-		}
-		click_link_or_button 'Create Product'
+		create_product unsaved_product, false
 		wait_until{ assert page.has_content?("is too long (maximum is 30 characters)") }
 	end
 
-	test "Create a product with SKU more than 19 characters" do
-		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :sku => "abcdefghijklmnopqrst" )
-		visit products_path(@partner.prefix, @club.name)
-		click_link_or_button 'New Product'
-
-		wait_until{ 
-			fill_in 'product[sku]', :with => unsaved_product.sku
-		}
-		click_link_or_button 'Create Product'
-		sleep 5
+	test "Create a product with cost_center more than 19 characters" do
+		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :cost_center => "abcdefghijklmnopqrst" )
+		create_product unsaved_product, false
 		wait_until{ assert page.has_content?("is too long (maximum is 19 characters)") }
 	end
 
 	test "Create a product with numbers at SKU " do
 		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :sku => "123456789" )
-		visit products_path(@partner.prefix, @club.name)
-		click_link_or_button 'New Product'
-
-		wait_until{ 
-			fill_in 'product[sku]', :with => unsaved_product.sku
-		}
-		click_link_or_button 'Create Product'
-		wait_until{ assert page.has_content?("is invalid") }
+		create_product unsaved_product
 	end
 	
 	test "Create a product with numbers at package " do
 		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :package => "123456789" )
-		visit products_path(@partner.prefix, @club.name)
-		click_link_or_button 'New Product'
-
-		wait_until{ 
-			fill_in 'product[package]', :with => unsaved_product.package
-		}
-		click_link_or_button 'Create Product'
+		create_product unsaved_product, false
 		wait_until{ assert page.has_content?("is invalid") }
+	end
+
+	test "Create a member with Allow backorder at true" do
+		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :allow_backorder => true )
+		create_product(unsaved_product)
 	end
 
 end
