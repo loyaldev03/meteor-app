@@ -1,10 +1,11 @@
 class AddProductPackageAtProducts < ActiveRecord::Migration
   def up
     add_column :products, :package, :string
-    Product.all.each do |p|
-      p.package = p.sku
-      p.save
-    end
+    puts "Execute the following lines if you want to set the package for previous products"
+    # Product.all.each do |p|
+    #   p.package = p.sku
+    #   p.save
+    # end
     add_column :fulfillments, :product_package, :string
   end
 
