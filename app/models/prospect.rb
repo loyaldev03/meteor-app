@@ -9,7 +9,7 @@ class Prospect < ActiveRecord::Base
 
   after_create :after_create_sync_to_remote_domain
   def after_create_sync_to_remote_domain
-    sync_to_remote_domain if pardot_prospect.nil?
+    sync_to_remote_domain unless pardot_prospect.nil?
   end
 
   attr_accessible :first_name, :last_name, :address, :city, :state, :zip, :email,:phone_country_code, 
