@@ -104,6 +104,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
   end
 
+  # Reject new enrollments if billing is disable
   test "If billing is disabled member cant be enrolled." do
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
@@ -125,6 +126,7 @@ class Api::MembersControllerTest < ActionController::TestCase
         end
       end
     end
+    assert_equal @response.body, '{"message":"We are not accepting new enrollments at this time. Please call member services at: 123 456 7891","code":"410"}'
   end
 
   test "Representative should enroll/create member" do
@@ -549,7 +551,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.token, @credit_card.token)
   end
 
-  test "Should activate old credit when it is already created, if it is not expired (with tabs)" do
+  test "Should activate old credit when it is already created, if it is not expired (with slashes)" do
     sign_in @admin_user
     number = "340/5043/2363/2976"
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -808,7 +810,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   # Update a member with different CC 
-  test "Update a profile with CC with '/'" do
+  test "Update a profile with CC with slashes" do
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id

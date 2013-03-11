@@ -36,39 +36,31 @@ class MembersClubCashTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
+  # Remove/Add Club Cash
+  # See club cash transaction history (Only Clubs without Drupal domain)
   test "add club cash amount" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     
-    add_club_cash(member, 15, "Generic description")
-    add_club_cash(member, -5, "Generic description")
-
-    club_cash_transaction = @saved_member.club_cash_transactions.last
-    within("#club_cash_transactions_table") do
-      wait_until{
-        assert page.has_content?("15")
-        assert page.has_content?(club_cash_transaction.id.to_s)
-        assert page.has_content?(club_cash_transaction.description)
-        assert page.has_content?(I18n.l(club_cash_transaction.created_at, :format => :dashed))
-      }
-    end
+    add_club_cash(@saved_member, 15, "Generic description")
+    @saved_member.reload
+    add_club_cash(@saved_member, -5, "Generic description")
   end
 
   test "club cash amount can't be negatibe" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     
-    add_club_cash(member, 15, "Generic description")
+    add_club_cash(@saved_member, 15, "Generic description")
 
-    click_on 'Add club cash'
-    fill_in 'club_cash_transaction[amount]', :with => "-20"
-    alert_ok_js
-    click_on 'Save club cash transaction'
+    add_club_cash(@saved_member, -20, "Deducting more than member has.", false)
 
+    assert page.has_content?("You can not deduct 20 because the member only has 15 club cash.")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
     within("#td_mi_club_cash_amount") { assert page.has_content?("15") }
   end
 
+  # Error message when adding a wrong club cash
   test "invalid characters on club cash" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -79,7 +71,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     click_on 'Save club cash transaction'
 
     wait_until{
-      assert page.has_content?('Can not process club cash transaction with amount 0 or letters.')
+      assert page.has_content?(I18n.t("error_messages.club_cash_transaction_invalid_amount"))
     }
   end
 
@@ -449,6 +441,5 @@ class MembersClubCashTest < ActionController::IntegrationTest
     end 
     wait_until{ page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s) }
   end
- 
 end
 

@@ -9,6 +9,7 @@ class ClubTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
+  # Club Creation
   test "create club" do
     unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)

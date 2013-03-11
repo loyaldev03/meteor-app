@@ -278,28 +278,6 @@ class MemberTest < ActiveSupport::TestCase
     end
   end
 
-  test "Recycle credit card twice" do
-    @club = @terms_of_membership_with_gateway.club
-    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
-    active_merchant_stubs_store
-    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
-    original_year = 2000
-    member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
-    member.reload
-    assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 2) do
-        assert_difference('Transaction.count') do
-          assert_equal member.recycled_times, 0
-          answer = member.bill_membership
-          member.reload
-          assert_equal answer[:code], @sd_strategy.response_code
-          assert_equal member.recycled_times, 1
-          assert_equal member.credit_cards.count, 1 # only one credit card
-          assert_equal member.credit_cards.first.expire_year, original_year # original expire year should not be touch, because we need it to recycle
-        end
-      end
-    end
-
     # im sorry to add this sleep. But if I dont, the member.transactions.last does not work always. why?
     # because the created_at of both transactions has the same value!!!
     sleep(1)
@@ -417,7 +395,6 @@ class MemberTest < ActiveSupport::TestCase
     member = FactoryGirl.create(:member_with_api, :club_id => @club.id)
 
     answer = member.add_club_cash(agent, 12385243.2)
-    puts answer
   end
 
 end

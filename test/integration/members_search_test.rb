@@ -809,6 +809,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
   end
 
+  # See a member is blacklisted in the search results
   test "should show status with 'Blisted' on search results, when member is blacklisted." do
     setup_member
     cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)

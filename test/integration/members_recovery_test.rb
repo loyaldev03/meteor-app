@@ -215,6 +215,34 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     validate_view_member_base(@saved_member)
   end
 
+  test "Drupal should not create a new account when updating a lapsed member info in phoenix" do
+    setup_member
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)    
+    click_link_or_button 'Edit'
+
+    within("#table_demographic_information")do
+      fill_in 'member[first_name]', :with => "New name"
+    end
+    alert_ok_js
+    click_link_or_button 'Update Member'
+    @saved_member.reload
+    assert_equal @saved_member.first_name, "New name"
+    assert_equal @saved_member.status, "lapsed"
+
+    credit_card = FactoryGirl.build(:credit_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    assert_difference("CreditCard.count",0) do
+      create_member_by_sloop(@admin_agent, @saved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway, false)
+    end
+    @saved_member.reload
+
+    assert_equal @saved_member.status, "provisional"
+    assert_equal @saved_member.active_credit_card.token, credit_card.token
+
+    validate_view_member_base(@saved_member)
+  end
+
   # # #TODO: FIX THIS TEST.
   # # test "Recover a member with CC expired year after (actualYear-3 years)" do
   # #   setup_member
@@ -267,7 +295,4 @@ class MembersRecoveryTest < ActionController::IntegrationTest
 #   #   end
 
 #   # end
-
-
-  
 end

@@ -19,8 +19,9 @@ class MembersSyncronize < ActionController::IntegrationTest
     Pardot::Member.any_instance.stubs(:save!).returns(response)
 
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_and_api)
-    @club = @terms_of_membership_with_gateway.club
+    @club = FactoryGirl.create(:club_with_api)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club.id)
+    
     @club.update_attribute(:name,"club_uno")
     Time.zone = @club.time_zone
     @partner = @club.partner
@@ -33,7 +34,7 @@ class MembersSyncronize < ActionController::IntegrationTest
 	def fill_in_member(unsaved_member, credit_card, tom)
     club = tom.club
     visit members_path(:partner_prefix => club.partner.prefix, :club_prefix => club.name)
-    wait_until{ click_link_or_button 'New Member' }
+    click_link_or_button 'New Member'
 
     within("#table_demographic_information")do
       wait_until{
@@ -564,6 +565,19 @@ class MembersSyncronize < ActionController::IntegrationTest
       }
     end
   end
+
+  # FIX ME!!
+  # test "Remove drupal account when Cancel a member" do
+  #   setup_environment 
+  #   unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card)
+
+  #   @saved_member = fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
+  #   @saved_member.set_as_canceled!
+  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+
+  #   sleep 500
+  # end
 
 end
 

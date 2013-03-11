@@ -13,8 +13,9 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   def setup_member(create_new_member = true, create_member_by_sloop = false)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway)
-    @club = @terms_of_membership_with_gateway.club
+    @club = FactoryGirl.creat(:simple_club_with_gateway)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+
     @partner = @club.partner
     Time.zone = @club.time_zone
     @communication_type = FactoryGirl.create(:communication_type)
@@ -36,16 +37,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
 
     sign_in_as(@admin_agent)
-  end
-
-  def set_as_undeliverable_member(member,reason)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-    click_link_or_button "Set undeliverable"
-    within("#undeliverable_table"){
-      fill_in reason, :with => 'Undeliverable'
-    }
-    confirm_ok_js
-    click_link_or_button 'Set wrong address'
   end
 
   def set_as_unreachable_member(member,reason)
@@ -243,7 +234,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     assert find_field("operation_notes").value == text_note  
   end
 
-
   test "change unreachable phone number to reachable by check" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
@@ -280,12 +270,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     set_as_undeliverable_member(@saved_member,'reason')
 
-    within("#table_demographic_information")do
-      assert page.has_css?('tr.yellow')
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_address, 'Undeliverable'
-
     click_link_or_button "Edit"
     within("#table_demographic_information")do
       wait_until{
@@ -304,12 +288,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "change unreachable address to undeliverable when changeing city" do
     setup_member
     set_as_undeliverable_member(@saved_member,'reason')
-
-    within("#table_demographic_information")do
-      assert page.has_css?('tr.yellow')
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_address, 'Undeliverable'
 
     click_link_or_button "Edit"
     within("#table_demographic_information")do
@@ -330,12 +308,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     set_as_undeliverable_member(@saved_member,'reason')
 
-    within("#table_demographic_information")do
-      assert page.has_css?('tr.yellow')
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_address, 'Undeliverable'
-
     click_link_or_button "Edit"
     within("#table_demographic_information")do
       wait_until{
@@ -355,12 +327,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     set_as_undeliverable_member(@saved_member,'reason')
 
-    within("#table_demographic_information")do
-      assert page.has_css?('tr.yellow')
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_address, 'Undeliverable'
-
     click_link_or_button "Edit"
     within("#table_demographic_information")do
       wait_until{
@@ -379,12 +345,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "change unreachable address to undeliverable when changeing country" do
     setup_member
     set_as_undeliverable_member(@saved_member,'reason')
-
-    within("#table_demographic_information")do
-      assert page.has_css?('tr.yellow')
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_address, 'Undeliverable'
 
     click_link_or_button "Edit"
     within("#table_demographic_information")do
@@ -406,12 +366,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "change unreachable address to undeliverable by check" do
     setup_member
     set_as_undeliverable_member(@saved_member,'reason')
-
-    within("#table_demographic_information")do
-      assert page.has_css?('tr.yellow')
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_address, 'Undeliverable'
 
     click_link_or_button "Edit"
     within("#table_demographic_information")do
@@ -435,12 +389,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     
     set_as_unreachable_member(@saved_member,'Unreachable')    
    
-    within("#table_contact_information")do
-      assert page.has_css?('tr.yellow')
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_phone_number, 'Unreachable'
-
     click_link_or_button "Edit"
     within("#table_contact_information")do
       wait_until{
@@ -461,12 +409,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   
     set_as_unreachable_member(@saved_member,'Unreachable')    
   
-    within("#table_contact_information")do
-     wait_until{ assert page.has_css?('tr.yellow') }
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_phone_number, 'Unreachable'
-
     click_link_or_button "Edit"
     within("#table_contact_information")do
       wait_until{ fill_in 'member[phone_area_code]', :with => '9876' }

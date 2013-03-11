@@ -277,7 +277,10 @@ module ActionController
   end
 
   # Check Refund email -  It is send it by CS inmediate
-  def bill_member(member, do_refund = true, refund_amount = nil)
+  def bill_member(member, do_refund = true, refund_amount = nil, update_next_bill_date_to_today = true)
+    active_merchant_stubs
+    
+    member.update_attribute(:next_retry_bill_date, Time.zone.now)
     next_bill_date = member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)
 
     answer = member.bill_membership
@@ -325,11 +328,12 @@ module ActionController
 
       wait_until{ assert page.has_content?(transaction.amount_available_to_refund.to_s) }
 
-      final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
+      # final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
+      final_amount = Transaction.first.amount_available_to_refund
       final_amount = refund_amount.to_s if not refund_amount.nil?
 
-      fill_in 'refund_amount', :with => final_amount   
 
+      fill_in 'refund_amount', :with => final_amount   
       assert_difference ['Transaction.count'] do 
         click_on 'Refund'
       end
@@ -369,8 +373,9 @@ module ActionController
     click_on 'Save credit card'
   end
 
-  def add_club_cash(member, amount, description, valide = true)
+  def add_club_cash(member, amount, description, validate = true)
     previous_amount = member.club_cash_amount
+    new_amount = previous_amount + amount
     visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
     within("#table_membership_information"){ click_on 'Add club cash' }
     
@@ -379,8 +384,12 @@ module ActionController
     fill_in 'club_cash_transaction[description]', :with => description
     click_on 'Save club cash transaction'
 
-    within("#operations"){assert page.has_content?("#{amount.to_f} club cash was successfully #{amount>0 ? 'added' : 'deducted'}. Concept: #{description}")}
-    within("#td_mi_club_cash_amount") { assert page.has_content?((previous_amount+amount).to_s) }
+    if validate
+      within('.nav-tabs'){ click_on 'Operations' }
+      within("#operations_table"){assert page.has_content?("#{amount.to_f.abs} club cash was successfully #{amount>0 ? 'added' : 'deducted'}. Concept: #{description}")}
+      within('.nav-tabs'){ click_on 'Club Cash' }
+      within("#td_mi_club_cash_amount") { assert page.has_content?((new_amount).to_s) }
+    end
   end
 
   def save_the_sale(member, new_terms_of_membership, validate = true)
@@ -399,6 +408,118 @@ module ActionController
       assert_equal member.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
       assert_equal member.status, member.current_membership.status
       within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
+    end
+  end
+
+  def recover_member(member,new_tom, validate = true)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == member.first_name }
+    click_link_or_button "Recover"
+    select(new_tom.name, :from => 'terms_of_membership_id')
+    confirm_ok_js
+    click_on "Recover"
+    sleep 1
+    if validate
+      wait_until{ assert find_field('input_first_name').value == member.first_name }
+      within("#td_mi_reactivation_times")do
+        wait_until{ assert page.has_content?("1")}
+      end
+    end
+  end
+
+  def set_as_undeliverable_member(member, reason = 'Undeliverable', validate = true)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
+    click_link_or_button "Set undeliverable"
+    within("#undeliverable_table"){
+      fill_in reason, :with => reason
+    }
+    confirm_ok_js
+    click_link_or_button 'Set wrong address'
+
+    if validate
+      member.reload
+      within('.nav-tabs'){ click_on 'Operations' }
+      within("#operations"){ assert page.has_content?("Address #{member.full_address} is undeliverable. Reason: #{reason}")}
+      
+      within("#table_demographic_information")do
+        assert page.has_css?('tr.yellow')
+      end 
+      @saved_member.reload
+      assert_equal @saved_member.wrong_address, reason
+    end
+  end
+
+  def search_fulfillments(all_times = false, initial_date = nil, end_date = nil, status = nil, type = nil)
+    visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#fulfillments_table")do
+      check "all_times" if all_times
+
+      unless initial_date.nil?
+        months_difference = initial_date.month - Time.zone.now.month
+        within("#td_initial_date")do
+          page.execute_script("window.jQuery('#end_date').next().click()")
+          within(".ui-datepicker-div") do
+            if months_difference > 0
+              months_difference.times { click("ui-datepicker-next") }
+            elsif months_difference < 0
+              months_difference.times { click("ui-datepicker-prev") } 
+            end
+            
+            within(".ui-datepicker-calendar"){ click_on(initial_date.day) }
+          end
+        end
+      end
+
+      unless end_date.nil?
+        months_difference = end_date.month - Time.zone.month
+        within("#td_end_date")do
+          page.execute_script("window.jQuery('#end_date').next().click()")
+          if months_difference > 0
+            within(".ui-datepicker-div"){ months_difference.times { click("ui-datepicker-next") } }
+          elsif months_difference < 0
+            within(".ui-datepicker-div"){ months_difference.times { click("ui-datepicker-prev") } }
+          end
+          within(".ui-datepicker-div") do
+            within(".ui-datepicker-calendar"){ click_on(end_date.day) }
+          end
+        end
+      end
+
+      select status, :from => "status" unless status.nil?
+      unless type.nil?
+        if type == 'sloops'
+          find(:css, "#radio_product_type_SLOOPS[value='SLOOPS']").set(true)
+        else
+          fill_in "product_type", :with => type
+        end
+      end
+    end
+
+    click_link_or_button "Report"
+  end
+
+  def update_status_on_fulfillments(fulfillments, new_status, all = false, type = 'KIT-CARD', validate = true)
+    within("#report_results")do
+      select new_status, :from => "new_status"
+      if ['returned','bad_address'].include? new_status 
+        fill_in 'reason', :with => "Reason to change."
+      end
+
+      if all
+        check "fulfillment_select_all"
+      else 
+        fulfillments.each do |fulfillment|
+          check "fulfillment_selected[#{fulfillment.id}]"
+        end
+      end
+
+      click_link_or_button 'Update status'
+      
+      if validate
+        fulfillments.each do |fulfillment|
+          wait_until{assert page.has_content?("Changed status on Fulfillment ##{fulfillment.id} #{type} from #{fulfillment.status} to #{new_status}")}
+        end
+      end
     end
   end
 
