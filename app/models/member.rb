@@ -904,7 +904,7 @@ class Member < ActiveRecord::Base
   end
 
   def self.process_sync 
-    Member.find_in_batches( :conditions => ("status = 'lapsed' AND api_id IS NOT NULL") ) do |group|
+    Member.find_in_batches( :conditions => ("status = 'lapsed' AND api_id != ''") ) do |group|
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members lapsed and api_id not null, processing #{group.count} members"
       group.each do |member|
         member.api_member.destroy!
