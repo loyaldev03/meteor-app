@@ -3,7 +3,7 @@ development:
 #  database: sac_production_onmc_import
   database: sac_platform_development
   host: localhost
-  user: root
+  username: root
   encoding: utf8
 
 # Warning: The database defined as "test" will be erased and
@@ -14,14 +14,14 @@ test:
   database: sac_platform_test
   host: localhost
   encoding: utf8
-  user: root
+  username: root
 
 demo:
   adapter: mysql2
   database: sac_platform_demo
   host: localhost
   encoding: utf8
-  user: root
+  username: root
   password: pH03n[xk1{{s
 
 production:
@@ -29,7 +29,7 @@ production:
   database: sac_production
   host: localhost
   encoding: utf8
-  user: root
+  username: root
   password: pH03n[xk1{{s
 
 staging:
@@ -37,13 +37,13 @@ staging:
   database: sac_platform_development
   host: localhost
   encoding: utf8
-  user: root
+  username: root
 
 prototype:
   adapter: mysql2
   database: sac_platform_prototype
   host: localhost
   encoding: utf8
-  user: root
+  username: root
 
 
