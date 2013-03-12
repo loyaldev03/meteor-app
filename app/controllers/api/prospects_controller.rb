@@ -43,7 +43,7 @@ class Api::ProspectsController < ApplicationController
   #                             *cookie_set
   #                             *cookie_value: Cookie from where the enrollment is being submitted.
   #                             *joint
-  # [club_id] Id of the club the product belongs to. 
+  # [club_id] Id of the club the prospect belongs to. 
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
   # [prospect_id] ID of the prospect. This ID is unique for each prospect. (32 characters string)

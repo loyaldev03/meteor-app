@@ -136,7 +136,7 @@ class Api::MembersController < ApplicationController
   #           * batch_update: Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) (optional)
   #           * skip_api_sync: Boolean variable which tell us if we have to sync or not user to remote api. Send 1 if you want to skip sync otherwise dont send this attribute. (optional) (e.g drupal)
   #
-  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment. This value will be returned only if the member was updated successfully.
+  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). 
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
   # [errors] A hash with members errors. This will be use to show errors on members edit page. 
