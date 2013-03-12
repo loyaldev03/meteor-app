@@ -1,6 +1,6 @@
 class PaymentGatewayConfiguration < ActiveRecord::Base
-  attr_accessible :login, :merchant_key, :password, :mode, :gateway, :report_group
-  
+  attr_accessible :login, :merchant_key, :password, :mode, :gateway, :report_group, :aus_login, :aus_password
+
   belongs_to :club
   has_many :transactions
 
