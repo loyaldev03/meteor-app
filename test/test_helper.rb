@@ -141,14 +141,12 @@ module ActionController
     def search_member(field_selector, value, validate_obj)
       fill_in field_selector, :with => value unless value.nil?
       click_on 'Search'
-
+      sleep 5
       within("#members") do
-        wait_until {
-          assert page.has_content?(validate_obj.status)
-          assert page.has_content?("#{validate_obj.visible_id}")
-          assert page.has_content?(validate_obj.full_name)
-          assert page.has_content?(validate_obj.full_address)
-        }
+        assert page.has_content?(validate_obj.status)
+        assert page.has_content?("#{validate_obj.visible_id}")
+        assert page.has_content?(validate_obj.full_name)
+        assert page.has_content?(validate_obj.full_address)
 
         if !validate_obj.external_id.nil?
           assert page.has_content?(validate_obj.external_id)
@@ -165,7 +163,7 @@ module ActionController
         Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
                                         :auth_code => '111', :duplicate => false, 
                                         :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
-            ) 
+            )
       )
       active_merchant_stubs_store(credit_card.number)
       post( api_members_url , { member: {:first_name => member.first_name, 
@@ -591,10 +589,12 @@ module ActionController
 
       within("#td_mi_quota") { assert page.has_content?("#{member.quota}") }      
     end  
-    if not member.current_membership.enrollment_info.product_sku.blank? and not member.status == 'applied'
-      within(".nav-tabs"){ click_on 'Fulfillments' }
-      within("#fulfillments") do
-        assert page.has_content?('KIT-CARD')
+    if not member.current_membership.enrollment_info.nil?
+      if not member.current_membership.enrollment_info.product_sku.blank? and not member.status == 'applied'
+        within(".nav-tabs"){ click_on 'Fulfillments' }
+        within("#fulfillments") do
+          assert page.has_content?('KIT-CARD')
+        end
       end
     end
     membership = member.current_membership
@@ -607,7 +607,6 @@ module ActionController
       assert page.has_content?(status)
     end
   end
-
 
     teardown do
       DatabaseCleaner.clean
