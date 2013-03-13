@@ -43,18 +43,17 @@ class Api::ProspectsController < ApplicationController
   #                             *cookie_set
   #                             *cookie_value: Cookie from where the enrollment is being submitted.
   #                             *joint
-  # [club_id] Id of the club the prospect belongs to. 
   # [message] Shows the method results and also informs the errors.
   # [code] Code related to the method result.
   # [prospect_id] ID of the prospect. This ID is unique for each prospect. (32 characters string)
   #
   # @param [Hash] prospect
-  # @param [Integer] club_id
   # @return [string] *message*
   # @return [Integer] *code*
   # @return [String] *prospect_id*
   def create
-    my_authorize! :manage_prospects_api, Prospect, params[:club_id]
+    tom = TermsOfMembership.find(params[:prospect][:terms_of_membership_id])
+    my_authorize! :manage_prospects_api, Prospect, tom.club_id
   	response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
   	prospect = Prospect.new(params[:prospect])
   	if prospect.save
@@ -63,6 +62,8 @@ class Api::ProspectsController < ApplicationController
       response[:prospect_id] = prospect.id
     end   
     render json: response
+  rescue ActiveRecord::RecordNotFound
+    render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
   end
 
 end

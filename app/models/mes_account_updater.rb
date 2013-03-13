@@ -1,3 +1,4 @@
+# TODO: move this to lib folder and convert the class to a module
 class MesAccountUpdater
   def self.process_chargebacks(gateway)
     conn = Faraday.new(:url => Settings.mes_report_service.url, :ssl => {:verify => false})

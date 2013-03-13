@@ -6,9 +6,23 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+# Clear any existing tables
+DeclineStrategy.delete_all!
+Agent.delete_all!
+Partner.delete_all!
+Club.delete_all!
+Domain.delete_all!
+PaymentGatewayConfiguration.delete_all!
+TermsOfMembership.delete_all!
+CommunicationType.delete_all!
+DispositionType.delete_all!
+MemberCancelReason.delete_all!
+MemberBlacklistReason.delete_all!
+
+
 File.open("#{Rails.root}/db/decline_strategies.yml", 'r') do |file|
    YAML::load(file).each do |record|
-      ds = DeclineStrategy.new 
+      ds = DeclineStrategy.new
       record.attributes.each do |key, value|
         ds.send("#{key}=", value)
       end
@@ -44,22 +58,22 @@ p5 = Partner.new :prefix => 'pri', :name => 'TEST', :contract_uri => 'www.test.c
 p5.save!
 
 
-c = Club.new :name => "Fans"
+c = Club.new :name => "Fans", :cs_phone_number => '123-456-7890'
 c.partner = p
 c.save!
-c2 = Club.new :name => "Players"
+c2 = Club.new :name => "Players", :cs_phone_number => '123-456-7890'
 c2.partner = p
 c2.save!
-c3 = Club.new :name => "TC Fans"
+c3 = Club.new :name => "TC Fans", :cs_phone_number => '123-456-7890'
 c3.partner = p3
 c3.save!
-c4 = Club.new :name => "TC Players"
+c4 = Club.new :name => "TC Players", :cs_phone_number => '123-456-7890'
 c4.partner = p3
 c4.save!
-c5 = Club.new :name => "Nascar", :api_type => 'Drupal::Member', :theme => 'application'
+c5 = Club.new :name => "Nascar", :cs_phone_number => '123-456-7890', :api_type => 'Drupal::Member', :theme => 'application'
 c5.partner = p4
 c5.save! 
-c6 = Club.new :name => "AO Adventure Club", :api_type => 'Drupal::Member', :theme => 'application'
+c6 = Club.new :name => "AO Adventure Club", :cs_phone_number => '123-456-7890', :api_type => 'Drupal::Member', :theme => 'application'
 c6.partner = p2
 c6.save!
 
