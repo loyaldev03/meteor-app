@@ -91,8 +91,8 @@ function club_index_functions(column_count){
     "bLengthChange": false,
     "iDisplayLength": 25,
     "aaSorting": [[ 0, "asc" ]],
-    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count+1, column_count ] }],
-    "aoColumnDefs": [{ "sWidth": "380px", "aTargets": [ column_count+1 ] }],
+    "aoColumnDefs": [{ "sWidth": "380px", "aTargets": [ column_count+1 ] },
+                     { "bSortable": false, "aTargets": [ column_count+1, column_count ] }],
     "sAjaxSource": $('#clubs_table').data('source'),
   });
 }
@@ -104,8 +104,8 @@ function my_club_index_functions(column_count){
     "bProcessing": true,
     "bServerSide": true,
     "aaSorting": [[ 0, "asc" ]],
-    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ]}],
-    "aoColumnDefs": [{ "sWidth": "360px", "aTargets": [ column_count+1 ] }],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ] },
+                     { "sWidth": "360px", "aTargets": [ column_count+1 ] }],
     "sAjaxSource": $('#my_clubs_table').data('source'),
   });
 }
@@ -118,8 +118,8 @@ function domain_index_functions(column_count){
     "bLengthChange": false,
     "iDisplayLength": 25,
     "aaSorting": [[ 0, "asc" ]],
-    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
-    "aoColumnDefs": [{ "sWidth": "190px", "aTargets": [ column_count ] }],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] },
+                     { "sWidth": "190px", "aTargets": [ column_count ] }],
     "sAjaxSource": $('#domains_table').data('source'),
   });   
 }
