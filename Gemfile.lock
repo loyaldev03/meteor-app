@@ -1,10 +1,10 @@
 GIT
   remote: git://github.com/carlaares/active_merchant
-  revision: 1a47500c846da702a09df532d7692bdf3aad3bf9
+  revision: 5afd0ed0be4888eb26f25a1e34e382ffdca3bb36
   specs:
-    activemerchant (1.21.0)
+    activemerchant (1.31.1)
       active_utils (>= 1.0.2)
-      activesupport (>= 2.3.11)
+      activesupport (>= 2.3.14)
       builder (>= 2.0.0)
       i18n
       json (>= 1.5.1)
@@ -175,7 +175,7 @@ GEM
     httparty (0.10.2)
       multi_json (~> 1.0)
       multi_xml (>= 0.5.2)
-    i18n (0.6.1)
+    i18n (0.6.4)
     i18n-country-translations (0.0.9)
       i18n (~> 0.5)
       railties (>= 3.0.0)
@@ -201,9 +201,9 @@ GEM
     mime-types (1.21)
     mocha (0.13.2)
       metaclass (~> 0.0.1)
-    money (5.1.0)
+    money (5.1.1)
       i18n (~> 0.6.0)
-    multi_json (1.6.0)
+    multi_json (1.6.1)
     multi_xml (0.5.3)
     multipart-post (1.1.5)
     mysql2 (0.3.11)

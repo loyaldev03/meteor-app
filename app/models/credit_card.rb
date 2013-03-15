@@ -93,7 +93,7 @@ class CreditCard < ActiveRecord::Base
   def get_token(pgc = nil, first_name = nil, last_name = nil, allow_cc_blank = false)
     am = CreditCard.am_card(number, expire_month, expire_year, first_name || member.first_name, last_name || member.last_name)
     if am.valid?
-      self.cc_type = am.type
+      self.cc_type = am.brand
       begin
         self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
       rescue
