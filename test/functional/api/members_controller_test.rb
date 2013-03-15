@@ -104,6 +104,77 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
   end
 
+  test "Member should not be enrolled if the email is already is used." do
+    sign_in @admin_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count') do
+      assert_difference('EnrollmentInfo.count') do
+        assert_difference('Transaction.count') do
+          assert_difference('MemberPreference.count',@preferences.size) do 
+            assert_difference('Member.count') do
+              generate_post_message
+              assert_response :success
+            end
+          end
+        end
+      end
+    end
+    email_used = @member.email
+    @member = FactoryGirl.build :member_with_api, :email => email_used
+    assert_difference('Membership.count',0) do
+      assert_difference('EnrollmentInfo.count',0) do
+        assert_difference('Transaction.count',0) do
+          assert_difference('Member.count',0) do
+            generate_post_message
+            assert_response :success
+          end
+        end
+      end
+    end
+    assert_equal @response.body, '{"message":"Membership already exists for this email address. Contact Member Services if you would like more information at: 123 456 7891.","code":"409","errors":{"status":"Already active."}}'
+  end
+
+  # test "Member should not be enrolled if the email is already is used, even when mes throws error." do
+  #   sign_in @admin_user
+  #   @credit_card = FactoryGirl.build :credit_card
+  #   @member = FactoryGirl.build :member_with_api
+  #   @enrollment_info = FactoryGirl.build :enrollment_info
+  #   @current_club = @terms_of_membership.club
+  #   @current_agent = @admin_user
+  #   active_merchant_stubs
+  #   assert_difference('Membership.count') do
+  #     assert_difference('EnrollmentInfo.count') do
+  #       assert_difference('Transaction.count') do
+  #         assert_difference('MemberPreference.count',@preferences.size) do 
+  #           assert_difference('Member.count') do
+  #             generate_post_message
+  #             assert_response :success
+  #           end
+  #         end
+  #       end
+  #     end
+  #   end
+  #   email_used = @member.email
+  #   @member = FactoryGirl.build :member_with_api, :email => email_used
+  #   active_merchant_stubs_store(@credit_card, "900", "This transaction has been approved with stub", false)
+  #   assert_difference('Membership.count',0) do
+  #     assert_difference('EnrollmentInfo.count',0) do
+  #       assert_difference('Transaction.count',0) do
+  #         assert_difference('Member.count',0) do
+  #           generate_post_message
+  #           assert_response :success
+  #         end
+  #       end
+  #     end
+  #   end
+  #   puts @response.body
+  # end
+
   # Reject new enrollments if billing is disable
   test "If billing is disabled member cant be enrolled." do
     sign_in @admin_user

@@ -34,18 +34,54 @@ class MembersSearchTest < ActionController::IntegrationTest
    end
 
   #Only for search test
-  def setup_search
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    50.times{ create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) }
-    25.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
-    25.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
+  def setup_search(create_new_members = true)
+    setup_member false
+    if create_new_members
+      20.times{ create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) }
+      20.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
+      20.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
+    end
     @search_member = Member.first
-    sign_in_as(@admin_agent)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  end
+
+ #  ############################################################
+ #  # UTILS
+ #  ############################################################
+
+  def fill_in_member(unsaved_member, credit_card)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    click_link_or_button 'New Member'
+
+    within("#table_demographic_information")do
+      wait_until{
+        fill_in 'member[first_name]', :with => unsaved_member.first_name
+        select(unsaved_member.gender, :from => 'member[gender]')
+        fill_in 'member[address]', :with => unsaved_member.address
+        select_country_and_state(unsaved_member.country)
+        fill_in 'member[city]', :with => unsaved_member.city
+        fill_in 'member[last_name]', :with => unsaved_member.last_name
+        fill_in 'member[zip]', :with => unsaved_member.zip
+      }
+    end
+    within("#table_contact_information")do
+      wait_until{
+        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+        select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
+        fill_in 'member[email]', :with => unsaved_member.email
+      }
+    end
+    within("#table_credit_card")do
+      wait_until{
+        fill_in 'member[credit_card][number]', :with => credit_card.number
+        select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
+        select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
+      }
+    end
+    alert_ok_js
+    click_link_or_button 'Create Member'    
   end
 
 
@@ -55,16 +91,11 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search members by next bill date" do
     setup_search
-    @search_member.update_attribute :next_retry_bill_date, Time.zone.now
     page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
     within("#ui-datepicker-div") do
       click_on("#{Time.zone.now.day}")
     end
-    click_on 'Search'
-    within("#members") do
-      assert page.has_content?(@search_member.full_name)
-      assert page.has_content?(@search_member.full_address)
-    end
+    search_member("member[next_retry_bill_date]", nil, @search_member)
   end
 
   test "search member by member id" do
@@ -77,13 +108,13 @@ class MembersSearchTest < ActionController::IntegrationTest
     search_member("member[first_name]", "#{@search_member.first_name}", @search_member)
   end
 
-
   test "search member with empty form" do
-    setup_search
+    setup_search 
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_on 'Search'
     
     within("#members") {
-      assert page.has_selector?(".pagination")
+      assert page.has_css?(".pagination")
       assert page.has_content?(Member.first.full_name)
     }
   end
@@ -91,8 +122,11 @@ class MembersSearchTest < ActionController::IntegrationTest
   test "search member by pagination" do
     setup_search
     click_on 'Search'
-    assert page.has_selector?(".pagination")
-    assert page.has_content?(Member.first.full_name)
+    
+    wait_until {
+      assert page.has_selector?(".pagination")
+      assert page.has_content?(Member.first.full_name)
+    }
 
     within(".pagination") do
       assert page.has_content?("1")
@@ -130,39 +164,56 @@ class MembersSearchTest < ActionController::IntegrationTest
   test "Organize Member results by Pagination" do
     setup_search
     click_on 'Search'
-    assert page.has_no_selector?(".pagination")
-    within("#members"){ assert page.has_content?(Member.find_by_visible_id(24).full_name) }
-
-    assert page.has_selector?(".pagination")
-    assert page.has_content?(Member.first.full_name)
-    
+    wait_until {
+      assert page.has_no_selector?(".pagination")
+    }
     within("#members")do
-      click_on("2")
-      if page.has_content?(Member.find_by_visible_id(26).full_name)
-        assert true
-      else
-        assert false, "The last member was not found"
-      end
+      wait_until {
+        assert page.has_content?(Member.find_by_visible_id(24).full_name)
+      }
     end
 
-    assert page.has_selector?(".pagination")
+    wait_until {
+      assert page.has_selector?(".pagination")
+      assert page.has_content?(Member.first.full_name)
+    }
     within("#members")do
-      click_on("3")
-      if page.has_content?(Member.find_by_visible_id(51).full_name)
-        assert true
-      else
-        assert false, "The last member was not found"
-      end
+      wait_until {
+        click_on("2")
+        if page.has_content?(Member.find_by_visible_id(26).full_name)
+          assert true
+        else
+          assert false, "The last member was not found"
+        end
+      }
     end
 
-    assert page.has_selector?(".pagination")
+    wait_until {
+      assert page.has_selector?(".pagination")
+    }
     within("#members")do
-      click_on("4")
-      if page.has_content?(Member.find_by_visible_id(76).full_name)
-        assert true
-      else
-        assert false, "The last member was not found"
-      end
+      wait_until {
+        click_on("3")
+        if page.has_content?(Member.find_by_visible_id(51).full_name)
+          assert true
+        else
+          assert false, "The last member was not found"
+        end
+      }
+    end
+
+    wait_until {
+      assert page.has_selector?(".pagination")
+    }
+    within("#members")do
+      wait_until {
+        click_on("4")
+        if page.has_content?(Member.find_by_visible_id(76).full_name)
+          assert true
+        else
+          assert false, "The last member was not found"
+        end
+      }
     end
   end
 
@@ -171,76 +222,72 @@ class MembersSearchTest < ActionController::IntegrationTest
     page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
     assert page.evaluate_script("window.jQuery('.ui-datepicker-prev').is('.ui-state-disabled')")
   end
+
   
   test "display member" do
     setup_search
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    @saved_member = create_member(unsaved_member, credit_card)
-
-    visit members_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name)
-    search_member("member[member_id]", "#{@saved_member.visible_id}", @saved_member)
-    within("#members"){ assert page.has_content?("#{@saved_member.visible_id}") }
+    search_member("member[member_id]", "#{@search_member.visible_id}", @search_member)
+    within("#members") do
+      wait_until {
+        assert page.has_content?("#{@search_member.visible_id}")
+      }
+    end
     page.execute_script("window.jQuery('.odd:first a:first').find('.icon-zoom-in').click()")
 
-    validate_view_member_base(@saved_member)
+    validate_view_member_base(@search_member)
+
+    within("#operations_table") { assert page.has_content?(operations_table_empty_text) }
 
     active_credit_card = @search_member.active_credit_card
-    within(".nav-tabs"){ click_on 'Credit Cards' }
-    within("#credit_cards") do
+    within("#credit_cards") { 
       assert page.has_content?("#{active_credit_card.number}") 
       assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
-    end
-    
-    within(".nav-tabs"){ click_on 'Operations' }
-    within("#operations_table"){ assert page.has_content?("Member enrolled successfully") }
-    within(".nav-tabs"){ click_on 'Transactions' }
+    }
+
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
-    within(".nav-tabs"){ click_on 'Communications' }
+
+    within("#fulfillments") { assert page.has_content?(fulfillments_table_empty_text) }
+
     within("#communication") { assert page.has_content?(communication_table_empty_text) }
-    fulfillment = @saved_member.fulfillments.first
-    within(".nav-tabs"){ click_on 'Fulfillments' }
-    within("#fulfillments") do
-      assert page.has_content?(fulfillment.product_sku) 
-      assert page.has_content?(fulfillment.status) 
-    end
   end
 
-  # #Search member with duplicated letters at Last Name
+  #Search member with duplicated letters at Last Name
   test "search by last name" do
-    setup_search
-    active_member = Member.where(:status => 'active').first
-    provisional_member = Member.where(:status => 'provisional').first
-    lapsed_member = Member.where(:status => 'lapsed').first
-    duplicated_name_member = Member.first
+    setup_search false
+    2.times{ create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) }
+    2.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
+    2.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
+    create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent })
+    
+    active_member = Member.find_by_status 'active'
+    provisional_member = Member.find_by_status 'provisional'
+    lapsed_member = Member.find_by_status 'lapsed'
+    duplicated_name_member = Member.last
     duplicated_name_member.update_attribute(:last_name, "Elwood")
 
-    search_member("member[last_name]", "Elwood", duplicated_name_member)
-    within("#members"){ assert page.has_content?(duplicated_name_member.full_name) }
-    sleep 3
-    search_member("member[last_name]", active_member.last_name, active_member)
-    within("#members"){ assert page.has_content?(active_member.full_name) }
+    within("#personal_details"){ fill_in "member[last_name]", :with => "Elwood" }
 
+    click_link_or_button 'Search'
+    within("#members"){ assert page.has_content?(duplicated_name_member.full_name) }
+
+    within("#personal_details"){ fill_in "member[last_name]", :with => active_member.last_name }
+    click_link_or_button 'Search'
     within("#members")do
       assert page.has_content?(active_member.full_name)
       assert page.has_content?(active_member.status)
       assert page.has_css?('tr td.btn-success')
     end
 
-    sleep 3
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    search_member("member[last_name]", provisional_member.last_name, provisional_member)
-    within("#members"){ assert page.has_content?(provisional_member.full_name) }
+    within("#personal_details"){ fill_in "member[last_name]", :with => provisional_member.last_name }
+    click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(provisional_member.full_name)
-      assert page.has_content?(provisional_member.status)
-      assert page.has_css?('tr td.btn-warning')
+        assert page.has_content?(provisional_member.full_name)
+        assert page.has_content?(provisional_member.status)
+        assert page.has_css?('tr td.btn-warning')
     end
 
-    sleep 3
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    search_member("member[last_name]", lapsed_member.last_name, lapsed_member)
-    within("#members"){ assert page.has_content?(lapsed_member.full_name) }
+    within("#personal_details"){ fill_in "member[last_name]", :with => lapsed_member.last_name }
+    click_link_or_button 'Search'
     within("#members")do
       assert page.has_content?(lapsed_member.full_name)
       assert page.has_content?(lapsed_member.status)
@@ -517,16 +564,18 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search by external_id" do
     setup_member(false)
+    @terms_of_membership_with_gateway_and_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id)
     @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
-    @terms_of_membership_with_gateway_and_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id, :club_id => @club_external_id.id)
     @member_with_external_id = create_active_member(@terms_of_membership_with_gateway_and_external_id, :active_member_with_external_id, 
       nil, {}, { :created_by => @admin_agent })
 
     visit members_path(:partner_prefix => @member_with_external_id.club.partner.prefix, :club_prefix => @member_with_external_id.club.name)
     assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
-    within("#payment_details"){ fill_in "member[external_id]", :with => @member_with_external_id.external_id }
-
-
+    within("#payment_details")do
+      wait_until{
+        fill_in "member[external_id]", :with => @member_with_external_id.external_id
+      }
+    end
     click_link_or_button 'Search'
 
     within("#members")do
@@ -680,8 +729,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     unsaved_member.gender = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    @saved_member = create_member(unsaved_member,credit_card)
-    @saved_member.update_attribute(:gender, '')
+    fill_in_member(unsaved_member,credit_card)
+    @saved_member = Member.find_by_email(unsaved_member.email)
     wait_until{
       assert find_field('input_first_name').value == @saved_member.first_name
       assert find_field('input_last_name').value == @saved_member.last_name
@@ -696,8 +745,11 @@ class MembersSearchTest < ActionController::IntegrationTest
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     unsaved_member.type_of_phone_number = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    @saved_member = create_member(unsaved_member,credit_card)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    fill_in_member(unsaved_member,credit_card)
+    @saved_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
+    wait_until{
+      assert find_field('input_first_name').value == @saved_member.first_name
+    }
     @saved_member.reload
     wait_until{ assert_equal(@saved_member.type_of_phone_number, '') }
   end
@@ -739,6 +791,8 @@ class MembersSearchTest < ActionController::IntegrationTest
 
     click_link_or_button 'Search'
 
-    within("#members"){ assert page.has_content?("lapsed - Blisted") }
+    within("#members")do
+      wait_until{ assert page.has_content?("Lapsed - Blisted") }
+    end
   end
 end

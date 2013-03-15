@@ -675,7 +675,6 @@ test "Agency role - Recover a member" do
     fourth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
     fifth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
 
-
     @agent.add_role_with_club('supervisor', first_club)
     @agent.add_role_with_club('representative', second_club)
     @agent.add_role_with_club('api', third_club)
@@ -1019,4 +1018,12 @@ test "Agency role - Recover a member" do
       visit fulfillments_index_path(@partner.prefix, @club.name)
       within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:disabled] == nil}
     end
+
+    # test "fulfillment_managment role - Fulfillment File page" do
+    #   setup_fulfillment_managment
+    #   setup_member
+    #   visit fulfillments_index_path( :partner_prefix => @partner.prefix, :club_prefix => @club.name)
+
+    #   sleep 5000
+    # end
 end
