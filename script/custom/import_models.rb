@@ -45,6 +45,7 @@ require 'active_record'
 require 'uuidtools'
 require 'attr_encrypted'
 require 'settingslogic'
+require 'json'
 
 CLUB = 1 # ONMC
 DEFAULT_CREATED_BY = 1 # batch
@@ -99,41 +100,41 @@ unless USE_PROD_DB
   }
 else
   # PRODUCTION !!!!!!!!!!!!!!!!
-  # ActiveRecord::Base.configurations["phoenix"] = { 
-  #   :adapter => "mysql2",
-  #   :database => "sac_production",
-  #   :host => "10.6.0.58",
-  #   :username => "root",
-  #   :password => 'pH03n[xk1{{s', 
-  #   :port => 3306 
-  # }
+   # ActiveRecord::Base.configurations["phoenix"] = { 
+   #   :adapter => "mysql2",
+   #   :database => "sac_production",
+   #   :host => "10.6.0.58",
+   #   :username => "root",
+   #   :password => 'pH03n[xk1{{s', 
+   #   :port => 3306 
+   # }
 
-  # ActiveRecord::Base.configurations["billing"] = { 
-  #   :adapter => "mysql2",
-  #   :database => "billingcomponent_production",
-  #   :host => "10.6.0.6",
-  #   :username => "root2",
-  #   :password => "f4c0n911",
-  #   :port => 3306
-  # }
+   # ActiveRecord::Base.configurations["billing"] = { 
+   #   :adapter => "mysql2",
+   #   :database => "billingcomponent_production",
+   #   :host => "10.6.0.6",
+   #   :username => "root2",
+   #   :password => "f4c0n911",
+   #   :port => 3306
+   # }
 
-  # ActiveRecord::Base.configurations["customer_services"] = { 
-  #   :adapter => "mysql2",
-  #   :database => "customerservice3",
-  #   :host => "10.6.0.6",
-  #   :username => "root2",
-  #   :password => "f4c0n911",
-  #   :port => 3308
-  # }
+   # ActiveRecord::Base.configurations["customer_services"] = { 
+   #   :adapter => "mysql2",
+   #   :database => "customerservice3",
+   #   :host => "10.6.0.6",
+   #   :username => "root2",
+   #   :password => "f4c0n911",
+   #   :port => 3308
+   # }
 
-  # ActiveRecord::Base.configurations["prospect"] = { 
-  #   :adapter => "mysql2",
-  #   :database => "prospectcomponent",
-  #   :host => "10.6.0.6",
-  #   :username => "root2",
-  #   :password => "f4c0n911",
-  #   :port => 3306
-  # }
+   # ActiveRecord::Base.configurations["prospect"] = { 
+   #   :adapter => "mysql2",
+   #   :database => "prospectcomponent",
+   #   :host => "10.6.0.6",
+   #   :username => "root2",
+   #   :password => "f4c0n911",
+   #   :port => 3306
+   # }
 end
 
 
@@ -153,8 +154,6 @@ class PhoenixMember < ActiveRecord::Base
   self.record_timestamps = false
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 
-  serialize :preferences, JSON
-
   def terms_of_membership_id
     PhoenixMembership.find_by_member_id(self.id).terms_of_membership_id rescue nil
   end
@@ -170,7 +169,7 @@ class PhoenixProspect < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "prospects" 
   self.primary_key = 'uuid'
-  serialize :preferences, JSON
+
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
   self.record_timestamps = false
 end
@@ -194,7 +193,6 @@ class PhoenixEnrollmentInfo < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "enrollment_infos" 
   self.record_timestamps = false
-  serialize :preferences, JSON
 end
 class PhoenixTransaction < ActiveRecord::Base
   establish_connection "phoenix" 
@@ -476,8 +474,8 @@ def new_prospect(object, campaign, tom_id)
   phoenix.campaign_medium = campaign.campaign_medium
   phoenix.campaign_description = campaign.campaign_description
   phoenix.campaign_medium_version = campaign.campaign_medium_version
-  phoenix.preferences = { :old_id => object.id }
-  phoenix.referral_parameters = {}.to_json
+  phoenix.preferences = JSON.generate({ :old_id => object.id })
+  phoenix.referral_parameters = JSON.generate({})
   phoenix.gender = object.gender
   phoenix.save!
   phoenix
