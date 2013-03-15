@@ -31,7 +31,7 @@ class ProductTest < ActiveSupport::TestCase
 	test "Create a product with SKU more than 19 characters" do
 		assert_difference("Product.count")do
 			@product = FactoryGirl.build(:product, :sku => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-			assert !@product.save, "Product was saved with package with more than 30 characters."
+			assert @product.save
 		end
 	end
 end
