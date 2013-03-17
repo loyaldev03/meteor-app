@@ -1,6 +1,6 @@
 development:
   adapter: mysql2
-#  database: sac_production_onmc_import
+  #database: sac_production_onmc_import
   database: sac_platform_development
   host: localhost
   username: root
