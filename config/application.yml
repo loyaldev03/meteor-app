@@ -295,7 +295,7 @@ defaults: &defaults
         zip:
           presence: true
           format: 
-            :with: !ruby/regexp /^[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}[\s]{1}[0-9]{1}[A-Za-z][0-9]{1}$/
+            :with: !ruby/regexp /^[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}\s?[0-9]{1}[A-Za-z][0-9]{1}$/
             :message: 'The zip code is not valid for the selected country.'
 
 development:
