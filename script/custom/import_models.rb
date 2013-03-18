@@ -52,18 +52,18 @@ DEFAULT_CREATED_BY = 1 # batch
 PAYMENT_GW_CONFIGURATION_LITLE = 2 
 PAYMENT_GW_CONFIGURATION_MES = 3
 TEST_EMAIL = false # if true email will be replaced with a fake one
-USE_PROD_DB = false
+USE_PROD_DB = true
 SITE_ID = 2010001547 # lyris site id
 MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
 TIMEZONE = 'Eastern Time (US & Canada)'
 
 CREDIT_CARD_NULL = "a"
-USE_MEMBER_LIST = true
+USE_MEMBER_LIST = false
 
 
 if USE_PROD_DB
-  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
-  exit
+  #puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
+  #exit
 end
 
 unless USE_PROD_DB
@@ -100,41 +100,41 @@ unless USE_PROD_DB
   }
 else
   # PRODUCTION !!!!!!!!!!!!!!!!
-   # ActiveRecord::Base.configurations["phoenix"] = { 
-   #   :adapter => "mysql2",
-   #   :database => "sac_production",
-   #   :host => "10.6.0.58",
-   #   :username => "root",
-   #   :password => 'pH03n[xk1{{s', 
-   #   :port => 3306 
-   # }
+   ActiveRecord::Base.configurations["phoenix"] = { 
+     :adapter => "mysql2",
+     :database => "sac_production",
+     :host => "10.6.0.58",
+     :username => "root",
+     :password => 'pH03n[xk1{{s', 
+     :port => 3306 
+   }
 
-   # ActiveRecord::Base.configurations["billing"] = { 
-   #   :adapter => "mysql2",
-   #   :database => "billingcomponent_production",
-   #   :host => "10.6.0.6",
-   #   :username => "root2",
-   #   :password => "f4c0n911",
-   #   :port => 3306
-   # }
+   ActiveRecord::Base.configurations["billing"] = { 
+     :adapter => "mysql2",
+     :database => "billingcomponent_production",
+     :host => "10.6.0.6",
+     :username => "root2",
+     :password => "f4c0n911",
+     :port => 3306
+   }
 
-   # ActiveRecord::Base.configurations["customer_services"] = { 
-   #   :adapter => "mysql2",
-   #   :database => "customerservice3",
-   #   :host => "10.6.0.6",
-   #   :username => "root2",
-   #   :password => "f4c0n911",
-   #   :port => 3308
-   # }
+   ActiveRecord::Base.configurations["customer_services"] = { 
+     :adapter => "mysql2",
+     :database => "customerservice3",
+     :host => "10.6.0.6",
+     :username => "root2",
+     :password => "f4c0n911",
+     :port => 3308
+   }
 
-   # ActiveRecord::Base.configurations["prospect"] = { 
-   #   :adapter => "mysql2",
-   #   :database => "prospectcomponent",
-   #   :host => "10.6.0.6",
-   #   :username => "root2",
-   #   :password => "f4c0n911",
-   #   :port => 3306
-   # }
+   ActiveRecord::Base.configurations["prospect"] = { 
+     :adapter => "mysql2",
+     :database => "prospectcomponent",
+     :host => "10.6.0.6",
+     :username => "root2",
+     :password => "f4c0n911",
+     :port => 3306
+   }
 end
 
 
@@ -299,8 +299,8 @@ class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
   def invoice_number(a)
     "#{self.created_at.to_date}-#{a.member_id}"
   end
-  def member
-    PhoenixMember.find_by_visible_id_and_club_id(authorization.member_id, CLUB)
+  def member(a)
+    PhoenixMember.find_by_visible_id_and_club_id(a.member_id, CLUB)
   end
   def amount
     phoenix_amount
@@ -321,11 +321,8 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
   def authorization
     BillingMembershipAuthorization.find_by_id(self.authorization_id)
   end
-  def member
-    PhoenixMember.find_by_visible_id_and_club_id(authorization.member_id, CLUB)
-  end
-  def billing_member
-    BillingMember.find_by_id(authorization.member_id)
+  def member(a)
+    PhoenixMember.find_by_visible_id_and_club_id(a.member_id, CLUB)
   end
   def invoice_number(a)
     "#{self.created_at.to_date}-#{a.member_id}"

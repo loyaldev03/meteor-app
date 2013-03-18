@@ -150,7 +150,6 @@ def update_members
           puts "  * member ##{member.id} not found on phoenix ?? "
           next
         end
-
         @e_info = PhoenixEnrollmentInfo.find_by_member_id(phoenix.id) || PhoenixEnrollmentInfo.new(:member_id => phoenix.id)
         
         @member = phoenix
@@ -204,9 +203,9 @@ end
 # 2- import new members.
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
-      " AND id <= 17422401001 " +
-      " AND api_id IS NOT NULL AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND quota IS NOT NULL AND phoenix_join_date IS NOT NULL " +
-      " AND (active = 1 or trial = 1) AND blacklisted IS NULL AND phoenix_email IS NOT NULL " +
+      # " AND id <= 20243965592 " +
+      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND quota IS NOT NULL AND phoenix_join_date IS NOT NULL " +
+      " AND (active = 1 or trial = 1) AND blacklisted IS NULL  " +
       " AND credit_card_token IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
@@ -292,7 +291,7 @@ end
 
 
 # if we use load_duplicated_emails , update_members will override changes.
-update_members
+# update_members
 
-# add_new_members
+add_new_members
 

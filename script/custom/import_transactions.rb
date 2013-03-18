@@ -56,7 +56,7 @@ end
 def load_enrollment_transactions
   BillingEnrollmentAuthorizationResponse.
   joins(' JOIN enrollment_authorizations ON enrollment_authorizations.id = enrollment_auth_responses.authorization_id ').
-  where(" enrollment_authorizations.campaign_id IS NOT NULL and imported_at IS NULL and phoenix_amount IS NOT NULL " +
+  where(" enrollment_authorizations.campaign_id IS NOT NULL and imported_at IS NULL and phoenix_amount IS NOT NULL and phoenix_amount != 0.0" +
     (USE_MEMBER_LIST ? " and member_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
   ).find_in_batches do |group|
     puts "cant #{group.count}"
@@ -66,7 +66,7 @@ def load_enrollment_transactions
         begin
           tz = Time.now.utc
           @log.info "  * processing Enrollment Auth response ##{response.id}"
-          @member = response.member
+          @member = response.member(authorization)
           unless @member.nil?
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.uuid
@@ -117,8 +117,8 @@ end
 def load_membership_transactions
   BillingMembershipAuthorizationResponse.
   joins(' JOIN membership_authorizations ON membership_authorizations.id = membership_auth_responses.authorization_id ').
-  where(" membership_authorizations.campaign_id IS NOT NULL and  imported_at IS NULL and phoenix_amount IS NOT NULL " +
-    (USE_MEMBER_LIST ? " and member_id IN (#{PhoenixMember.find_all_by_club_id(CLUB, :limit => 400).map(&:visible_id).join(',')}) " : "")
+  where(" membership_authorizations.campaign_id IS NOT NULL and  imported_at IS NULL and phoenix_amount IS NOT NULL and phoenix_amount != 0.0 " +
+    (USE_MEMBER_LIST ? " and member_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
   ).find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |response|
@@ -126,7 +126,7 @@ def load_membership_transactions
       unless authorization.nil?
         begin
           tz = Time.now.utc
-          @member = response.member
+          @member = response.member(authorization)
           unless @member.nil?
             @log.info "  * processing Membership Auth response ##{response.id}"
             transaction = PhoenixTransaction.new
