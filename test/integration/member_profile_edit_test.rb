@@ -79,7 +79,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     assert_difference('Member.count', 0) do 
       click_link_or_button 'Update Member'
     end
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
   end
 
 
@@ -146,8 +146,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within('.nav-tabs'){ click_on 'Credit Cards'}
     within("#credit_cards") {
       within(".ligthgreen") {
-      assert page.has_content?("#{old_active_credit_card.last_digits}") 
-      assert page.has_content?("#{old_active_credit_card.expire_month} / #{old_active_credit_card.expire_year}")
+        assert page.has_content?("#{old_active_credit_card.last_digits}") 
+        assert page.has_content?("#{old_active_credit_card.expire_month} / #{old_active_credit_card.expire_year}")
       }
     }
   end
@@ -179,8 +179,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_on 'Cancel'
 
     within("#operations_table") do
-        assert page.has_content?("Edited operation note")
-        assert page.has_content?(text_note) 
+      assert page.has_content?("Edited operation note")
+      assert page.has_content?(text_note) 
     end
   end
 
@@ -194,8 +194,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button 'Set wrong address'
     
     within("#operations_table") do
-        assert page.has_content?("undeliverable")
-        find('.icon-zoom-in').click
+      assert page.has_content?("undeliverable")
+      find('.icon-zoom-in').click
     end
     
     text_note = "text note 123456789"
@@ -271,9 +271,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     click_link_or_button "Edit"
     within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[city]', :with => 'another city'
-      }
+      fill_in 'member[city]', :with => 'another city'
     end
     alert_ok_js
     click_link_or_button 'Update Member'
@@ -290,9 +288,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     click_link_or_button "Edit"
     within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[zip]', :with => '12345'
-      }
+      fill_in 'member[zip]', :with => '12345'
     end
     alert_ok_js
     click_link_or_button 'Update Member'
@@ -309,9 +305,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     click_link_or_button "Edit"
     within("#table_demographic_information")do
-      wait_until{
-        within('#states_td'){ select('Colorado', :from => 'member[state]') }
-      }
+      within('#states_td'){ select('Colorado', :from => 'member[state]') }
     end
     alert_ok_js
     click_link_or_button 'Update Member'
@@ -328,10 +322,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     click_link_or_button "Edit"
     within("#table_demographic_information")do
-      wait_until{
-        select('Canada', :from => 'member[country]')
-        within('#states_td'){ select('Ontario', :from => 'member[state]') }
-      }
+      select('Canada', :from => 'member[country]')
+      within('#states_td'){ select('Ontario', :from => 'member[state]') }
     end
     alert_ok_js
     click_link_or_button 'Update Member'
@@ -1251,17 +1243,13 @@ test "Partial refund from CS" do
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#communication") do
-      wait_until {
-        assert page.has_content?("Test prebill")
-        assert page.has_content?("prebill")
-        assert_equal(Communication.last.template_type, 'prebill')
-      }
+      assert page.has_content?("Test prebill")
+      assert page.has_content?("prebill")
+      assert_equal(Communication.last.template_type, 'prebill')
     end
    
     within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Communication 'Test prebill' sent")
-      }
+      assert page.has_content?("Communication 'Test prebill' sent")
     end
   end
 
@@ -1272,21 +1260,13 @@ test "Partial refund from CS" do
     sleep 1
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
 
-      within(".nav-tabs") do
-        click_on("Transactions")
-      end
+    within(".nav-tabs"){ click_on("Transactions") }
 
     within("#transactions_table")do
-      wait_until{
-        assert page.has_content?(Transaction.last.full_label.truncate(50))
-      }
-      wait_until{
-        find("#th_date").click
-        find("#th_date").click
-      }
-      wait_until{
-        assert page.has_content?(Transaction.first.full_label.truncate(50))
-      }
+      assert page.has_content?(Transaction.last.full_label.truncate(50))
+      find("#th_date").click
+      find("#th_date").click
+      assert page.has_content?(Transaction.first.full_label.truncate(50))
     end
   end
 
@@ -1297,21 +1277,29 @@ test "Partial refund from CS" do
     sleep 1
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
 
-      within(".nav-tabs") do
-        click_on("Memberships")
-      end
-
+    within(".nav-tabs"){ click_on("Memberships") }
     within("#memberships_table")do
-      wait_until{
-        assert page.has_content?(Membership.last.id.to_s)
-      }
-      wait_until{
-        find("#th_id").click
-        find("#th_id").click
-      }
-      wait_until{
-        assert page.has_content?(Membership.first.id.to_s)
-      }
+      assert page.has_content?(Membership.last.id.to_s)
+      find("#th_id").click
+      find("#th_id").click
+      assert page.has_content?(Membership.first.id.to_s)
     end
   end
+
+  test "Update a member with CC blacklisted inside the same Club" do
+    setup_member false, true
+    @saved_member.active_credit_card.update_attribute :blacklisted, true 
+
+    unsaved_member =  FactoryGirl.build(:provisional_member_with_cc, :club_id => @club.id, :email => 'testing@withthisemail.com')
+    credit_card = FactoryGirl.build(:credit_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :enrollment_amount => 0.0)
+    @terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    new_member = Member.find_by_email(unsaved_member.email)
+
+    add_credit_card(new_member, credit_card)
+    assert page.has_content?("There was an error with your credit card information. Please call member services at: #{@club.cs_phone_number}.")
+    assert page.has_content?('{:number=>"Credit card is blacklisted"}')
+  end
+
 end
