@@ -4,6 +4,6 @@ class AddMissingKeys < ActiveRecord::Migration
   end
 
   def down
-  	execute "ALTER TABLE transactions REMOVE PRIMARY KEY (uuid)"
+  	execute "ALTER TABLE transactions DROP PRIMARY KEY"
   end
 end

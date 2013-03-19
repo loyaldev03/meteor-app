@@ -4,6 +4,6 @@ class AddPrimaryKeyOnProspects < ActiveRecord::Migration
   end
 
   def down
-  	execute "ALTER TABLE prospects REMOVE PRIMARY KEY (uuid)"
+  	execute "ALTER TABLE prospects DROP PRIMARY KEY"
   end
 end
