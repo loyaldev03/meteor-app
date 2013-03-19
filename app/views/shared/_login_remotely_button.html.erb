@@ -1,0 +1,19 @@
+<% large_button = ( use_large_button ? "btn-large-w" : "") %>
+<% if @current_member.lapsed? || !@current_member.api_member || @current_member.api_id.blank? %>
+  <%= 
+    link_to "#", 
+      class: "btn #{large_button} btn-success disabled",
+      id: "login_remotely_as_member" do %>
+    <i class='icon-signin'></i>
+    <%= t('buttons.login_remotely_as_member') %>
+  <% end %>
+<% else %>
+  <%= 
+    link_to login_as_member_path, 
+      id: "login_remotely_as_member",
+      class: "btn #{large_button} btn-success", 
+      target: '_blank' do %>
+    <i class='icon-signin'></i>
+    <%= t('buttons.login_remotely_as_member') %>
+  <% end %>
+<% end %>
