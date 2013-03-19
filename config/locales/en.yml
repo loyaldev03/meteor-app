@@ -256,7 +256,7 @@ en:
         added_at: 'Added at'
         expire_year: 'Expire year'
         blacklisted: 'Blacklisted'
-        last_digits: 'Last digits'
+        last_digits: 'Last 4 digits'
         active: 'active'
         type_unknown: 'unknown'
       operation:
