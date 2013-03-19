@@ -21,6 +21,7 @@ class Ability
     cannot :manage, TermsOfMembership
     cannot :manage, Transaction
     cannot :manage_club_cash_api, ClubCashTransaction
+    cannot :see_sync_status, Member
     cannot :api_enroll, Member
     cannot :api_update, Member
     cannot :api_profile, Member
@@ -57,6 +58,7 @@ class Ability
       can :manage, Member
       cannot :api_profile, Member
       cannot :set_undeliverable, Member
+      cannot :see_sync_status, Member
       can :manage, Operation
       can :list, Membership
       can :manage, CreditCard
@@ -69,6 +71,7 @@ class Ability
     elsif agent.has_role_with_club? 'supervisor', club_id
       can :manage, Member
       cannot :api_profile, Member
+      cannot :see_sync_status, Member
       can :manage, Operation
       can :list, Membership
       can :manage, MemberNote
@@ -103,6 +106,7 @@ class Ability
     elsif agent.has_role_with_club? 'fulfillment_managment', club_id
       can :manage, Member
       cannot :api_profile, Member
+      cannot :see_sync_status, Member
       can :manage, Operation
       can :list, Membership
       can :manage, CreditCard
@@ -115,8 +119,6 @@ class Ability
       can :manage, Product
       can :manage, Fulfillment
     end
-
-
 
     # Define abilities for the passed in user here. For example:
     #
