@@ -3478,6 +3478,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     end
   end  
 
+  # fulfillment_managment role - Fulfillment File page
   test "Fulfillments file page should filter the results by Club" do
     setup_member(false)
     @club2 = FactoryGirl.create(:simple_club_with_gateway)
@@ -3490,7 +3491,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     FactoryGirl.create(:fulfillment_file, :agent_id => @admin_agent.id, :club_id => @club.id, :created_at => Time.zone.now-1.days )
     FactoryGirl.create(:fulfillment_file, :agent_id => @admin_agent.id, :club_id => @club2.id, :created_at => Time.zone.now+1.days )
     FactoryGirl.create(:fulfillment_file, :agent_id => @admin_agent.id, :club_id => @club2.id, :created_at => Time.zone.now+2.days)
-    
+
     visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     fulfillment_file = FulfillmentFile.find_all_by_club_id(@club.id)
     fulfillment_file2 = FulfillmentFile.find_all_by_club_id(@club2.id)
@@ -3499,6 +3500,14 @@ test "Update the status of all the fulfillments - In process using individual ch
       assert page.has_content?( I18n.l(fulfillment_file.last.created_at.to_date) )
       assert page.has_no_content?( I18n.l(fulfillment_file2.first.created_at.to_date) )     
       assert page.has_no_content?( I18n.l(fulfillment_file2.last.created_at.to_date) )
+    
+      confirm_ok_js
+      first(:link, 'Mark as sent').click
     end
+    assert page.has_content?("Fulfillment file marked as sent successfully")
+
+    within("#fulfillment_files_table"){ first(:link, 'View').click }
+
+    assert page.has_content?("Fulfillments for file")
   end
 end
