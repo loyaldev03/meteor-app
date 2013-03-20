@@ -181,9 +181,40 @@ class Api::MembersController < ApplicationController
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   #             *club_cash_amount: Amount of the club cash the member has at this moment. We accept a maximun of two digits after the comma.
+  #             *club_cash_expire_date: 
+  #             *gender: 
+  #             *bill_date: 
+  #             *next_retry_bill_date: 
+  #             *wrong_address: 
+  #             *wrong_phone_number: 
+  #             *member_since_date: 
+  #             *reactivation_times: 
+  #             *blacklisted: 
+  #             *member_group_type_id: 
+  #             *recycled_times: 
+  #             *preferences: 
+  #             *sync_status: 
+  #             *last_synced_at: 
+  #             *last_sync_error_at: 
+  #             *last_sync_error: 
   # [credit_card] Information related to member's credit card.
   #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   #                 *expire_year: The year (in numbers) in which the credit card will expire.  
+  # [current_membership] Information related to the member's membership at the moment.
+  #                 *status: 
+  #                 *join_date: 
+  #                 *cancel_date: 
+  #                 *quota: 
+  #                 *terms_of_membership: [Hash]
+  # [terms_of_membership] Information related to the terms of membership the membership is related to.
+  #                 *name: 
+  #                 *description: 
+  #                 *provisional_days: 
+  #                 *mode: 
+  #                 *needs_enrollment_approval: 
+  #                 *installment_amount: 
+  #                 *installment_type: 
+  #                 *club_cash_amount: 
   # [enrollment_info] Information obtained from the member's enrollment
   #              *enrollment_amount
   #              *product_sku 
@@ -212,11 +243,15 @@ class Api::MembersController < ApplicationController
   # @return [String] *message* 
   # @return [Hash] *member*
   # @return [Hash] *credit_card*
+  # @return [Hash] *current_membership*
   # @return [Hash] *enrollment_info*
   # @return [Integer] *code*
   #
   def show
     member = Member.find(params[:id])
+    club = member.club
+    membership = member.current_membership
+    terms_of_membership = membership.terms_of_membership
     my_authorize! :api_profile, Member, member.club_id
     ei = member.enrollment_infos[0]
     ei = if ei.blank? 
@@ -255,14 +290,48 @@ class Api::MembersController < ApplicationController
         city: member.city, 
         state: member.state, 
         zip: member.zip,
+        birth_date: member.birth_date,
         phone_country_code: member.phone_country_code, 
         phone_area_code: member.phone_area_code,
         phone_local_number: member.phone_local_number, 
-        club_cash_amount: member.club_cash_amount
-      },
+        type_of_phone_number: member.type_of_phone_number,
+        club_cash_amount: member.club_cash_amount,
+        club_cash_expire_date: member.club_cash_expire_date,
+        gender: member.gender,
+        bill_date: member.bill_date,
+        next_retry_bill_date: member.next_retry_bill_date,
+        wrong_address: member.wrong_address,
+        wrong_phone_number: member.wrong_phone_number,
+        member_since_date: member.member_since_date,
+        reactivation_times: member.reactivation_times,
+        blacklisted: member.blacklisted,
+        member_group_type_id: member.member_group_type.name,
+        recycled_times: member.recycled_times,
+        preferences: member.preferences,
+      }.merge(club.api_type == 'Drupal::Member' ? {} : {sync_status: member.sync_status, 
+                                                        last_synced_at: member.last_synced_at,
+                                                        last_sync_error_at: member.last_sync_error_at,
+                                                        last_sync_error: member.last_sync_error
+                                                       }),
       credit_card: {
         expire_month: (member.active_credit_card && member.active_credit_card.expire_month),
         expire_year: (member.active_credit_card && member.active_credit_card.expire_year)
+      },
+      current_membership:{
+        status: membership.status,
+        join_date: membership.join_date,
+        cancel_date: membership.cancel_date,
+        quota: membership.quota,
+        terms_of_membership:{
+          name: terms_of_membership.name,
+          description: terms_of_membership.description,
+          provisional_days: terms_of_membership.provisional_days,
+          mode: terms_of_membership.mode,
+          needs_enrollment_approval: terms_of_membership.needs_enrollment_approval,
+          installment_amount: terms_of_membership.installment_amount,
+          installment_type: terms_of_membership.installment_type,
+          club_cash_amount: terms_of_membership.club_cash_amount
+        }
       },
       enrollment_info: ei
     }
