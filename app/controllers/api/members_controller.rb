@@ -238,6 +238,7 @@ class Api::MembersController < ApplicationController
   #              *prospect_id
   # [message] Shows the method errors. This message will be only shown when there was an error.
   # [code] Code related to the method result.
+  # [message] Shows the method errors. This message will be only shown when there was an error.
   #
   # @param [String] api_key
   # @return [String] *message* 
