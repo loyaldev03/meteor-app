@@ -8527,3 +8527,29 @@
     limit: "0"
   attributes_cache: {}
 
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: Credit card is blank and grace period is disabled
+    days: "0"
+    response_code: "9997"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1000.years"
+    id: "660"
+    gateway: litle
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: Credit card is blank and grace period is disabled
+    days: "0"
+    response_code: "9997"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1000.years"
+    id: "661"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
