@@ -28,14 +28,20 @@ def load_cancellations
 end
 
 def process_preferences
-  phoenix.preferences.each do |key, value|
-    pref = PhoenixMemberPreference.find_or_create_by_member_id_and_club_id_and_param(phoenix.id, phoenix.club_id, key)
-    pref.value = value
-    pref.save
+  PhoenixMember.find_in_batches do |group|
+    group.each do |member|
+      member.preferences.each do |key, value|
+        pref = PhoenixMemberPreference.find_or_create_by_member_id_and_club_id_and_param(member.id, member.club_id, key)
+        pref.value = value
+        pref.save
+      end
+    end
   end
 end
 
 # 1- do we need to update phoenix.product_sku = @campaign.product_sku ?/????? 
 # 2- load_cancellations  
 # 3- process_preferences
+# 4- member notes can be invoked after migration.
+
 

@@ -54,7 +54,7 @@ PAYMENT_GW_CONFIGURATION_MES = 3
 TEST_EMAIL = false # if true email will be replaced with a fake one
 USE_PROD_DB = true
 SITE_ID = 2010001547 # lyris site id
-MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
+MEMBER_GROUP_TYPE = 19 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
 TIMEZONE = 'Eastern Time (US & Canada)'
 
 CREDIT_CARD_NULL = "a"
@@ -417,7 +417,7 @@ end
 def get_campaign_and_tom_id(cid)
   @campaign = BillingCampaign.find_by_id(cid)
   @tom_id = nil
-  unless @campaign.nil?
+  if not @campaign.nil? and @campaign.phoenix_tom_id.to_i > 0
     @tom_id = @campaign.phoenix_tom_id.to_i + 18
   end
 end

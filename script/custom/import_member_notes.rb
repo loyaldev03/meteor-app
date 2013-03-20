@@ -36,9 +36,7 @@ def get_communication_type_id(communication_id)
 end
 
 def import_customer_notes
-  CustomerServicesNotes.where("imported_at IS NULL" +
-    (USE_MEMBER_LIST ? " and source_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
-    ).find_in_batches do |group|
+  CustomerServicesNotes.where("imported_at IS NULL").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |note| 
       begin
@@ -61,8 +59,8 @@ def import_customer_notes
       rescue Exception => e
         @log.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        exit
-        return
+        #exit
+        #return
       end
     end
   end

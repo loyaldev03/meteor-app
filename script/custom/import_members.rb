@@ -13,12 +13,12 @@ def add_fulfillment(member)
     phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.visible_id.to_s
     phoenix_f.product_package = KIT_CARD_FULFILLMENT
     phoenix_f.product_sku = KIT_CARD_FULFILLMENT
-    phoenix_f.assigned_at = Time.now.utc
+    phoenix_f.assigned_at = Time.now.utc if phoenix_f.new_record?
     renewdate = member.phoenix_join_date_time + (Date.today.year - member.phoenix_join_date_time.year).years
     phoenix_f.renewable_at = (renewdate > Date.today ? renewdate : renewdate.next_year)
     phoenix_f.recurrent = true
     phoenix_f.status = "not_processed"
-    phoenix_f.save!  
+    phoenix_f.save! if phoenix_f.changed? 
   end
 end
 
@@ -85,7 +85,7 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
       @e_info.prospect_id = new_prospect(prospect, campaign, tom_id).id
     end
   end
-  @e_info.save
+  @e_info.save if @e_info.changed?
 end
 
 def fill_aus_attributes(cc, member)
@@ -105,11 +105,11 @@ def set_membership_data(tom_id, member)
   membership.updated_at = member.updated_at
   membership.member_id = @member.id
   membership.cancel_date = member.cancelled_at
-  membership.save!
+  membership.save! if membership.changed? 
   @member.current_membership_id = membership.id
-  @member.save
+  @member.save if @member.changed?
   @e_info.membership_id = membership.id
-  @e_info.save
+  @e_info.save if @e_info.changed?
 end
 
 def set_member_bill_dates(member, phoenix)
@@ -154,9 +154,10 @@ def update_members
         
         @member = phoenix
         set_member_data(phoenix, member)
-        add_enrollment_info(phoenix, member, @tom_id)
+        phoenix.status = member.phoenix_status
         set_member_bill_dates(member, phoenix)
         phoenix.save!
+        add_enrollment_info(phoenix, member, @tom_id)
 
         # create Membership data
         set_membership_data(@tom_id, member)
@@ -176,7 +177,7 @@ def update_members
           phoenix_cc.expire_month = member.cc_month_exp 
           phoenix_cc.expire_year = member.cc_year_exp
           fill_aus_attributes(phoenix_cc, member)
-          phoenix_cc.save!
+          phoenix_cc.save! if phoenix_cc.changed?
         end
         
         blacklist_ccs(member, phoenix)
@@ -244,7 +245,7 @@ def add_new_members
         # create CC
         phoenix_cc = PhoenixCreditCard.new 
         fill_credit_card(phoenix_cc, member, phoenix)
-        phoenix_cc.save!
+        phoenix_cc.save! 
 
         # create Membership data
         set_membership_data(@tom_id, member)
@@ -290,8 +291,6 @@ def fill_credit_card(phoenix_cc, member, phoenix)
 end
 
 
-# if we use load_duplicated_emails , update_members will override changes.
-# update_members
-
+update_members
 add_new_members
 
