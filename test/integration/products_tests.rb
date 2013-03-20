@@ -146,24 +146,24 @@ class ProductsTests < ActionController::IntegrationTest
 		wait_until{ assert page.has_content?("has already been taken") }
 	end
 	
-	test "Create a product with cost_center limit - 19 chars length" do
-		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :cost_center => "abcdefghijklmnopqrs" )
+	test "Create a product with package limit - 19 chars length" do
+    	unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :package => "abcdefghijklmnopqrs" )
 		create_product unsaved_product
 	end
 
-	test "Create a product with Package limit - 30 chars length" do
-		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :package => "abcdefghijklmnopqrstuvwxyzabcd" )
+	test "Create a product with cost center limit - 30 chars length" do
+        unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :cost_center => "abcdefghijklmnopqrstuvwxyzabcd" )
 		create_product unsaved_product
 	end
 
-	test "Create a product with Package more than 30 characters" do
-		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :package => "abcdefghijklmnopqrstuvwxyzabcde" )
-		create_product unsaved_product, false
+    test "Create a product with cost center more than 30 characters" do
+        unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :cost_center => "abcdefghijklmnopqrstuvwxyzabcde" )		
+        create_product unsaved_product, false
 		wait_until{ assert page.has_content?("is too long (maximum is 30 characters)") }
 	end
 
-	test "Create a product with cost_center more than 19 characters" do
-		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :cost_center => "abcdefghijklmnopqrst" )
+ 	test "Create a product with package more than 19 characters" do
+        unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :package => "abcdefghijklmnopqrst" )
 		create_product unsaved_product, false
 		wait_until{ assert page.has_content?("is too long (maximum is 19 characters)") }
 	end
