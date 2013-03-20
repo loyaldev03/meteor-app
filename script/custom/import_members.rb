@@ -2,23 +2,23 @@
 
 require './import_models'
 
-@log = Logger.new('log/import_members.log', 10, 1024000)
+@log = Logger.new('log/import_members.log', 10, 10024000)
 ActiveRecord::Base.logger = @log
 
 KIT_CARD_FULFILLMENT = "KIT-CARD"
 
 def add_fulfillment(member)
-  unless @campaign.product_sku.empty?
+  unless @campaign.product_sku.blank?
     phoenix_f = PhoenixFulfillment.find_or_create_by_member_id @member.uuid
     phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.visible_id.to_s
     phoenix_f.product_package = KIT_CARD_FULFILLMENT
     phoenix_f.product_sku = KIT_CARD_FULFILLMENT
-    phoenix_f.assigned_at = Time.now.utc
+    phoenix_f.assigned_at = Time.now.utc if phoenix_f.new_record?
     renewdate = member.phoenix_join_date_time + (Date.today.year - member.phoenix_join_date_time.year).years
     phoenix_f.renewable_at = (renewdate > Date.today ? renewdate : renewdate.next_year)
     phoenix_f.recurrent = true
     phoenix_f.status = "not_processed"
-    phoenix_f.save!  
+    phoenix_f.save! if phoenix_f.changed? 
   end
 end
 
@@ -41,7 +41,7 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.phone_area_code = member.phone_area_code
   phoenix.phone_local_number = member.phone_local_number
   phoenix.reactivation_times = member.phoenix_reactivations
-  phoenix.preferences = { :driver_1 => member.fav_driver1, :driver_2 => member.fav_driver2, :track => member.fav_track, :car => member.fav_car }
+  phoenix.preferences = JSON.generate({ :driver_1 => member.fav_driver1, :driver_2 => member.fav_driver2, :track => member.fav_track, :car => member.fav_car })
   # phoenix.gender
   phoenix.blacklisted = member.blacklisted
   phoenix.api_id = member.api_id
@@ -70,7 +70,7 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   @e_info.referral_host = campaign.referral_host
   @e_info.landing_url = campaign.landing_url
   @e_info.terms_of_membership_id = tom_id
-  @e_info.preferences = { :driver_1 => member.fav_driver1, :driver_2 => member.fav_driver2, :track => member.fav_track, :car => member.fav_car }
+  @e_info.preferences = JSON.generate({ :driver_1 => member.fav_driver1, :driver_2 => member.fav_driver2, :track => member.fav_track, :car => member.fav_car })
   @e_info.created_at = member.created_at
   @e_info.updated_at = member.updated_at
   @e_info.campaign_medium = campaign.campaign_medium
@@ -78,14 +78,14 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   @e_info.campaign_medium_version = campaign.campaign_medium_version
   @e_info.joint = campaign.is_joint
   if @e_info.prospect_id.nil?
-    prospect = ProspectProspect.where(" member_id = '#{member.id}' ").first
+    prospect = ProspectProspect.where(" member_id_updated = '#{member.id}' ").first
     if prospect.nil? #https://redmine.xagax.com/issues/25731#note-7
       @e_info.prospect_id = new_prospect(member, campaign, tom_id).id
     else
       @e_info.prospect_id = new_prospect(prospect, campaign, tom_id).id
     end
   end
-  @e_info.save
+  @e_info.save if @e_info.changed?
 end
 
 def fill_aus_attributes(cc, member)
@@ -105,11 +105,11 @@ def set_membership_data(tom_id, member)
   membership.updated_at = member.updated_at
   membership.member_id = @member.id
   membership.cancel_date = member.cancelled_at
-  membership.save!
+  membership.save! if membership.changed? 
   @member.current_membership_id = membership.id
-  @member.save
+  @member.save if @member.changed?
   @e_info.membership_id = membership.id
-  @e_info.save
+  @e_info.save if @e_info.changed?
 end
 
 def set_member_bill_dates(member, phoenix)
@@ -122,7 +122,7 @@ def set_member_bill_dates(member, phoenix)
     phoenix.bill_date = original_bill_date 
     phoenix.next_retry_bill_date = next_bill_date 
     if @campaign.terms_of_membership_id.to_i == 365 
-      phoenix.bill_date = member.original_next_bill_date.nil? ? phoenix.phoenix_join_date_time : convert_from_date_to_time(member.original_next_bill_date) 
+      phoenix.bill_date = member.original_next_bill_date.nil? ? member.phoenix_join_date_time : convert_from_date_to_time(member.original_next_bill_date) 
     end
   else
     phoenix.bill_date, phoenix.next_retry_bill_date = nil, nil
@@ -134,8 +134,8 @@ end
 def update_members
   BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) " + 
     " and is_prospect = false ").find_in_batches do |group|
-    group.each do |member| 
     puts "cant #{group.count}"
+    group.each do |member| 
       tz = Time.now.utc
       get_campaign_and_tom_id(member.campaign_id)
       if @tom_id.nil?
@@ -146,17 +146,18 @@ def update_members
       @log.info "  * processing member ##{member.id}"
       begin
         phoenix = PhoenixMember.find_by_club_id_and_visible_id(CLUB, member.id)
-        @e_info = PhoenixEnrollmentInfo.find_by_member_id(phoenix.id) || PhoenixEnrollmentInfo.new(:member_id => phoenix.id)
         if phoenix.nil?
           puts "  * member ##{member.id} not found on phoenix ?? "
           next
         end
+        @e_info = PhoenixEnrollmentInfo.find_by_member_id(phoenix.id) || PhoenixEnrollmentInfo.new(:member_id => phoenix.id)
         
         @member = phoenix
         set_member_data(phoenix, member)
-        add_enrollment_info(phoenix, member, @tom_id)
+        phoenix.status = member.phoenix_status
         set_member_bill_dates(member, phoenix)
         phoenix.save!
+        add_enrollment_info(phoenix, member, @tom_id)
 
         # create Membership data
         set_membership_data(@tom_id, member)
@@ -176,7 +177,7 @@ def update_members
           phoenix_cc.expire_month = member.cc_month_exp 
           phoenix_cc.expire_year = member.cc_year_exp
           fill_aus_attributes(phoenix_cc, member)
-          phoenix_cc.save!
+          phoenix_cc.save! if phoenix_cc.changed?
         end
         
         blacklist_ccs(member, phoenix)
@@ -194,8 +195,8 @@ def update_members
         puts "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         exit
       end
+      @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
     end
-    @log.info "    ... took #{Time.now.utc - tz} for member ##{member.id}"
   end
 end
 
@@ -203,9 +204,9 @@ end
 # 2- import new members.
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
-      # " AND id <= 60683457 " + 
-      " AND api_id IS NOT NULL AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND quota IS NOT NULL AND phoenix_join_date IS NOT NULL " +
-      " AND (active = 1 or trial = 1) " +
+      # " AND id <= 20243965592 " +
+      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND quota IS NOT NULL AND phoenix_join_date IS NOT NULL " +
+      " AND (active = 1 or trial = 1) AND blacklisted IS NULL  " +
       " AND credit_card_token IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
@@ -244,7 +245,7 @@ def add_new_members
         # create CC
         phoenix_cc = PhoenixCreditCard.new 
         fill_credit_card(phoenix_cc, member, phoenix)
-        phoenix_cc.save!
+        phoenix_cc.save! 
 
         # create Membership data
         set_membership_data(@tom_id, member)
@@ -272,7 +273,7 @@ end
 
 def blacklist_ccs(member, phoenix)
   if member.blacklisted
-    ccs = PhoenixCreditCard.find_by_member_id_and_blacklisted(phoenix.uuid, false)
+    ccs = PhoenixCreditCard.find_all_by_member_id_and_blacklisted(phoenix.uuid, false)
     ccs.each {|s| s.update_attribute :blacklisted, true }
   end  
 end
@@ -290,8 +291,6 @@ def fill_credit_card(phoenix_cc, member, phoenix)
 end
 
 
-# if we use load_duplicated_emails , update_members will override changes.
-# update_members
-
+update_members
 add_new_members
 

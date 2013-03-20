@@ -5,7 +5,7 @@ require './import_models'
 @log = Logger.new('log/import_prospects.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
-ProspectProspect.where(" imported_at IS NULL and member_id IS NULL ").find_in_batches do |group|
+ProspectProspect.where(" imported_at IS NULL and member_id_updated IS NULL ").find_in_batches do |group|
   puts "cant #{group.count}"
   group.each do |prospect| 
     get_campaign_and_tom_id(prospect.campaign_id)

@@ -20,7 +20,9 @@ class MembersSyncronize < ActionController::IntegrationTest
 
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @club = FactoryGirl.create(:club_with_api)
+    @club_without_api = FactoryGirl.create(:simple_club_with_gateway)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club.id)
+    @terms_of_membership_without_api = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club_without_api.id)
     
     @club.update_attribute(:name,"club_uno")
     Time.zone = @club.time_zone
@@ -30,43 +32,6 @@ class MembersSyncronize < ActionController::IntegrationTest
     FactoryGirl.create(:batch_agent)
     sign_in_as(@admin_agent)
    end
-
-	def fill_in_member(unsaved_member, credit_card, tom)
-    club = tom.club
-    visit members_path(:partner_prefix => club.partner.prefix, :club_prefix => club.name)
-    click_link_or_button 'New Member'
-
-    within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select(unsaved_member.gender, :from => 'member[gender]')
-        fill_in 'member[address]', :with => unsaved_member.address
-        select_country_and_state(unsaved_member.country)
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
-    end
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
-        fill_in 'member[email]', :with => unsaved_member.email
-      }
-    end
-    within("#table_credit_card")do
-      wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
-        select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
-      }
-    end
-    alert_ok_js
-    click_link_or_button 'Create Member'  	
-  end
-
 
   ############################################################
   # TEST
@@ -82,58 +47,35 @@ class MembersSyncronize < ActionController::IntegrationTest
   test "Club with invalid 'drupal domain' ( that is, a domain where there is no drupal installed)" do
   	setup_environment 
     @club.update_attribute(:drupal_domain_id, 999);
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-
-
-    fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-    @saved_member = Member.find_by_email(unsaved_member.email)
-
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
-    within("#sync_status")do
-      wait_until{
-      	click_link_or_button(I18n.t('buttons.login_remotely_as_member'))
-      }
-    end
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-    within("#sync_status")do
-      wait_until{
-        click_link_or_button(I18n.t('buttons.password_reset'))
-      }
-    end
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-    within("#sync_status")do
-      wait_until{
-        assert page.has_selector?("#show_remote_data")
-      }
-    end
+    
+    @saved_member = create_member(unsaved_member, credit_card)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
-    within("#span_api_id"){
-      wait_until{ assert page.has_content?("none") }
-    }
-    within("#td_mi_last_sync_error_at"){
-      wait_until{ assert page.has_content?("none") }
-    }
-    within("#td_autologin_url"){
-      wait_until{ assert page.has_content?("none") }
-    }
+    within(".nav-tabs"){ click_on("Sync Status") }
+    within("#sync_status"){	click_link_or_button(I18n.t('buttons.login_remotely_as_member')) }
+
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    within("#sync_status"){ click_link_or_button(I18n.t('buttons.password_reset')) }
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    within("#sync_status"){ assert page.has_selector?("#show_remote_data") }
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+
+    within("#span_api_id"){ assert page.has_content?("none") }
+    within("#td_mi_last_sync_error_at"){ assert page.has_content?("none") }
+    within("#td_autologin_url"){ assert page.has_content?("none") }
   end
 
   test "Search members by Indifferent Sync Status " do
     setup_environment 
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
-    fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
-    visit members_path(:partner_prefix => @terms_of_membership_with_gateway.club.partner.prefix, :club_prefix => @terms_of_membership_with_gateway.club.name)
+    @saved_member = create_member(unsaved_member, credit_card)
+    visit members_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name)
 
-    fill_in("member[last_name]", :with => unsaved_member.last_name)
     select("Indifferent", :from => 'member[sync_status]')
-    @saved_member = Member.find_by_email(unsaved_member.email)
     click_link_or_button 'Search'
 
     within("#members")do
@@ -148,12 +90,10 @@ class MembersSyncronize < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
-    fill_in_member(unsaved_member,credit_card, @terms_of_membership_with_gateway)
-    visit members_path(:partner_prefix => @terms_of_membership_with_gateway.club.partner.prefix, :club_prefix => @terms_of_membership_with_gateway.club.name)
+    @saved_member = create_member(unsaved_member, credit_card)
+    visit members_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name)
 
-    fill_in("member[last_name]", :with => unsaved_member.last_name)
     select("Not Synced", :from => 'member[sync_status]')
-    @saved_member = Member.find_by_email(unsaved_member.email)
     click_link_or_button 'Search'
 
     within("#members")do
@@ -165,13 +105,10 @@ class MembersSyncronize < ActionController::IntegrationTest
 
   test "Club without 'drupal domain'" do
     setup_environment 
-    @terms_of_membership_with_gateway2 = FactoryGirl.create(:terms_of_membership_with_gateway)
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @terms_of_membership_with_gateway2.club.id)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club_without_api.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
-    fill_in_member(unsaved_member, credit_card, @terms_of_membership_with_gateway2)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member = create_member(unsaved_member, credit_card)
 
     within(".nav-tabs") do
       wait_until { page.has_no_selector?("#sync_status_tab") }
@@ -183,10 +120,8 @@ class MembersSyncronize < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
-    fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
+    @saved_member = create_member(unsaved_member, credit_card)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    wait_until { assert page.has_content?("Search") }
-    @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:updated_at, Time.zone.now-1)
     @saved_member.update_attribute(:last_synced_at, Time.zone.now)
     @saved_member.update_attribute(:sync_status, "synced")
@@ -208,13 +143,9 @@ class MembersSyncronize < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
 
-    fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
+    @saved_member = create_member(unsaved_member, credit_card)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    wait_until { assert page.has_content?("Search") }
-    @saved_member = Member.find_by_email(unsaved_member.email)
-    @saved_member.update_attribute(:last_synced_at, Time.zone.now)
 
-    fill_in("member[last_name]", :with => unsaved_member.last_name)
     select("Without Error", :from => 'member[sync_status]')
     click_link_or_button 'Search'
 
@@ -230,14 +161,11 @@ class MembersSyncronize < ActionController::IntegrationTest
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
 
-    fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
+    @saved_member = create_member(unsaved_member, credit_card)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    wait_until { assert page.has_content?("Search") }
-    @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:last_sync_error_at, Time.zone.now)
     @saved_member.update_attribute(:sync_status, "with_error")
 
-    fill_in("member[last_name]", :with => unsaved_member.last_name)
     select("With Error", :from => 'member[sync_status]')
     click_link_or_button 'Search'
 
@@ -252,17 +180,14 @@ class MembersSyncronize < ActionController::IntegrationTest
     setup_environment 
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member = create_member(unsaved_member, credit_card)
     @saved_member.update_attribute(:updated_at, Time.zone.now-1)
     @saved_member.update_attribute(:last_synced_at, Time.zone.now)
-     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
+    within(".nav-tabs"){ click_on("Sync Status") }
     within("#sync_status")do
       wait_until{
         assert page.has_selector?("#login_remotely_as_member")
@@ -288,18 +213,14 @@ class MembersSyncronize < ActionController::IntegrationTest
     setup_environment
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member = create_member(unsaved_member, credit_card)
     @saved_member.update_attribute(:updated_at, Time.zone.now-1)
     @saved_member.update_attribute(:last_synced_at, Time.zone.now)
     
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
+    within(".nav-tabs"){ click_on("Sync Status") }
     within("#sync_status")do
       wait_until{
         click_link_or_button 'Edit'
@@ -329,18 +250,14 @@ class MembersSyncronize < ActionController::IntegrationTest
     setup_environment
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member = create_member(unsaved_member, credit_card)
     @saved_member.update_attribute(:updated_at, Time.zone.now-1)
     @saved_member.update_attribute(:last_synced_at, Time.zone.now)
     
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
+    within(".nav-tabs"){ click_on("Sync Status") }
     within("#sync_status")do
       wait_until{
         click_link_or_button 'Edit'
@@ -356,17 +273,13 @@ class MembersSyncronize < ActionController::IntegrationTest
     setup_environment
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member = create_member(unsaved_member, credit_card)
     @saved_member.update_attribute(:updated_at, Time.zone.now-1)
     @saved_member.update_attribute(:last_synced_at, Time.zone.now)
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
+    within(".nav-tabs"){ click_on("Sync Status") }
     within("#sync_status")do
       wait_until{
         click_link_or_button 'Edit'
@@ -376,10 +289,7 @@ class MembersSyncronize < ActionController::IntegrationTest
       }
     end
     wait_until{ page.has_content?("Sync data updated") }
-
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
+    within(".nav-tabs"){ click_on("Sync Status") }
     within("#sync_status")do
       wait_until{
         confirm_ok_js
@@ -388,18 +298,10 @@ class MembersSyncronize < ActionController::IntegrationTest
     end
     wait_until{ page.has_content?("Sync data updated") }
 
-    within(".nav-tabs") do
-      click_on("Operations")
-    end
-    within("#operations_table"){
-      wait_until{ page.has_content?("Member's api_id changed from \"1234\" to \"\"") }
-    }
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
-    within("#span_api_id")do
-      wait_until { assert page.has_content?("none") }
-    end
+    within(".nav-tabs"){ click_on("Operations") }
+    within("#operations_table"){ page.has_content?("Member's api_id changed from \"1234\" to \"\"") }
+    within(".nav-tabs"){ click_on("Sync Status") }
+    within("#span_api_id"){ assert page.has_content?("none") }
   end
 
   test "Create a member with Synced Status" do
@@ -409,16 +311,16 @@ class MembersSyncronize < ActionController::IntegrationTest
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
     
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    sleep 1
+    @saved_member = Member.last
+
     @saved_member.update_attribute(:updated_at, Time.zone.now-1)
     @saved_member.update_attribute(:last_synced_at, Time.zone.now)
 
-     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
-    within(".nav-tabs") do
-      wait_until { page.has_selector?("#sync_status_tab") }
-    end
+    within(".nav-tabs"){ page.has_selector?("#sync_status_tab") }
   end
 
   test "Create a member with Not Synced status" do
@@ -428,7 +330,8 @@ class MembersSyncronize < ActionController::IntegrationTest
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    sleep 1
+    @saved_member = Member.last
 
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
@@ -437,9 +340,7 @@ class MembersSyncronize < ActionController::IntegrationTest
       wait_until { page.has_selector?("#sync_status_tab") }
       click_on("Sync Status")
     end
-    within("#span_mi_sync_status")do
-      wait_until{ page.has_content?('Not Synced') }
-    end
+    within("#span_mi_sync_status"){ page.has_content?('Not Synced') }
   end
 
   test "Create a member with Sync Error status" do
@@ -451,7 +352,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    @saved_member = Member.last
     @saved_member.update_attribute(:last_sync_error_at, Time.zone.now)
     @saved_member.update_attribute(:sync_status, "with_error")
 
@@ -462,9 +363,7 @@ class MembersSyncronize < ActionController::IntegrationTest
       wait_until { page.has_selector?("#sync_status_tab") }
       click_on("Sync Status")
     end
-    within("#span_mi_sync_status")do
-      wait_until{ page.has_content?('Sync Error') }
-    end
+    within("#span_mi_sync_status"){ page.has_content?('Sync Error') }
   end
 
   test "Platform will create Drupal account by Drupal API" do
@@ -485,29 +384,17 @@ class MembersSyncronize < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
     
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
-    within("#span_mi_sync_status")do
-      wait_until{
-        page.has_content?('Sync Error') 
-      }
-    end
+    within(".nav-tabs"){ click_on("Sync Status") }
+    within("#span_mi_sync_status"){ page.has_content?('Sync Error') }
     within("#sync_status")do
-      wait_until{
-        click_link_or_button 'Edit'
-        fill_in "member[api_id]", :with => "1234"
-        confirm_ok_js
-        click_on 'Update'
-      }
+      click_link_or_button 'Edit'
+      fill_in "member[api_id]", :with => "1234"
+      confirm_ok_js
+      click_on 'Update'
     end
     wait_until{ page.has_content?("Sync data updated") }
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
-    within("#sync_status")do
-      click_link_or_button I18n.t('buttons.show_remote_data')
-    end
+    within(".nav-tabs"){ click_on("Sync Status") }
+    within("#sync_status"){ click_link_or_button I18n.t('buttons.show_remote_data') }
 
     within('#sync-data')do
       wait_until{ assert page.has_content?('"uid":"291"') }
@@ -533,14 +420,8 @@ class MembersSyncronize < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
     
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
-    within("#sync_status")do
-      wait_until{
-        assert page.has_no_selector?("edit_api_id")
-      }
-    end
+    within(".nav-tabs"){ click_on("Sync Status") }
+    within("#sync_status"){ assert page.has_no_selector?("edit_api_id") }
   end
 
   test "Should not let agent to update api_id when member is applied" do
@@ -556,28 +437,32 @@ class MembersSyncronize < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
     
-    within(".nav-tabs") do
-      click_on("Sync Status")
-    end
-    within("#sync_status")do
-      wait_until{
-        assert page.has_no_selector?("edit_api_id")
-      }
-    end
+    within(".nav-tabs"){ click_on("Sync Status") }
+    within("#sync_status"){ assert page.has_no_selector?("edit_api_id") }
   end
 
-  # FIX ME!!
-  # test "Remove drupal account when Cancel a member" do
-  #   setup_environment 
-  #   unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-  #   credit_card = FactoryGirl.build(:credit_card_master_card)
+  test "Remove drupal account when Cancel a member" do
+    setup_environment
+    unsaved_member =  FactoryGirl.build(:member_with_api, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
+    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_approval)
+    @saved_member = Member.find_by_email(unsaved_member.email)
+    visit members_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name)
 
-  #   @saved_member = fill_in_member(unsaved_member,credit_card,@terms_of_membership_with_gateway)
-  #   @saved_member.set_as_canceled!
-  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
 
-  #   sleep 500
-  # end
+    search_member('member[member_id]', @saved_member.visible_id.to_s, @saved_member)
+
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    
+    within(".nav-tabs"){ click_on("Sync Status") }
+    within("#span_api_id"){ assert page.has_content?("none") }
+    within("#span_mi_sync_status"){ assert page.has_content?('Not Synced') } 
+  end
 
 end
 

@@ -19,6 +19,7 @@ private
         number_to_currency(transaction.amount) ,
         transaction.can_be_refunded? ? number_to_currency(transaction.amount_available_to_refund) : '',
         transaction.response_transaction_id,
+        transaction.last_digits,
         transaction.can_be_refunded? ? link_to(I18n.t('refund'),
             @url_helpers.member_refund_path(@current_partner.prefix,@current_club.name,@current_member.visible_id, :transaction_id => transaction.id), 
             :class=>"btn btn-warning btn-mini", :id => 'refund' ,:disabled=>(!@current_agent.can? :refund, Transaction, @current_club.id)) : '',

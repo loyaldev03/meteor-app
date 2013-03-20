@@ -45,24 +45,25 @@ require 'active_record'
 require 'uuidtools'
 require 'attr_encrypted'
 require 'settingslogic'
+require 'json'
 
 CLUB = 1 # ONMC
 DEFAULT_CREATED_BY = 1 # batch
 PAYMENT_GW_CONFIGURATION_LITLE = 2 
 PAYMENT_GW_CONFIGURATION_MES = 3
 TEST_EMAIL = false # if true email will be replaced with a fake one
-USE_PROD_DB = false
+USE_PROD_DB = true
 SITE_ID = 2010001547 # lyris site id
-MEMBER_GROUP_TYPE = 4 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
+MEMBER_GROUP_TYPE = 19 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
 TIMEZONE = 'Eastern Time (US & Canada)'
 
 CREDIT_CARD_NULL = "a"
-USE_MEMBER_LIST = true
+USE_MEMBER_LIST = false
 
 
 if USE_PROD_DB
-  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
-  exit
+  #puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
+  #exit
 end
 
 unless USE_PROD_DB
@@ -99,41 +100,41 @@ unless USE_PROD_DB
   }
 else
   # PRODUCTION !!!!!!!!!!!!!!!!
-  # ActiveRecord::Base.configurations["phoenix"] = { 
-  #   :adapter => "mysql2",
-  #   :database => "sac_production",
-  #   :host => "10.6.0.58",
-  #   :username => "root",
-  #   :password => 'pH03n[xk1{{s', 
-  #   :port => 3306 
-  # }
+   ActiveRecord::Base.configurations["phoenix"] = { 
+     :adapter => "mysql2",
+     :database => "sac_production",
+     :host => "10.6.0.58",
+     :username => "root",
+     :password => 'pH03n[xk1{{s', 
+     :port => 3306 
+   }
 
-  # ActiveRecord::Base.configurations["billing"] = { 
-  #   :adapter => "mysql2",
-  #   :database => "billingcomponent_production",
-  #   :host => "10.6.0.6",
-  #   :username => "root2",
-  #   :password => "f4c0n911",
-  #   :port => 3306
-  # }
+   ActiveRecord::Base.configurations["billing"] = { 
+     :adapter => "mysql2",
+     :database => "billingcomponent_production",
+     :host => "10.6.0.6",
+     :username => "root2",
+     :password => "f4c0n911",
+     :port => 3306
+   }
 
-  # ActiveRecord::Base.configurations["customer_services"] = { 
-  #   :adapter => "mysql2",
-  #   :database => "customerservice3",
-  #   :host => "10.6.0.6",
-  #   :username => "root2",
-  #   :password => "f4c0n911",
-  #   :port => 3308
-  # }
+   ActiveRecord::Base.configurations["customer_services"] = { 
+     :adapter => "mysql2",
+     :database => "customerservice3",
+     :host => "10.6.0.6",
+     :username => "root2",
+     :password => "f4c0n911",
+     :port => 3308
+   }
 
-  # ActiveRecord::Base.configurations["prospect"] = { 
-  #   :adapter => "mysql2",
-  #   :database => "prospectcomponent",
-  #   :host => "10.6.0.6",
-  #   :username => "root2",
-  #   :password => "f4c0n911",
-  #   :port => 3306
-  # }
+   ActiveRecord::Base.configurations["prospect"] = { 
+     :adapter => "mysql2",
+     :database => "prospectcomponent",
+     :host => "10.6.0.6",
+     :username => "root2",
+     :password => "f4c0n911",
+     :port => 3306
+   }
 end
 
 
@@ -153,8 +154,6 @@ class PhoenixMember < ActiveRecord::Base
   self.record_timestamps = false
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 
-  serialize :preferences, JSON
-
   def terms_of_membership_id
     PhoenixMembership.find_by_member_id(self.id).terms_of_membership_id rescue nil
   end
@@ -170,7 +169,7 @@ class PhoenixProspect < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "prospects" 
   self.primary_key = 'uuid'
-  serialize :preferences, JSON
+
   before_create 'self.id = UUIDTools::UUID.random_create.to_s'
   self.record_timestamps = false
 end
@@ -194,7 +193,6 @@ class PhoenixEnrollmentInfo < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "enrollment_infos" 
   self.record_timestamps = false
-  serialize :preferences, JSON
 end
 class PhoenixTransaction < ActiveRecord::Base
   establish_connection "phoenix" 
@@ -301,8 +299,8 @@ class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
   def invoice_number(a)
     "#{self.created_at.to_date}-#{a.member_id}"
   end
-  def member
-    PhoenixMember.find_by_visible_id_and_club_id(authorization.member_id, CLUB)
+  def member(a)
+    PhoenixMember.find_by_visible_id_and_club_id(a.member_id, CLUB)
   end
   def amount
     phoenix_amount
@@ -323,11 +321,8 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
   def authorization
     BillingMembershipAuthorization.find_by_id(self.authorization_id)
   end
-  def member
-    PhoenixMember.find_by_visible_id_and_club_id(authorization.member_id, CLUB)
-  end
-  def billing_member
-    BillingMember.find_by_id(authorization.member_id)
+  def member(a)
+    PhoenixMember.find_by_visible_id_and_club_id(a.member_id, CLUB)
   end
   def invoice_number(a)
     "#{self.created_at.to_date}-#{a.member_id}"
@@ -422,7 +417,7 @@ end
 def get_campaign_and_tom_id(cid)
   @campaign = BillingCampaign.find_by_id(cid)
   @tom_id = nil
-  unless @campaign.nil?
+  if not @campaign.nil? and @campaign.phoenix_tom_id.to_i > 0
     @tom_id = @campaign.phoenix_tom_id.to_i + 18
   end
 end
@@ -476,8 +471,8 @@ def new_prospect(object, campaign, tom_id)
   phoenix.campaign_medium = campaign.campaign_medium
   phoenix.campaign_description = campaign.campaign_description
   phoenix.campaign_medium_version = campaign.campaign_medium_version
-  phoenix.preferences = { :old_id => object.id }
-  phoenix.referral_parameters = {}.to_json
+  phoenix.preferences = JSON.generate({ :old_id => object.id })
+  phoenix.referral_parameters = JSON.generate({})
   phoenix.gender = object.gender
   phoenix.save!
   phoenix

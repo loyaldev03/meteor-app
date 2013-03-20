@@ -146,6 +146,7 @@ en:
         description: 'Description'
         amount: 'Amount'
         gw_trans: 'Gw trans'
+        cc_related: 'Credit Card Last Digits'
         not_found: 'No transactions were found.'
       agent:  
         login: "Username or email"
@@ -255,7 +256,7 @@ en:
         added_at: 'Added at'
         expire_year: 'Expire year'
         blacklisted: 'Blacklisted'
-        last_digits: 'Last digits'
+        last_digits: 'Last 4 digits'
         active: 'active'
         type_unknown: 'unknown'
       operation:

@@ -34,24 +34,20 @@ class MembersSearchTest < ActionController::IntegrationTest
    end
 
   #Only for search test
-  def setup_search
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    50.times{ create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) }
-    25.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
-    25.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
+  def setup_search(create_new_members = true)
+    setup_member false
+    if create_new_members
+      20.times{ create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) }
+      20.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
+      20.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
+    end
     @search_member = Member.first
-    sign_in_as(@admin_agent)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   end
 
  #  ############################################################
  #  # UTILS
  #  ############################################################
-
 
   def fill_in_member(unsaved_member, credit_card)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -112,19 +108,15 @@ class MembersSearchTest < ActionController::IntegrationTest
     search_member("member[first_name]", "#{@search_member.first_name}", @search_member)
   end
 
-
   test "search member with empty form" do
-    setup_search
+    setup_search 
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_on 'Search'
     
     within("#members") {
-      wait_until {
-        assert page.has_content?("Search Result")
-        assert page.has_selector?(".pagination")
-        assert page.has_content?(Member.first.full_name)
-      }
+      assert page.has_css?(".pagination")
+      assert page.has_content?(Member.first.full_name)
     }
-
   end
 
   test "search member by pagination" do
@@ -261,66 +253,45 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   #Search member with duplicated letters at Last Name
   test "search by last name" do
-    setup_search
-    active_member = Member.where(:status => 'active').first
-    provisional_member = Member.where(:status => 'provisional').first
-    lapsed_member = Member.where(:status => 'lapsed').first
+    setup_search false
+    2.times{ create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) }
+    2.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
+    2.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
+    create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent })
+    
+    active_member = Member.find_by_status 'active'
+    provisional_member = Member.find_by_status 'provisional'
+    lapsed_member = Member.find_by_status 'lapsed'
     duplicated_name_member = Member.last
     duplicated_name_member.update_attribute(:last_name, "Elwood")
 
-    sleep 1
-    within("#personal_details")do
-      wait_until{
-        fill_in "member[last_name]", :with => "Elwood"
-      }
-    end
+    within("#personal_details"){ fill_in "member[last_name]", :with => "Elwood" }
+
+    click_link_or_button 'Search'
+    within("#members"){ assert page.has_content?(duplicated_name_member.full_name) }
+
+    within("#personal_details"){ fill_in "member[last_name]", :with => active_member.last_name }
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(duplicated_name_member.full_name)
-      }
+      assert page.has_content?(active_member.full_name)
+      assert page.has_content?(active_member.status)
+      assert page.has_css?('tr td.btn-success')
     end
 
-    within("#personal_details")do
-      wait_until{
-        fill_in "member[last_name]", :with => active_member.last_name
-      }
-    end
+    within("#personal_details"){ fill_in "member[last_name]", :with => provisional_member.last_name }
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(active_member.full_name)
-        assert page.has_content?(active_member.status)
-        assert page.has_css?('tr td.ligthgreen')
-      }
-    end
-
-    within("#personal_details")do
-      wait_until{
-        fill_in "member[last_name]", :with => provisional_member.last_name
-      }
-    end
-    click_link_or_button 'Search'
-    within("#members")do
-      wait_until{
         assert page.has_content?(provisional_member.full_name)
         assert page.has_content?(provisional_member.status)
-        assert page.has_css?('tr td.yellow')
-      }
+        assert page.has_css?('tr td.btn-warning')
     end
 
-    within("#personal_details")do
-      wait_until{
-        fill_in "member[last_name]", :with => lapsed_member.last_name
-      }
-    end
+    within("#personal_details"){ fill_in "member[last_name]", :with => lapsed_member.last_name }
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(lapsed_member.full_name)
-        assert page.has_content?(lapsed_member.status)
-        assert page.has_css?('tr td.red')
-      }
+      assert page.has_content?(lapsed_member.full_name)
+      assert page.has_content?(lapsed_member.status)
+      assert page.has_css?('tr td.btn-danger')
     end
   end
 

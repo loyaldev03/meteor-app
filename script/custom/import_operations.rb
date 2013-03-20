@@ -6,8 +6,7 @@ require './import_models'
 ActiveRecord::Base.logger = @log
 
 def load_save_the_sales
-  CustomerServicesOperations.where(" name like '%Edit Campaign%' and imported_at IS NULL " +
-    (USE_MEMBER_LIST ? " and contact_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
+  CustomerServicesOperations.where(" name like '%Edit Campaign%' and imported_at IS NULL "
     ).find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |op|
@@ -32,8 +31,7 @@ end
 # Customer Services Reactivate
 # Billing Component Reactivate
 def load_reactivations
-  CustomerServicesOperations.where(" name like '%Customer Services Reactivate%' or name = 'Billing Component Reactivate' and imported_at IS NULL " +
-    (USE_MEMBER_LIST ? " and contact_id IN (#{PhoenixMember.find_all_by_club_id(CLUB).map(&:visible_id).join(',')}) " : "")
+  CustomerServicesOperations.where(" name like '%Customer Services Reactivate%' or name = 'Billing Component Reactivate' and imported_at IS NULL " 
     ).find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |op|

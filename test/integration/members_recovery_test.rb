@@ -243,56 +243,51 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     validate_view_member_base(@saved_member)
   end
 
-  # # #TODO: FIX THIS TEST.
-  # # test "Recover a member with CC expired year after (actualYear-3 years)" do
-  # #   setup_member
-  # #   three_years_before = (Time.zone.now-3.year).year
-  # #   @saved_member.active_credit_card.update_attribute(:expire_year, three_years_before )
-  # #   @saved_member.active_credit_card.update_attribute(:expire_month, Time.zone.now.month)
-  # #   @new_terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
+  test "Recover a member with CC expired year after (actualYear-3 years)" do
+    setup_member
+    three_years_before = (Time.zone.now-3.year).year
+    @saved_member.active_credit_card.update_attribute(:expire_year, three_years_before )
+    @saved_member.active_credit_card.update_attribute(:expire_month, Time.zone.now.month)
+    @new_terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
 
-  # #   recover_member(@saved_member, @new_terms_of_membership_with_gateway)
-  # #   wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-  # #   @saved_member.bill_membership
+    recover_member(@saved_member, @new_terms_of_membership_with_gateway)
+    assert find_field('input_first_name').value == @saved_member.first_name 
+    @saved_member.bill_membership
 
-  # #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-  # #   wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    assert find_field('input_first_name').value == @saved_member.first_name 
 
-  # #   @saved_member.bill_membership
+    @saved_member.bill_membership
 
-  # #   next_bill_date = Time.zone.now + eval(@new_terms_of_membership_with_gateway.installment_type)
-  # #   within("#operations_table") do
-  # #     wait_until {
-  # #       assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@new_terms_of_membership_with_gateway.id}) -#{@new_terms_of_membership_with_gateway.name}-")
-  # #       assert page.has_content?("Member billed successfully $#{@new_terms_of_membership_with_gateway.installment_amount}")
-  # #       assert page.has_content?("Renewal scheduled. NBD set #{I18n.l(next_bill_date, :format => :only_date)}")
-  # #       assert page.has_content?("#{@new_terms_of_membership_with_gateway.club_cash_amount} club cash was successfully added. Concept: Adding club cash after billing")
-  # #     }
-  # #   end
-  # # end
+    next_bill_date = Time.zone.now + eval(@new_terms_of_membership_with_gateway.installment_type)
+    within('.nav-tabs'){ click_on 'Operations' }
+    within("#operations_table") do
+      assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@new_terms_of_membership_with_gateway.id}) -#{@new_terms_of_membership_with_gateway.name}-")
+      assert page.has_content?("Member billed successfully $#{@new_terms_of_membership_with_gateway.installment_amount}")
+      assert page.has_content?("Renewal scheduled. NBD set #{I18n.l(next_bill_date, :format => :only_date)}")
+      assert page.has_content?("#{@new_terms_of_membership_with_gateway.club_cash_amount} club cash was successfully added. Concept: Adding club cash after billing")
+    end
+  end
 
-#   # # #TODO: FIX THIS TEST.
-#   # test "Recover a member with CC expired year less than (actualYear-3 years)" do
-#   #   setup_member
-#   #   three_years_before = (Time.zone.now-4.year).year
-#   #   @saved_member.active_credit_card.update_attribute(:expire_year, three_years_before )
-#   #   @saved_member.active_credit_card.update_attribute(:expire_month, Time.zone.now.month)
-#   #   @new_terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
+  test "Recover a member with CC expired year less than (actualYear-3 years)" do
+    setup_member
+    three_years_before = (Time.zone.now-4.year).year
+    @saved_member.active_credit_card.update_attribute(:expire_year, three_years_before )
+    @saved_member.active_credit_card.update_attribute(:expire_month, Time.zone.now.month)
+    @new_terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
 
-#   #   recover_member(@saved_member, @new_terms_of_membership_with_gateway)
-#   #   wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-#   #   @saved_member.reload
-#   #   @saved_member.bill_membership
+    recover_member(@saved_member, @new_terms_of_membership_with_gateway)
+    assert find_field('input_first_name').value == @saved_member.first_name 
+    @saved_member.reload
+    @saved_member.bill_membership
 
-#   #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
-#   #   wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    assert find_field('input_first_name').value == @saved_member.first_name 
 
-#   #   next_bill_date = Time.zone.now + eval(@new_terms_of_membership_with_gateway.installment_type)
-#   #   within("#operations_table") do
-#   #     wait_until {
-#   #       assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@new_terms_of_membership_with_gateway.id}) -#{@new_terms_of_membership_with_gateway.name}-")
-#   #     }
-#   #   end
-
-#   # end
+    next_bill_date = Time.zone.now + eval(@new_terms_of_membership_with_gateway.installment_type)
+    within('.nav-tabs'){ click_on 'Operations' }
+    within("#operations_table") do
+      assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@new_terms_of_membership_with_gateway.id}) -#{@new_terms_of_membership_with_gateway.name}-")
+    end
+  end
 end
