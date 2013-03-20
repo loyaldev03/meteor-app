@@ -45,7 +45,7 @@ class MembersController < ApplicationController
   def show
     @operation_filter = params[:filter]
     @current_membership = @current_member.current_membership
-    @notes = @current_member.member_notes.includes([ :created_by, :communication_type, :disposition_type ]).paginate(:page => params[:page], :per_page => 10, :order => "created_at DESC")
+    @notes = @current_member.member_notes.includes([ :communication_type, :disposition_type ]).paginate(:page => params[:page], :per_page => 10, :order => "created_at DESC")
     @credit_cards = @current_member.credit_cards.all
     @active_credit_card = @current_member.active_credit_card
     @fulfillments = @current_member.fulfillments.all

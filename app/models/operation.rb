@@ -1,5 +1,5 @@
 class Operation < ActiveRecord::Base
-  belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
+  belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id', :with_deleted => true
   belongs_to :resource, :polymorphic => true
   belongs_to :member
   attr_accessible :description, :operation_date, :resource, :notes, :operation_type
