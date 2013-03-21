@@ -11,8 +11,11 @@ ip="${1}"
 host="${2}"
 domain="${3}"
 
+echo "ip: $ip"
+echo "host: $host"
+
 if [ "x$ip" == "x" -o "x$host" == "x" ]; then
-  echo "Usage: deploy.sh [ip] [hostname] <domain>" >&2
+  echo "Usage: install.sh [ip] [hostname] <domain>" >&2
   exit 1
 fi
 
@@ -24,6 +27,7 @@ fqdn="${host}.${domain}"
 remote="root@${fqdn}"
 
 chef_binary="/usr/local/bin/chef-solo"
+ruby_release="1.9.3-p385"  # must be 1.9.x
 
 if [[ ! -f "json/${host}/solo.json" ]]; then
   json_file="json/default/solo.json";
@@ -57,9 +61,9 @@ if ! test -f "${chef_binary}"; then
 
   # install ruby
   mkdir /tmp/src && cd /tmp/src
-  curl -LO http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p327.tar.gz
-  tar -xvzf ruby-1.9.3-p327.tar.gz
-  cd ruby-1.9.3-p327/
+  curl -LO http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-${ruby_release}.tar.gz
+  tar -xvzf ruby-${ruby_release}.tar.gz
+  cd ruby-${ruby_release}/
   ./configure --prefix=/usr/local
   make
   make install

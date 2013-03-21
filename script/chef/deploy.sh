@@ -19,7 +19,7 @@ if [ "x$domain" == "x" ]; then
 fi
 
 fqdn="${host}.${domain}"
-remote="root@${fqdn}"
+remote="root@${ip}"
 
 # The host key might change when we instantiate a new VM, so
 # we remove (-R) the old host key from known_hosts
@@ -27,9 +27,9 @@ ssh-keygen -R "${fqdn#*@}" 2> /dev/null
 ssh-keygen -R "${ip#*@}" 2> /dev/null
 
 # production
-tar cj . | ssh -o "StrictHostKeyChecking no" "${remote}" '
+tar cj . | ssh -o "StrictHostKeyChecking no" "${remote}" "
 rm -rf /var/chef &&
 mkdir /var/chef &&
 cd /var/chef &&
 tar xj &&
-bash install.sh "${ip}" ${host}" "${domain}"'
+bash install.sh \"${ip}\" \"${host}\" \"${domain}\""
