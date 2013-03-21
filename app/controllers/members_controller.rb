@@ -167,7 +167,7 @@ class MembersController < ApplicationController
   def change_next_bill_date
     if request.post?
       begin
-        answer = @current_member.change_next_bill_date!(params[:next_bill_date], @current_agent)
+        answer = @current_member.change_next_bill_date(params[:next_bill_date], @current_agent)
         if answer[:code] == Settings.error_codes.success
           flash[:notice] = answer[:message]
           redirect_to show_member_path

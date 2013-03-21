@@ -231,7 +231,7 @@ class Member < ActiveRecord::Base
   end
 
   # Changes next bill date.
-  def change_next_bill_date!(next_bill_date, current_agent = nil)
+  def change_next_bill_date(next_bill_date, current_agent = nil)
     if next_bill_date.blank?
       errors = { :next_bill_date => 'Is blank' }
       answer = { :message => I18n.t('error_messages.next_bill_date_blank'), :code => Settings.error_codes.next_bill_date_blank, :errors => errors }
@@ -241,14 +241,14 @@ class Member < ActiveRecord::Base
     elsif self.valid? and not self.active_credit_card.expired?  
       self.next_retry_bill_date = next_bill_date
       self.bill_date = next_bill_date
-      self.save!
+      self.save(:validate => false)
       message = "Next bill date changed to #{next_bill_date}"
       Auditory.audit(current_agent, self, message, self, Settings.operation_types.change_next_bill_date)
       answer = {:message => message, :code => Settings.error_codes.success }
     else
       errors = self.errors.to_hash
       errors = errors.merge!({:credit_card => "is expired"}) if self.active_credit_card.expired?
-      answer = {:errors => errors, :code => Settings.error_codes.member_data_invalid }
+      answer = { :errors => errors, :code => Settings.error_codes.member_data_invalid }
     end
     answer 
   end

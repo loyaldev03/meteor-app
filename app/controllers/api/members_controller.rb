@@ -17,7 +17,7 @@ class Api::MembersController < ApplicationController
   #     <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
   #     <li><strong>city</strong> City from where the member is from. </li>
   #     <li><strong>state</strong> The state standard code where the member is from. </li>
-  #     <li><strong>zip</strong> Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers. </li>
+  #     <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.) </li>
   #     <li><strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States). </li>
   #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "1"). </li>
   #     <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. </li>
@@ -96,7 +96,7 @@ class Api::MembersController < ApplicationController
   #     <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
   #     <li><strong>city</strong> City from where the member is from.</li>
   #     <li><strong>state</strong> The state standard code where the member is from. </li>
-  #     <li><strong>zip</strong> Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.</li>
+  #     <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.)</li>
   #     <li><strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).</li>
   #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "1"). </li>
   #     <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. </li>
@@ -174,7 +174,7 @@ class Api::MembersController < ApplicationController
   #             *address: The address of the member that is being enrolled. 
   #             *city: City from where the member is from.
   #             *state: The state standard code where the member is from.
-  #             *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
+  #             *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.)
   #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
   #             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
   #             *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
@@ -193,14 +193,14 @@ class Api::MembersController < ApplicationController
   #             *member_group_type_id: Group type the member belongs to.
   #             *recycled_times: 
   #             *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
-  #             *sync_status: String with status of the actual synchronization status with drupal. 
+  #             *sync_status: String with status of the actual synchronization status with drupal. This value will be only returned if member's club api type is 'Drupal::Member'
   #                           *Options: 
   #                                   *'synced': Member is synced with drupal successfully. 
   #                                   *'not_synced': Member is not synced with drupal. 
   #                                   *'with_errors': Member is not synced with drupal because there were errors.
-  #             *last_synced_at: Date of the last time the member was synchronized against drupal. It is saved with dateTime format.
-  #             *last_sync_error_at: Date of the last time there was an error while trying to synchronized with drupal. It is saved with dateTime format.
-  #             *last_sync_error: Last error message while syncrhonizating.
+  #             *last_synced_at: Date of the last time the member was synchronized against drupal. It is saved with dateTime format. This value will be only returned if member's club api type is 'Drupal::Member'
+  #             *last_sync_error_at: Date of the last time there was an error while trying to synchronized with drupal. It is saved with dateTime format. This value will be only returned if member's club api type is 'Drupal::Member'
+  #             *last_sync_error: Last error message while syncrhonizating. This value will be only returned if member's club api type is 'Drupal::Member'
   # [credit_card] Information related to member's credit card.
   #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   #                 *expire_year: The year (in numbers) in which the credit card will expire.  
@@ -258,10 +258,10 @@ class Api::MembersController < ApplicationController
   #
   def show
     member = Member.find(params[:id])
+    my_authorize! :api_profile, Member, member.club_id
     club = member.club
     membership = member.current_membership
     terms_of_membership = membership.terms_of_membership
-    my_authorize! :api_profile, Member, member.club_id
     ei = member.enrollment_infos[0]
     ei = if ei.blank? 
       {} 
@@ -402,36 +402,35 @@ class Api::MembersController < ApplicationController
   # 
   def next_bill_date
     member = Member.find params[:member_id]
-    render json: member.change_next_bill_date!(params[:next_bill_date], @current_agent)
+    render json: member.change_next_bill_date(params[:next_bill_date], @current_agent)
     
     rescue ActiveRecord::RecordNotFound
       render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
     rescue Exception => e
-      render json: { :message => "There seems to be an error, please verify date.", :code => Settings.error_codes.wrong_data }
+      render json: { :error => e.inspect, :message => "There seems to be an error, please verify next bill date format.", :code => Settings.error_codes.wrong_data }
   end 
 
 
   # Method : GET
   # Gets an array with the member's uuid that were updated between the dates given. 
   #
-  # [url] api/v1/members/report/get_updated
+  # [url] api/v1/members/report/find_all_by_updated/:start_date/:end_date
   # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
   # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
   #             Have in mind that this value is part of the url.
-  # [start_date] Date where we will start the query from. This date must be in date format. (required)
-  # [end_date] Date where we will end the query. This date must be in date format. (required)
+  # [start_date] Date where we will start the query from. This date must be in date format. Have in mind that this value is part of the url. (required)
+  # [end_date] Date where we will end the query. This date must be in date format. Have in mind that this value is part of the url. (required)
   #
   # [message] Shows the method result. This message will be shown when there is an error.
   # [list] Hash with member's uuid updated between the dates given. This list will be returned only when this method is success.
   # [code] Code related to the method result.
   #
   # @param [String] api_key
-  # @param [String] next_bill_date
   # @return [String] *message*
   # @return [Integer] *code*
   # @return [Hash] *list*
   # 
-  def get_updated
+  def find_all_by_updated
     if params[:start_date].blank? or params[:end_date].blank?
       answer = { :message => "Dates must not be null or blank", :code => Settings.error_codes.wrong_data }
     else
@@ -447,24 +446,23 @@ class Api::MembersController < ApplicationController
   # Method : GET
   # Gets an array with the member's uuid that were created between the dates given. 
   #
-  # [url] api/v1/members/report/get_created
+  # [url] api/v1/members/report/find_all_by_created/:start_date/:end_date
   # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
   # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
   #             Have in mind that this value is part of the url.
-  # [start_date] Date where we will start the query from. This date must be in date format. (required)
-  # [end_date] Date where we will end the query. This date must be in date format. (required)
+  # [start_date] Date where we will start the query from. This date must be in date format. Have in mind that this value is part of the url. (required)
+  # [end_date] Date where we will end the query. This date must be in date format. Have in mind that this value is part of the url. (required)
   #
   # [message] Shows the method result. This message will be shown when there is an error.
   # [list] Hash with member's uuid created between the dates given. This list will be returned only when this method is success.
   # [code] Code related to the method result.
   #
   # @param [String] api_key
-  # @param [String] next_bill_date
   # @return [String] *message*
   # @return [Integer] *code*
   # @return [Hash] *list*
   # 
-  def get_created
+  def find_all_by_created
     if params[:start_date].blank? or params[:end_date].blank?
       answer = { :message => "Dates must not be null or blank", :code => Settings.error_codes.wrong_data }
     else
