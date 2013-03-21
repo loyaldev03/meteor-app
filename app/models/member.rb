@@ -232,7 +232,13 @@ class Member < ActiveRecord::Base
 
   # Changes next bill date.
   def change_next_bill_date!(next_bill_date, current_agent = nil)
-    if self.valid? and not self.active_credit_card.expired?  
+    if next_bill_date.blank?
+      errors = { :next_bill_date => 'Is blank' }
+      answer = { :message => I18n.t('error_messages.next_bill_date_blank'), :code => Settings.error_codes.next_bill_date_blank, :errors => errors }
+    elsif next_bill_date.to_date < Time.zone.now.to_date
+      errors = { :next_bill_date => 'Is prior to actual date' }
+      answer   = { :message => "Next bill date should be older that actual date.", :code => Settings.error_codes.next_bill_date_prior_actual_date, :errors => errors }
+    elsif self.valid? and not self.active_credit_card.expired?  
       self.next_retry_bill_date = next_bill_date
       self.bill_date = next_bill_date
       self.save!

@@ -5,10 +5,12 @@ SacPlatform::Application.routes.draw do
     scope 'v1' do
       resources :tokens,:only => [:create, :destroy]
       resources :members, :only => [:create, :show, :update] do
-        put  :club_cash
+        put :club_cash
         resources :club_cash_transaction, only: [:create]
         resources :operation, only: [:create]
       end
+      match 'members/report/get_updated' => 'members#get_updated', as: 'get_updated', :via => [:get]
+      match 'members/report/get_created' => 'members#get_updated', as: 'get_updated', :via => [:get]
       match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get]
       resources :prospects, :only => [:create]      
     end

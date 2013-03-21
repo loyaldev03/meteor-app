@@ -372,4 +372,97 @@ class Api::MembersController < ApplicationController
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end
 
+
+  # Method : PUT
+  # Updates member's next retry bill date.
+  #
+  # [url] api/v1/members/:member_id/next_bill_date
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
+  # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
+  #             Have in mind that this value is part of the url.
+  # [next_bill_date] Date to be stored as date where we should bill this member. This date is stored with date format. (required)
+  #
+  # [message] Shows the method result.
+  # [code] Code related to the method result.
+  # [errors] A hash with members and next_bill_date errors. This will be use to show errors on members edit page. 
+  #
+  # @param [String] api_key
+  # @param [String] next_bill_date
+  # @return [String] *message*
+  # @return [String] *errors*  
+  # @return [Integer] *code*
+  # 
+  def next_bill_date
+    member = Member.find params[:member_id]
+    render json: member.change_next_bill_date!(params[:next_bill_date], @current_agent)
+    
+    rescue ActiveRecord::RecordNotFound
+      render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
+    rescue Exception => e
+      render json: { :message => "There seems to be an error, please verify data.", :code => Settings.error_codes.wrong_data }
+  end 
+
+  
+  # Method : GET
+  # Gets an array with the member's uuid that were updated between the dates given. 
+  #
+  # [url] api/v1/members/report/get_updated
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
+  # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
+  #             Have in mind that this value is part of the url.
+  # [start_date] Date where we will start the query from. This date must be in date format. (required)
+  # [end_date] Date where we will end the query. This date must be in date format. (required)
+  #
+  # [message] Shows the method result.
+  # [list] Hash with member's uuid updated between the dates given.
+  # [code] Code related to the method result.
+  #
+  # @param [String] api_key
+  # @param [String] next_bill_date
+  # @return [String] *message*
+  # @return [Integer] *code*
+  # @return [Hash] *list*
+  # 
+  def get_updated
+    if params[:start_date].blank? or params[:end_date].blank?
+      answer = { :message => "Verify dates.", :code => Settings.error_codes.wrong_data }
+    else
+      members_list = ( Member.where :updated_at =>(params[:start_date].to_date)..(params[:end_date].to_date) ).collect &:uuid
+      answer = { :list => members_list, :code => Settings.error_codes.success }
+    end
+    render json: answer
+  end
+
+
+  # Method : GET
+  # Gets an array with the member's uuid that were created between the dates given. 
+  #
+  # [url] api/v1/members/report/get_created
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
+  # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
+  #             Have in mind that this value is part of the url.
+  # [start_date] Date where we will start the query from. This date must be in date format. (required)
+  # [end_date] Date where we will end the query. This date must be in date format. (required)
+  #
+  # [message] Shows the method result.
+  # [list] Hash with member's uuid created between the dates given.
+  # [code] Code related to the method result.
+  #
+  # @param [String] api_key
+  # @param [String] next_bill_date
+  # @return [String] *message*
+  # @return [Integer] *code*
+  # @return [Hash] *list*
+  # 
+  def get_created
+    if params[:start_date].blank? or params[:end_date].blank?
+      answer = { :message => "Verify dates.", :code => Settings.error_codes.wrong_data }
+    else
+      members_list = ( Member.where :created_at =>(params[:start_date].to_date)..(params[:end_date].to_date) ).collect &:uuid
+      answer = { :list => members_list, :code => Settings.error_codes.success }
+    end
+    render json: answer
+  end
+
+
 end

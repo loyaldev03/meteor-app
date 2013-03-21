@@ -166,25 +166,17 @@ class MembersController < ApplicationController
 
   def change_next_bill_date
     if request.post?
-      unless params[:next_bill_date].blank?
-        if params[:next_bill_date].to_date > Time.zone.now.to_date
-          begin
-            answer = @current_member.change_next_bill_date!(params[:next_bill_date], @current_agent)
-            if answer[:code] == Settings.error_codes.success
-              flash[:notice] = answer[:message]
-              redirect_to show_member_path
-            else
-              @errors = answer[:errors]
-            end
-          rescue Exception => e
-            flash.now[:error] = t('error_messages.airbrake_error_message')
-            Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e)
-          end
+      begin
+        answer = @current_member.change_next_bill_date!(params[:next_bill_date], @current_agent)
+        if answer[:code] == Settings.error_codes.success
+          flash[:notice] = answer[:message]
+          redirect_to show_member_path
         else
-          @errors = { :next_bill_date => "Next bill date should be older that actual date." }
-        end
-      else
-        @errors = { :next_bill_date => I18n.t('error_messages.next_bill_date_blank') }
+          @errors = answer[:errors]
+        end       
+      rescue Exception => e
+        flash.now[:error] = t('error_messages.airbrake_error_message')
+        Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e)
       end
     end
   end
