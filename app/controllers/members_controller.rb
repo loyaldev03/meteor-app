@@ -166,18 +166,14 @@ class MembersController < ApplicationController
 
   def change_next_bill_date
     if request.post?
-      begin
-        answer = @current_member.change_next_bill_date(params[:next_bill_date], @current_agent)
-        if answer[:code] == Settings.error_codes.success
-          flash[:notice] = answer[:message]
-          redirect_to show_member_path
-        else
-          @errors = answer[:errors]
-        end       
-      rescue Exception => e
-        flash.now[:error] = t('error_messages.airbrake_error_message')
-        Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e)
-      end
+      answer = @current_member.change_next_bill_date(params[:next_bill_date], @current_agent)
+      if answer[:code] == Settings.error_codes.success
+        flash[:notice] = answer[:message]
+        redirect_to show_member_path
+      else
+        flash.now[:error] = answer[:message]
+        @errors = answer[:errors]
+      end  
     end
   end
 
