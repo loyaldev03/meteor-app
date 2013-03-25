@@ -60,8 +60,6 @@ gem 'acts_as_paranoid'
 
 gem "airbrake"
 
-gem "timecop"
-
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
@@ -93,6 +91,7 @@ group :test do
   gem 'brakeman'
   gem 'simplecov'
   gem 'database_cleaner'
+  gem "timecop"
 end
 
 gem 'activemerchant', :git => "git://github.com/carlaares/active_merchant"
