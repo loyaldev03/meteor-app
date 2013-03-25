@@ -183,5 +183,6 @@ after "deploy:update_code", "bundle_install"
 after "deploy:update_code", "assets"
 after "deploy:update", "deploy:migrate"
 after "deploy:update", "newrelic:notice_deployment"
-after 'deploy', 'restart_delayed_jobs', 'notify_campfire'
+after 'deploy', 'restart_delayed_jobs'
+after 'deploy', 'notify_campfire'
 after "deploy", "deploy:tag"
