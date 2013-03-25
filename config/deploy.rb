@@ -179,8 +179,9 @@ end
 
 after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
 after "deploy:update_code", "link_config_files"
+after "deploy:update_code", "bundle_install"
 after "deploy:update_code", "assets"
-after "deploy:update", "bundle_install", "deploy:migrate"
+after "deploy:update", "deploy:migrate"
 after "deploy:update", "newrelic:notice_deployment"
 after 'deploy', 'restart_delayed_jobs', 'notify_campfire'
 after "deploy", "deploy:tag"
