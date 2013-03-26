@@ -31,7 +31,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 		end
 
     sign_in_as(@admin_agent)
-   end
+  end
 
   def setup_email_templates
     et = EmailTemplate.new :name => "Day 7 - Trial", :client => :lyris, :template_type => :pillar
@@ -484,7 +484,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     		assert page.has_no_selector?('member[bill_date]')
     	}
   	end
-  # end
+  end
 
   test "display all operations on member profile" do
   	setup_member(false)
@@ -1186,5 +1186,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     validate_view_member_base(@saved_member)
     add_club_cash(@saved_member, 10, "Generic description",true)
   end
+
 end
 

@@ -3330,7 +3330,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     generate_fulfillment_files(false, fulfillments, nil, nil, nil, 'sloops')
   end
 
-  test "Create a fulfillment file with initial-end dates and with sloop product" do
+  test "Create a fulfillment file with initial-end dates and with sloop product 2" do
     setup_member(false)
     active_merchant_stubs
     enrollment_info = FactoryGirl.build(:enrollment_info)
