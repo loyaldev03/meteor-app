@@ -46,23 +46,23 @@ class Api::MembersController < ApplicationController
   #     <li><strong>cookie_set</strong> If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side. [optional]</li>
   #     <li><strong>campaign_medium</strong> [optional]</li>
   #     <li><strong>campaign_description</strong> The name of the campaign. [optional]</li>
-  #     <li><strong>campaign_medium_version</strong> </li>
+  #     <li><strong>campaign_medium_version</strong> [optional]</li>
   #     <li><strong>joint</strong> It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level.  [optional]</li>
   #     <li><strong>credit_card</strong> Hash with credit cards information. It must have the following information:</li>
   #     <ul>
-  #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces , and "/") </li>
+  #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
   #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
   #     </ul>
   #   </ul>
-  # @optional [Hash] setter Variable used to pass some boolean values as "cc_blank" for enrolling, or "wrong_phone_number" for update. It must have the following information:
+  # @optional [Hash] setter Variable used to pass some boolean values as "cc_blank". It must have the following information:
   #   <ul>
   #     <li><strong>cc_blank</strong> Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. If it is true, send credit_card with the following attributes: number=>"0000000000" and expire_month and expired_year setted as today's month and year respectively. </li>
   #     <li><strong>skip_api_sync</strong> Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal) [optional]</li>
   #   </ul>
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
-  # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. API users dont know the member id at this moment. This value will be returned only if the member is enrolled successfully.
+  # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.
   # @response_field [Hash] errors A hash with members and credit card errors. This will be use to show errors on members creation page.
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account.
   #
@@ -109,12 +109,12 @@ class Api::MembersController < ApplicationController
   #     <li><strong>api_id</strong> Send this value with the User Id of your site. This id is used to access your API (e.g. Autologin URL - Update member data). [optional]</li>
   #     <li><strong>credit_card</strong> Hash with credit cards information. It must have the following information:</li>
   #     <ul>
-  #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces , and "/") </li>
+  #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
   #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
   #     </ul>
   #   </ul>
-  # @required [Hash] setter Variable used to pass some boolean values as "cc_blank" for enrolling, or "wron_phone_number" for update. It must have the following information:
+  # @required [Hash] setter Variable used to pass some boolean values as "wron_phone_number". It must have the following information:
   #   <ul>
   #     <li><strong>wrong_phone_number</strong> Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set wrong_phone_number as nil) [optional]</li>
   #     <li><strong>batch_update</strong> Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) [optional]</li>
@@ -273,11 +273,11 @@ class Api::MembersController < ApplicationController
   ##
   # Updates member's club cash's data.
   #
-  # @resource /api/v1/members/:member_id/club_cash
+  # @resource /api/v1/members/:id/club_cash
   # @action PUT
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [Integer] member_id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @required [Integer] id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
   # @required [String] expire_date club cash expiration date. This date is stored with datetime format.
   # @response_field [String] message Shows the method results and also informs the errors.
@@ -285,7 +285,7 @@ class Api::MembersController < ApplicationController
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. It will be returned only when the request was a success.
   # 
   def club_cash
-    member = Member.find(params[:member_id])
+    member = Member.find(params[:id])
     my_authorize! :api_update_club_cash, Member, member.club_id
     response = { :message => "This club is not allowed to fix the amount of the club cash on members.", :code => Settings.error_codes.club_cash_cant_be_fixed, :member_id => member.id }
     unless member.club.club_cash_transactions_enabled

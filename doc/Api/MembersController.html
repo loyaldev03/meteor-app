@@ -357,11 +357,11 @@ It will also send a welcome email and charge the enrollment to the member's cred
   <li><strong>cookie_set</strong> If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side. [optional]</li>
   <li><strong>campaign_medium</strong> [optional]</li>
   <li><strong>campaign_description</strong> The name of the campaign. [optional]</li>
-  <li><strong>campaign_medium_version</strong> </li>
+  <li><strong>campaign_medium_version</strong> [optional]</li>
   <li><strong>joint</strong> It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level.  [optional]</li>
   <li><strong>credit_card</strong> Hash with credit cards information. It must have the following information:</li>
   <ul>
-    <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces , and "/") </li>
+    <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
     <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
     <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
   </ul>
@@ -380,7 +380,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<li>
 									<span class="name">setter</span>
 									<span class="type">Hash</span>
-									<span class="text">Variable used to pass some boolean values as "cc_blank" for enrolling, or "wrong_phone_number" for update. It must have the following information:
+									<span class="text">Variable used to pass some boolean values as "cc_blank". It must have the following information:
 <ul>
   <li><strong>cc_blank</strong> Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. If it is true, send credit_card with the following attributes: number=>"0000000000" and expire_month and expired_year setted as today's month and year respectively. </li>
   <li><strong>skip_api_sync</strong> Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal) [optional]</li>
@@ -416,7 +416,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							<li>
 								<span class="name">member_id</span>
 								<span class="type">Integer</span>
-								<span class="text">Member's id. Integer autoincrement value that is used by platform. API users dont know the member id at this moment. This value will be returned only if the member is enrolled successfully.</span>
+								<span class="text">Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.</span>
 							</li>
 						</ul>
 					
@@ -490,7 +490,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
   <li><strong>api_id</strong> Send this value with the User Id of your site. This id is used to access your API (e.g. Autologin URL - Update member data). [optional]</li>
   <li><strong>credit_card</strong> Hash with credit cards information. It must have the following information:</li>
   <ul>
-    <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces , and "/") </li>
+    <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
     <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
     <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
   </ul>
@@ -502,7 +502,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<li>
 									<span class="name">setter</span>
 									<span class="type">Hash</span>
-									<span class="text">Variable used to pass some boolean values as "cc_blank" for enrolling, or "wron_phone_number" for update. It must have the following information:
+									<span class="text">Variable used to pass some boolean values as "wron_phone_number". It must have the following information:
 <ul>
   <li><strong>wrong_phone_number</strong> Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set wrong_phone_number as nil) [optional]</li>
   <li><strong>batch_update</strong> Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) [optional]</li>
@@ -561,7 +561,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
     
 		<div class="method">
 			<p class="method_desc">Updates member's club cash's data.</p>
-			<h3 class="resource_url"><strong>/api/v1/members/:member_id/club_cash</strong> [PUT]</h3>
+			<h3 class="resource_url"><strong>/api/v1/members/:id/club_cash</strong> [PUT]</h3>
 
 			<div class="parameters">	
 				
@@ -578,7 +578,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 						
 							<ul>
 								<li>
-									<span class="name">member_id</span>
+									<span class="name">id</span>
 									<span class="type">Integer</span>
 									<span class="text">Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
 								</li>
@@ -659,7 +659,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Tue Mar 26 17:23:09 2013 with ruby-1.9.2
+  Generated on Tue Mar 26 17:42:34 2013 with ruby-1.9.2
 </div>
 
   </body>

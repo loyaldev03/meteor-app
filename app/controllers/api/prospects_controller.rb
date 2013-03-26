@@ -17,13 +17,13 @@ class Api::ProspectsController < ApplicationController
   #     <li><strong>state</strong> The state standard code where the member is from. [optional]</li>
   #     <li><strong>zip</strong> Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.[optional]</li>
   #     <li><strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).[optional]</li>
-  #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). [optional]</li>
+  #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "1"). [optional]</li>
   #     <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. [optional]</li>
   #     <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached.[optional]</li>
   #     <li><strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
   #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female.[optional]</li>
   #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others).[optional]</li>
-  #     <li><strong>terms_of_memberhips_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level. </li> 
+  #     <li><strong>terms_of_memberhips_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at prospect level. </li> 
   #     <li><strong>enrollment_amount</strong> Amount of money that takes to enroll. It is present at member level.[optional]</li>
   #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd"[optional]</li>
   #     <li><strong>product_sku</strong> Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet")[optional]</li>
@@ -47,7 +47,7 @@ class Api::ProspectsController < ApplicationController
   #  </ul>
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
-  # @response_field [String] prospect_id Prospect's id. Integer autoincrement value that is used by platform. It will be returned only when the request was a success.
+  # @response_field [String] prospect_id Prospect's id. This ID is unique for each prospect. (36 characters string)
   #
   def create
     tom = TermsOfMembership.find(params[:prospect][:terms_of_membership_id])
