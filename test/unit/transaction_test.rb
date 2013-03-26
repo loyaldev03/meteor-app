@@ -26,7 +26,7 @@ class TransactionTest < ActiveSupport::TestCase
         expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
 
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
-    member = Member.find_by_id(answer[:member_id])
+    member = Member.find(answer[:member_id])
     assert_not_nil member
     assert_equal member.status, 'provisional'
     member
@@ -52,7 +52,7 @@ class TransactionTest < ActiveSupport::TestCase
           { number: @credit_card.number, 
             expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
         assert (answer[:code] == Settings.error_codes.success), answer[:message]
-        member = Member.find_by_id(answer[:member_id])
+        member = Member.find(answer[:member_id])
         assert_not_nil member
         assert_not_nil member.join_date, "join date should not be nil"
         assert_nil member.bill_date, "bill date should be nil"
