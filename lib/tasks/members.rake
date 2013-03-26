@@ -34,7 +34,7 @@ namespace :members do
       Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
       Member.find_each do |member|
         begin
-          Rails.logger.info "   * processing member ##{member.uuid}"
+          Rails.logger.info "   * processing member ##{member.id}"
           member.refresh_autologin_url!
         rescue
           Airbrake.notify error_class: "Members::Members", 

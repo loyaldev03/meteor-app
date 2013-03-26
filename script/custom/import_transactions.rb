@@ -16,7 +16,7 @@ def process_chargeback(refund, find_refund_operation)
       end
 
       transaction = PhoenixTransaction.new
-      transaction.member_id = @member.uuid
+      transaction.member_id = @member.id
       transaction.terms_of_membership_id = @member.terms_of_membership_id
       transaction.gateway = refund.phoenix_gateway
       transaction.set_payment_gateway_configuration(transaction.gateway)
@@ -91,7 +91,7 @@ def load_enrollment_transactions
           @member = response.member(authorization)
           unless @member.nil?
             transaction = PhoenixTransaction.new
-            transaction.member_id = @member.uuid
+            transaction.member_id = @member.id
             get_campaign_and_tom_id(authorization.campaign_id)
             transaction.terms_of_membership_id = @tom_id
             next if transaction.terms_of_membership_id.nil?
@@ -154,7 +154,7 @@ def load_membership_transactions
           unless @member.nil?
             @log.info "  * processing Membership Auth response ##{response.id}"
             transaction = PhoenixTransaction.new
-            transaction.member_id = @member.uuid
+            transaction.member_id = @member.id
             get_campaign_and_tom_id(authorization.campaign_id)
             transaction.terms_of_membership_id = @tom_id
             next if transaction.terms_of_membership_id.nil?

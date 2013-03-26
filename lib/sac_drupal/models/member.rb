@@ -99,7 +99,7 @@ module Drupal
             sync_status: "with_error"
           }
         end
-        ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+        ::Member.where(id: self.member.id).limit(1).update_all(data)
         self.member.reload rescue self.member
       end
     end
@@ -183,8 +183,8 @@ module Drupal
           field_phoenix_member_vid: {
             und: [ { value: m.visible_id } ]
           },
-          field_phoenix_member_uuid: {
-            und: [ { value: m.uuid } ]
+          field_phoenix_member_id: {
+            und: [ { value: m.id } ]
           }
         })
       else

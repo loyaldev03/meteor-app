@@ -51,7 +51,7 @@ module Pardot
           pardot_last_sync_error_at: Time.zone.now
         }
       end
-      ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+      ::Member.where(id: self.member.id).limit(1).update_all(data)
       self.member.reload rescue self.member
     end
 

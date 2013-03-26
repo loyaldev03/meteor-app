@@ -104,7 +104,7 @@ class MembersController < ApplicationController
   end
 
   def refund
-    @transaction = Transaction.find_by_uuid_and_member_id params[:transaction_id], @current_member.uuid
+    @transaction = Transaction.find_by_uuid_and_member_id params[:transaction_id], @current_member.id
     if @transaction.nil?
       flash[:error] = "Transaction not found."
       redirect_to show_member_path

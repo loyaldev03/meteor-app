@@ -559,7 +559,7 @@ class Member < ActiveRecord::Base
           f.product_package = product.package
           f.recurrent = product.recurrent 
         end
-        f.member_id = self.uuid
+        f.member_id = self.id
         f.save
         answer = f.decrease_stock!
         unless answer[:code] == Settings.error_codes.success
@@ -801,7 +801,7 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid}"
+          Rails.logger.info "  * processing member ##{member.id}"
           member.sync_to_pardot unless member.pardot_member.nil?
         rescue Exception => e
           Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
@@ -823,7 +823,7 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid} nbd: #{member.next_retry_bill_date}"
+          Rails.logger.info "  * processing member ##{member.id} nbd: #{member.next_retry_bill_date}"
           member.bill_membership
         rescue Exception => e
           Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect, :credit_card => member.active_credit_card.inspect })
@@ -873,7 +873,7 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid}"
+          Rails.logger.info "  * processing member ##{member.id}"
           member.reset_club_cash
         rescue Exception => e
           Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
@@ -914,7 +914,7 @@ class Member < ActiveRecord::Base
     Member.find_in_batches( :conditions => ("sync_status IN ('with_error', 'not_synced')") ) do |group|
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{group.count} members"
       group.each do |member|
-        Rails.logger.info "  * processing member ##{member.uuid}"
+        Rails.logger.info "  * processing member ##{member.id}"
         api_m = member.api_member
         unless api_m.nil?
           if api_m.save!(force: true)
@@ -946,7 +946,7 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid}"
+          Rails.logger.info "  * processing member ##{member.id}"
           Communication.deliver!(:birthday, member)
         rescue Exception => e
           Airbrake.notify(:error_class => "Members::send_happy_birthday", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
@@ -962,7 +962,7 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid}"
+          Rails.logger.info "  * processing member ##{member.id}"
           member.send_pre_bill
         rescue Exception => e
           Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })

@@ -20,7 +20,7 @@ ActiveRecord::Base.configurations["phoenix"] = {
 class Member < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
-  self.primary_key = 'uuid'
+  self.primary_key = 'id'
 end
 
 class Membership < ActiveRecord::Base

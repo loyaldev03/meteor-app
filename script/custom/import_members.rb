@@ -9,7 +9,7 @@ KIT_CARD_FULFILLMENT = "KIT-CARD"
 
 def add_fulfillment(member)
   unless @campaign.product_sku.blank?
-    phoenix_f = PhoenixFulfillment.find_or_create_by_member_id @member.uuid
+    phoenix_f = PhoenixFulfillment.find_or_create_by_member_id @member.id
     phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.visible_id.to_s
     phoenix_f.product_package = KIT_CARD_FULFILLMENT
     phoenix_f.product_sku = KIT_CARD_FULFILLMENT
@@ -23,7 +23,7 @@ def add_fulfillment(member)
 end
 
 def remove_fulfillment
-  phoenix_f = PhoenixFulfillment.find_by_member_id @member.uuid
+  phoenix_f = PhoenixFulfillment.find_by_member_id @member.id
   phoenix_f.destroy unless phoenix_f.nil?
 end
 
@@ -162,7 +162,7 @@ def update_members
         # create Membership data
         set_membership_data(@tom_id, member)
 
-        phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
+        phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.id, true)
 
         new_phoenix_cc = PhoenixCreditCard.new 
         fill_credit_card(new_phoenix_cc, member, phoenix)
@@ -273,7 +273,7 @@ end
 
 def blacklist_ccs(member, phoenix)
   if member.blacklisted
-    ccs = PhoenixCreditCard.find_all_by_member_id_and_blacklisted(phoenix.uuid, false)
+    ccs = PhoenixCreditCard.find_all_by_member_id_and_blacklisted(phoenix.id, false)
     ccs.each {|s| s.update_attribute :blacklisted, true }
   end  
 end
@@ -287,7 +287,7 @@ def fill_credit_card(phoenix_cc, member, phoenix)
   phoenix_cc.last_digits = member.credit_card_last_digits
   phoenix_cc.updated_at = member.updated_at
   fill_aus_attributes(phoenix_cc, member)
-  phoenix_cc.member_id = phoenix.uuid
+  phoenix_cc.member_id = phoenix.id
 end
 
 

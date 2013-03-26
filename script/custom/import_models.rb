@@ -150,9 +150,8 @@ end
 class PhoenixMember < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
-  self.primary_key = 'uuid'
+  self.primary_key = 'id'
   self.record_timestamps = false
-  before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 
   def terms_of_membership_id
     PhoenixMembership.find_by_member_id(self.id).terms_of_membership_id rescue nil
@@ -410,7 +409,7 @@ def add_operation(operation_date, object_class, object_id, description, operatio
     o.resource_id = object_id
   end
   o.updated_at = updated_at
-  o.member_id = @member.uuid
+  o.member_id = @member.id
   o.save!
 end
 

@@ -92,7 +92,7 @@ module Wordpress
           last_sync_error: res.body
         }
       end
-      ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+      ::Member.where(id: self.member.id).limit(1).update_all(data)
     end
 
 
@@ -108,7 +108,7 @@ module Wordpress
           last_sync_error: res.body
         }
       end
-      ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+      ::Member.where(id: self.member.id).limit(1).update_all(data)
     end
 
   end
