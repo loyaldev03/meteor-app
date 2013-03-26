@@ -43,15 +43,12 @@ gem 'settingslogic', '2.0.8'
 gem 'wirble'
 gem 'bootstrap-will_paginate'
 gem 'nokogiri'
-gem 'faraday'
-gem 'faraday_middleware'
+gem 'faraday', '0.8.5'
+gem 'faraday_middleware', '0.9.0'
 gem 'hashie'
 gem 'state_machine', '1.1.2'
 gem 'cancan'
 gem 'easy_roles'
-gem "yard", "~> 0.8.2.1"
-gem 'yard-rest'
-gem 'redcarpet'
 gem "axlsx"
 
 gem 'twitter-bootstrap-rails', '2.0.6'
@@ -82,6 +79,9 @@ group :development do
   gem 'ruby-debug19'
   gem "rails-erd"
   gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
+  gem "yard", "~> 0.8.2.1"
+  gem 'yard-rest'
+  gem 'redcarpet'
 end
 
 group :test do
