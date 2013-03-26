@@ -57,8 +57,7 @@ class Api::MembersController < ApplicationController
   #   </br>&nbsp&nbsp&nbsp&nbsp<strong>skip_api_sync</strong> Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal)
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
-  # @response_field [String] member_id ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment. This value will be returned only if the member is enrolled successfully.
-  # @response_field [Integer] v_id Visible id of the member that was enrolled or recovered, or updated. This id is unique within each club. This value will be returned only if the member is enrolled successfully.
+  # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. API users dont know the member id at this moment. This value will be returned only if the member is enrolled successfully.
   # @response_field [Hash] errors A hash with members and credit card errors. This will be use to show errors on members creation page.
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account.
   #
@@ -85,7 +84,7 @@ class Api::MembersController < ApplicationController
   # @action PUT
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [String] id Member's ID. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
+  # @required [Integer] id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information:
   #   </br>&nbsp&nbsp&nbsp&nbsp<strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
   #   </br>&nbsp&nbsp&nbsp&nbsp<strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 
@@ -113,7 +112,7 @@ class Api::MembersController < ApplicationController
   #   </br>&nbsp&nbsp&nbsp&nbsp<strong>skip_api_sync</strong> Boolean variable which tell us if we have to sync or not user to remote api. Send 1 if you want to skip sync otherwise dont send this attribute. (optional) (e.g drupal)
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
-  # @response_field [String] member_id ID of the member. This ID is unique for each member. (32 characters string).
+  # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. API users dont know the member id at this moment. This value will be returned only if the member is enrolled successfully.
   # @response_field [Hash] errors A hash with members errors. This will be use to show errors on members edit page. 
   # 
   def update
@@ -268,11 +267,12 @@ class Api::MembersController < ApplicationController
   # @action PUT
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [String] member_id Member's ID. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
+  # @required [Integer] member_id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
   # @required [String] expire_date club cash expiration date. This date is stored with datetime format.
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
+  # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. API users dont know the member id at this moment. This value will be returned only if the member is enrolled successfully.
   # 
   def club_cash
     member = Member.find(params[:member_id])

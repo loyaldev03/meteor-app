@@ -8,7 +8,7 @@ class Api::OperationController < ApplicationController
   # @action POST
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [String] member_id Member's ID. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
+  # @required [Integer] member_id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Integer] description Description of the operation. It is a text field.
   # @required [Integer] operation_type message Integer value related to the operation type. Operations supported at the moment:
   #   </br>&nbsp&nbsp&nbsp&nbsp<strong>[900]</strong> vip_event_registration

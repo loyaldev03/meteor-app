@@ -7,7 +7,7 @@ class Api::ClubCashTransactionController < ApplicationController
   # @action POST
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [String] member_id Member's ID. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
+  # @required [Integer] member_id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
   # @required [Hash] club_cash_transaction Hash with necessary information to create the club cash transaction. It has the following information: 
   #   </br>&nbsp&nbsp&nbsp&nbsp<strong>amount</strong> Amount of the club cash to add or deduct. We only accept numbers with up to two digits after the comma. (required) (Eg: 2.50 , -10.99, 25)
