@@ -407,7 +407,7 @@ class Api::MembersController < ApplicationController
     rescue ActiveRecord::RecordNotFound
       render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
     rescue Exception => e
-      render json: { :message => "There seems to be an error, please verify data.", :code => Settings.error_codes.wrong_data }
+      render json: { :message => "There seems to be an error, please verify date.", :code => Settings.error_codes.wrong_data }
   end 
 
 
@@ -421,8 +421,8 @@ class Api::MembersController < ApplicationController
   # [start_date] Date where we will start the query from. This date must be in date format. (required)
   # [end_date] Date where we will end the query. This date must be in date format. (required)
   #
-  # [message] Shows the method result.
-  # [list] Hash with member's uuid updated between the dates given.
+  # [message] Shows the method result. This message will be shown when there is an error.
+  # [list] Hash with member's uuid updated between the dates given. This list will be returned only when this method is success.
   # [code] Code related to the method result.
   #
   # @param [String] api_key
@@ -433,12 +433,14 @@ class Api::MembersController < ApplicationController
   # 
   def get_updated
     if params[:start_date].blank? or params[:end_date].blank?
-      answer = { :message => "Verify dates.", :code => Settings.error_codes.wrong_data }
+      answer = { :message => "Dates must not be null or blank", :code => Settings.error_codes.wrong_data }
     else
       members_list = ( Member.where :updated_at =>(params[:start_date].to_date)..(params[:end_date].to_date) ).collect &:uuid
       answer = { :list => members_list, :code => Settings.error_codes.success }
     end
-    render json: answer
+    render json: answer 
+    rescue Exception => e
+      render json: { :message => "There seems to be an error, please verify dates.", :code => Settings.error_codes.wrong_data }
   end
 
 
@@ -452,8 +454,8 @@ class Api::MembersController < ApplicationController
   # [start_date] Date where we will start the query from. This date must be in date format. (required)
   # [end_date] Date where we will end the query. This date must be in date format. (required)
   #
-  # [message] Shows the method result.
-  # [list] Hash with member's uuid created between the dates given.
+  # [message] Shows the method result. This message will be shown when there is an error.
+  # [list] Hash with member's uuid created between the dates given. This list will be returned only when this method is success.
   # [code] Code related to the method result.
   #
   # @param [String] api_key
@@ -464,12 +466,14 @@ class Api::MembersController < ApplicationController
   # 
   def get_created
     if params[:start_date].blank? or params[:end_date].blank?
-      answer = { :message => "Verify dates.", :code => Settings.error_codes.wrong_data }
+      answer = { :message => "Dates must not be null or blank", :code => Settings.error_codes.wrong_data }
     else
       members_list = ( Member.where :created_at =>(params[:start_date].to_date)..(params[:end_date].to_date) ).collect &:uuid
       answer = { :list => members_list, :code => Settings.error_codes.success }
     end
     render json: answer
+    rescue Exception => e
+      render json: { :message => "There seems to be an error, please verify dates.", :code => Settings.error_codes.wrong_data }
   end
 
 
