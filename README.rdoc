@@ -10,3 +10,5 @@ Generate Model
 rake erd
 rake assets:precompile
 
+In order to create the doc you must run: 	
+yardoc --plugin rest --title "Api Documentation"

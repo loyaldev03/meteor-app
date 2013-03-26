@@ -9,10 +9,12 @@ class Api::OperationController < ApplicationController
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] member_id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
-  # @required [Integer] description Description of the operation. It is a text field.
+  # @optional [Integer] description Description of the operation. It is a text field.
   # @required [Integer] operation_type message Integer value related to the operation type. Operations supported at the moment:
-  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>[900]</strong> vip_event_registration
-  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>[901]</strong> vip_event_cancelation  # @response_field [String] 
+  #   <ul>
+  #     <li> <strong>900</strong> vip_event_registration </li>
+  #     <li> <strong>901</strong> vip_event_cancelation </li>
+  #   </ul>
   # @required [String] operation_date If this value is nil we save that operation with Time.zone.now
   # @response_field [Integer] code Code related to the method result.
   # @response_field [String] message Shows the method results and also informs the errors.
