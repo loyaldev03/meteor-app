@@ -2,87 +2,66 @@ class Api::MembersController < ApplicationController
   skip_before_filter :verify_authenticity_token
   respond_to :json
 
-  # Method : POST
-  #
+  ##
   # Submits a member to be created. This method will call the method enroll on member model. It will validate
   # the member's data (including its credit card) and, in case it is correct, it will create and save the member.
   # It will also send a welcome email and charge the enrollment to the member's credit card.  
   #
-  # [url] /api/v1/members
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # [member] Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info).
-  #          Here is a list of the regex we are using to validate {Member show}.
-  #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
-  #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 
-  #             *address: The address of the member that is being enrolled.
-  #             *city: City from where the member is from.
-  #             *state: The state standard code where the member is from. 
-  #             *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
-  #             *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
-  #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
-  #             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
-  #             *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
-  #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to
-  #              validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
-  #             *gender: Gender of the member. The values we are recieving are "M" for male or "F" for female.
-  #             *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
-  #             *terms_of_memberhips_id: This is the id of the term of membership the member is enrolling with. With this param
-  #              we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level. 
-  #             *enrollment_amount: Amount of money that takes to enroll. It is present at member level.
-  #             *birth_date: Birth date of the member. This date is stored with format "yyyy-mm-dd"
-  #             *credit_card  [Hash]
-  #             *prospect_id: Id of the prospect the enrollment info is related to.
-  #             *product_sku: Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet")
-  #             *product_description: Description of the selected product.
-  #             *mega_channel: 
-  #             *marketing_code: multi-team
-  #             *fulfillment_code: Id of the fulfillment we are sending to our member. (car-flag).
-  #             *ip_address: Ip address from where the enrollment is being submitted.
-  #             *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
-  #             *referral_host:  Link where is being redirect when after subimiting the enroll. (It shows the params in it).
-  #             *referral_parameters
-  #             *referral_path
-  #             *user_id: User ID alias UID is an md5 hash of the user's IP address and user-agent information.
-  #             *landing_url: Url from where te submit comes from.
-  #             *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
-  #              this information is selected by the member. This information is stored with format as hash encoded with json.
-  #             *cookie_value: Cookie from where the enrollment is being submitted.
-  #             *cookie_set: If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.
-  #             *campaign_medium
-  #             *campaign_description: The name of the campaign.
-  #             *campaign_medium_version
-  #             *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
-  #              informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. 
-  #              This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level.
-  # [credit_card] Information related to member's credit card. {CreditCard show}
-  #                 *number: Number of member's credit card, from where we will charge the membership or any other service.  
-  #                  This number will be stored as a hashed value. This number can have white-spaces or not ()
-  #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
-  #                 *expire_year: The year (in numbers) in which the credit card will expire.  
+  # @resource /api/v1/members
+  # @action POST
   #
-  # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling, or "wrong_address" for update.
-  #           * cc_blank: Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. It should only be true
-  #                       when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following 
-  #                       attributes: number=>"0000000000" and expire_month and expired_year setted as today's month and year respectively.
-  #           * skip_api_sync: Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal)
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information:
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>city</strong> City from where the member is from.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>state</strong> The state standard code where the member is from. 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>zip</strong> Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others).
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>terms_of_memberhips_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level. 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>enrollment_amount</strong> Amount of money that takes to enroll. It is present at member level.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd"
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>prospect_id</strong> Id of the prospect the enrollment info is related to.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>product_sku</strong> Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet")
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>product_description</strong> Description of the selected product.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>mega_channel</strong>
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>marketing_code</strong> multi-team
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>fulfillment_code</strong> Id of the fulfillment we are sending to our member. (car-flag).
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>ip_address</strong> Ip address from where the enrollment is being submitted.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>user_agent</strong> Information related to the browser and computer from where the enrollment is being submitted.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>referral_host</strong> Link where is being redirect when after subimiting the enroll. (It shows the params in it).
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>referral_parameters</strong> 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>referral_path</strong> 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>user_id</strong> User ID alias UID is an md5 hash of the user's IP address and user-agent information.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>landing_url</strong> Url from where te submit comes from.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. This information is selected by the member. This information is stored with format as hash encoded with json.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>cookie_value</strong> Cookie from where the enrollment is being submitted.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>cookie_set</strong> If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>campaign_medium</strong> 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>campaign_description</strong> The name of the campaign.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>campaign_medium_version</strong> 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>joint</strong> It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level. 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>credit_card</strong> Hash with credit cards information
+  # @required [Hash] credit_card Information related to member's credit card. It must have the following information:
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This number will be stored as a hashed value. This number can have white-spaces or not ()  
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  
+  # @optional [Hash] setter Variable used to pass some boolean values as "cc_blank" for enrolling, or "wrong_address" for update. It must have the following information:
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>cc_blank</strong> Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. It should only be true when we are allowing a credit blank credit card. If this variable is true, it should be pass a credit_card with the following attributes: number=>"0000000000" and expire_month and expired_year setted as today's month and year respectively.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>skip_api_sync</strong> Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal)
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] member_id ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment. This value will be returned only if the member is enrolled successfully.
+  # @response_field [Integer] v_id Visible id of the member that was enrolled or recovered, or updated. This id is unique within each club. This value will be returned only if the member is enrolled successfully.
+  # @response_field [Hash] errors A hash with members and credit card errors. This will be use to show errors on members creation page.
+  # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account.
   #
-  # [message] Shows the method results and also informs the errors.
-  # [code] Code related to the method result.
-  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. API users dont know the member id at this moment. This value will be returned only if the member is enrolled successfully.
-  # [v_id] Visible id of the member that was enrolled or recovered, or updated. This id is unique within each club. This value will be returned only if the member is enrolled successfully.
-  # [errors] A hash with members and credit card errors. This will be use to show errors on members creation page.
-  # [autologin_url] Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account.
-  #
-  # @param [String] api_key
-  # @param [Hash] member
-  # @param [Hash] setter
-  # @return [String] *message*
-  # @return [Integer] *code*
-  # @return [String] *member_id*
-  # @return [Integer] *v_id*  
-  # @return [Hash] *errors*
-  # @return [String] *autologin_url*
-  # 
   def create
     tom = TermsOfMembership.find(params[:member][:terms_of_membership_id])  
     my_authorize! :api_enroll, Member, tom.club_id
@@ -99,55 +78,43 @@ class Api::MembersController < ApplicationController
     render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
   end
 
-  # Method : PUT
+  ##
   # Updates member's data.
   #
-  # [url] /api/v1/members/:id
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # [id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform.
-  #      Have in mind that this value is part of the url.
-  # [member] Information related to the member that is being updated.. Here is a list of the regex we are using to validate. {Member show}.
-  #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
-  #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 
-  #             *address: The address of the member that is being enrolled. 
-  #             *city: City from where the member is from.
-  #             *member_group_type_id: Id of the member's group type where he belongs to. Each club can has many classifications for its member's, like 'VIP' or 'Celebrity'.
-  #              This types are stored as 'MemberGroupType'. The id is an integer up to 8 digits.
-  #             *state: The state standard code where the member is from. 
-  #             *zip: Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
-  #             *country: The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
-  #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
-  #             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
-  #             *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
-  #             *gender: Gender of the member. The values we are recieving are "M" for male or "F" for female.
-  #             *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
-  #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
-  #              mails with the following formats: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
-  #             *api_id: Send this value with the User Id of your site. This id is used to access your API (e.g. Autologin URL - Update member data). (optional)
-  #             *credit_card  [Hash] 
-  # [credit_card] Information related to member's credit card. {CreditCard show}
-  #                 *number: Number of member's credit card, from where we will charge the membership or any other service.  
-  #                  This number will be stored as a hashed value. This number can have white-spaces or not ()
-  #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
-  #                 *expire_year: The year (in numbers) in which the credit card will expire.
-  # [setter] Variable used to pass some boolean values as "cc_blank" for enrolling or "wrong_address" for update.
-  #           * wrong_phone_number: Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set 
-  #                                 wrong_phone_number as nil)
-  #           * batch_update: Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) (optional)
-  #           * skip_api_sync: Boolean variable which tell us if we have to sync or not user to remote api. Send 1 if you want to skip sync otherwise dont send this attribute. (optional) (e.g drupal)
+  # @resource /api/v1/members/:id
+  # @action PUT
   #
-  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). 
-  # [message] Shows the method results and also informs the errors.
-  # [code] Code related to the method result.
-  # [errors] A hash with members errors. This will be use to show errors on members edit page. 
-  #
-  # @param [String] api_key
-  # @param [Hash] member
-  # @param [Hash] setter
-  # @return [String] *message*
-  # @return [Integer] *member_id*  
-  # @return [Integer] *code*
-  # @return [Hash] *errors*
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] id Member's ID. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
+  # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information:
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>city</strong> City from where the member is from.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>state</strong> The state standard code where the member is from. 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>zip</strong> Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others).
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd"
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>member_group_type_id</strong> Id of the member's group type where he belongs to. Each club can has many classifications for its member's, like 'VIP' or 'Celebrity'.
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>api_id</strong> Send this value with the User Id of your site. This id is used to access your API (e.g. Autologin URL - Update member data). (optional)
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>credit_card</strong> Hash with credit cards information
+  # @required [Hash] credit_card Information related to member's credit card. It must have the following information:
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This number will be stored as a hashed value. This number can have white-spaces or not ()  
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  
+  # @required [Hash] setter Variable used to pass some boolean values as "cc_blank" for enrolling, or "wrong_address" for update. It must have the following information:
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>wrong_phone_number</strong> Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set wrong_phone_number as nil)
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>batch_update</strong> Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) (optional)
+  #   </br>&nbsp&nbsp&nbsp&nbsp<strong>skip_api_sync</strong> Boolean variable which tell us if we have to sync or not user to remote api. Send 1 if you want to skip sync otherwise dont send this attribute. (optional) (e.g drupal)
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] member_id ID of the member. This ID is unique for each member. (32 characters string).
+  # @response_field [Hash] errors A hash with members errors. This will be use to show errors on members edit page. 
   # 
   def update
     response = {}
@@ -294,25 +261,18 @@ class Api::MembersController < ApplicationController
     render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
   end    
 
-  # Method : PUT
+  ##
   # Updates member's club cash's data.
   #
-  # [url] /api/v1/members/:member_id/club_cash
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
-  # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
-  #             Have in mind that this value is part of the url.
-  # [amount] club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma. (required)
-  # [expire_date] club cash expiration date. This date is stored with datetime format. (required)
+  # @resource /api/v1/members/:member_id/club_cash
+  # @action PUT
   #
-  # [message] Shows the method result.
-  # [code] Code related to the method result.
-  #
-  # @param [String] api_key
-  # @param [Float] amount
-  # @param [String] expire_date
-  # @return [String] *message*
-  # @return [String] *member_id*  
-  # @return [Integer] *code*
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] member_id Member's ID. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
+  # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
+  # @required [String] expire_date club cash expiration date. This date is stored with datetime format.
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [Integer] code Code related to the method result.
   # 
   def club_cash
     member = Member.find(params[:member_id])

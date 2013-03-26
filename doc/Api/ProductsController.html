@@ -6,7 +6,7 @@
 <title>
   Class: Api::ProductsController
   
-    &mdash; Documentation by YARD 0.8.2.1
+    &mdash; Api Documentation
   
 </title>
 
@@ -25,333 +25,381 @@
 
   <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
 
+  <script type="text/javascript" charset="utf-8" src="../js/rest_plugin.js"></script>
 
+
+	<style type="text/css">
+		body {
+			overflow-x: hidden;
+			overflow-y: auto;
+			padding: 0 !important;
+			margin: 0 !important;
+			width: 100%;
+		}
+		#toc {
+		  height: 100%;
+		  right: 0;
+		  position: fixed;
+		  top: 0;
+		  width: 230px;
+	  }
+	  #header {
+	    position: fixed;
+	    top: 0;
+	    z-index: 1001;
+	  }
+	  #header #search {
+	    position: fixed;
+	    top: 0;
+	    right: 8px;
+	    z-index: 1001;
+	  }
+	  #content {
+	    margin-right: 285px;
+	    position: relative;
+	    padding: 20px;
+	    z-index: 1;
+	  }
+		#toc .title {display: none;}
+		#toc a:link, #content a:visited { text-decoration: none; color: #05a; }
+		#toc a:hover { background: #ffffa5; }
+		pre code {
+			display: block;
+			background: #EAF0FF;
+			padding: 12px;
+			line-height: 1.9em;
+		}
+		a.back {
+			font-size: 1.2em;
+			padding: 4px;
+		}
+		p.method_desc {
+			padding: 16px 0 0 14px;
+			font-size: 1.4em;
+			font-weight: bold;
+		}
+		h2 {
+			margin: 2.4em 0 0.5em;
+		}
+		.service h2 + p {
+			font-size: 1.2em;
+			margin-bottom: 62px;
+		}
+		.method {
+			display: block;
+			margin-top: 40px;
+			padding-top: 0;
+			position: relative;
+		}
+		h3 {
+			font-size: 1.2em;
+			font-weight: normal;
+			padding-top: 6px;
+			margin-bottom: -6px;
+		}
+		h4 {
+			margin: 0;
+		}
+		#resources {
+			padding: 14px 20px 52px;
+		}
+		#resources li {
+			border-right: 1px solid #0055AA;
+			display: block;
+			font-size: 1.4em;
+			float: left;
+			padding-right: 14px;
+			padding-left: 12px;
+		}
+		.resource_url {
+			border: 1px solid white;
+			display: block;
+			background: #EAF0FF;
+			margin-top: 11px;
+			padding: 12px 12px 18px;
+		}
+		#search_frame #search {
+			display: none;
+		}
+		.parameters, .response_fields {
+			background: none repeat scroll 0 0 #EAF0FF;
+		}
+		.parameters .required {
+			background: #d5e1ff;
+			padding: 12px;
+			border: 1px solid white;
+		}
+		.parameters .optional, .response_fields {
+			padding: 18px 12px 12px 12px;
+			border: 1px solid white;
+		}
+		.parameters .optional ul li, .parameters .required li, .response_fields li {
+			display: block;
+			padding: 4px 0 0 6px;
+		}
+		.parameters .optional ul li .name, .parameters .required li .name, .response_fields li .name {
+			font-weight: bold;
+		}
+		.parameters .optional ul li .text, .parameters .required li .text, .response_fields li .text {
+			display: block;
+		}
+		.examples {
+			padding: 32px 12px 12px 12px;
+		}
+		.example {			
+			border-bottom: 1px solid #BBB;
+			display: block;
+			padding: 18px 0 26px;
+			margin-bottom: 14px;
+			margin-top: 8px;
+		}
+		.example .description {
+			display: block;
+			font-size: 1.2em;
+			margin: 8px 0;
+		}
+		
+		.example .hash {
+			display: block;
+			background: #EEF;
+			font-size: 1.1em;
+			border-radius: 4px;
+			box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+			padding: 12px;
+		}
+		
+		.example .hash .type {
+			display: block;
+			font-size: 0.8em;
+			color: #99A;
+			padding-bottom: 6px;
+		}
+		
+		.example .hash.request {
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+		
+		.example .hash.response {
+			border-top: 1px solid white;
+			border-top-left-radius: 0;
+			border-top-right-radius: 0;
+		}
+		
+		pre.code.json {
+		  margin: 0;
+		}
+		
+		pre.code.json code {
+		  position: relative;
+		  border: 1px solid transparent;
+		  border-radius: 6px;
+		}
+		
+		pre.code.json code:hover {
+		  background: #d4e5fe;
+		}
+		
+		pre.code.json code:active {
+		  background: #c1d8fb;
+		}
+	</style>
+	<script type="text/javascript">
+		//<![CDATA[
+		
+		  function setup_log() {
+		    $("pre.code.json").attr("title", "click to inspect in browser debugger: console.log()");
+		    $("pre.code.json").css("cursor", "pointer");
+		    $("pre.code.json").click(function(){
+		      var code = $(this).find("code");
+		      console.log(code.html());
+		      console.log(JSON.parse(code.html()));
+		    });
+		  }
+		
+			function setup_toc() {
+	 		  if ($('#content').length === 0) return;
+			  var _toc = $('<ol class="top"></ol>');
+			  var show = false;
+			  var toc = _toc;
+			  var counter = 0;
+			  var tags = ['h2', 'h3', 'h4', 'h5', 'h6'];
+			  var i;
+			  if ($('#content h1').length > 1) tags.unshift('h1');
+			  for (i = 0; i < tags.length; i++) { tags[i] = '#content ' + tags[i]; }
+			  var lastTag = parseInt(tags[0][1], 10);
+			  $(tags.join(', ')).each(function() {
+			    if (this.id == "content") return;
+			    show = true;
+			    var thisTag = parseInt(this.tagName[1], 10);
+			    if (this.id.length === 0) {
+			      var proposedId = $(this).text().replace(/[^a-z0-9-]/ig, '_');
+			      if ($('#' + proposedId).length > 0) { proposedId += counter; counter++; }
+			      this.id = proposedId;
+			    }
+			    if (thisTag > lastTag) { 
+			      for (i = 0; i < thisTag - lastTag; i++) { 
+			        var tmp = $('<ol/>'); toc.append(tmp); toc = tmp; 
+			      } 
+			    }
+			    if (thisTag < lastTag) { 
+			      for (i = 0; i < lastTag - thisTag; i++) toc = toc.parent(); 
+			    }
+			    toc.append('<li><a href="#' + this.id + '">' + $(this).text() + '</a></li>');
+			    lastTag = thisTag;
+			  });
+			  if (!show) return;
+			  html = '<div id="toc"><p class="title"><a class="hide_toc" href="#"><strong>Table of Contents</strong></a> <small>(<a href="#" class="float_toc">left</a>)</small></p></div>';
+			  $('#content').prepend(html);
+			  $('#toc').append(_toc);
+			  $('#toc .hide_toc').toggle(function() { 
+			    $('#toc .top').slideUp('fast');
+			    $('#toc').toggleClass('hidden');
+			    $('#toc .title small').toggle();
+			  }, function() {
+			    $('#toc .top').slideDown('fast');
+			    $('#toc').toggleClass('hidden');
+			    $('#toc .title small').toggle();
+			  });
+			  $('#toc .float_toc').toggle(function() { 
+			    $(this).text('float');
+			    $('#toc').toggleClass('nofloat');
+			  }, function() {
+			    $(this).text('left');
+			    $('#toc').toggleClass('nofloat');
+			  });
+			}
+			$(document).ready(function(){
+			  setup_toc();
+			  setup_log();
+			});
+		//]]>
+	</script>
   </head>
   <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
     <div id="header">
-      <div id="menu">
-  
-    <a href="../_index.html">Index (P)</a> &raquo;
-    <span class='title'>Api</span>
-     &raquo; 
-    <span class="title">ProductsController</span>
-  
-
-  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
-</div>
-
       <div id="search">
-  
-    <a class="full_list_link" id="class_list_link"
-        href="../class_list.html">
-      Class List
-    </a>
-  
-    <a class="full_list_link" id="method_list_link"
-        href="../method_list.html">
-      Method List
-    </a>
-  
-    <a class="full_list_link" id="file_list_link"
-        href="../file_list.html">
-      File List
-    </a>
-  
+  <!-- <a id="topic_list_link" href="#">Topic List</a> -->
+  <a id="resource_list_link" href="#">Resources</a>
 </div>
-      <div class="clear"></div>
+
     </div>
-
+    
     <iframe id="search_frame"></iframe>
-
-    <div id="content"><h1>Class: Api::ProductsController
-  
-  
-  
-</h1>
-
-<dl class="box">
-  
-    <dt class="r1">Inherits:</dt>
-    <dd class="r1">
-      <span class="inheritName">ApplicationController</span>
-      
-        <ul class="fullTree">
-          <li>Object</li>
-          
-            <li class="next">ApplicationController</li>
-          
-            <li class="next">Api::ProductsController</li>
-          
-        </ul>
-        <a href="#" class="inheritanceTree">show all</a>
-      
-      </dd>
     
-  
-  
+    <div id="content" style="padding-top: 12px;">
+		<div class="service">
+  <h1 class="noborder title">Api Documentation</h1>
+    <a class="back" href="../index.html" title="back to the overview">&laquo; back to overview</a>
+    <h2>Products</h2>
     
-  
+  <div id="Services" class="method_details_list">
     
-  
-  
-  
-    <dt class="r2 last">Defined in:</dt>
-    <dd class="r2 last">app/controllers/api/products_controller.rb</dd>
-  
-</dl>
-<div class="clear"></div>
+		<div class="method">
+			<p class="method_desc">Returns the stock available for a product.</p>
+			<h3 class="resource_url"><strong>/api/v1/products/get_stock</strong> [GET]</h3>
 
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">api_key</span>
+									<span class="type">String</span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">sku</span>
+									<span class="type">String</span>
+									<span class="text">Sku of the product we are interested in. This parameter is the product description.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">club_id</span>
+									<span class="type">String</span>
+									<span class="text">Id of the club the product belongs to.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
 
-
-
-
-
-
-
-  
-    <h2>
-      Instance Method Summary
-      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
-    </h2>
-
-    <ul class="summary">
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#get_stock-instance_method" title="#get_stock (instance method)">- (String, Integer) <strong>get_stock</strong> </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>
-Method : GET Returns the stock available for a product.
-</p>
-</div></span>
-  
-</li>
-
-      
-    </ul>
-  
-
-
-  
-
-  <div id="instance_method_details" class="method_details_list">
-    <h2>Instance Method Details</h2>
-
-    
-      <div class="method_details first">
-  <h3 class="signature first" id="get_stock-instance_method">
-  
-    - (<tt>String</tt>, <tt>Integer</tt>) <strong>get_stock</strong> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>
-Method : GET Returns the stock available for a product. 
-</p>
-<dl>
-<dt>url</dt><dd><p>
-/api/v1/products/get_stock
-</p>
-</dd>
-<dt>api_key</dt><dd><p>
-Agent&#8217;s authentication token. This token allows us to check if the
-agent is allowed to request this action.
-</p>
-</dd>
-<dt>sku</dt><dd><p>
-Sku of the product we are interested in. This parameter is the product
-description. 
-</p>
-</dd>
-<dt>club_id</dt><dd><p>
-Id of the club the product belongs to. 
-</p>
-</dd>
-<dt>stock</dt><dd><p>
-Actual stock of the product. This value is an integer type. This value is
-returned if there was no error.
-</p>
-</dd>
-<dt>allow_backorder</dt><dd><p>
-Flag to inform that product allow negative stocks. It returns 1 for true
-value, and 0 for false value. This flag is returned if there was no error. 
-</p>
-</dd>
-<dt>message</dt><dd><p>
-Shows the method errors.  
-</p>
-</dd>
-<dt>code</dt><dd><p>
-Code related to the method result.
-</p>
-</dd>
-</dl>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>api_key</span>
-      
-      
-        <span class='type'>(<tt>String</tt>)</span>
-      
-      
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>sku</span>
-      
-      
-        <span class='type'>(<tt>String</tt>)</span>
-      
-      
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>club_id</span>
-      
-      
-        <span class='type'>(<tt>Integer</tt>)</span>
-      
-      
-      
-    </li>
-  
-</ul>
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>String</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>
-<b>message</b>
-</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Integer</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>
-<b>code</b>
-</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Integer</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>
-<b>stock</b>
-</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Integer</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>
-<b>allow_backorder</b>
-</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-26
-27
-28
-29
-30
-31
-32
-33
-34</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/products_controller.rb', line 26</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_get_stock'>get_stock</span>
-  <span class='id identifier rubyid_my_authorize!'>my_authorize!</span> <span class='symbol'>:manage_product_api</span><span class='comma'>,</span> <span class='const'>Product</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:club_id</span><span class='rbracket'>]</span>
-  <span class='id identifier rubyid_product'>product</span> <span class='op'>=</span> <span class='const'>Product</span><span class='period'>.</span><span class='id identifier rubyid_find_by_sku_and_club_id'>find_by_sku_and_club_id</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:sku</span><span class='rbracket'>]</span><span class='comma'>,</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:club_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_product'>product</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
-    <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='lbrace'>{</span> <span class='label'>code:</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_not_found'>not_found</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Product not found</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='lbrace'>{</span> <span class='label'>code:</span> <span class='const'>Settings</span><span class='period'>.</span><span class='id identifier rubyid_error_codes'>error_codes</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span><span class='comma'>,</span> <span class='label'>stock:</span> <span class='id identifier rubyid_product'>product</span><span class='period'>.</span><span class='id identifier rubyid_stock'>stock</span><span class='comma'>,</span> <span class='label'>allow_backorder:</span> <span class='id identifier rubyid_product'>product</span><span class='period'>.</span><span class='id identifier rubyid_allow_backorder'>allow_backorder</span> <span class='rbrace'>}</span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">stock</span>
+								<span class="type">Integer</span>
+								<span class="text">Actual stock of the product. This value is an integer type. This value is returned if there was no error.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">allow_backorder</span>
+								<span class="type">Integer</span>
+								<span class="text">Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag is returned if there was no error.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">Integer</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method errors.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+		</div>	
     
   </div>
 
 </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+	</div>
+    
     <div id="footer">
-  Generated on Tue Mar 12 11:36:37 2013 by
-  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.2.1 (ruby-1.9.2).
+  Generated on Tue Mar 26 10:07:05 2013 with ruby-1.9.2
 </div>
 
   </body>

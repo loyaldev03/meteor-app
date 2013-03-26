@@ -1,28 +1,21 @@
 class Api::ProductsController < ApplicationController
   skip_before_filter :verify_authenticity_token
-
   respond_to :json
-
-  # Method : GET
+  
+  ##
   # Returns the stock available for a product. 
+  #
+  # @resource /api/v1/products/get_stock
+  # @action GET
+  #
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] sku Sku of the product we are interested in. This parameter is the product description. 
+  # @required [String] club_id Id of the club the product belongs to. 
+  # @response_field [Integer] stock Actual stock of the product. This value is an integer type. This value is returned if there was no error.
+  # @response_field [Integer] allow_backorder Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag is returned if there was no error.  
+  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] message Shows the method errors.
   # 
-  # [url] /api/v1/products/get_stock
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # [sku] Sku of the product we are interested in. This parameter is the product description. 
-  # [club_id] Id of the club the product belongs to. 
-  # [stock] Actual stock of the product. This value is an integer type. This value is returned if there was no error.
-  # [allow_backorder] Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag is returned if there was no error.  
-  # [message] Shows the method errors.  
-  # [code] Code related to the method result.
-  #
-  # @param [String] api_key
-  # @param [String] sku
-  # @param [Integer] club_id 
-  # @return [String] *message*
-  # @return [Integer] *code*
-  # @return [Integer] *stock*
-  # @return [Integer] *allow_backorder*
-  #
   def get_stock
     my_authorize! :manage_product_api, Product, params[:club_id]
     product = Product.find_by_sku_and_club_id(params[:sku],params[:club_id])
