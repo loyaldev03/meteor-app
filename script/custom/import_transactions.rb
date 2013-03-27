@@ -11,8 +11,13 @@ def process_chargeback(refund, find_refund_operation)
     tz = Time.now.utc
     @log.info "  * processing Chargeback ##{refund.id}"
     begin
-      if find_refund_operation
-    
+      if find_refund_operation and refund.result == "Success"
+    	case refund.reason
+	when 'Enrollment Capture', 'Enrollment Capture MeS', 'EnrollmentCapture':
+          billing = BillingEnrollmentAuthorization.find(refund.capture_id)
+	when 'Membership Capture', 'Membership Capture MeS', 'MembershipCapture', 'Webservice Capture MES':
+          billing = BillingMembershipAuthorization.find(refund.capture_id)
+	end
       end
 
       transaction = PhoenixTransaction.new
@@ -31,6 +36,18 @@ def process_chargeback(refund, find_refund_operation)
       transaction.created_at = refund.created_at
       transaction.updated_at = refund.updated_at
       transaction.save!
+
+      if billing
+        transaction_type = if transaction.gateway == 'litle'
+          'authorization_capture'
+        else
+          'sale'
+        end
+
+        prev_transaction = PhoenixTransaction.find_by_invoice_number_and_transaction_type_and_amount_and_created_at_and_refunded_amount(transaction.invoice_number, transaction_type, amount, billing.created_at, 0.0)
+        prev_transaction.refunded_amount = refund.phoenix_amount
+        prev_transaction.save!
+      end
 
       if refund.result == "Success"
         add_operation(transaction.created_at, 'Transaction', transaction.id, "Refund success $#{transaction.amount}",
@@ -98,7 +115,11 @@ def load_enrollment_transactions
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
-            transaction.transaction_type = 'authorization_capture'
+            if transaction.gateway == 'litle'
+              transaction.transaction_type = 'authorization_capture'
+            else
+              transaction.transaction_type = 'sale'
+            end
             transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
             transaction.response = { :authorization => response.message }
@@ -161,7 +182,11 @@ def load_membership_transactions
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
-            transaction.transaction_type = 'authorization_capture'
+            if transaction.gateway == 'litle'
+              transaction.transaction_type = 'authorization_capture'
+            else
+              transaction.transaction_type = 'sale'
+            end
             transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
             transaction.response = { :authorization => response.message }
