@@ -20,7 +20,7 @@ ActiveRecord::Base.configurations["phoenix"] = {
 class Member < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
-  self.primary_key = 'uuid'
+  self.primary_key = 'id'
 end
 
 class Membership < ActiveRecord::Base
@@ -78,61 +78,61 @@ end
 
 def delete_operations(member)
   tz = Time.now.utc
-  member.operations.delete_all
+  Operation.delete_all(["member_id = ?", member.id])
   @log.info "    ... took #{Time.now.utc - tz} to delete member's operations."
 end
 
 def delete_member_notes(member)
   tz = Time.now.utc
-  member.member_notes.delete_all
+  MemberNote.delete_all(["member_id = ?", member.id])
   @log.info "    ... took #{Time.now.utc - tz} to delete member notes."
 end
 
 def delete_member_preferences(member)
   tz = Time.now.utc
-  member.member_preferences.delete_all
+  MemberPreference.delete_all(["member_id = ?", member.id])
   @log.info "    ... took #{Time.now.utc - tz} to delete member preferences."
 end
 
 def delete_credit_cards(member)
   tz = Time.now.utc
-  member.credit_cards.delete_all
+  CreditCard.delete_all(["member_id = ?", member.id])
   @log.info "    ... took #{Time.now.utc - tz} to delete member's credit cards."
 end
 
 def delete_transactions(member)
   tz = Time.now.utc
-  member.transactions.delete_all
+  Transaction.delete_all(["member_id = ?", member.id])
   @log.info "    ... took #{Time.now.utc - tz} to delete member's transactions."
 end
 
 def delete_fulfillments(member)
   tz = Time.now.utc
-  member.fulfillments.delete_all
+  Fulfillment.delete_all(["member_id = ?", member.id])
   @log.info "    ... took #{Time.now.utc - tz} to delete member fulfillments."
 end
 
 def delete_communications(member)
   tz = Time.now.utc
-  member.communications.delete_all
+  Communication.delete_all(["member_id = ?", member.id])
   @log.info "    ... took #{Time.now.utc - tz} to delete member communications."
 end
 
 def delete_club_cash_transactions(member)
   tz = Time.now.utc
-  member.club_cash_transactions.delete_all
+  ClubCashTransaction.delete_all(["member_id = ?", member.id])
   @log.info "    ... took #{Time.now.utc - tz} to delete member's club cash transactions."
 end
 
 def delete_memberships(member)
   tz = Time.now.utc
-  member.memberships.delete_all
+  Membership.delete_all(["member_id = ?", member.id])
   @log.info "    ... took #{Time.now.utc - tz} to delete member memberships."
 end
 
 def delete_enrollment_infos(member)
   tz = Time.now.utc
-  member.enrollment_infos.delete_all
+  EnrollmentInfo.delete_all(["member_id = ?", member.id])
   @log.info "    ... took #{Time.now.utc - tz} to delete member enrollment infos."
 end
 
