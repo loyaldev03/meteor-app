@@ -1,6 +1,5 @@
 # encoding: utf-8
 class Member < ActiveRecord::Base
-  include Extensions::UUID
   extend Extensions::Member::CountrySpecificValidations
 
   belongs_to :club
@@ -43,7 +42,6 @@ class Member < ActiveRecord::Base
   after_destroy :cancel_member_at_remote_domain
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
-
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
