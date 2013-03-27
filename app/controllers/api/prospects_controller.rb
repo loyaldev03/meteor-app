@@ -13,6 +13,7 @@ class Api::ProspectsController < ApplicationController
   #  <ul>
   #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). [optional]</li>
   #     <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). [optional]</li>
+  #     <li><strong>address</strong> The address of the member that is being enrolled. </li>
   #     <li><strong>city</strong> City from where the member is from.[optional]</li>
   #     <li><strong>state</strong> The state standard code where the member is from. [optional]</li>
   #     <li><strong>zip</strong> Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.[optional]</li>
