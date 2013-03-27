@@ -326,6 +326,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 <ul>
   <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
   <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
+  <li><strong>address</strong> The address of the member that is being enrolled. </li>
   <li><strong>city</strong> City from where the member is from. </li>
   <li><strong>state</strong> The state standard code where the member is from. </li>
   <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.) </li>
@@ -336,6 +337,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
   <li><strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
   <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. [optional]</li>
   <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). [optional]</li>
+  <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. [optional]</li>
   <li><strong>terms_of_memberhips_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level.  </li>
   <li><strong>enrollment_amount</strong> Amount of money that takes to enroll. It is present at member level.</li>
   <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" [optional]</li>
@@ -440,6 +442,168 @@ It will also send a welcome email and charge the enrollment to the member's cred
 			
 			
 			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Requesting enroll of a valid member.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										<pre class="code json"><code>{
+  &quot;api_key&quot;:&quot;aq4BS8XzbTvczcDZvDRt&quot;,
+  &quot;member&quot;: {
+    &quot;first_name&quot;:&quot;Alice&quot;,
+    &quot;last_name&quot;:&quot;Brennan&quot;,
+    &quot;address&quot;:&quot;SomeSt&quot;,
+    &quot;state&quot;:&quot;Deirdre&quot;,
+    &quot;city&quot;:&quot;City&quot;,
+    &quot;zip&quot;:12345,
+    &quot;country&quot;:&quot;US&quot;,
+    &quot;phone_country_code&quot;:1,
+    &quot;phone_area_code&quot;:123,
+    &quot;phone_local_number&quot;:1234,
+    &quot;email&quot;:&quot;alice@brennan.com&quot;,
+    &quot;gender&quot;:&quot;M&quot;,
+    &quot;type_of_phone_number&quot;:&quot;home&quot;,
+    &quot;terms_of_memberhips_id&quot;:10,
+    &quot;enrollment_amount&quot;:34.34,
+    &quot;birth_date&quot;:&quot;1989&quot;,
+    &quot;prospect_id&quot;:&quot;&quot;,
+    &quot;product_sku&quot;:&quot;KIT-CARD&quot;,
+    &quot;product_description&quot;:&quot;product default&quot;,
+    &quot;external_id&quot;:&quot;2568&quot;,
+    &quot;preferences&quot;:{ &quot;color&quot;:&quot;red&quot;, &quot;player&quot;:&quot;DaveJr&quot; },
+    &quot;credit_card&quot;:{
+       &quot;number&quot;:&quot;4485-6302-0286-9418&quot;
+       &quot;expire_month&quot;:5
+       &quot;expire_year&quot;:2016
+    }
+  }
+}
+</code></pre>
+
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										<pre class="code json"><code>{
+  &quot;result&quot;: {
+    &quot;message&quot;:&quot;Member enrolled successfully $34.34 on TOM(10) -test-&quot;,
+    &quot;code&quot;:&quot;000&quot;,
+    &quot;member_id&quot;:&quot;123458&quot;,
+    &quot;autologin_url&quot;:&quot;&quot;
+  }
+}
+</code></pre>
+
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Response in case it was success.
+									
+								
+							</span>
+						</div>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Requesting enroll with invalid information.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										<pre class="code json"><code>{
+  &quot;api_key&quot;:&quot;aq4BS8XzbTvczcDZvDRt&quot;,
+  &quot;member&quot;: {
+    &quot;first_name&quot;:&quot;Alice&quot;,
+    &quot;last_name&quot;:&quot;Brennan&quot;,
+    &quot;address&quot;:&quot;SomeSt&quot;,
+    &quot;state&quot;:&quot;Deirdre&quot;,
+    &quot;city&quot;:&quot;City&quot;,
+    &quot;zip&quot;:12345,
+    &quot;country&quot;:&quot;United States&quot;,
+    &quot;phone_country_code&quot;:1,
+    &quot;phone_area_code&quot;:123,
+    &quot;phone_local_number&quot;:1234,
+    &quot;email&quot;:&quot;alice@brennan.com&quot;,
+    &quot;gender&quot;:&quot;M&quot;,
+    &quot;type_of_phone_number&quot;:&quot;home&quot;,
+    &quot;terms_of_memberhips_id&quot;:10,
+    &quot;enrollment_amount&quot;:34.34,
+    &quot;birth_date&quot;:&quot;1989&quot;,
+    &quot;prospect_id&quot;:&quot;&quot;,
+    &quot;product_sku&quot;:&quot;KIT-CARD&quot;,
+    &quot;product_description&quot;:&quot;product default&quot;,
+    &quot;external_id&quot;:&quot;2568&quot;,
+    &quot;preferences&quot;:{ &quot;color&quot;:&quot;red&quot;, &quot;player&quot;:&quot;DaveJr&quot; },
+    &quot;credit_card&quot;:{
+       &quot;number&quot;:&quot;4485-6302-0286-9418&quot;
+       &quot;expire_month&quot;:5
+       &quot;expire_year&quot;:2016
+    },
+    &quot;setter&quot;:{
+       &quot;cc_blank&quot;:0,
+       &quot;skip_api_sync&quot;:0
+    }
+  }
+}
+</code></pre>
+
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										<pre class="code json"><code>{
+  &quot;result&quot;: {
+    &quot;message&quot;:&quot;Member iformation is invalid.&quot;,
+    &quot;code&quot;:&quot;405&quot;,
+    &quot;errors&quot;:{&quot;country&quot;:[&quot;is the wrong length (should be 2 characters)&quot;,&quot;is not included in the list&quot;]}
+  }
+}
+</code></pre>
+
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Response with member's errors within an 'error' hash.
+									
+								
+							</span>
+						</div>
+					
+				</div>
+			
 		</div>	
     
 		<div class="method">
@@ -475,6 +639,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 <ul>
   <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
   <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
+  <li><strong>address</strong> The address of the member that is being enrolled. </li>
   <li><strong>city</strong> City from where the member is from.</li>
   <li><strong>state</strong> The state standard code where the member is from. </li>
   <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.)</li>
@@ -487,6 +652,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
   <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). [optional] </li>
   <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" [optional]</li>
   <li><strong>member_group_type_id</strong> Id of the member's group type where he belongs to. Each club can has many classifications for its member's, like 'VIP' or 'Celebrity'.</li>
+  <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. [optional]</li>
   <li><strong>api_id</strong> Send this value with the User Id of your site. This id is used to access your API (e.g. Autologin URL - Update member data). [optional]</li>
   <li><strong>credit_card</strong> Hash with credit cards information. It must have the following information:</li>
   <ul>
@@ -556,6 +722,163 @@ It will also send a welcome email and charge the enrollment to the member's cred
 				</div>
 			
 			
+			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Requesting update with valid information.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										<pre class="code json"><code>{
+  &quot;api_key&quot;:&quot;aq4BS8XzbTvczcDZvDRt&quot;,
+  &quot;member&quot;: {
+    &quot;first_name&quot;:&quot;Alice&quot;,
+    &quot;last_name&quot;:&quot;Brennan&quot;,
+    &quot;address&quot;:&quot;SomeSt&quot;,
+    &quot;state&quot;:&quot;Deirdre&quot;,
+    &quot;city&quot;:&quot;City&quot;,
+    &quot;zip&quot;:12345,
+    &quot;country&quot;:&quot;US&quot;,
+    &quot;phone_country_code&quot;:1,
+    &quot;phone_area_code&quot;:123,
+    &quot;phone_local_number&quot;:1234,
+    &quot;email&quot;:&quot;alice@brennan.com&quot;,
+    &quot;gender&quot;:&quot;M&quot;,
+    &quot;type_of_phone_number&quot;:&quot;home&quot;,
+    &quot;terms_of_memberhips_id&quot;:10,
+    &quot;enrollment_amount&quot;:34.34,
+    &quot;birth_date&quot;:&quot;1989&quot;,
+    &quot;prospect_id&quot;:&quot;&quot;,
+    &quot;member_group_type_id&quot;:1,
+    &quot;product_sku&quot;:&quot;KIT-CARD&quot;,
+    &quot;product_description&quot;:&quot;product default&quot;,
+    &quot;external_id&quot;:&quot;2568&quot;
+  },
+    &quot;setter&quot;:{
+       &quot;wrong_phone_number&quot;:0,
+       &quot;skip_api_sync&quot;:0,
+       &quot;batch_update&quot;:0
+    }
+}
+</code></pre>
+
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										<pre class="code json"><code>{
+  &quot;result&quot;: {
+    &quot;message&quot;:&quot;Member updated successfully&quot;,
+    &quot;code&quot;:&quot;000&quot;,
+    &quot;member_id&quot;:12345
+  }
+}
+</code></pre>
+
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Response in case it was success.
+									
+								
+							</span>
+						</div>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Requesting enroll with invalid information.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										<pre class="code json"><code>{
+  &quot;api_key&quot;:&quot;aq4BS8XzbTvczcDZvDRt&quot;,
+  &quot;member&quot;: {
+    &quot;first_name&quot;:&quot;Alice&quot;,
+    &quot;last_name&quot;:&quot;Brennan&quot;,
+    &quot;address&quot;:&quot;SomeSt&quot;,
+    &quot;state&quot;:&quot;Deirdre&quot;,
+    &quot;city&quot;:&quot;City&quot;,
+    &quot;zip&quot;:12345,
+    &quot;country&quot;:&quot;US&quot;,
+    &quot;phone_country_code&quot;:1,
+    &quot;phone_area_code&quot;:123,
+    &quot;phone_local_number&quot;:1234,
+    &quot;email&quot;:&quot;alice@brennan.com&quot;,
+    &quot;gender&quot;:&quot;M&quot;,
+    &quot;type_of_phone_number&quot;:&quot;home&quot;,
+    &quot;terms_of_memberhips_id&quot;:10,
+    &quot;enrollment_amount&quot;:34.34,
+    &quot;birth_date&quot;:&quot;1989&quot;,
+    &quot;prospect_id&quot;:&quot;&quot;,
+    &quot;member_group_type_id&quot;:1,
+    &quot;product_sku&quot;:&quot;KIT-CARD&quot;,
+    &quot;product_description&quot;:&quot;product default&quot;,
+    &quot;external_id&quot;:&quot;2568&quot;
+  },
+    &quot;setter&quot;:{
+       &quot;wrong_phone_number&quot;:0,
+       &quot;skip_api_sync&quot;:0,
+       &quot;batch_update&quot;:0
+    }
+}
+</code></pre>
+
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										<pre class="code json"><code>{
+  &quot;result&quot;: {
+    &quot;message&quot;:&quot;Member iformation is invalid.&quot;,
+    &quot;code&quot;:&quot;405&quot;,
+    &quot;errors&quot;:{&quot;country&quot;:[&quot;is the wrong length (should be 2 characters)&quot;,&quot;is not included in the list&quot;]}
+  }
+}
+</code></pre>
+
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Response with member's errors within an 'error' hash.
+									
+								
+							</span>
+						</div>
+					
+				</div>
 			
 		</div>	
     
@@ -659,7 +982,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Tue Mar 26 18:41:29 2013 with ruby-1.9.3
+  Generated on Wed Mar 27 11:47:08 2013 with ruby-1.9.2
 </div>
 
   </body>
