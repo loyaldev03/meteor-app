@@ -93,11 +93,11 @@ class Member < ActiveRecord::Base
     end
   }
   scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }
+  scope :with_id, lambda { |value| where('id = ?', value.strip) unless value.blank? }
   scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
   scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value.strip) unless value.blank? }
   scope :with_phone_area_code, lambda { |value| where('phone_area_code = ?', value.strip) unless value.blank? }
   scope :with_phone_local_number, lambda { |value| where('phone_local_number = ?', value.strip) unless value.blank? }
-  scope :with_visible_id, lambda { |value| where('visible_id = ?',value.strip) unless value.blank? }
   scope :with_first_name_like, lambda { |value| where('first_name like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_last_name_like, lambda { |value| where('last_name like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_address_like, lambda { |value| where('address like ?', '%'+value.strip+'%') unless value.blank? }
@@ -541,7 +541,7 @@ class Member < ActiveRecord::Base
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
 
-      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id, :autologin_url => self.full_autologin_url.to_s }
+      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :autologin_url => self.full_autologin_url.to_s }
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "Member:enroll" : "Member:recovery/save the sale") + " -- member turned invalid while enrolling"

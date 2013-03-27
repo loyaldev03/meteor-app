@@ -548,10 +548,10 @@ class Api::MembersController < ApplicationController
 
   ##
   # Updates member's club cash's data.
-  #
+  # 
   # @resource /api/v1/members/:id/club_cash
   # @action PUT
-  #
+  # 
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
@@ -559,6 +559,35 @@ class Api::MembersController < ApplicationController
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. It will be returned only when the request was a success.
+  # 
+  # @example_request 
+  #   ```json
+  #   {
+  #     "api_key":"aq4BS8XzbTvczcDZvDRt",
+  #     "member": {
+  #       "amount":"Alice",
+  #       "expire_date":"Brennan",
+  #       "address":"SomeSt",
+  #     },
+  #       "setter":{
+  #          "wrong_phone_number":0,
+  #          "skip_api_sync":0,
+  #          "batch_update":0
+  #       }
+  #   }
+  #   ```
+  # @example_request_description Requesting enroll with invalid information.
+  # @example_response 
+  #   ```json
+  #   {
+  #     "result": {
+  #       "message":"Member iformation is invalid.",
+  #       "code":"405",
+  #       "member_id":{"country":["is the wrong length (should be 2 characters)","is not included in the list"]}
+  #     }
+  #   }
+  #   ```
+  # @example_response_description Response with member's errors within an 'error' hash.
   # 
   def club_cash
     member = Member.find(params[:id])

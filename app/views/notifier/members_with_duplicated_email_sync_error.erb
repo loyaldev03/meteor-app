@@ -3,7 +3,7 @@
 
 <table class="bordered">
 	<tr> 
-		<td>Visible_id</td> 
+		<td>id</td> 
 		<td>Club</td> 
 		<td>Email</td> 
 		<td>Profile link </p>
@@ -11,10 +11,10 @@
 	</tr>
 	<% @members.each do |member| %>
 		<tr> 
-			<td><%= member.visible_id %> - <%= member.full_name %></td> 
+			<td><%= member.id %> - <%= member.full_name %></td> 
 			<td><%= member.club.id %> - <%= member.club.name %></td> 
 			<td><%= member.email %></td> 
-			<td><%= link_to 'Link', show_member_url(member.club.partner.prefix, member.club.name, member.visible_id)  %></td>
+			<td><%= link_to 'Link', show_member_url(member.club.partner.prefix, member.club.name, member.id)  %></td>
 			<td>	
 				<% member.club.domains.each do |drupal_domain| %>
 				<%= link_to drupal_domain.url, drupal_domain.url+"/admin/people" %>

@@ -10,10 +10,10 @@ KIT_CARD_FULFILLMENT = "KIT-CARD"
 def add_fulfillment(member)
   unless @campaign.product_sku.blank?
     phoenix_f = PhoenixFulfillment.find_or_create_by_member_id @member.id
-    phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.visible_id.to_s
+    phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.id
     phoenix_f.product_package = KIT_CARD_FULFILLMENT
     phoenix_f.product_sku = KIT_CARD_FULFILLMENT
-    phoenix_f.assigned_at = Time.now.utc if phoenix_f.new_record?
+    phoenix_f.assigned_at = Time.now.utc if phoenix_f.assigned_at.nil?
     renewdate = member.phoenix_join_date_time + (Date.today.year - member.phoenix_join_date_time.year).years
     phoenix_f.renewable_at = (renewdate > Date.today ? renewdate : renewdate.next_year)
     phoenix_f.recurrent = true
@@ -34,7 +34,7 @@ def set_member_data(phoenix, member, merge_member = false)
   phoenix.address = member.address
   phoenix.city = member.city
   phoenix.state = member.state
-  phoenix.zip = member.zip
+  phoenix.zip = member.phoenix_zip
   phoenix.country = member.country
   phoenix.birth_date = member.birth_date
   phoenix.phone_country_code = member.phone_country_code
@@ -132,8 +132,9 @@ end
 
 # 1- update existing members
 def update_members
-  BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) " + 
-    " and is_prospect = false ").find_in_batches do |group|
+  #base = BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) and is_prospect = false ")
+  base = BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) and is_prospect = false ")
+  base.find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
       tz = Time.now.utc
@@ -145,7 +146,7 @@ def update_members
 
       @log.info "  * processing member ##{member.id}"
       begin
-        phoenix = PhoenixMember.find_by_club_id_and_visible_id(CLUB, member.id)
+        phoenix = PhoenixMember.find_by_club_id_and_id(CLUB, member.id)
         if phoenix.nil?
           puts "  * member ##{member.id} not found on phoenix ?? "
           next
@@ -230,7 +231,7 @@ def add_new_members
 
         phoenix = PhoenixMember.new 
         phoenix.club_id = CLUB
-        phoenix.visible_id = member.id
+        phoenix.id = member.id
         set_member_data(phoenix, member)
         phoenix.status = member.phoenix_status
         phoenix.recycled_times = 0

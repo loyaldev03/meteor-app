@@ -205,7 +205,7 @@ class Fulfillment < ActiveRecord::Base
             member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
             self.product.weight, 'MID']
     else
-      [ member.visible_id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
+      [ member.id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
               (I18n.l self.renewable_at, :format => :only_date_short if self.renewable_at), member.address, member.city,
               "=\"#{member.zip}\"", self.product_sku, ('C' if member.member_group_type_id) ]
     end
@@ -239,7 +239,7 @@ class Fulfillment < ActiveRecord::Base
       if self.recurrent and self.renewable_at.nil?
         self.renewable_at = self.assigned_at + 1.year 
       end
-      self.tracking_code = self.product_package.to_s + self.member.visible_id.to_s
+      self.tracking_code = self.product_package.to_s + self.member.id.to_s
     end
 
 end

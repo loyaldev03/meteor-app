@@ -201,7 +201,7 @@ function new_member_functions(){
         $('input').parent().parent().removeClass("error");
         if (data.code == 000) {
           alert (data.message);
-          window.location.replace('../member/'+data.v_id);
+          window.location.replace('../member/'+data.member_id);
         }else{
           $('#error_explanation').show();
           $('#error_explanation ul').empty();
@@ -279,7 +279,7 @@ function edit_member_functions(){
         alert(data.message);
         $('input').parent().parent().removeClass("error");
         if (data.code == 000)
-          window.location.replace('../'+v_id);
+          window.location.replace('../'+id);
         else{
           $('#submit_button').removeAttr('disabled');
           $('#error_explanation').show();
@@ -318,11 +318,11 @@ function club_cash_functions(){
     event.preventDefault(); 
     $.ajax({
       type: 'POST',
-      url: "/api/v1/members/"+member_id+"/club_cash_transaction",
+      url: "/api/v1/members/"+id+"/club_cash_transaction",
       data: $("form").serialize(),
       success: function(data) {
         if (data.code == 000)
-          window.location.replace('../'+visible_id);
+          window.location.replace('../'+id);
         else{
           $('#submit_button').removeAttr("disabled");
           $('#error_explanation').show();
