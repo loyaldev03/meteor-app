@@ -10,7 +10,7 @@ KIT_CARD_FULFILLMENT = "KIT-CARD"
 def add_fulfillment(member)
   unless @campaign.product_sku.blank?
     phoenix_f = PhoenixFulfillment.find_or_create_by_member_id @member.id
-    phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.visible_id.to_s
+    phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.id
     phoenix_f.product_package = KIT_CARD_FULFILLMENT
     phoenix_f.product_sku = KIT_CARD_FULFILLMENT
     phoenix_f.assigned_at = Time.now.utc if phoenix_f.new_record?
@@ -145,7 +145,7 @@ def update_members
 
       @log.info "  * processing member ##{member.id}"
       begin
-        phoenix = PhoenixMember.find_by_club_id_and_visible_id(CLUB, member.id)
+        phoenix = PhoenixMember.find_by_club_id_and_id(CLUB, member.id)
         if phoenix.nil?
           puts "  * member ##{member.id} not found on phoenix ?? "
           next
@@ -230,7 +230,7 @@ def add_new_members
 
         phoenix = PhoenixMember.new 
         phoenix.club_id = CLUB
-        phoenix.visible_id = member.id
+        phoenix.id = member.id
         set_member_data(phoenix, member)
         phoenix.status = member.phoenix_status
         phoenix.recycled_times = 0

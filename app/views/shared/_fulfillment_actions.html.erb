@@ -6,11 +6,11 @@
       <%= (link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id, :class=> "btn btn-small") if can? :mark_as_sent, Fulfillment %>
       <% unless member_show %>
       <%= (link_to 'Set as wrong address','#', :id => "set_as_wrong_address", 
-        :name => fulfillment.member.visible_id, :class=> "btn btn-small", :remote => true)  if can? :mark_as_undeliverable, Member %>
+        :name => fulfillment.member.id, :class=> "btn btn-small", :remote => true)  if can? :mark_as_undeliverable, Member %>
   	  <% end %>
     <% else %>
       <% unless member_show %>
-      <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.visible_id) %>
+      <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.id) %>
       <% else %>
   		<%= t('activerecord.attributes.member.undeliverable') %>
       <% end %>
@@ -18,7 +18,7 @@
   <% elsif fulfillment.out_of_stock? or fulfillment.bad_address? %>
     <% if fulfillment.member.wrong_address %>
       <% unless member_show %>
-      <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.visible_id)%>
+      <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.id)%>
       <% else %>
       <%= t('activerecord.attributes.member.undeliverable') %>
       <% end %>	
@@ -36,7 +36,7 @@
         <%= t('activerecord.attributes.member.is_lapsed') %>
       <% elsif fulfillment.member.wrong_address %>
         <% unless member_show %>
-          <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.visible_id)%>
+          <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.id)%>
           <% else %>
             <%= t('activerecord.attributes.member.undeliverable') %>
         <% end %> 

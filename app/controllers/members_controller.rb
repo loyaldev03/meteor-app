@@ -15,7 +15,7 @@ class MembersController < ApplicationController
 
   def search_result
     @members = Member.paginate(:page => params[:page], :per_page => 25)
-                       .with_visible_id(params[:member][:member_id])
+                       .with_id(params[:member][:id])
                        .with_first_name_like(params[:member][:first_name])
                        .with_last_name_like(params[:member][:last_name])
                        .with_address_like(params[:member][:address])
@@ -34,7 +34,7 @@ class MembersController < ApplicationController
                        .with_external_id(params[:member][:external_id])
                        .where(:club_id => @current_club)
                        .needs_approval(params[:member][:needs_approval])
-                       .order(:visible_id)
+                       .order(:id)
                        .uniq
     respond_to do |format|
       format.html {render 'index'}

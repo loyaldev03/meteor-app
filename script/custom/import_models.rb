@@ -299,7 +299,7 @@ class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
     "#{self.created_at.to_date}-#{a.member_id}"
   end
   def member(a)
-    PhoenixMember.find_by_visible_id_and_club_id(a.member_id, CLUB)
+    PhoenixMember.find_by_id_and_club_id(a.member_id, CLUB)
   end
   def amount
     phoenix_amount
@@ -321,7 +321,7 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
     BillingMembershipAuthorization.find_by_id(self.authorization_id)
   end
   def member(a)
-    PhoenixMember.find_by_visible_id_and_club_id(a.member_id, CLUB)
+    PhoenixMember.find_by_id_and_club_id(a.member_id, CLUB)
   end
   def invoice_number(a)
     "#{self.created_at.to_date}-#{a.member_id}"
