@@ -207,17 +207,13 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
       click_on("Fulfillments")
     end
     within("#fulfillments")do
-      wait_until{
-        assert page.has_selector?('#mark_as_sent')     
-      }
+      assert page.has_selector?('#mark_as_sent')     
     end
 
     click_link_or_button('mark_as_sent')
 
     within("#fulfillments")do
-      wait_until{
-        assert page.has_content?("Fulfillment #{@fulfillment.product_sku} was set as sent.")    
-      }
+      assert page.has_content?("Fulfillment #{@fulfillment.product_sku} was set as sent.")    
     end
     @fulfillment.reload
     assert_equal @fulfillment.status,'sent'

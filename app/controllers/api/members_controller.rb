@@ -638,7 +638,7 @@ class Api::MembersController < ApplicationController
 
 
   # Method : GET
-  # Gets an array with the member's uuid that were updated between the dates given. 
+  # Gets an array with the member's id that were updated between the dates given. 
   #
   # [url] api/v1/members/report/find_all_by_updated/:start_date/:end_date
   # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
@@ -648,7 +648,7 @@ class Api::MembersController < ApplicationController
   # [end_date] Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. (required)
   #
   # [message] Shows the method result. This message will be shown when there is an error.
-  # [list] Hash with member's uuid updated between the dates given. This list will be returned only when this method is success.
+  # [list] Hash with member's id updated between the dates given. This list will be returned only when this method is success.
   # [code] Code related to the method result.
   #
   # @param [String] api_key
@@ -663,7 +663,7 @@ class Api::MembersController < ApplicationController
     if params[:start_date].blank? or params[:end_date].blank?
       answer = { :message => "Dates must not be null or blank", :code => Settings.error_codes.wrong_data }
     else
-      members_list = ( Member.where :updated_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime) ).collect &:uuid
+      members_list = ( Member.where :updated_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime) ).collect &:id
       answer = { :list => members_list, :code => Settings.error_codes.success }
     end
     render json: answer
@@ -673,7 +673,7 @@ class Api::MembersController < ApplicationController
 
 
   # Method : GET
-  # Gets an array with the member's uuid that were created between the dates given. 
+  # Gets an array with the member's id that were created between the dates given. 
   #
   # [url] api/v1/members/report/find_all_by_created/:start_date/:end_date
   # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
@@ -683,7 +683,7 @@ class Api::MembersController < ApplicationController
   # [end_date] Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. (required)
   #
   # [message] Shows the method result. This message will be shown when there is an error.
-  # [list] Hash with member's uuid created between the dates given. This list will be returned only when this method is success.
+  # [list] Hash with member's id created between the dates given. This list will be returned only when this method is success.
   # [code] Code related to the method result.
   #
   # @param [String] api_key
@@ -698,7 +698,7 @@ class Api::MembersController < ApplicationController
     if params[:start_date].blank? or params[:end_date].blank?
       answer = { :message => "Dates must not be null or blank", :code => Settings.error_codes.wrong_data }
     else
-      members_list = ( Member.where :created_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime) ).collect &:uuid
+      members_list = ( Member.where :created_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime) ).collect &:id
       answer = { :list => members_list, :code => Settings.error_codes.success }
     end
     render json: answer

@@ -570,21 +570,14 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
  test "go from member index to edit member's classification to VIP" do
     setup_member
-
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    within("#personal_details")do
-      wait_until{
-        fill_in 'member[member_id]', :with => @saved_member.id
-        fill_in 'member[first_name]', :with => @saved_member.first_name
-        fill_in 'member[last_name]', :with => @saved_member.last_name
-      }
+    within("#personal_details") do
+      fill_in 'member[member_id]', :with => @saved_member.id.to_s
+      fill_in 'member[first_name]', :with => @saved_member.first_name
+      fill_in 'member[last_name]', :with => @saved_member.last_name
     end
     click_link_or_button 'Search'
-    within("#members")do
-      wait_until{
-        find(".icon-pencil").click
-      }
-    end   
+    within("#members"){ find(".icon-pencil").click }  
     select('VIP', :from => 'member[member_group_type_id]')
 
     alert_ok_js
@@ -954,10 +947,9 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.set_as_active!
     @saved_member.set_as_canceled
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
    
-    within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+    within("#td_mi_next_retry_bill_date"){ wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) } }
     end
   end
 
@@ -1002,25 +994,22 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.recover(@terms_of_membership_with_gateway)
     @saved_member.set_as_active
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+   
+    assert find_field('input_first_name').value == @saved_member.first_name
     
     click_link_or_button 'Change'
-    wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
+    page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) 
     page.execute_script("window.jQuery('#next_bill_date').next().click()")
     within("#ui-datepicker-div") do
       if ((Time.zone.now+1.day).month != Time.zone.now.month)
-        within(".ui-datepicker-header")do
-          wait_until { find(".ui-icon-circle-triangle-e").click }
-        end
+        within(".ui-datepicker-header"){ find(".ui-icon-circle-triangle-e").click }
       end
-      wait_until { click_on("#{(Time.zone.now+1.day).day}") }
+      click_on("#{(Time.zone.now+1.day).day}")
     end
     click_link_or_button 'Change next bill date'
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     next_bill_date = Time.zone.now + 1.day
-    within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
-    end
+    within("#td_mi_next_retry_bill_date"){ assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
   end  
 
   test "Next Bill Date for monthly memberships" do
@@ -1228,26 +1217,25 @@ test "Partial refund from CS" do
   test "Send Prebill email (7 days before NBD)" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }    
+    assert find_field('input_first_name').value == @saved_member.first_name 
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
-    
-    sleep 1   
-    Member.find_in_batches(:conditions => [" date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
-      group.each do |member| 
-        @saved_member.send_pre_bill
-      end
-    end
+
+    sleep 1
+    Member.send_prebill
+
     sleep 5 #Wait untill script finish.
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
+    within(".nav-tabs"){ click_on 'Communications' }
     within("#communication") do
       assert page.has_content?("Test prebill")
       assert page.has_content?("prebill")
       assert_equal(Communication.last.template_type, 'prebill')
     end
    
+    within(".nav-tabs"){ click_on 'Operations' }
     within("#operations_table") do
       assert page.has_content?("Communication 'Test prebill' sent")
     end
@@ -1261,7 +1249,6 @@ test "Partial refund from CS" do
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within(".nav-tabs"){ click_on("Transactions") }
-
     within("#transactions_table")do
       assert page.has_content?(Transaction.last.full_label.truncate(50))
       find("#th_date").click
@@ -1301,5 +1288,4 @@ test "Partial refund from CS" do
     assert page.has_content?("There was an error with your credit card information. Please call member services at: #{@club.cs_phone_number}.")
     assert page.has_content?('{:number=>"Credit card is blacklisted"}')
   end
-
 end

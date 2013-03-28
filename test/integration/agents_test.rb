@@ -157,7 +157,7 @@ class AgentsTest < ActionController::IntegrationTest
       find("#th_created_at").click
     end
   end
-
+  
   test "create agent with supervisor role" do
     setup_environment
     visit new_admin_agent_path

@@ -18,7 +18,7 @@ class CreditCardsControllerTest < ActionController::TestCase
   end
 
   def generate_post_message
-    post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.visible_id, 
+    post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id, 
                   credit_card: { :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
   end  
 

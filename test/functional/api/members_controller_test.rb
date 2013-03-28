@@ -1151,8 +1151,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     last.update_attribute :updated_at, Time.zone.now - 10.days
 
     generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
-    assert @response.body.include? first.id
-    assert @response.body.include? last.id
+    assert @response.body.include? first.id.to_s
+    assert @response.body.include? last.id.to_s
   end
 
   test "get members updated between given dates with blank date" do
@@ -1176,34 +1176,29 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Representative should not get members updated between given dates" do
-    
     sign_in @representative_user
     generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Supervisor should not get members updated between given dates" do
-    
     sign_in @supervisor_user
     generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Agency should not get members updated between given dates" do
-    
     sign_in @agency_agent
     generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Fulfillment manager should not get members updated between given dates" do
-    
     sign_in @fulfillment_managment_user
     generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
   test "Api should not get members updated between given dates" do
-    
     sign_in @api_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     first = Member.first
@@ -1212,12 +1207,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     last.update_attribute :updated_at, Time.zone.now - 10.days
 
     generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
-    assert @response.body.include? first.id
-    assert @response.body.include? last.id
+    assert @response.body.include? first.id.to_s
+    assert @response.body.include? last.id.to_s
   end
 
   test "get members created between given dates" do
-    
     sign_in @admin_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     first = Member.first
@@ -1226,12 +1220,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     last.update_attribute :created_at, Time.zone.now - 10.days
 
     generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
-    assert @response.body.include? first.id
-    assert @response.body.include? last.id
+    assert @response.body.include? first.id.to_s
+    assert @response.body.include? last.id.to_s
   end
 
   test "get members created between given dates with blank date" do
-    
     sign_in @admin_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     
@@ -1241,7 +1234,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @response.body.include? "Dates must not be null or blank"
   end
   test "get members created between given dates with wrong format date" do
-    
     sign_in @admin_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     
@@ -1252,35 +1244,30 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Supervisor should not get members created between given dates" do
-    
     sign_in @supervisor_user
     generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Representative should not get members created between given dates" do
-    
     sign_in @representative_user
     generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Agency agent should not get members created between given dates" do
-    
     sign_in @agency_agent
     generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Fulfillment manager should not get members created between given dates" do
-    
     sign_in @fulfillment_managment_user
     generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Api agent should get members created between given dates" do
-  
     sign_in @admin_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     first = Member.first
@@ -1289,8 +1276,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     last.update_attribute :created_at, Time.zone.now - 10.days
 
     generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
-    assert @response.body.include? first.id
-    assert @response.body.include? last.id
+    assert @response.body.include? first.id.to_s
+    assert @response.body.include? last.id.to_s
   end
 
 end
