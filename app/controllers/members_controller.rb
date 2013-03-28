@@ -15,7 +15,7 @@ class MembersController < ApplicationController
 
   def search_result
     @members = Member.paginate(:page => params[:page], :per_page => 25)
-                       .with_visible_id(params[:member][:member_id])
+                       .with_id(params[:member][:id])
                        .with_first_name_like(params[:member][:first_name])
                        .with_last_name_like(params[:member][:last_name])
                        .with_address_like(params[:member][:address])
@@ -34,7 +34,7 @@ class MembersController < ApplicationController
                        .with_external_id(params[:member][:external_id])
                        .where(:club_id => @current_club)
                        .needs_approval(params[:member][:needs_approval])
-                       .order(:visible_id)
+                       .order(:id)
                        .uniq
     respond_to do |format|
       format.html {render 'index'}
@@ -104,7 +104,7 @@ class MembersController < ApplicationController
   end
 
   def refund
-    @transaction = Transaction.find_by_uuid_and_member_id params[:transaction_id], @current_member.uuid
+    @transaction = Transaction.find_by_uuid_and_member_id params[:transaction_id], @current_member.id
     if @transaction.nil?
       flash[:error] = "Transaction not found."
       redirect_to show_member_path
@@ -166,26 +166,14 @@ class MembersController < ApplicationController
 
   def change_next_bill_date
     if request.post?
-      unless params[:next_bill_date].blank?
-        if params[:next_bill_date].to_date > Time.zone.now.to_date
-          begin
-            answer = @current_member.change_next_bill_date!(params[:next_bill_date], @current_agent)
-            if answer[:code] == Settings.error_codes.success
-              flash[:notice] = answer[:message]
-              redirect_to show_member_path
-            else
-              @errors = answer[:errors]
-            end
-          rescue Exception => e
-            flash.now[:error] = t('error_messages.airbrake_error_message')
-            Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e)
-          end
-        else
-          @errors = { :next_bill_date => "Next bill date should be older that actual date." }
-        end
+      answer = @current_member.change_next_bill_date(params[:next_bill_date], @current_agent)
+      if answer[:code] == Settings.error_codes.success
+        flash[:notice] = answer[:message]
+        redirect_to show_member_path
       else
-        @errors = { :next_bill_date => I18n.t('error_messages.next_bill_date_blank') }
-      end
+        flash.now[:error] = answer[:message]
+        @errors = answer[:errors]
+      end  
     end
   end
 

@@ -1,6 +1,5 @@
 # encoding: utf-8
 class Member < ActiveRecord::Base
-  include Extensions::UUID
   extend Extensions::Member::CountrySpecificValidations
 
   belongs_to :club
@@ -43,7 +42,6 @@ class Member < ActiveRecord::Base
   after_destroy :cancel_member_at_remote_domain
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
-
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
@@ -95,11 +93,11 @@ class Member < ActiveRecord::Base
     end
   }
   scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }
+  scope :with_id, lambda { |value| where('id = ?', value.strip) unless value.blank? }
   scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
   scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value.strip) unless value.blank? }
   scope :with_phone_area_code, lambda { |value| where('phone_area_code = ?', value.strip) unless value.blank? }
   scope :with_phone_local_number, lambda { |value| where('phone_local_number = ?', value.strip) unless value.blank? }
-  scope :with_visible_id, lambda { |value| where('visible_id = ?',value.strip) unless value.blank? }
   scope :with_first_name_like, lambda { |value| where('first_name like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_last_name_like, lambda { |value| where('last_name like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_address_like, lambda { |value| where('address like ?', '%'+value.strip+'%') unless value.blank? }
@@ -231,20 +229,31 @@ class Member < ActiveRecord::Base
   end
 
   # Changes next bill date.
-  def change_next_bill_date!(next_bill_date, current_agent = nil)
-    if self.valid? and not self.active_credit_card.expired?  
-      self.next_retry_bill_date = next_bill_date
-      self.bill_date = next_bill_date
-      self.save!
+  def change_next_bill_date(next_bill_date, current_agent = nil)
+    if next_bill_date.blank?
+      errors = { :next_bill_date => 'is blank' }
+      answer = { :message => I18n.t('error_messages.next_bill_date_blank'), :code => Settings.error_codes.next_bill_date_blank, :errors => errors }
+    elsif next_bill_date.to_datetime < Time.zone.now.to_date
+      errors = { :next_bill_date => 'Is prior to actual date' }
+      answer   = { :message => "Next bill date should be older that actual date.", :code => Settings.error_codes.next_bill_date_prior_actual_date, :errors => errors }
+    elsif self.valid? and not self.active_credit_card.expired?  
+      self.next_retry_bill_date = next_bill_date.to_datetime
+      self.bill_date = next_bill_date.to_datetime
+      self.save(:validate => false)
       message = "Next bill date changed to #{next_bill_date}"
       Auditory.audit(current_agent, self, message, self, Settings.operation_types.change_next_bill_date)
       answer = {:message => message, :code => Settings.error_codes.success }
     else
       errors = self.errors.to_hash
       errors = errors.merge!({:credit_card => "is expired"}) if self.active_credit_card.expired?
-      answer = {:errors => errors, :code => Settings.error_codes.member_data_invalid }
+      answer = { :errors => errors, :code => Settings.error_codes.member_data_invalid }
     end
-    answer 
+    answer
+  rescue ArgumentError => e
+    return { :message => "Next bill date wrong format.", :errors => { :next_bill_date => "invalid date"}, :code => Settings.error_codes.wrong_data } 
+  rescue Exception => e
+    Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e, :parameters => { :member => self.inspect })
+    return { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.could_not_change_next_bill_date }
   end
 
   # Returns a string with first and last name concatenated. 
@@ -532,7 +541,7 @@ class Member < ActiveRecord::Base
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
 
-      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :v_id => self.visible_id, :autologin_url => self.full_autologin_url.to_s }
+      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :autologin_url => self.full_autologin_url.to_s }
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "Member:enroll" : "Member:recovery/save the sale") + " -- member turned invalid while enrolling"
@@ -559,7 +568,7 @@ class Member < ActiveRecord::Base
           f.product_package = product.package
           f.recurrent = product.recurrent 
         end
-        f.member_id = self.uuid
+        f.member_id = self.id
         f.save
         answer = f.decrease_stock!
         unless answer[:code] == Settings.error_codes.success
@@ -801,7 +810,7 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid}"
+          Rails.logger.info "  * processing member ##{member.id}"
           member.sync_to_pardot unless member.pardot_member.nil?
         rescue Exception => e
           Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
@@ -823,7 +832,7 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid} nbd: #{member.next_retry_bill_date}"
+          Rails.logger.info "  * processing member ##{member.id} nbd: #{member.next_retry_bill_date}"
           member.bill_membership
         rescue Exception => e
           Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect, :credit_card => member.active_credit_card.inspect })
@@ -873,7 +882,7 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid}"
+          Rails.logger.info "  * processing member ##{member.id}"
           member.reset_club_cash
         rescue Exception => e
           Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
@@ -914,7 +923,7 @@ class Member < ActiveRecord::Base
     Member.find_in_batches( :conditions => ("sync_status IN ('with_error', 'not_synced')") ) do |group|
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{group.count} members"
       group.each do |member|
-        Rails.logger.info "  * processing member ##{member.uuid}"
+        Rails.logger.info "  * processing member ##{member.id}"
         api_m = member.api_member
         unless api_m.nil?
           if api_m.save!(force: true)
@@ -946,7 +955,7 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid}"
+          Rails.logger.info "  * processing member ##{member.id}"
           Communication.deliver!(:birthday, member)
         rescue Exception => e
           Airbrake.notify(:error_class => "Members::send_happy_birthday", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
@@ -962,7 +971,7 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.uuid}"
+          Rails.logger.info "  * processing member ##{member.id}"
           member.send_pre_bill
         rescue Exception => e
           Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })

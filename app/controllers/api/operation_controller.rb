@@ -1,27 +1,23 @@
 class Api::OperationController < ApplicationController
 
-	# Method : POST
-  #
+
+  ##
   # Creates a new operation related to a member
   #
+  # @resource /api/v1/members/:member_id/operation
+  # @action POST
   #
-  # [url] /api/v1/members/:member_id/operation
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # [member_id] ID of the member. This ID is unique for each member. (32 characters string). This value is used by platform. Have in mind that this value is part of the url.
-  # [description] Text that describes the operation in a few words. (Eg. "VIP event number #12 registered for 2013-03-14" or "VIP event number #12 canceled" )
-  # [operation_type] Integer value related to the operation type. Options:
-  #                  * [900] vip_event_registration
-  #                  * [901] vip_event_cancelation
-  # [operation_date] If this value is nil we save that operation with Time.zone.now
-  # [message] Shows the method results and also informs the errors.
-  # [code] Code related to the method result.
-  #
-  # @param [String] api_key
-  # @param [String] description
-  # @param [Integer] operation_type
-  # @param [String] operation_date
-  # @return [String] *message*
-  # @return [Integer] *code*
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [Integer] member_id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @optional [Integer] description Description of the operation. It is a text field.
+  # @required [Integer] operation_type message Integer value related to the operation type. Operations supported at the moment:
+  #   <ul>
+  #     <li> <strong>900</strong> vip_event_registration </li>
+  #     <li> <strong>901</strong> vip_event_cancelation </li>
+  #   </ul>
+  # @required [String] operation_date If this value is nil we save that operation with Time.zone.now
+  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] message Shows the method results and also informs the errors.
   # 
 	def create
     begin

@@ -26,7 +26,7 @@ class Transaction < ActiveRecord::Base
   def member=(member)
     self.member_id = member.id
     # MeS supports only 17 characters on order_id
-    self.invoice_number = member.visible_id
+    self.invoice_number = member.id
     self.first_name = member.first_name
     self.last_name = member.last_name
     self.phone_number = member.full_phone_number

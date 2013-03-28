@@ -100,7 +100,7 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search member by member id" do
     setup_search
-    search_member("member[member_id]", "#{@search_member.visible_id}", @search_member)
+    search_member("member[member_id]", "#{@search_member.id}", @search_member)
   end
 
   test "search member by first name" do
@@ -169,7 +169,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     }
     within("#members")do
       wait_until {
-        assert page.has_content?(Member.find_by_visible_id(24).full_name)
+        assert page.has_content?(Member.find_by_id(24).full_name)
       }
     end
 
@@ -180,7 +180,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#members")do
       wait_until {
         click_on("2")
-        if page.has_content?(Member.find_by_visible_id(26).full_name)
+        if page.has_content?(Member.find_by_id(26).full_name)
           assert true
         else
           assert false, "The last member was not found"
@@ -194,7 +194,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#members")do
       wait_until {
         click_on("3")
-        if page.has_content?(Member.find_by_visible_id(51).full_name)
+        if page.has_content?(Member.find_by_id(51).full_name)
           assert true
         else
           assert false, "The last member was not found"
@@ -208,7 +208,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#members")do
       wait_until {
         click_on("4")
-        if page.has_content?(Member.find_by_visible_id(76).full_name)
+        if page.has_content?(Member.find_by_id(76).full_name)
           assert true
         else
           assert false, "The last member was not found"
@@ -226,10 +226,10 @@ class MembersSearchTest < ActionController::IntegrationTest
   
   test "display member" do
     setup_search
-    search_member("member[member_id]", "#{@search_member.visible_id}", @search_member)
+    search_member("member[member_id]", "#{@search_member.id}", @search_member)
     within("#members") do
       wait_until {
-        assert page.has_content?("#{@search_member.visible_id}")
+        assert page.has_content?("#{@search_member.id}")
       }
     end
     page.execute_script("window.jQuery('.odd:first a:first').find('.icon-zoom-in').click()")
@@ -480,7 +480,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     member_to_seach = Member.first
     within("#personal_details")do
       wait_until{
-        fill_in "member[member_id]", :with => @saved_member.visible_id
+        fill_in "member[member_id]", :with => @saved_member.id
         fill_in "member[first_name]", :with => @saved_member.first_name
         fill_in "member[last_name]", :with => @saved_member.last_name
         fill_in "member[email]", :with => @saved_member.email
@@ -526,7 +526,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     member_to_seach = Member.first
     within("#personal_details")do
       wait_until{
-        fill_in "member[member_id]", :with => " #{@saved_member.visible_id} "
+        fill_in "member[member_id]", :with => " #{@saved_member.id} "
         fill_in "member[first_name]", :with => " #{@saved_member.first_name} "
         fill_in "member[last_name]", :with => " #{@saved_member.last_name} "
         fill_in "member[email]", :with => " #{@saved_member.email} "
@@ -581,7 +581,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#members")do
       wait_until{
         assert page.has_content?(@member_with_external_id.status)
-        assert page.has_content?(@member_with_external_id.visible_id.to_s)
+        assert page.has_content?(@member_with_external_id.id.to_s)
         assert page.has_content?(@member_with_external_id.external_id.to_s)
         assert page.has_content?(@member_with_external_id.full_name)
         assert page.has_content?(@member_with_external_id.full_address)
@@ -679,7 +679,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member = create_active_member(@terms_of_membership_with_gateway_needs_approval, :applied_member, :enrollment_info, {}, { :created_by => @admin_agent })
 
     sign_in_as(@admin_agent)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     confirm_ok_js
     click_link_or_button 'Approve'
@@ -706,7 +706,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member = create_active_member(@terms_of_membership_with_gateway_needs_approval, :applied_member, :enrollment_info, {}, { :created_by => @admin_agent })
 
     sign_in_as(@admin_agent)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     confirm_ok_js
     click_link_or_button 'Reject'
@@ -758,7 +758,7 @@ class MembersSearchTest < ActionController::IntegrationTest
   test "canceled date will not be changed when it is set." do
     setup_member
     cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     click_link_or_button 'Cancel'
@@ -787,7 +787,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled!
     @saved_member.update_attribute(:blacklisted,true)
 
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     click_link_or_button 'Search'
 

@@ -35,7 +35,7 @@ module Drupal
             sync_status: "with_error"
           }
         end
-        ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+        ::Member.where(id: self.member.id).limit(1).update_all(data)
         self.member.reload rescue self.member
       end
     end

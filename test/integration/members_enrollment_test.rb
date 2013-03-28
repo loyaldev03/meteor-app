@@ -31,7 +31,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 		end
 
     sign_in_as(@admin_agent)
-   end
+  end
 
   def setup_email_templates
     et = EmailTemplate.new :name => "Day 7 - Trial", :client => :lyris, :template_type => :pillar
@@ -122,7 +122,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @club.save
     Time.zone = timezone
     @saved_member.reload
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(@saved_member.member_since_date, :format => :only_date)) }
     within("#td_mi_join_date") { assert page.has_content?(I18n.l(@saved_member.join_date, :format => :only_date)) }    
     within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(@saved_member.next_retry_bill_date, :format => :only_date)) }    
@@ -143,7 +143,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     Member.send_pillar_emails
     sleep 3
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){ click_on 'Communications' }
     within("#communication"){ assert page.has_content?(template_name) }
     within('.nav-tabs'){ click_on 'Operations' }
@@ -151,7 +151,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     assert page.has_content?(template_name)
     assert page.has_no_content?("Member enrolled successfully $0.0")
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
   end
 
   ###########################################################
@@ -207,7 +207,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#td_mi_external_id") { assert page.has_content?(unsaved_member.external_id) }
 
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
-    search_member("member[member_id]", "#{created_member.visible_id}", created_member)
+    search_member("member[member_id]", "#{created_member.id}", created_member)
   end
 
 	test "new member for with external_id not requiered" do
@@ -387,10 +387,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   # return to member's profile from terms of membership
   test "show terms of membership" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     validate_terms_of_membership_show_page(@saved_member) 
     click_link_or_button('Return to member show')
-    wait_until{ assert find_field('input_visible_id').value == "#{@saved_member.visible_id}" }
+    wait_until{ assert find_field('input_id').value == "#{@saved_member.id}" }
   end
 
   test "create member with gender male" do
@@ -470,7 +470,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   test "should not let bill date to be edited" do
   	setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_link_or_button 'Edit'
 
     assert page.has_no_selector?('member[bill_date]')
@@ -484,7 +484,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     		assert page.has_no_selector?('member[bill_date]')
     	}
   	end
-  # end
+  end
 
   test "display all operations on member profile" do
   	setup_member(false)
@@ -493,7 +493,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     saved_member = create_member(unsaved_member)
     generate_operations(saved_member)
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.id)
     wait_until{ assert find_field('input_first_name').value == saved_member.first_name }
 
 
@@ -522,7 +522,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :resource_type => 'Member', :member_id => @saved_member.id, 
                                 :description => 'Member updated succesfully last' )
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within("#operations_table")do
       wait_until{
@@ -554,7 +554,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :operation_type => 104,
                                 :description => 'Member enrolled - 103')
     }
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){ click_on 'Operations'}
     within("#dataTableSelect"){ select('billing', :from => 'operation[operation_type]') }
     within("#operations_table")do
@@ -589,7 +589,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :operation_type => 203,
                                 :description => 'Blacklisted member. Reason: Too much spam - 203')
     }
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){ click_on 'Operations'}
     within("#dataTableSelect"){ select('profile', :from => 'operation[operation_type]') }
     sleep 2
@@ -624,7 +624,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :operation_type => 303,
                                 :description => 'Communication sent - 303')
     }
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){ click_on 'Operations'}
     within("#dataTableSelect"){ select('communications', :from => 'operation[operation_type]') }
     sleep 2
@@ -639,7 +639,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "see operations grouped by others from lastest to newest" do
     setup_member
     generate_operations(@saved_member)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     10.times{FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 1000,
@@ -670,7 +670,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   test "create blank member note" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_link_or_button 'Add a note'
     click_link_or_button 'Save note'
     within("#member_notes_table"){ assert page.has_content?("Can't be blank.") }
@@ -683,7 +683,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     @saved_member.recovered
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     validate_view_member_base(@saved_member)
   end
 
@@ -718,7 +718,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
 
     @saved_member.set_as_canceled!
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
     click_link_or_button "Recover"
@@ -747,7 +747,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @saved_member.reload
 
     @saved_member.set_as_canceled!
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
 
@@ -761,7 +761,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     assert_not_equal @saved_member.status, "lapsed"
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#td_mi_reactivation_times"){ assert page.has_content?("1") }
@@ -859,7 +859,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @saved_member = Member.find_by_email(unsaved_member.email)  
 
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     click_link_or_button 'Edit'
@@ -890,7 +890,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @saved_member = Member.find_by_email(unsaved_member.email)  
     @saved_member.set_as_active
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     sleep 1
     within("#table_membership_information") do
@@ -906,7 +906,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within('.nav-tabs'){ click_on 'Operations'}
     within("#operations_table") do
       assert page.has_content?("Communication 'Test active' sent")
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     end
   end
 
@@ -920,7 +920,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:birth_date, Time.zone.now)
     Member.send_happy_birthday
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within('.nav-tabs'){ click_on 'Communications' }
     within("#communication") do
@@ -932,7 +932,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within('.nav-tabs'){ click_on 'Operations' }
     within("#operations_table") do
       assert page.has_content?("Communication 'Test birthday' sent")
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     end
   end
 
@@ -989,7 +989,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     FactoryGirl.create(:operation, :description => 'others', :operation_type => Settings.operation_types.others, :member_id => created_member.id, :created_by_id => @admin_agent.id)
 
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.id)
     within('.nav-tabs'){ click_on 'Operations' }
     within("#operations") do
       select 'communications', :from => "operation[operation_type]"
@@ -1162,7 +1162,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     add_credit_card(created_member, credit_card)
 
-    visit show_member_path(:partner_prefix => created_member.club.partner.prefix, :club_prefix => created_member.club.name, :member_prefix => created_member.visible_id)
+    visit show_member_path(:partner_prefix => created_member.club.partner.prefix, :club_prefix => created_member.club.name, :member_prefix => created_member.id)
     click_on 'Add a credit card'
     active_merchant_stubs_store(credit_card.number)
 
@@ -1186,5 +1186,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     validate_view_member_base(@saved_member)
     add_club_cash(@saved_member, 10, "Generic description",true)
   end
+
 end
 

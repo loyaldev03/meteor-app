@@ -72,6 +72,19 @@ class Api::MembersControllerTest < ActionController::TestCase
                               }.merge(options),:format => :json})
   end
 
+  def generate_put_next_bill_date(next_bill_date)
+    put( :next_bill_date, { :member_id => @member.id,
+                            :next_bill_date => next_bill_date } )
+  end
+
+  def generate_get_by_updated(start_date, end_date)
+    get( :find_all_by_updated, { :start_date => start_date, :end_date => end_date })
+  end
+
+  def generate_get_by_created(start_date, end_date)
+    get( :find_all_by_created, { :start_date => start_date, :end_date => end_date })
+   end
+
   # Store the membership id at enrollment_infos table when enrolling a new member
   # Admin should enroll/create member with preferences
   # Billing membership by Provisional amount
@@ -1023,6 +1036,248 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member.reload
     assert_response :success
     assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@active_credit_card.number])
+  end
+
+    test "Update member's next_bill_date" do
+      
+      sign_in @admin_user
+      @member = create_active_member(@terms_of_membership, :member_with_api)
+      FactoryGirl.create :credit_card, :member_id => @member.id
+      assert_difference('Operation.count') do
+        generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      end
+      @member.reload
+      assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
+    end
+  
+    test "Update member's next_bill_date with wrong date format" do
+      
+      sign_in @admin_user
+      @member = create_active_member(@terms_of_membership, :member_with_api)
+      FactoryGirl.create :credit_card, :member_id => @member.id
+      assert_difference('Operation.count',0) do
+        generate_put_next_bill_date( "25012015" )
+      end
+      assert @response.body.include? "Next bill date wrong format." 
+    end
+
+  test "Update member's next_bill_date with date prior to actual date" do
+    
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now - 3.days, :format => :only_date) )
+    end
+    assert @response.body.include? "Next bill date should be older that actual date" 
+    assert @response.body.include? "Is prior to actual date" 
+  end
+
+  test "Update member's next_bill_date with blank date" do
+    
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( "" )
+    end
+    assert @response.body.include? "Next bill date should not be blank" 
+    assert @response.body.include? "is blank" 
+  end
+
+  test "Supervisor should not updates member's next_bill_date" do
+    
+    sign_in @supervisor_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      assert_response :unauthorized
+    end
+  end
+
+  test "Representative should not updates member's next_bill_date" do
+    
+    sign_in @representative_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      assert_response :unauthorized
+    end
+  end
+
+  test "Agency should not updates member's next_bill_date" do
+    
+    sign_in @agency_agent
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      assert_response :unauthorized
+    end
+  end
+
+  test "Fulfillment manager should not updates member's next_bill_date" do
+    
+    sign_in @fulfillment_managment_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      assert_response :unauthorized
+    end
+  end
+
+  test "Api agent should update member's next_bill_date" do
+    
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    assert_difference('Operation.count') do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    @member.reload
+    assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
+  end
+
+
+  test "get members updated between given dates" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    first = Member.first
+    last = Member.last
+    first.update_attribute :updated_at, Time.zone.now - 10.days
+    last.update_attribute :updated_at, Time.zone.now - 10.days
+
+    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    assert @response.body.include? first.id.to_s
+    assert @response.body.include? last.id.to_s
+  end
+
+  test "get members updated between given dates with blank date" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    
+    generate_get_by_updated "",Time.zone.now-10.day
+    assert @response.body.include? "Dates must not be null or blank"
+    generate_get_by_updated Time.zone.now-10.day,""
+    assert @response.body.include? "Dates must not be null or blank"
+  end
+  test "get members updated between given dates with wrong format date" do
+    
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    
+    generate_get_by_updated "1234567",Time.zone.now-10.day
+    assert @response.body.include? "Wrong date format"
+    generate_get_by_updated Time.zone.now-10.day,"1234567"
+    assert @response.body.include? "Wrong date format"
+  end
+
+  test "Representative should not get members updated between given dates" do
+    sign_in @representative_user
+    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
+
+  test "Supervisor should not get members updated between given dates" do
+    sign_in @supervisor_user
+    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
+
+  test "Agency should not get members updated between given dates" do
+    sign_in @agency_agent
+    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
+
+  test "Fulfillment manager should not get members updated between given dates" do
+    sign_in @fulfillment_managment_user
+    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
+  test "Api should not get members updated between given dates" do
+    sign_in @api_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    first = Member.first
+    last = Member.last
+    first.update_attribute :updated_at, Time.zone.now - 10.days
+    last.update_attribute :updated_at, Time.zone.now - 10.days
+
+    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    assert @response.body.include? first.id.to_s
+    assert @response.body.include? last.id.to_s
+  end
+
+  test "get members created between given dates" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    first = Member.first
+    last = Member.last
+    first.update_attribute :created_at, Time.zone.now - 10.days
+    last.update_attribute :created_at, Time.zone.now - 10.days
+
+    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    assert @response.body.include? first.id.to_s
+    assert @response.body.include? last.id.to_s
+  end
+
+  test "get members created between given dates with blank date" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    
+    generate_get_by_created "",Time.zone.now-10.day
+    assert @response.body.include? "Dates must not be null or blank"
+    generate_get_by_created Time.zone.now-10.day,""
+    assert @response.body.include? "Dates must not be null or blank"
+  end
+  test "get members created between given dates with wrong format date" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    
+    generate_get_by_created "1234567",Time.zone.now-10.day
+    assert @response.body.include? "Wrong date format"
+    generate_get_by_created Time.zone.now-10.day,"1234567"
+    assert @response.body.include? "Wrong date format"
+  end
+
+  test "Supervisor should not get members created between given dates" do
+    sign_in @supervisor_user
+    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
+
+  test "Representative should not get members created between given dates" do
+    sign_in @representative_user
+    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
+
+  test "Agency agent should not get members created between given dates" do
+    sign_in @agency_agent
+    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
+
+  test "Fulfillment manager should not get members created between given dates" do
+    sign_in @fulfillment_managment_user
+    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
+
+  test "Api agent should get members created between given dates" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    first = Member.first
+    last = Member.last
+    first.update_attribute :created_at, Time.zone.now - 10.days
+    last.update_attribute :created_at, Time.zone.now - 10.days
+
+    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    assert @response.body.include? first.id.to_s
+    assert @response.body.include? last.id.to_s
   end
 
 end

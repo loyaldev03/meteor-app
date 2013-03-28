@@ -8,9 +8,9 @@ ActiveRecord::Base.logger = @log
 KIT_CARD_FULFILLMENT = "KIT-CARD"
 
 def add_fulfillment(member)
-  unless @campaign.product_sku.blank?
-    phoenix_f = PhoenixFulfillment.find_or_create_by_member_id @member.uuid
-    phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.visible_id.to_s
+  if @campaign.product_sku.to_s.size > 3
+    phoenix_f = PhoenixFulfillment.find_or_create_by_member_id @member.id
+    phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.id.to_s
     phoenix_f.product_package = KIT_CARD_FULFILLMENT
     phoenix_f.product_sku = KIT_CARD_FULFILLMENT
     phoenix_f.assigned_at = Time.now.utc if phoenix_f.assigned_at.nil?
@@ -23,7 +23,7 @@ def add_fulfillment(member)
 end
 
 def remove_fulfillment
-  phoenix_f = PhoenixFulfillment.find_by_member_id @member.uuid
+  phoenix_f = PhoenixFulfillment.find_by_member_id @member.id
   phoenix_f.destroy unless phoenix_f.nil?
 end
 
@@ -132,11 +132,10 @@ end
 
 # 1- update existing members
 def update_members
-  #base = BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) and is_prospect = false ")
   base = BillingMember.where("imported_at IS NOT NULL AND (updated_at > imported_at or phoenix_updated_at > imported_at) and is_prospect = false ")
   base.find_in_batches do |group|
     puts "cant #{group.count}"
-    group.each do |member| 
+    group.each do |member|
       tz = Time.now.utc
       get_campaign_and_tom_id(member.campaign_id)
       if @tom_id.nil?
@@ -146,7 +145,7 @@ def update_members
 
       @log.info "  * processing member ##{member.id}"
       begin
-        phoenix = PhoenixMember.find_by_club_id_and_visible_id(CLUB, member.id)
+        phoenix = PhoenixMember.find_by_club_id_and_id(CLUB, member.id)
         if phoenix.nil?
           puts "  * member ##{member.id} not found on phoenix ?? "
           next
@@ -163,7 +162,7 @@ def update_members
         # create Membership data
         set_membership_data(@tom_id, member)
 
-        phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.uuid, true)
+        phoenix_cc = PhoenixCreditCard.find_by_member_id_and_active(phoenix.id, true)
 
         new_phoenix_cc = PhoenixCreditCard.new 
         fill_credit_card(new_phoenix_cc, member, phoenix)
@@ -206,8 +205,8 @@ end
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
       # " AND id <= 20243965592 " +
-      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND quota IS NOT NULL AND phoenix_join_date IS NOT NULL " +
-      " AND (active = 1 or trial = 1) AND blacklisted IS NULL  " +
+      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date IS NOT NULL AND phoenix_prospect_id IS NOT NULL" +
+      " AND (active = 1 or trial = 1) AND blacklisted IS NULL AND phoenix_status IS NOT NULL AND phoenix_email IS NOT NULL " +
       " AND credit_card_token IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |member| 
@@ -231,7 +230,7 @@ def add_new_members
 
         phoenix = PhoenixMember.new 
         phoenix.club_id = CLUB
-        phoenix.visible_id = member.id
+        phoenix.id = member.id
         set_member_data(phoenix, member)
         phoenix.status = member.phoenix_status
         phoenix.recycled_times = 0
@@ -274,7 +273,7 @@ end
 
 def blacklist_ccs(member, phoenix)
   if member.blacklisted
-    ccs = PhoenixCreditCard.find_all_by_member_id_and_blacklisted(phoenix.uuid, false)
+    ccs = PhoenixCreditCard.find_all_by_member_id_and_blacklisted(phoenix.id, false)
     ccs.each {|s| s.update_attribute :blacklisted, true }
   end  
 end
@@ -288,7 +287,7 @@ def fill_credit_card(phoenix_cc, member, phoenix)
   phoenix_cc.last_digits = member.credit_card_last_digits
   phoenix_cc.updated_at = member.updated_at
   fill_aus_attributes(phoenix_cc, member)
-  phoenix_cc.member_id = phoenix.uuid
+  phoenix_cc.member_id = phoenix.id
 end
 
 

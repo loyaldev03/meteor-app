@@ -30,7 +30,7 @@ class MembersCancelTest < ActionController::IntegrationTest
   #Check cancel email - It is send it by CS inmediate after member is lapsed
   test "cancel member" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_on 'Cancel'
     date_time = Time.zone.now + 1.days
 
@@ -56,7 +56,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     @saved_member.reload
     @saved_member.set_as_canceled!
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
     within("#table_membership_information") do
       assert page.has_content?("lapsed")

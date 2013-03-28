@@ -4,7 +4,7 @@
     <thead>
     	<tr>
         <th style="width: 110px;"> <%= t('activerecord.attributes.member.status') %> </th>
-        <th> <%= t('activerecord.attributes.member.visible_id') %> </th>
+        <th> <%= t('activerecord.attributes.member.id') %> </th>
         <% if @current_club.requires_external_id %>
           <th> <%= t('activerecord.attributes.member.external_id') %> </th>
         <% end %>
@@ -27,16 +27,16 @@
         <%= member.status %>
         <% end %>
         </td>
-        <td> <%= member.visible_id %> </td>
+        <td> <%= member.id %> </td>
         <% if @current_club.requires_external_id %>
           <td> <%= member.external_id if !member.external_id.nil? %> </td>
         <% end %>
         <td> <%= member.full_name %> </td>
         <td> <%= member.full_address %> </td>
-        <td><a href="<%= show_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
+        <td><a href="<%= show_member_path(:member_prefix => member.id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
         <td>
           <% if can? :edit, Member %>
-            <a href="<%= edit_member_path(:member_prefix => member.visible_id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a>
+            <a href="<%= edit_member_path(:member_prefix => member.id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a>
           <% end %>
         </td>
         <td>

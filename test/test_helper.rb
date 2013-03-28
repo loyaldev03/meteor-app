@@ -145,7 +145,7 @@ module ActionController
       sleep 5
       within("#members") do
         assert page.has_content?(validate_obj.status)
-        assert page.has_content?("#{validate_obj.visible_id}")
+        assert page.has_content?("#{validate_obj.id}")
         assert page.has_content?(validate_obj.full_name)
         assert page.has_content?(validate_obj.full_address)
 
@@ -284,7 +284,7 @@ module ActionController
 
     answer = member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id)
     
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
@@ -323,7 +323,7 @@ module ActionController
     
     if do_refund
       transaction = Transaction.last
-      visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id, :transaction_id => transaction.id)
+      visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id, :transaction_id => transaction.id)
 
       wait_until{ assert page.has_content?(transaction.amount_available_to_refund.to_s) }
 
@@ -361,7 +361,7 @@ module ActionController
   end
 
   def add_credit_card(member,credit_card)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id)
     click_on 'Add a credit card'
     active_merchant_stubs_store(credit_card.number)
 
@@ -375,7 +375,7 @@ module ActionController
   def add_club_cash(member, amount, description, validate = true)
     previous_amount = member.club_cash_amount
     new_amount = previous_amount + amount
-    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
     within("#table_membership_information"){ click_on 'Add club cash' }
     
     alert_ok_js
@@ -393,7 +393,7 @@ module ActionController
 
   def save_the_sale(member, new_terms_of_membership, validate = true)
     old_membership = member.current_membership  
-    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
 
     click_on 'Save the sale'    
     select(new_terms_of_membership.name, :from => 'terms_of_membership_id')
@@ -411,7 +411,7 @@ module ActionController
   end
 
   def recover_member(member,new_tom, validate = true)
-    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
     wait_until{ assert find_field('input_first_name').value == member.first_name }
     click_link_or_button "Recover"
     select(new_tom.name, :from => 'terms_of_membership_id')
@@ -427,7 +427,7 @@ module ActionController
   end
 
   def set_as_undeliverable_member(member, reason = 'Undeliverable', validate = true)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id)
     click_link_or_button "Set undeliverable"
     within("#undeliverable_table"){
       fill_in reason, :with => reason

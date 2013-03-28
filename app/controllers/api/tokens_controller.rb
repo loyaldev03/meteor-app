@@ -2,19 +2,21 @@ class Api::TokensController < ApplicationController
   skip_before_filter :verify_authenticity_token 
   skip_before_filter :authenticate_agent!
   before_filter :check_authentification, :except => :create
-
   respond_to :json
-
-  # Method  : POST
-  # 
-  # [url] /api/v1/tokens
+  
+  ##
+  # Returns the stock available for a product. 
   #
-  # @param [Hash] email
-  # @param [Hash] password
-  # @return [string] *message*: Shows the method results and also informs the errors.
-  # @return [Integer] *status*: Code related to the method result.
-  # @return [String] *token*: authentication token
-  # @return [String] *location*
+  # @resource /api/v1/tokens
+  # @action POST
+  #
+  # @required [String] email Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] password Sku of the product we are interested in. This parameter is the product description. 
+  # @response_field [Integer] status Code related to the method result.
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [String] token authentication token.
+  # @response_field [String] location
+  #
   def create
     email = params[:email]
     password = params[:password]

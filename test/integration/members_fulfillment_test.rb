@@ -85,7 +85,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
   test "cancel member and check if not_processed fulfillments were updated to canceled" do
     setup_member
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
@@ -97,7 +97,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
     @saved_member.set_as_canceled!
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
@@ -114,7 +114,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     setup_member
     @fulfillment.set_as_processing
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
@@ -126,7 +126,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
     @saved_member.set_as_canceled!
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
@@ -143,7 +143,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     setup_member
     @fulfillment.set_as_out_of_stock
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
@@ -155,7 +155,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
     @saved_member.set_as_canceled!
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
@@ -173,7 +173,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     @fulfillment.set_as_processing
     @fulfillment.set_as_undeliverable
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
@@ -185,7 +185,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
     @saved_member.set_as_canceled!
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
@@ -202,22 +202,18 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     setup_member
     @fulfillment.set_as_processing    
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
     within("#fulfillments")do
-      wait_until{
-        assert page.has_selector?('#mark_as_sent')     
-      }
+      assert page.has_selector?('#mark_as_sent')     
     end
 
     click_link_or_button('mark_as_sent')
 
     within("#fulfillments")do
-      wait_until{
-        assert page.has_content?("Fulfillment #{@fulfillment.product_sku} was set as sent.")    
-      }
+      assert page.has_content?("Fulfillment #{@fulfillment.product_sku} was set as sent.")    
     end
     @fulfillment.reload
     assert_equal @fulfillment.status,'sent'
@@ -226,7 +222,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
   test "display 'resend' when fulfillment is out_of_stock on memebr's profile." do
     setup_member
     @fulfillment.set_as_out_of_stock    
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
@@ -278,7 +274,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal(fulfillment.renewable_at, nil)
     assert_equal(fulfillment.status, 'not_processed')
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{
       assert find_field('input_first_name').value == @saved_member.first_name
     }
@@ -315,7 +311,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal(fulfillment.renewable_at, fulfillment.assigned_at + 1.year)
     assert_equal(fulfillment.status, 'not_processed')
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{
       assert find_field('input_first_name').value == @saved_member.first_name
     }
@@ -352,7 +348,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal(fulfillment.renewable_at, fulfillment.assigned_at + 1.year)
     assert_equal(fulfillment.status, 'out_of_stock')
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{
       assert find_field('input_first_name').value == @saved_member.first_name
     }
@@ -389,7 +385,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal(fulfillment.renewable_at, nil)
     assert_equal(fulfillment.status, 'out_of_stock')
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{
       assert find_field('input_first_name').value == @saved_member.first_name
     }
@@ -424,7 +420,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal(fulfillment.renewable_at, nil)
     assert_equal(fulfillment.status, 'out_of_stock')
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{
       assert find_field('input_first_name').value == @saved_member.first_name
     }
@@ -452,7 +448,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{
       assert find_field('input_first_name').value == @saved_member.first_name
     }
@@ -489,7 +485,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -561,7 +557,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -617,7 +613,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -667,7 +663,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -720,7 +716,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -767,7 +763,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button('Report')
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -809,7 +805,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button('Report')
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -823,7 +819,7 @@ test "Enroll a member with recurrent product and it on the list" do
         wait_until{ assert page.has_content?("Fulfillment #{product.sku} was set as sent.") }
       }
     end
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Fulfillments")
@@ -858,7 +854,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button('Report')
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -876,7 +872,7 @@ test "Enroll a member with recurrent product and it on the list" do
         wait_until{ page.has_content?("#{fulfillment.member.full_address} is undeliverable. Reason: spam")}
       }
     end
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Fulfillments")
@@ -915,7 +911,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button('Report')
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -952,7 +948,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button('Report')
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -981,7 +977,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button('Report')
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -1027,7 +1023,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button('Report')
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -1040,7 +1036,7 @@ test "Enroll a member with recurrent product and it on the list" do
       click_link_or_button('Resend')
       wait_until{ assert page.has_content?('Fulfillment KIT was marked to be delivered next time.') }
     end
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Fulfillments")
@@ -1077,7 +1073,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillment.renew!
 
     sleep 1
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Fulfillments")
@@ -1121,7 +1117,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillment.reload
     fulfillment.renew!
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Fulfillments")
@@ -1176,7 +1172,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button('Report')
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
@@ -1207,7 +1203,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @fulfillment.reload
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{@fulfillment.member.visible_id}")
+        assert page.has_content?("#{@fulfillment.member.id}")
         assert page.has_content?(@fulfillment.member.full_name)
         assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
         assert page.has_content?(@fulfillment.product_sku)
@@ -1235,7 +1231,7 @@ test "Enroll a member with recurrent product and it on the list" do
     
     within("#report_results")do
       wait_until{
-        assert page.has_content?(@fulfillment.member.visible_id.to_s)
+        assert page.has_content?(@fulfillment.member.id.to_s)
         assert page.has_content?(@fulfillment.member.full_name)
         assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
         assert page.has_content?(@fulfillment.product_sku)
@@ -1290,7 +1286,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @fulfillment.reload
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{@fulfillment.member.visible_id}")
+        assert page.has_content?("#{@fulfillment.member.id}")
         assert page.has_content?(@fulfillment.member.full_name)
         assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
         assert page.has_content?(@fulfillment.product_sku)
@@ -1327,7 +1323,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     @saved_member.set_as_canceled
     @saved_member.reload
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#table_membership_information")do
@@ -1352,7 +1348,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     @saved_member.set_as_canceled
     @saved_member.reload
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#table_membership_information")do
@@ -1377,7 +1373,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     @saved_member.set_as_canceled
     @saved_member.reload
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#table_membership_information")do
@@ -1404,7 +1400,7 @@ test "Enroll a member with recurrent product and it on the list" do
     wait_until{ assert_equal(@fulfillment.status, 'undeliverable') }
     @saved_member.set_as_canceled
     @saved_member.reload
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#table_membership_information")do
@@ -1431,7 +1427,7 @@ test "Enroll a member with recurrent product and it on the list" do
     wait_until{ assert_equal(@fulfillment.status, 'sent') }
     @saved_member.set_as_canceled
     @saved_member.reload
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#table_membership_information")do
@@ -1461,7 +1457,7 @@ test "Enroll a member with recurrent product and it on the list" do
     Fulfillment.process_fulfillments_up_today
     @fulfillment.reload
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs") do
@@ -1481,7 +1477,7 @@ test "Enroll a member with recurrent product and it on the list" do
     setup_member
     @fulfillment.set_as_out_of_stock
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs") do
@@ -1508,7 +1504,7 @@ test "Enroll a member with recurrent product and it on the list" do
     
     Fulfillment.process_fulfillments_up_today
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     last_fulfillment = Fulfillment.last
@@ -1548,7 +1544,7 @@ test "Enroll a member with recurrent product and it on the list" do
     
     Fulfillment.process_fulfillments_up_today
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     last_fulfillment = Fulfillment.last
@@ -1585,7 +1581,7 @@ test "Enroll a member with recurrent product and it on the list" do
     
     Fulfillment.process_fulfillments_up_today
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     last_fulfillment = Fulfillment.last
@@ -1699,7 +1695,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button('Report')
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?(fulfillment.product_sku)
@@ -1733,7 +1729,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button('Report')
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?(fulfillment.product_sku)
@@ -1768,7 +1764,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
 
     csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
-    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},KIT,\n")
+    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},KIT,\n")
 
     within("#fulfillments_table")do
       check('all_times')
@@ -1780,7 +1776,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?(fulfillment.product_sku)
@@ -1820,7 +1816,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
 
     csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
-    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},CARD,\n")
+    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},CARD,\n")
 
     within("#fulfillments_table")do
       check('all_times')
@@ -1831,7 +1827,7 @@ test "Enroll a member with recurrent product and it on the list" do
     click_link_or_button 'Report'
     within("#report_results")do
       wait_until{
-        assert page.has_content?("#{fulfillment.member.visible_id}")
+        assert page.has_content?("#{fulfillment.member.id}")
         assert page.has_content?(fulfillment.member.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?(fulfillment.product_sku)
@@ -1860,7 +1856,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member = Member.find_by_email(@member.email)
     @saved_member.set_as_canceled
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
   
     within(".nav-tabs") do
@@ -1911,7 +1907,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member = Member.find_by_email(@member.email)
     @saved_member.set_as_canceled
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
   
     within(".nav-tabs") do
@@ -2097,7 +2093,7 @@ test "Enroll a member with recurrent product and it on the list" do
     csv_string = Fulfillment.generateCSV(fulfillments, true, true) 
     assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},#{fulfillment.product_sku},#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
   
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
   
     within(".nav-tabs") do
@@ -2151,7 +2147,7 @@ test "Enroll a member with recurrent product and it on the list" do
     csv_string = Fulfillment.generateCSV(fulfillments, true, true) 
     assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},#{fulfillment.product_sku},#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
   
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
   
     within(".nav-tabs") do
@@ -2179,7 +2175,7 @@ test "Enroll a member with recurrent product and it on the list" do
     
     fulfillment.set_as_processing
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Fulfillments")
@@ -2230,7 +2226,7 @@ test "Enroll a member with recurrent product and it on the list" do
             'not_processed', Date.today, Date.today, @club.id]).type_kit
 
     csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
-    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},\n")
+    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},\n")
   
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
@@ -2290,7 +2286,7 @@ test "Enroll a member with recurrent product and it on the list" do
             'not_processed', Date.today, Date.today, @club.id]).type_card
 
     csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
-    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},\n")
+    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},\n")
   
     wait_until{page.has_content?("Fulfillments")}
     within("#fulfillments_table")do
@@ -2329,7 +2325,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
     fulfillment.set_as_processing
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     click_link_or_button 'Edit'
@@ -2348,7 +2344,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
             'processing', Date.today, Date.today, @club.id]).type_kit
     csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
-    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
+    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
   end
 
   test "Create a report fulfillment selecting CARD at product type - Chapter member status" do
@@ -2361,7 +2357,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
     fulfillment.set_as_processing
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     click_link_or_button 'Edit'
@@ -2380,7 +2376,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
             'processing', Date.today, Date.today, @club.id]).type_card
     csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
-    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.visible_id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
+    assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
   end
 
 
@@ -2453,7 +2449,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
     search_fulfillments(false, nil, nil, nil, 'sloops')
     within("#report_results"){
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
       assert page.has_content?(@saved_member.full_name)
     }
   end
@@ -2487,7 +2483,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
 
     search_fulfillments
@@ -2497,7 +2493,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
   end
 
@@ -2519,7 +2515,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
 
     search_fulfillments(false,nil,nil,'in_process')
@@ -2529,7 +2525,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
   end 
 
@@ -2551,7 +2547,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
 
     search_fulfillments(false,nil,nil,'on_hold')
@@ -2561,7 +2557,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
   end 
 
@@ -2583,7 +2579,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
 
     search_fulfillments(false,nil,nil,'sent')
@@ -2593,7 +2589,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
   end 
 
@@ -2615,7 +2611,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
 
     search_fulfillments(false,nil,nil,'out_of_stock')
@@ -2625,7 +2621,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
   end
 
@@ -2647,7 +2643,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
 
     search_fulfillments(false,nil,nil,'returned')
@@ -2657,7 +2653,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
   end
 
@@ -2679,7 +2675,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
 
     search_fulfillments(false,nil,nil,'bad_address')
@@ -2689,7 +2685,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_member.full_name)
-      assert page.has_content?(@saved_member.visible_id.to_s)
+      assert page.has_content?(@saved_member.id.to_s)
     end
   end
 
@@ -3330,7 +3326,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     generate_fulfillment_files(false, fulfillments, nil, nil, nil, 'sloops')
   end
 
-  test "Create a fulfillment file with initial-end dates and with sloop product" do
+  test "Create a fulfillment file with initial-end dates and with sloop product 2" do
     setup_member(false)
     active_merchant_stubs
     enrollment_info = FactoryGirl.build(:enrollment_info)
@@ -3403,7 +3399,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     create_member_throught_sloop(enrollment_info)
     5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
 
-    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within('.nav-tabs'){ click_on 'Fulfillments'}

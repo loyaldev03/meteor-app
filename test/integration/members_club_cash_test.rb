@@ -40,7 +40,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
   # See club cash transaction history (Only Clubs without Drupal domain)
   test "add club cash amount" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
     add_club_cash(@saved_member, 15, "Generic description")
     @saved_member.reload
@@ -49,21 +49,21 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
   test "club cash amount can't be negatibe" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
     add_club_cash(@saved_member, 15, "Generic description")
 
     add_club_cash(@saved_member, -20, "Deducting more than member has.", false)
 
     assert page.has_content?("You can not deduct 20 because the member only has 15 club cash.")
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#td_mi_club_cash_amount") { assert page.has_content?("15") }
   end
 
   # Error message when adding a wrong club cash
   test "invalid characters on club cash" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_on 'Add club cash'
 
     fill_in 'club_cash_transaction[amount]', :with => "random text"
@@ -77,7 +77,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
   test "add club cash with ammount 0" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_on 'Add club cash'
 
     fill_in 'club_cash_transaction[amount]', :with => "0"
@@ -91,13 +91,13 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
   test "add club cash with float ammount" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_on 'Add club cash'
     fill_in 'club_cash_transaction[amount]', :with => "0.99"
     alert_ok_js
     click_on 'Save club cash transaction'
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#td_mi_club_cash_amount") { assert page.has_content?("0.99") }
     within("#operations_table")do
       wait_until{
@@ -119,7 +119,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
     @saved_member.bill_membership
     sleep(3) #To wait until billing is finished.
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
   
     within("#operations_table")do
       wait_until{
@@ -130,7 +130,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
   test "member cancelation must set to 0 the club cash" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_on 'Add club cash'
     fill_in 'club_cash_transaction[amount]', :with => "99"
     alert_ok_js
@@ -145,7 +145,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     }
 
     @saved_member.set_as_canceled
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_membership_information"){
       within("#td_mi_club_cash_amount"){
         wait_until{
@@ -157,7 +157,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
   test "member cancelation must set club cash expired day as nil" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_on 'Add club cash'
     fill_in 'club_cash_transaction[amount]', :with => "99"
     alert_ok_js
@@ -172,7 +172,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     }
 
     @saved_member.set_as_canceled
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_membership_information"){
       within("#td_mi_club_cash_expire_date"){
         wait_until{
@@ -196,7 +196,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     sign_in_as @admin_agent
     @saved_member = Member.find_by_email(@member.email)
     @saved_member.bill_membership
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{
       assert find_field('input_first_name').value == @saved_member.first_name
     }
@@ -218,7 +218,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     @saved_member = Member.last
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
@@ -233,7 +233,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     wait_until{ assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount ) }
     @saved_member.reload
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
@@ -252,7 +252,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
   test "add club cash from club cash amount configured in the TOM - Monthly Member" do
     setup_member
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
@@ -267,7 +267,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     wait_until{ assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount ) }
     @saved_member.reload
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
@@ -294,7 +294,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
     sign_in_as(@admin_agent)
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
@@ -309,7 +309,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     wait_until{ assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount ) }
     @saved_member.reload
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
@@ -338,7 +338,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @saved_member.update_attribute(:state, "AL")
     sign_in_as(@admin_agent)
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     click_link_or_button('Edit')
     
@@ -352,7 +352,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @saved_member.bill_membership 
     wait_until{ assert_equal(@saved_member.club_cash_amount, 200 ) }
     @saved_member.reload
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
@@ -375,7 +375,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @saved_member.save
     date = @saved_member.club_cash_expire_date
     @saved_member.reset_club_cash
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
@@ -401,7 +401,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     @saved_member = Member.last
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
@@ -416,7 +416,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     wait_until{ assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount ) }
     @saved_member.reload
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
@@ -435,7 +435,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
   test "Check club cash amount on membership show at CS" do
     setup_member
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_membership_information")do
       click_link_or_button(@terms_of_membership_with_gateway.name)
     end 
