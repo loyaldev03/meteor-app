@@ -1,4 +1,4 @@
-<div class="page-header">
+  <div class="page-header">
   <%= render :partial => "shared/member_information" %>
 </div>
 
@@ -248,7 +248,7 @@
             <th><%= t('activerecord.attributes.member.next_retry_bill_date') %>:</th>
             <td id="td_mi_next_retry_bill_date">
               <%= I18n.l(@current_member.next_retry_bill_date, :format => :only_date) unless @current_member.next_retry_bill_date.nil? %>&nbsp;&nbsp;&nbsp;
-              <% unless @current_member.next_retry_bill_date.nil? || @current_member.lapsed? %>
+              <% if @current_member.can_change_next_bill_date? %>
                 <%= link_to(member_change_next_bill_date_path, :class => "btn btn-mini btn-info", :id => "link_member_change_next_bill_date", :disabled => (cannot? :change_next_bill_date, Member)) do %> 
                   <i class="icon-pencil"></i> Change
                 <% end %>

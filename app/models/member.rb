@@ -230,7 +230,10 @@ class Member < ActiveRecord::Base
 
   # Changes next bill date.
   def change_next_bill_date(next_bill_date, current_agent = nil)
-    if next_bill_date.blank?
+    if not self.can_change_next_bill_date?
+      errors = { :member => 'is not in billable status' }
+      answer = { :message => I18n.t('error_messages.unable_to_perform_due_member_status'), :code => Settings.error_codes.next_bill_date_blank, :errors => errors }
+    elsif next_bill_date.blank?
       errors = { :next_bill_date => 'is blank' }
       answer = { :message => I18n.t('error_messages.next_bill_date_blank'), :code => Settings.error_codes.next_bill_date_blank, :errors => errors }
     elsif next_bill_date.to_datetime < Time.zone.now.to_date
@@ -351,6 +354,10 @@ class Member < ActiveRecord::Base
       return true
     end
     false
+  end
+
+  def can_change_next_bill_date?
+    not self.next_retry_bill_date.nil? and not self.lapsed?
   end
 
   ###############################################

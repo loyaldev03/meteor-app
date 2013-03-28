@@ -459,34 +459,7 @@ class Api::MembersController < ApplicationController
     my_authorize! :api_profile, Member, member.club_id
     club = member.club
     membership = member.current_membership
-    terms_of_membership = membership.terms_of_membership
-    ei = member.enrollment_infos[0]
-    ei = if ei.blank? 
-      {} 
-    else
-      ei.attributes.symbolize_keys.slice(
-        :enrollment_amount, 
-        :product_sku, 
-        :product_description, 
-        :mega_channel, 
-        :marketing_code, 
-        :fulfillment_code, 
-        :ip_address, 
-        :user_agent, 
-        :referral_host, 
-        :referral_parameters, 
-        :referral_path, 
-        :user_id, 
-        :landing_url, 
-        :cookie_value, 
-        :cookie_set, 
-        :campaign_medium, 
-        :campaign_description,
-        :campaign_medium_version, 
-        :joint, 
-        :prospect_id
-      )
-    end
+    credit_card = member.active_credit_card
     render json: {
       code: Settings.error_codes.success,
       member: {
@@ -502,45 +475,26 @@ class Api::MembersController < ApplicationController
         phone_area_code: member.phone_area_code,
         phone_local_number: member.phone_local_number, 
         type_of_phone_number: member.type_of_phone_number,
-        club_cash_amount: member.club_cash_amount,
-        club_cash_expire_date: member.club_cash_expire_date,
         gender: member.gender,
-        bill_date: member.bill_date,
-        next_retry_bill_date: member.next_retry_bill_date,
+        bill_date: member.next_retry_bill_date,
         wrong_address: member.wrong_address,
         wrong_phone_number: member.wrong_phone_number,
         member_since_date: member.member_since_date,
         reactivation_times: member.reactivation_times,
         blacklisted: member.blacklisted,
         member_group_type_id: member.member_group_type.name,
-        recycled_times: member.recycled_times,
-        preferences: member.preferences,
-      }.merge(club.api_type == 'Drupal::Member' ? {} : {sync_status: member.sync_status, 
-                                                        last_synced_at: member.last_synced_at,
-                                                        last_sync_error_at: member.last_sync_error_at,
-                                                        last_sync_error: member.last_sync_error
-                                                       }),
+        preferences: member.preferences
+      },
       credit_card: {
-        expire_month: (member.active_credit_card && member.active_credit_card.expire_month),
-        expire_year: (member.active_credit_card && member.active_credit_card.expire_year)
+        last_4_digits: credit_card.last_digits,
+        expire_month: (credit_card && credit_card.expire_month),
+        expire_year: (credit_card && credit_card.expire_year)
       },
       current_membership:{
         status: membership.status,
         join_date: membership.join_date,
-        cancel_date: membership.cancel_date,
-        quota: membership.quota,
-        terms_of_membership:{
-          name: terms_of_membership.name,
-          description: terms_of_membership.description,
-          provisional_days: terms_of_membership.provisional_days,
-          mode: terms_of_membership.mode,
-          needs_enrollment_approval: terms_of_membership.needs_enrollment_approval,
-          installment_amount: terms_of_membership.installment_amount,
-          installment_type: terms_of_membership.installment_type,
-          club_cash_amount: terms_of_membership.club_cash_amount
-        }
-      },
-      enrollment_info: ei
+        cancel_date: membership.cancel_date
+      }
     }
   rescue ActiveRecord::RecordNotFound
     render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
@@ -610,10 +564,9 @@ class Api::MembersController < ApplicationController
   # Method : GET
   # Gets an array with the member's id that were updated between the dates given. 
   #
-  # [url] api/v1/members/report/find_all_by_updated/:start_date/:end_date
+  # [url] /api/v1/members/find_all_by_updated/:club_id/:start_date/:end_date
   # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
-  # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
-  #             Have in mind that this value is part of the url.
+  # [club_id] Id of the club where we are goint to check for memebers. 
   # [start_date] Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url. (required)
   # [end_date] Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. (required)
   #
@@ -624,31 +577,33 @@ class Api::MembersController < ApplicationController
   # @param [String] api_key
   # @param [String] start_date
   # @param [String] end_date
+  # @param [Integer] club_id
   # @return [String] *message*
   # @return [Integer] *code*
   # @return [Hash] *list*
   # 
   def find_all_by_updated
-    my_authorize! :api_find_all_by_updated, Member
+    my_authorize! :api_find_all_by_updated, Member, params[:club_id]
     if params[:start_date].blank? or params[:end_date].blank?
-      answer = { :message => "Dates must not be null or blank", :code => Settings.error_codes.wrong_data }
+      answer = { :message => "Make sure to send both start and end dates, please. There seems to be at least one as null or blank", :code => Settings.error_codes.wrong_data }
+    elsif params[:start_date].to_datetime > params[:end_date].to_datetime
+      answer = { :message => "Check both start and end date, please. Start date is greater than end date.", :code => Settings.error_codes.wrong_data }
     else
-      members_list = ( Member.where :updated_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime) ).collect &:id
+      members_list = ( Member.where :updated_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime), :club_id => params[:club_id] ).collect &:id
       answer = { :list => members_list, :code => Settings.error_codes.success }
     end
     render json: answer
     rescue ArgumentError => e
-      render json: { :message => "Wrong date format", :code => Settings.error_codes.wrong_data }
+      render json: { :message => "Check both start and end date format, please. It seams one of them is in an invalid format", :code => Settings.error_codes.wrong_data }
   end
 
 
   # Method : GET
   # Gets an array with the member's id that were created between the dates given. 
   #
-  # [url] api/v1/members/report/find_all_by_created/:start_date/:end_date
+  # [url] /api/v1/members/find_all_by_created/:club_id/:start_date/:end_date
   # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
-  # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
-  #             Have in mind that this value is part of the url.
+  # [club_id] Id of the club where we are goint to check for memebers. 
   # [start_date] Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url. (required)
   # [end_date] Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. (required)
   #
@@ -659,21 +614,24 @@ class Api::MembersController < ApplicationController
   # @param [String] api_key
   # @param [String] start_date
   # @param [String] end_date
+  # @param [Integer] club_id
   # @return [String] *message*
   # @return [Integer] *code*
   # @return [Hash] *list*
   # 
   def find_all_by_created
-    my_authorize! :api_find_all_by_created, Member
+    my_authorize! :api_find_all_by_updated, Member, params[:club_id]
     if params[:start_date].blank? or params[:end_date].blank?
-      answer = { :message => "Dates must not be null or blank", :code => Settings.error_codes.wrong_data }
+      answer = { :message => "Make sure to send both start and end dates, please. There seems to be at least one as null or blank", :code => Settings.error_codes.wrong_data }
+    elsif params[:start_date].to_datetime > params[:end_date].to_datetime
+      answer = { :message => "Check both start and end date, please. Start date is greater than end date.", :code => Settings.error_codes.wrong_data }
     else
-      members_list = ( Member.where :created_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime) ).collect &:id
+      members_list = ( Member.where :created_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime), :club_id => params[:club_id] ).collect &:id
       answer = { :list => members_list, :code => Settings.error_codes.success }
     end
     render json: answer
     rescue ArgumentError => e
-      render json: { :message => "Wrong date format", :code => Settings.error_codes.wrong_data }
+      render json: { :message => "Check both start and end date format, please. It seams one of them is in an invalid format", :code => Settings.error_codes.wrong_data } 
   end
 
 

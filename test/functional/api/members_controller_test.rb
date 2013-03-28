@@ -1,7 +1,8 @@
 require 'test_helper'
 
 class Api::MembersControllerTest < ActionController::TestCase
-  setup do
+  
+  def setup_enviroment 
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
     @representative_user = FactoryGirl.create(:confirmed_representative_agent)
     @fulfillment_manager_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
@@ -18,6 +19,11 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     @preferences = {'color' => 'green','car'=> 'dodge'}
     # request.env["devise.mapping"] = Devise.mappings[:agent]
+ 
+
+    @unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    @credit_card = FactoryGirl.build(:credit_card_master_card)
+    @enrollment_info = FactoryGirl.build(:enrollment_info)
   end
 
 
@@ -39,7 +45,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 :credit_card => {:number => @credit_card.number,
                                                :expire_month => @credit_card.expire_month,
                                                :expire_year => @credit_card.expire_year },
-                                }.merge(options), :format => :json})
+                                }.merge(options), :format => :json } )
   end  
 
   def generate_post_message(options = {})
@@ -69,7 +75,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                               :marketing_code => @enrollment_info.marketing_code,
                               :fulfillment_code => @enrollment_info.fulfillment_code,
                               :ip_address => @enrollment_info.ip_address
-                              }.merge(options),:format => :json})
+                              }.merge(options),:format => :json } )
   end
 
   def generate_put_next_bill_date(next_bill_date)
@@ -77,18 +83,19 @@ class Api::MembersControllerTest < ActionController::TestCase
                             :next_bill_date => next_bill_date } )
   end
 
-  def generate_get_by_updated(start_date, end_date)
-    get( :find_all_by_updated, { :start_date => start_date, :end_date => end_date })
+  def generate_get_by_updated(club_id, start_date, end_date)
+    get( :find_all_by_updated, { :club_id => club_id, :start_date => start_date, :end_date => end_date })
   end
 
-  def generate_get_by_created(start_date, end_date)
-    get( :find_all_by_created, { :start_date => start_date, :end_date => end_date })
-   end
+  def generate_get_by_created(club_id, start_date, end_date)
+    get( :find_all_by_created, { :club_id => club_id, :start_date => start_date, :end_date => end_date })
+  end
 
   # Store the membership id at enrollment_infos table when enrolling a new member
   # Admin should enroll/create member with preferences
   # Billing membership by Provisional amount
   test "Admin should enroll/create member with preferences" do
+    setup_enviroment
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -118,6 +125,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Member should not be enrolled if the email is already is used." do
+    setup_enviroment
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -153,6 +161,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   # test "Member should not be enrolled if the email is already is used, even when mes throws error." do
+    # setup_enviroment
   #   sign_in @admin_user
   #   @credit_card = FactoryGirl.build :credit_card
   #   @member = FactoryGirl.build :member_with_api
@@ -190,6 +199,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # Reject new enrollments if billing is disable
   test "If billing is disabled member cant be enrolled." do
+    setup_enviroment
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -214,6 +224,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Representative should enroll/create member" do
+    setup_enviroment
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -229,6 +240,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Fulfillment mamager should enroll/create member" do
+    setup_enviroment
     sign_in @fulfillment_manager_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -244,6 +256,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Supervisor should enroll/create member" do
+    setup_enviroment
     sign_in @supervisor_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -258,6 +271,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Api user should enroll/create member" do
+    setup_enviroment
     sign_in @api_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = FactoryGirl.build :member_with_api
@@ -267,6 +281,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Agency should not enroll/create member" do
+    setup_enviroment
     sign_in @agency_agent
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -282,6 +297,7 @@ class Api::MembersControllerTest < ActionController::TestCase
  
   #Profile fulfillment_managment
   test "fulfillment_managment should enroll/create member" do
+    setup_enviroment
     sign_in @fulfillment_managment_user
     @credit_card = FactoryGirl.build :credit_card
     @member = FactoryGirl.build :member_with_api
@@ -296,6 +312,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "admin user should update member" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -312,6 +329,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "api_id should be updated if batch_update enabled" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -339,6 +357,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "representative user should update member" do
+    setup_enviroment
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -351,6 +370,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "supervisor user should update member" do
+    setup_enviroment
     sign_in @supervisor_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -363,6 +383,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "api user should update member" do
+    setup_enviroment
     sign_in @api_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -375,6 +396,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "agency user should not update member" do
+    setup_enviroment
     sign_in @agency_agent
     @credit_card = FactoryGirl.build :credit_card    
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -385,6 +407,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   #Profile fulfillment_managment
   test "fulfillment_managment user should update member" do
+    setup_enviroment
     sign_in @fulfillment_managment_user
     @credit_card = FactoryGirl.build :credit_card    
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -398,6 +421,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # Credit card tests.
   test "Should update credit card" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -432,6 +456,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # Multiple same credit cards with different expiration date
   test "Should update credit card only year" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -447,6 +472,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   def validate_credit_card_updated_only_month(active_credit_card, token, number, amount_months)
+    setup_enviroment
     @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
     @credit_card.expire_month = Date.today.month+amount_months # January is the first month.
     @credit_card.expire_year = active_credit_card.expire_year
@@ -462,6 +488,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # Multiple same credit cards with different expiration date
   test "Should update credit card only month" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -478,6 +505,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Multiple same credit cards with different expiration date" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -497,6 +525,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Should not update credit card when dates are not changed and same number. (With 'X')" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -518,6 +547,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # Multiple same credit cards with same expiration date
   test "Should not add new credit card with same data as the one active" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_year => (Time.zone.now+1.year).year, :expire_month => (Time.zone.now+1.month).month
@@ -545,6 +575,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Should not update credit card when invalidid credit card number" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
 
@@ -573,6 +604,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # Activate an inactive credit card record
   test "Should activate old credit when it is already created, if it is not expired" do
+    setup_enviroment
     sign_in @admin_user
     
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -594,6 +626,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Should activate old credit when it is already created, if it is not expired (with dashes)" do
+    setup_enviroment
     sign_in @admin_user
     number = "340-5043-2363-2976" 
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -615,6 +648,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Should activate old credit when it is already created, if it is not expired (with spaces)" do
+    setup_enviroment
     sign_in @admin_user
     number = "340 5043 2363 2976"   
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -636,6 +670,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Should activate old credit when it is already created, if it is not expired (with slashes)" do
+    setup_enviroment
     sign_in @admin_user
     number = "340/5043/2363/2976"
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -657,6 +692,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Should not activate old credit card when update only number, if old is expired" do
+    setup_enviroment
     sign_in @admin_user
     
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -679,6 +715,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Should not update active credit card with expired month" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -704,6 +741,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Should not update active credit card with expired year" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -727,6 +765,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Update a profile with CC blacklisted" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @member2 = create_active_member(@terms_of_membership, :member_with_api)
@@ -748,6 +787,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # New Member when CC is already used (Sloop) and Family memberships = true
   test "New Member when CC is already used (Drupal) and Family memberships = true" do
+    setup_enviroment
     sign_in @admin_user
     @terms_of_membership = @terms_of_membership_with_family
 
@@ -770,6 +810,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # New Member when CC is already used (Sloop), Family memberships = true and email is duplicated
   test "Enroll error when CC is already used (Drupal), Family memberships = true and email is duplicated" do
+    setup_enviroment
     sign_in @admin_user
     @terms_of_membership.club.update_attribute(:family_memberships_allowed, true)
 
@@ -793,6 +834,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Update a profile with CC used by another member. club with family memberships" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership_with_family, :member_with_api)
     @member2 = create_active_member(@terms_of_membership_with_family, :member_with_api)
@@ -820,6 +862,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # #TODO: FIX THIS TEST!
   # #Update a profile with CC used by another member and Family Membership = False
   test "Error Member when CC is already used (Sloop) and Family memberships = false" do
+    setup_enviroment
     sign_in @admin_user
     active_merchant_stubs
     
@@ -845,6 +888,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Update a profile with CC used by another member. club does not allow family memberships" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @member2 = create_active_member(@terms_of_membership, :member_with_api)
@@ -870,6 +914,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Update a member with different CC 
   # Update same CC with dashes
   test "Update a profile with CC with dashes" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -895,6 +940,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   # Update a member with different CC 
   test "Update a profile with CC with slashes" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -921,6 +967,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Update a member with different CC 
   # Update same CC with spaces 
   test "Update a profile with CC with white spaces" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
@@ -945,6 +992,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
   
   test "Should not create member's record when there is an error on transaction." do
+    setup_enviroment
     active_merchant_stubs_store
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
@@ -970,6 +1018,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Should not create member's record when there is an error on MeS get token." do
+    setup_enviroment
     active_merchant_stubs_store
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
@@ -993,6 +1042,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Update club cash if club is not Drupal" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@wordpress_terms_of_membership, :member_with_api)
     new_amount, new_expire_date = 34, Date.today
@@ -1005,6 +1055,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Update club cash if club is Drupal" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     new_amount, new_expire_date = 34, Date.today
@@ -1017,6 +1068,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Update Credit Card with expire this current month" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @active_credit_card = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member.id
@@ -1038,34 +1090,82 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@active_credit_card.number])
   end
 
-    test "Update member's next_bill_date" do
-      
-      sign_in @admin_user
-      @member = create_active_member(@terms_of_membership, :member_with_api)
-      FactoryGirl.create :credit_card, :member_id => @member.id
-      assert_difference('Operation.count') do
-        generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
-      end
-      @member.reload
-      assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
-    end
-  
-    test "Update member's next_bill_date with wrong date format" do
-      
-      sign_in @admin_user
-      @member = create_active_member(@terms_of_membership, :member_with_api)
-      FactoryGirl.create :credit_card, :member_id => @member.id
-      assert_difference('Operation.count',0) do
-        generate_put_next_bill_date( "25012015" )
-      end
-      assert @response.body.include? "Next bill date wrong format." 
-    end
-
-  test "Update member's next_bill_date with date prior to actual date" do
-    
+  test "Update member's next_bill_date provisional status" do
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
+    
+    @member.set_as_provisional
+    assert_difference('Operation.count') do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    @member.reload
+    assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
+  end
+
+  test "Update member's next_bill_date active status" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    
+    @member.set_as_provisional
+    @member.set_as_active
+    assert_difference('Operation.count') do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    @member.reload
+    assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
+  end
+
+  test "Update member's next_bill_date applied status" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    
+    @set_as_canceled
+    @member.set_as_applied   
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    assert @response.body, I18n.t('error_messages.unable_to_perform_due_member_status')
+  end
+
+  test "Update member's next_bill_date lapsed status" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    
+    @member.set_as_canceled
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    assert @response.body, I18n.t('error_messages.unable_to_perform_due_member_status')
+  end
+
+  test "Update member's next_bill_date with wrong date format" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    
+    @member.set_as_provisional
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( "25012015" )
+    end
+    assert @response.body.include? "Next bill date wrong format." 
+  end
+
+  test "Update member's next_bill_date with date prior to actual date" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    
+    @member.set_as_provisional
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now - 3.days, :format => :only_date) )
     end
@@ -1074,10 +1174,12 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Update member's next_bill_date with blank date" do
-    
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
+   
+    @member.set_as_provisional
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( "" )
     end
@@ -1086,10 +1188,11 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Supervisor should not updates member's next_bill_date" do
-    
+    setup_enviroment
     sign_in @supervisor_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
+    @member.set_as_provisional
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
       assert_response :unauthorized
@@ -1097,10 +1200,11 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Representative should not updates member's next_bill_date" do
-    
+    setup_enviroment
     sign_in @representative_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
+    @member.set_as_provisional
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
       assert_response :unauthorized
@@ -1108,10 +1212,11 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Agency should not updates member's next_bill_date" do
-    
+    setup_enviroment
     sign_in @agency_agent
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
+    @member.set_as_provisional
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
       assert_response :unauthorized
@@ -1119,10 +1224,11 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Fulfillment manager should not updates member's next_bill_date" do
-    
+    setup_enviroment
     sign_in @fulfillment_managment_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
+    @member.set_as_provisional
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
       assert_response :unauthorized
@@ -1130,10 +1236,12 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   test "Api agent should update member's next_bill_date" do
-    
+    setup_enviroment
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
+
+    @member.set_as_provisional
     assert_difference('Operation.count') do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
     end
@@ -1141,64 +1249,81 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
   end
 
-
   test "get members updated between given dates" do
+    setup_enviroment
     sign_in @admin_user
+    
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     first = Member.first
     last = Member.last
+
     first.update_attribute :updated_at, Time.zone.now - 10.days
     last.update_attribute :updated_at, Time.zone.now - 10.days
 
-    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_updated first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
     assert @response.body.include? first.id.to_s
-    assert @response.body.include? last.id.to_s
+    assert !(@response.body.include? last.id.to_s)
+  end
+
+  test "get members updated between given dates with start date greater to end" do
+    setup_enviroment
+    sign_in @admin_user
+    generate_get_by_updated 5, Time.zone.now-9.day, Time.zone.now-11.day
+    assert @response.body.include? "Check both start and end date, please. Start date is greater than end date"
   end
 
   test "get members updated between given dates with blank date" do
+    setup_enviroment
     sign_in @admin_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     
-    generate_get_by_updated "",Time.zone.now-10.day
-    assert @response.body.include? "Dates must not be null or blank"
-    generate_get_by_updated Time.zone.now-10.day,""
-    assert @response.body.include? "Dates must not be null or blank"
+    generate_get_by_updated 5, "",Time.zone.now-10.day
+    assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
+    generate_get_by_updated 5, Time.zone.now-10.day,""
+    assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
   end
+
   test "get members updated between given dates with wrong format date" do
-    
+    setup_enviroment
     sign_in @admin_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     
-    generate_get_by_updated "1234567",Time.zone.now-10.day
-    assert @response.body.include? "Wrong date format"
-    generate_get_by_updated Time.zone.now-10.day,"1234567"
-    assert @response.body.include? "Wrong date format"
+    generate_get_by_updated 5, "1234567", Time.zone.now-10.day
+    assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
+    generate_get_by_updated 5, Time.zone.now-10.day, "1234567"
+    assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
   end
 
   test "Representative should not get members updated between given dates" do
+    setup_enviroment
     sign_in @representative_user
-    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Supervisor should not get members updated between given dates" do
+    setup_enviroment
     sign_in @supervisor_user
-    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Agency should not get members updated between given dates" do
+    setup_enviroment
     sign_in @agency_agent
-    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Fulfillment manager should not get members updated between given dates" do
+    setup_enviroment
     sign_in @fulfillment_managment_user
-    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
+
   test "Api should not get members updated between given dates" do
+    setup_enviroment
     sign_in @api_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     first = Member.first
@@ -1206,12 +1331,13 @@ class Api::MembersControllerTest < ActionController::TestCase
     first.update_attribute :updated_at, Time.zone.now - 10.days
     last.update_attribute :updated_at, Time.zone.now - 10.days
 
-    generate_get_by_updated Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_updated first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
     assert @response.body.include? first.id.to_s
-    assert @response.body.include? last.id.to_s
+    assert !(@response.body.include? last.id.to_s)
   end
 
   test "get members created between given dates" do
+    setup_enviroment
     sign_in @admin_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     first = Member.first
@@ -1219,55 +1345,63 @@ class Api::MembersControllerTest < ActionController::TestCase
     first.update_attribute :created_at, Time.zone.now - 10.days
     last.update_attribute :created_at, Time.zone.now - 10.days
 
-    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_created first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
     assert @response.body.include? first.id.to_s
-    assert @response.body.include? last.id.to_s
+    assert !(@response.body.include? last.id.to_s)
   end
 
   test "get members created between given dates with blank date" do
+    setup_enviroment
     sign_in @admin_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     
-    generate_get_by_created "",Time.zone.now-10.day
-    assert @response.body.include? "Dates must not be null or blank"
-    generate_get_by_created Time.zone.now-10.day,""
-    assert @response.body.include? "Dates must not be null or blank"
+    generate_get_by_created 5, "",Time.zone.now-10.day
+    assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
+    generate_get_by_created 5, Time.zone.now-10.day,""
+    assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
   end
+
   test "get members created between given dates with wrong format date" do
+    setup_enviroment
     sign_in @admin_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     
-    generate_get_by_created "1234567",Time.zone.now-10.day
-    assert @response.body.include? "Wrong date format"
-    generate_get_by_created Time.zone.now-10.day,"1234567"
-    assert @response.body.include? "Wrong date format"
+    generate_get_by_created 5, "1234567",Time.zone.now-10.day
+    assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
+    generate_get_by_created 5, Time.zone.now-10.day,"1234567"
+    assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
   end
 
   test "Supervisor should not get members created between given dates" do
+    setup_enviroment
     sign_in @supervisor_user
-    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Representative should not get members created between given dates" do
+    setup_enviroment
     sign_in @representative_user
-    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Agency agent should not get members created between given dates" do
+    setup_enviroment
     sign_in @agency_agent
-    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Fulfillment manager should not get members created between given dates" do
+    setup_enviroment
     sign_in @fulfillment_managment_user
-    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
     assert_response :unauthorized
   end
 
   test "Api agent should get members created between given dates" do
+    setup_enviroment
     sign_in @admin_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     first = Member.first
@@ -1275,9 +1409,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     first.update_attribute :created_at, Time.zone.now - 10.days
     last.update_attribute :created_at, Time.zone.now - 10.days
 
-    generate_get_by_created Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_created first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
     assert @response.body.include? first.id.to_s
-    assert @response.body.include? last.id.to_s
+    assert !(@response.body.include? last.id.to_s)
   end
-
 end
