@@ -24,8 +24,7 @@ class Api::ProspectsController < ApplicationController
   #     <li><strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
   #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female.[optional]</li>
   #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others).[optional]</li>
-  #     <li><strong>terms_of_memberhips_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at prospect level. </li> 
-  #     <li><strong>enrollment_amount</strong> Amount of money that takes to enroll. It is present at member level.[optional]</li>
+  #     <li><strong>terms_of_membership_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at prospect level. </li> 
   #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd"[optional]</li>
   #     <li><strong>product_sku</strong> Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet")[optional]</li>
   #     <li><strong>mega_channel</strong>[optional]</li>
@@ -66,3 +65,16 @@ class Api::ProspectsController < ApplicationController
   end
 
 end
+
+
+
+
+
+
+
+:first_name, :last_name, :address, :city, :state, :zip, :email,:phone_country_code, 
+            :phone_area_code ,:phone_local_number, :birth_date, :preferences, :gender, 
+            :ip_address, :referral_host, :referral_parameters, :cookie_value,:marketing_code, 
+            :product_sku, :user_id, :landing_url, :mega_channel, :user_agent, :joint,
+            :campaign_medium, :campaign_description, :campaign_medium_version , :terms_of_membership_id, 
+            :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description

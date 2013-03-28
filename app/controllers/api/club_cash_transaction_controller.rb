@@ -10,7 +10,7 @@ class Api::ClubCashTransactionController < ApplicationController
   # @required [Integer] member_id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Hash] club_cash_transaction Hash with necessary information to create the club cash transaction. It has the following information: 
   #   <ul>
-  #     <li><strong>amount</strong> Amount of the club cash to add or deduct. We only accept numbers with up to two digits after the comma. (required) (Eg: 2.50 , -10.99, 25) </li>
+  #     <li><strong>amount</strong> Amount of the club cash to add or deduct. Positive value to add, or negative value to deduct. We only accept numbers with up to two digits after the comma. (required) (Eg: 2.50 , -10.99, 25) </li>
   #     <li><strong>description</strong> Description of the club cash. (Eg. "Adding $20 club cash because of enroll.".) [optional]</li>
   #   </ul>
   # @response_field [String] message Shows the method results and also informs the errors.

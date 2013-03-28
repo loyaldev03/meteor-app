@@ -4,14 +4,15 @@ class Api::TokensController < ApplicationController
   before_filter :check_authentification, :except => :create
   respond_to :json
   
+
   ##
-  # Returns the stock available for a product. 
+  # Generate token.
   #
   # @resource /api/v1/tokens
   # @action POST
   #
-  # @required [String] email Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [String] password Sku of the product we are interested in. This parameter is the product description. 
+  # @required [String] email 
+  # @required [String] password 
   # @response_field [Integer] status Code related to the method result.
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] token authentication token.
@@ -50,13 +51,17 @@ class Api::TokensController < ApplicationController
     end
   end
 
-
-  # Method  : PUT
+  ##
+  # Destroy token
   #
-  # @param [Integer] id
-  # @return [string] *message*: Shows the method results and also informs the errors.
-  # @return [Integer] *status*: Code related to the method result.
-  # @return [String] *token*: authentication token
+  # @resource /api/v1/tokens/:id
+  # @action PUT
+  #
+  # @required [String] id Token's id to destroy. Have in mind this is part of the url. 
+  # @response_field [Integer] status Code related to the method result.
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [String] token authentication token.
+  #
   def destroy
     @user=Agent.find_by_authentication_token(params[:id])
     if @user.nil?

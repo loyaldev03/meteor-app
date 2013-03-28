@@ -664,11 +664,18 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								</li>
 							</ul>
 						
+					</div>
+				
+
+				
+					<div class="optional">
+						<h4>Optional Parameters</h4>
+						
 							<ul>
 								<li>
 									<span class="name">setter</span>
 									<span class="type">Hash</span>
-									<span class="text">Variable used to pass some boolean values as "wron_phone_number". It must have the following information:
+									<span class="text">Variable used to pass some boolean values as "wrong_phone_number". It must have the following information:
 <ul>
   <li><strong>wrong_phone_number</strong> Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set wrong_phone_number as nil) [optional]</li>
   <li><strong>batch_update</strong> Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) [optional]</li>
@@ -678,8 +685,6 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							</ul>
 						
 					</div>
-				
-
 				
 			</div><!-- parameters -->
 			
@@ -919,7 +924,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<li>
 									<span class="name">expire_date</span>
 									<span class="type">String</span>
-									<span class="text">club cash expiration date. This date is stored with datetime format.</span>
+									<span class="text">club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")</span>
 								</li>
 							</ul>
 						
@@ -949,14 +954,6 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							</li>
 						</ul>
 					
-						<ul>
-							<li>
-								<span class="name">member_id</span>
-								<span class="type">Integer</span>
-								<span class="text">Member's id. Integer autoincrement value that is used by platform. It will be returned only when the request was a success.</span>
-							</li>
-						</ul>
-					
 				</div>
 			
 			
@@ -982,7 +979,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Wed Mar 27 14:53:11 2013 with ruby-1.9.2
+  Generated on Thu Mar 28 13:38:16 2013 with ruby-1.9.2
 </div>
 
   </body>

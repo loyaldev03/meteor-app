@@ -330,17 +330,9 @@
 									<span class="type">Integer</span>
 									<span class="text">message Integer value related to the operation type. Operations supported at the moment:
 <ul>
-  <li> <strong>900</strong> vip_event_registration </li>
-  <li> <strong>901</strong> vip_event_cancelation </li>
+  <li><strong>900</strong> vip_event_registration </li>
+  <li><strong>901</strong> vip_event_cancelation </li>
 </ul></span>
-								</li>
-							</ul>
-						
-							<ul>
-								<li>
-									<span class="name">operation_date</span>
-									<span class="type">String</span>
-									<span class="text">If this value is nil we save that operation with Time.zone.now</span>
 								</li>
 							</ul>
 						
@@ -350,6 +342,14 @@
 				
 					<div class="optional">
 						<h4>Optional Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">operation_date</span>
+									<span class="type">String</span>
+									<span class="text">If this value is nil we save that operation with Time.zone.now. (Format "yyyy-mm-dd")</span>
+								</li>
+							</ul>
 						
 							<ul>
 								<li>
@@ -408,7 +408,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Wed Mar 27 14:53:11 2013 with ruby-1.9.2
+  Generated on Thu Mar 28 13:38:16 2013 with ruby-1.9.2
 </div>
 
   </body>

@@ -300,7 +300,7 @@
   <div id="Services" class="method_details_list">
     
 		<div class="method">
-			<p class="method_desc">Returns the stock available for a product.</p>
+			<p class="method_desc">Generate token.</p>
 			<h3 class="resource_url"><strong>/api/v1/tokens</strong> [POST]</h3>
 
 			<div class="parameters">	
@@ -312,7 +312,7 @@
 								<li>
 									<span class="name">email</span>
 									<span class="type">String</span>
-									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action.</span>
+									<span class="text"></span>
 								</li>
 							</ul>
 						
@@ -320,7 +320,7 @@
 								<li>
 									<span class="name">password</span>
 									<span class="type">String</span>
-									<span class="text">Sku of the product we are interested in. This parameter is the product description.</span>
+									<span class="text"></span>
 								</li>
 							</ul>
 						
@@ -372,6 +372,63 @@
 			
 		</div>	
     
+		<div class="method">
+			<p class="method_desc">Destroy token</p>
+			<h3 class="resource_url"><strong>/api/v1/tokens/:id</strong> [PUT]</h3>
+
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">id</span>
+									<span class="type">String</span>
+									<span class="text">Token's id to destroy. Have in mind this is part of the url.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">status</span>
+								<span class="type">Integer</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method results and also informs the errors.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">token</span>
+								<span class="type">String</span>
+								<span class="text">authentication token.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+		</div>	
+    
   </div>
 
 </div>
@@ -391,7 +448,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Wed Mar 27 14:53:11 2013 with ruby-1.9.2
+  Generated on Thu Mar 28 13:38:16 2013 with ruby-1.9.2
 </div>
 
   </body>

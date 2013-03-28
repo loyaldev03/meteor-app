@@ -218,7 +218,7 @@ class Api::MembersController < ApplicationController
   #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
   #     </ul>
   #   </ul>
-  # @required [Hash] setter Variable used to pass some boolean values as "wron_phone_number". It must have the following information:
+  # @optional [Hash] setter Variable used to pass some boolean values as "wrong_phone_number". It must have the following information:
   #   <ul>
   #     <li><strong>wrong_phone_number</strong> Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set wrong_phone_number as nil) [optional]</li>
   #     <li><strong>batch_update</strong> Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) [optional]</li>
@@ -555,39 +555,9 @@ class Api::MembersController < ApplicationController
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
-  # @required [String] expire_date club cash expiration date. This date is stored with datetime format.
+  # @required [String] expire_date club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
-  # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. It will be returned only when the request was a success.
-  # 
-  # @example_request 
-  #   ```json
-  #   {
-  #     "api_key":"aq4BS8XzbTvczcDZvDRt",
-  #     "member": {
-  #       "amount":"Alice",
-  #       "expire_date":"Brennan",
-  #       "address":"SomeSt",
-  #     },
-  #       "setter":{
-  #          "wrong_phone_number":0,
-  #          "skip_api_sync":0,
-  #          "batch_update":0
-  #       }
-  #   }
-  #   ```
-  # @example_request_description Requesting enroll with invalid information.
-  # @example_response 
-  #   ```json
-  #   {
-  #     "result": {
-  #       "message":"Member iformation is invalid.",
-  #       "code":"405",
-  #       "member_id":{"country":["is the wrong length (should be 2 characters)","is not included in the list"]}
-  #     }
-  #   }
-  #   ```
-  # @example_response_description Response with member's errors within an 'error' hash.
   # 
   def club_cash
     member = Member.find(params[:id])
@@ -600,7 +570,7 @@ class Api::MembersController < ApplicationController
       member.save(:validate => false)
       message = "Member updated successfully"
       Auditory.audit(current_agent, member, message, member, Settings.operation_types.profile_updated)
-      response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id }
+      response = { :message => message, :code => Settings.error_codes.success }
     end
     render json: response
   rescue ActiveRecord::RecordNotFound
