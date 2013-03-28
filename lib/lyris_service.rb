@@ -17,7 +17,7 @@ class LyrisService
       body.DATA communication.member.first_name, :type => 'demographic', :id => 1
       body.DATA communication.member.last_name, :type => 'demographic', :id => 2
       # Demographic data from ONMC . Do v5 have diff demographic IDs?
-      body.DATA communication.member.visible_id, :type => 'demographic', :id => 41166
+      body.DATA communication.member.id, :type => 'demographic', :id => 41166
       body.DATA communication.member.next_retry_bill_date, :type => 'demographic', :id => 47171
       body.DATA communication.member.terms_of_membership.installment_amount, :type => 'demographic', :id => 48297
       body.DATA communication.external_attributes[:trigger_id], :type => 'extra', :id => 'trigger_id'
