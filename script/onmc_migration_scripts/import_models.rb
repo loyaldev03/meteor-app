@@ -7,7 +7,7 @@
 # update onmc_customer_service.operations set imported_at = NULL where imported_at IS NOT NULL;
 # update onmc_customer_service.notes set imported_at = NULL where imported_at IS NOT NULL;
 # update onmc_prospects.prospects set imported_at = NULL where imported_at IS NOT NULL;
-# production datase
+# production database
 # update billingcomponent_production.members set imported_at = NULL where imported_at IS NOT NULL;
 # update billingcomponent_production.chargebacks set imported_at = NULL where imported_at IS NOT NULL;
 # update billingcomponent_production.enrollment_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
@@ -15,6 +15,17 @@
 # update prospectcomponent.prospects set imported_at = NULL where imported_at IS NOT NULL;
 # update customerservice3.operations set imported_at = NULL where imported_at IS NOT NULL;
 # update customerservice3.notes set imported_at = NULL where imported_at IS NOT NULL;
+# phoenix database
+# use sac_production;
+# truncate credit_cards;
+# truncate enrollment_infos;
+# truncate prospect;
+# truncate fulfillments;
+# truncate members;
+# truncate memberships;
+# truncate member_notes;
+# truncate operations;
+# truncate transactions;
 #
 # 1.1- Load toms (only once) => Done
 #     ruby script/custom/import_load_toms.rb  
@@ -150,7 +161,6 @@ end
 class PhoenixMember < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
-  self.primary_key = 'id'
   self.record_timestamps = false
 
   def terms_of_membership_id

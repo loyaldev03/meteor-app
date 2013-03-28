@@ -41,11 +41,11 @@ def import_customer_notes
     group.each do |note| 
       begin
         # load member notes
-        member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, note.source_id)
+        member = PhoenixMember.find_by_club_id_and_id(CLUB, note.source_id)
         unless member.nil?
           @log.info "  * processing note ##{note.id}"
           phoenix_note = PhoenixMemberNote.new
-          phoenix_note.member_id = member
+          phoenix_note.member_id = member.id
           phoenix_note.created_by_id = get_agent(note.author_id)
           phoenix_note.description = note.content
           phoenix_note.disposition_type_id = get_disposition_type_id(note.note_type_id, CLUB)
