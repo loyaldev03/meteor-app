@@ -18,7 +18,7 @@ gem 'daemons'
 gem 'foreman'
 gem 'god'
 gem 'rvm-capistrano'
-gem 'capistrano-campfire'
+gem 'capistrano-campfire', '0.2.0'
 gem "ruby-pardot"
 
 # Gems used only for assets and not required
