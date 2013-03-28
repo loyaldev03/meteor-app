@@ -41,7 +41,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   end
 
   def set_as_unreachable_member(member,reason)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_link_or_button "Set Unreachable"
     within("#unreachable_table"){
       select(reason, :from => 'reason')
@@ -52,7 +52,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "edit member" do
     setup_member
-    visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
     within("#table_demographic_information") {
       assert find_field('member[first_name]').value == @saved_member.first_name
@@ -85,7 +85,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "set undeliverable address" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_link_or_button 'Set undeliverable'
     confirm_ok_js
     click_link_or_button 'Set wrong address'
@@ -97,7 +97,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "add notable at classification" do
     setup_member
 
-    visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     select('Notable', :from => 'member[member_group_type_id]')
 
@@ -155,7 +155,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "edit a note at operations tab" do
     setup_member
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
     click_link_or_button 'Set undeliverable'
     confirm_ok_js
@@ -187,7 +187,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "edit a note and click on link" do
     setup_member
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
     click_link_or_button 'Set undeliverable'
     confirm_ok_js
@@ -216,7 +216,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "change unreachable phone number to reachable by check" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_link_or_button "Set Unreachable"
     within("#unreachable_table") do
       select('Unreachable', :from => 'reason')
@@ -336,7 +336,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "change unreachable phone number to reachable by changeing phone" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     #By changing phone_country_number
     
     set_as_unreachable_member(@saved_member,'Unreachable')    
@@ -402,7 +402,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "change type of phone number" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_contact_information")do
       wait_until{
@@ -432,7 +432,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "edit member's type of phone number" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
     within("#table_contact_information")do
       wait_until{
@@ -574,7 +574,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#personal_details")do
       wait_until{
-        fill_in 'member[member_id]', :with => @saved_member.visible_id
+        fill_in 'member[member_id]', :with => @saved_member.id
         fill_in 'member[first_name]', :with => @saved_member.first_name
         fill_in 'member[last_name]', :with => @saved_member.last_name
       }
@@ -599,7 +599,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#personal_details")do
       wait_until{
-        fill_in 'member[member_id]', :with => @saved_member.visible_id
+        fill_in 'member[member_id]', :with => @saved_member.id
         fill_in 'member[first_name]', :with => @saved_member.first_name
         fill_in 'member[last_name]', :with => @saved_member.last_name
       }
@@ -644,7 +644,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "change member gender from male to female" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
 
@@ -672,7 +672,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     @saved_member.gender = 'F'
     @saved_member.save
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
 
@@ -698,7 +698,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "canceled date will not be changed when it is set." do
     setup_member
     cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     click_link_or_button 'Cancel'
@@ -724,7 +724,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "Should not show destroy button on credit card when this one is the last one" do
     setup_member
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs")do
@@ -736,7 +736,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     @saved_member.set_as_canceled!
     @saved_member.update_attribute(:blacklisted, true)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs")do
@@ -747,7 +747,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
 
     @saved_member.update_attribute(:blacklisted, false)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs")do
@@ -765,7 +765,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     second_credit_card = FactoryGirl.create(:credit_card_american_express , :member_id => @saved_member.id, :active => false)
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs")do
@@ -776,7 +776,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
 
     @saved_member.update_attribute(:status, "provisional")
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs")do
@@ -788,7 +788,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     @saved_member.set_as_canceled!
     @saved_member.update_attribute(:blacklisted, true)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs")do
@@ -799,7 +799,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
 
     @saved_member.update_attribute(:blacklisted, false)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs")do
@@ -859,7 +859,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     bill_member(@saved_member, false)
     
-    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
     click_on 'Full save'
      
     assert page.has_content?("Full save done")
@@ -877,7 +877,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     bill_member(@saved_member, false)
     
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
     fill_in 'refund_amount', :with => "99999999"   
       
     click_on 'Refund'
@@ -890,7 +890,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     bill_member(@saved_member, true, (@terms_of_membership_with_gateway.installment_amount / 2))
     
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
     fill_in 'refund_amount', :with => ((@terms_of_membership_with_gateway.installment_amount / 2) + 1).to_s      
     
     assert_difference('Transaction.count', 0) do 
@@ -911,7 +911,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
 
     bill_member(@saved_member, true, final_amount)
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
     fill_in 'refund_amount', :with => final_amount.to_s
     assert_difference('Transaction.count') do 
       click_on 'Refund'
@@ -930,7 +930,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     bill_member(@saved_member, false)
     
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
     fill_in 'refund_amount', :with => "&%$"
     alert_ok_js
     assert_difference('Transaction.count', 0) do 
@@ -941,7 +941,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "Change member from Provisional (trial) status to Lapse (inactive) status" do
     setup_member
     @saved_member.set_as_canceled
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
    
     within("#td_mi_next_retry_bill_date")do
@@ -953,7 +953,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     @saved_member.set_as_active!
     @saved_member.set_as_canceled
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
    
     within("#td_mi_next_retry_bill_date")do
@@ -967,7 +967,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway.update_attribute :provisional_days,  5
     @saved_member.recover(@terms_of_membership_with_gateway)
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
     @saved_member.reload 
@@ -985,7 +985,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled
     @saved_member.recover(@terms_of_membership_with_gateway)
     @saved_member.set_as_active
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
     click_link_or_button 'Change'
@@ -1001,7 +1001,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled
     @saved_member.recover(@terms_of_membership_with_gateway)
     @saved_member.set_as_active
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
     click_link_or_button 'Change'
@@ -1025,7 +1025,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "Next Bill Date for monthly memberships" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
@@ -1040,7 +1040,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
   end  
 
@@ -1048,7 +1048,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member(false, true)
 
     @saved_member.current_membership.join_date = Time.zone.now-3.day
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
     within("#td_mi_status")do
@@ -1077,7 +1077,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Transactions")
@@ -1108,7 +1108,7 @@ test "Partial refund from CS" do
     @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Transactions")
@@ -1141,7 +1141,7 @@ test "Partial refund from CS" do
 
 
     @saved_member.bill_membership
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
     within(".nav-tabs") do
@@ -1164,7 +1164,7 @@ test "Partial refund from CS" do
 
     Member.bill_all_members_up_today
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
@@ -1194,7 +1194,7 @@ test "Partial refund from CS" do
 
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Transactions")
@@ -1209,7 +1209,7 @@ test "Partial refund from CS" do
     click_link_or_button 'Refund'
     wait_until{ page.has_content?("This transaction has been approved") }
 
-    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
     click_on 'Full save'
     assert page.has_content?("Full save done")
     
@@ -1227,7 +1227,7 @@ test "Partial refund from CS" do
 
   test "Send Prebill email (7 days before NBD)" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }    
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
@@ -1239,7 +1239,7 @@ test "Partial refund from CS" do
       end
     end
     sleep 5 #Wait untill script finish.
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#communication") do
@@ -1258,7 +1258,7 @@ test "Partial refund from CS" do
 
     11.times{ @saved_member.bill_membership }
     sleep 1
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within(".nav-tabs"){ click_on("Transactions") }
 
@@ -1275,7 +1275,7 @@ test "Partial refund from CS" do
 
     11.times{ @saved_member.bill_membership }
     sleep 1
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within(".nav-tabs"){ click_on("Memberships") }
     within("#memberships_table")do

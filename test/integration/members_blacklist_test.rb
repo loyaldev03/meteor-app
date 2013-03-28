@@ -71,7 +71,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
   end
 
   def blacklist_member(member,reason)
-    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
     click_on 'Blacklist'
     select(reason, :from => 'reason')
     confirm_ok_js
@@ -138,7 +138,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     end
     @saved_member.reload
     
-    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#td_mi_status") do
@@ -235,7 +235,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     setup_member
     @saved_member.update_attribute(:blacklisted,true)
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
     wait_until { assert find(:xpath, "//a[@id='blacklist_btn' and @disabled='disabled']") }
   end
