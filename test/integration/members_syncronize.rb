@@ -453,7 +453,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name)
 
 
-    search_member('member[member_id]', @saved_member.id.to_s, @saved_member)
+    search_member('member[id]', @saved_member.id.to_s, @saved_member)
 
     @saved_member.set_as_canceled
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)

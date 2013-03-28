@@ -100,7 +100,7 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search member by member id" do
     setup_search
-    search_member("member[member_id]", "#{@search_member.id}", @search_member)
+    search_member("member[id]", "#{@search_member.id}", @search_member)
   end
 
   test "search member by first name" do
@@ -226,7 +226,7 @@ class MembersSearchTest < ActionController::IntegrationTest
   
   test "display member" do
     setup_search
-    search_member("member[member_id]", "#{@search_member.id}", @search_member)
+    search_member("member[id]", "#{@search_member.id}", @search_member)
     within("#members") do
       wait_until {
         assert page.has_content?("#{@search_member.id}")
@@ -480,7 +480,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     member_to_seach = Member.first
     within("#personal_details")do
       wait_until{
-        fill_in "member[member_id]", :with => @saved_member.id
+        fill_in "member[id]", :with => @saved_member.id
         fill_in "member[first_name]", :with => @saved_member.first_name
         fill_in "member[last_name]", :with => @saved_member.last_name
         fill_in "member[email]", :with => @saved_member.email
@@ -526,7 +526,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     member_to_seach = Member.first
     within("#personal_details")do
       wait_until{
-        fill_in "member[member_id]", :with => " #{@saved_member.id} "
+        fill_in "member[id]", :with => " #{@saved_member.id} "
         fill_in "member[first_name]", :with => " #{@saved_member.first_name} "
         fill_in "member[last_name]", :with => " #{@saved_member.last_name} "
         fill_in "member[email]", :with => " #{@saved_member.email} "
@@ -599,7 +599,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     member_to_seach = Member.first
     within("#personal_details")do
       wait_until{
-        fill_in "member[member_id]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+        fill_in "member[id]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in "member[first_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in "member[last_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in "member[email]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
