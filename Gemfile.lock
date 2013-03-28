@@ -414,6 +414,7 @@ DEPENDENCIES
   state_machine (= 1.1.2)
   therubyracer
   timecop
+  tinder (= 1.9.2)
   twitter-bootstrap-rails (= 2.0.6)
   uglifier (>= 1.0.3)
   uuidtools
