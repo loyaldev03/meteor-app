@@ -187,7 +187,7 @@ class MemberTest < ActiveSupport::TestCase
     member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
     cancel_date = member.cancel_date
     member.cancel! Time.zone.now, "Cancel from Unit Test"
-    m = Member.find member.uuid
+    m = Member.find member.id
     assert_not_nil m.cancel_date 
     assert_nil cancel_date
   end
@@ -214,7 +214,7 @@ class MemberTest < ActiveSupport::TestCase
     assert_difference('Operation.count', 4) do
       member.blacklist(nil, "Test")
     end
-    m = Member.find member.uuid
+    m = Member.find member.id
     assert_not_nil m.cancel_date 
     assert_nil cancel_date
     assert_equal m.blacklisted, true
@@ -226,7 +226,7 @@ class MemberTest < ActiveSupport::TestCase
     assert_difference('Operation.count', 1) do
       member.blacklist(nil, "Test")
     end
-    m = Member.find member.uuid
+    m = Member.find member.id
     assert_not_nil m.cancel_date 
     assert_equal m.cancel_date.to_date, cancel_date.to_date
     assert_equal m.blacklisted, true

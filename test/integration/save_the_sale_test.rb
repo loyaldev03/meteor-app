@@ -184,7 +184,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     setup_member
     @saved_member.bill_membership
     
-    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => Transaction.last.id)
+    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
     click_on 'Full save'
      
     assert page.has_content?("Full save done")

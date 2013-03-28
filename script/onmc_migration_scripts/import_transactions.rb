@@ -6,7 +6,7 @@ require './import_models'
 ActiveRecord::Base.logger = @log
 
 def process_chargeback(refund, find_refund_operation)
-  @member = PhoenixMember.find_by_club_id_and_visible_id(CLUB, refund.member_id)
+  @member = PhoenixMember.find_by_club_id_and_id(CLUB, refund.member_id)
   unless @member.nil?
     tz = Time.now.utc
     @log.info "  * processing Chargeback ##{refund.id}"
@@ -21,13 +21,13 @@ def process_chargeback(refund, find_refund_operation)
       end
 
       transaction = PhoenixTransaction.new
-      transaction.member_id = @member.uuid
+      transaction.member_id = @member.id
       transaction.terms_of_membership_id = @member.terms_of_membership_id
       transaction.gateway = refund.phoenix_gateway
       transaction.set_payment_gateway_configuration(transaction.gateway)
       transaction.recurrent = false
       transaction.transaction_type = "credit" 
-      transaction.invoice_number = @member.visible_id
+      transaction.invoice_number = @member.id
       transaction.amount = refund.phoenix_amount
       transaction.response = refund.result
       transaction.response_code = (refund.result == "Success" ? "000" : "999")
@@ -108,7 +108,7 @@ def load_enrollment_transactions
           @member = response.member(authorization)
           unless @member.nil?
             transaction = PhoenixTransaction.new
-            transaction.member_id = @member.uuid
+            transaction.member_id = @member.id
             get_campaign_and_tom_id(authorization.campaign_id)
             transaction.terms_of_membership_id = @tom_id
             next if transaction.terms_of_membership_id.nil?
@@ -175,7 +175,7 @@ def load_membership_transactions
           unless @member.nil?
             @log.info "  * processing Membership Auth response ##{response.id}"
             transaction = PhoenixTransaction.new
-            transaction.member_id = @member.uuid
+            transaction.member_id = @member.id
             get_campaign_and_tom_id(authorization.campaign_id)
             transaction.terms_of_membership_id = @tom_id
             next if transaction.terms_of_membership_id.nil?

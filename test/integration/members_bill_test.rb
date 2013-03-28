@@ -39,7 +39,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
     
   def make_a_refund(transaction, amount, check_refund = true)
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id, :transaction_id => transaction.id)
+    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => transaction.id)
     fill_in 'refund_amount', :with => amount.to_s  
   
     alert_ok_js      
@@ -58,7 +58,7 @@ class MembersBillTest < ActionController::IntegrationTest
   end
 
   def change_next_bill_date(date)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     click_link_or_button 'Change'
     wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
@@ -171,7 +171,7 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Change member from Provisional (trial) status to Lapse (inactive) status" do
     setup_member
     @saved_member.set_as_canceled
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
    
     within("#td_mi_next_retry_bill_date")do
@@ -183,7 +183,7 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     @saved_member.set_as_active!
     @saved_member.set_as_canceled
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
    
     within("#td_mi_next_retry_bill_date")do
@@ -195,7 +195,7 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     @saved_member.set_as_canceled
     @saved_member.recover(@terms_of_membership_with_gateway)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
     next_bill_date = @saved_member.current_membership.join_date + @terms_of_membership_with_gateway.provisional_days
@@ -233,7 +233,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
   test "Next Bill Date for monthly memberships" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
@@ -249,7 +249,7 @@ class MembersBillTest < ActionController::IntegrationTest
     active_merchant_stubs("34234", "decline stubbed", false)
 
     @saved_member.bill_membership
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs") do
@@ -269,7 +269,7 @@ class MembersBillTest < ActionController::IntegrationTest
     
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".nav-tabs") do
@@ -283,7 +283,7 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Provisional member" do
     setup_member
     @saved_member.current_membership.join_date = Time.zone.now-3.day
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
     within("#td_mi_status")do
@@ -312,7 +312,7 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Transactions")
@@ -328,7 +328,7 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Transactions")
@@ -351,7 +351,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
     Member.bill_all_members_up_today
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
@@ -384,7 +384,7 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within(".nav-tabs") do
       click_on("Transactions")
@@ -396,7 +396,7 @@ class MembersBillTest < ActionController::IntegrationTest
     end
     make_a_refund(Transaction.last, final_amount, true)
 
-    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     click_on 'Full save'
     assert page.has_content?("Full save done")
@@ -415,7 +415,7 @@ class MembersBillTest < ActionController::IntegrationTest
 
   test "Send Prebill email (7 days before NBD)" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }    
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
@@ -427,7 +427,7 @@ class MembersBillTest < ActionController::IntegrationTest
     end
 
     sleep 1
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within('.nav-tabs'){click_on 'Communications'}
@@ -475,7 +475,7 @@ class MembersBillTest < ActionController::IntegrationTest
       Member.bill_all_members_up_today
     end
 
-    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
 

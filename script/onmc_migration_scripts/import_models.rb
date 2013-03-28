@@ -7,7 +7,7 @@
 # update onmc_customer_service.operations set imported_at = NULL where imported_at IS NOT NULL;
 # update onmc_customer_service.notes set imported_at = NULL where imported_at IS NOT NULL;
 # update onmc_prospects.prospects set imported_at = NULL where imported_at IS NOT NULL;
-# production datase
+# production database
 # update billingcomponent_production.members set imported_at = NULL where imported_at IS NOT NULL;
 # update billingcomponent_production.chargebacks set imported_at = NULL where imported_at IS NOT NULL;
 # update billingcomponent_production.enrollment_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
@@ -15,6 +15,17 @@
 # update prospectcomponent.prospects set imported_at = NULL where imported_at IS NOT NULL;
 # update customerservice3.operations set imported_at = NULL where imported_at IS NOT NULL;
 # update customerservice3.notes set imported_at = NULL where imported_at IS NOT NULL;
+# phoenix database
+# use sac_production;
+# truncate credit_cards;
+# truncate enrollment_infos;
+# truncate prospect;
+# truncate fulfillments;
+# truncate members;
+# truncate memberships;
+# truncate member_notes;
+# truncate operations;
+# truncate transactions;
 #
 # 1.1- Load toms (only once) => Done
 #     ruby script/custom/import_load_toms.rb  
@@ -150,9 +161,7 @@ end
 class PhoenixMember < ActiveRecord::Base
   establish_connection "phoenix" 
   self.table_name = "members" 
-  self.primary_key = 'uuid'
   self.record_timestamps = false
-  before_create 'self.id = UUIDTools::UUID.random_create.to_s'
 
   def terms_of_membership_id
     PhoenixMembership.find_by_member_id(self.id).terms_of_membership_id rescue nil
@@ -300,7 +309,7 @@ class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
     "#{self.created_at.to_date}-#{a.member_id}"
   end
   def member(a)
-    PhoenixMember.find_by_visible_id_and_club_id(a.member_id, CLUB)
+    PhoenixMember.find_by_id_and_club_id(a.member_id, CLUB)
   end
   def amount
     phoenix_amount
@@ -322,7 +331,7 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
     BillingMembershipAuthorization.find_by_id(self.authorization_id)
   end
   def member(a)
-    PhoenixMember.find_by_visible_id_and_club_id(a.member_id, CLUB)
+    PhoenixMember.find_by_id_and_club_id(a.member_id, CLUB)
   end
   def invoice_number(a)
     "#{self.created_at.to_date}-#{a.member_id}"
@@ -410,7 +419,7 @@ def add_operation(operation_date, object_class, object_id, description, operatio
     o.resource_id = object_id
   end
   o.updated_at = updated_at
-  o.member_id = @member.uuid
+  o.member_id = @member.id
   o.save!
 end
 

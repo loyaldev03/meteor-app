@@ -2,7 +2,7 @@
   <% unless params[:controller].include?('terms_of_membership') %>
     <%= params[:controller].humanize.singularize %>:
   <% end %>
-  <%= @current_member.visible_id %> - 
+  <%= @current_member.id %> - 
   <%= @current_member.first_name %> <%= @current_member.last_name %> 
 	<% if @current_member.blacklisted? %>
   &nbsp;<small style="color: red;">Blacklisted!!!</small>

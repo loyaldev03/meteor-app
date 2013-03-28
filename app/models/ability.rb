@@ -26,6 +26,9 @@ class Ability
     cannot :api_update, Member
     cannot :api_profile, Member
     cannot :api_update_club_cash, Member
+    cannot :api_change_next_bill_date, Member
+    cannot :api_find_all_by_updated, Member
+    cannot :api_find_all_by_created, Member
     cannot :manage_product_api, Product
     cannot :manage_prospects_api, Prospect
     cannot :manage_token_api, Agent
@@ -49,6 +52,10 @@ class Ability
       can :api_enroll, Member
       can :api_update, Member
       can :api_profile, Member
+      can :api_update_club_cash, Member
+      can :api_change_next_bill_date, Member
+      can :api_find_all_by_updated, Member
+      can :api_find_all_by_created, Member
       can :manage_product_api, Product
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
@@ -59,6 +66,10 @@ class Ability
       cannot :api_profile, Member
       cannot :set_undeliverable, Member
       cannot :see_sync_status, Member
+      cannot :api_update_club_cash, Member
+      cannot :api_change_next_bill_date, Member
+      cannot :api_find_all_by_updated, Member
+      cannot :api_find_all_by_created, Member
       can :manage, Operation
       can :list, Membership
       can :manage, CreditCard
@@ -72,6 +83,10 @@ class Ability
       can :manage, Member
       cannot :api_profile, Member
       cannot :see_sync_status, Member
+      cannot :api_update_club_cash, Member
+      cannot :api_change_next_bill_date, Member
+      cannot :api_find_all_by_updated, Member
+      cannot :api_find_all_by_created, Member
       can :manage, Operation
       can :list, Membership
       can :manage, MemberNote
@@ -84,6 +99,9 @@ class Ability
       can :api_update, Member
       can :api_profile, Member
       can :api_update_club_cash, Member
+      can :api_change_next_bill_date, Member
+      can :api_find_all_by_updated, Member
+      can :api_find_all_by_created, Member
       can :manage_product_api, Product
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
@@ -107,6 +125,10 @@ class Ability
       can :manage, Member
       cannot :api_profile, Member
       cannot :see_sync_status, Member
+      cannot :api_update_club_cash, Member
+      cannot :api_change_next_bill_date, Member
+      cannot :api_find_all_by_updated, Member
+      cannot :api_find_all_by_created, Member
       can :manage, Operation
       can :list, Membership
       can :manage, CreditCard

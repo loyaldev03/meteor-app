@@ -137,7 +137,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_admin
     setup_member
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".breadcrumb")do
@@ -153,7 +153,7 @@ class RolesTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled!
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     within('.nav-tabs'){ click_on('Credit Cards')}
@@ -169,7 +169,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_member
     @saved_member.set_as_canceled!
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     wait_until { find(:xpath, "//a[@id='recovery']").click }
@@ -201,7 +201,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_supervisor
     setup_member
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".breadcrumb")do
@@ -229,7 +229,7 @@ class RolesTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled!
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     within('.nav-tabs'){ click_on('Credit Cards')}
@@ -262,7 +262,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_member
     @saved_member.set_as_canceled!
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     wait_until { find(:xpath, "//a[@id='recovery']").click }
@@ -298,7 +298,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_representative
     setup_member
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".breadcrumb")do
@@ -315,7 +315,7 @@ class RolesTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled!
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     assert find(:xpath, "//a[@id='link_member_set_undeliverable' and @disabled='disabled']")
@@ -334,7 +334,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_member
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#table_active_credit_card") do
@@ -374,7 +374,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_member
     @saved_member.set_as_canceled!
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     wait_until { find(:xpath, "//a[@id='recovery']").click }
@@ -431,7 +431,7 @@ class RolesTest < ActionController::IntegrationTest
   test "Agency should see full breadcrumb" do
     setup_agency
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     within(".breadcrumb")do
@@ -446,7 +446,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_member
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     within('.nav-tabs'){ click_on('Credit Cards')}
@@ -462,7 +462,7 @@ test "Agency role - Recover a member" do
     setup_member
     @saved_member.set_as_canceled!
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     wait_until { assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
@@ -717,7 +717,7 @@ test "Agency role - Recover a member" do
                                    :operation_type => Settings.operation_types.chargeback, 
                                    :created_by_id => @agent.id )
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
 
     within('.nav-tabs'){ click_on('Credit Cards')}
@@ -732,7 +732,7 @@ test "Agency role - Recover a member" do
   test "Admin, Supervisor, fulfillment_managment, Representative and Agency role - Display Credit Card type" do
     setup_admin
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
     within("#table_active_credit_card")do
@@ -741,28 +741,28 @@ test "Agency role - Recover a member" do
     end
 
     @agent.update_attribute(:roles, ['supervisor'])
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_active_credit_card")do
       assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
       assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
     end
 
     @agent.update_attribute(:roles, ['fulfillment_managment'])
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_active_credit_card")do
       assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
       assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
     end 
 
     @agent.update_attribute(:roles, ['representative'])
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_active_credit_card")do
       assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
       assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
     end
 
     @agent.update_attribute(:roles, ['agency'])
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_active_credit_card")do
       assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
       assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
@@ -801,12 +801,12 @@ test "Agency role - Recover a member" do
     @saved_member.update_attribute :next_retry_bill_date, Time.zone.now
     active_merchant_stubs
     @saved_member.bill_membership
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){click_on 'Transactions'}
     within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
 
     @saved_member.set_as_canceled
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
     within('.nav-tabs'){click_on 'Credit Cards'}
     within('#credit_cards'){ assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil }
@@ -855,12 +855,12 @@ test "Agency role - Recover a member" do
       @saved_member.update_attribute :next_retry_bill_date, Time.zone.now
       active_merchant_stubs
       @saved_member.bill_membership
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
       within('.nav-tabs'){click_on 'Transactions'}
       within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
 
       @saved_member.set_as_canceled
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
       assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
       within('.nav-tabs'){click_on 'Credit Cards'}
       within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
@@ -898,12 +898,12 @@ test "Agency role - Recover a member" do
       @saved_member.update_attribute :next_retry_bill_date, Time.zone.now
       active_merchant_stubs
       @saved_member.bill_membership
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
       within('.nav-tabs'){click_on 'Transactions'}
       within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
 
       @saved_member.set_as_canceled
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
       assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
       within('.nav-tabs'){click_on 'Credit Cards'}
       within('#credit_cards'){ assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil }
@@ -924,7 +924,7 @@ test "Agency role - Recover a member" do
       visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
       assert page.has_no_selector?("#new_member")
 
-      visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
 
       assert find(:xpath, "//a[@id='edit' and @disabled='disabled']")
       assert find(:xpath, "//a[@id='save_the_sale' and @disabled='disabled']")
@@ -941,12 +941,12 @@ test "Agency role - Recover a member" do
     
       @saved_member.update_attribute :next_retry_bill_date, Time.zone.now
       active_merchant_stubs
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
       within('.nav-tabs'){click_on 'Transactions'}
       within('#transactions_table'){ assert find(:xpath, "//a[@id='refund' and @disabled='disabled']") }
 
       @saved_member.set_as_canceled
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
       assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
       within('.nav-tabs'){click_on 'Credit Cards'}
       within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
@@ -997,12 +997,12 @@ test "Agency role - Recover a member" do
       @saved_member.update_attribute :next_retry_bill_date, Time.zone.now
       active_merchant_stubs
       @saved_member.bill_membership
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
       within('.nav-tabs'){click_on 'Transactions'}
       within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
 
       @saved_member.set_as_canceled
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
       assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
       within('.nav-tabs'){click_on 'Credit Cards'}
       within('#credit_cards'){ assert page.has_no_selector?("#destroy") }

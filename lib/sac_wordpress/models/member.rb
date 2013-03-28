@@ -16,7 +16,7 @@ module Wordpress
     #   [:phone,          :profile,        :phone_number],
     #   [:state_province, :profile_single, :state],
     #   [:zip,            :profile,        :zip],
-    #   [:member_id,      :profile,        :visible_id],
+    #   [:member_id,      :profile,        :id],
     #   [:cc_month,       :profile_assoc,  :active_credit_card, :expire_month],
     #   [:cc_year,        :profile_assoc,  :active_credit_card, :expire_year],
     #   [:cc_number,      :profile_assoc,  :active_credit_card, :number]
@@ -92,7 +92,7 @@ module Wordpress
           last_sync_error: res.body
         }
       end
-      ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+      ::Member.where(id: self.member.id).limit(1).update_all(data)
     end
 
 
@@ -108,7 +108,7 @@ module Wordpress
           last_sync_error: res.body
         }
       end
-      ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+      ::Member.where(id: self.member.id).limit(1).update_all(data)
     end
 
   end

@@ -148,7 +148,6 @@ defaults: &defaults
     others: 1000
   error_codes:
     success: '000'
-    wrong_data: '100'
     not_found: '401'
     member_data_invalid: '405'
     prospect_data_invalid: '403'
@@ -176,10 +175,6 @@ defaults: &defaults
     no_amount: '9887'    
     member_already_set_wrong_address: '9888'
     member_set_wrong_address_error: '9889'
-    could_not_get_member_list: 9992
-    could_not_change_next_bill_date: 9993
-    next_bill_date_prior_actual_date: 9994
-    next_bill_date_blank: 9995
     credit_card_blank_without_grace: '9997'
     billing_date_not_reached: '9999'
     member_email_blacklisted: '9996'
@@ -300,7 +295,7 @@ defaults: &defaults
         zip:
           presence: true
           format: 
-            :with: !ruby/regexp /^[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}\s?[0-9]{1}[A-Za-z][0-9]{1}$/
+            :with: !ruby/regexp /^[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}[\s]{1}[0-9]{1}[A-Za-z][0-9]{1}$/
             :message: 'The zip code is not valid for the selected country.'
 
 development:

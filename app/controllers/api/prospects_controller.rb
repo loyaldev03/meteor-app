@@ -1,56 +1,55 @@
 class Api::ProspectsController < ApplicationController
   skip_before_filter :verify_authenticity_token
-  
   respond_to :json
 
-  # Method  : POST
+  ##
   # Creates prospect with data that we recieve. We don't validate this data.
   #
-  # [url] /api/v1/prospects
-  # [prospect] Information related to the prospect.
-  #                             *terms_of_membership_id: 
-  #                             *first_name: Prospect's first name.
-  #                             *last_name: Prospect's last name.
-  #                             *gender:
-  #                             *address: Address registered by the prospect.
-  #                             *city: City registered by the prospect. 
-  #                             *state: State registered by the prospect.
-  #                             *zip: Zip registered by the prospect.
-  #                             *country:
-  #                             *referral_parameters:
-  #                             *email: Email registered by the prospect.
-  #                             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
-  #                             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
-  #                             *phone_local_number: Third and las field of the phone_number. This is the local number of the phone number.
-  #                             *type_of_phone_number
-  #                             *birth_date: Birth date of the prospect
-  #                             *product_sku: Name of the selected product. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet")
-  #                             *product_description:
-  #                             *marketing_code: multi-team
-  #                             *campaign_medium
-  #                             *campaign_description
-  #                             *campaign_medium_version
-  #                             *fulfillment_code
-  #                             *mega_channel:
-  #                             *ip_address: Ip address from where the enrollment is being submitted.
-  #                             *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
-  #                             *referral_host: Link where is being redirect when after subimiting the enroll. (It shows the params in it),
-  #                             *referral_path
-  #                             *user_id
-  #                             *landing_url: Url from where te submit comes from.
-  #                             *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
-  #                              this information is selected by the member. This information is stored with format as hash encoded with json.
-  #                             *cookie_set
-  #                             *cookie_value: Cookie from where the enrollment is being submitted.
-  #                             *joint
-  # [message] Shows the method results and also informs the errors.
-  # [code] Code related to the method result.
-  # [prospect_id] ID of the prospect. This ID is unique for each prospect. (32 characters string)
+  # @resource /api/v1/prospects
+  # @action POST
   #
-  # @param [Hash] prospect
-  # @return [string] *message*
-  # @return [Integer] *code*
-  # @return [String] *prospect_id*
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [Hash] prospect Information related to the prospect.
+  #  <ul>
+  #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). [optional]</li>
+  #     <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). [optional]</li>
+  #     <li><strong>address</strong> The address of the member that is being enrolled. </li>
+  #     <li><strong>city</strong> City from where the member is from.[optional]</li>
+  #     <li><strong>state</strong> The state standard code where the member is from. [optional]</li>
+  #     <li><strong>zip</strong> Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.[optional]</li>
+  #     <li><strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).[optional]</li>
+  #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "1"). [optional]</li>
+  #     <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. [optional]</li>
+  #     <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached.[optional]</li>
+  #     <li><strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
+  #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female.[optional]</li>
+  #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others).[optional]</li>
+  #     <li><strong>terms_of_memberhips_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at prospect level. </li> 
+  #     <li><strong>enrollment_amount</strong> Amount of money that takes to enroll. It is present at member level.[optional]</li>
+  #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd"[optional]</li>
+  #     <li><strong>product_sku</strong> Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet")[optional]</li>
+  #     <li><strong>mega_channel</strong>[optional]</li>
+  #     <li><strong>marketing_code</strong> multi-team[optional]</li>
+  #     <li><strong>fulfillment_code</strong> Id of the fulfillment we are sending to our member. (car-flag).[optional]</li>
+  #     <li><strong>ip_address</strong> Ip address from where the enrollment is being submitted.[optional]</li>
+  #     <li><strong>user_agent</strong> Information related to the browser and computer from where the enrollment is being submitted.[optional]</li>
+  #     <li><strong>referral_host</strong> Link where is being redirect when after subimiting the enroll. (It shows the params in it).[optional]</li>
+  #     <li><strong>referral_parameters</strong> [optional]</li>
+  #     <li><strong>referral_path</strong> [optional]</li>
+  #     <li><strong>user_id</strong> User ID alias UID is an md5 hash of the user's IP address and user-agent information.[optional]</li>
+  #     <li><strong>landing_url</strong> Url from where te submit comes from.[optional]</li>
+  #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. This information is selected by the member. This information is stored with format as hash encoded with json. [optional]</li>
+  #     <li><strong>cookie_value</strong> Cookie from where the enrollment is being submitted.[optional]</li>
+  #     <li><strong>cookie_set</strong> If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.[optional]</li>
+  #     <li><strong>campaign_medium</strong> [optional]</li>
+  #     <li><strong>campaign_description</strong> The name of the campaign.[optional]</li>
+  #     <li><strong>campaign_medium_version</strong> [optional]</li>
+  #     <li><strong>joint</strong> It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level. [optional]</li> 
+  #  </ul>
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] prospect_id Prospect's id. This ID is unique for each prospect. (36 characters string)
+  #
   def create
     tom = TermsOfMembership.find(params[:prospect][:terms_of_membership_id])
     my_authorize! :manage_prospects_api, Prospect, tom.club_id

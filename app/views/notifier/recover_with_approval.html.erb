@@ -9,7 +9,7 @@
         <p> <b> Club: </b> <%= @member.club_id %> - <%= @member.club.name %> </p> 
         <p> <b> Terms of membership: </b> <%= @member.terms_of_membership_id %> - <%= @member.terms_of_membership.name %> </p>
 
-<p> In order to accept or reject this member, please follow this link <%= link_to 'Link to member show page', show_member_url(@member.club.partner.prefix, @member.club.name , @member.visible_id) %> .</p>.
+<p> In order to accept or reject this member, please follow this link <%= link_to 'Link to member show page', show_member_url(@member.club.partner.prefix, @member.club.name , @member.id) %> .</p>.
 
 <p>Regards.</p>
 

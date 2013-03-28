@@ -35,7 +35,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   end
 
   def recover_member(member, tom)
-    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     
     click_on 'Recover'
@@ -49,7 +49,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   end
 
   def cancel_member(member,date_time)
-    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     click_on 'Cancel'
@@ -64,7 +64,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   end
 
   def validate_member_recovery(member, tom)
-    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
     within("#td_mi_status") do
@@ -178,7 +178,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     setup_member
     @saved_member.update_attribute(:blacklisted,true)
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until { find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
   end
 
@@ -218,7 +218,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   test "Drupal should not create a new account when updating a lapsed member info in phoenix" do
     setup_member
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)    
     click_link_or_button 'Edit'
 
     within("#table_demographic_information")do
@@ -254,7 +254,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_member.first_name 
     @saved_member.bill_membership
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name 
 
     @saved_member.bill_membership
@@ -281,7 +281,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     @saved_member.reload
     @saved_member.bill_membership
 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.visible_id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name 
 
     next_bill_date = Time.zone.now + eval(@new_terms_of_membership_with_gateway.installment_type)

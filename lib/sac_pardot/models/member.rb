@@ -2,7 +2,7 @@ module Pardot
   class Member < Struct.new(:member)
 
     # We dont check if a field changed, because we do this sync after drupal sync. Drupal sync saves object making changes hash to be empty.
-    MEMBER_OBSERVED_FIELDS = %w(first_name last_name address city email phone_country_code phone_area_code phone_local_number state zip visible_id birth_date blacklisted preferences status member_since_date wrong_address wrong_phone_number bill_date gender external_id autologin_url country member_group_type_id club_cash_amount).to_set.freeze
+    MEMBER_OBSERVED_FIELDS = %w(first_name last_name address city email phone_country_code phone_area_code phone_local_number state zip id birth_date blacklisted preferences status member_since_date wrong_address wrong_phone_number bill_date gender external_id autologin_url country member_group_type_id club_cash_amount).to_set.freeze
     MEMBERSHIP_OBSERVED_FIELDS = %w(terms_of_membership join_date cancel_date quota).to_set.freeze
     ENROLLMENT_INFO_OBSERVED_FIELDS = %w(joint marketing_code mega_channel fulfillment_code campaign_medium_version campaign_medium product_sku landing_url enrollment_amount).to_set.freeze
 
@@ -51,7 +51,7 @@ module Pardot
           pardot_last_sync_error_at: Time.zone.now
         }
       end
-      ::Member.where(uuid: self.member.uuid).limit(1).update_all(data)
+      ::Member.where(id: self.member.id).limit(1).update_all(data)
       self.member.reload rescue self.member
     end
 
@@ -78,7 +78,7 @@ module Pardot
         wrong_phone_number: (m.wrong_phone_number ? 1 : 0),
         external_id: m.external_id,
         club_cash_amount: m.club_cash_amount,
-        member_number: m.visible_id,
+        member_number: m.id,
         club: m.club.name,
         client: m.club.partner.name,
         next_bill_date: m.bill_date
