@@ -316,8 +316,8 @@ class TransactionTest < ActiveSupport::TestCase
       '"Adj Ref Num","Reason","First Time","Reason Code","CB Ref Num","Terminal ID"\n' +
       '"941000110030",""SAC*AO ADVENTURE CLUB"","2890810","07/26/2012","'+active_member.credit_cards.first.number.to_s+
       '","25247702125003734750438",'+
-      '"05/03/2012","84.0","'+transaction.response_transaction_id+'","'+active_member.visible_id.to_s+'",""'+
-      active_member.visible_id.to_s+'"","00465Z",""07/27/2012-""' +
+      '"05/03/2012","84.0","'+transaction.response_transaction_id+'","'+active_member.id.to_s+'",""'+
+      active_member.id.to_s+'"","00465Z",""07/27/2012-""' +
       ',""00373475043"",""No Cardholder Authorization"","Y","4837","2206290194",""94100011003000000002""' }
 
     # assert_difference('Transaction', 1) do 

@@ -523,10 +523,10 @@ module ActionController
   end
 
   def validate_view_member_base(member, status='provisional')
-    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.visible_id)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
     wait_until{ assert find_field('input_first_name').value == member.first_name }
 
-    assert find_field('input_visible_id').value == "#{member.visible_id}"
+    assert find_field('input_id').value == "#{member.id}"
     assert find_field('input_first_name').value == member.first_name
     assert find_field('input_last_name').value == member.last_name
     assert find_field('input_gender').value == (member.gender == 'F' ? 'Female' : 'Male') unless member.gender.blank?
