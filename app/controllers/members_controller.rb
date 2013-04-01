@@ -15,6 +15,7 @@ class MembersController < ApplicationController
 
   def search_result
     @members = Member.paginate(:page => params[:page], :per_page => 25)
+                       .includes([:current_membership])
                        .with_id(params[:member][:id])
                        .with_first_name_like(params[:member][:first_name])
                        .with_last_name_like(params[:member][:last_name])

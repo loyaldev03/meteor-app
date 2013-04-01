@@ -83,6 +83,7 @@ group :development do
   gem "yard", "~> 0.8.2.1"
   gem 'yard-rest'
   gem 'redcarpet'
+  gem "bullet"
 end
 
 group :test do
