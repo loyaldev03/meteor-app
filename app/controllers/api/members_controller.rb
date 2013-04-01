@@ -360,7 +360,7 @@ class Api::MembersController < ApplicationController
   end
 
   # Method : GET
-  # Returns information related to member and its credit card.
+  # Returns information related to member's information, credit card, current membership and enrollment information.
   #
   # [url] /api/v1/members/:id
   # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
@@ -380,6 +380,8 @@ class Api::MembersController < ApplicationController
   #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
   #             *club_cash_amount: Amount of the club cash the member has at this moment. We accept a maximun of two digits after the comma.
   #             *club_cash_expire_date: Date when the club cash will be expired and set to 0. This date is saved as date format.
+  #             *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
+  #             *birth_date: Birth date of the member. This date is stored with format "yyyy-mm-dd"
   #             *gender: Gender of the member. The values we are recieving are "M" for male or "F" for female.
   #             *bill_date: Date when the billing will be done. 
   #             *next_retry_bill_date: Date when the billing will be done. 
@@ -389,62 +391,17 @@ class Api::MembersController < ApplicationController
   #             *reactivation_times: Integer value that tells us how many times this member was recovered. 
   #             *blacklisted: Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted)
   #             *member_group_type_id: Group type the member belongs to.
-  #             *recycled_times: 
   #             *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
-  #             *sync_status: String with status of the actual synchronization status with drupal. This value will be only returned if member's club api type is 'Drupal::Member'
-  #                           *Options: 
-  #                                   *'synced': Member is synced with drupal successfully. 
-  #                                   *'not_synced': Member is not synced with drupal. 
-  #                                   *'with_errors': Member is not synced with drupal because there were errors.
-  #             *last_synced_at: Date of the last time the member was synchronized against drupal. It is saved with dateTime format. This value will be only returned if member's club api type is 'Drupal::Member'
-  #             *last_sync_error_at: Date of the last time there was an error while trying to synchronized with drupal. It is saved with dateTime format. This value will be only returned if member's club api type is 'Drupal::Member'
-  #             *last_sync_error: Last error message while syncrhonizating. This value will be only returned if member's club api type is 'Drupal::Member'
   # [credit_card] Information related to member's credit card.
+  #                 *last_4_digits: The last four digits of member's active credit card.
   #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
   #                 *expire_year: The year (in numbers) in which the credit card will expire.  
   # [current_membership] Information related to the member's membership at the moment.
   #                 *status: Member's current status.  
   #                 *join_date: Date when the member join. This date is updated each time the member is recovered, or it is saved the sale.
   #                 *cancel_date: Date schedule when the member will be canceled. 
-  #                 *quota: 
-  #                 *terms_of_membership: [Hash]
-  # [terms_of_membership] Information related to the terms of membership the membership is related to.
-  #                 *name: Terms of membership name.  
-  #                 *description: Description of the terms of membership.
-  #                 *provisional_days: Days given before the first billing is done.
-  #                 *mode: 
-  #                 *needs_enrollment_approval: 
-  #                 *installment_amount: 
-  #                 *installment_type: 
-  #                 *club_cash_amount: 
-  # [enrollment_info] Information obtained from the member's enrollment
-  #              *enrollment_amount: Amount of money that takes to enroll. It is present at member level
-  #              *product_sku: Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet")
-  #              *product_description: Description of the selected product.
-  #              *mega_channel: 
-  #              *marketing_code: multi-team
-  #              *fulfillment_code: Id of the fulfillment we are sending to our member. (car-flag).
-  #              *ip_address: Ip address from where the enrollment is being submitted.
-  #              *user_agent: Information related to the browser and computer from where the enrollment is being submitted.
-  #              *referral_host:  Link where is being redirect when after subimiting the enroll. (It shows the params in it).
-  #              *referral_parameters
-  #              *referral_path 
-  #              *user_id: User ID alias UID is an md5 hash of the user's IP address and user-agent information.
-  #              *landing_url: Url from where te submit comes from.
-  #              *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
-  #               this information is selected by the member. This information is stored with format as hash encoded with json.
-  #              *cookie_value: Cookie from where the enrollment is being submitted.
-  #              *cookie_set: If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.
-  #              *campaign_medium
-  #              *campaign_description: The name of the campaign.
-  #              *campaign_medium_version
-  #              *joint: It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's 
-  #               informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. 
-  #               This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level.
-  #              *prospect_id: Id of the prospect related to this member. 
   # [message] Shows the method errors. This message will be only shown when there was an error.
   # [code] Code related to the method result.
-  # [message] Shows the method errors. This message will be only shown when there was an error.
   #
   # @param [String] api_key
   # @return [String] *message* 
