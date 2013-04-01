@@ -7,17 +7,17 @@ class FulfillmentsController < ApplicationController
       @status = params[:status]
     	if params[:all_times] == '1'
         if params[:product_type] == Settings.others_product
-          @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_others.not_renewed
+          @fulfillments = Fulfillment.includes(:member).joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_others.not_renewed
         else
-          @fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ? and product_sku = ? ', params[:status], @current_club.id, params[:product_type]).not_renewed
+          @fulfillments = Fulfillment.includes(:member).joins(:member).where('fulfillments.status = ? and club_id = ? and product_sku = ? ', params[:status], @current_club.id, params[:product_type]).not_renewed
         end
         @product_type = params[:product_type]
       else
         if params[:product_type] == Settings.others_product
-          @fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? ', 
+          @fulfillments = Fulfillment.includes(:member).joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? ', 
             params[:status], params[:initial_date], params[:end_date], @current_club.id]).type_others.not_renewed
         else
-          @fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND product_sku = ? ', 
+          @fulfillments = Fulfillment.includes(:member).joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND product_sku = ? ', 
             params[:status], params[:initial_date], params[:end_date], @current_club.id, params[:product_type]]).not_renewed
         end
       end  
