@@ -147,7 +147,7 @@ en:
         description: 'Description'
         amount: 'Amount'
         gw_trans: 'Gw trans'
-        cc_related: 'Credit Card Last Digits'
+        cc_related: 'CC Last 4 Digits'
         not_found: 'No transactions were found.'
       agent:  
         login: "Username or email"

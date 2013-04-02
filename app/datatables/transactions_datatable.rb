@@ -17,8 +17,8 @@ private
         " <i class ='icon-eye-open help' rel= 'popover' data-toggle='modal' href='#myModal"+transaction.id+"' 
              style='cursor: pointer'></i>"+modal(transaction), 
         number_to_currency(transaction.amount) ,
-        transaction.can_be_refunded? ? number_to_currency(transaction.amount_available_to_refund) : '',
-        transaction.response_transaction_id,
+        number_to_currency(transaction.amount_available_to_refund),
+        transaction.gateway + " " + transaction.response_transaction_id.to_s,
         transaction.last_digits,
         transaction.can_be_refunded? ? link_to(I18n.t('refund'),
             @url_helpers.member_refund_path(@current_partner.prefix,@current_club.name,@current_member.id, :transaction_id => transaction.id), 
