@@ -17,7 +17,7 @@ private
         " <i class ='icon-eye-open help' rel= 'popover' data-toggle='modal' href='#myModal"+transaction.id+"' 
              style='cursor: pointer'></i>"+modal(transaction), 
         number_to_currency(transaction.amount) ,
-        number_to_currency(transaction.amount_available_to_refund),
+        transaction.can_be_refunded? ? number_to_currency(transaction.amount_available_to_refund) : '',
         transaction.gateway + " " + transaction.response_transaction_id.to_s,
         transaction.last_digits,
         transaction.can_be_refunded? ? link_to(I18n.t('refund'),
