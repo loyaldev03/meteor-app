@@ -13,9 +13,9 @@ def add_fulfillment(member)
     phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.id.to_s
     phoenix_f.product_package = KIT_CARD_FULFILLMENT
     phoenix_f.product_sku = KIT_CARD_FULFILLMENT
-    phoenix_f.assigned_at = Time.now.utc if phoenix_f.assigned_at.nil?
     renewdate = member.phoenix_join_date_time + (Date.today.year - member.phoenix_join_date_time.year).years
     phoenix_f.renewable_at = (renewdate > Date.today ? renewdate : renewdate.next_year)
+    phoenix_f.assigned_at = (phoenix_f.renewable_at - 1.year)
     phoenix_f.recurrent = true
     phoenix_f.status = "not_processed"
     phoenix_f.save! if phoenix_f.changed? 
@@ -27,7 +27,7 @@ def remove_fulfillment
   phoenix_f.destroy unless phoenix_f.nil?
 end
 
-def set_member_data(phoenix, member, merge_member = false)
+def set_member_data(phoenix, member)
   phoenix.first_name = member.first_name
   phoenix.last_name = member.last_name
   phoenix.email = member.email_to_import
@@ -52,11 +52,9 @@ def set_member_data(phoenix, member, merge_member = false)
   else
     phoenix.member_group_type_id = nil
   end
-  unless merge_member
-    phoenix.created_at = member.created_at
-    phoenix.updated_at = member.updated_at
-    phoenix.member_since_date = convert_from_date_to_time(member.member_since_date)
-  end
+  phoenix.created_at = member.created_at
+  phoenix.updated_at = member.updated_at
+  phoenix.member_since_date = convert_from_date_to_time(member.member_since_date)
 end
 
 def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
@@ -71,8 +69,8 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   @e_info.landing_url = campaign.landing_url
   @e_info.terms_of_membership_id = tom_id
   @e_info.preferences = JSON.generate({ :driver_1 => member.fav_driver1, :driver_2 => member.fav_driver2, :track => member.fav_track, :car => member.fav_car })
-  @e_info.created_at = member.created_at
-  @e_info.updated_at = member.updated_at
+  @e_info.created_at = member.phoenix_join_date_time
+  @e_info.updated_at = member.phoenix_join_date_time
   @e_info.campaign_medium = campaign.campaign_medium
   @e_info.campaign_description = campaign.campaign_description
   @e_info.campaign_medium_version = campaign.campaign_medium_version
@@ -101,7 +99,7 @@ def set_membership_data(tom_id, member)
   membership.join_date = member.phoenix_join_date_time
   membership.status = @member.status
   membership.quota = member.quota
-  membership.created_at = member.created_at
+  membership.created_at = member.phoenix_join_date_time
   membership.updated_at = member.updated_at
   membership.member_id = @member.id
   membership.cancel_date = member.cancelled_at
@@ -205,7 +203,7 @@ end
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
       # " AND id <= 20243965592 " +
-      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date IS NOT NULL AND phoenix_prospect_id IS NOT NULL" +
+      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date IS NOT NULL " +
       " AND (active = 1 or trial = 1) AND blacklisted IS NULL AND phoenix_status IS NOT NULL AND phoenix_email IS NOT NULL " +
       " AND credit_card_token IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
