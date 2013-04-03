@@ -8,7 +8,7 @@ class Api::ProspectsController < ApplicationController
   # @resource /api/v1/prospects
   # @action POST
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
   # @required [Hash] prospect Information related to the prospect.
   #  <ul>
   #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). [optional]</li>
