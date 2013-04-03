@@ -485,8 +485,8 @@ It will also send a welcome email and charge the enrollment to the member's cred
     &quot;external_id&quot;:&quot;2568&quot;,
     &quot;preferences&quot;:{ &quot;color&quot;:&quot;red&quot;, &quot;player&quot;:&quot;DaveJr&quot; },
     &quot;credit_card&quot;:{
-       &quot;number&quot;:&quot;4485-6302-0286-9418&quot;
-       &quot;expire_month&quot;:5
+       &quot;number&quot;:&quot;4485-6302-0286-9418&quot;,
+       &quot;expire_month&quot;:5,
        &quot;expire_year&quot;:2016
     }
   }
@@ -562,8 +562,8 @@ It will also send a welcome email and charge the enrollment to the member's cred
     &quot;external_id&quot;:&quot;2568&quot;,
     &quot;preferences&quot;:{ &quot;color&quot;:&quot;red&quot;, &quot;player&quot;:&quot;DaveJr&quot; },
     &quot;credit_card&quot;:{
-       &quot;number&quot;:&quot;4485-6302-0286-9418&quot;
-       &quot;expire_month&quot;:5
+       &quot;number&quot;:&quot;4485-6302-0286-9418&quot;,
+       &quot;expire_month&quot;:5,
        &quot;expire_year&quot;:2016
     },
     &quot;setter&quot;:{
@@ -769,7 +769,12 @@ It will also send a welcome email and charge the enrollment to the member's cred
     &quot;member_group_type_id&quot;:1,
     &quot;product_sku&quot;:&quot;KIT-CARD&quot;,
     &quot;product_description&quot;:&quot;product default&quot;,
-    &quot;external_id&quot;:&quot;2568&quot;
+    &quot;external_id&quot;:&quot;2568&quot;,
+    &quot;credit_card&quot;:{
+       &quot;number&quot;:&quot;XXXX-XXXX-XXXX-9418&quot;,
+       &quot;expire_month&quot;:5,
+       &quot;expire_year&quot;:2016
+    }
   },
     &quot;setter&quot;:{
        &quot;wrong_phone_number&quot;:0,
@@ -845,7 +850,12 @@ It will also send a welcome email and charge the enrollment to the member's cred
     &quot;member_group_type_id&quot;:1,
     &quot;product_sku&quot;:&quot;KIT-CARD&quot;,
     &quot;product_description&quot;:&quot;product default&quot;,
-    &quot;external_id&quot;:&quot;2568&quot;
+    &quot;external_id&quot;:&quot;2568&quot;,
+    &quot;credit_card&quot;:{
+       &quot;number&quot;:&quot;XXXX-XXXX-XXXX-9418&quot;,
+       &quot;expire_month&quot;:5,
+       &quot;expire_year&quot;:2016
+    }
   },
     &quot;setter&quot;:{
        &quot;wrong_phone_number&quot;:0,
@@ -1152,7 +1162,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 		</div>	
     
 		<div class="method">
-			<p class="method_desc">Gets an array with the member's id that were updated between the dates given.</p>
+			<p class="method_desc">Gets an array with all member's id that were updated between the dates given.</p>
 			<h3 class="resource_url"><strong>/api/v1/members/find_all_by_updated/:club_id/:start_date/:end_date</strong> [GET]</h3>
 
 			<div class="parameters">	
@@ -1233,7 +1243,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 		</div>	
     
 		<div class="method">
-			<p class="method_desc">Gets an array with the member's id that were created between the dates given.</p>
+			<p class="method_desc">Gets an array with all member's id that were created between the dates given.</p>
 			<h3 class="resource_url"><strong>/api/v1/members/find_all_by_created/:club_id/:start_date/:end_date</strong> [GET]</h3>
 
 			<div class="parameters">	
@@ -1332,7 +1342,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Wed Apr  3 11:21:53 2013 with ruby-1.9.2
+  Generated on Wed Apr  3 12:57:50 2013 with ruby-1.9.2
 </div>
 
   </body>

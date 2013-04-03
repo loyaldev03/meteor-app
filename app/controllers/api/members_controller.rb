@@ -90,8 +90,8 @@ class Api::MembersController < ApplicationController
   #       "external_id":"2568",
   #       "preferences":{ "color":"red", "player":"DaveJr" },
   #       "credit_card":{
-  #          "number":"4485-6302-0286-9418"
-  #          "expire_month":5
+  #          "number":"4485-6302-0286-9418",
+  #          "expire_month":5,
   #          "expire_year":2016
   #       }
   #     }
@@ -138,8 +138,8 @@ class Api::MembersController < ApplicationController
   #       "external_id":"2568",
   #       "preferences":{ "color":"red", "player":"DaveJr" },
   #       "credit_card":{
-  #          "number":"4485-6302-0286-9418"
-  #          "expire_month":5
+  #          "number":"4485-6302-0286-9418",
+  #          "expire_month":5,
   #          "expire_year":2016
   #       },
   #       "setter":{
@@ -249,7 +249,12 @@ class Api::MembersController < ApplicationController
   #       "member_group_type_id":1,
   #       "product_sku":"KIT-CARD",
   #       "product_description":"product default",
-  #       "external_id":"2568"
+  #       "external_id":"2568",
+  #       "credit_card":{
+  #          "number":"XXXX-XXXX-XXXX-9418",
+  #          "expire_month":5,
+  #          "expire_year":2016
+  #       }
   #     },
   #       "setter":{
   #          "wrong_phone_number":0,
@@ -296,7 +301,12 @@ class Api::MembersController < ApplicationController
   #       "member_group_type_id":1,
   #       "product_sku":"KIT-CARD",
   #       "product_description":"product default",
-  #       "external_id":"2568"
+  #       "external_id":"2568",
+  #       "credit_card":{
+  #          "number":"XXXX-XXXX-XXXX-9418",
+  #          "expire_month":5,
+  #          "expire_year":2016
+  #       }
   #     },
   #       "setter":{
   #          "wrong_phone_number":0,
@@ -507,7 +517,7 @@ class Api::MembersController < ApplicationController
   end 
 
   ##
-  # Gets an array with the member's id that were updated between the dates given. 
+  # Gets an array with all member's id that were updated between the dates given. 
   #
   # @resource /api/v1/members/find_all_by_updated/:club_id/:start_date/:end_date
   # @action GET
@@ -537,7 +547,7 @@ class Api::MembersController < ApplicationController
 
 
   ##
-  # Gets an array with the member's id that were created between the dates given.
+  # Gets an array with all member's id that were created between the dates given.
   #
   # @resource /api/v1/members/find_all_by_created/:club_id/:start_date/:end_date
   # @action GET
