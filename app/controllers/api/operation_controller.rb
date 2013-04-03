@@ -7,7 +7,7 @@ class Api::OperationController < ApplicationController
   # @resource /api/v1/members/:member_id/operation
   # @action POST
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] member_id Member's id related to the operation we are creating. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Integer] operation_type message Integer value related to the operation type. Operations supported at the moment:
   #   <ul>
