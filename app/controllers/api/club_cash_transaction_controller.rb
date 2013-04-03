@@ -6,7 +6,7 @@ class Api::ClubCashTransactionController < ApplicationController
   # @resource /api/v1/members/:member_id/club_cash_transaction
   # @action POST
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
   # @required [Integer] member_id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Hash] club_cash_transaction Hash with necessary information to create the club cash transaction. It has the following information: 
   #   <ul>

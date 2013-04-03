@@ -10,7 +10,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members
   # @action POST
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
   # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information:
   #   <ul>
   #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
@@ -190,7 +190,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members/:id
   # @action PUT
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
   # @required [Integer] id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information: 
   #   <ul>
@@ -363,8 +363,8 @@ class Api::MembersController < ApplicationController
   # Returns information related to member's information, credit card, current membership and enrollment information.
   #
   # [url] /api/v1/members/:id
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # [id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # [id] Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   #      Have in mind that this value is part of the url.
   # [member] Information related to the member that is sumbitting the enroll. Here is a list of the regex we are using to validate {Member show}.
   #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
@@ -378,19 +378,16 @@ class Api::MembersController < ApplicationController
   #             *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
   #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
   #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
-  #             *club_cash_amount: Amount of the club cash the member has at this moment. We accept a maximun of two digits after the comma.
-  #             *club_cash_expire_date: Date when the club cash will be expired and set to 0. This date is saved as date format.
   #             *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
   #             *birth_date: Birth date of the member. This date is stored with format "yyyy-mm-dd"
   #             *gender: Gender of the member. The values we are recieving are "M" for male or "F" for female.
   #             *bill_date: Date when the billing will be done. 
-  #             *next_retry_bill_date: Date when the billing will be done. 
   #             *wrong_address: Reason the member was set as undeliverable. 
   #             *wrong_phone_number: Reason the member was set as unreachable. 
   #             *member_since_date: Date when the member was created. This date is saved with date format.
   #             *reactivation_times: Integer value that tells us how many times this member was recovered. 
   #             *blacklisted: Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted)
-  #             *member_group_type_id: Group type the member belongs to.
+  #             *member_group_type: Group type the member belongs to.
   #             *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
   # [credit_card] Information related to member's credit card.
   #                 *last_4_digits: The last four digits of member's active credit card.
@@ -408,7 +405,6 @@ class Api::MembersController < ApplicationController
   # @return [Hash] *member*
   # @return [Hash] *credit_card*
   # @return [Hash] *current_membership*
-  # @return [Hash] *enrollment_info*
   # @return [Integer] *code*
   #
   def show
@@ -463,7 +459,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members/:id/club_cash
   # @action PUT
   # 
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
   # @required [Integer] id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
   # @required [String] expire_date club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")
@@ -493,8 +489,8 @@ class Api::MembersController < ApplicationController
   # Updates member's next retry bill date.
   #
   # [url] api/v1/members/:member_id/next_bill_date
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
-  # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # [member_id] Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   #             Have in mind that this value is part of the url.
   # [next_bill_date] Date to be stored as date where we should bill this member. This date is stored with date format. (required)
   #
@@ -517,13 +513,12 @@ class Api::MembersController < ApplicationController
       render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end 
 
-
   # Method : GET
   # Gets an array with the member's id that were updated between the dates given. 
   #
   # [url] /api/v1/members/find_all_by_updated/:club_id/:start_date/:end_date
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
-  # [club_id] Id of the club where we are goint to check for memebers. 
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # [club_id] Club's ID where we are going to check for members. 
   # [start_date] Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url. (required)
   # [end_date] Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. (required)
   #
@@ -559,8 +554,8 @@ class Api::MembersController < ApplicationController
   # Gets an array with the member's id that were created between the dates given. 
   #
   # [url] /api/v1/members/find_all_by_created/:club_id/:start_date/:end_date
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
-  # [club_id] Id of the club where we are goint to check for memebers. 
+  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # [club_id] Club's ID where we are going to check for members. 
   # [start_date] Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url. (required)
   # [end_date] Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. (required)
   #
