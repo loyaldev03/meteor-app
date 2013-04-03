@@ -26,6 +26,7 @@ class Transaction < ActiveRecord::Base
   def member=(member)
     self.member_id = member.id
     # MeS supports only 17 characters on order_id
+    # litle had "#{Date.today}-#{order_mark}#{@transaction.member_id}"
     self.invoice_number = member.id
     self.first_name = member.first_name
     self.last_name = member.last_name
@@ -256,18 +257,24 @@ class Transaction < ActiveRecord::Base
       else
         ActiveMerchant::Billing::Base.mode = :test
       end
+      @options = {}
+      @login_data = { :login => login, :password => password, :merchant_key => merchant_key }
       if mes?
-        @gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(
-            :login    => login,
-            :password => password,
-            :merchant_key => merchant_key
-          )
+        @gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(@login_data)
+        @options = { :customer => member_id }
+        @options[:moto_ecommerce_ind] = 2 if recurrent        
       elsif litle?
-        # TODO: add litle configuration!!!
+        @gateway = ActiveMerchant::Billing::LitleGateway.new(@login_data)
+        # @options = {
+        #   :report_group => report_group,
+        #   :custom_billing => {
+        #     :descriptor => descriptor_name,
+        #     :phone => descriptor_phone
+        #   }
+        # }
       end
-      @options = {
+      @options.merge!({
         :order_id => invoice_number,
-        :customer => member_id,
         :billing_address => {
           :name     => "#{first_name} #{last_name}",
           :address1 => address,
@@ -276,8 +283,7 @@ class Transaction < ActiveRecord::Base
           :zip      => zip.gsub(/[a-zA-Z-]/, ''),
           :phone    => phone_number
           }
-        }
-      @options[:moto_ecommerce_ind] = 2 if recurrent
+      })
     end
 
 end

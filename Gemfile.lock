@@ -1,17 +1,4 @@
 GIT
-  remote: git://github.com/carlaares/active_merchant
-  revision: c8f3fe6ad93cab17df41d8dc1c3949dff30c9747
-  specs:
-    activemerchant (1.31.1)
-      active_utils (>= 1.0.2)
-      activesupport (>= 2.3.14)
-      builder (>= 2.0.0)
-      i18n
-      json (>= 1.5.1)
-      money
-      nokogiri
-
-GIT
   remote: git://github.com/mark-moseley/linecache
   revision: 869c6a65155068415925067e480741bd0a71527e
   specs:
@@ -24,6 +11,19 @@ GIT
   specs:
     jquery-datatables-rails (1.11.1)
       jquery-rails
+
+GIT
+  remote: git://github.com/stoneacre/active_merchant
+  revision: b02f7b646ead74c772f82441aaa842b5c9e0adf3
+  specs:
+    activemerchant (1.32.0)
+      active_utils (>= 1.0.2)
+      activesupport (>= 2.3.14)
+      builder (>= 2.0.0)
+      i18n
+      json (>= 1.5.1)
+      money
+      nokogiri
 
 GIT
   remote: https://github.com/brynary/rack-bug.git

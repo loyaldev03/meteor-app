@@ -98,4 +98,4 @@ group :test do
   gem "timecop"
 end
 
-gem 'activemerchant', :git => "git://github.com/carlaares/active_merchant"
+gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant"
