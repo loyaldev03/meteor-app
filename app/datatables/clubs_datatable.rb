@@ -14,7 +14,7 @@ private
       [
         club.id,
         club.name, 
-        (club.description.nil? ? "" : club.description.truncate(30)),
+        club.description.to_s.truncate(30),
         club.members.count,
         (link_to(I18n.t('show'), @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id), :class => 'btn btn-mini') if @current_agent.can? :read, Club).to_s+
         (link_to(I18n.t(:edit), @url_helpers.edit_club_path(:partner_prefix => @current_partner.prefix,:id => club.id), :class => 'btn btn-mini')if @current_agent.can? :update, Club).to_s+
