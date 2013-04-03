@@ -367,8 +367,20 @@ class Api::MembersController < ApplicationController
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
-  # @response_field [Hash] Hash with member new information to be updated. (Have in mind you have to send all the information even if a field is not going to be updated)
-  #   <ul>        
+  # @response_field [Hash] credit_card Information related to member's credit card.
+  #  <ul>
+  #     <li><strong>last_4_digits</strong> Member's active credit card last four digits. </li>
+  #     <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
+  #     <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. </li>
+  #  </ul>
+  # @response_field [Hash] current_membership Information related to the member's membership at the moment.
+  #  <ul>
+  #     <li><strong>status</strong> String with member's current status. </li>
+  #     <li><strong>join_date</strong> String with date when the member join. This date is updated each time the member is recovered, or it is saved the sale. </li>
+  #     <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is now date schedule this value will be null. </li>
+  #  </ul>
+  # @response_field [Hash] member Hash with member information.
+  #  <ul>
   #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
   #     <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
   #     <li><strong>address</strong> The address of the member that is being enrolled. </li>
@@ -390,19 +402,6 @@ class Api::MembersController < ApplicationController
   #     <li><strong>blacklisted</strong> Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted) </li>
   #     <li><strong>member_group_type</strong> Group type the member belongs to. </li>
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. </li>
-  #  </ul>
-  # @response_field [Hash] credit_card Information related to member's credit card.
-  #  <ul>
-  #     <li><strong>last_4_digits</strong> The last four digits of member's active credit card. </li>
-  #     <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-  #     <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. </li>
-  #  </ul>
-  # @response_field [Hash] current_membership Information related to the member's membership at the moment.
-  #  <ul>
-  #     <li><strong>status</strong> Member's current status. </li>
-  #     <li><strong>join_date</strong> Date when the member join. This date is updated each time the member is recovered, or it is saved the sale. </li>
-  #     <li><strong>cancel_date</strong> Date schedule when the member will be canceled. </li>
-  #  </ul>
   # @response_field [String] message Shows the method errors. This message will be only shown when there was an error. 
   # @response_field [Integer] code Code related to the method result.
   #
@@ -461,15 +460,17 @@ class Api::MembersController < ApplicationController
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
   # @required [Integer] id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
-  # @required [String] expire_date club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")
+  # @optional [String] expire_date club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
   # 
   def club_cash
-    member = Member.find(params[:id])
+    member = Member.find(params[:id].to_i)
     my_authorize! :api_update_club_cash, Member, member.club_id
     response = { :message => "This club is not allowed to fix the amount of the club cash on members.", :code => Settings.error_codes.club_cash_cant_be_fixed, :member_id => member.id }
-    unless member.club.club_cash_transactions_enabled
+    if params[:amount].blank?
+      response = { :message => "Check amount value, please. Amount cannot be blank or null.", :code => Settings.error_codes.wrong_data }
+    elsif not member.club.club_cash_transactions_enabled
       member.skip_api_sync!
       member.club_cash_amount = params[:amount]
       member.club_cash_expire_date = params[:expire_date]
@@ -482,7 +483,6 @@ class Api::MembersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end
-
 
   ##
   # Updates member's next retry bill date.x
