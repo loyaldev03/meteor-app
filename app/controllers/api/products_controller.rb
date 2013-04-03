@@ -8,7 +8,7 @@ class Api::ProductsController < ApplicationController
   # @resource /api/v1/products/get_stock
   # @action GET
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [String] sku Sku of the product we are interested in. This parameter is the product description. 
   # @required [String] club_id Id of the club the product belongs to. 
   # @response_field [Integer] stock Actual stock of the product. This value is an integer type. This value is returned if there was no error.

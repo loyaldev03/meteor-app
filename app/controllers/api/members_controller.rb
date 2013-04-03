@@ -190,7 +190,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members/:id
   # @action PUT
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information: 
   #   <ul>
@@ -375,7 +375,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members/:id
   # @action GET
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @response_field [Hash] credit_card Information related to member's credit card.
   #  <ul>
@@ -467,7 +467,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members/:id/club_cash
   # @action PUT
   # 
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's id needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
   # @optional [String] expire_date club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")
@@ -500,7 +500,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members/:id/next_bill_date
   # @action PUT
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's ID needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [String] next_bill_date Date to be stored as date where we should bill this member. This date is stored with date format.
   # @response_field [String] message Shows the method result.
@@ -522,7 +522,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members/find_all_by_updated/:club_id/:start_date/:end_date
   # @action GET
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] club_id Club's ID needed to find the club where we are going to check for members. 
   # @required [String] start_date Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url.
   # @required [String] end_date Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. 
@@ -552,7 +552,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members/find_all_by_created/:club_id/:start_date/:end_date
   # @action GET
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] club_id Club's ID needed to find the club where we are going to check for members. 
   # @required [String] start_date Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url. 
   # @required [String] end_date Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url.

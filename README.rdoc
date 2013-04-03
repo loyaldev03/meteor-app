@@ -11,4 +11,5 @@ rake erd
 rake assets:precompile
 
 In order to create the doc you must run: 	
-yardoc --plugin rest --title "Api Documentation"
+yardoc --plugin rest --title "Api Documentation" --readme readme_api_doc.rdoc
+
