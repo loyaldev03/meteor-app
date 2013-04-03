@@ -395,7 +395,7 @@ function transactions_member_functions(column_count){
     "sPaginationType": "bootstrap",
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
-    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5 ] }],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5,6 ] }],
     "sAjaxSource": $('#transactions_table').data('source'),
   });
 }
