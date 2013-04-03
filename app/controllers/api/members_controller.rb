@@ -10,7 +10,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members
   # @action POST
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
   # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information:
   #   <ul>
   #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>

@@ -1,0 +1,7 @@
+
+<h2>How we handle roles</h2>
+On every call you will require you to send the "api_key". This api_key is the authentication token of the agent that is commiting the request. With the api_key we receive on each request, we will search for the agent on our database and check if that agent is allowed to make that request. If the agent is not allowed, we will stop processing the request, and proceed to return a message telling that the agent is not authorized. 
+Have in mind that this "api_token" is reseted on every login, and can be obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+
+<h2>Error codes</h2>
+We always answer with an integer variable called "code". Acording to the method result we will set this "code" variable in order to match the result. (At the moment we are using 000 for success, and any other value if there was an error).
