@@ -14,7 +14,7 @@ class Api::ClubCashTransactionController < ApplicationController
   #     <li><strong>description</strong> Description of the club cash. (Eg. "Adding $20 club cash because of enroll.".) [optional]</li>
   #   </ul>
   # @response_field [String] message Shows the method results and also informs the errors.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   # @response_field [String] errors A hash with club cash and members errors.
   #
   def create

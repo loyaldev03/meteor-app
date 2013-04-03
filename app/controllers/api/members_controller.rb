@@ -54,7 +54,7 @@ class Api::MembersController < ApplicationController
   #     <ul>
   #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the compleate year with four digits (Eg. 2014) </li>
+  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
   #     </ul>
   #   </ul>
   # @optional [Hash] setter Variable used to pass some boolean values as "cc_blank". It must have the following information:
@@ -163,7 +163,7 @@ class Api::MembersController < ApplicationController
   # @example_response_description Response with member's errors within an 'error' hash.
   #
   # @response_field [String] message Shows the method results and also informs the errors.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.
   # @response_field [Hash] errors A hash with members and credit card errors.
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account.
@@ -215,7 +215,7 @@ class Api::MembersController < ApplicationController
   #     <ul>
   #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the compleate year with four digits (Eg. 2014) </li>
+  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
   #     </ul>
   #   </ul>
   # @optional [Hash] setter Variable used to pass some boolean values as "wrong_phone_number". It must have the following information:
@@ -329,7 +329,7 @@ class Api::MembersController < ApplicationController
   # @example_response_description Response with member's errors within an 'error' hash.
   #
   # @response_field [String] message Shows the method results and also informs the errors.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. It will be returned only when the request was a success.
   # @response_field [Hash] errors A hash with members errors.
   # 
@@ -381,7 +381,7 @@ class Api::MembersController < ApplicationController
   #  <ul>
   #     <li><strong>last_4_digits</strong> Member's active credit card last four digits. </li>
   #     <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-  #     <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the compleate year with four digits (Eg. 2014) </li>
+  #     <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
   #  </ul>
   # @response_field [Hash] current_membership Information related to the member's membership at the moment.
   #  <ul>
@@ -413,7 +413,7 @@ class Api::MembersController < ApplicationController
   #     <li><strong>member_group_type</strong> Group type the member belongs to. </li>
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. </li>
   # @response_field [String] message Shows the method errors. This message will be only shown when there was an error. 
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   #
   def show
     member = Member.find(params[:id])
@@ -472,7 +472,7 @@ class Api::MembersController < ApplicationController
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
   # @optional [String] expire_date club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")
   # @response_field [String] message Shows the method results and also informs the errors.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   # 
   def club_cash
     member = Member.find(params[:id])
@@ -528,7 +528,7 @@ class Api::MembersController < ApplicationController
   # @required [String] end_date Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. 
   # @response_field [String] message Shows the method result. This message will be shown when there is an error.
   # @response_field [Array] list Array with member's id updated between the dates given. This list will be returned only when this method is success.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   #
   def find_all_by_updated
     my_authorize! :api_find_all_by_updated, Member, params[:club_id]
@@ -558,7 +558,7 @@ class Api::MembersController < ApplicationController
   # @required [String] end_date Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url.
   # @response_field [String] message Shows the method result. This message will be shown when there is an error.
   # @response_field [Array] list Array with member's id created between the dates given. This list will be returned only when this method is success.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   #
   def find_all_by_created
     my_authorize! :api_find_all_by_updated, Member, params[:club_id]
