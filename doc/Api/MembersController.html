@@ -888,9 +888,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 		</div>	
     
 		<div class="method">
-			<p class="method_desc">Returns information related to member's information, credit card, current membership and enrollment information.
-
- </ul></p>
+			<p class="method_desc">Returns information related to member's information, credit card, current membership and enrollment information.</p>
 			<h3 class="resource_url"><strong>/api/v1/members/:id</strong> [GET]</h3>
 
 			<div class="parameters">	
@@ -926,41 +924,11 @@ It will also send a welcome email and charge the enrollment to the member's cred
 					
 						<ul>
 							<li>
-								<span class="name">Hash</span>
-								<span class="type">Hash</span>
-								<span class="text">with member new information to be updated. (Have in mind you have to send all the information even if a field is not going to be updated)
-<ul>        
-  <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
-  <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
-  <li><strong>address</strong> The address of the member that is being enrolled. </li>
-  <li><strong>city</strong> City from where the member is from. </li>
-  <li><strong>state</strong> The state standard code where the member is from. </li>
-  <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.) </li>
-  <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). </li>
-  <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. </li>
-  <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached. </li>
-  <li><strong>phone_local_number</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
-  <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). </li>
-  <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" </li>
-  <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. </li>
-  <li><strong>bill_date</strong> Date when the billing will be done. </li>
-  <li><strong>wrong_address</strong> Reason the member was set as undeliverable. </li>
-  <li><strong>wrong_phone_number</strong> Reason the member was set as unreachable. </li>
-  <li><strong>member_since_date</strong> Date when the member was created. This date is saved with date format. </li>
-  <li><strong>reactivation_times</strong> Integer value that tells us how many times this member was recovered. </li>
-  <li><strong>blacklisted</strong> Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted) </li>
-  <li><strong>member_group_type</strong> Group type the member belongs to. </li>
-  <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. </li></span>
-							</li>
-						</ul>
-					
-						<ul>
-							<li>
 								<span class="name">credit_card</span>
 								<span class="type">Hash</span>
 								<span class="text">Information related to member's credit card.
 <ul>
-   <li><strong>last_4_digits</strong> The last four digits of member's active credit card. </li>
+   <li><strong>last_4_digits</strong> Member's active credit card last four digits. </li>
    <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
    <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. </li>
 </ul></span>
@@ -973,10 +941,40 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<span class="type">Hash</span>
 								<span class="text">Information related to the member's membership at the moment.
 <ul>
-   <li><strong>status</strong> Member's current status. </li>
-   <li><strong>join_date</strong> Date when the member join. This date is updated each time the member is recovered, or it is saved the sale. </li>
-   <li><strong>cancel_date</strong> Date schedule when the member will be canceled. </li>
+   <li><strong>status</strong> String with member's current status. </li>
+   <li><strong>join_date</strong> String with date when the member join. This date is updated each time the member is recovered, or it is saved the sale. </li>
+   <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is now date schedule this value will be null. </li>
 </ul></span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">member</span>
+								<span class="type">Hash</span>
+								<span class="text">Hash with member information.
+<ul>
+   <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
+   <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
+   <li><strong>address</strong> The address of the member that is being enrolled. </li>
+   <li><strong>city</strong> City from where the member is from. </li>
+   <li><strong>state</strong> The state standard code where the member is from. </li>
+   <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.) </li>
+   <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). </li>
+   <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. </li>
+   <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached. </li>
+   <li><strong>phone_local_number</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
+   <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). </li>
+   <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" </li>
+   <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. </li>
+   <li><strong>bill_date</strong> Date when the billing will be done. </li>
+   <li><strong>wrong_address</strong> Reason the member was set as undeliverable. </li>
+   <li><strong>wrong_phone_number</strong> Reason the member was set as unreachable. </li>
+   <li><strong>member_since_date</strong> Date when the member was created. This date is saved with date format. </li>
+   <li><strong>reactivation_times</strong> Integer value that tells us how many times this member was recovered. </li>
+   <li><strong>blacklisted</strong> Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted) </li>
+   <li><strong>member_group_type</strong> Group type the member belongs to. </li>
+   <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. </li></span>
 							</li>
 						</ul>
 					
@@ -1035,6 +1033,13 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								</li>
 							</ul>
 						
+					</div>
+				
+
+				
+					<div class="optional">
+						<h4>Optional Parameters</h4>
+						
 							<ul>
 								<li>
 									<span class="name">expire_date</span>
@@ -1044,8 +1049,6 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							</ul>
 						
 					</div>
-				
-
 				
 			</div><!-- parameters -->
 			
@@ -1329,7 +1332,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Wed Apr  3 09:43:19 2013 with ruby-1.9.2
+  Generated on Wed Apr  3 10:54:48 2013 with ruby-1.9.2
 </div>
 
   </body>
