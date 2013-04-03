@@ -15,7 +15,7 @@ class Api::ClubCashTransactionController < ApplicationController
   #   </ul>
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
-  # @response_field [String] errors A hash with club cash and members errors. This will be use to show errors on club cash cs web page.
+  # @response_field [String] errors A hash with club cash and members errors.
   #
   def create
     member = Member.find(params[:member_id])

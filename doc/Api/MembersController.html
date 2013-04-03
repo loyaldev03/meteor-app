@@ -365,7 +365,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
   <ul>
     <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
     <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-    <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
+    <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the compleate year with four digits (Eg. 2014) </li>
   </ul>
 </ul></span>
 								</li>
@@ -426,7 +426,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							<li>
 								<span class="name">errors</span>
 								<span class="type">Hash</span>
-								<span class="text">A hash with members and credit card errors. This will be use to show errors on members creation page.</span>
+								<span class="text">A hash with members and credit card errors.</span>
 							</li>
 						</ul>
 					
@@ -658,7 +658,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
   <ul>
     <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
     <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-    <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
+    <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the compleate year with four digits (Eg. 2014) </li>
   </ul>
 </ul></span>
 								</li>
@@ -720,7 +720,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							<li>
 								<span class="name">errors</span>
 								<span class="type">Hash</span>
-								<span class="text">A hash with members errors. This will be use to show errors on members edit page.</span>
+								<span class="text">A hash with members errors.</span>
 							</li>
 						</ul>
 					
@@ -940,7 +940,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 <ul>
    <li><strong>last_4_digits</strong> Member's active credit card last four digits. </li>
    <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-   <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. </li>
+   <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the compleate year with four digits (Eg. 2014) </li>
 </ul></span>
 							</li>
 						</ul>
@@ -953,7 +953,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 <ul>
    <li><strong>status</strong> String with member's current status. </li>
    <li><strong>join_date</strong> String with date when the member join. This date is updated each time the member is recovered, or it is saved the sale. </li>
-   <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is now date schedule this value will be null. </li>
+   <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is no date schedule this value will be null. </li>
 </ul></span>
 							</li>
 						</ul>
@@ -1089,8 +1089,8 @@ It will also send a welcome email and charge the enrollment to the member's cred
 		</div>	
     
 		<div class="method">
-			<p class="method_desc">Updates member's next retry bill date.x</p>
-			<h3 class="resource_url"><strong>/api/v1/members/:member_id/next_bill_date</strong> [PUT]</h3>
+			<p class="method_desc">Updates member's next retry bill date.</p>
+			<h3 class="resource_url"><strong>/api/v1/members/:id/next_bill_date</strong> [PUT]</h3>
 
 			<div class="parameters">	
 				
@@ -1107,7 +1107,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 						
 							<ul>
 								<li>
-									<span class="name">member_id</span>
+									<span class="name">id</span>
 									<span class="type">Integer</span>
 									<span class="text">Member's ID needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
 								</li>
@@ -1151,7 +1151,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							<li>
 								<span class="name">errors</span>
 								<span class="type">Hash</span>
-								<span class="text">A hash with members and next_bill_date errors. This will be use to show errors on members edit page.</span>
+								<span class="text">A hash with member and next_bill_date errors.</span>
 							</li>
 						</ul>
 					
@@ -1342,7 +1342,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Wed Apr  3 12:57:50 2013 with ruby-1.9.2
+  Generated on Wed Apr  3 14:24:42 2013 with ruby-1.9.2
 </div>
 
   </body>
