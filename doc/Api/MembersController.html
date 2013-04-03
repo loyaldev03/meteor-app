@@ -314,7 +314,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<li>
 									<span class="name">api_key</span>
 									<span class="type">String</span>
-									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained through token's POST api method. <a href="TokensController.html">TokensMethods</a></span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a></span>
 								</li>
 							</ul>
 						
@@ -619,7 +619,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<li>
 									<span class="name">api_key</span>
 									<span class="type">String</span>
-									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action.</span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a></span>
 								</li>
 							</ul>
 						
@@ -888,6 +888,121 @@ It will also send a welcome email and charge the enrollment to the member's cred
 		</div>	
     
 		<div class="method">
+			<p class="method_desc">Returns information related to member's information, credit card, current membership and enrollment information.
+
+ </ul></p>
+			<h3 class="resource_url"><strong>/api/v1/members/:id</strong> [GET]</h3>
+
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">api_key</span>
+									<span class="type">String</span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a></span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">id</span>
+									<span class="type">Integer</span>
+									<span class="text">Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">Hash</span>
+								<span class="type">Hash</span>
+								<span class="text">with member new information to be updated. (Have in mind you have to send all the information even if a field is not going to be updated)
+<ul>        
+  <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
+  <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
+  <li><strong>address</strong> The address of the member that is being enrolled. </li>
+  <li><strong>city</strong> City from where the member is from. </li>
+  <li><strong>state</strong> The state standard code where the member is from. </li>
+  <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.) </li>
+  <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). </li>
+  <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. </li>
+  <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached. </li>
+  <li><strong>phone_local_number</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
+  <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). </li>
+  <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" </li>
+  <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. </li>
+  <li><strong>bill_date</strong> Date when the billing will be done. </li>
+  <li><strong>wrong_address</strong> Reason the member was set as undeliverable. </li>
+  <li><strong>wrong_phone_number</strong> Reason the member was set as unreachable. </li>
+  <li><strong>member_since_date</strong> Date when the member was created. This date is saved with date format. </li>
+  <li><strong>reactivation_times</strong> Integer value that tells us how many times this member was recovered. </li>
+  <li><strong>blacklisted</strong> Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted) </li>
+  <li><strong>member_group_type</strong> Group type the member belongs to. </li>
+  <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. </li></span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">credit_card</span>
+								<span class="type">Hash</span>
+								<span class="text">Information related to member's credit card.
+<ul>
+   <li><strong>last_4_digits</strong> The last four digits of member's active credit card. </li>
+   <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
+   <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. </li>
+</ul></span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">current_membership</span>
+								<span class="type">Hash</span>
+								<span class="text">Information related to the member's membership at the moment.
+<ul>
+   <li><strong>status</strong> Member's current status. </li>
+   <li><strong>join_date</strong> Date when the member join. This date is updated each time the member is recovered, or it is saved the sale. </li>
+   <li><strong>cancel_date</strong> Date schedule when the member will be canceled. </li>
+</ul></span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method errors. This message will be only shown when there was an error.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">Integer</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+		</div>	
+    
+		<div class="method">
 			<p class="method_desc">Updates member's club cash's data.</p>
 			<h3 class="resource_url"><strong>/api/v1/members/:id/club_cash</strong> [PUT]</h3>
 
@@ -900,7 +1015,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<li>
 									<span class="name">api_key</span>
 									<span class="type">String</span>
-									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action.</span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a></span>
 								</li>
 							</ul>
 						
@@ -960,6 +1075,241 @@ It will also send a welcome email and charge the enrollment to the member's cred
 			
 		</div>	
     
+		<div class="method">
+			<p class="method_desc">Updates member's next retry bill date.x</p>
+			<h3 class="resource_url"><strong>/api/v1/members/:member_id/next_bill_date</strong> [PUT]</h3>
+
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">api_key</span>
+									<span class="type">String</span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a></span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">member_id</span>
+									<span class="type">Integer</span>
+									<span class="text">Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">next_bill_date</span>
+									<span class="type">String</span>
+									<span class="text">Date to be stored as date where we should bill this member. This date is stored with date format.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method result.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">Integer</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">errors</span>
+								<span class="type">Hash</span>
+								<span class="text">A hash with members and next_bill_date errors. This will be use to show errors on members edit page.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+		</div>	
+    
+		<div class="method">
+			<p class="method_desc">Gets an array with the member's id that were updated between the dates given.</p>
+			<h3 class="resource_url"><strong>/api/v1/members/find_all_by_updated/:club_id/:start_date/:end_date</strong> [GET]</h3>
+
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">api_key</span>
+									<span class="type">String</span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a></span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">club_id</span>
+									<span class="type">Integer</span>
+									<span class="text">Club's ID needed to find the club where we are going to check for members.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">start_date</span>
+									<span class="type">String</span>
+									<span class="text">Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">end_date</span>
+									<span class="type">String</span>
+									<span class="text">Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method result. This message will be shown when there is an error.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">list</span>
+								<span class="type">Array</span>
+								<span class="text">Array with member's id updated between the dates given. This list will be returned only when this method is success.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">Integer</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+		</div>	
+    
+		<div class="method">
+			<p class="method_desc">Gets an array with the member's id that were created between the dates given.</p>
+			<h3 class="resource_url"><strong>/api/v1/members/find_all_by_created/:club_id/:start_date/:end_date</strong> [GET]</h3>
+
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">api_key</span>
+									<span class="type">String</span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a></span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">club_id</span>
+									<span class="type">Integer</span>
+									<span class="text">Club's ID needed to find the club where we are going to check for members.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">start_date</span>
+									<span class="type">String</span>
+									<span class="text">Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">end_date</span>
+									<span class="type">String</span>
+									<span class="text">Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method result. This message will be shown when there is an error.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">list</span>
+								<span class="type">Array</span>
+								<span class="text">Array with member's id created between the dates given. This list will be returned only when this method is success.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">Integer</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+		</div>	
+    
   </div>
 
 </div>
@@ -979,7 +1329,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Tue Apr  2 12:16:52 2013 with ruby-1.9.2
+  Generated on Wed Apr  3 09:43:19 2013 with ruby-1.9.2
 </div>
 
   </body>
