@@ -54,7 +54,7 @@ class Api::MembersController < ApplicationController
   #     <ul>
   #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
+  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the compleate year with four digits (Eg. 2014) </li>
   #     </ul>
   #   </ul>
   # @optional [Hash] setter Variable used to pass some boolean values as "cc_blank". It must have the following information:
@@ -165,7 +165,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.
-  # @response_field [Hash] errors A hash with members and credit card errors. This will be use to show errors on members creation page.
+  # @response_field [Hash] errors A hash with members and credit card errors.
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account.
   #
   def create
@@ -215,7 +215,7 @@ class Api::MembersController < ApplicationController
   #     <ul>
   #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
+  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the compleate year with four digits (Eg. 2014) </li>
   #     </ul>
   #   </ul>
   # @optional [Hash] setter Variable used to pass some boolean values as "wrong_phone_number". It must have the following information:
@@ -331,7 +331,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [Integer] code Code related to the method result.
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. It will be returned only when the request was a success.
-  # @response_field [Hash] errors A hash with members errors. This will be use to show errors on members edit page. 
+  # @response_field [Hash] errors A hash with members errors.
   # 
   def update
     response = {}
@@ -381,13 +381,13 @@ class Api::MembersController < ApplicationController
   #  <ul>
   #     <li><strong>last_4_digits</strong> Member's active credit card last four digits. </li>
   #     <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-  #     <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. </li>
+  #     <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the compleate year with four digits (Eg. 2014) </li>
   #  </ul>
   # @response_field [Hash] current_membership Information related to the member's membership at the moment.
   #  <ul>
   #     <li><strong>status</strong> String with member's current status. </li>
   #     <li><strong>join_date</strong> String with date when the member join. This date is updated each time the member is recovered, or it is saved the sale. </li>
-  #     <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is now date schedule this value will be null. </li>
+  #     <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is no date schedule this value will be null. </li>
   #  </ul>
   # @response_field [Hash] member Hash with member information.
   #  <ul>
@@ -475,7 +475,7 @@ class Api::MembersController < ApplicationController
   # @response_field [Integer] code Code related to the method result.
   # 
   def club_cash
-    member = Member.find(params[:id].to_i)
+    member = Member.find(params[:id])
     my_authorize! :api_update_club_cash, Member, member.club_id
     response = { :message => "This club is not allowed to fix the amount of the club cash on members.", :code => Settings.error_codes.club_cash_cant_be_fixed, :member_id => member.id }
     if params[:amount].blank?
@@ -495,20 +495,20 @@ class Api::MembersController < ApplicationController
   end
 
   ##
-  # Updates member's next retry bill date.x
+  # Updates member's next retry bill date.
   #
-  # @resource /api/v1/members/:member_id/next_bill_date
+  # @resource /api/v1/members/:id/next_bill_date
   # @action PUT
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. This token is obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
-  # @required [Integer] member_id Member's ID needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @required [Integer] id Member's ID needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [String] next_bill_date Date to be stored as date where we should bill this member. This date is stored with date format.
   # @response_field [String] message Shows the method result.
   # @response_field [Integer] code Code related to the method result.
-  # @response_field [Hash] errors A hash with members and next_bill_date errors. This will be use to show errors on members edit page. 
+  # @response_field [Hash] errors A hash with member and next_bill_date errors. 
   #
   def next_bill_date
-    member = Member.find params[:member_id]
+    member = Member.find params[:id]
     my_authorize! :api_change_next_bill_date, Member, member.club_id
     render json: member.change_next_bill_date(params[:next_bill_date], @current_agent)
     
