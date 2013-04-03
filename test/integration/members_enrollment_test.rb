@@ -207,7 +207,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#td_mi_external_id") { assert page.has_content?(unsaved_member.external_id) }
 
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
-    search_member("member[member_id]", "#{created_member.id}", created_member)
+    search_member("member[id]", "#{created_member.id}", created_member)
   end
 
 	test "new member for with external_id not requiered" do
@@ -248,6 +248,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("zip: can't be blank,The zip code is not valid for the selected country."), "Failure on zip validation message"
       }
     end
+
+
   end
 
   # TODO: FIX THIS TEST!
@@ -523,12 +525,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :description => 'Member updated succesfully last' )
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    within("#operations_table")do
-      wait_until{
-        assert page.has_content?('Member updated succesfully last')
-      }
-    end
+    assert find_field('input_first_name').value == @saved_member.first_name
+    within("#operations_table"){ assert page.has_content?('Member updated succesfully last') }
   end
 
   test "see operations grouped by billing from lastest to newest" do
@@ -734,7 +732,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   end
 
   test "Recover member from sloop with the same credit card" do
-    require 'ruby-debug'
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info)
