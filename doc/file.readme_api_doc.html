@@ -294,14 +294,14 @@
   <h1 class="noborder title">Api Documentation</h1>
 
   
-	<h2>How we handle roles</h2>
+	<h2>How we handle authentication</h2>
 
-<p>On every call you will require you to send the &quot;api<em>key&quot;. This api</em>key is the authentication token of the agent that is commiting the request. With the api<em>key we receive on each request, we will search for the agent on our database and check if that agent is allowed to make that request. If the agent is not allowed, we will stop processing the request, and proceed to return a message telling that the agent is not authorized. 
-Have in mind that this &quot;api</em>token&quot; is reseted on every login, and can be obtained using token&#39;s POST api method. <a href="TokensController.html">TokensMethods</a></p>
+<p>On every call we will need you to send the &quot;api<em>key&quot;. This api</em>key is the authentication token of the agent that is commiting the request. If the agent is not allowed, we will stop processing the request, and proceed to return a message telling that the agent is not authorized. 
+Have in mind that this &quot;api_token&quot; is reseted on every login, and can be obtained using token&#39;s POST api method. <a href="TokensController.html">TokensMethods</a></p>
 
 <h2>Error codes</h2>
 
-<p>We always answer with an integer variable called &quot;code&quot;. Acording to the method result we will set this &quot;code&quot; variable in order to match the result. (At the moment we are using 000 for success, and any other value if there was an error).</p>
+<p>We always answer with an string variable called &quot;code&quot;. Acording to the method result we will set this &quot;code&quot; variable in order to match the result. (We are answering &quot;000&quot; for success, and with an especific value for each kind of error).</p>
 
   
   
@@ -331,7 +331,7 @@ Have in mind that this &quot;api</em>token&quot; is reseted on every login, and 
 	</div>
     
     <div id="footer">
-  Generated on Wed Apr  3 15:48:16 2013 with ruby-1.9.2
+  Generated on Wed Apr  3 17:05:50 2013 with ruby-1.9.2
 </div>
 
   </body>

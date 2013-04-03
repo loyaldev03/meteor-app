@@ -16,7 +16,7 @@ class Api::OperationController < ApplicationController
   #   </ul>
   # @optional [String] operation_date Date when the operation was done. If this value is nil we save that operation with Time.zone.now. (Format "yyyy-mm-dd")
   # @optional [Integer] description Description of the operation. It is a text field.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   # @response_field [String] message Shows the method results and also informs the errors.
   # 
 	def create
