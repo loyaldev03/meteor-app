@@ -1235,19 +1235,21 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
 
-  test "Api agent should update member's next_bill_date" do
-    setup_enviroment
-    sign_in @admin_user
-    @member = create_active_member(@terms_of_membership, :member_with_api)
-    FactoryGirl.create :credit_card, :member_id => @member.id
-
-    @member.set_as_provisional
-    assert_difference('Operation.count') do
-      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
-    end
-    @member.reload
-    assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
-  end
+   test "Api agent should update member's next_bill_date" do
+     setup_enviroment
+     sign_in @admin_user
+     next_bill_date = Time.zone.now + 3.days
+ 
+     @member = create_active_member(@terms_of_membership, :member_with_api)
+     FactoryGirl.create :credit_card, :member_id => @member.id
+ 
+     @member.set_as_provisional
+     assert_difference('Operation.count') do
+      generate_put_next_bill_date( I18n.l(next_bill_date, :format => :only_date) )
+     end
+     @member.reload
+     assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(next_bill_date, :format => :only_date)
+   end
 
   test "get members updated between given dates" do
     setup_enviroment
