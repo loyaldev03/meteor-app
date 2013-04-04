@@ -474,7 +474,9 @@ class Api::MembersController < ApplicationController
     member = Member.find(params[:id])
     my_authorize! :api_update_club_cash, Member, member.club_id
     response = { :message => "This club is not allowed to fix the amount of the club cash on members.", :code => Settings.error_codes.club_cash_cant_be_fixed, :member_id => member.id }
-    unless member.club.club_cash_transactions_enabled
+    if params[:amount].blank?
+      response = { :message => "Check amount value, please. Amount cannot be blank or null.", :code => Settings.error_codes.wrong_data }
+    elsif not member.club.club_cash_transactions_enabled
       member.skip_api_sync!
       member.club_cash_amount = params[:amount]
       member.club_cash_expire_date = params[:expire_date]
