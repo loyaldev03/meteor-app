@@ -109,6 +109,10 @@ class Transaction < ActiveRecord::Base
     gateway == "mes"
   end
 
+  def litle?
+    gateway == "litle"
+  end
+
   # answer credit card token
   def self.store!(am_credit_card, pgc)
     if pgc.production?
@@ -116,14 +120,11 @@ class Transaction < ActiveRecord::Base
     else
       ActiveMerchant::Billing::Base.mode = :test
     end
+    @login_data = { :login => pgc.login, :password => pgc.password, :merchant_key => pgc.merchant_key }
     if pgc.mes?
-      gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(
-          :login    => pgc.login,
-          :password => pgc.password,
-          :merchant_key => pgc.merchant_key
-        )
-    elsif litle?
-      # TODO: add litle configuration!!!
+      gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(@login_data)
+    elsif pgc.litle?
+      @gateway = ActiveMerchant::Billing::LitleGateway.new(@login_data)
     end
     answer = gateway.store(am_credit_card)
     logger.error "AM::Store::Answer => " + answer.inspect
