@@ -99,3 +99,4 @@ group :test do
 end
 
 gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant"
+gem 'LitleOnline'

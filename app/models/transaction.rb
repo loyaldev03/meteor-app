@@ -120,16 +120,22 @@ class Transaction < ActiveRecord::Base
     else
       ActiveMerchant::Billing::Base.mode = :test
     end
-    @login_data = { :login => pgc.login, :password => pgc.password, :merchant_key => pgc.merchant_key }
+    login_data = { :login => pgc.login, :password => pgc.password, :merchant_key => pgc.merchant_key }
+    token, answer = nil, nil
     if pgc.mes?
-      gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(@login_data)
+      gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(login_data)
+      answer = gateway.store(am_credit_card)
+      raise answer.params['error_code'] unless answer.success?
+      token = answer.params['transaction_id']  
     elsif pgc.litle?
-      @gateway = ActiveMerchant::Billing::LitleGateway.new(@login_data)
+      gateway = ActiveMerchant::Billing::LitleGateway.new(login_data.merge!(:merchant_id => ""))
+      answer = gateway.store(am_credit_card)
+      raise answer.params['litleOnlineResponse']['response'] unless answer.success?
+      token = answer.params['litleOnlineResponse']['litleToken']
     end
-    answer = gateway.store(am_credit_card)
+    
     logger.error "AM::Store::Answer => " + answer.inspect
-    raise answer.params['error_code'] if Settings.error_codes.success != answer.params['error_code']
-    answer.params['transaction_id']
+    token
   end
 
   def self.refund(amount, sale_transaction_id, agent=nil)
@@ -265,7 +271,7 @@ class Transaction < ActiveRecord::Base
         @options = { :customer => member_id }
         @options[:moto_ecommerce_ind] = 2 if recurrent        
       elsif litle?
-        @gateway = ActiveMerchant::Billing::LitleGateway.new(@login_data)
+        @gateway = ActiveMerchant::Billing::LitleGateway.new(@login_data.merge!(:merchant_id => ""))
         # @options = {
         #   :report_group => report_group,
         #   :custom_billing => {
