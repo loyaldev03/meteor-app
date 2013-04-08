@@ -25,9 +25,6 @@ class Transaction < ActiveRecord::Base
 
   def member=(member)
     self.member_id = member.id
-    # MeS supports only 17 characters on order_id
-    # litle had "#{Date.today}-#{order_mark}#{@transaction.member_id}"
-    self.invoice_number = member.id
     self.first_name = member.first_name
     self.last_name = member.last_name
     self.phone_number = member.full_phone_number
@@ -61,6 +58,7 @@ class Transaction < ActiveRecord::Base
     self.descriptor_phone = pgc.descriptor_phone
     self.order_mark = pgc.order_mark
     self.gateway = pgc.gateway
+    ActiveMerchant::Billing::Base.mode = ( pgc.production? ? :production : :test )
   end
 
   def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil)
@@ -70,14 +68,21 @@ class Transaction < ActiveRecord::Base
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
     self.save
-  end
-
-  def success?
-    response_code == Settings.error_codes.success
+    @options = {
+      :order_id => invoice_number,
+      :billing_address => {
+        :name     => "#{first_name} #{last_name}",
+        :address1 => address,
+        :city     => city,
+        :state    => state,
+        :zip      => zip.gsub(/[a-zA-Z-]/, ''),
+        :phone    => phone_number
+        }
+    }    
   end
 
   def can_be_refunded?
-    [ 'sale', 'capture' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted? and response_code == Settings.error_codes.success
+    [ 'sale' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted? and self.success?
   end
 
   def process
@@ -115,34 +120,27 @@ class Transaction < ActiveRecord::Base
 
   # answer credit card token
   def self.store!(am_credit_card, pgc)
-    if pgc.production?
-      ActiveMerchant::Billing::Base.mode = :production
-    else
-      ActiveMerchant::Billing::Base.mode = :test
-    end
-    login_data = { :login => pgc.login, :password => pgc.password, :merchant_key => pgc.merchant_key }
-    token, answer = nil, nil
     if pgc.mes?
-      gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(login_data)
-      answer = gateway.store(am_credit_card)
-      raise answer.params['error_code'] unless answer.success?
-      token = answer.params['transaction_id']  
+      MerchantESolutionsTransaction.store!(am_credit_card, pgc)
     elsif pgc.litle?
-      gateway = ActiveMerchant::Billing::LitleGateway.new(login_data.merge!(:merchant_id => ""))
-      answer = gateway.store(am_credit_card)
-      raise answer.params['litleOnlineResponse']['response'] unless answer.success?
-      token = answer.params['litleOnlineResponse']['litleToken']
+      LitleTransaction.store!(am_credit_card, pgc)
     end
-    
-    logger.error "AM::Store::Answer => " + answer.inspect
-    token
+  end
+
+  def self.obtain_transaction_by_gateway(gateway)
+    case gateway
+    when 'mes'
+      MerchantESolutionsTransaction.new
+    when 'litle'
+      LitleTransaction.new
+    end
   end
 
   def self.refund(amount, sale_transaction_id, agent=nil)
     amount = amount.to_f
     # Lock transaction, so no one can use this record while we refund this member.
-    sale_transaction = Transaction.find_by_uuid sale_transaction_id, :lock => true
-    trans = Transaction.new
+    sale_transaction = Transaction.find sale_transaction_id, :lock => true
+    trans = Transaction.obtain_transaction_by_gateway(sale_transaction.gateway)
     if amount <= 0.0
       return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
     elsif sale_transaction.amount == amount
@@ -171,19 +169,6 @@ class Transaction < ActiveRecord::Base
     amount - refunded_amount
   end
 
-  def self.new_chargeback(sale_transaction, args)
-    trans = Transaction.new
-    trans.transaction_type = "chargeback"
-    trans.refund_response_transaction_id = sale_transaction.response_transaction_id
-    trans.prepare(sale_transaction.member, sale_transaction.credit_card, args[:transaction_amount], 
-                  sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
-    trans.response_auth_code=args[:auth_code]
-    trans.response_result=args[:reason]
-    trans.response_code=args[:reason_code]
-    trans.response = args
-    trans.save
-    Auditory.audit(nil, trans, "Chargeback processed $#{trans.amount}", sale_transaction.member, Settings.operation_types.chargeback)
-  end
 
   private
 
@@ -228,7 +213,8 @@ class Transaction < ActiveRecord::Base
     end
 
     def save_custom_response(answer)
-      self.response = answer
+      self.success=false
+      self.response=answer
       self.response_code=answer[:code]
       self.response_result=answer[:message]
       self.save
@@ -236,14 +222,7 @@ class Transaction < ActiveRecord::Base
     end
 
     def save_response(answer)
-      self.response = answer
-      if answer.params 
-        self.response_transaction_id=answer.params['transaction_id']
-        self.response_auth_code=answer.params['auth_code']
-        self.response_code=answer.params['error_code']
-      end
-      self.response_result=answer.message
-      save
+      self.success = answer.success?
       if answer.params and answer.params[:duplicate]=="true"
         # we keep this if, just because it was on Litle version (compatibility).
         # MeS seems to not send this param
@@ -256,41 +235,6 @@ class Transaction < ActiveRecord::Base
       else
         { :message=>"Error: " + answer.message, :code=>self.response_code }
       end      
-    end
-
-    def load_gateway(recurrent = false)
-      if production?
-        ActiveMerchant::Billing::Base.mode = :production
-      else
-        ActiveMerchant::Billing::Base.mode = :test
-      end
-      @options = {}
-      @login_data = { :login => login, :password => password, :merchant_key => merchant_key }
-      if mes?
-        @gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(@login_data)
-        @options = { :customer => member_id }
-        @options[:moto_ecommerce_ind] = 2 if recurrent        
-      elsif litle?
-        @gateway = ActiveMerchant::Billing::LitleGateway.new(@login_data.merge!(:merchant_id => ""))
-        # @options = {
-        #   :report_group => report_group,
-        #   :custom_billing => {
-        #     :descriptor => descriptor_name,
-        #     :phone => descriptor_phone
-        #   }
-        # }
-      end
-      @options.merge!({
-        :order_id => invoice_number,
-        :billing_address => {
-          :name     => "#{first_name} #{last_name}",
-          :address1 => address,
-          :city     => city,
-          :state    => state,
-          :zip      => zip.gsub(/[a-zA-Z-]/, ''),
-          :phone    => phone_number
-          }
-      })
-    end
+    end  
 
 end
