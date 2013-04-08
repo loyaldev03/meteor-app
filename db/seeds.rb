@@ -54,8 +54,6 @@ p3 = Partner.new :prefix => 'TC', :name => 'Tennis', :contract_uri => '/tennis',
 p3.save!
 p4 = Partner.new :prefix => 'ONMC', :name => 'ONMC Import', :contract_uri => '', :website_url => '', :description => 'Partner to test imports from ONMC.'
 p4.save!
-p5 = Partner.new :prefix => 'pri', :name => 'TEST', :contract_uri => 'www.test.com', :website_url => 'www.test.com', :description => 'Partner to test imports from ONMC.'
-p5.save!
 
 
 c = Club.new :name => "Fans", :cs_phone_number => '123-456-7890'
@@ -111,54 +109,62 @@ if c4.respond_to?(:api_domain)
   c4.save
 end
 
-[c, c2].each do |c|
-  pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
-    :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
-    :mode => "development", :gateway => "mes", :report_group => "SAC_STAGING_TEST", 
-    :aus_login => '941000108792', :aus_password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU"
-  pgc.club = c
-  pgc.save!
-  pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
-    :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
-    :mode => "production", :gateway => "mes", :report_group => "SAC_STAGING_TEST",
-    :aus_login => '941000108792', :aus_password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU"
-  pgc.club = c
-  pgc.save!
+Club.all.each_with_index do |c, i|
+  if (i % 2) == 0
+    pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
+      :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
+      :mode => "development", :gateway => "mes", :report_group => "SAC_STAGING_TEST", 
+      :aus_login => '941000108792', :aus_password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU"
+    pgc.club = c
+    pgc.save!
+    pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
+      :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
+      :mode => "production", :gateway => "mes", :report_group => "SAC_STAGING_TEST",
+      :aus_login => '941000108792', :aus_password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU"
+    pgc.club = c
+    pgc.save!
+  else
+    pgc = PaymentGatewayConfiguration.new :login => "a", 
+      :merchant_key => "SAC, Inc", :password => "a", 
+      :mode => "development", :gateway => "litle", :report_group => "SAC_STAGING_TEST", 
+      :aus_login => '', :aus_password => ""
+    pgc.club = c
+    pgc.save!
+  end
+
+  tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "1.month", :mode => 'development',
+    :needs_enrollment_approval => false, :name => "test2"
+  tom.club = c
+  tom.save!
+  tom = TermsOfMembership.new :installment_amount => 100.56, :installment_type => "1.year", :mode => 'development',
+    :needs_enrollment_approval => false, :name => "test2 year"
+  tom.club = c
+  tom.save!
+  tom = TermsOfMembership.new :installment_amount => 45, :installment_type => "1.year", :mode => 'development',
+    :needs_enrollment_approval => false, :name => "test"
+  tom.club = c
+  tom.save!
+  tom = TermsOfMembership.new :installment_amount => 25, :installment_type => "30.days", :mode => 'development',
+    :needs_enrollment_approval => false, :name => "test paid", :club_cash_amount => 10
+  tom.club = c
+  tom.save!
+  tom = TermsOfMembership.new :installment_amount => 100, :installment_type => "1.year", :mode => 'development',
+    :needs_enrollment_approval => false, :name => "test annual"
+  tom.club = c
+  tom.save!
+  tom = TermsOfMembership.new :installment_amount => 50, :installment_type => "30.days", :mode => 'development',
+    :needs_enrollment_approval => true, :name => "test approval"
+  tom.club = c
+  tom.save!
+  tom = TermsOfMembership.new :installment_amount => 50, :installment_type => "1.year", :mode => 'development',
+    :needs_enrollment_approval => true, :name => "test anual approval"
+  tom.club = c
+  tom.save!
+  tom = TermsOfMembership.new :installment_amount => 0.0, :installment_type => "30.days", :mode => 'development',
+    :needs_enrollment_approval => false, :name => "test for drupal", :provisional_days => 30
+  tom.club = c
+  tom.save!
 end
-
-tom = TermsOfMembership.new :installment_amount => 34.56, :installment_type => "1.month", 
-  :needs_enrollment_approval => false, :name => "test2"
-tom.club = c
-tom.save!
-tom = TermsOfMembership.new :installment_amount => 100.56, :installment_type => "1.year", 
-  :needs_enrollment_approval => false, :name => "test2 year"
-tom.club = c
-tom.save!
-tom = TermsOfMembership.new :installment_amount => 45, :installment_type => "1.year", 
-  :needs_enrollment_approval => false, :name => "test"
-tom.club = c2
-tom.save!
-tom = TermsOfMembership.new :installment_amount => 25, :installment_type => "30.days", 
-  :needs_enrollment_approval => false, :name => "test paid", :club_cash_amount => 10
-tom.club = c
-tom.save!
-tom = TermsOfMembership.new :installment_amount => 100, :installment_type => "1.year", 
-  :needs_enrollment_approval => false, :name => "test annual"
-tom.club = c
-tom.save!
-tom = TermsOfMembership.new :installment_amount => 50, :installment_type => "30.days", 
-  :needs_enrollment_approval => true, :name => "test approval"
-tom.club = c
-tom.save!
-tom = TermsOfMembership.new :installment_amount => 50, :installment_type => "1.year", 
-  :needs_enrollment_approval => true, :name => "test anual approval"
-tom.club = c
-tom.save!
-tom = TermsOfMembership.new :installment_amount => 0.0, :installment_type => "30.days", 
-  :needs_enrollment_approval => false, :name => "test for drupal", :provisional_days => 30
-tom.club = c
-tom.save!
-
 
 [ 'Incoming Call', 'Outbound Call' ,  'Email' ,  'Chat' , 'Other' ].each do |name|
   c = CommunicationType.new
