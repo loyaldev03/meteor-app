@@ -46,7 +46,7 @@ class Api::ProspectsController < ApplicationController
   #     <li><strong>joint</strong> It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level. [optional]</li> 
   #  </ul>
   # @response_field [String] message Shows the method results and also informs the errors.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   # @response_field [String] prospect_id Prospect's id. This ID is unique for each prospect. (36 characters string)
   #
   def create

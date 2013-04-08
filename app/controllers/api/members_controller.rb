@@ -10,7 +10,7 @@ class Api::MembersController < ApplicationController
   # @resource /api/v1/members
   # @action POST
   #
-  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
   # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information:
   #   <ul>
   #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
@@ -54,7 +54,7 @@ class Api::MembersController < ApplicationController
   #     <ul>
   #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
+  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
   #     </ul>
   #   </ul>
   # @optional [Hash] setter Variable used to pass some boolean values as "cc_blank". It must have the following information:
@@ -90,8 +90,8 @@ class Api::MembersController < ApplicationController
   #       "external_id":"2568",
   #       "preferences":{ "color":"red", "player":"DaveJr" },
   #       "credit_card":{
-  #          "number":"4485-6302-0286-9418"
-  #          "expire_month":5
+  #          "number":"4485-6302-0286-9418",
+  #          "expire_month":5,
   #          "expire_year":2016
   #       }
   #     }
@@ -138,8 +138,8 @@ class Api::MembersController < ApplicationController
   #       "external_id":"2568",
   #       "preferences":{ "color":"red", "player":"DaveJr" },
   #       "credit_card":{
-  #          "number":"4485-6302-0286-9418"
-  #          "expire_month":5
+  #          "number":"4485-6302-0286-9418",
+  #          "expire_month":5,
   #          "expire_year":2016
   #       },
   #       "setter":{
@@ -163,9 +163,9 @@ class Api::MembersController < ApplicationController
   # @example_response_description Response with member's errors within an 'error' hash.
   #
   # @response_field [String] message Shows the method results and also informs the errors.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.
-  # @response_field [Hash] errors A hash with members and credit card errors. This will be use to show errors on members creation page.
+  # @response_field [Hash] errors A hash with members and credit card errors.
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account.
   #
   def create
@@ -215,7 +215,7 @@ class Api::MembersController < ApplicationController
   #     <ul>
   #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
-  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire.  </li>
+  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
   #     </ul>
   #   </ul>
   # @optional [Hash] setter Variable used to pass some boolean values as "wrong_phone_number". It must have the following information:
@@ -249,7 +249,12 @@ class Api::MembersController < ApplicationController
   #       "member_group_type_id":1,
   #       "product_sku":"KIT-CARD",
   #       "product_description":"product default",
-  #       "external_id":"2568"
+  #       "external_id":"2568",
+  #       "credit_card":{
+  #          "number":"XXXX-XXXX-XXXX-9418",
+  #          "expire_month":5,
+  #          "expire_year":2016
+  #       }
   #     },
   #       "setter":{
   #          "wrong_phone_number":0,
@@ -296,7 +301,12 @@ class Api::MembersController < ApplicationController
   #       "member_group_type_id":1,
   #       "product_sku":"KIT-CARD",
   #       "product_description":"product default",
-  #       "external_id":"2568"
+  #       "external_id":"2568",
+  #       "credit_card":{
+  #          "number":"XXXX-XXXX-XXXX-9418",
+  #          "expire_month":5,
+  #          "expire_year":2016
+  #       }
   #     },
   #       "setter":{
   #          "wrong_phone_number":0,
@@ -319,9 +329,9 @@ class Api::MembersController < ApplicationController
   # @example_response_description Response with member's errors within an 'error' hash.
   #
   # @response_field [String] message Shows the method results and also informs the errors.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. It will be returned only when the request was a success.
-  # @response_field [Hash] errors A hash with members errors. This will be use to show errors on members edit page. 
+  # @response_field [Hash] errors A hash with members errors.
   # 
   def update
     response = {}
@@ -359,57 +369,51 @@ class Api::MembersController < ApplicationController
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end
 
-  # Method : GET
+  ##
   # Returns information related to member's information, credit card, current membership and enrollment information.
   #
-  # [url] /api/v1/members/:id
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # [id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
-  #      Have in mind that this value is part of the url.
-  # [member] Information related to the member that is sumbitting the enroll. Here is a list of the regex we are using to validate {Member show}.
-  #             *first_name: The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
-  #             *last_name: The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%").
-  #             *address: The address of the member that is being enrolled. 
-  #             *city: City from where the member is from.
-  #             *state: The state standard code where the member is from.
-  #             *zip: Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.)
-  #             *phone_country_code: First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). 
-  #             *phone_area_code: Second field of the phone number. This is the number related to the area the phone number is from. 
-  #             *phone_local_number: Third and last field of the phone_number. This is the local number where the member will be reached.
-  #             *email: Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting
-  #              mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx
-  #             *club_cash_amount: Amount of the club cash the member has at this moment. We accept a maximun of two digits after the comma.
-  #             *club_cash_expire_date: Date when the club cash will be expired and set to 0. This date is saved as date format.
-  #             *type_of_phone_number: Type of the phone number the member has input (home, mobile, others).
-  #             *birth_date: Birth date of the member. This date is stored with format "yyyy-mm-dd"
-  #             *gender: Gender of the member. The values we are recieving are "M" for male or "F" for female.
-  #             *bill_date: Date when the billing will be done. 
-  #             *next_retry_bill_date: Date when the billing will be done. 
-  #             *wrong_address: Reason the member was set as undeliverable. 
-  #             *wrong_phone_number: Reason the member was set as unreachable. 
-  #             *member_since_date: Date when the member was created. This date is saved with date format.
-  #             *reactivation_times: Integer value that tells us how many times this member was recovered. 
-  #             *blacklisted: Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted)
-  #             *member_group_type_id: Group type the member belongs to.
-  #             *preferences: Information about the preferences selected when enrolling. This will be use to know about the member likes.
-  # [credit_card] Information related to member's credit card.
-  #                 *last_4_digits: The last four digits of member's active credit card.
-  #                 *expire_month: The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. 
-  #                 *expire_year: The year (in numbers) in which the credit card will expire.  
-  # [current_membership] Information related to the member's membership at the moment.
-  #                 *status: Member's current status.  
-  #                 *join_date: Date when the member join. This date is updated each time the member is recovered, or it is saved the sale.
-  #                 *cancel_date: Date schedule when the member will be canceled. 
-  # [message] Shows the method errors. This message will be only shown when there was an error.
-  # [code] Code related to the method result.
+  # @resource /api/v1/members/:id
+  # @action GET
   #
-  # @param [String] api_key
-  # @return [String] *message* 
-  # @return [Hash] *member*
-  # @return [Hash] *credit_card*
-  # @return [Hash] *current_membership*
-  # @return [Hash] *enrollment_info*
-  # @return [Integer] *code*
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @response_field [Hash] credit_card Information related to member's credit card.
+  #  <ul>
+  #     <li><strong>last_4_digits</strong> Member's active credit card last four digits. </li>
+  #     <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
+  #     <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
+  #  </ul>
+  # @response_field [Hash] current_membership Information related to the member's membership at the moment.
+  #  <ul>
+  #     <li><strong>status</strong> String with member's current status. </li>
+  #     <li><strong>join_date</strong> String with date when the member join. This date is updated each time the member is recovered, or it is saved the sale. </li>
+  #     <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is no date schedule this value will be null. </li>
+  #  </ul>
+  # @response_field [Hash] member Hash with member information.
+  #  <ul>
+  #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
+  #     <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
+  #     <li><strong>address</strong> The address of the member that is being enrolled. </li>
+  #     <li><strong>city</strong> City from where the member is from. </li>
+  #     <li><strong>state</strong> The state standard code where the member is from. </li>
+  #     <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.) </li>
+  #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "011"). </li>
+  #     <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. </li>
+  #     <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached. </li>
+  #     <li><strong>phone_local_number</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We are accepting mails with formtas like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
+  #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). </li>
+  #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" </li>
+  #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. </li>
+  #     <li><strong>bill_date</strong> Date when the billing will be done. </li>
+  #     <li><strong>wrong_address</strong> Reason the member was set as undeliverable. </li>
+  #     <li><strong>wrong_phone_number</strong> Reason the member was set as unreachable. </li>
+  #     <li><strong>member_since_date</strong> Date when the member was created. This date is saved with date format. </li>
+  #     <li><strong>reactivation_times</strong> Integer value that tells us how many times this member was recovered. </li>
+  #     <li><strong>blacklisted</strong> Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted) </li>
+  #     <li><strong>member_group_type</strong> Group type the member belongs to. </li>
+  #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. </li>
+  # @response_field [String] message Shows the method errors. This message will be only shown when there was an error. 
+  # @response_field [String] code Code related to the method result.
   #
   def show
     member = Member.find(params[:id])
@@ -464,11 +468,11 @@ class Api::MembersController < ApplicationController
   # @action PUT
   # 
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [Integer] id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @required [Integer] id Member's id needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
-  # @required [String] expire_date club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")
+  # @optional [String] expire_date club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")
   # @response_field [String] message Shows the method results and also informs the errors.
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   # 
   def club_cash
     member = Member.find(params[:id])
@@ -490,28 +494,21 @@ class Api::MembersController < ApplicationController
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end
 
-
-  # Method : PUT
+  ##
   # Updates member's next retry bill date.
   #
-  # [url] api/v1/members/:member_id/next_bill_date
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
-  # [member_id] Members ID. This id is a string type ID (lenght 32 characters.). This ID is unique for each member.
-  #             Have in mind that this value is part of the url.
-  # [next_bill_date] Date to be stored as date where we should bill this member. This date is stored with date format. (required)
+  # @resource /api/v1/members/:id/next_bill_date
+  # @action PUT
   #
-  # [message] Shows the method result.
-  # [code] Code related to the method result.
-  # [errors] A hash with members and next_bill_date errors. This will be use to show errors on members edit page. 
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [Integer] id Member's ID needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @required [String] next_bill_date Date to be stored as date where we should bill this member. This date is stored with date format.
+  # @response_field [String] message Shows the method result.
+  # @response_field [Integer] code Code related to the method result.
+  # @response_field [Hash] errors A hash with member and next_bill_date errors. 
   #
-  # @param [String] api_key
-  # @param [String] next_bill_date
-  # @return [String] *message*
-  # @return [String] *errors*  
-  # @return [Integer] *code*
-  # 
   def next_bill_date
-    member = Member.find params[:member_id]
+    member = Member.find params[:id]
     my_authorize! :api_change_next_bill_date, Member, member.club_id
     render json: member.change_next_bill_date(params[:next_bill_date], @current_agent)
     
@@ -519,28 +516,20 @@ class Api::MembersController < ApplicationController
       render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end 
 
-
-  # Method : GET
-  # Gets an array with the member's id that were updated between the dates given. 
+  ##
+  # Gets an array with all member's id that were updated between the dates given. 
   #
-  # [url] /api/v1/members/find_all_by_updated/:club_id/:start_date/:end_date
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
-  # [club_id] Id of the club where we are goint to check for memebers. 
-  # [start_date] Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url. (required)
-  # [end_date] Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. (required)
+  # @resource /api/v1/members/find_all_by_updated/:club_id/:start_date/:end_date
+  # @action GET
   #
-  # [message] Shows the method result. This message will be shown when there is an error.
-  # [list] Hash with member's id updated between the dates given. This list will be returned only when this method is success.
-  # [code] Code related to the method result.
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [Integer] club_id Club's ID needed to find the club where we are going to check for members. 
+  # @required [String] start_date Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url.
+  # @required [String] end_date Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. 
+  # @response_field [String] message Shows the method result. This message will be shown when there is an error.
+  # @response_field [Array] list Array with member's id updated between the dates given. This list will be returned only when this method is success.
+  # @response_field [String] code Code related to the method result.
   #
-  # @param [String] api_key
-  # @param [String] start_date
-  # @param [String] end_date
-  # @param [Integer] club_id
-  # @return [String] *message*
-  # @return [Integer] *code*
-  # @return [Hash] *list*
-  # 
   def find_all_by_updated
     my_authorize! :api_find_all_by_updated, Member, params[:club_id]
     if params[:start_date].blank? or params[:end_date].blank?
@@ -557,27 +546,20 @@ class Api::MembersController < ApplicationController
   end
 
 
-  # Method : GET
-  # Gets an array with the member's id that were created between the dates given. 
+  ##
+  # Gets an array with all member's id that were created between the dates given.
   #
-  # [url] /api/v1/members/find_all_by_created/:club_id/:start_date/:end_date
-  # [api_key] Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
-  # [club_id] Id of the club where we are goint to check for memebers. 
-  # [start_date] Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url. (required)
-  # [end_date] Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url. (required)
+  # @resource /api/v1/members/find_all_by_created/:club_id/:start_date/:end_date
+  # @action GET
   #
-  # [message] Shows the method result. This message will be shown when there is an error.
-  # [list] Hash with member's id created between the dates given. This list will be returned only when this method is success.
-  # [code] Code related to the method result.
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [Integer] club_id Club's ID needed to find the club where we are going to check for members. 
+  # @required [String] start_date Date where we will start the query from. This date must be in datetime format. Have in mind that this value is part of the url. 
+  # @required [String] end_date Date where we will end the query. This date must be in datetime format. Have in mind that this value is part of the url.
+  # @response_field [String] message Shows the method result. This message will be shown when there is an error.
+  # @response_field [Array] list Array with member's id created between the dates given. This list will be returned only when this method is success.
+  # @response_field [String] code Code related to the method result.
   #
-  # @param [String] api_key
-  # @param [String] start_date
-  # @param [String] end_date
-  # @param [Integer] club_id
-  # @return [String] *message*
-  # @return [Integer] *code*
-  # @return [Hash] *list*
-  # 
   def find_all_by_created
     my_authorize! :api_find_all_by_updated, Member, params[:club_id]
     if params[:start_date].blank? or params[:end_date].blank?
@@ -592,6 +574,4 @@ class Api::MembersController < ApplicationController
     rescue ArgumentError => e
       render json: { :message => "Check both start and end date format, please. It seams one of them is in an invalid format", :code => Settings.error_codes.wrong_data } 
   end
-
-
 end
