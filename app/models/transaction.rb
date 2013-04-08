@@ -172,6 +172,10 @@ class Transaction < ActiveRecord::Base
 
   private
 
+    def amount_to_send
+      (amount.to_f * 100).to_i
+    end
+
     def credit
       if payment_gateway_configuration.nil?
         save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
@@ -179,8 +183,7 @@ class Transaction < ActiveRecord::Base
         save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
       else
         load_gateway
-        a = (amount.to_f * 100)
-        credit_response=@gateway.credit(a, self.token, @options)
+        credit_response=@gateway.credit(amount_to_send, credit_card_token, @options)
         save_response(credit_response)
       end
     end
@@ -190,8 +193,7 @@ class Transaction < ActiveRecord::Base
         save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
       else
         load_gateway
-        a = (amount.to_f * 100)
-        refund_response=@gateway.refund(a, refund_response_transaction_id, @options)
+        refund_response=@gateway.refund(amount_to_send, refund_response_transaction_id, @options)
         save_response(refund_response)
       end
     end    
@@ -206,8 +208,7 @@ class Transaction < ActiveRecord::Base
         save_custom_response({ :message => "Transaction success. Amount $0.0", :code => Settings.error_codes.success })
       else
         load_gateway
-        a = (amount.to_f * 100)
-        purchase_response = @gateway.purchase(a, self.token, @options)
+        purchase_response = @gateway.purchase(amount_to_send, credit_card_token, @options)
         save_response(purchase_response)
       end
     end

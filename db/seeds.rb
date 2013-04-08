@@ -160,7 +160,7 @@ Club.all.each_with_index do |c, i|
     :needs_enrollment_approval => true, :name => "test anual approval"
   tom.club = c
   tom.save!
-  tom = TermsOfMembership.new :installment_amount => 0.0, :installment_type => "30.days", :mode => 'development',
+  tom = TermsOfMembership.new :installment_amount => 84, :installment_type => "30.days", :mode => 'development',
     :needs_enrollment_approval => false, :name => "test for drupal", :provisional_days => 30
   tom.club = c
   tom.save!
