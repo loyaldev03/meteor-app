@@ -86,7 +86,7 @@ SacPlatform::Application.configure do
     Bullet.bullet_logger = true
     Bullet.console = true
     Bullet.rails_logger = true
-    Bullet.airbrake = true
+    Bullet.airbrake = false
   end
 
 end
