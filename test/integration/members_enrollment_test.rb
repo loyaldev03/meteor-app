@@ -141,7 +141,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     @saved_member.current_membership.update_attribute(:join_date, Time.zone.now - amount_of_days.day)
     Member.send_pillar_emails
-    sleep 3
+    sleep 5
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){ click_on 'Communications' }
@@ -207,7 +207,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#td_mi_external_id") { assert page.has_content?(unsaved_member.external_id) }
 
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
-    search_member("member[member_id]", "#{created_member.id}", created_member)
+    search_member("member[id]", "#{created_member.id}", created_member)
   end
 
 	test "new member for with external_id not requiered" do
@@ -248,6 +248,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("zip: can't be blank,The zip code is not valid for the selected country."), "Failure on zip validation message"
       }
     end
+
+
   end
 
   # TODO: FIX THIS TEST!
@@ -523,12 +525,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :description => 'Member updated succesfully last' )
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    within("#operations_table")do
-      wait_until{
-        assert page.has_content?('Member updated succesfully last')
-      }
-    end
+    assert find_field('input_first_name').value == @saved_member.first_name
+    within(".nav-tabs"){ click_on 'Operations' }
+    within("#operations_table"){ assert page.has_content?('Member updated succesfully last') }
   end
 
   test "see operations grouped by billing from lastest to newest" do
@@ -609,17 +608,20 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :operation_type => 300,
                                 :description => 'Communication sent - 300')
     }
+    sleep 2
     3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 301,
                                 :description => 'Communication sent - 301')
     }
+    sleep 2
     3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 302,
                                 :description => 'Communication sent - 302')
     }
-    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+    sleep 2
+    4.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 303,
                                 :description => 'Communication sent - 303')
@@ -628,11 +630,11 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within('.nav-tabs'){ click_on 'Operations'}
     within("#dataTableSelect"){ select('communications', :from => 'operation[operation_type]') }
     sleep 2
-    within("#operations_table")do
-      assert page.has_content?('Communication sent - 300')
-      assert page.has_content?('Communication sent - 301')
-      assert page.has_content?('Communication sent - 302')
-      assert page.has_content?('Communication sent - 303')
+    within("#operations_table") do
+      assert page.has_content?("Communication sent - 303")
+      assert page.has_content?("Communication sent - 302")
+      assert page.has_content?("Communication sent - 301")
+      assert page.has_no_content?("Communication sent - 300")
     end
   end
 
@@ -734,7 +736,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   end
 
   test "Recover member from sloop with the same credit card" do
-    require 'ruby-debug'
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info)
@@ -916,7 +917,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     
     @saved_member = create_member(unsaved_member)
 
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    assert find_field('input_first_name').value == unsaved_member.first_name
     @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:birth_date, Time.zone.now)
     Member.send_happy_birthday
