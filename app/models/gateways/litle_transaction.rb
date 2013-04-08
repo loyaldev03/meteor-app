@@ -34,7 +34,8 @@ class LitleTransaction < Transaction
 
     def save_response(answer)
       self.response = answer
-      if answer.params 
+      self.success = answer.success?
+      if answer.params
         self.response_transaction_id=answer.params['litleOnlineResponse']['litleTxnId']
         self.response_auth_code=answer.params['auth_code']
         self.response_code=answer.params['litleOnlineResponse']['response']

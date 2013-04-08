@@ -41,9 +41,12 @@ class MerchantESolutionsTransaction < Transaction
 
     def save_response(answer)
       self.response = answer
-      self.response_transaction_id=answer.params['transaction_id']
-      self.response_auth_code=answer.params['auth_code']
-      self.response_code=answer.params['error_code']
+      self.success = answer.success?
+      if answer.params
+        self.response_transaction_id=answer.params['transaction_id']
+        self.response_auth_code=answer.params['auth_code']
+        self.response_code=answer.params['error_code']
+      end
       self.response_result=answer.message
       save
       super(answer)

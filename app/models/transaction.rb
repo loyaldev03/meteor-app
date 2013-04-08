@@ -223,7 +223,6 @@ class Transaction < ActiveRecord::Base
     end
 
     def save_response(answer)
-      self.success = answer.success?
       if answer.params and answer.params[:duplicate]=="true"
         # we keep this if, just because it was on Litle version (compatibility).
         # MeS seems to not send this param
