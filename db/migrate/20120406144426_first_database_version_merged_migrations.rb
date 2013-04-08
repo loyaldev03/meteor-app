@@ -386,7 +386,6 @@ class FirstDatabaseVersionMergedMigrations < ActiveRecord::Migration
     execute "ALTER TABLE products ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;"
 
     create_table "prospects", {:id => false} do |t|
-      t.string   "uuid",                   :limit => 36
       t.string   "first_name"
       t.string   "last_name"
       t.string   "address"
@@ -424,6 +423,7 @@ class FirstDatabaseVersionMergedMigrations < ActiveRecord::Migration
       t.text     "campaign_description"
       t.text     "campaign_medium_version"
     end
+    execute "ALTER TABLE prospects ADD COLUMN uuid VARCHAR(36) NOT NULL PRIMARY KEY;"
 
     add_index "prospects", ["uuid"], :name => "index_prospects_on_uuid", :unique => true
 
@@ -446,7 +446,6 @@ class FirstDatabaseVersionMergedMigrations < ActiveRecord::Migration
     execute "ALTER TABLE terms_of_memberships ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;"
 
     create_table "transactions", {:id => false} do |t|
-      t.string   "uuid",                   :limit => 36
       t.integer  "terms_of_membership_id",           :limit => 8
       t.integer  "payment_gateway_configuration_id", :limit => 8
       t.string   "report_group"
@@ -489,7 +488,6 @@ class FirstDatabaseVersionMergedMigrations < ActiveRecord::Migration
       t.string   "last_digits"
       t.integer  "member_id",                        :limit => 8
     end
-
-    add_index "transactions", ["uuid"], :name => "index_transactions_on_uuid", :unique => true
+    execute "ALTER TABLE transactions ADD COLUMN uuid VARCHAR(36) NOT NULL PRIMARY KEY;"
   end
 end
