@@ -21,7 +21,12 @@ class LitleTransaction < Transaction
   end
 
 
+  def fill_transaction_type_for_credit(sale_transaction)
+    self.transaction_type = "credit"
+  end 
+
   private
+
     def credit_card_token
       token = ActiveMerchant::Billing::LitleGateway::LitleCardToken.new(
         :token              => self.token,

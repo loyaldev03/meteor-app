@@ -33,6 +33,15 @@ class MerchantESolutionsTransaction < Transaction
     Auditory.audit(nil, trans, "Chargeback processed $#{trans.amount}", sale_transaction.member, Settings.operation_types.chargeback)
   end
 
+  def fill_transaction_type_for_credit(sale_transaction)
+    if sale_transaction.amount == amount
+      self.transaction_type = "refund"
+      self.refund_response_transaction_id = sale_transaction.response_transaction_id
+    elsif sale_transaction.amount > amount
+      self.transaction_type = "credit"
+    end
+  end    
+  
   private
 
     def credit_card_token

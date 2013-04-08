@@ -77,7 +77,7 @@ class Transaction < ActiveRecord::Base
         :state    => state,
         :zip      => zip.gsub(/[a-zA-Z-]/, ''),
         :phone    => phone_number
-        }
+      }
     }    
   end
 
@@ -136,22 +136,18 @@ class Transaction < ActiveRecord::Base
     end
   end
 
+
   def self.refund(amount, sale_transaction_id, agent=nil)
     amount = amount.to_f
     # Lock transaction, so no one can use this record while we refund this member.
     sale_transaction = Transaction.find sale_transaction_id, :lock => true
-    trans = Transaction.obtain_transaction_by_gateway(sale_transaction.gateway)
     if amount <= 0.0
       return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
-    elsif sale_transaction.amount == amount
-      trans.transaction_type = "refund"
-      trans.refund_response_transaction_id = sale_transaction.response_transaction_id
-    elsif sale_transaction.amount > amount
-      trans.transaction_type = "credit"
-    end
-    if sale_transaction.amount_available_to_refund < amount
+    elsif sale_transaction.amount_available_to_refund < amount
       return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
     end
+    trans = Transaction.obtain_transaction_by_gateway(sale_transaction.gateway)
+    trans.fill_transaction_type_for_credit(sale_transaction)
     trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
     answer = trans.process
     if trans.success?
