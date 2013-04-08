@@ -458,7 +458,7 @@ class Api::MembersController < ApplicationController
   end    
 
   ##
-  # Updates member's club cash's data.
+  # Updates member's club cash's data. Have in mind that in order to use this feature, member's club must allow club cash transaction within it.  
   # 
   # @resource /api/v1/members/:id/club_cash
   # @action PUT
