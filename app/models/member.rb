@@ -697,11 +697,11 @@ class Member < ActiveRecord::Base
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful, :message => "Could not save club cash transaction"  }
     ClubCashTransaction.transaction do
       begin
-        if amount.to_f == 0
+        if not club.allow_club_cash_transaction?
+          answer = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
+        elsif amount.to_f == 0
           answer[:message] = I18n.t("error_messages.club_cash_transaction_invalid_amount")
           answer[:errors] = { :amount => "Invalid amount" } 
-        elsif not club.allow_club_cash_transaction?
-          answer = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
         elsif club_cash_transactions_enabled
           if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
             cct = ClubCashTransaction.new(:amount => amount, :description => description)
