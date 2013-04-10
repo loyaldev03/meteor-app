@@ -35,7 +35,7 @@ class MembersController < ApplicationController
                        .with_external_id(params[:member][:external_id])
                        .where(:club_id => @current_club)
                        .needs_approval(params[:member][:needs_approval])
-                       .order(:id)
+                       .order('members.id')
                        .uniq
     respond_to do |format|
       format.html {render 'index'}
