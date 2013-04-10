@@ -407,7 +407,7 @@ class Member < ActiveRecord::Base
               Airbrake.notify(:error_class => "Billing::set_as_active", :error_message => "we cant set as active this member.", :parameters => { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
             end
             schedule_renewal
-            assign_club_cash
+            assign_club_cash if club.allow_club_cash_transaction?
             message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
             Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
             { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
@@ -658,10 +658,12 @@ class Member < ActiveRecord::Base
 
   # Resets member club cash in case of a cancelation.
   def nillify_club_cash
-    add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation')
-    if club_cash_transactions_enabled
-      self.club_cash_expire_date = nil
-      self.save(:validate => false)
+    if club.allow_club_cash_transaction?
+      add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation')
+      if club_cash_transactions_enabled
+        self.club_cash_expire_date = nil
+        self.save(:validate => false)
+      end
     end
   end
 
@@ -695,7 +697,9 @@ class Member < ActiveRecord::Base
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful, :message => "Could not save club cash transaction"  }
     ClubCashTransaction.transaction do
       begin
-        if amount.to_f == 0
+        if not club.allow_club_cash_transaction?
+          answer = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
+        elsif amount.to_f == 0
           answer[:message] = I18n.t("error_messages.club_cash_transaction_invalid_amount")
           answer[:errors] = { :amount => "Invalid amount" } 
         elsif club_cash_transactions_enabled
@@ -884,7 +888,7 @@ class Member < ActiveRecord::Base
 
   # Method used from rake task and also from tests!
   def self.reset_club_cash_up_today
-    Member.includes(:club).find_in_batches(:conditions => ["date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member'", Time.zone.now.to_date ]) do |group|
+    Member.includes(:club).find_in_batches(:conditions => ["date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member' AND club_cash_enable = true", Time.zone.now.to_date ]) do |group|
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:reset_club_cash_up_today rake task, processing #{group.count} members"
       group.each do |member| 
         tz = Time.zone.now

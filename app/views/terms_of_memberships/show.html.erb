@@ -16,8 +16,10 @@
          <%= @tom.grace_period %> </td>
     <td> <%= t('activerecord.attributes.terms_of_membership.provisional_days') %>: 
          <%= @tom.provisional_days %> </td>    
-    <td> <%= t('activerecord.attributes.terms_of_membership.club_cash_amount') %>: 
-         <%= @tom.club_cash_amount %> </tr>
+    <% if @current_club.allow_club_cash_transaction? %>
+      <td> <%= t('activerecord.attributes.terms_of_membership.club_cash_amount') %>: 
+        <%= @tom.club_cash_amount %> </td>
+    <% end %>
   </tr>
   <tr>
     <td colspan="5" class="comment"> <%= t('activerecord.attributes.terms_of_membership.description') %>: 

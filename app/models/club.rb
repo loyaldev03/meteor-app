@@ -21,7 +21,7 @@ class Club < ActiveRecord::Base
 
   attr_accessible :description, :name, :logo, :drupal_domain_id, :theme, :requires_external_id,
     :api_type, :api_username, :api_password, :time_zone, :pardot_email, :pardot_password, :pardot_user_key,
-    :cs_phone_number, :family_memberships_allowed
+    :cs_phone_number, :family_memberships_allowed, :club_cash_enable
 
   acts_as_paranoid
 
@@ -55,6 +55,10 @@ class Club < ActiveRecord::Base
   # Improvements #25771 - Club cash transactions will be managed by Drupal User Points plugin. 
   def club_cash_transactions_enabled
     api_type != 'Drupal::Member'
+  end
+
+  def allow_club_cash_transaction?
+    club_cash_enable
   end
 
   private

@@ -313,14 +313,10 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
-        wait_until{
-          assert page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s)
-        }
+        assert page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s)
       end
       within("#td_mi_club_cash_expire_date")do
-        wait_until{
-          assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
-        }
+        assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
       end
     end
   end
@@ -356,14 +352,10 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
-        wait_until{
-          assert page.has_content?('200.0')
-        }
+        assert page.has_content?('200.0')
       end
       within("#td_mi_club_cash_expire_date")do
-        wait_until{
-          assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
-        }
+        assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
       end
     end
   end  
@@ -379,14 +371,10 @@ class MembersClubCashTest < ActionController::IntegrationTest
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
-        wait_until{
-          assert page.has_content?('0.0')
-        }
+        assert page.has_content?('0.0')
       end
       within("#td_mi_club_cash_expire_date")do
-        wait_until{
-          assert page.has_content?(I18n.l(date+1.year, :format => :only_date))
-        }
+        assert page.has_content?(I18n.l(date+1.year, :format => :only_date))
       end
     end
   end
@@ -405,9 +393,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
-        wait_until{
-          assert page.has_content?('0.0')
-        }
+        assert page.has_content?('0.0')
       end
     end
     wait_until{ assert @saved_member.club_cash_expire_date == nil }
@@ -420,14 +406,10 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
-        wait_until{
-          assert page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s)
-        }
+        assert page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s)
       end
       within("#td_mi_club_cash_expire_date")do
-        wait_until{
-          assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
-        }
+        assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))
       end
     end
   end
@@ -440,6 +422,19 @@ class MembersClubCashTest < ActionController::IntegrationTest
       click_link_or_button(@terms_of_membership_with_gateway.name)
     end 
     wait_until{ page.has_content?(@terms_of_membership_with_gateway.club_cash_amount.to_s) }
+  end
+
+  test "Should not show anything related to club cash when club does not allow it." do
+    setup_member
+    @club.update_attribute :club_cash_enable, false
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+
+    within("#table_membership_information") do
+      assert page.has_no_content?( I18n.t('activerecord.attributes.member.club_cash_amount') )
+      assert page.has_no_selector?( I18n.t('activerecord.attributes.member.add_club_cash_transaction') )
+      assert page.has_no_content?( I18n.t('activerecord.attributes.member.add_club_cash_transaction') )
+    end
+    within(".nav-tabs"){ assert page.has_no_content?("Club Cash") }
   end
 end
 

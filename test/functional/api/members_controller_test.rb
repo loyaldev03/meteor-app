@@ -1047,7 +1047,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member = create_active_member(@wordpress_terms_of_membership, :member_with_api)
     new_amount, new_expire_date = 34, Date.today
     old_amount, old_expire_date = @member.club_cash_amount, @member.club_cash_expire_date
-    put( :club_cash, { member_id: @member.id, amount: new_amount, expire_date: new_expire_date , :format => :json })
+    put( :club_cash, { id: @member.id, amount: new_amount, expire_date: new_expire_date , :format => :json })
     @member.reload
     assert_response :success
     assert_equal(@member.club_cash_amount, old_amount)
@@ -1060,7 +1060,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member = create_active_member(@terms_of_membership, :member_with_api)
     new_amount, new_expire_date = 34, Date.today
     old_amount, old_expire_date = @member.club_cash_amount, @member.club_cash_expire_date
-    put( :club_cash, member_id: @member.id, amount: new_amount, expire_date: new_expire_date, :format => :json )
+    put( :club_cash, id: @member.id, amount: new_amount, expire_date: new_expire_date, :format => :json )
     @member.reload
     assert_response :success
     assert_equal(@member.club_cash_amount, old_amount)
@@ -1130,7 +1130,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
     end
-    assert @response.body, I18n.t('error_messages.unable_to_perform_due_member_status')
+    assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
   end
 
   test "Update member's next_bill_date lapsed status" do
@@ -1143,7 +1143,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
     end
-    assert @response.body, I18n.t('error_messages.unable_to_perform_due_member_status')
+    assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
   end
 
   test "Update member's next_bill_date with wrong date format" do
