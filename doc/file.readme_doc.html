@@ -2,30 +2,28 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>
-  Class: Api::OperationController
-  
-    &mdash; Api Documentation
+  Api Documentation
   
 </title>
 
-  <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
 
-  <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
 
 <script type="text/javascript" charset="utf-8">
   hasFrames = window.top.frames.main ? true : false;
-  relpath = '../';
-  framesUrl = "../frames.html#!" + escape(window.location.href);
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
 </script>
 
 
-  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
 
-  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
 
-  <script type="text/javascript" charset="utf-8" src="../js/rest_plugin.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/rest_plugin.js"></script>
 
 
 	<style type="text/css">
@@ -292,123 +290,41 @@
     <iframe id="search_frame"></iframe>
     
     <div id="content" style="padding-top: 12px;">
-		<div class="service">
+		<div id="start">
   <h1 class="noborder title">Api Documentation</h1>
-    <a class="back" href="../index.html" title="back to the overview">&laquo; back to overview</a>
-    <h2>Operation</h2>
-    
-  <div id="Services" class="method_details_list">
-    
-		<div class="method">
-			<p class="method_desc">Creates a new operation related to a member</p>
-			<h3 class="resource_url"><strong>/api/v1/members/:member_id/operation</strong> [POST]</h3>
 
-			<div class="parameters">	
-				
-					<div class="required">
-						<h4>Required Parameters</h4>
-						
-							<ul>
-								<li>
-									<span class="name">api_key</span>
-									<span class="type">String</span>
-									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action.</span>
-								</li>
-							</ul>
-						
-							<ul>
-								<li>
-									<span class="name">member_id</span>
-									<span class="type">Integer</span>
-									<span class="text">Member's id related to the operation we are creating. Integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
-								</li>
-							</ul>
-						
-							<ul>
-								<li>
-									<span class="name">operation_type</span>
-									<span class="type">Integer</span>
-									<span class="text">message Integer value related to the operation type. Operations supported at the moment:
-<ul>
-  <li><strong>900</strong> vip_event_registration </li>
-  <li><strong>901</strong> vip_event_cancelation </li>
-</ul></span>
-								</li>
-							</ul>
-						
-					</div>
-				
+  
+	<p>Hello... this is new doc.</p>
 
-				
-					<div class="optional">
-						<h4>Optional Parameters</h4>
-						
-							<ul>
-								<li>
-									<span class="name">operation_date</span>
-									<span class="type">String</span>
-									<span class="text">Date when the operation was done. If this value is nil we save that operation with Time.zone.now. (Format "yyyy-mm-dd")</span>
-								</li>
-							</ul>
-						
-							<ul>
-								<li>
-									<span class="name">description</span>
-									<span class="type">Integer</span>
-									<span class="text">Description of the operation. It is a text field.</span>
-								</li>
-							</ul>
-						
-					</div>
-				
-			</div><!-- parameters -->
-			
-			
-				<div class="response_fields">
-					<h4>Response Fields</h4>
-					
-						<ul>
-							<li>
-								<span class="name">code</span>
-								<span class="type">String</span>
-								<span class="text">Code related to the method result.</span>
-							</li>
-						</ul>
-					
-						<ul>
-							<li>
-								<span class="name">message</span>
-								<span class="type">String</span>
-								<span class="text">Shows the method results and also informs the errors.</span>
-							</li>
-						</ul>
-					
-				</div>
-			
-			
-			
-		</div>	
+  
+  
+  <h2>All Resources</h2>
+  <ul id="resources">
+	
+    	
+      		<li><span class='object_link'><a href="Api/ClubCashTransactionController.html" title="Api::ClubCashTransactionController (class)">ClubCashTransaction</a></span></li>
+    	
+      		<li><span class='object_link'><a href="Api/MembersController.html" title="Api::MembersController (class)">Members</a></span></li>
+    	
+      		<li><span class='object_link'><a href="Api/OperationController.html" title="Api::OperationController (class)">Operation</a></span></li>
+    	
+      		<li><span class='object_link'><a href="Api/ProductsController.html" title="Api::ProductsController (class)">Products</a></span></li>
+    	
+      		<li><span class='object_link'><a href="Api/ProspectsController.html" title="Api::ProspectsController (class)">Prospects</a></span></li>
+    	
+      		<li><span class='object_link'><a href="Api/TokensController.html" title="Api::TokensController (class)">Tokens</a></span></li>
+    	
     
-  </div>
+  </ul>
+
+  <div class="clear"></div>
 
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
 
 	</div>
     
     <div id="footer">
-  Generated on Wed Apr  3 17:51:29 2013 with ruby-1.9.2
+  Generated on Wed Apr  3 15:13:04 2013 with ruby-1.9.2
 </div>
 
   </body>

@@ -13,7 +13,7 @@ class Api::ProductsController < ApplicationController
   # @required [String] club_id Id of the club the product belongs to. 
   # @response_field [Integer] stock Actual stock of the product. This value is an integer type. This value is returned if there was no error.
   # @response_field [Integer] allow_backorder Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag is returned if there was no error.  
-  # @response_field [Integer] code Code related to the method result.
+  # @response_field [String] code Code related to the method result.
   # @response_field [String] message Shows the method errors.
   # 
   def get_stock
