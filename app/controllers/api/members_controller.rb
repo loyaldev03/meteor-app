@@ -462,7 +462,7 @@ class Api::MembersController < ApplicationController
   end    
 
   ##
-  # Updates member's club cash's data.
+  # Updates member's club cash's data. Have in mind that in order to use this feature, member's club must allow club cash transaction within it.  
   # 
   # @resource /api/v1/members/:id/club_cash
   # @action PUT
@@ -480,6 +480,8 @@ class Api::MembersController < ApplicationController
     response = { :message => "This club is not allowed to fix the amount of the club cash on members.", :code => Settings.error_codes.club_cash_cant_be_fixed, :member_id => member.id }
     if params[:amount].blank?
       response = { :message => "Check amount value, please. Amount cannot be blank or null.", :code => Settings.error_codes.wrong_data }
+    elsif not member.club.allow_club_cash_transaction?
+      response = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
     elsif not member.club.club_cash_transactions_enabled
       member.skip_api_sync!
       member.club_cash_amount = params[:amount]

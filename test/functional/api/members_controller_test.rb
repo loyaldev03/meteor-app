@@ -1139,7 +1139,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
     end
-    assert @response.body, I18n.t('error_messages.unable_to_perform_due_member_status')
+    assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
   end
 
   test "Update member's next_bill_date lapsed status" do
@@ -1152,7 +1152,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
     end
-    assert @response.body, I18n.t('error_messages.unable_to_perform_due_member_status')
+    assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
   end
 
   test "Update member's next_bill_date with wrong date format" do

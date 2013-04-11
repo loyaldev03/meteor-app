@@ -260,28 +260,29 @@
             <th><%= t('activerecord.attributes.member.cancel_date') %>:</th>
             <td id="td_mi_cancel_date"><%= I18n.l(@current_membership.cancel_date, :format => :only_date) unless @current_membership.cancel_date.nil? %></td>  
           </tr>
-  
-          <tr class="ligthgrey">
-            <th><%= t('activerecord.attributes.member.club_cash_amount') %>:</th>
-            <td id="td_mi_club_cash_amount">
-              <%= @current_member.club_cash_amount %>&nbsp;&nbsp;&nbsp;
-              <% unless disable_save_sale %>
-                <% if (not @current_agent.can? :add_club_cash, Member, @current_club.id or not @current_member.can_add_club_cash?) %>
-                  <%= link_to('#', :class => "btn btn-mini btn-success", :id => "link_member_add_club_cash", :disabled => ("disable")) do %> 
-                  <i class="icon-plus"></i> <%= t('activerecord.attributes.member.add_club_cash_transaction') %>
-                  <% end %>
-                <% else %>
-                  <%= link_to(member_add_club_cash_path, :class => "btn btn-mini btn-success", :id => "link_member_add_club_cash") do %> 
-                  <i class="icon-plus"></i> <%= t('activerecord.attributes.member.add_club_cash_transaction') %>      
-                  <% end %>  
-                <% end %> 
-              <% end %>
-            </td>  
-          </tr>
+          <% if @current_club.allow_club_cash_transaction? %>
+            <tr class="ligthgrey">
+              <th><%= t('activerecord.attributes.member.club_cash_amount') %>:</th>
+              <td id="td_mi_club_cash_amount">
+                <%= @current_member.club_cash_amount %>&nbsp;&nbsp;&nbsp;
+                <% unless disable_save_sale %>
+                  <% if (not @current_agent.can? :add_club_cash, Member, @current_club.id or not @current_member.can_add_club_cash?) %>
+                    <%= link_to('#', :class => "btn btn-mini btn-success", :id => "link_member_add_club_cash", :disabled => ("disable")) do %> 
+                    <i class="icon-plus"></i> <%= t('activerecord.attributes.member.add_club_cash_transaction') %>
+                    <% end %>
+                  <% else %>
+                    <%= link_to(member_add_club_cash_path, :class => "btn btn-mini btn-success", :id => "link_member_add_club_cash") do %> 
+                    <i class="icon-plus"></i> <%= t('activerecord.attributes.member.add_club_cash_transaction') %>      
+                    <% end %>  
+                  <% end %> 
+                <% end %>
+              </td>  
+            </tr>
           <tr>
             <th> <%= t('activerecord.attributes.member.club_cash_expire_date') %>: </th>
             <td id="td_mi_club_cash_expire_date"> <%= I18n.l(@current_member.club_cash_expire_date, :format => :only_date) unless @current_member.club_cash_expire_date.nil?  %> </td>
           </tr>
+          <% end %>
           <tr>
             <th><%= t('activerecord.attributes.member.quota') %>: </th>
             <td id="td_mi_quota"><%= @current_membership.quota %></td>  
@@ -314,8 +315,10 @@
   <li><a href="#notes" data-toggle="tab">Notes</a></li>
   <li><a href="#credit_cards" data-toggle="tab">Credit Cards</a></li>
   <li><a href="#transactions" data-toggle="tab">Transactions</a></li>
-  <% if @current_club.club_cash_transactions_enabled %>
-    <li><a href="#club_cash_transactions" data-toggle="tab">Club Cash</a></li>
+  <% if @current_club.allow_club_cash_transaction? %>
+    <% if @current_club.club_cash_transactions_enabled %>
+      <li><a href="#club_cash_transactions" data-toggle="tab">Club Cash</a></li>
+    <% end %> 
   <% end %>
   <li><a href="#fulfillments" data-toggle="tab">Fulfillments</a></li>
   <li><a href="#communication" data-toggle="tab">Communications</a></li>
@@ -346,12 +349,14 @@
       <%= render :partial => 'transactions' %>
     </div>
   </div>
-  <% if @current_club.club_cash_transactions_enabled %>
-    <div class="tab-pane" id="club_cash_transactions">
-      <div class="tab_body_padding">
-        <%= render :partial => 'club_cash_transactions' %>
+  <% if @current_club.allow_club_cash_transaction? %>
+    <% if @current_club.club_cash_transactions_enabled %>
+      <div class="tab-pane" id="club_cash_transactions">
+        <div class="tab_body_padding">
+          <%= render :partial => 'club_cash_transactions' %>
+        </div>
       </div>
-    </div>
+    <% end %>
   <% end %>
   <div class="tab-pane" id="fulfillments">
     <div class="tab_body_padding">

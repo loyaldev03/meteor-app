@@ -658,10 +658,12 @@ class Member < ActiveRecord::Base
 
   # Resets member club cash in case of a cancelation.
   def nillify_club_cash
-    add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation')
-    if club_cash_transactions_enabled
-      self.club_cash_expire_date = nil
-      self.save(:validate => false)
+    if club.allow_club_cash_transaction?
+      add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation')
+      if club_cash_transactions_enabled
+        self.club_cash_expire_date = nil
+        self.save(:validate => false)
+      end
     end
   end
 
@@ -676,13 +678,15 @@ class Member < ActiveRecord::Base
 
   # Adds club cash when membership billing is success.
   def assign_club_cash(message = "Adding club cash after billing")
-    amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
-    self.add_club_cash(nil, amount, message)
-    if club_cash_transactions_enabled
-      if self.club_cash_expire_date.nil? # first club cash assignment
-        self.club_cash_expire_date = join_date + 1.year
+    if club.allow_club_cash_transaction?
+      amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
+      self.add_club_cash(nil, amount, message)
+      if club_cash_transactions_enabled
+        if self.club_cash_expire_date.nil? # first club cash assignment
+          self.club_cash_expire_date = join_date + 1.year
+        end
+        self.save(:validate => false)
       end
-      self.save(:validate => false)
     end
   rescue Exception => e
     # refs #21133
@@ -695,7 +699,9 @@ class Member < ActiveRecord::Base
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful, :message => "Could not save club cash transaction"  }
     ClubCashTransaction.transaction do
       begin
-        if amount.to_f == 0
+        if not club.allow_club_cash_transaction?
+          answer = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
+        elsif amount.to_f == 0
           answer[:message] = I18n.t("error_messages.club_cash_transaction_invalid_amount")
           answer[:errors] = { :amount => "Invalid amount" } 
         elsif club_cash_transactions_enabled
@@ -705,7 +711,7 @@ class Member < ActiveRecord::Base
             raise "Could not save club cash transaction" unless cct.valid? and self.valid?
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save(:validate => false)
-            message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }. Concept: #{description}"
+            message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }."+(description.blank? ? '' : ". Concept: #{description}")
             if amount.to_f > 0
               Auditory.audit(agent, cct, message, self, Settings.operation_types.add_club_cash)
             elsif amount.to_f < 0 and amount.to_f.abs == club_cash_amount 
@@ -884,7 +890,7 @@ class Member < ActiveRecord::Base
 
   # Method used from rake task and also from tests!
   def self.reset_club_cash_up_today
-    Member.includes(:club).find_in_batches(:conditions => ["date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member'", Time.zone.now.to_date ]) do |group|
+    Member.includes(:club).find_in_batches(:conditions => ["date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member' AND club_cash_enable = true", Time.zone.now.to_date ]) do |group|
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:reset_club_cash_up_today rake task, processing #{group.count} members"
       group.each do |member| 
         tz = Time.zone.now
