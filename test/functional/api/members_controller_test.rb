@@ -159,6 +159,22 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal @response.body, '{"message":"Membership already exists for this email address. Contact Member Services if you would like more information at: 123 456 7891.","code":"409","errors":{"status":"Already active."}}'
   end
 
+  test "When no param is provided on creation, it should tell us so" do
+    setup_enviroment
+    sign_in @admin_user
+    assert_difference('Membership.count',0) do
+      assert_difference('EnrollmentInfo.count',0) do
+        assert_difference('Transaction.count',0) do
+          assert_difference('Member.count',0) do
+            post( :create )
+            assert_response :success
+          end
+        end
+      end
+    end
+    assert @response.body.include?("There are some params missing. Please check them.")
+  end
+
   # test "Member should not be enrolled if the email is already is used, even when mes throws error." do
     # setup_enviroment
   #   sign_in @admin_user
@@ -308,6 +324,23 @@ class Api::MembersControllerTest < ActionController::TestCase
       generate_post_message
       assert_response :success
     end
+  end
+
+  test "When no param is provided on update, it should tell us so" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    assert_difference('Membership.count',0) do
+      assert_difference('EnrollmentInfo.count',0) do
+        assert_difference('Transaction.count',0) do
+          assert_difference('Member.count',0) do
+            put( :update, { id: @member.id } )
+            assert_response :success
+          end
+        end
+      end
+    end
+    assert @response.body.include?("There are some params missing. Please check them.")
   end
 
   test "admin user should update member" do

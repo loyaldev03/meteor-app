@@ -182,6 +182,8 @@ class Api::MembersController < ApplicationController
     )
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
+  rescue Exception => e
+    render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
 
   ##
@@ -336,8 +338,8 @@ class Api::MembersController < ApplicationController
   def update
     response = {}
     batch_update = params[:setter] && params[:setter][:batch_update] && params[:setter][:batch_update].to_s.to_bool
-
     member = Member.find(params[:id])
+
     my_authorize! :api_update, Member, member.club_id
     member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync] && params[:setter][:skip_api_sync].to_s.to_bool
     member.api_id = params[:member][:api_id] if params[:member][:api_id].present? and batch_update
@@ -367,6 +369,8 @@ class Api::MembersController < ApplicationController
     render json: response
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
+  rescue Exception => e
+    render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
 
   ##
@@ -510,11 +514,11 @@ class Api::MembersController < ApplicationController
   def next_bill_date
     member = Member.find params[:id]
     my_authorize! :api_change_next_bill_date, Member, member.club_id
+
     render json: member.change_next_bill_date(params[:next_bill_date], @current_agent)
-    
-    rescue ActiveRecord::RecordNotFound
-      render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
-  end 
+  rescue ActiveRecord::RecordNotFound
+    render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
+ end 
 
   ##
   # Gets an array with all member's id that were updated between the dates given. 
