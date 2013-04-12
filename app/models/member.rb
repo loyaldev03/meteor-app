@@ -678,15 +678,13 @@ class Member < ActiveRecord::Base
 
   # Adds club cash when membership billing is success.
   def assign_club_cash(message = "Adding club cash after billing")
-    if club.allow_club_cash_transaction?
-      amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
-      self.add_club_cash(nil, amount, message)
-      if club_cash_transactions_enabled
-        if self.club_cash_expire_date.nil? # first club cash assignment
-          self.club_cash_expire_date = join_date + 1.year
-        end
-        self.save(:validate => false)
+    amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
+    self.add_club_cash(nil, amount, message)
+    if club_cash_transactions_enabled
+      if self.club_cash_expire_date.nil? # first club cash assignment
+        self.club_cash_expire_date = join_date + 1.year
       end
+      self.save(:validate => false)
     end
   rescue Exception => e
     # refs #21133

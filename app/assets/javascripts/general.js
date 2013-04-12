@@ -321,9 +321,10 @@ function club_cash_functions(){
       url: "/api/v1/members/"+id+"/club_cash_transaction",
       data: $("form").serialize(),
       success: function(data) {
-        if (data.code == 000)
+        if (data.code == 000){
           window.location.replace('../'+id);
-        else{
+          alert(data.message);
+        }else{
           $('#submit_button').removeAttr("disabled");
           $('#error_explanation').show();
           $("#error_explanation ul").empty();
