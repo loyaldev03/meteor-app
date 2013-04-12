@@ -36,7 +36,7 @@ class Api::TokensController < ApplicationController
 
     if @user.nil?
       logger.info("User #{email} failed signin, user cannot be found.")
-      respond_with({:message=>"Invalid email or passoword."}, :status=>401, :location => nil)
+      respond_with({:message=>"Invalid email or password."}, :status=>401, :location => nil)
       return
     end
 
@@ -45,7 +45,7 @@ class Api::TokensController < ApplicationController
 
     if not @user.valid_password?(password)
       logger.info("User #{email} failed signin, password \"#{password}\" is invalid")
-      respond_with({:message=>"Invalid email or passoword."}, :status=>401, :location => nil)
+      respond_with({:message=>"Invalid email or password."}, :status=>401, :location => nil)
     else
       respond_with({:token=>@user.authentication_token}, :status=>200, :location => nil)
     end
