@@ -5,16 +5,8 @@ namespace :products do
     Rails.logger = Logger.new("#{Rails.root}/log/products_send_product_list_email.log")
     tall = Time.zone.now
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting products:send_product_list_email rake task"
-
     begin
-      product_xls = Product.generate_xls
-      temp = Tempfile.new("posts.xlsx") 
-      
-      product_xls.serialize temp.path
-      Notifier.product_list(temp).deliver!
-      
-      temp.close 
-      temp.unlink
+      Product.send_product_list_email
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run products:send_product_list_email task"
     end

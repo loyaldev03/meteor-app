@@ -59,4 +59,14 @@ class Product < ActiveRecord::Base
     package
   end
 
+  def self.send_product_list_email
+    product_xls = Product.generate_xls
+    temp = Tempfile.new("posts.xlsx") 
+    
+    product_xls.serialize temp.path
+    Notifier.product_list(temp).deliver!
+    
+    temp.close 
+    temp.unlink
+  end 
 end
