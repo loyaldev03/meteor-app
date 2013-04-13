@@ -320,7 +320,7 @@ production:
     url: https://www.merchante-solutions.com/
     path: /jsp/reports/report_api.jsp
   mes_aus_service:
-    folder: "#{Rails.root}/mes_account_updater_files"
+    folder: <%= "#{Rails.root}/mes_account_updater_files" %>
     url: https://www.merchante-solutions.com/
 
 
