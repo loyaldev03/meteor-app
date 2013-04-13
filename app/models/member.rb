@@ -93,7 +93,7 @@ class Member < ActiveRecord::Base
     end
   }
   scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }
-  scope :with_id, lambda { |value| where('id = ?', value.strip) unless value.blank? }
+  scope :with_id, lambda { |value| where('members.id = ?', value.strip) unless value.blank? }
   scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
   scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value.strip) unless value.blank? }
   scope :with_phone_area_code, lambda { |value| where('phone_area_code = ?', value.strip) unless value.blank? }
@@ -109,7 +109,7 @@ class Member < ActiveRecord::Base
   scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value.strip) unless value.blank? }
   scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_external_id, lambda{ |value| where("external_id = ?",value) unless value.blank? }
-  scope :needs_approval, lambda{ |value| where('status = ?', 'applied') unless value == '0' }
+  scope :needs_approval, lambda{ |value| where('members.status = ?', 'applied') unless value == '0' }
 
   state_machine :status, :initial => :none, :action => :save_state do
     ###### member gets applied =====>>>>
