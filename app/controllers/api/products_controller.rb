@@ -26,4 +26,42 @@ class Api::ProductsController < ApplicationController
     end
   end
 
+  ##
+  # Returns the stock available and the backorder flag for a list of product. 
+  #
+  # @resource /api/v1/products/get_list_of_stock
+  # @action GET
+  #
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [String] sku product's skus that we are interest in. Skus must be separated by commas. (Eg: "KIT-CARD,NCARFLAGKASEYKAHNE")
+  # @required [String] club_id Id of the club the products belongs to. 
+  # @response_field [Array] product_list Array of Hashes with the product's information.
+  # <ul>
+  #   <li><strong>sku</strong> Product's sku. </li>
+  #   <li><strong>stock</strong> Integer value. Actual stock of the product. This value is an integer type. This value is returned if there was no error. </li>
+  #   <li><strong>allow_backorder</strong> Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag is returned if there was no error. </li>
+  # </ul>
+  # @response_field [String] code Code related to the method result.
+  # @response_field [String] message Shows the method errors.
+  # 
+  def get_list_of_stock
+    my_authorize! :manage_product_api, Product, params[:club_id]
+    skus = params[:sku].split(',')
+    if skus.count == 0
+      response = { code: Settings.error_codes.wrong_data, message: 'Check sku params please. It seams it is empty.' }
+    else
+      skus_could_not_found = []
+      product_list = []
+      skus.each do |sku|
+        product = Product.find_by_sku_and_club_id(sku, params[:club_id])
+        if product.nil?
+          skus_could_not_found << sku    
+        else
+          product_list << { sku: product.sku, stock: product.stock, allow_backorder: product.allow_backorder }
+        end
+      end
+      response = { code: Settings.error_codes.success, product_list: product_list, skus_could_not_found: skus_could_not_found }
+    end
+    render json: response
+  end
 end

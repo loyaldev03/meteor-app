@@ -14,6 +14,7 @@ SacPlatform::Application.routes.draw do
       match 'members/find_all_by_updated/:club_id/:start_date/:end_date' => 'members#find_all_by_updated', as: 'find_all_by_updated', :via => [:get]
       match 'members/find_all_by_created/:club_id/:start_date/:end_date' => 'members#find_all_by_created', as: 'find_all_by_created', :via => [:get]
       match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get]
+      match '/products/get_list_of_stock' => 'products#get_list_of_stock', as: 'get_list_of_stock', :via => [:get]
       resources :prospects, :only => [:create]      
     end
   end
