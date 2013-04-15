@@ -180,11 +180,13 @@ class Fulfillment < ActiveRecord::Base
 
 
   def self.process_fulfillments_up_today
+    index = 0
     Fulfillment.to_be_renewed.find_in_batches do |group|
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_fulfillments_up_today rake task, processing #{group.count} fulfillments"
       group.each do |fulfillment| 
         begin
-          Rails.logger.info "  * processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
+          index = index+1
+          Rails.logger.info "  *[#{index}] processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
           fulfillment.renew!
         rescue Exception => e
           Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :fulfillment => fulfillment.inspect })

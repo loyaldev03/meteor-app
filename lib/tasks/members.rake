@@ -32,16 +32,7 @@ namespace :members do
     tall = Time.zone.now
     begin
       Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
-      Member.find_each do |member|
-        begin
-          Rails.logger.info "   * processing member ##{member.id}"
-          member.refresh_autologin_url!
-        rescue
-          Airbrake.notify error_class: "Members::Members", 
-            error_message: "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect }
-          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        end
-      end
+      Member.refresh_autologin
     rescue
     end    
   end
