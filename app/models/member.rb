@@ -874,20 +874,22 @@ class Member < ActiveRecord::Base
     # TODO: join EmailTemplate and Member querys
     base = EmailTemplate.where(["template_type = ? ", :pillar])
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{base.count} templates"
-    index = 0
+    index_template = 0
+    index_member = 0
     base.find_in_batches do |group|
       group.each do |template| 
         tz = Time.zone.now
         begin
-          index = index + 1 
-          Rails.logger.info "  *[#{index}] processing template ##{template.id}"
+          index_template = index_template+1 
+          Rails.logger.info "  *[#{index_template}] processing template ##{template.id}"
           Membership.find_in_batches(:conditions => 
               [ " date(join_date) = ? AND terms_of_membership_id = ? AND status IN (?) ", 
                 (Time.zone.now - template.days_after_join_date.days).to_date, 
                 template.terms_of_membership_id, ['active', 'provisional'] ]) do |group1|
             group1.each do |membership| 
               begin
-                Rails.logger.info "  * processing member ##{membership.member_id}"
+                index_member = index_member+1
+                Rails.logger.info "  *[#{index_member}] processing member ##{membership.member_id}"
                 Communication.deliver!(template, membership.member)
               rescue Exception => e
                 Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect, :membership => membership.inspect })
