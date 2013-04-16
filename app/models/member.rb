@@ -835,7 +835,7 @@ class Member < ActiveRecord::Base
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
     index = 0
-    base = Member.where(" next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status != 'lapsed'", 
+    base = Member.where("next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status != 'lapsed'", 
                 Time.zone.now)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:billing rake task, processing #{base.count} members"
     base.find_in_batches(:batch_size => 60) do |group|
