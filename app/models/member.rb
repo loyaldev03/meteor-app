@@ -926,17 +926,19 @@ def self.sync_members_to_pardot
     index = 0
     base =  Member.joins(:current_membership).where("date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:cancel_all_member_up_today rake task, processing #{base.count} members"
-    base.each do |member| 
-      tz = Time.zone.now
-      begin
-        index = index+1
-        Rails.logger.info "  *[#{index}] processing member ##{member.id}"
-        Member.find(member.id).set_as_canceled!
-      rescue Exception => e
-        Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+    base.find_in_batches do |group|
+      group.each do |member| 
+        tz = Time.zone.now
+        begin
+          index = index+1
+          Rails.logger.info "  *[#{index}] processing member ##{member.id}"
+          Member.find(member.id).set_as_canceled!
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
       end
-      Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
     end
   end
 
