@@ -35,20 +35,21 @@ class Api::ProductsController < ApplicationController
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [String] sku product's skus that we are interest in. Skus must be separated by commas. (Eg: "KIT-CARD,NCARFLAGKASEYKAHNE")
   # @required [String] club_id Id of the club the products belongs to. 
-  # @response_field [Array] product_list Array of Hashes with the product's information.
+  # @response_field [Array] product_list Array of Hashes with the product's information. This Array is returned if there were no error.
   # <ul>
   #   <li><strong>sku</strong> Product's sku. </li>
-  #   <li><strong>stock</strong> Integer value. Actual stock of the product. This value is an integer type. This value is returned if there was no error. </li>
-  #   <li><strong>allow_backorder</strong> Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag is returned if there was no error. </li>
+  #   <li><strong>stock</strong> Actual stock of the product. This value is an integer type </li>
+  #   <li><strong>allow_backorder</strong> Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. </li>
   # </ul>
+  # @response_field [Array] Array with the skus that we were not able to find. 
   # @response_field [String] code Code related to the method result.
   # @response_field [String] message Shows the method errors.
   # 
   def get_list_of_stock
     my_authorize! :manage_product_api, Product, params[:club_id]
-    skus = params[:sku].split(',')
-    if skus.count == 0
-      response = { code: Settings.error_codes.wrong_data, message: 'Check sku params please. It seams it is empty.' }
+    skus = params[:sku].to_s.split(',')
+    if skus.count == 0 or params[:club_id].blank?
+      response = { code: Settings.error_codes.wrong_data, message: 'Please check params, There seems to be some missing.' }
     else
       skus_could_not_found = []
       product_list = []
