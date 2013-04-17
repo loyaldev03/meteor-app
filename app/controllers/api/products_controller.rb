@@ -41,7 +41,7 @@ class Api::ProductsController < ApplicationController
   #   <li><strong>stock</strong> Actual stock of the product. This value is an integer type </li>
   #   <li><strong>allow_backorder</strong> Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. </li>
   # </ul>
-  # @response_field [Array] Array with the skus that we were not able to find. 
+  # @response_field [Array] skus_could_not_found Array with the skus that we were not able to find. 
   # @response_field [String] code Code related to the method result.
   # @response_field [String] message Shows the method errors.
   # 
