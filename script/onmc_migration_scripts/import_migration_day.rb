@@ -4,18 +4,18 @@
 
 require 'import_models'
 
-@log = Logger.new('log/import_operations.log', 10, 1024000)
+@log = Logger.new('log/import_migration_day.log', 10, 1024000)
 ActiveRecord::Base.logger = @log
 
 
 def load_cancellations
-  ActiveRecord::Base.connection.execute "delete from operations where club_id = #{CLUB} and operation_type = #{Settings.operation_types.cancel}"
+ # ActiveRecord::Base.connection.execute "delete from operations where club_id = #{CLUB} and operation_type = #{Settings.operation_types.cancel}"
 
   PhoenixMembership.where("status = 'lapsed'").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |membership|
       begin
-        @member = membership.member
+        @member = PhoenixMember.find(membership.member_id)
         cancel_date = membership.cancel_date
         add_operation(cancel_date, 'Membership', membership.id, "Member canceled", Settings.operation_types.cancel, cancel_date, cancel_date) 
       rescue Exception => e
@@ -38,6 +38,9 @@ def process_preferences
     end
   end
 end
+
+
+# load_cancellations
 
 # 1- do we need to update phoenix.product_sku = @campaign.product_sku ?/????? 
 # 2- load_cancellations  

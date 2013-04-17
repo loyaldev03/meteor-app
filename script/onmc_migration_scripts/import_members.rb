@@ -203,7 +203,7 @@ end
 def add_new_members
   BillingMember.where(" imported_at IS NULL and is_prospect = false " + 
       # " AND id <= 20243965592 " +
-      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date IS NOT NULL " +
+      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date_time IS NOT NULL " +
       " AND (active = 1 or trial = 1) AND blacklisted IS NULL AND phoenix_status IS NOT NULL AND phoenix_email IS NOT NULL " +
       " AND credit_card_token IS NOT NULL ").find_in_batches do |group|
     puts "cant #{group.count}"
@@ -289,6 +289,6 @@ def fill_credit_card(phoenix_cc, member, phoenix)
 end
 
 
-update_members
+# update_members
 add_new_members
 

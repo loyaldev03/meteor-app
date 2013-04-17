@@ -56,8 +56,7 @@ end
 def load_refunds_controlled
   BillingChargeback.joins(' JOIN members ON chargebacks.member_id = members.id ').
 	where(" chargebacks.imported_at IS NULL and chargebacks.phoenix_amount IS NOT NULL and chargebacks.phoenix_amount > 0.0 " +
-                " and members.imported_at IS NOT NULL and result = 'Success'" +
-		# " and result = 'Success'" +
+                " and members.imported_at IS NOT NULL and result = 'Success' and chargebacks.campaign_id IS NOT NULL and chargebacks.campaign_id != 0" +
 		" and chargebacks.reason not like '%Uncontroled%' ").find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |refund|
@@ -67,7 +66,7 @@ def load_refunds_controlled
 		  joins(' JOIN membership_authorizations ON membership_authorizations.id = membership_auth_responses.authorization_id '+
 			' JOIN membership_captures ON membership_captures.litleTxnId = membership_authorizations.litleTxnId '+
 			' JOIN members ON membership_authorizations.member_id = members.id ').
-		  where(" membership_authorizations.campaign_id IS NOT NULL and  membership_auth_responses.imported_at IS NOT NULL " + 
+		  where(" membership_authorizations.campaign_id != 0 and membership_authorizations.campaign_id IS NOT NULL and  membership_auth_responses.imported_at IS NOT NULL " + 
 			" AND membership_auth_responses.phoenix_amount IS NOT NULL and membership_auth_responses.phoenix_amount != 0.0 " +
 			" AND members.imported_at IS NOT NULL AND membership_captures.id = #{refund.capture_id}").first
         elsif [ 'Enrollment Capture', 'Enrollment Capture MeS', 'EnrollmentCapture' ].include?(refund.reason)
@@ -75,13 +74,18 @@ def load_refunds_controlled
             joins(' JOIN enrollment_authorizations ON enrollment_authorizations.id = enrollment_auth_responses.authorization_id ' + 
 		' JOIN enrollment_captures ON enrollment_captures.litleTxnId = enrollment_authorizations.litleTxnId '+
                 ' JOIN members ON enrollment_authorizations.member_id = members.id ').
-            where(" enrollment_authorizations.campaign_id IS NOT NULL and enrollment_auth_responses.imported_at IS NOT NULL " + 
+            where(" enrollment_authorizations.campaign_id != 0 and enrollment_authorizations.campaign_id IS NOT NULL and enrollment_auth_responses.imported_at IS NOT NULL " + 
                 " and enrollment_auth_responses.phoenix_amount IS NOT NULL and enrollment_auth_responses.phoenix_amount != 0.0 " + 
                 " and enrollment_auth_responses.message not like 'Failed%' " + # These transacciones have code == 0 :(
                 " and members.imported_at IS NOT NULL AND enrollment_captures.id = #{refund.capture_id}").first
         end
 
-	next if current_t.nil?
+	      if current_t.nil?
+	      puts "xxxxxxxxxxxxxxxxxx"
+	      next
+	      else
+	      puts "current t found"
+	      end
 
         if current_t.gateway == 'litle'
           transaction_type = 'authorization_capture'
@@ -89,7 +93,16 @@ def load_refunds_controlled
           transaction_type = 'sale'
         end
 
-        phoenix_t = PhoenixTransaction.find_by_member_id_and_response_transaction_id @member.id, current_t.litle_txn_id
+        authorization = current_t.authorization
+        next if authorization.nil?
+	puts "current auth found"
+        @member = current_t.member(authorization)
+
+
+        phoenix_t = PhoenixTransaction.find_by_member_id_and_created_at_and_updated_at_and_response_code @member.id, current_t.created_at, current_t.updated_at, '000'
+        next if phoenix_t.nil?
+	puts "phoenix t found"
+        
         process_chargeback(refund, phoenix_t.terms_of_membership_id)
         if refund.result == 'Success'
           phoenix_t.refunded_amount += refund.phoenix_amount
@@ -153,7 +166,7 @@ def load_enrollment_transactions
   BillingEnrollmentAuthorizationResponse.
   joins(' JOIN enrollment_authorizations ON enrollment_authorizations.id = enrollment_auth_responses.authorization_id ' + 
 	' JOIN members ON enrollment_authorizations.member_id = members.id ').
-  where(" enrollment_authorizations.campaign_id IS NOT NULL and enrollment_auth_responses.imported_at IS NULL " + 
+  where(" enrollment_authorizations.campaign_id != 0 and enrollment_authorizations.campaign_id IS NOT NULL and enrollment_auth_responses.imported_at IS NULL " + 
 	" and enrollment_auth_responses.phoenix_amount IS NOT NULL and enrollment_auth_responses.phoenix_amount != 0.0 " + 
   " and enrollment_auth_responses.message not like 'Failed%' " + # These transacciones have code == 0 :(
   " and members.imported_at IS NOT NULL " +
@@ -223,7 +236,7 @@ def load_membership_transactions
   BillingMembershipAuthorizationResponse.
   joins(' JOIN membership_authorizations ON membership_authorizations.id = membership_auth_responses.authorization_id '+
 	' JOIN members ON membership_authorizations.member_id = members.id ').
-  where(" membership_authorizations.campaign_id IS NOT NULL and  membership_auth_responses.imported_at IS NULL " + 
+  where(" membership_authorizations.campaign_id != 0 and membership_authorizations.campaign_id IS NOT NULL and  membership_auth_responses.imported_at IS NULL " + 
 	" AND membership_auth_responses.phoenix_amount IS NOT NULL and membership_auth_responses.phoenix_amount != 0.0 " +
 	" AND members.imported_at IS NOT NULL "
   ).find_in_batches do |group|
@@ -302,10 +315,10 @@ end
 
 
 
-load_enrollment_transactions
-load_membership_transactions
-load_refunds_uncontrolled
-#load_refunds_controlled
+#load_enrollment_transactions
+#load_membership_transactions
+#load_refunds_uncontrolled
+load_refunds_controlled
 
 
 
