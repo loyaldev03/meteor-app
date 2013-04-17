@@ -17,7 +17,7 @@ class Fulfillment < ActiveRecord::Base
   SLOOPS_HEADER = ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
   KIT_CARD_HEADER = ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
-                'ADDRESS','CITY','ZIP','Product','Charter Member Status' ]
+                'ADDRESS','CITY','STATE','ZIP','Product','Charter Member Status' ]
 
   scope :where_bad_address, lambda { where("status = 'bad_address'") }
   scope :where_in_process, lambda { where("status = 'in_process'") }
@@ -209,7 +209,7 @@ class Fulfillment < ActiveRecord::Base
     else
       [ member.id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
               (I18n.l self.renewable_at, :format => :only_date_short if self.renewable_at), member.address, member.city,
-              "=\"#{member.zip}\"", self.product_sku, ('C' if member.member_group_type_id) ]
+              member.state,"=\"#{member.zip}\"", self.product_sku, ('C' if member.member_group_type_id) ]
     end
   end
 
