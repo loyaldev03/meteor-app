@@ -27,6 +27,7 @@ class Ability
     cannot :api_profile, Member
     cannot :api_update_club_cash, Member
     cannot :api_change_next_bill_date, Member
+    cannot :api_cancel, Member
     cannot :api_find_all_by_updated, Member
     cannot :api_find_all_by_created, Member
     cannot :manage_product_api, Product
@@ -54,6 +55,7 @@ class Ability
       can :api_profile, Member
       can :api_update_club_cash, Member
       can :api_change_next_bill_date, Member
+      can :api_cancel, Member
       can :api_find_all_by_updated, Member
       can :api_find_all_by_created, Member
       can :manage_product_api, Product
@@ -68,6 +70,7 @@ class Ability
       cannot :see_sync_status, Member
       cannot :api_update_club_cash, Member
       cannot :api_change_next_bill_date, Member
+      cannot :api_cancel, Member
       cannot :api_find_all_by_updated, Member
       cannot :api_find_all_by_created, Member
       can :manage, Operation
@@ -85,6 +88,7 @@ class Ability
       cannot :see_sync_status, Member
       cannot :api_update_club_cash, Member
       cannot :api_change_next_bill_date, Member
+      cannot :api_cancel, Member
       cannot :api_find_all_by_updated, Member
       cannot :api_find_all_by_created, Member
       can :manage, Operation
@@ -100,6 +104,7 @@ class Ability
       can :api_profile, Member
       can :api_update_club_cash, Member
       can :api_change_next_bill_date, Member
+      can :api_cancel, Member
       can :api_find_all_by_updated, Member
       can :api_find_all_by_created, Member
       can :manage_product_api, Product
