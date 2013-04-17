@@ -82,6 +82,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     put( :next_bill_date, { :id => @member.id, :next_bill_date => next_bill_date } )
   end
 
+  def generate_put_cancel(cancel_date, reason)
+    put( :cancel, { :id => @member.id, :cancel_date => cancel_date, :reason => reason } )
+  end
+
   def generate_get_by_updated(club_id, start_date, end_date)
     get( :find_all_by_updated, { :club_id => club_id, :start_date => start_date, :end_date => end_date })
   end
@@ -1413,7 +1417,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Api agent should get members created between given dates" do
     setup_enviroment
-    sign_in @admin_user
+    sign_in @api_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     first = Member.first
     last = Member.last
@@ -1425,4 +1429,104 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @response.body.include? first.id.to_s
     assert !(@response.body.include? last.id.to_s)
   end
+
+  test "Admin should cancel memeber" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count") do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :success
+    end
+    @member.reload
+    assert_equal @member.current_membership.cancel_date, cancel_date
+  end
+
+  test "Should not cancel member when reason is blank" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "" )
+      assert_response :success
+    end
+    assert @response.body.include?("Reason missing. Please, make sure to provide a reason for this cancelation.")
+  end
+
+
+  test "Should not cancel member when cancel date is in wrong format" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "" )
+      assert_response :success
+    end
+    assert @response.body.include?("Reason missing. Please, make sure to provide a reason for this cancelation.")
+  end
+
+  test "Supervisor should not cancel memeber" do
+    setup_enviroment
+    sign_in @supervisor_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :unauthorized
+    end
+  end
+
+  test "Representative should not cancel memeber" do
+    setup_enviroment
+    sign_in @representative_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :unauthorized
+    end
+  end
+
+  test "Agency should not cancel memeber" do
+    setup_enviroment
+    sign_in @agency_agent
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :unauthorized
+    end
+  end
+
+  test "api should cancel memeber" do
+    setup_enviroment
+    sign_in @api_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count") do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :success
+    end
+    @member.reload
+    assert_equal @member.current_membership.cancel_date, cancel_date
+  end
+
+
 end

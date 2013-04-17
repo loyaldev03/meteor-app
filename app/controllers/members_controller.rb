@@ -8,8 +8,8 @@ class MembersController < ApplicationController
   def index
     @countries = Carmen::Country.coded('US').subregions + Carmen::Country.coded('CA').subregions
     respond_to do |format|
-      format.html 
-      format.js 
+      format.html
+      format.js
     end
   end
 
@@ -132,22 +132,17 @@ class MembersController < ApplicationController
   def cancel
     @member_cancel_reason = MemberCancelReason.all
     if request.post?
-      unless params[:reason].blank?
-        if params[:cancel_date].to_date > Time.zone.now.to_date
-          begin
-            message = "Member cancellation scheduled to #{params[:cancel_date]} - Reason: #{params[:reason]}"
-            @current_member.cancel! params[:cancel_date], message, current_agent
-            flash[:notice] = message
-            redirect_to show_member_path
-          rescue Exception => e
-            flash.now[:error] = t('error_messages.airbrake_error_message')
-            Airbrake.notify(:error_class => "Member:cancel", :error_message => e, :parameters => { :member => @current_member.inspect })
-          end
+      begin
+        response = @current_member.cancel! params[:cancel_date], params[:reason], current_agent
+        if response[:code] == Settings.error_codes.success
+          flash[:notice] = response[:message]
+          redirect_to show_member_path
         else
-          flash.now[:error] = "Cancellation date cant be less or equal than today."
+          flash.now[:error] = response[:message]
         end
-      else
-        flash.now[:error] = "Reason cant be blank."
+      rescue Exception => e
+        flash.now[:error] = t('error_messages.airbrake_error_message')
+        Airbrake.notify(:error_class => "Member:cancel", :error_message => e, :parameters => { :member => @current_member.inspect })
       end
     end    
   end
