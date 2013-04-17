@@ -578,4 +578,27 @@ class Api::MembersController < ApplicationController
     rescue ArgumentError => e
       render json: { :message => "Check both start and end date format, please. It seams one of them is in an invalid format", :code => Settings.error_codes.wrong_data } 
   end
+
+  ##
+  # Set member's cancelation date to be canceled. In case the member is already cancel, or it has the canselation date set, we won't excecute the request. 
+  #
+  # @resource /api/v1/members/:id/cancel
+  # @action PUT
+  #
+  # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
+  # @required [Integer] id Member's ID needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @required [String] cancel_date Date when we are going to cancel the member. This date is stored in date format. (Format: "yyyy-mm-dd")
+  # @required [String] reason Reason why the member is being canceled.
+  # @response_field [String] message Shows the method result.
+  # @response_field [Integer] code Code related to the method result.
+  #
+  def cancel
+    member = Member.find params[:id]
+    my_authorize! :api_cancel, Member, member.club_id
+    render json: member.cancel!(params[:cancel_date], params[:reason], @current_agent)
+    rescue ActiveRecord::RecordNotFound
+      render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
+    rescue ArgumentError => e
+      render json: { :message => "Check cancel date, please. It seams that it is in the wrong format.", :code => Settings.error_codes.wrong_data }
+  end
 end

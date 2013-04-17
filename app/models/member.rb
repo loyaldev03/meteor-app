@@ -781,10 +781,22 @@ class Member < ActiveRecord::Base
   end
 
   def cancel!(cancel_date, message, current_agent = nil)
-    if can_be_canceled?
-      self.current_membership.update_attribute :cancel_date, cancel_date
-      Auditory.audit(current_agent, self, message, self, Settings.operation_types.future_cancel)
-    end
+    unless message.blank?
+      if cancel_date.to_date > Time.zone.now.to_date
+        if can_be_canceled?
+          self.current_membership.update_attribute :cancel_date, cancel_date
+          Auditory.audit(current_agent, self, message, self, Settings.operation_types.future_cancel)
+          answer = { :message => "Member cancellation scheduled to #{cancel_date} - Reason: #{message}", :code => Settings.error_codes.success }
+        else
+          answer = { :message => "Member is not in cancelable status or it already has cancel date set.", :code => Settings.error_codes.cancel_date_blank }
+        end
+      else
+        answer = { :message => "Cancellation date cannot be less or equal than today.", :code => Settings.error_codes.wrong_data }
+      end
+    else 
+      answer = { :message => "Reason missing. Please, make sure to provide a reason for this cancelation.", :code => Settings.error_codes.cancel_reason_blank }
+    end 
+    return answer
   end
   
   def set_wrong_address(agent, reason, set_fulfillments = true)

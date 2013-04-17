@@ -1323,6 +1323,79 @@ It will also send a welcome email and charge the enrollment to the member's cred
 			
 		</div>	
     
+		<div class="method">
+			<p class="method_desc">Set member's cancelation date to be canceled. In case the member is already cancel, or it has the canselation date set, we won't excecute the request.</p>
+			<h3 class="resource_url"><strong>/api/v1/members/:id/cancel</strong> [PUT]</h3>
+
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">api_key</span>
+									<span class="type">String</span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">id</span>
+									<span class="type">Integer</span>
+									<span class="text">Member's ID needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">cancel_date</span>
+									<span class="type">String</span>
+									<span class="text">Date when we are going to cancel the member. This date is stored in date format. (Format: "yyyy-mm-dd")</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">reason</span>
+									<span class="type">String</span>
+									<span class="text">Reason why the member is being canceled.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method result.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">Integer</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+		</div>	
+    
   </div>
 
 </div>
@@ -1342,7 +1415,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Wed Apr  3 17:51:29 2013 with ruby-1.9.2
+  Generated on Wed Apr 17 12:48:22 2013 with ruby-1.9.3
 </div>
 
   </body>
