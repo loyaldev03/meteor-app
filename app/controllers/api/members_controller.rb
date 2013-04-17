@@ -472,7 +472,7 @@ class Api::MembersController < ApplicationController
   # @action PUT
   # 
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [Integer] id Member's id needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Float] amount club cash amount to be set on this member profile. We only accept numbers with up to two digits after the comma.
   # @optional [String] expire_date club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")
   # @response_field [String] message Shows the method results and also informs the errors.
