@@ -193,7 +193,7 @@ class Api::MembersController < ApplicationController
   # @action PUT
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [Integer] id Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information: 
   #   <ul>
   #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
@@ -505,7 +505,7 @@ class Api::MembersController < ApplicationController
   # @action PUT
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [Integer] id Member's ID needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [String] next_bill_date Date to be stored as date where we should bill this member. This date is stored with date format.
   # @response_field [String] message Shows the method result.
   # @response_field [Integer] code Code related to the method result.
@@ -586,7 +586,7 @@ class Api::MembersController < ApplicationController
   # @action PUT
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
-  # @required [Integer] id Member's ID needed to find the member we are going to update. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [String] cancel_date Date when we are going to cancel the member. This date is stored in date format. (Format: "yyyy-mm-dd")
   # @required [String] reason Reason why the member is being canceled.
   # @response_field [String] message Shows the method result.
