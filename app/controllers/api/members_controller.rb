@@ -418,6 +418,14 @@ class Api::MembersController < ApplicationController
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. </li>
   # @response_field [String] message Shows the method errors. This message will be only shown when there was an error. 
   # @response_field [String] code Code related to the method result.
+  # 
+  # @example_request
+  #   curl -v -k -X GET -d "api_key=G6qq3KzWQVi9zgfFVXud" https://dev.stoneacrehq.com:3000/api/v1/members/1
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"code":"000","member":{"first_name":"Carla","last_name":"Ares","email":"carla.ares@gmail.com","address":"Gorriti 37856","city":"CABA","state":"IN","zip":"12345","birth_date":null,"phone_country_code":123,"phone_area_code":123,"phone_local_number":1234,"type_of_phone_number":"other","gender":"M","bill_date":null,"wrong_address":null,"wrong_phone_number":null,"member_since_date":"2013-01-15T18:03:07Z","reactivation_times":0,"blacklisted":false,"member_group_type_id":"VIP","preferences":{"example_color":"blue","example_team":"esto se guarda en alg\u00fan lugar?"}},"credit_card":{"last_4_digits":"0398","expire_month":7,"expire_year":2015},"current_membership":{"status":"lapsed","join_date":"2013-01-15T18:03:19Z","cancel_date":"2013-04-11T00:00:00Z"}}
+  # @example_response_descripti on Example response to the previos example request.
   #
   def show
     member = Member.find(params[:id])
@@ -478,6 +486,14 @@ class Api::MembersController < ApplicationController
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] code Code related to the method result.
   # 
+  # @example_request
+  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&amount=102&expiration_date=2013-02-02" https://dev.stoneacrehq.com:3000/api/v1/members/1/club_cash
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"message":"Member updated successfully","code":"000"}
+  # @example_response_descripti on Example response to the previos example request.
+  #
   def club_cash
     member = Member.find(params[:id])
     my_authorize! :api_update_club_cash, Member, member.club_id
@@ -510,6 +526,14 @@ class Api::MembersController < ApplicationController
   # @response_field [String] message Shows the method result.
   # @response_field [Integer] code Code related to the method result.
   # @response_field [Hash] errors A hash with member and next_bill_date errors. 
+  # 
+  # @example_request
+  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&next_bill_date=2013-05-21" https://dev.stoneacrehq.com:3000/api/v1/members/1/next_bill_date
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"message":"Next bill date changed to 2013-05-21","code":"000"}
+  # @example_response_description Example response to the previos example request.
   #
   def next_bill_date
     member = Member.find params[:id]
@@ -533,6 +557,14 @@ class Api::MembersController < ApplicationController
   # @response_field [String] message Shows the method result. This message will be shown when there is an error.
   # @response_field [Array] list Array with member's id updated between the dates given. This list will be returned only when this method is success.
   # @response_field [String] code Code related to the method result.
+  # 
+  # @example_request
+  #   curl -v -k -X GET -d "api_key=G6qq3KzWQVi9zgfFVXud" https://dev.stoneacrehq.com:3000/api/v1/members/find_all_by_updated/2/2013-03-20/2013-03-22
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"list":[20,21,22,24,25],"code":"000"}
+  # @example_response_description Example response to the previos example request.
   #
   def find_all_by_updated
     my_authorize! :api_find_all_by_updated, Member, params[:club_id]
@@ -563,6 +595,14 @@ class Api::MembersController < ApplicationController
   # @response_field [String] message Shows the method result. This message will be shown when there is an error.
   # @response_field [Array] list Array with member's id created between the dates given. This list will be returned only when this method is success.
   # @response_field [String] code Code related to the method result.
+  # 
+  # @example_request
+  #   curl -v -k -X GET -d "api_key=G6qq3KzWQVi9zgfFVXud" https://dev.stoneacrehq.com:3000/api/v1/members/find_all_by_created/2/2013-03-20/2013-03-22
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"list":[20,21,22,24,25],"code":"000"}
+  # @example_response_description Example response to the previos example request.
   #
   def find_all_by_created
     my_authorize! :api_find_all_by_updated, Member, params[:club_id]
@@ -591,6 +631,14 @@ class Api::MembersController < ApplicationController
   # @required [String] reason Reason why the member is being canceled.
   # @response_field [String] message Shows the method result.
   # @response_field [Integer] code Code related to the method result.
+  # 
+  # @example_request
+  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&cancel_date=2013-05-21&reason=Did not I have enrolled" https://dev.stoneacrehq.com:3000/api/v1/members/3/cancel
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"message":"Member cancellation scheduled to 2013-05-21 - Reason: Did not I have enrolled","code":"000"}
+  # @example_response_description Example response to the previos example request.
   #
   def cancel
     member = Member.find params[:id]

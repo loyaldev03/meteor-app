@@ -17,6 +17,14 @@ class Api::TokensController < ApplicationController
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] token authentication token.
   # @response_field [String] location
+  # 
+  # @example_request
+  #   curl -v -k -X POST -d "email=testmail@gmail.com&password=testpassword" https://dev.stoneacrehq.com:3000/api/v1/tokens
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"token":"G6qq3KzWQVi9zgfFVXud"}
+  # @example_response_description Example response to the previos example request.
   #
   def create
     email = params[:email]

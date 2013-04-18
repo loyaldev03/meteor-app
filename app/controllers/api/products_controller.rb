@@ -16,6 +16,14 @@ class Api::ProductsController < ApplicationController
   # @response_field [String] code Code related to the method result.
   # @response_field [String] message Shows the method errors.
   # 
+  # @example_request
+  #   curl -v -k -X GET -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD" https://dev.stoneacrehq.com:3000/api/v1/products/get_stock
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"code":"000","stock":9746,"allow_backorder":true}
+  # @example_response_description Example response to the previos example request.
+  #
   def get_stock
     my_authorize! :manage_product_api, Product, params[:club_id]
     product = Product.find_by_sku_and_club_id(params[:sku],params[:club_id])
@@ -45,6 +53,14 @@ class Api::ProductsController < ApplicationController
   # @response_field [String] code Code related to the method result.
   # @response_field [String] message Shows the method errors.
   # 
+  # @example_request
+  #   curl -v -k -X GET -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD,AnoterOne,NCARFLAGTONYSTEWART" https://dev.stoneacrehq.com:3000/api/v1/products/get_list_of_stock
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"code":"000","product_list":[{"sku":"KIT-CARD","stock":9746,"allow_backorder":true}],"skus_could_not_found":["AnoterOne","NCARFLAGTONYSTEWART"]}
+  # @example_response_description Example response to the previos example request.
+  #
   def get_list_of_stock
     my_authorize! :manage_product_api, Product, params[:club_id]
     skus = params[:sku].to_s.split(',')
