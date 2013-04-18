@@ -1,4 +1,4 @@
-  #!/bin/ruby
+#!/bin/ruby
   APP_PATH = File.expand_path('../../../config/application',  __FILE__)
   require File.expand_path('../../../config/boot',  __FILE__)
   ENV["RAILS_ENV"] ||= "staging"
@@ -105,24 +105,30 @@
     conn = Club.find(9).drupal
     saved_id = []
     wrong_count = 0
-    i = 900
+    i = 1200
     puts "Starting creation [#{I18n.l(Time.zone.now, :format =>:dashed)}]"
     quantity.times do
-      res = conn.post '/api/user', fieldmap(i)
-      i = i+1
-      if res and res.status == 200
-        saved_id << res.body['uid']
-        print(".")
-      else
-        wrong_count = wrong_count+1
-        puts res.body.class == Hash ? res.body[:message] : res.body
-        print("F")
+      begin
+        res = conn.post '/api/user', fieldmap(i)
+        i = i+1
+        if res and res.status == 200
+          saved_id << res.body['uid']
+          print(".")
+        else
+          wrong_count = wrong_count+1
+          puts res.body.class == Hash ? res.body[:message] : res.body
+          print("F")
+        end
+      rescue Exception => e
+        puts "TimeoutException"
+        printf("E")
       end
     end
 
     puts ""
     puts "Finished creation [#{I18n.l(Time.zone.now, :format =>:dashed)}]"
     puts "Attemps: #{quantity}"
+    puts "It all took: #{Time.zone.now-tz}"
     puts "Success: #{quantity - wrong_count}"
     puts "Failed: #{wrong_count}"
     puts "Starting deletion [#{I18n.l(Time.zone.now, :format =>:dashed)}]"
@@ -130,13 +136,18 @@
     tz = Time.zone.now
     wrong_count = 0
     saved_id.each do |uid|  
-      res = conn.delete('/api/user/%{drupal_id}' % { drupal_id: uid })
-      if res and res.status == 200
-        print(".")
-      else
-        wrong_count = wrong_count+1
-        puts res.body.class == Hash ? res.body[:message] : res.body
-        print("F")
+      begin
+        res = conn.delete('/api/user/%{drupal_id}' % { drupal_id: uid })
+        if res and res.status == 200
+          print(".")
+        else
+          wrong_count = wrong_count+1
+          puts res.body.class == Hash ? res.body[:message] : res.body
+          print("F")
+        end
+      rescue Exception => e
+        puts "TimeoutException"
+        printf("E")
       end
     end
 
@@ -145,6 +156,7 @@
     puts "Success: #{saved_id.count - wrong_count}"
     puts "Failed: #{wrong_count}"
     puts "It all took: #{Time.zone.now-tz}"
+    puts "Average time to delete a member was #{(Time.zone.now-tz)/quantity}"
     puts "Finished deletion [#{I18n.l(Time.zone.now, :format =>:dashed)}]"
   end
 
