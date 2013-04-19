@@ -39,7 +39,7 @@ class Api::MembersController < ApplicationController
   #     <li><strong>ip_address</strong> Ip address from where the enrollment is being submitted. [optional] </li>
   #     <li><strong>user_agent</strong> Information related to the browser and computer from where the enrollment is being submitted. [optional] </li>
   #     <li><strong>referral_host</strong> Link where is being redirect when after subimiting the enroll. (It shows the params in it). [optional]</li>
-  #     <li><strong>referral_parameters</strong>  [optional]</li>
+  #     <li><strong>referral_parameters</strong> [optional]</li>
   #     <li><strong>referral_path</strong> [optional]</li>
   #     <li><strong>user_id</strong> User ID alias UID is an md5 hash of the user's IP address and user-agent information. [optional]</li>
   #     <li><strong>landing_url</strong> Url from where te submit comes from. [optional]</li>
@@ -196,31 +196,31 @@ class Api::MembersController < ApplicationController
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information: 
   #   <ul>
-  #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
-  #     <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
-  #     <li><strong>address</strong> The address of the member that is being enrolled. </li>
-  #     <li><strong>city</strong> City from where the member is from.</li>
-  #     <li><strong>state</strong> The state standard code where the member is from. </li>
-  #     <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.)</li>
-  #     <li><strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).</li>
-  #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "1"). </li>
-  #     <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. </li>
-  #     <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached.</li>
-  #     <li><strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
+  #     <li><strong>first_name</strong> The first name of the member that is enrolling. [optional] </li>
+  #     <li><strong>last_name</strong> The last name of the member that is enrolling. [optional] </li>
+  #     <li><strong>address</strong> The address of the member that is being enrolled. [optional] </li>
+  #     <li><strong>city</strong> City from where the member is from. [optional]</li>
+  #     <li><strong>state</strong> The state standard code where the member is from. [optional]</li>
+  #     <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.) [optional]</li>
+  #     <li><strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States). [optional]</li>
+  #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "1"). [optional] </li>
+  #     <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. [optional] </li>
+  #     <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached. [optional]</li>
+  #     <li><strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx [optional]</li>
   #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. [optional]</li>
   #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). [optional] </li>
   #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" [optional]</li>
-  #     <li><strong>member_group_type_id</strong> Id of the member's group type where he belongs to. Each club can has many classifications for its member's, like 'VIP' or 'Celebrity'.</li>
+  #     <li><strong>member_group_type_id</strong> Id of the member's group type where he belongs to. Each club can has many classifications for its member's, like 'VIP' or 'Celebrity'. [optional]</li>
   #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. [optional]</li>
   #     <li><strong>api_id</strong> Send this value with the User Id of your site. This id is used to access your API (e.g. Autologin URL - Update member data). [optional]</li>
-  #     <li><strong>credit_card</strong> Hash with credit cards information. It must have the following information:</li>
+  #     <li><strong>credit_card</strong> Hash with credit cards information. [optional] </li>
   #     <ul>
   #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
   #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
   #     </ul>
   #   </ul>
-  # @optional [Hash] setter Variable used to pass some boolean values as "wrong_phone_number". It must have the following information:
+  # @optional [Hash] setter Variable used to pass some boolean values as "wrong_phone_number". 
   #   <ul>
   #     <li><strong>wrong_phone_number</strong> Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set wrong_phone_number as nil) [optional]</li>
   #     <li><strong>batch_update</strong> Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) [optional]</li>
@@ -506,7 +506,7 @@ class Api::MembersController < ApplicationController
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
-  # @required [String] next_bill_date Date to be stored as date where we should bill this member. This date is stored with date format.
+  # @required [String] next_bill_date Date to be stored as date where we should bill this member. This date is stored with date format. (Format: "yyyy-mm-dd")
   # @response_field [String] message Shows the method result.
   # @response_field [Integer] code Code related to the method result.
   # @response_field [Hash] errors A hash with member and next_bill_date errors. 
