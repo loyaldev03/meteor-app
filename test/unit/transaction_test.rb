@@ -1,4 +1,4 @@
-    require 'test_helper'
+require 'test_helper'
 
 class TransactionTest < ActiveSupport::TestCase
   setup do
@@ -26,6 +26,7 @@ class TransactionTest < ActiveSupport::TestCase
         expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
 
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
+
     member = Member.find(answer[:member_id])
     assert_not_nil member
     assert_equal member.status, 'provisional'

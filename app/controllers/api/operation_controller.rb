@@ -18,7 +18,15 @@ class Api::OperationController < ApplicationController
   # @optional [Integer] description Description of the operation. It is a text field.
   # @response_field [String] code Code related to the method result.
   # @response_field [String] message Shows the method results and also informs the errors.
-  # 
+  #
+  # @example_request
+  #   curl -v -k -X POST -d "api_key=G6qq3KzWQVi9zgfFVXud&operation_type=900&operation_date=2013-2-12&description=Enrolled vip registration" https://dev.stoneacrehq.com:3000/api/v1/members/1/operation
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"message":"Operation created succesfully.","code":"000"}
+  # @example_response_description Example response to the previos example request.
+  #
 	def create
     begin
     	member = Member.find(params[:member_id])      

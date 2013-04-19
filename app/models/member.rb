@@ -398,7 +398,7 @@ class Member < ActiveRecord::Base
           Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
           { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
         else
-          trans = Transaction.new
+          trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
           trans.transaction_type = "sale"
           trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
           answer = trans.process
@@ -513,7 +513,7 @@ class Member < ActiveRecord::Base
     self.current_membership = membership
 
     if amount.to_f != 0.0
-      trans = Transaction.new
+      trans = Transaction.obtain_transaction_by_gateway(tom.payment_gateway_configuration.gateway)
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
       answer = trans.process
