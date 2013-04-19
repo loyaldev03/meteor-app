@@ -876,7 +876,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_on 'Refund'
     assert page.has_content?("Cant credit more $ than the original transaction amount")
   end
- 
 
   test "two uncontrolled refund more than transaction amount" do
     active_merchant_stubs
@@ -950,7 +949,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_member.first_name
    
     within("#td_mi_next_retry_bill_date"){ wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) } }
-    end
   end
 
   test "Change member from Lapse status to Provisional statuss" do
@@ -1091,7 +1089,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
   end 
 
-test "Partial refund from CS" do
+  test "Partial refund from CS" do
     setup_member
     active_merchant_stubs
     @saved_member.current_membership.join_date = Time.zone.now-3.day
