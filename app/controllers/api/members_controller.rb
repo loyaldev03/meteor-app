@@ -39,7 +39,7 @@ class Api::MembersController < ApplicationController
   #     <li><strong>ip_address</strong> Ip address from where the enrollment is being submitted. [optional] </li>
   #     <li><strong>user_agent</strong> Information related to the browser and computer from where the enrollment is being submitted. [optional] </li>
   #     <li><strong>referral_host</strong> Link where is being redirect when after subimiting the enroll. (It shows the params in it). [optional]</li>
-  #     <li><strong>referral_parameters</strong>  [optional]</li>
+  #     <li><strong>referral_parameters</strong> [optional]</li>
   #     <li><strong>referral_path</strong> [optional]</li>
   #     <li><strong>user_id</strong> User ID alias UID is an md5 hash of the user's IP address and user-agent information. [optional]</li>
   #     <li><strong>landing_url</strong> Url from where te submit comes from. [optional]</li>
