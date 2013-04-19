@@ -86,6 +86,11 @@ group :development do
   gem "bullet"
 end
 
+group :prototype do
+  gem "bullet"
+end
+
+
 group :test do
   gem 'factory_girl_rails'
   gem 'faker'
@@ -98,4 +103,6 @@ group :test do
   gem "timecop"
 end
 
-gem 'activemerchant', :git => "git://github.com/carlaares/active_merchant"
+gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant"
+
+gem 'LitleOnline'

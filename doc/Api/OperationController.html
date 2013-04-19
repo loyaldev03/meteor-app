@@ -320,7 +320,7 @@
 								<li>
 									<span class="name">member_id</span>
 									<span class="type">Integer</span>
-									<span class="text">Member's id. Integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
+									<span class="text">Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
 								</li>
 							</ul>
 						
@@ -347,7 +347,7 @@
 								<li>
 									<span class="name">operation_date</span>
 									<span class="type">String</span>
-									<span class="text">If this value is nil we save that operation with Time.zone.now. (Format "yyyy-mm-dd")</span>
+									<span class="text">Date when the operation was done. If this value is nil we save that operation with Time.zone.now. (Format "yyyy-mm-dd")</span>
 								</li>
 							</ul>
 						
@@ -370,7 +370,7 @@
 						<ul>
 							<li>
 								<span class="name">code</span>
-								<span class="type">Integer</span>
+								<span class="type">String</span>
 								<span class="text">Code related to the method result.</span>
 							</li>
 						</ul>
@@ -386,6 +386,47 @@
 				</div>
 			
 			
+			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Example with curl.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										curl -v -k -X POST -d "api_key=G6qq3KzWQVi9zgfFVXud&operation_type=900&operation_date=2013-2-12&description=Enrolled vip registration" https://dev.stoneacrehq.com:3000/api/v1/members/1/operation
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										{"message":"Operation created succesfully.","code":"000"}
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Example response to the previos example request.
+									
+								
+							</span>
+						</div>
+					
+				</div>
 			
 		</div>	
     
@@ -408,7 +449,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Thu Mar 28 13:38:16 2013 with ruby-1.9.2
+  Generated on Fri Apr 19 12:11:06 2013 with ruby-1.9.3
 </div>
 
   </body>

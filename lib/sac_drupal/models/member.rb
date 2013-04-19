@@ -180,9 +180,6 @@ module Drupal
       if self.new_record?
         map.merge!({
           pass: SecureRandom.hex, 
-          field_phoenix_member_vid: {
-            und: [ { value: m.id } ]
-          },
           field_phoenix_member_id: {
             und: [ { value: m.id } ]
           }

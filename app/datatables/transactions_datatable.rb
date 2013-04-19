@@ -32,7 +32,7 @@ private
   end
 
   def fetch_transactions
-    transactions = Transaction.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member)
+    transactions = Transaction.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member).includes(:member)
     transactions = transactions.page(page).per_page(per_page)
     if params[:sSearch].present?
       transactions = transactions.where("transaction_type like :search or response_result like :search", search: "%#{params[:sSearch]}%")

@@ -1,5 +1,23 @@
-# TODO: move this to lib folder and convert the class to a module
-class MesAccountUpdater
+module MesAccountUpdater
+
+  def self.process_chargebacks(mode)
+    PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
+      MesAccountUpdater.process_chargebacks gateway
+    end
+  end
+
+  def self.account_updater_process_answers(mode)
+    PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
+      MesAccountUpdater.account_updater_process_answers gateway unless gateway.aus_login.blank?
+    end
+  end
+  
+  def self.account_updater_send_file_to_process(mode)
+    PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
+      MesAccountUpdater.account_updater_send_file_to_process gateway unless gateway.aus_login.blank?
+    end
+  end
+
   def self.process_chargebacks(gateway)
     conn = Faraday.new(:url => Settings.mes_report_service.url, :ssl => {:verify => false})
     initial_date, end_date = (Date.today - 1).strftime('%m/%d/%Y'), (Date.today - 1).strftime('%m/%d/%Y')
