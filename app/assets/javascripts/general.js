@@ -473,9 +473,10 @@ function blacklist_member_functions(){
      submitHandler: function(form) {
       if (confirm('This member will be blacklisted. Are you really sure?')) {
         form.submit();            
-      }else
-      return false;
-     }
+      } else {
+        return false;
+      }
+    }
   })
 }
 
@@ -489,10 +490,12 @@ function member_change_next_bill_date(){
 
 function refund_member_functions(){
   $('form').submit( function(event) {
+    $('input:submit').attr("disabled", true);
     if ($("#refunded_amount").val().match(/^[0-9 .]+$/)){
-
+      
     }else{
-      alert("Incorrect refund value.")
+      $('input:submit').attr("disabled", false);
+      alert("Incorrect refund value.");
       event.preventDefault(); 
     };
   })
