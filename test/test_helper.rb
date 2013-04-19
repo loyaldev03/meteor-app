@@ -32,7 +32,6 @@ class ActiveSupport::TestCase
     "340504323632976" => "c25ccfecae10384698a44360444dead6", "123456" => "anytransactioniditsvalid.forinvalidccnumber", 
     "123456789" => "c25ccfecae10384698asddd60444dead6" }
 
-
   def active_merchant_stubs(code = "000", message = "This transaction has been approved with stub", success = true)
     answer = ActiveMerchant::Billing::Response.new(success, message, 
       { "transaction_id"=>"c25ccfecae10384698a44360444dead8", "error_code"=> code, 
@@ -49,7 +48,7 @@ class ActiveSupport::TestCase
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:store).returns(answer)
   end  
 
-  def active_merchant_stubs_purchace(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
+  def active_merchant_stubs_purchase(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
     answer = ActiveMerchant::Billing::Response.new(success, message, { "transaction_id"=>CREDIT_CARD_TOKEN[number], "error_code"=> code, "auth_response_text"=>"No Match" })
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns(answer)
   end
