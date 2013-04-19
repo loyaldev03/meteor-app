@@ -397,6 +397,47 @@
 			
 			
 			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Requesting enroll of a valid member.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										curl -v -k -X POST --data-ascii "{\"prospect\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/prospects?api_key=G6qq3KzWQVi9zgfFVXud
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										{"message":"Prospect was successfuly saved.","code":"000","prospect_id":"55e8f945-9d24-4d10-95cd-b0dcfcdb7f5c"}
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Example response to the previos example request.
+									
+								
+							</span>
+						</div>
+					
+				</div>
+			
 		</div>	
     
   </div>
@@ -418,7 +459,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Fri Apr 19 11:32:13 2013 with ruby-1.9.3
+  Generated on Fri Apr 19 12:11:06 2013 with ruby-1.9.3
 </div>
 
   </body>

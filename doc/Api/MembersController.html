@@ -460,39 +460,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<strong class="type">Request</strong>
 								
 									
-										<pre class="code json"><code>{
-  &quot;api_key&quot;:&quot;aq4BS8XzbTvczcDZvDRt&quot;,
-  &quot;member&quot;: {
-    &quot;first_name&quot;:&quot;Alice&quot;,
-    &quot;last_name&quot;:&quot;Brennan&quot;,
-    &quot;address&quot;:&quot;SomeSt&quot;,
-    &quot;state&quot;:&quot;Deirdre&quot;,
-    &quot;city&quot;:&quot;City&quot;,
-    &quot;zip&quot;:12345,
-    &quot;country&quot;:&quot;US&quot;,
-    &quot;phone_country_code&quot;:1,
-    &quot;phone_area_code&quot;:123,
-    &quot;phone_local_number&quot;:1234,
-    &quot;email&quot;:&quot;alice@brennan.com&quot;,
-    &quot;gender&quot;:&quot;M&quot;,
-    &quot;type_of_phone_number&quot;:&quot;home&quot;,
-    &quot;terms_of_memberhips_id&quot;:10,
-    &quot;enrollment_amount&quot;:34.34,
-    &quot;birth_date&quot;:&quot;1989&quot;,
-    &quot;prospect_id&quot;:&quot;&quot;,
-    &quot;product_sku&quot;:&quot;KIT-CARD&quot;,
-    &quot;product_description&quot;:&quot;product default&quot;,
-    &quot;external_id&quot;:&quot;2568&quot;,
-    &quot;preferences&quot;:{ &quot;color&quot;:&quot;red&quot;, &quot;player&quot;:&quot;DaveJr&quot; },
-    &quot;credit_card&quot;:{
-       &quot;number&quot;:&quot;4485-6302-0286-9418&quot;,
-       &quot;expire_month&quot;:5,
-       &quot;expire_year&quot;:2016
-    }
-  }
-}
-</code></pre>
-
+										curl -v -k -X POST --data-ascii "{\"member\":{\"api_id\":\"999\",\"first_name\":\"alice\",\"last_name\":\"brennan\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"deadbeef\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"},\"product_sku\":\"KIT-CARD\",\"enrollment_info\":{\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members?api_key=G6qq3KzWQVi9zgfFVXud
 									
 								
 							</span>
@@ -500,103 +468,14 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<strong class="type">Response</strong>
 								
 									
-										<pre class="code json"><code>{
-  &quot;result&quot;: {
-    &quot;message&quot;:&quot;Member enrolled successfully $34.34 on TOM(10) -test-&quot;,
-    &quot;code&quot;:&quot;000&quot;,
-    &quot;member_id&quot;:&quot;123458&quot;,
-    &quot;autologin_url&quot;:&quot;&quot;
-  }
-}
-</code></pre>
-
+										{"message":"Member enrolled successfully $0.0 on TOM(1) -test2-","code":"000","member_id":11349950166,"autologin_url":""}
 									
 								
 							</span>
 							<span class="description">
 								
 									
-										Response in case it was success.
-									
-								
-							</span>
-						</div>
-					
-						<div class="example">
-							
-							
-							
-							<span class="description">
-								
-									
-										Requesting enroll with invalid information.
-									
-								
-							</span>
-							<span class="hash request">
-								<strong class="type">Request</strong>
-								
-									
-										<pre class="code json"><code>{
-  &quot;api_key&quot;:&quot;aq4BS8XzbTvczcDZvDRt&quot;,
-  &quot;member&quot;: {
-    &quot;first_name&quot;:&quot;Alice&quot;,
-    &quot;last_name&quot;:&quot;Brennan&quot;,
-    &quot;address&quot;:&quot;SomeSt&quot;,
-    &quot;state&quot;:&quot;Deirdre&quot;,
-    &quot;city&quot;:&quot;City&quot;,
-    &quot;zip&quot;:12345,
-    &quot;country&quot;:&quot;United States&quot;,
-    &quot;phone_country_code&quot;:1,
-    &quot;phone_area_code&quot;:123,
-    &quot;phone_local_number&quot;:1234,
-    &quot;email&quot;:&quot;alice@brennan.com&quot;,
-    &quot;gender&quot;:&quot;M&quot;,
-    &quot;type_of_phone_number&quot;:&quot;home&quot;,
-    &quot;terms_of_memberhips_id&quot;:10,
-    &quot;enrollment_amount&quot;:34.34,
-    &quot;birth_date&quot;:&quot;1989&quot;,
-    &quot;prospect_id&quot;:&quot;&quot;,
-    &quot;product_sku&quot;:&quot;KIT-CARD&quot;,
-    &quot;product_description&quot;:&quot;product default&quot;,
-    &quot;external_id&quot;:&quot;2568&quot;,
-    &quot;preferences&quot;:{ &quot;color&quot;:&quot;red&quot;, &quot;player&quot;:&quot;DaveJr&quot; },
-    &quot;credit_card&quot;:{
-       &quot;number&quot;:&quot;4485-6302-0286-9418&quot;,
-       &quot;expire_month&quot;:5,
-       &quot;expire_year&quot;:2016
-    },
-    &quot;setter&quot;:{
-       &quot;cc_blank&quot;:0,
-       &quot;skip_api_sync&quot;:0
-    }
-  }
-}
-</code></pre>
-
-									
-								
-							</span>
-							<span class="hash response">
-								<strong class="type">Response</strong>
-								
-									
-										<pre class="code json"><code>{
-  &quot;result&quot;: {
-    &quot;message&quot;:&quot;Member iformation is invalid.&quot;,
-    &quot;code&quot;:&quot;405&quot;,
-    &quot;errors&quot;:{&quot;country&quot;:[&quot;is the wrong length (should be 2 characters)&quot;,&quot;is not included in the list&quot;]}
-  }
-}
-</code></pre>
-
-									
-								
-							</span>
-							<span class="description">
-								
-									
-										Response with member's errors within an 'error' hash.
+										Example response to the previos example request.
 									
 								
 							</span>
@@ -738,7 +617,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							<span class="description">
 								
 									
-										Requesting update with valid information.
+										Requesting enroll of a valid member.
 									
 								
 							</span>
@@ -746,44 +625,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<strong class="type">Request</strong>
 								
 									
-										<pre class="code json"><code>{
-  &quot;api_key&quot;:&quot;aq4BS8XzbTvczcDZvDRt&quot;,
-  &quot;member&quot;: {
-    &quot;first_name&quot;:&quot;Alice&quot;,
-    &quot;last_name&quot;:&quot;Brennan&quot;,
-    &quot;address&quot;:&quot;SomeSt&quot;,
-    &quot;state&quot;:&quot;Deirdre&quot;,
-    &quot;city&quot;:&quot;City&quot;,
-    &quot;zip&quot;:12345,
-    &quot;country&quot;:&quot;US&quot;,
-    &quot;phone_country_code&quot;:1,
-    &quot;phone_area_code&quot;:123,
-    &quot;phone_local_number&quot;:1234,
-    &quot;email&quot;:&quot;alice@brennan.com&quot;,
-    &quot;gender&quot;:&quot;M&quot;,
-    &quot;type_of_phone_number&quot;:&quot;home&quot;,
-    &quot;terms_of_memberhips_id&quot;:10,
-    &quot;enrollment_amount&quot;:34.34,
-    &quot;birth_date&quot;:&quot;1989&quot;,
-    &quot;prospect_id&quot;:&quot;&quot;,
-    &quot;member_group_type_id&quot;:1,
-    &quot;product_sku&quot;:&quot;KIT-CARD&quot;,
-    &quot;product_description&quot;:&quot;product default&quot;,
-    &quot;external_id&quot;:&quot;2568&quot;,
-    &quot;credit_card&quot;:{
-       &quot;number&quot;:&quot;XXXX-XXXX-XXXX-9418&quot;,
-       &quot;expire_month&quot;:5,
-       &quot;expire_year&quot;:2016
-    }
-  },
-    &quot;setter&quot;:{
-       &quot;wrong_phone_number&quot;:0,
-       &quot;skip_api_sync&quot;:0,
-       &quot;batch_update&quot;:0
-    }
-}
-</code></pre>
-
+										curl -v -k -X PUT --data-ascii "{\"member\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members/1?api_key=G6qq3KzWQVi9zgfFVXud
 									
 								
 							</span>
@@ -791,103 +633,14 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<strong class="type">Response</strong>
 								
 									
-										<pre class="code json"><code>{
-  &quot;result&quot;: {
-    &quot;message&quot;:&quot;Member updated successfully&quot;,
-    &quot;code&quot;:&quot;000&quot;,
-    &quot;member_id&quot;:12345
-  }
-}
-</code></pre>
-
+										{"message":"Member updated successfully","code":"000","member_id":1}
 									
 								
 							</span>
 							<span class="description">
 								
 									
-										Response in case it was success.
-									
-								
-							</span>
-						</div>
-					
-						<div class="example">
-							
-							
-							
-							<span class="description">
-								
-									
-										Requesting enroll with invalid information.
-									
-								
-							</span>
-							<span class="hash request">
-								<strong class="type">Request</strong>
-								
-									
-										<pre class="code json"><code>{
-  &quot;api_key&quot;:&quot;aq4BS8XzbTvczcDZvDRt&quot;,
-  &quot;member&quot;: {
-    &quot;first_name&quot;:&quot;Alice&quot;,
-    &quot;last_name&quot;:&quot;Brennan&quot;,
-    &quot;address&quot;:&quot;SomeSt&quot;,
-    &quot;state&quot;:&quot;Deirdre&quot;,
-    &quot;city&quot;:&quot;City&quot;,
-    &quot;zip&quot;:12345,
-    &quot;country&quot;:&quot;US&quot;,
-    &quot;phone_country_code&quot;:1,
-    &quot;phone_area_code&quot;:123,
-    &quot;phone_local_number&quot;:1234,
-    &quot;email&quot;:&quot;alice@brennan.com&quot;,
-    &quot;gender&quot;:&quot;M&quot;,
-    &quot;type_of_phone_number&quot;:&quot;home&quot;,
-    &quot;terms_of_memberhips_id&quot;:10,
-    &quot;enrollment_amount&quot;:34.34,
-    &quot;birth_date&quot;:&quot;1989&quot;,
-    &quot;prospect_id&quot;:&quot;&quot;,
-    &quot;member_group_type_id&quot;:1,
-    &quot;product_sku&quot;:&quot;KIT-CARD&quot;,
-    &quot;product_description&quot;:&quot;product default&quot;,
-    &quot;external_id&quot;:&quot;2568&quot;,
-    &quot;credit_card&quot;:{
-       &quot;number&quot;:&quot;XXXX-XXXX-XXXX-9418&quot;,
-       &quot;expire_month&quot;:5,
-       &quot;expire_year&quot;:2016
-    }
-  },
-    &quot;setter&quot;:{
-       &quot;wrong_phone_number&quot;:0,
-       &quot;skip_api_sync&quot;:0,
-       &quot;batch_update&quot;:0
-    }
-}
-</code></pre>
-
-									
-								
-							</span>
-							<span class="hash response">
-								<strong class="type">Response</strong>
-								
-									
-										<pre class="code json"><code>{
-  &quot;result&quot;: {
-    &quot;message&quot;:&quot;Member iformation is invalid.&quot;,
-    &quot;code&quot;:&quot;405&quot;,
-    &quot;errors&quot;:{&quot;country&quot;:[&quot;is the wrong length (should be 2 characters)&quot;,&quot;is not included in the list&quot;]}
-  }
-}
-</code></pre>
-
-									
-								
-							</span>
-							<span class="description">
-								
-									
-										Response with member's errors within an 'error' hash.
+										Example response to the previos example request.
 									
 								
 							</span>
@@ -1160,7 +913,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							<span class="description">
 								
 									
-										on Example response to the previos example request.
+										Example response to the previos example request.
 									
 								
 							</span>
@@ -1661,7 +1414,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Fri Apr 19 11:32:13 2013 with ruby-1.9.3
+  Generated on Fri Apr 19 12:11:06 2013 with ruby-1.9.3
 </div>
 
   </body>

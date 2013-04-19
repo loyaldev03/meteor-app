@@ -64,103 +64,12 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @example_request 
-  #   ```json
-  #   {
-  #     "api_key":"aq4BS8XzbTvczcDZvDRt",
-  #     "member": {
-  #       "first_name":"Alice",
-  #       "last_name":"Brennan",
-  #       "address":"SomeSt",
-  #       "state":"Deirdre",
-  #       "city":"City",
-  #       "zip":12345,
-  #       "country":"US",
-  #       "phone_country_code":1,
-  #       "phone_area_code":123,
-  #       "phone_local_number":1234,
-  #       "email":"alice@brennan.com",
-  #       "gender":"M",
-  #       "type_of_phone_number":"home",
-  #       "terms_of_memberhips_id":10,
-  #       "enrollment_amount":34.34,
-  #       "birth_date":"1989",
-  #       "prospect_id":"",
-  #       "product_sku":"KIT-CARD",
-  #       "product_description":"product default",
-  #       "external_id":"2568",
-  #       "preferences":{ "color":"red", "player":"DaveJr" },
-  #       "credit_card":{
-  #          "number":"4485-6302-0286-9418",
-  #          "expire_month":5,
-  #          "expire_year":2016
-  #       }
-  #     }
-  #   }
-  #   ```
+  #   curl -v -k -X POST --data-ascii "{\"member\":{\"api_id\":\"999\",\"first_name\":\"alice\",\"last_name\":\"brennan\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"deadbeef\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"},\"product_sku\":\"KIT-CARD\",\"enrollment_info\":{\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members?api_key=G6qq3KzWQVi9zgfFVXud
   # @example_request_description Requesting enroll of a valid member.
-  # @example_response 
-  #   ```json
-  #   {
-  #     "result": {
-  #       "message":"Member enrolled successfully $34.34 on TOM(10) -test-",
-  #       "code":"000",
-  #       "member_id":"123458",
-  #       "autologin_url":""
-  #     }
-  #   }
-  #   ```
-  # @example_response_description Response in case it was success.
   #
-  # @example_request 
-  #   ```json
-  #   {
-  #     "api_key":"aq4BS8XzbTvczcDZvDRt",
-  #     "member": {
-  #       "first_name":"Alice",
-  #       "last_name":"Brennan",
-  #       "address":"SomeSt",
-  #       "state":"Deirdre",
-  #       "city":"City",
-  #       "zip":12345,
-  #       "country":"United States",
-  #       "phone_country_code":1,
-  #       "phone_area_code":123,
-  #       "phone_local_number":1234,
-  #       "email":"alice@brennan.com",
-  #       "gender":"M",
-  #       "type_of_phone_number":"home",
-  #       "terms_of_memberhips_id":10,
-  #       "enrollment_amount":34.34,
-  #       "birth_date":"1989",
-  #       "prospect_id":"",
-  #       "product_sku":"KIT-CARD",
-  #       "product_description":"product default",
-  #       "external_id":"2568",
-  #       "preferences":{ "color":"red", "player":"DaveJr" },
-  #       "credit_card":{
-  #          "number":"4485-6302-0286-9418",
-  #          "expire_month":5,
-  #          "expire_year":2016
-  #       },
-  #       "setter":{
-  #          "cc_blank":0,
-  #          "skip_api_sync":0
-  #       }
-  #     }
-  #   }
-  #   ```
-  # @example_request_description Requesting enroll with invalid information.
   # @example_response 
-  #   ```json
-  #   {
-  #     "result": {
-  #       "message":"Member iformation is invalid.",
-  #       "code":"405",
-  #       "errors":{"country":["is the wrong length (should be 2 characters)","is not included in the list"]}
-  #     }
-  #   }
-  #   ```
-  # @example_response_description Response with member's errors within an 'error' hash.
+  #   {"message":"Member enrolled successfully $0.0 on TOM(1) -test2-","code":"000","member_id":11349950166,"autologin_url":""}
+  # @example_response_description Example response to the previos example request.
   #
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] code Code related to the method result.
@@ -226,109 +135,14 @@ class Api::MembersController < ApplicationController
   #     <li><strong>batch_update</strong> Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) [optional]</li>
   #     <li><strong>skip_api_sync</strong> Boolean variable which tell us if we have to sync or not user to remote api. Send 1 if you want to skip sync otherwise dont send this attribute. [optional] (e.g drupal)</li>
   #   </ul>
-  # @example_request 
-  #   ```json
-  #   {
-  #     "api_key":"aq4BS8XzbTvczcDZvDRt",
-  #     "member": {
-  #       "first_name":"Alice",
-  #       "last_name":"Brennan",
-  #       "address":"SomeSt",
-  #       "state":"Deirdre",
-  #       "city":"City",
-  #       "zip":12345,
-  #       "country":"US",
-  #       "phone_country_code":1,
-  #       "phone_area_code":123,
-  #       "phone_local_number":1234,
-  #       "email":"alice@brennan.com",
-  #       "gender":"M",
-  #       "type_of_phone_number":"home",
-  #       "terms_of_memberhips_id":10,
-  #       "enrollment_amount":34.34,
-  #       "birth_date":"1989",
-  #       "prospect_id":"",
-  #       "member_group_type_id":1,
-  #       "product_sku":"KIT-CARD",
-  #       "product_description":"product default",
-  #       "external_id":"2568",
-  #       "credit_card":{
-  #          "number":"XXXX-XXXX-XXXX-9418",
-  #          "expire_month":5,
-  #          "expire_year":2016
-  #       }
-  #     },
-  #       "setter":{
-  #          "wrong_phone_number":0,
-  #          "skip_api_sync":0,
-  #          "batch_update":0
-  #       }
-  #   }
-  #   ```
-  # @example_request_description Requesting update with valid information.
-  # @example_response 
-  #   ```json
-  #   {
-  #     "result": {
-  #       "message":"Member updated successfully",
-  #       "code":"000",
-  #       "member_id":12345
-  #     }
-  #   }
-  #   ```
-  # @example_response_description Response in case it was success.
   #
   # @example_request 
-  #   ```json
-  #   {
-  #     "api_key":"aq4BS8XzbTvczcDZvDRt",
-  #     "member": {
-  #       "first_name":"Alice",
-  #       "last_name":"Brennan",
-  #       "address":"SomeSt",
-  #       "state":"Deirdre",
-  #       "city":"City",
-  #       "zip":12345,
-  #       "country":"US",
-  #       "phone_country_code":1,
-  #       "phone_area_code":123,
-  #       "phone_local_number":1234,
-  #       "email":"alice@brennan.com",
-  #       "gender":"M",
-  #       "type_of_phone_number":"home",
-  #       "terms_of_memberhips_id":10,
-  #       "enrollment_amount":34.34,
-  #       "birth_date":"1989",
-  #       "prospect_id":"",
-  #       "member_group_type_id":1,
-  #       "product_sku":"KIT-CARD",
-  #       "product_description":"product default",
-  #       "external_id":"2568",
-  #       "credit_card":{
-  #          "number":"XXXX-XXXX-XXXX-9418",
-  #          "expire_month":5,
-  #          "expire_year":2016
-  #       }
-  #     },
-  #       "setter":{
-  #          "wrong_phone_number":0,
-  #          "skip_api_sync":0,
-  #          "batch_update":0
-  #       }
-  #   }
-  #   ```
-  # @example_request_description Requesting enroll with invalid information.
+  #   curl -v -k -X PUT --data-ascii "{\"member\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members/1?api_key=G6qq3KzWQVi9zgfFVXud
+  # @example_request_description Requesting enroll of a valid member.
+  #
   # @example_response 
-  #   ```json
-  #   {
-  #     "result": {
-  #       "message":"Member iformation is invalid.",
-  #       "code":"405",
-  #       "errors":{"country":["is the wrong length (should be 2 characters)","is not included in the list"]}
-  #     }
-  #   }
-  #   ```
-  # @example_response_description Response with member's errors within an 'error' hash.
+  #   {"message":"Member updated successfully","code":"000","member_id":1}
+  # @example_response_description Example response to the previos example request.
   #
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] code Code related to the method result.
@@ -492,7 +306,7 @@ class Api::MembersController < ApplicationController
   #
   # @example_response
   #   {"message":"Member updated successfully","code":"000"}
-  # @example_response_description on Example response to the previos example request.
+  # @example_response_description Example response to the previos example request.
   #
   def club_cash
     member = Member.find(params[:id])
