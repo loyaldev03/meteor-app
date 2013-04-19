@@ -961,20 +961,20 @@ def self.sync_members_to_pardot
         Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
       end
     end
-    base = Member.where("sync_status IN ('with_error', 'not_synced')").limit(2000)
+    base = Member.where("sync_status IN ('with_error', 'not_synced') and status != 'lapsed' ").limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{base.count} members"
     index = 0
     base.each do |member|
       index = index+1
       Rails.logger.info "  *[#{index}] processing member ##{member.id}"
-      api_m = member.api_member
-      unless api_m.nil?
-        if api_m.save!(force: true)
-          unless member.last_sync_error_at
-            Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
+        api_m = member.api_member
+        unless api_m.nil?
+          if api_m.save!(force: true)
+            unless member.last_sync_error_at
+              Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
+            end
           end
         end
-      end
     end       
   end
 
