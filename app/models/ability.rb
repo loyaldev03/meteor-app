@@ -118,7 +118,6 @@ class Ability
       can :read, Fulfillment
       can :report, Fulfillment
       can :read, Member
-      cannot :api_enroll, Member
       can :search_result, Member    
       can :list, Membership
       can :list, Operation

@@ -184,7 +184,7 @@ class Api::MembersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   rescue NoMethodError => e
-    render json: { :message => "There are some params missing. Please check them. #{e}", :code => Settings.error_codes.wrong_data }
+    render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
 
   ##
