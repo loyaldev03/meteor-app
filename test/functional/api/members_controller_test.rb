@@ -1072,7 +1072,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs_store(@credit_card.number, "117", "decline stubbed")
+    active_merchant_stubs_store(@credit_card.number, "117", "decline stubbed", false)
     assert_difference('Membership.count', 0) do
       assert_difference('EnrollmentInfo.count', 0)do
         assert_difference('Transaction.count',0)do
