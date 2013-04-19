@@ -25,16 +25,19 @@ end
 
   def generate_products(file, club_id)
     file.each  do |row|
-      product = Product.new
+      product = Product.find_by_sku_and_club_id row[2], club_id
+      if product.nil?   #Product does not already exists?
+        product = Product.new
+        product.sku = row[2]
+        product.club_id = club_id
+      end
       product.name = row[0] 
       product.package = row[1]
-      product.sku = row[2]
       product.recurrent = (row[3].upcase=='YES' ? true : false )
       product.stock = row[4].to_i
       product.weight = row[5].to_i
       product.allow_backorder = (row[6].upcase=='YES' ? true : false )
       product.cost_center = row[7]
-      product.club_id = club_id
       product.save
     end
   end

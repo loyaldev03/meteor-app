@@ -73,8 +73,8 @@ USE_MEMBER_LIST = false
 
 
 if USE_PROD_DB
-  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
-  exit
+  #puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
+  #exit
 end
 
 unless USE_PROD_DB

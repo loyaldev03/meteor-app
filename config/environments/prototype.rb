@@ -66,7 +66,7 @@ SacPlatform::Application.configure do
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
-  config.action_mailer.default_url_options = { :host => 'prototype.platform.xagax.com:3000', :protocol => 'https' }
+  config.action_mailer.default_url_options = { :host => 'dev.stoneacrehq.com:3000', :protocol => 'https' }
 
   # these options are only needed if you choose smtp delivery
   config.action_mailer.smtp_settings = {
@@ -86,7 +86,7 @@ SacPlatform::Application.configure do
     Bullet.bullet_logger = true
     Bullet.console = true
     Bullet.rails_logger = true
-    Bullet.airbrake = true
+    Bullet.airbrake = false
   end
 
 end

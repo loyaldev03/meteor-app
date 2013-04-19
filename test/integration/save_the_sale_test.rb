@@ -210,8 +210,4 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
     validate_view_member_base(@saved_member)
   end
-
-
-
-
 end

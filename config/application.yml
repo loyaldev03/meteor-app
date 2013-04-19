@@ -176,6 +176,8 @@ defaults: &defaults
     no_amount: '9887'    
     member_already_set_wrong_address: '9888'
     member_set_wrong_address_error: '9889'
+    cancel_reason_blank: 9990
+    cancel_date_blank: 9991
     could_not_get_member_list: 9992
     could_not_change_next_bill_date: 9993
     next_bill_date_prior_actual_date: 9994
@@ -320,7 +322,7 @@ production:
     url: https://www.merchante-solutions.com/
     path: /jsp/reports/report_api.jsp
   mes_aus_service:
-    folder: "#{Rails.root}/mes_account_updater_files"
+    folder: <%= "#{Rails.root}/mes_account_updater_files" %>
     url: https://www.merchante-solutions.com/
 
 

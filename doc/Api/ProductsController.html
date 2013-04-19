@@ -361,7 +361,7 @@
 						<ul>
 							<li>
 								<span class="name">code</span>
-								<span class="type">Integer</span>
+								<span class="type">String</span>
 								<span class="text">Code related to the method result.</span>
 							</li>
 						</ul>
@@ -377,6 +377,175 @@
 				</div>
 			
 			
+			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Example with curl.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										curl -v -k -X GET -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD" https://dev.stoneacrehq.com:3000/api/v1/products/get_stock
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										{"code":"000","stock":9746,"allow_backorder":true}
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Example response to the previos example request.
+									
+								
+							</span>
+						</div>
+					
+				</div>
+			
+		</div>	
+    
+		<div class="method">
+			<p class="method_desc">Returns the stock available and the backorder flag for a list of product. 
+
+<ul>
+  <li><strong>sku</strong> Product's sku. </li>
+  <li><strong>stock</strong> Actual stock of the product. This value is an integer type </li>
+  <li><strong>allow_backorder</strong> Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. </li>
+</ul></p>
+			<h3 class="resource_url"><strong>/api/v1/products/get_list_of_stock</strong> [GET]</h3>
+
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">api_key</span>
+									<span class="type">String</span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">sku</span>
+									<span class="type">String</span>
+									<span class="text">product's skus that we are interest in. Skus must be separated by commas. (Eg: "KIT-CARD,NCARFLAGKASEYKAHNE")</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">club_id</span>
+									<span class="type">String</span>
+									<span class="text">Id of the club the products belongs to.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">product_list</span>
+								<span class="type">Array</span>
+								<span class="text">Array of Hashes with the product's information. This Array is returned if there were no error.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">skus_could_not_found</span>
+								<span class="type">Array</span>
+								<span class="text">Array with the skus that we were not able to find.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">String</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method errors.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Example with curl.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										curl -v -k -X GET -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD,AnoterOne,NCARFLAGTONYSTEWART" https://dev.stoneacrehq.com:3000/api/v1/products/get_list_of_stock
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										{"code":"000","product_list":[{"sku":"KIT-CARD","stock":9746,"allow_backorder":true}],"skus_could_not_found":["AnoterOne","NCARFLAGTONYSTEWART"]}
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Example response to the previos example request.
+									
+								
+							</span>
+						</div>
+					
+				</div>
 			
 		</div>	
     
@@ -399,7 +568,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Thu Mar 28 13:38:16 2013 with ruby-1.9.2
+  Generated on Fri Apr 19 12:11:06 2013 with ruby-1.9.3
 </div>
 
   </body>

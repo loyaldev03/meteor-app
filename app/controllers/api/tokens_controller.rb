@@ -17,6 +17,14 @@ class Api::TokensController < ApplicationController
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] token authentication token.
   # @response_field [String] location
+  # 
+  # @example_request
+  #   curl -v -k -X POST -d "email=testmail@gmail.com&password=testpassword" https://dev.stoneacrehq.com:3000/api/v1/tokens
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"token":"G6qq3KzWQVi9zgfFVXud"}
+  # @example_response_description Example response to the previos example request.
   #
   def create
     email = params[:email]
@@ -36,7 +44,7 @@ class Api::TokensController < ApplicationController
 
     if @user.nil?
       logger.info("User #{email} failed signin, user cannot be found.")
-      respond_with({:message=>"Invalid email or passoword."}, :status=>401, :location => nil)
+      respond_with({:message=>"Invalid email or password."}, :status=>401, :location => nil)
       return
     end
 
@@ -45,7 +53,7 @@ class Api::TokensController < ApplicationController
 
     if not @user.valid_password?(password)
       logger.info("User #{email} failed signin, password \"#{password}\" is invalid")
-      respond_with({:message=>"Invalid email or passoword."}, :status=>401, :location => nil)
+      respond_with({:message=>"Invalid email or password."}, :status=>401, :location => nil)
     else
       respond_with({:token=>@user.authentication_token}, :status=>200, :location => nil)
     end

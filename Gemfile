@@ -86,6 +86,11 @@ group :development do
   gem "bullet"
 end
 
+group :prototype do
+  gem "bullet"
+end
+
+
 group :test do
   gem 'factory_girl_rails'
   gem 'faker'
