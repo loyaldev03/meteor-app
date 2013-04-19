@@ -1,5 +1,5 @@
 class TermsOfMembership < ActiveRecord::Base
-  attr_accessible :grace_period, :mode, :needs_enrollment_approval, :provisional_days, 
+  attr_accessible :mode, :needs_enrollment_approval, :provisional_days, 
     :installment_amount, :description, :installment_type, :club, :name, :club_cash_amount
 
   belongs_to :club
@@ -13,7 +13,6 @@ class TermsOfMembership < ActiveRecord::Base
   after_create :setup_defaul_email_templates
 
   validates :name, :presence => true
-  validates :grace_period, :presence => true
   validates :mode, :presence => true
   #validates :needs_enrollment_approval, :presence => true
   validates :club, :presence => true
