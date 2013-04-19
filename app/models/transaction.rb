@@ -149,8 +149,8 @@ class Transaction < ActiveRecord::Base
         return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
       end
       trans = Transaction.obtain_transaction_by_gateway(sale_transaction.gateway)
-      trans.fill_transaction_type_for_credit(sale_transaction)
       trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
+      trans.fill_transaction_type_for_credit(sale_transaction)
       answer = trans.process
       if trans.success?
         sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
