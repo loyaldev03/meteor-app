@@ -958,6 +958,9 @@ def self.sync_members_to_pardot
     base.find_in_batches do |group|
       group.each do |member|
         member.api_member.destroy!
+        if member.last_sync_error.include?("There is no user with ID")
+          member.update_attribute :api_id, nil
+        end
         Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
       end
     end
