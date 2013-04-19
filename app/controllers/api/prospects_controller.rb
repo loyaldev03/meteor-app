@@ -11,9 +11,9 @@ class Api::ProspectsController < ApplicationController
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Hash] prospect Information related to the prospect.
   #  <ul>
-  #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). [optional]</li>
-  #     <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). [optional]</li>
-  #     <li><strong>address</strong> The address of the member that is being enrolled. </li>
+  #     <li><strong>first_name</strong> The first name of the member that is enrolling. [optional] </li>
+  #     <li><strong>last_name</strong> The last name of the member that is enrolling. [optional] </li>
+  #     <li><strong>address</strong> The address of the member that is being enrolled. [optional]  </li>
   #     <li><strong>city</strong> City from where the member is from.[optional]</li>
   #     <li><strong>state</strong> The state standard code where the member is from. [optional]</li>
   #     <li><strong>zip</strong> Member's address's zip code. We are accepting only formats like: xxxxx or xxxxx-xxxx. Only numbers.[optional]</li>
@@ -48,6 +48,14 @@ class Api::ProspectsController < ApplicationController
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] code Code related to the method result.
   # @response_field [String] prospect_id Prospect's id. This ID is unique for each prospect. (36 characters string)
+  #
+  # @example_request 
+  #   curl -v -k -X POST --data-ascii "{\"prospect\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/prospects?api_key=G6qq3KzWQVi9zgfFVXud
+  # @example_request_description Requesting enroll of a valid member.
+  #
+  # @example_response 
+  #   {"message":"Prospect was successfuly saved.","code":"000","prospect_id":"55e8f945-9d24-4d10-95cd-b0dcfcdb7f5c"}
+  # @example_response_description Example response to the previos example request.
   #
   def create
     tom = TermsOfMembership.find(params[:prospect][:terms_of_membership_id])

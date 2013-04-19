@@ -13,8 +13,8 @@ class Api::MembersController < ApplicationController
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
   # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information:
   #   <ul>
-  #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
-  #     <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
+  #     <li><strong>first_name</strong> The first name of the member that is enrolling. </li>
+  #     <li><strong>last_name</strong> The last name of the member that is enrolling. </li>
   #     <li><strong>address</strong> The address of the member that is being enrolled. </li>
   #     <li><strong>city</strong> City from where the member is from. </li>
   #     <li><strong>state</strong> The state standard code where the member is from. </li>
@@ -22,15 +22,15 @@ class Api::MembersController < ApplicationController
   #     <li><strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States). </li>
   #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "1"). </li>
   #     <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. </li>
-  #     <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached.</li>
+  #     <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached. </li>
   #     <li><strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
-  #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. [optional]</li>
-  #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). [optional]</li>
-  #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. [optional]</li>
+  #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. [optional] </li>
+  #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). [optional] </li>
+  #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. [optional] </li>
   #     <li><strong>terms_of_memberhips_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level.  </li>
-  #     <li><strong>enrollment_amount</strong> Amount of money that takes to enroll. It is present at member level.</li>
-  #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" [optional]</li>
-  #     <li><strong>prospect_id</strong> Id of the prospect the enrollment info is related to.</li>
+  #     <li><strong>enrollment_amount</strong> Amount of money that takes to enroll. It is present at member level. </li>
+  #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" [optional] </li>
+  #     <li><strong>prospect_id</strong> Id of the prospect the enrollment info is related to. [optional] </li>
   #     <li><strong>product_sku</strong> Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet") [optional] </li>
   #     <li><strong>product_description</strong> Description of the selected product. [optional]</li>
   #     <li><strong>mega_channel</strong> [optional] </li>
@@ -64,103 +64,12 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @example_request 
-  #   ```json
-  #   {
-  #     "api_key":"aq4BS8XzbTvczcDZvDRt",
-  #     "member": {
-  #       "first_name":"Alice",
-  #       "last_name":"Brennan",
-  #       "address":"SomeSt",
-  #       "state":"Deirdre",
-  #       "city":"City",
-  #       "zip":12345,
-  #       "country":"US",
-  #       "phone_country_code":1,
-  #       "phone_area_code":123,
-  #       "phone_local_number":1234,
-  #       "email":"alice@brennan.com",
-  #       "gender":"M",
-  #       "type_of_phone_number":"home",
-  #       "terms_of_memberhips_id":10,
-  #       "enrollment_amount":34.34,
-  #       "birth_date":"1989",
-  #       "prospect_id":"",
-  #       "product_sku":"KIT-CARD",
-  #       "product_description":"product default",
-  #       "external_id":"2568",
-  #       "preferences":{ "color":"red", "player":"DaveJr" },
-  #       "credit_card":{
-  #          "number":"4485-6302-0286-9418",
-  #          "expire_month":5,
-  #          "expire_year":2016
-  #       }
-  #     }
-  #   }
-  #   ```
+  #   curl -v -k -X POST --data-ascii "{\"member\":{\"api_id\":\"999\",\"first_name\":\"alice\",\"last_name\":\"brennan\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"deadbeef\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"},\"product_sku\":\"KIT-CARD\",\"enrollment_info\":{\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members?api_key=G6qq3KzWQVi9zgfFVXud
   # @example_request_description Requesting enroll of a valid member.
-  # @example_response 
-  #   ```json
-  #   {
-  #     "result": {
-  #       "message":"Member enrolled successfully $34.34 on TOM(10) -test-",
-  #       "code":"000",
-  #       "member_id":"123458",
-  #       "autologin_url":""
-  #     }
-  #   }
-  #   ```
-  # @example_response_description Response in case it was success.
   #
-  # @example_request 
-  #   ```json
-  #   {
-  #     "api_key":"aq4BS8XzbTvczcDZvDRt",
-  #     "member": {
-  #       "first_name":"Alice",
-  #       "last_name":"Brennan",
-  #       "address":"SomeSt",
-  #       "state":"Deirdre",
-  #       "city":"City",
-  #       "zip":12345,
-  #       "country":"United States",
-  #       "phone_country_code":1,
-  #       "phone_area_code":123,
-  #       "phone_local_number":1234,
-  #       "email":"alice@brennan.com",
-  #       "gender":"M",
-  #       "type_of_phone_number":"home",
-  #       "terms_of_memberhips_id":10,
-  #       "enrollment_amount":34.34,
-  #       "birth_date":"1989",
-  #       "prospect_id":"",
-  #       "product_sku":"KIT-CARD",
-  #       "product_description":"product default",
-  #       "external_id":"2568",
-  #       "preferences":{ "color":"red", "player":"DaveJr" },
-  #       "credit_card":{
-  #          "number":"4485-6302-0286-9418",
-  #          "expire_month":5,
-  #          "expire_year":2016
-  #       },
-  #       "setter":{
-  #          "cc_blank":0,
-  #          "skip_api_sync":0
-  #       }
-  #     }
-  #   }
-  #   ```
-  # @example_request_description Requesting enroll with invalid information.
   # @example_response 
-  #   ```json
-  #   {
-  #     "result": {
-  #       "message":"Member iformation is invalid.",
-  #       "code":"405",
-  #       "errors":{"country":["is the wrong length (should be 2 characters)","is not included in the list"]}
-  #     }
-  #   }
-  #   ```
-  # @example_response_description Response with member's errors within an 'error' hash.
+  #   {"message":"Member enrolled successfully $0.0 on TOM(1) -test2-","code":"000","member_id":11349950166,"autologin_url":""}
+  # @example_response_description Example response to the previos example request.
   #
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] code Code related to the method result.
@@ -187,148 +96,53 @@ class Api::MembersController < ApplicationController
   end
 
   ##
-  # Updates member's data.
+  # Updates member's data. You may only send fields that has change only. In case a credit_card field has been change, make sure to send all credit cards fields again (even the ones that has not change). 
   #
   # @resource /api/v1/members/:id
   # @action PUT
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
-  # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information: 
+  # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). 
   #   <ul>
-  #     <li><strong>first_name</strong> The first name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
-  #     <li><strong>last_name</strong> The last name of the member that is enrolling. We are not accepting any invalid character (like: #$"!#%&%"). </li>
-  #     <li><strong>address</strong> The address of the member that is being enrolled. </li>
-  #     <li><strong>city</strong> City from where the member is from.</li>
-  #     <li><strong>state</strong> The state standard code where the member is from. </li>
-  #     <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.)</li>
-  #     <li><strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States).</li>
-  #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "1"). </li>
-  #     <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. </li>
-  #     <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached.</li>
-  #     <li><strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx </li>
+  #     <li><strong>first_name</strong> The first name of the member that is enrolling. [optional] </li>
+  #     <li><strong>last_name</strong> The last name of the member that is enrolling. [optional] </li>
+  #     <li><strong>address</strong> The address of the member that is being enrolled. [optional] </li>
+  #     <li><strong>city</strong> City from where the member is from. [optional]</li>
+  #     <li><strong>state</strong> The state standard code where the member is from. [optional]</li>
+  #     <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.) [optional] </li>
+  #     <li><strong>country</strong> The country standard code where the member is from. This code has a length of 2 digits. (Eg: US for United States). [optional]</li>
+  #     <li><strong>phone_country_code</strong> First field of the phone number. This is the number related to the country the phone number is from. (Eg. For United States it would be "1"). [optional]</li>
+  #     <li><strong>phone_area_code</strong> Second field of the phone number. This is the number related to the area the phone number is from. [optional]</li>
+  #     <li><strong>phone_local_number</strong> Third and last field of the phone_number. This is the local number where the member will be reached. [optional]</li>
+  #     <li><strong>email</strong> Members personal email. This mail will be one of our contact method and every mail will be send to this. We recommend frontend to validate mails with the following formts like: xxxxxxxxx@xxxx.xxx.xx or xxxxxx+xxx@xxxx.xxx.xx. [optional]</li>
   #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. [optional]</li>
   #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). [optional] </li>
   #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" [optional]</li>
-  #     <li><strong>member_group_type_id</strong> Id of the member's group type where he belongs to. Each club can has many classifications for its member's, like 'VIP' or 'Celebrity'.</li>
+  #     <li><strong>member_group_type_id</strong> Id of the member's group type where he belongs to. Each club can has many classifications for its member's, like 'VIP' or 'Celebrity'. [optional]</li>
   #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. [optional]</li>
   #     <li><strong>api_id</strong> Send this value with the User Id of your site. This id is used to access your API (e.g. Autologin URL - Update member data). [optional]</li>
-  #     <li><strong>credit_card</strong> Hash with credit cards information. It must have the following information:</li>
+  #     <li><strong>credit_card</strong> Hash with credit cards information. [optional]</li>
   #     <ul>
   #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
   #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
   #     </ul>
   #   </ul>
-  # @optional [Hash] setter Variable used to pass some boolean values as "wrong_phone_number". It must have the following information:
+  # @optional [Hash] setter Variable used to pass some boolean values as "wrong_phone_number".
   #   <ul>
   #     <li><strong>wrong_phone_number</strong> Boolean value that (if it is true) it will tell us to unset member's phone_number as wrong. (It will set wrong_phone_number as nil) [optional]</li>
   #     <li><strong>batch_update</strong> Boolean variable which tell us if this update was made by a member or by a system. Send 1 if you want batch_update otherwise dont send this attribute (different operations will be stored) [optional]</li>
   #     <li><strong>skip_api_sync</strong> Boolean variable which tell us if we have to sync or not user to remote api. Send 1 if you want to skip sync otherwise dont send this attribute. [optional] (e.g drupal)</li>
   #   </ul>
-  # @example_request 
-  #   ```json
-  #   {
-  #     "api_key":"aq4BS8XzbTvczcDZvDRt",
-  #     "member": {
-  #       "first_name":"Alice",
-  #       "last_name":"Brennan",
-  #       "address":"SomeSt",
-  #       "state":"Deirdre",
-  #       "city":"City",
-  #       "zip":12345,
-  #       "country":"US",
-  #       "phone_country_code":1,
-  #       "phone_area_code":123,
-  #       "phone_local_number":1234,
-  #       "email":"alice@brennan.com",
-  #       "gender":"M",
-  #       "type_of_phone_number":"home",
-  #       "terms_of_memberhips_id":10,
-  #       "enrollment_amount":34.34,
-  #       "birth_date":"1989",
-  #       "prospect_id":"",
-  #       "member_group_type_id":1,
-  #       "product_sku":"KIT-CARD",
-  #       "product_description":"product default",
-  #       "external_id":"2568",
-  #       "credit_card":{
-  #          "number":"XXXX-XXXX-XXXX-9418",
-  #          "expire_month":5,
-  #          "expire_year":2016
-  #       }
-  #     },
-  #       "setter":{
-  #          "wrong_phone_number":0,
-  #          "skip_api_sync":0,
-  #          "batch_update":0
-  #       }
-  #   }
-  #   ```
-  # @example_request_description Requesting update with valid information.
-  # @example_response 
-  #   ```json
-  #   {
-  #     "result": {
-  #       "message":"Member updated successfully",
-  #       "code":"000",
-  #       "member_id":12345
-  #     }
-  #   }
-  #   ```
-  # @example_response_description Response in case it was success.
   #
   # @example_request 
-  #   ```json
-  #   {
-  #     "api_key":"aq4BS8XzbTvczcDZvDRt",
-  #     "member": {
-  #       "first_name":"Alice",
-  #       "last_name":"Brennan",
-  #       "address":"SomeSt",
-  #       "state":"Deirdre",
-  #       "city":"City",
-  #       "zip":12345,
-  #       "country":"US",
-  #       "phone_country_code":1,
-  #       "phone_area_code":123,
-  #       "phone_local_number":1234,
-  #       "email":"alice@brennan.com",
-  #       "gender":"M",
-  #       "type_of_phone_number":"home",
-  #       "terms_of_memberhips_id":10,
-  #       "enrollment_amount":34.34,
-  #       "birth_date":"1989",
-  #       "prospect_id":"",
-  #       "member_group_type_id":1,
-  #       "product_sku":"KIT-CARD",
-  #       "product_description":"product default",
-  #       "external_id":"2568",
-  #       "credit_card":{
-  #          "number":"XXXX-XXXX-XXXX-9418",
-  #          "expire_month":5,
-  #          "expire_year":2016
-  #       }
-  #     },
-  #       "setter":{
-  #          "wrong_phone_number":0,
-  #          "skip_api_sync":0,
-  #          "batch_update":0
-  #       }
-  #   }
-  #   ```
-  # @example_request_description Requesting enroll with invalid information.
+  #   curl -v -k -X PUT --data-ascii "{\"member\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members/1?api_key=G6qq3KzWQVi9zgfFVXud
+  # @example_request_description Requesting enroll of a valid member.
+  #
   # @example_response 
-  #   ```json
-  #   {
-  #     "result": {
-  #       "message":"Member iformation is invalid.",
-  #       "code":"405",
-  #       "errors":{"country":["is the wrong length (should be 2 characters)","is not included in the list"]}
-  #     }
-  #   }
-  #   ```
-  # @example_response_description Response with member's errors within an 'error' hash.
+  #   {"message":"Member updated successfully","code":"000","member_id":1}
+  # @example_response_description Example response to the previos example request.
   #
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] code Code related to the method result.
@@ -418,6 +232,14 @@ class Api::MembersController < ApplicationController
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. </li>
   # @response_field [String] message Shows the method errors. This message will be only shown when there was an error. 
   # @response_field [String] code Code related to the method result.
+  # 
+  # @example_request
+  #   curl -v -k -X GET -d "api_key=G6qq3KzWQVi9zgfFVXud" https://dev.stoneacrehq.com:3000/api/v1/members/1
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"code":"000","member":{"first_name":"Carla","last_name":"Ares","email":"carla.ares@gmail.com","address":"Gorriti 37856","city":"CABA","state":"IN","zip":"12345","birth_date":null,"phone_country_code":123,"phone_area_code":123,"phone_local_number":1234,"type_of_phone_number":"other","gender":"M","bill_date":null,"wrong_address":null,"wrong_phone_number":null,"member_since_date":"2013-01-15T18:03:07Z","reactivation_times":0,"blacklisted":false,"member_group_type_id":"VIP","preferences":{"example_color":"blue","example_team":"esto se guarda en alg\u00fan lugar?"}},"credit_card":{"last_4_digits":"0398","expire_month":7,"expire_year":2015},"current_membership":{"status":"lapsed","join_date":"2013-01-15T18:03:19Z","cancel_date":"2013-04-11T00:00:00Z"}}
+  # @example_response_description on Example response to the previos example request.
   #
   def show
     member = Member.find(params[:id])
@@ -477,7 +299,15 @@ class Api::MembersController < ApplicationController
   # @optional [String] expire_date club cash expiration date. This date is stored with datetime format. (Format "yyyy-mm-dd")
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] code Code related to the method result.
-  # 
+  #
+  # @example_request
+  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&amount=102&expiration_date=2013-02-02" https://dev.stoneacrehq.com:3000/api/v1/members/1/club_cash
+  # @example_request_description Example with curl.
+  #
+  # @example_response
+  #   {"message":"Member updated successfully","code":"000"}
+  # @example_response_description Example response to the previos example request.
+  #
   def club_cash
     member = Member.find(params[:id])
     my_authorize! :api_update_club_cash, Member, member.club_id
@@ -506,10 +336,18 @@ class Api::MembersController < ApplicationController
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
-  # @required [String] next_bill_date Date to be stored as date where we should bill this member. This date is stored with date format.
+  # @required [String] next_bill_date Date to be stored as date where we should bill this member. This date is stored with date format. (Format "yyyy-mm-dd" or “dd/mm/yyyy”)
   # @response_field [String] message Shows the method result.
   # @response_field [Integer] code Code related to the method result.
   # @response_field [Hash] errors A hash with member and next_bill_date errors. 
+  # 
+  # @example_request
+  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&next_bill_date=2013-05-21" https://dev.stoneacrehq.com:3000/api/v1/members/1/next_bill_date
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"message":"Next bill date changed to 2013-05-21","code":"000"}
+  # @example_response_description Example response to the previos example request.
   #
   def next_bill_date
     member = Member.find params[:id]
@@ -533,6 +371,14 @@ class Api::MembersController < ApplicationController
   # @response_field [String] message Shows the method result. This message will be shown when there is an error.
   # @response_field [Array] list Array with member's id updated between the dates given. This list will be returned only when this method is success.
   # @response_field [String] code Code related to the method result.
+  # 
+  # @example_request
+  #   curl -v -k -X GET -d "api_key=G6qq3KzWQVi9zgfFVXud" https://dev.stoneacrehq.com:3000/api/v1/members/find_all_by_updated/2/2013-03-20/2013-03-22
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"list":[20,21,22,24,25],"code":"000"}
+  # @example_response_description Example response to the previos example request.
   #
   def find_all_by_updated
     my_authorize! :api_find_all_by_updated, Member, params[:club_id]
@@ -563,6 +409,14 @@ class Api::MembersController < ApplicationController
   # @response_field [String] message Shows the method result. This message will be shown when there is an error.
   # @response_field [Array] list Array with member's id created between the dates given. This list will be returned only when this method is success.
   # @response_field [String] code Code related to the method result.
+  # 
+  # @example_request
+  #   curl -v -k -X GET -d "api_key=G6qq3KzWQVi9zgfFVXud" https://dev.stoneacrehq.com:3000/api/v1/members/find_all_by_created/2/2013-03-20/2013-03-22
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"list":[20,21,22,24,25],"code":"000"}
+  # @example_response_description Example response to the previos example request.
   #
   def find_all_by_created
     my_authorize! :api_find_all_by_updated, Member, params[:club_id]
@@ -591,6 +445,14 @@ class Api::MembersController < ApplicationController
   # @required [String] reason Reason why the member is being canceled.
   # @response_field [String] message Shows the method result.
   # @response_field [Integer] code Code related to the method result.
+  # 
+  # @example_request
+  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&cancel_date=2013-05-21&reason=Did not I have enrolled" https://dev.stoneacrehq.com:3000/api/v1/members/3/cancel
+  # @example_request_description Example with curl. 
+  #
+  # @example_response
+  #   {"message":"Member cancellation scheduled to 2013-05-21 - Reason: Did not I have enrolled","code":"000"}
+  # @example_response_description Example response to the previos example request.
   #
   def cancel
     member = Member.find params[:id]
