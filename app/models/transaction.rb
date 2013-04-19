@@ -131,32 +131,34 @@ class Transaction < ActiveRecord::Base
   end
 
   def self.refund(amount, sale_transaction_id, agent=nil)
-    amount = amount.to_f
-    # Lock transaction, so no one can use this record while we refund this member.
-    sale_transaction = Transaction.find_by_uuid sale_transaction_id, :lock => true
-    trans = Transaction.new
-    if amount <= 0.0
-      return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
-    elsif sale_transaction.amount == amount
-      trans.transaction_type = "refund"
-      trans.refund_response_transaction_id = sale_transaction.response_transaction_id
-    elsif sale_transaction.amount > amount
-      trans.transaction_type = "credit"
+    Transaction.transaction do 
+      amount = amount.to_f
+      # Lock transaction, so no one can use this record while we refund this member.
+      sale_transaction = Transaction.find_by_uuid sale_transaction_id, :lock => true
+      trans = Transaction.new
+      if amount <= 0.0
+        return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
+      elsif sale_transaction.amount == amount
+        trans.transaction_type = "refund"
+        trans.refund_response_transaction_id = sale_transaction.response_transaction_id
+      elsif sale_transaction.amount > amount
+        trans.transaction_type = "credit"
+      end
+      if sale_transaction.amount_available_to_refund < amount
+        return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
+      end
+      trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
+      answer = trans.process
+      if trans.success?
+        sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
+        sale_transaction.save
+        Auditory.audit(agent, trans, "Refund success $#{amount}", sale_transaction.member, Settings.operation_types.credit)
+        Communication.deliver!(:refund, sale_transaction.member)
+      else
+        Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
+      end
+      answer
     end
-    if sale_transaction.amount_available_to_refund < amount
-      return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
-    end
-    trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
-    answer = trans.process
-    if trans.success?
-      sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
-      sale_transaction.save
-      Auditory.audit(agent, trans, "Refund success $#{amount}", sale_transaction.member, Settings.operation_types.credit)
-      Communication.deliver!(:refund, sale_transaction.member)
-    else
-      Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
-    end
-    answer
   end
 
   def amount_available_to_refund
