@@ -1475,7 +1475,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_response :success
     end
     @member.reload
-    assert_equal @member.current_membership.cancel_date, cancel_date
+    assert_equal I18n.l(@member.current_membership.cancel_date, :format => :only_date), cancel_date
   end
 
   test "Should not cancel member when reason is blank" do
@@ -1558,7 +1558,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_response :success
     end
     @member.reload
-    assert_equal @member.current_membership.cancel_date, cancel_date
+    assert_equal I18n.l(@member.current_membership.cancel_date, :format => :only_date), cancel_date
   end
 
 

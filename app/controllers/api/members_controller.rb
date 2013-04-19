@@ -91,7 +91,7 @@ class Api::MembersController < ApplicationController
     )
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
-  rescue Exception => e
+  rescue NoMethodError => e
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
 
@@ -183,8 +183,8 @@ class Api::MembersController < ApplicationController
     render json: response
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
-  rescue Exception => e
-    render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
+  rescue NoMethodError => e
+    render json: { :message => "There are some params missing. Please check them. #{e}", :code => Settings.error_codes.wrong_data }
   end
 
   ##
@@ -352,7 +352,6 @@ class Api::MembersController < ApplicationController
   def next_bill_date
     member = Member.find params[:id]
     my_authorize! :api_change_next_bill_date, Member, member.club_id
-
     render json: member.change_next_bill_date(params[:next_bill_date], @current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
@@ -391,8 +390,8 @@ class Api::MembersController < ApplicationController
       answer = { :list => members_list, :code => Settings.error_codes.success }
     end
     render json: answer
-    rescue ArgumentError => e
-      render json: { :message => "Check both start and end date format, please. It seams one of them is in an invalid format", :code => Settings.error_codes.wrong_data }
+  rescue ArgumentError => e
+    render json: { :message => "Check both start and end date format, please. It seams one of them is in an invalid format", :code => Settings.error_codes.wrong_data }
   end
 
 
@@ -429,8 +428,8 @@ class Api::MembersController < ApplicationController
       answer = { :list => members_list, :code => Settings.error_codes.success }
     end
     render json: answer
-    rescue ArgumentError => e
-      render json: { :message => "Check both start and end date format, please. It seams one of them is in an invalid format", :code => Settings.error_codes.wrong_data } 
+  rescue ArgumentError => e
+    render json: { :message => "Check both start and end date format, please. It seams one of them is in an invalid format", :code => Settings.error_codes.wrong_data } 
   end
 
   ##
@@ -458,9 +457,9 @@ class Api::MembersController < ApplicationController
     member = Member.find params[:id]
     my_authorize! :api_cancel, Member, member.club_id
     render json: member.cancel!(params[:cancel_date], params[:reason], @current_agent)
-    rescue ActiveRecord::RecordNotFound
-      render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
-    rescue ArgumentError => e
-      render json: { :message => "Check cancel date, please. It seams that it is in the wrong format.", :code => Settings.error_codes.wrong_data }
+  rescue ActiveRecord::RecordNotFound
+    render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
+  rescue ArgumentError => e
+    render json: { :message => "Check cancel date, please. It seams that it is in the wrong format.", :code => Settings.error_codes.wrong_data }
   end
 end
