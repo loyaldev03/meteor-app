@@ -247,7 +247,7 @@ class Api::MembersController < ApplicationController
     club = member.club
     membership = member.current_membership
     credit_card = member.active_credit_card
-    render json: {
+    response = {
       code: Settings.error_codes.success,
       member: {
         first_name: member.first_name, 
@@ -269,7 +269,7 @@ class Api::MembersController < ApplicationController
         member_since_date: member.member_since_date,
         reactivation_times: member.reactivation_times,
         blacklisted: member.blacklisted,
-        member_group_type_id: member.member_group_type.name,
+        member_group_type: ( member.member_group_type.nil? ? nil : member.member_group_type.name ),
         preferences: member.preferences
       },
       credit_card: {
@@ -283,6 +283,8 @@ class Api::MembersController < ApplicationController
         cancel_date: membership.cancel_date
       }
     }
+    response.merge!( external_id: member.external_id ) if member.club.requires_external_id
+    render json: response
   rescue ActiveRecord::RecordNotFound
     render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
   end    
