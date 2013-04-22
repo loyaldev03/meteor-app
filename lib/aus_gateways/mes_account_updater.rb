@@ -2,23 +2,23 @@ module MesAccountUpdater
 
   def self.process_chargebacks(mode)
     PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
-      MesAccountUpdater.process_chargebacks gateway
+      MesAccountUpdater.process_chargebacks_for_gateway gateway
     end
   end
 
   def self.account_updater_process_answers(mode)
     PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
-      MesAccountUpdater.account_updater_process_answers gateway unless gateway.aus_login.blank?
+      MesAccountUpdater.account_updater_process_answers_for_gateway gateway unless gateway.aus_login.blank?
     end
   end
   
   def self.account_updater_send_file_to_process(mode)
     PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
-      MesAccountUpdater.account_updater_send_file_to_process gateway unless gateway.aus_login.blank?
+      MesAccountUpdater.account_updater_send_file_to_process_for_gateway gateway unless gateway.aus_login.blank?
     end
   end
 
-  def self.process_chargebacks(gateway)
+  def self.process_chargebacks_for_gateway(gateway)
     conn = Faraday.new(:url => Settings.mes_report_service.url, :ssl => {:verify => false})
     initial_date, end_date = (Date.today - 1).strftime('%m/%d/%Y'), (Date.today - 1).strftime('%m/%d/%Y')
     result = conn.get Settings.mes_report_service.path, { 
@@ -40,7 +40,7 @@ module MesAccountUpdater
   ################################################
   ########## AUS new file! #######################
   ################################################
-  def self.account_updater_process_answers(gateway)
+  def self.account_updater_process_answers_for_gateway(gateway)
     return if gateway.aus_login.nil? or gateway.aus_password.nil?
     answer = prepare_connection '/srv/api/ausStatus?', { :statusFilter => 'NEW' }, gateway
     quantity = answer['statusCount'].to_i-1
@@ -52,7 +52,7 @@ module MesAccountUpdater
     end
   end
 
-  def self.account_updater_send_file_to_process(gateway)
+  def self.account_updater_send_file_to_process_for_gateway(gateway)
     return if gateway.aus_login.nil? or gateway.aus_password.nil?
     local_filename = "#{Settings.mes_aus_service.folder}/#{gateway.club_id}_account_updater_#{Time.zone.now}.txt"
     send_file_to_mes(local_filename, gateway) if store_file(local_filename, gateway)
@@ -210,12 +210,13 @@ module MesAccountUpdater
 
     def self.process_chargebacks_result(body, gateway)
       return if body.include?('Export Failed')
-      body.split("\n").each do |line|
+      lines = body.split("\n")
+      lines.each do |line|
         columns = line.split(',')
         next if columns[0].include?('Merchant Id')
         columns.each { |x| x.gsub!('"', '') }
         args = { :control_number => columns[2], :incomming_date => columns[3],
-          :reference_number => columns[5], :transaction_date => columns[6], :transaction_amount => columns[7],
+          :reference_number => columns[5].gsub("'", ''), :transaction_date => columns[6], :transaction_amount => columns[7],
           :trident_transaction_id => columns[8], :purchase_transaction_id => columns[9],
           :client_reference_number => columns[10], :auth_code => columns[11],
           :adjudication_date => columns[12], :adjudication_number => columns[13],
