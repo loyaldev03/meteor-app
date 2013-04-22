@@ -228,6 +228,7 @@ class Api::MembersController < ApplicationController
   #     <li><strong>member_since_date</strong> Date when the member was created. This date is saved with date format. </li>
   #     <li><strong>reactivation_times</strong> Integer value that tells us how many times this member was recovered. </li>
   #     <li><strong>blacklisted</strong> Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted) </li>
+  #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. </li>
   #     <li><strong>member_group_type</strong> Group type the member belongs to. </li>
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. </li>
   # @response_field [String] message Shows the method errors. This message will be only shown when there was an error. 
@@ -268,8 +269,9 @@ class Api::MembersController < ApplicationController
         wrong_phone_number: member.wrong_phone_number,
         member_since_date: member.member_since_date,
         reactivation_times: member.reactivation_times,
+        external_id: member.external_id,
         blacklisted: member.blacklisted,
-        member_group_type_id: member.member_group_type.name,
+        member_group_type: ( member.member_group_type.nil? ? nil : member.member_group_type.name ),
         preferences: member.preferences
       },
       credit_card: {
