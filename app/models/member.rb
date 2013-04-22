@@ -325,7 +325,7 @@ class Member < ActiveRecord::Base
 
   def is_chargeback?
     self.operations.each do |operation|
-      return true if operation.operation_type == 110
+      return true if operation. operation_type == 110
     end
     false
   end
@@ -1214,10 +1214,12 @@ def self.sync_members_to_pardot
 
     def cancellation
       self.cancel_member_at_remote_domain
-      self.fulfillments.where_cancellable.each do |fulfillment| 
-        former_status = fulfillment.status
-        fulfillment.set_as_canceled
-        fulfillment.audit_status_transition(nil,former_status,nil)
+      if (Time.zone.now.to_date - join_date.to_date).to_i < Settings.days_to_wait_to_cancel_fulfillments
+        fulfillments.where_cancellable.each do |fulfillment| 
+          former_status = fulfillment.status
+          fulfillment.set_as_canceled
+          fulfillment.audit_status_transition(nil,former_status,nil)
+        end
       end
       self.next_retry_bill_date = nil
       self.bill_date = nil
