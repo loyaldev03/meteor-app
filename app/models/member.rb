@@ -325,7 +325,7 @@ class Member < ActiveRecord::Base
 
   def is_chargeback?
     self.operations.each do |operation|
-      return true if operation. operation_type == 110
+      return true if operation.operation_type == 110
     end
     false
   end
