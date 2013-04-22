@@ -63,7 +63,7 @@ DEFAULT_CREATED_BY = 1 # batch
 PAYMENT_GW_CONFIGURATION_LITLE = 2 
 PAYMENT_GW_CONFIGURATION_MES = 3
 TEST_EMAIL = false # if true email will be replaced with a fake one
-USE_PROD_DB = true
+USE_PROD_DB = false
 SITE_ID = 2010001547 # lyris site id
 MEMBER_GROUP_TYPE = 19 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
 TIMEZONE = 'Eastern Time (US & Canada)'
@@ -80,7 +80,7 @@ end
 unless USE_PROD_DB
   ActiveRecord::Base.configurations["phoenix"] = { 
     :adapter => "mysql2",
-    :database => "sac_production_onmc_import",
+    :database => "sac_production",
     :host => "127.0.0.1",
     :username => "root",
     :password => "" 

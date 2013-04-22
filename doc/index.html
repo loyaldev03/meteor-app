@@ -294,13 +294,21 @@
   <h1 class="noborder title">Api Documentation</h1>
 
   
-	<h2>How we handle authentication</h2>
+	<h2>How we handle authentication </h2>
 
 <p>Authentication is handled using the &quot;api_key&quot; argument on each API call. This api_key is the authentication token of the agent that is commiting the request. If the agent is not allowed, we will stop processing the request, and proceed to return a message telling that the agent is not authorized. Have in mind that this &quot;api_token&quot; is reseted on every login, and can be obtained using token&#39;s POST api method. <a href="TokensController.html">TokensMethods</a></p>
 
-<h2>Error codes</h2>
+<h2>Error codes </h2>
 
 <p>We always answer with an string variable called &quot;code&quot;. Acording to the method result we will set this &quot;code&quot; variable in order to match the result. (We are answering &quot;000&quot; for success, and with an especific value for each kind of error).</p>
+
+<h2>Requests and response </h2>
+
+<p>Every method receives a common HTTP request (GET, POST or PUT), and it returns a json response. Within each method description, you can see that there is an example with curl of a success call to the method.</p>
+
+<h2>Validations </h2>
+
+<p>Within each method call, me make some validations before processing the request, just to make sre to work with clean data. In case there is a field with invalid data, the system will let you know about it. </p>
 
   
   
@@ -330,7 +338,11 @@
 	</div>
     
     <div id="footer">
+<<<<<<< HEAD
   Generated on Thu Apr 11 15:27:41 2013 with ruby-1.9.3
+=======
+  Generated on Fri Apr 19 12:11:06 2013 with ruby-1.9.3
+>>>>>>> master
 </div>
 
   </body>

@@ -93,7 +93,7 @@ class Member < ActiveRecord::Base
     end
   }
   scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }
-  scope :with_id, lambda { |value| where('id = ?', value.strip) unless value.blank? }
+  scope :with_id, lambda { |value| where('members.id = ?', value.strip) unless value.blank? }
   scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
   scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value.strip) unless value.blank? }
   scope :with_phone_area_code, lambda { |value| where('phone_area_code = ?', value.strip) unless value.blank? }
@@ -109,7 +109,7 @@ class Member < ActiveRecord::Base
   scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value.strip) unless value.blank? }
   scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_external_id, lambda{ |value| where("external_id = ?",value) unless value.blank? }
-  scope :needs_approval, lambda{ |value| where('status = ?', 'applied') unless value == '0' }
+  scope :needs_approval, lambda{ |value| where('members.status = ?', 'applied') unless value == '0' }
 
   state_machine :status, :initial => :none, :action => :save_state do
     ###### member gets applied =====>>>>
@@ -398,7 +398,7 @@ class Member < ActiveRecord::Base
           Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
           { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
         else
-          trans = Transaction.new
+          trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
           trans.transaction_type = "sale"
           trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
           answer = trans.process
@@ -513,7 +513,7 @@ class Member < ActiveRecord::Base
     self.current_membership = membership
 
     if amount.to_f != 0.0
-      trans = Transaction.new
+      trans = Transaction.obtain_transaction_by_gateway(tom.payment_gateway_configuration.gateway)
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
       answer = trans.process
@@ -785,10 +785,22 @@ class Member < ActiveRecord::Base
   end
 
   def cancel!(cancel_date, message, current_agent = nil)
-    if can_be_canceled?
-      self.current_membership.update_attribute :cancel_date, cancel_date
-      Auditory.audit(current_agent, self, message, self, Settings.operation_types.future_cancel)
-    end
+    unless message.blank?
+      if cancel_date.to_date > Time.zone.now.to_date
+        if can_be_canceled?
+          self.current_membership.update_attribute :cancel_date, cancel_date
+          Auditory.audit(current_agent, self, message, self, Settings.operation_types.future_cancel)
+          answer = { :message => "Member cancellation scheduled to #{cancel_date} - Reason: #{message}", :code => Settings.error_codes.success }
+        else
+          answer = { :message => "Member is not in cancelable status or it already has cancel date set.", :code => Settings.error_codes.cancel_date_blank }
+        end
+      else
+        answer = { :message => "Cancellation date cannot be less or equal than today.", :code => Settings.error_codes.wrong_data }
+      end
+    else 
+      answer = { :message => "Reason missing. Please, make sure to provide a reason for this cancelation.", :code => Settings.error_codes.cancel_reason_blank }
+    end 
+    return answer
   end
   
   def set_wrong_address(agent, reason, set_fulfillments = true)
@@ -814,21 +826,21 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def self.sync_members_to_pardot
-    base = Member.where(" date(updated_at) >= ? ", Time.zone.now.yesterday.to_date)
+def self.sync_members_to_pardot
+    index = 0
+    base = Member.where("date(updated_at) >= ? ", Time.zone.now.yesterday.to_date).limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_pardot, processing #{base.count} members"
-    base.find_in_batches do |group|
-      group.each do |member| 
-        tz = Time.zone.now
-        begin
-          Rails.logger.info "  * processing member ##{member.id}"
-          member.sync_to_pardot unless member.pardot_member.nil?
-        rescue Exception => e
-          Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        end
-        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+    base.each do |member|
+      tz = Time.zone.now
+      begin
+        index = index+1
+        Rails.logger.info "  *[#{index}] processing member ##{member.id}"
+        member.sync_to_pardot unless member.pardot_member.nil?
+      rescue Exception => e
+        Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
+      Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
     end
   end    
 
@@ -836,40 +848,60 @@ class Member < ActiveRecord::Base
   def self.bill_all_members_up_today
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
-    base = Member.where(" next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status != 'lapsed'", 
-                Time.zone.now)
+    index = 0
+    base = Member.where("next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status NOT IN ('applied','lapsed')", Time.zone.now).
+           limit(2000)    
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:billing rake task, processing #{base.count} members"
-    base.find_in_batches(:batch_size => 60) do |group|
-      group.each do |member| 
-        tz = Time.zone.now
-        begin
-          Rails.logger.info "  * processing member ##{member.id} nbd: #{member.next_retry_bill_date}"
-          member.bill_membership
-        rescue Exception => e
-          Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect, :credit_card => member.active_credit_card.inspect })
-          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        end
-        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+    base.each do |member| 
+      tz = Time.zone.now
+      begin
+        index = index+1 
+        Rails.logger.info "  *[#{index}] processing member ##{member.id} nbd: #{member.next_retry_bill_date}"
+        member.bill_membership
+      rescue Exception => e
+        Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect, :credit_card => member.active_credit_card.inspect })
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
+      Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
     end
     file.flock(File::LOCK_UN)
   end
 
+  def self.refresh_autologin
+    index = 0
+    Member.find_each do |member|
+      begin
+        index = index+1
+        Rails.logger.info "   *[#{index}] processing member ##{member.id}"
+        member.refresh_autologin_url!
+      rescue
+        Airbrake.notify error_class: "Members::Members", 
+          error_message: "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect }
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+      end
+    end
+  end
+
   def self.send_pillar_emails
     # TODO: join EmailTemplate and Member querys
-    EmailTemplate.find_in_batches(:conditions => [" template_type = ? ", :pillar]) do |group|
-      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{group.count} templates"
+    base = EmailTemplate.where(["template_type = ? ", :pillar])
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{base.count} templates"
+    index_template = 0
+    index_member = 0
+    base.find_in_batches do |group|
       group.each do |template| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing template ##{template.id}"
+          index_template = index_template+1 
+          Rails.logger.info "  *[#{index_template}] processing template ##{template.id}"
           Membership.find_in_batches(:conditions => 
               [ " date(join_date) = ? AND terms_of_membership_id = ? AND status IN (?) ", 
                 (Time.zone.now - template.days_after_join_date.days).to_date, 
                 template.terms_of_membership_id, ['active', 'provisional'] ]) do |group1|
             group1.each do |membership| 
               begin
-                Rails.logger.info "  * processing member ##{membership.member_id}"
+                index_member = index_member+1
+                Rails.logger.info "  *[#{index_member}] processing member ##{membership.member_id}"
                 Communication.deliver!(template, membership.member)
               rescue Exception => e
                 Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect, :membership => membership.inspect })
@@ -888,59 +920,65 @@ class Member < ActiveRecord::Base
 
   # Method used from rake task and also from tests!
   def self.reset_club_cash_up_today
-    Member.includes(:club).find_in_batches(:conditions => ["date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member' AND club_cash_enable = true", Time.zone.now.to_date ]) do |group|
-      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:reset_club_cash_up_today rake task, processing #{group.count} members"
-      group.each do |member| 
-        tz = Time.zone.now
-        begin
-          Rails.logger.info "  * processing member ##{member.id}"
-          member.reset_club_cash
-        rescue Exception => e
-          Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        end
-        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+    index = 0
+    base = Member.includes(:club).where("date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member' AND club_cash_enable = true", Time.zone.now.to_date).limit(2000)
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:reset_club_cash_up_today rake task, processing #{base.count} members"
+    base.each do |member|
+      tz = Time.zone.now
+      begin
+        index = index+1
+        Rails.logger.info "  *[#{index}] processing member ##{member.id}"
+        member.reset_club_cash
+      rescue Exception => e
+        Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
-    end    
+      Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+    end
   end
 
   # Method used from rake task and also from tests!
   def self.cancel_all_member_up_today
-    base =  Member.joins(:current_membership).where(" date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:cancel_all_member_up_today rake task, processing #{group.count} members"
-    base.find_in_batches do |group|
-      group.each do |member| 
-        tz = Time.zone.now
-        begin
-          Rails.logger.info "  * processing member ##{member.id}"
-          Member.find(member.id).set_as_canceled!
-        rescue Exception => e
-          Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        end
-        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+    index = 0
+    base =  Member.joins(:current_membership).where("date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:cancel_all_member_up_today rake task, processing #{base.count} members"
+    base.each do |member| 
+      tz = Time.zone.now
+      begin
+        index = index+1
+        Rails.logger.info "  *[#{index}] processing member ##{member.id}"
+        Member.find(member.id).set_as_canceled!
+      rescue Exception => e
+        Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
+      Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
     end
   end
 
   def self.process_sync 
-    Member.find_in_batches( :conditions => ("status = 'lapsed' AND api_id != ''") ) do |group|
-      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members lapsed and api_id not null, processing #{group.count} members"
+    base = Member.where("status = 'lapsed' AND api_id != ''")
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members lapsed and api_id not null, processing #{base.count} members"
+    base.find_in_batches do |group|
       group.each do |member|
         member.api_member.destroy!
+        if member.last_sync_error.include?("There is no user with ID")
+          member.update_attribute :api_id, nil
+        end
         Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
       end
     end
-    Member.find_in_batches( :conditions => ("sync_status IN ('with_error', 'not_synced')") ) do |group|
-      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{group.count} members"
-      group.each do |member|
-        Rails.logger.info "  * processing member ##{member.id}"
-        api_m = member.api_member
-        unless api_m.nil?
-          if api_m.save!(force: true)
-            unless member.last_sync_error_at
-              Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
-            end
+    base = Member.where("sync_status IN ('with_error', 'not_synced') and status != 'lapsed' ").limit(2000)
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{base.count} members"
+    index = 0
+    base.each do |member|
+      index = index+1
+      Rails.logger.info "  *[#{index}] processing member ##{member.id}"
+      api_m = member.api_member
+      unless api_m.nil?
+        if api_m.save!(force: true)
+          unless member.last_sync_error_at
+            Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
           end
         end
       end
@@ -949,7 +987,9 @@ class Member < ActiveRecord::Base
 
   def self.process_email_sync_error
     member_list = []
-    Member.find_in_batches( :conditions => ("sync_status = 'with_error' AND last_sync_error like 'The e-mail address%is already taken.%'") ) do |group|
+    base = Member.where("sync_status = 'with_error' AND last_sync_error like 'The e-mail address%is already taken.%'")
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_email_sync_error rake task, processing #{base.count} members"
+    base.find_in_batches do |group|
       group.each do |member|
         member_list << member
       end
@@ -959,6 +999,7 @@ class Member < ActiveRecord::Base
 
   def self.send_happy_birthday
     today = Time.zone.now.to_date
+    index = 0
     base = Member.billable.where(" birth_date IS NOT NULL and DAYOFMONTH(birth_date) = ? and MONTH(birth_date) = ? ", 
       today.day, today.month)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_happy_birthday rake task, processing #{base.count} members"
@@ -966,7 +1007,8 @@ class Member < ActiveRecord::Base
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.id}"
+          index = index+1
+          Rails.logger.info "  *[#{index}] processing member ##{member.id}"
           Communication.deliver!(:birthday, member)
         rescue Exception => e
           Airbrake.notify(:error_class => "Members::send_happy_birthday", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
@@ -978,11 +1020,13 @@ class Member < ActiveRecord::Base
   end
 
   def self.send_prebill
-    Member.find_in_batches(:conditions => [" date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
+    index = 0
+    Member.find_in_batches(:conditions => ["date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
       group.each do |member| 
         tz = Time.zone.now
         begin
-          Rails.logger.info "  * processing member ##{member.id}"
+          index = index + 1 
+          Rails.logger.info "  *[#{index}] processing member ##{member.id}"
           member.send_pre_bill
         rescue Exception => e
           Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
@@ -1174,10 +1218,12 @@ class Member < ActiveRecord::Base
 
     def cancellation
       self.cancel_member_at_remote_domain
-      self.fulfillments.where_cancellable.each do |fulfillment| 
-        former_status = fulfillment.status
-        fulfillment.set_as_canceled
-        fulfillment.audit_status_transition(nil,former_status,nil)
+      if (Time.zone.now.to_date - join_date.to_date).to_i < Settings.days_to_wait_to_cancel_fulfillments
+        fulfillments.where_cancellable.each do |fulfillment| 
+          former_status = fulfillment.status
+          fulfillment.set_as_canceled
+          fulfillment.audit_status_transition(nil,former_status,nil)
+        end
       end
       self.next_retry_bill_date = nil
       self.bill_date = nil

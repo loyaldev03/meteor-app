@@ -82,6 +82,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     put( :next_bill_date, { :id => @member.id, :next_bill_date => next_bill_date } )
   end
 
+  def generate_put_cancel(cancel_date, reason)
+    put( :cancel, { :id => @member.id, :cancel_date => cancel_date, :reason => reason } )
+  end
+
   def generate_get_by_updated(club_id, start_date, end_date)
     get( :find_all_by_updated, { :club_id => club_id, :start_date => start_date, :end_date => end_date })
   end
@@ -157,6 +161,22 @@ class Api::MembersControllerTest < ActionController::TestCase
       end
     end
     assert_equal @response.body, '{"message":"Membership already exists for this email address. Contact Member Services if you would like more information at: 123 456 7891.","code":"409","errors":{"status":"Already active."}}'
+  end
+
+  test "When no param is provided on creation, it should tell us so" do
+    setup_enviroment
+    sign_in @admin_user
+    assert_difference('Membership.count',0) do
+      assert_difference('EnrollmentInfo.count',0) do
+        assert_difference('Transaction.count',0) do
+          assert_difference('Member.count',0) do
+            post( :create )
+            assert_response :success
+          end
+        end
+      end
+    end
+    assert @response.body.include?("There are some params missing. Please check them.")
   end
 
   # test "Member should not be enrolled if the email is already is used, even when mes throws error." do
@@ -308,6 +328,23 @@ class Api::MembersControllerTest < ActionController::TestCase
       generate_post_message
       assert_response :success
     end
+  end
+
+  test "When no param is provided on update, it should tell us so" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    assert_difference('Membership.count',0) do
+      assert_difference('EnrollmentInfo.count',0) do
+        assert_difference('Transaction.count',0) do
+          assert_difference('Member.count',0) do
+            put( :update, { id: @member.id } )
+            assert_response :success
+          end
+        end
+      end
+    end
+    assert @response.body.include?("There are some params missing. Please check them.")
   end
 
   test "admin user should update member" do
@@ -1009,7 +1046,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs_purchace("34234", "decline stubbed", false) 
+    active_merchant_stubs_purchase(@credit_card.number, "34234", "decline stubbed", false) 
     assert_difference('Membership.count', 0) do
       assert_difference('EnrollmentInfo.count', 0)do
         assert_difference('Transaction.count')do
@@ -1035,7 +1072,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs_store(@credit_card.number, "117", "decline stubbed")
+    active_merchant_stubs_store(@credit_card.number, "117", "decline stubbed", false)
     assert_difference('Membership.count', 0) do
       assert_difference('EnrollmentInfo.count', 0)do
         assert_difference('Transaction.count',0)do
@@ -1413,7 +1450,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Api agent should get members created between given dates" do
     setup_enviroment
-    sign_in @admin_user
+    sign_in @api_user
     3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     first = Member.first
     last = Member.last
@@ -1425,4 +1462,104 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @response.body.include? first.id.to_s
     assert !(@response.body.include? last.id.to_s)
   end
+
+  test "Admin should cancel memeber" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count") do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :success
+    end
+    @member.reload
+    assert_equal I18n.l(@member.current_membership.cancel_date, :format => :only_date), cancel_date
+  end
+
+  test "Should not cancel member when reason is blank" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "" )
+      assert_response :success
+    end
+    assert @response.body.include?("Reason missing. Please, make sure to provide a reason for this cancelation.")
+  end
+
+
+  test "Should not cancel member when cancel date is in wrong format" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "" )
+      assert_response :success
+    end
+    assert @response.body.include?("Reason missing. Please, make sure to provide a reason for this cancelation.")
+  end
+
+  test "Supervisor should not cancel memeber" do
+    setup_enviroment
+    sign_in @supervisor_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :unauthorized
+    end
+  end
+
+  test "Representative should not cancel memeber" do
+    setup_enviroment
+    sign_in @representative_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :unauthorized
+    end
+  end
+
+  test "Agency should not cancel memeber" do
+    setup_enviroment
+    sign_in @agency_agent
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :unauthorized
+    end
+  end
+
+  test "api should cancel memeber" do
+    setup_enviroment
+    sign_in @api_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+    
+    assert_difference("Operation.count") do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :success
+    end
+    @member.reload
+    assert_equal I18n.l(@member.current_membership.cancel_date, :format => :only_date), cancel_date
+  end
+
+
 end
