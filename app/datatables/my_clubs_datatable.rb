@@ -40,7 +40,7 @@ private
     end
     clubs = clubs.page(page).per_page(per_page)
     if params[:sSearch].present?
-      clubs = clubs.where("id like :search or name like :search", search: "%#{params[:sSearch]}%")
+      clubs = clubs.where("clubs.id like :search or name like :search", search: "%#{params[:sSearch]}%")
     end
     clubs
   end
