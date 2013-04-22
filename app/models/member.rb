@@ -1021,7 +1021,9 @@ def self.sync_members_to_pardot
 
   def self.send_prebill
     index = 0
-    Member.find_in_batches(:conditions => ["date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
+    base = Member.where([" date(next_retry_bill_date) = ? AND recycled_times = 0 AND terms_of_memberships.installment_amount != 0.0", 
+      (Time.zone.now + 7.days).to_date ]).includes(:current_membership => :terms_of_membership) 
+    base.find_in_batches do |group|
       group.each do |member| 
         tz = Time.zone.now
         begin
