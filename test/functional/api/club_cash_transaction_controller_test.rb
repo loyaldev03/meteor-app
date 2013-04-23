@@ -100,6 +100,6 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
                                 :description => "adding club cash"
                               }, :format => :json })
     assert @response.body.include?(I18n.t('error_messages.club_cash_not_supported'))
-    assert @response.body.indlude?(Settings.error_codes.club_does_not_support_club_cash)
+    assert @response.body.include?(Settings.error_codes.club_does_not_support_club_cash)
   end
 end
