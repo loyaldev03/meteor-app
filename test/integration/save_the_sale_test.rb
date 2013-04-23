@@ -45,21 +45,24 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-  def success_save_the_sale(old_tom, new_tom, operation = nil)
-    assert page.has_content?("Save the sale succesfully applied")
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Save the sale from TOM(#{old_tom}) to TOM(#{new_tom})")
-      }
-    end
-    unless operation.nil?
-      wait_until{ assert_equal(operation.description, "Save the sale from TOM(#{old_tom}) to TOM(#{new_tom})") }
-    end
-  end
-
   ###########################################################
   # TESTS
   ###########################################################
+
+
+  test "save the sale from active to provisional with enrollment info related to product not available at inventory" do
+    setup_member(false, true)
+    assert_equal @saved_member.status, "active"
+    
+    prods = Product.find_all_by_sku @saved_member.enrollment_infos.first.product_sku.split(',')
+    prods.each {|p| p.update_attributes :stock =>  0, :allow_backorder => false }
+
+    assert_difference('Membership.count') do 
+      assert_difference('EnrollmentInfo.count') do
+        save_the_sale(@saved_member, @new_terms_of_membership_with_gateway)
+      end
+    end
+  end
 
   test "save the sale from provisional to provisional" do
     setup_member
