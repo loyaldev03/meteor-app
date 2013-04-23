@@ -391,33 +391,29 @@ class Member < ActiveRecord::Base
   def bill_membership
     if can_bill_membership? and self.next_retry_bill_date <= Time.zone.now
       amount = terms_of_membership.installment_amount
-      if amount.to_f > 0.0
-        if terms_of_membership.payment_gateway_configuration.nil?
-          message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
-          Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
-          Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
-          { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
-        else
-          trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
-          trans.transaction_type = "sale"
-          trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
-          answer = trans.process
-          if trans.success?
-            unless set_as_active
-              Airbrake.notify(:error_class => "Billing::set_as_active", :error_message => "we cant set as active this member.", :parameters => { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
-            end
-            schedule_renewal
-            assign_club_cash
-            message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
-            Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
-            { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
-          else
-            message = set_decline_strategy(trans)
-            answer # TODO: should we answer set_decline_strategy message too?
-          end
-        end
+      if terms_of_membership.payment_gateway_configuration.nil?
+        message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
+        Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
+        Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
+        { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
       else
-        { :message => "Called billing method but no amount on TOM is set.", :code => Settings.error_codes.no_amount }
+        trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
+        trans.transaction_type = "sale"
+        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
+        answer = trans.process
+        if trans.success?
+          unless set_as_active
+            Airbrake.notify(:error_class => "Billing::set_as_active", :error_message => "we cant set as active this member.", :parameters => { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+          end
+          schedule_renewal
+          assign_club_cash
+          message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
+          Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
+          { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
+        else
+          message = set_decline_strategy(trans)
+          answer # TODO: should we answer set_decline_strategy message too?
+        end
       end
     else
       if not self.club.billing_enable

@@ -201,10 +201,10 @@ class Transaction < ActiveRecord::Base
     def sale
       if payment_gateway_configuration.nil?
         save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
-      elsif self.token.nil? or self.token == CreditCard::BLANK_CREDIT_CARD_TOKEN
+      elsif (self.token.nil? or self.token == CreditCard::BLANK_CREDIT_CARD_TOKEN) and amount.to_f != 0.0
         save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
       elsif amount.to_f == 0.0
-        save_custom_response({ :message => "Transaction success. Amount $0.0", :code => Settings.error_codes.success })
+        save_custom_response({ :message => "Transaction success. Amount $0.0", :code => Settings.error_codes.success }, true)
       else
         load_gateway
         purchase_response = @gateway.purchase(amount_to_send, credit_card_token, @options)
@@ -212,8 +212,8 @@ class Transaction < ActiveRecord::Base
       end
     end
 
-    def save_custom_response(answer)
-      self.success=false
+    def save_custom_response(answer, trans_success=false)
+      self.success= trans_success
       self.response=answer
       self.response_code=answer[:code]
       self.response_result=answer[:message]
