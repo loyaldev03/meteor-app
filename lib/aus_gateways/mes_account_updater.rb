@@ -46,7 +46,7 @@ module MesAccountUpdater
     quantity = answer['statusCount'].to_i-1
     if quantity >= 0
       0.upto(quantity) do |i|
-        request_file_by_id answer["rspfId_#{i}"], "rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
+        request_file_by_id answer["rspfId_#{i}"], "#{gateway.club_id}-rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
       end
       send_email_with_call_members
     end
@@ -63,7 +63,7 @@ module MesAccountUpdater
       ccs = CreditCard.where([" aus_status = 'CALL' AND date(aus_answered_at) = ? ", Time.zone.now.to_date ])
       if ccs.size > 0
         csv = "id,first_name,last_name,email,phone,status,cs_next_bill_date\n"
-        csv += ccs.collect {|cc| [ cc.member_id, cc.member.first_name, cc.member.last_name, cc.email, cc.full_phone_number,
+        csv += ccs.collect {|cc| [ cc.member_id, cc.member.first_name, cc.member.last_name, cc.member.email, cc.member.full_phone_number,
             cc.member.status, cc.member.next_retry_bill_date ].join(',') }.join("\n")
         Notifier.call_these_members(csv).deliver
       end
@@ -163,7 +163,15 @@ module MesAccountUpdater
         old_account_token = line[6..37].strip
         old_expiration_date = line[38..41]
         new_account_type = line[42..45]
-        new_account_token = line[46..77].strip
+        new_account_type_am = case new_account_type
+        when 'VISA'
+          'visa'
+        when 'MC'
+          'master'
+        else
+          'unknown'
+        end
+        new_account_number= line[46..77].strip
         new_expiration_date = line[78..81]
         response_code = line[82..89].strip
         response_source = line[90..91]
@@ -175,7 +183,7 @@ module MesAccountUpdater
         else
           new_expire_year = new_expiration_date[0..1].to_i+2000
           new_expire_month = new_expiration_date[2..3]
-          credit_cards = CreditCard.find_all_by_token credit_card.old_account_token
+          credit_cards = CreditCard.find_all_by_token old_account_token
           credit_cards.each do |cc|
             if cc.active 
               if cc.aus_status.nil?
@@ -185,14 +193,16 @@ module MesAccountUpdater
               end
               case response_code
               when 'NEWACCT'
-                # TODO: Asking Sean if token changes after NEWACCT 
-                answer = cc.member.update_credit_card_from_drupal({number: new_account_number, :expire_year => new_expire_year, :expire_month => new_expire_month})
+                new_credit_card = CreditCard.new(number: new_account_number, expire_year: new_expire_year, expire_month: new_expire_month)
+                new_credit_card.token = old_account_token
+                new_credit_card.cc_type = new_account_type_am
+                answer = cc.member.add_new_credit_card(new_credit_card)
                 unless answer[:code] == Settings.error_codes.success
                   Airbrake.notify(:error_class => "MES::aus_update_process", :parameters => { :credit_card => cc.inspect, :answer => answer, :line => line })
                 end
               when 'NEWEXP'
-                cc.update_attributes :expire_year => new_expire_year, :expire_month => new_expire_month
                 Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.member, Settings.operation_types.aus_recycle_credit_card)
+                cc.update_attributes :expire_year => new_expire_year, :expire_month => new_expire_month
               when 'CLOSED', 'CALL'
                 member = cc.member
                 unless member.lapsed?

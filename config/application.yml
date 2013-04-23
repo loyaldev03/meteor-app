@@ -315,7 +315,7 @@ test:
 
 production:
   <<: *defaults
-  call_these_members_recipients: 'rmosher@stoneacreinc.com,wbryant@stoneacreinc.com,mfulginiti@stoneacreinc.com,kflynn@stoneacreinc.com,jsmith@stoneacreinc.com'
+  call_these_members_recipients: 'rmosher@stoneacreinc.com,wbryant@stoneacreinc.com,mfulginiti@stoneacreinc.com,kflynn@stoneacreinc.com'
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   email_to_send_product_list: 'ddanch@stoneacreinc.com,tbrady@stoneacreinc.com'
   mes_report_service:
