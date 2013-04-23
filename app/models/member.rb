@@ -518,7 +518,7 @@ class Member < ActiveRecord::Base
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
       answer = trans.process
       unless trans.success?
-        Auditory.audit(agent, trans, "Transaction was not succesful.", (self.new_record? ? nil : self), Settings.error_codes.member_enrollment_error)
+        Auditory.audit(agent, trans, "Transaction was not succesful.", (self.new_record? ? nil : self), Settings.operation_types.error_on_enrollment_billing)
         return answer 
       end
     end
