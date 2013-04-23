@@ -1153,7 +1153,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
 
     click_link_or_button 'Create Member'
-    assert page.has_content?("Member iformation is invalid.")
+    assert page.has_content?(I18n.t("error_messages.member_data_invalid"))
     assert page.has_content?("number: is required")
 
     fill_in_member(unsaved_member, credit_card)
