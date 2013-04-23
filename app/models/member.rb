@@ -789,8 +789,8 @@ class Member < ActiveRecord::Base
       if cancel_date.to_date > Time.zone.now.to_date
         if can_be_canceled?
           self.current_membership.update_attribute :cancel_date, cancel_date
-          Auditory.audit(current_agent, self, message, self, Settings.operation_types.future_cancel)
           answer = { :message => "Member cancellation scheduled to #{cancel_date} - Reason: #{message}", :code => Settings.error_codes.success }
+          Auditory.audit(current_agent, self, message, self, Settings.operation_types.future_cancel)
         else
           answer = { :message => "Member is not in cancelable status or it already has cancel date set.", :code => Settings.error_codes.cancel_date_blank }
         end
