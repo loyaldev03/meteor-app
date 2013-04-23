@@ -14,8 +14,8 @@ class TransactionTest < ActiveSupport::TestCase
     FactoryGirl.create(:without_grace_period_decline_strategy_yearly)
   end
 
-  def enroll_member(tom)
-    answer = Member.enroll(tom, @current_agent, 23, 
+  def enroll_member(tom, amount=23, cc_blank=false)
+    answer = Member.enroll(tom, @current_agent, amount, 
       { first_name: @member.first_name,
         last_name: @member.last_name, address: @member.address, city: @member.city, gender: 'M',
         zip: @member.zip, state: @member.state, email: @member.email, type_of_phone_number: @member.type_of_phone_number,
@@ -23,7 +23,8 @@ class TransactionTest < ActiveSupport::TestCase
         type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US', 
         product_sku: Settings.kit_card_product }, 
       { number: @credit_card.number, 
-        expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month })
+        expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month },
+      cc_blank)
 
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
 
@@ -328,5 +329,32 @@ class TransactionTest < ActiveSupport::TestCase
     # end
   end
 
+  test "enroll with monthly tom with no amount and cc blank" do
+    @tom = FactoryGirl.create(:terms_of_membership_monthly_without_provisional_day_and_amount, :club_id => @club.id)
+    @credit_card.number = "0000000000"
+    active_merchant_stubs
+    member = enroll_member(@tom, 0, true)
 
+    assert_difference("Operation.count",4) do  # communictaion | renewal schedule NBD | add club cash | billing
+      assert_difference("Transaction.count") do
+        member.bill_membership
+      end
+    end
+    assert_equal member.status, "active"
+  end
+
+  test "enroll with yearly tom with no amount and cc blank" do
+    @tom = FactoryGirl.create(:terms_of_membership_yearly_without_provisional_day_and_amount, :club_id => @club.id)
+    @credit_card.number = "0000000000"
+    active_merchant_stubs
+    member = enroll_member(@tom, 0, true)
+    
+    assert_difference("Operation.count",4) do  #  communictaion | renewal schedule NBD | add club cash | billing
+      assert_difference("Transaction.count") do
+        member.bill_membership
+        Operation.all.each {|x| puts x.description }
+      end
+    end
+    assert_equal member.status, "active"
+  end
 end
