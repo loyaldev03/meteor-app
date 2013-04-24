@@ -74,10 +74,9 @@ class MembersBillTest < ActionController::IntegrationTest
   end
 
 
-
-# #   ############################################################
-# #   # TEST
-# #   ############################################################
+#   ############################################################
+#   # TEST
+#   ############################################################
 
   test "create a member billing enroll > 0" do
     active_merchant_stubs
@@ -420,17 +419,13 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
     
-    Member.find_in_batches(:conditions => [" date(bill_date) = ? ", (Time.zone.now + 7.days).to_date ]) do |group|
-      group.each do |member| 
-        @saved_member.send_pre_bill
-      end
-    end
+    Member.send_prebill
 
-    sleep 1
+    sleep 2
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
-    within('.nav-tabs'){click_on 'Communications'}
+    within('.nav-tabs'){ click_on 'Communications' }
     within("#communication") do
       assert page.has_content?("prebill")
       assert_equal(Communication.last.template_type, 'prebill')
@@ -438,9 +433,57 @@ class MembersBillTest < ActionController::IntegrationTest
    
     within('.nav-tabs'){click_on 'Operations'}
     within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Communication 'Test prebill' sent")
-      }
+      assert page.has_content?("Communication 'Test prebill' sent")
+    end
+  end
+
+  test "Do not Send Prebill email (7 days before NBD) when member's installment_amount is 0" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }    
+    @terms_of_membership_with_gateway.update_attribute :installment_amount, 0.0
+    @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
+    @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
+    
+    Member.send_prebill
+
+    sleep 2
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within('.nav-tabs'){ click_on 'Communications' }
+    within("#communication") do 
+      assert page.has_no_content?("prebill")
+    end
+   
+    within('.nav-tabs'){ click_on 'Operations' }
+    within("#operations_table") do
+      assert page.has_no_content?("Communication 'Test prebill' sent")
+    end
+  end
+
+  test "Do not Send Prebill email (7 days before NBD) when member's recycled_times is not 0" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }    
+    @saved_member.recycled_times = 1
+    @saved_member.next_retry_bill_date = Time.zone.now+7.day
+    @saved_member.bill_date = Time.zone.now+7.day
+    @saved_member.save
+    
+    Member.send_prebill
+
+    sleep 2
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+    within('.nav-tabs'){ click_on 'Communications' }
+    within("#communication") do 
+      assert page.has_no_content?("prebill")
+    end
+    within('.nav-tabs'){ click_on 'Operations' }
+    within("#operations_table") do
+      assert page.has_no_content?("Communication 'Test prebill' sent")
     end
   end
 

@@ -94,7 +94,7 @@ en:
     member_set_wrong_address_error: "Could not set member's address as undeliverable. %{errors}"
     member_already_set_wrong_address: "Member's address already set as wrong address."
     member_set_as_blacklisted: "Operation cannot be done. Member is set as blacklisted."
-    member_data_invalid: "Member iformation is invalid."
+    member_data_invalid: "Member information is invalid."
     credit_card_in_use: "We're sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: %{cs_phone_number}."
     credit_card_blacklisted: "There was an error with your credit card information. Please call member services at: %{cs_phone_number}."
     expired_credit_card: "Credit card to activate is expired."
