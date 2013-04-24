@@ -19,14 +19,14 @@ echo "`date` env variable => `env`"
 cd /var/www/$2/current && rake members:cancel  >> $LOGFILE 2>&1
 cd /var/www/$2/current && rake members:process_sync  >> $LOGFILE 2>&1
 
-# nowadys we will run billing once per day 
-cd /var/www/$2/current && rake billing:for_today  >> $LOGFILE 2>&1
-
 if [ "$1" == "production" ]; then
 #  cd /var/www/$2/current && rake mes:chargeback_report  >> $LOGFILE 2>&1 
   cd /var/www/$2/current && rake mes:account_updater_process_answers  >> $LOGFILE 2>&1
   cd /var/www/$2/current && rake mes:account_updater_send_file_to_process  >> $LOGFILE 2>&1 
 fi
+
+# nowadys we will run billing once per day 
+cd /var/www/$2/current && rake billing:for_today  >> $LOGFILE 2>&1
 
 cd /var/www/$2/current && rake billing:send_prebill  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake members:process_fulfillments  >> $LOGFILE 2>&1 &
