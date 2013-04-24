@@ -45,22 +45,21 @@ class Fulfillment < ActiveRecord::Base
     event :set_as_on_hold do
       transition all => :on_hold
     end
-    event :set_as_sent do
-      transition all => :sent
-    end
     event :set_as_out_of_stock do
       transition all => :out_of_stock
     end
     event :set_as_returned do
       transition all => :returned
     end
-    event :set_as_canceled do
-      transition all => :canceled
+    event :set_as_sent do
+      transition all => :sent
     end
     event :set_as_bad_address do
       transition all => :bad_address
     end
-  
+    event :set_as_canceled do
+      transition all => :canceled
+    end
     #First status. fulfillment is waiting to be processed.
     state :not_processed
     #This status will be automatically set after the new fulfillment list is downloaded. Only if magento 
