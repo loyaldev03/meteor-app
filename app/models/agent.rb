@@ -50,7 +50,7 @@ class Agent < ActiveRecord::Base
     allow_destroy: true
 
   def has_role_with_club?(role, club_id = nil)
-    logger.debug "role: #{role} club_id: #{club_id}        #{self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?}"
+    # logger.debug "role: #{role} club_id: #{club_id}        #{self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?}"
     club_id = club_id.to_param
     self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?
   end

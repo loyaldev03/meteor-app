@@ -4,7 +4,7 @@ class LitleTransaction < Transaction
     super(member)
     # MeS supports only 17 characters on order_id
     # litle had "#{Date.today}-#{order_mark}#{@transaction.member_id}"
-    self.invoice_number = member.id
+    self.invoice_number = "#{Time.now.to_i}-#{self.member_id}"
   end
 
   # answer credit card token
