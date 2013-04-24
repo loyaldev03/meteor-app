@@ -78,7 +78,7 @@ class Transaction < ActiveRecord::Base
         :zip      => zip.gsub(/[a-zA-Z-]/, ''),
         :phone    => phone_number
       },
-      :expiration_date => "%02d%02d" % [ self.expire_month, self.expire_year.to_s.last(2) ]
+      :expiration_date => "%02d%s" % [ self.expire_month, self.expire_year.to_s.last(2) ]
     }    
   end
 
