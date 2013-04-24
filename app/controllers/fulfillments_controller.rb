@@ -71,7 +71,7 @@ class FulfillmentsController < ApplicationController
         ff.save!
         params[:fulfillment_selected].each do |fs|
           fulfillment = Fulfillment.find(fs.first)
-          ff.fulfillments << fulfillment 
+          ff.fulfillments << fulfillment
           fulfillment.set_as_in_process
         end
         flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
