@@ -352,7 +352,6 @@ class TransactionTest < ActiveSupport::TestCase
     assert_difference("Operation.count",4) do  #  communictaion | renewal schedule NBD | add club cash | billing
       assert_difference("Transaction.count") do
         member.bill_membership
-        Operation.all.each {|x| puts x.description }
       end
     end
     assert_equal member.status, "active"
