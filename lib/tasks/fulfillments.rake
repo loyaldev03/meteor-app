@@ -3,12 +3,17 @@ namespace :fulfillments do
 	task :generate_fulfillment_naamma_report => :environment do
 		fulfillment_file = FulfillmentFile.new 
 		fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
-		# fulfillment_file.club = Club.find 4
-		fulfillment_file.club = Club.find 2
+
+		if Rails.env=='prototype'
+			fulfillment_file.club = Club.find 2
+		elsif Rails.env=='production'
+			fulfillment_file.club = Club.find 4
+		end
+			
 		fulfillment_file.product = "KIT-CARD"
 		fulfillment_file.save!
 
-		fulfillments = Fulfillment.includes(:member).where( ["members.club_id = ? AND fulfillments.created_at BETWEEN ? AND ? and fulfillments.status = 'not_processed'", fulfillment_file.club_id, Time.zone.now-7.days, Time.zone.now ])
+		fulfillments = Fulfillment.includes(:member).where( ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? AND ? and fulfillments.status = 'not_processed'", fulfillment_file.club_id, Time.zone.now-7.days, Time.zone.now ])
 
 		fulfillments.each do |fulfillment|
 	    fulfillment_file.fulfillments << fulfillment
