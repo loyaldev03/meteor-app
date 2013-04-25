@@ -77,7 +77,7 @@ class Notifier < ActionMailer::Base
     @quantity = quantity
     attachments["fulfillments_xls_file#{Date.today}.xlsx"] = File.read(fulfillment_xls_file)
     mail :to => Rails.env=='production' ? 'bmiller@naamma.com' : 'clawler@stoneacreinc.com',
-         :subject => "[#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )} - NAAMMA fulfillments report"
+         :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NAAMMA fulfillments report"
   end
 
 end
