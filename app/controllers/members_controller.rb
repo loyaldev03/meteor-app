@@ -144,7 +144,7 @@ class MembersController < ApplicationController
         flash.now[:error] = t('error_messages.airbrake_error_message')
         Airbrake.notify(:error_class => "Member:cancel", :error_message => e, :parameters => { :member => @current_member.inspect })
       end
-    end    
+    end
   end
 
   def blacklist

@@ -290,7 +290,7 @@ class Member < ActiveRecord::Base
 
   # Returns true if members is lapsed.
   def can_be_canceled?
-    !self.lapsed? and !self.cancel_date
+    !self.lapsed? 
   end
 
   # Returns true if member is applied. 
@@ -785,12 +785,16 @@ class Member < ActiveRecord::Base
   def cancel!(cancel_date, message, current_agent = nil)
     unless message.blank?
       if cancel_date.to_date >= Time.zone.now.to_date
-        if can_be_canceled?
-          self.current_membership.update_attribute :cancel_date, cancel_date
-          answer = { :message => "Member cancellation scheduled to #{cancel_date} - Reason: #{message}", :code => Settings.error_codes.success }
-          Auditory.audit(current_agent, self, answer[:message], self, Settings.operation_types.future_cancel)
+        if self.cancel_date == cancel_date
+          answer = { :message => "Cancel date is already set to that date", :code => Settings.error_codes.wrong_data }
         else
-          answer = { :message => "Member is not in cancelable status or it already has cancel date set.", :code => Settings.error_codes.cancel_date_blank }
+          if can_be_canceled?
+            self.current_membership.update_attribute :cancel_date, cancel_date
+            answer = { :message => "Member cancellation scheduled to #{cancel_date} - Reason: #{message}", :code => Settings.error_codes.success }
+            Auditory.audit(current_agent, self, answer[:message], self, Settings.operation_types.future_cancel)
+          else
+            answer = { :message => "Member is not in cancelable status or it already has cancel date set.", :code => Settings.error_codes.cancel_date_blank }
+          end
         end
       else
         answer = { :message => "Cancellation date cannot be less or equal than today.", :code => Settings.error_codes.wrong_data }
