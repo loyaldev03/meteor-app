@@ -1492,6 +1492,18 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @response.body.include?("Reason missing. Please, make sure to provide a reason for this cancelation.")
   end
 
+  test "Should cancel member even if the cancel date is the same as today" do
+    setup_enviroment
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now, :format => :only_date)    
+
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "" )
+      assert_response :success
+    end
+  end
 
   test "Should not cancel member when cancel date is in wrong format" do
     setup_enviroment

@@ -793,7 +793,7 @@ class Member < ActiveRecord::Base
             answer = { :message => "Member cancellation scheduled to #{cancel_date} - Reason: #{message}", :code => Settings.error_codes.success }
             Auditory.audit(current_agent, self, answer[:message], self, Settings.operation_types.future_cancel)
           else
-            answer = { :message => "Member is not in cancelable status or it already has cancel date set.", :code => Settings.error_codes.cancel_date_blank }
+            answer = { :message => "Member is not in cancelable status.", :code => Settings.error_codes.cancel_date_blank }
           end
         end
       else
