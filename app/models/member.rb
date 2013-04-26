@@ -676,9 +676,9 @@ class Member < ActiveRecord::Base
     end
   end
 
-  # Adds club cash when membership billing is success.
+  # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing")
-    if terms_of_membership.yearly? or (terms_of_membership.monthly? and current_membership.quota%12 == 0)
+    if current_membership.quota%12==0 and current_membership.quota!=12
       amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
       self.add_club_cash(nil, amount, message)
       if club_cash_transactions_enabled

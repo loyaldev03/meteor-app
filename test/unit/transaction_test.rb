@@ -132,7 +132,7 @@ class TransactionTest < ActiveSupport::TestCase
         assert_equal member.bill_date, member.next_retry_bill_date
         assert_equal member.quota, time+1
         assert_equal member.recycled_times, 0
-        if (member.current_membership.quota%12 == 0)
+        if (member.current_membership.quota%12 == 0 and member.current_membership.quota != 12)
           assert_equal member.club_cash_amount, club_cash+@terms_of_membership.club_cash_amount
           club_cash = member.club_cash_amount
         end  
@@ -354,7 +354,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
     member = enroll_member(@tom, 0, true)
     
-    assert_difference("Operation.count",4) do  #  communictaion | renewal schedule NBD | add club cash | billing
+    assert_difference("Operation.count",3) do  #  communictaion | renewal schedule NBD | billing
       assert_difference("Transaction.count") do
         member.bill_membership
       end
