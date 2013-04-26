@@ -126,7 +126,7 @@ class Member < ActiveRecord::Base
     after_transition [ :none, :lapsed ] => # enroll and reactivation
                         :provisional, :do => 'schedule_first_membership(true)'
     after_transition [ :provisional, :active ] => 
-                        :provisional, :do => 'schedule_first_membership(true, true)' # save the sale
+                        :provisional, :do => 'schedule_first_membership(true, true, true)' # save the sale
     after_transition :applied => 
                         :provisional, :do => 'schedule_first_membership(false)'
     ###### <<<<<<========
@@ -213,8 +213,10 @@ class Member < ActiveRecord::Base
   end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
-  def schedule_first_membership(set_join_date, skip_send_fulfillment = false)
+  def schedule_first_membership(set_join_date, skip_send_fulfillment = false, skip_add_club_cash = false)
     send_fulfillment unless skip_send_fulfillment
+    add_club_cash(nil,terms_of_membership.club_cash_amount, 'club cash on enroll') unless skip_add_club_cash
+
     membership = current_membership
     membership.join_date = Time.zone.now if set_join_date
     membership.save
@@ -676,13 +678,15 @@ class Member < ActiveRecord::Base
 
   # Adds club cash when membership billing is success.
   def assign_club_cash(message = "Adding club cash after billing")
-    amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
-    self.add_club_cash(nil, amount, message)
-    if club_cash_transactions_enabled
-      if self.club_cash_expire_date.nil? # first club cash assignment
-        self.club_cash_expire_date = join_date + 1.year
+    if terms_of_membership.yearly? or (terms_of_membership.monthly? and current_membership.quota%12 == 0)
+      amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
+      self.add_club_cash(nil, amount, message)
+      if club_cash_transactions_enabled
+        if self.club_cash_expire_date.nil? # first club cash assignment
+          self.club_cash_expire_date = join_date + 1.year
+        end
+        self.save(:validate => false)
       end
-      self.save(:validate => false)
     end
   rescue Exception => e
     # refs #21133

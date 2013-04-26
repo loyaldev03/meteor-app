@@ -107,12 +107,14 @@ class Api::MembersControllerTest < ActionController::TestCase
     @current_agent = @admin_user
     active_merchant_stubs
     assert_difference('Membership.count')do
-      assert_difference('EnrollmentInfo.count')do
-        assert_difference('Transaction.count')do
-          assert_difference('MemberPreference.count',@preferences.size) do 
-            assert_difference('Member.count') do
-              generate_post_message
-              assert_response :success
+      assert_difference('ClubCashTransaction.count')do
+        assert_difference('EnrollmentInfo.count')do
+          assert_difference('Transaction.count')do
+            assert_difference('MemberPreference.count',@preferences.size) do 
+              assert_difference('Member.count') do
+                generate_post_message
+                assert_response :success
+              end
             end
           end
         end
@@ -122,7 +124,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     membership = Membership.last
     enrollment_info = EnrollmentInfo.last
     assert_equal(enrollment_info.membership_id, membership.id)
-
+    assert_equal(saved_member.club_cash_amount, @terms_of_membership.club_cash_amount)
     transaction = Transaction.last
     assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
   end
@@ -846,7 +848,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
 
     active_merchant_stubs_store(@credit_card.number)
-    assert_difference('Operation.count',1) do
+    assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',1) do
         generate_post_message
         assert_response :success
@@ -1572,6 +1574,4 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member.reload
     assert_equal I18n.l(@member.current_membership.cancel_date, :format => :only_date), cancel_date
   end
-
-
 end
