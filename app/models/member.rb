@@ -126,7 +126,7 @@ class Member < ActiveRecord::Base
     after_transition [ :none, :lapsed ] => # enroll and reactivation
                         :provisional, :do => 'schedule_first_membership(true)'
     after_transition [ :provisional, :active ] => 
-                        :provisional, :do => 'schedule_first_membership(true, true)' # save the sale
+                        :provisional, :do => 'schedule_first_membership(true, true, true)' # save the sale
     after_transition :applied => 
                         :provisional, :do => 'schedule_first_membership(false)'
     ###### <<<<<<========
@@ -213,17 +213,23 @@ class Member < ActiveRecord::Base
   end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
-  def schedule_first_membership(set_join_date, skip_send_fulfillment = false)
+  def schedule_first_membership(set_join_date, skip_send_fulfillment = false, nbd_update_for_sts = false)
     send_fulfillment unless skip_send_fulfillment
-    membership = current_membership
-    membership.join_date = Time.zone.now if set_join_date
-    membership.save
-    if terms_of_membership.monthly?
-      self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
-      self.next_retry_bill_date = self.bill_date
+    if set_join_date
+      current_membership.update_attribute :join_date, Time.zone.now
+    end
+    if nbd_update_for_sts
+      if terms_of_membership.monthly? # we need this if to avoid Bug #27211
+        self.bill_date = self.next_retry_bill_date
+      end
     else
-      self.bill_date = membership.join_date
-      self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
+      if terms_of_membership.monthly?
+        self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
+        self.next_retry_bill_date = self.bill_date
+      else
+        self.bill_date = membership.join_date
+        self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
+      end
     end
     self.save(:validate => false)
   end
