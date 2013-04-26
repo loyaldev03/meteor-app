@@ -334,7 +334,6 @@ prototype:
 staging:
   <<: *defaults
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
-  email_to_send_product_list: 'ddanch@stoneacreinc.com,tbrady@stoneacreinc.com'
 
 demo:
   <<: *defaults

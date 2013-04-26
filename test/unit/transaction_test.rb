@@ -65,7 +65,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Enrollment without approval" do
     active_merchant_stubs
-    assert_difference('Operation.count',1) do
+    assert_difference('Operation.count',2) do   #Enroll and club cash operations.
       assert_difference('Fulfillment.count') do
         member = enroll_member(@terms_of_membership)
         assert_not_nil member.next_retry_bill_date, "NBD should not be nil"
@@ -122,6 +122,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
 
     next_month = Time.zone.now + member.terms_of_membership.provisional_days.days
+    club_cash = @terms_of_membership.club_cash_amount
     1.upto(24) do |time|
       Timecop.travel(next_month + time.month) do
         Member.bill_all_members_up_today
@@ -131,6 +132,10 @@ class TransactionTest < ActiveSupport::TestCase
         assert_equal member.bill_date, member.next_retry_bill_date
         assert_equal member.quota, time+1
         assert_equal member.recycled_times, 0
+        if (member.current_membership.quota%12 == 0 and member.current_membership.quota != 12)
+          assert_equal member.club_cash_amount, club_cash+@terms_of_membership.club_cash_amount
+          club_cash = member.club_cash_amount
+        end  
       end
     end
   end
@@ -335,7 +340,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
     member = enroll_member(@tom, 0, true)
 
-    assert_difference("Operation.count",4) do  # communictaion | renewal schedule NBD | add club cash | billing
+    assert_difference("Operation.count",3) do  # communictaion | renewal schedule NBD | billing
       assert_difference("Transaction.count") do
         member.bill_membership
       end
@@ -349,11 +354,12 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
     member = enroll_member(@tom, 0, true)
     
-    assert_difference("Operation.count",4) do  #  communictaion | renewal schedule NBD | add club cash | billing
+    assert_difference("Operation.count",3) do  #  communictaion | renewal schedule NBD | billing
       assert_difference("Transaction.count") do
         member.bill_membership
       end
     end
     assert_equal member.status, "active"
   end
+
 end
