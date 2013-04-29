@@ -139,7 +139,6 @@ en:
         refund_amount_help: 'Amount to refund'
         transaction_types: 
           sale: Sale
-          event_billing: event_billing
           refund: Credit
           credit: Credit
           void: Credit
