@@ -10,6 +10,10 @@ class MembersControllerTest < ActionController::TestCase
     sign_in @agent
   end
 
+  def generate_post_bill_event(amount, description)
+    post :bill_event, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id, amount: amount, description: description
+  end
+
   test "Change Next Bill Date for today" do
   	correct_date = @saved_member.next_retry_bill_date
 		post :change_next_bill_date, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id, next_bill_date: Time.zone.now
@@ -48,20 +52,24 @@ class MembersControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['admin', 'supervisor'].each do |role|
       @agent.update_attribute :roles, [role]
-      post :bill_event, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id, amount: 200, description: "testing bill."
+        generate_post_bill_event(200, "testing billing event")
       assert_response :success
     end
   end
 
   test "should not bill an event" do
     club = FactoryGirl.create(:simple_club_with_gateway)
-    club_role = ClubRole.new :club_id => club.id
-    club_role.agent_id = @agent.id
     ['representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
       @agent.update_attribute :roles, [role]
-      post :bill_event, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id, amount: 200, description: "testing bill."
+      generate_post_bill_event(200, "testing billing event")
       assert_response :unauthorized
     end
   end
-
+  
+  test "billing event with negative amount" do
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    generate_post_bill_event(-100, "testing billing event")
+    assert_response :success
+    assert @response.body.include?("Amount must be greater than 0.")
+  end
 end
