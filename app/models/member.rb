@@ -452,7 +452,7 @@ class Member < ActiveRecord::Base
           answer = { :message => message, :code => Settings.error_codes.success }
           Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing)
         else
-          answer = { :message => trans.response_result, :code => Settings.error_codes.could_not_event_bill }
+          answer = { :message => trans.response_result, :code => Settings.error_codes.no_reccurent_billing_error }
           Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing_with_error)
         end
       else
@@ -466,7 +466,7 @@ class Member < ActiveRecord::Base
     answer
   rescue Exception => e
     Airbrake.notify(:error_class => "Billing:event_billing", :error_message => e, :parameters => { :member => self.inspect })
-    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.could_not_event_bill }
+    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.no_reccurent_billing_error }
   end
 
   def error_to_s(delimiter = "\n")
