@@ -83,7 +83,7 @@ class Transaction < ActiveRecord::Base
   end
 
   def can_be_refunded?
-    [ 'sale','event_billing' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted? and self.success?
+    [ 'sale' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted? and self.success?
   end
 
   def process
