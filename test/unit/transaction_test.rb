@@ -470,7 +470,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     assert_equal(operation.description, "Member billed successfully $#{amount} Transaction id: #{transaction.id}. Reason: testing event")
     assert_equal(operation.operation_type, Settings.operation_types.event_billing)
-    assert_equal(transaction.full_label, "event_billing : This transaction has been approved. Reason: testing event")
+    assert_equal(transaction.full_label, "Sale : This transaction has been approved. Reason: testing event")
     assert transaction.success?
 
     answer = Transaction.refund(amount, transaction)

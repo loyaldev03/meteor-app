@@ -443,7 +443,7 @@ class Member < ActiveRecord::Base
     else
       if can_bill_membership?
         trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
-        trans.transaction_type = "event_billing"
+        trans.transaction_type = "sale"
         trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
         answer = trans.process
         if trans.success?
