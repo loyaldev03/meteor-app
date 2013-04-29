@@ -24,4 +24,12 @@ FactoryGirl.define do
     token "c25ccfecae10384698a44360444dead6"
   end
 
+  factory :credit_card_american_express_litle, class: CreditCard do
+    active true
+    expire_month { (Date.today + 2.month).month }
+    expire_year { (Date.today + 2.year).year }
+    number "340504323632976"
+    token '1111222233334444' # litle always use the same token on dev site
+  end
+
 end

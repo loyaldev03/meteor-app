@@ -53,13 +53,6 @@ class LitleTransaction < Transaction
     def load_gateway(recurrent = false)
       @login_data = { :login => login, :password => password, :merchant_key => merchant_key, :merchant_id => "" }
       @gateway = ActiveMerchant::Billing::LitleGateway.new(@login_data)
-      # @options.merge!({
-      #   :report_group => report_group,
-      #   :custom_billing => {
-      #     :descriptor => descriptor_name,
-      #     :phone => descriptor_phone
-      #   }
-      # })
     end
 
 end

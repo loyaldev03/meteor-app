@@ -446,7 +446,7 @@ class Member < ActiveRecord::Base
     
     # credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
     credit_card = CreditCard.new credit_card_params
-    credit_card.get_token(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], cc_blank)
+    credit_card.get_token(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], member_params[:email], cc_blank)
 
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
@@ -1055,7 +1055,7 @@ def self.sync_members_to_pardot
     answer = { :message => "Credit card valid", :code => Settings.error_codes.success}
     family_memberships_allowed = tom.club.family_memberships_allowed
     new_credit_card = CreditCard.new(:number => number, :expire_month => new_month, :expire_year => new_year)
-    new_credit_card.get_token(tom.payment_gateway_configuration, first_name, last_name)
+    new_credit_card.get_token(tom.payment_gateway_configuration, first_name, last_name, email)
     credit_cards = new_credit_card.token.nil? ? [] : CreditCard.joins(:member).where(:token => new_credit_card.token, :members => { :club_id => club.id } )
 
     if credit_cards.empty? or allow_cc_blank

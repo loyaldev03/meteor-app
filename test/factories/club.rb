@@ -32,6 +32,28 @@ FactoryGirl.define do
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end  
 
+  factory :simple_club_with_litle_gateway, class: Club do
+    sequence(:name) {|n| "simple_club_with_litle_gateway#{n}" }
+    description "My description"
+    cs_phone_number "123 456 7891"
+    billing_enable true
+    time_zone { TZInfo::Timezone.all.sample.name }
+    family_memberships_allowed false
+    association :partner
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:litle_payment_gateway_configuration) }
+  end  
+
+  factory :simple_club_with_authorize_net_gateway, class: Club do
+    sequence(:name) {|n| "simple_club_with_authorize_net_gateway#{n}" }
+    description "My description"
+    cs_phone_number "123 456 7891"
+    billing_enable true
+    time_zone { TZInfo::Timezone.all.sample.name }
+    family_memberships_allowed false
+    association :partner
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:authorize_net_payment_gateway_configuration) }
+  end  
+
   factory :simple_club_with_gateway_with_family, class: Club do
     sequence(:name) {|n| "simple_club_with_gateway_with_family#{n}" }
     description "My description"

@@ -119,12 +119,18 @@ class Transaction < ActiveRecord::Base
     gateway == "litle"
   end
 
+  def authorize_net?
+    gateway == "authorize_net"
+  end
+
   # answer credit card token
-  def self.store!(am_credit_card, pgc)
+  def self.store!(am_credit_card, pgc, email)
     if pgc.mes?
       MerchantESolutionsTransaction.store!(am_credit_card, pgc)
     elsif pgc.litle?
       LitleTransaction.store!(am_credit_card, pgc)
+    elsif pgc.authorize_net?
+      AuthorizeNetTransaction.store!(am_credit_card, pgc, email)
     end
   end
 
@@ -134,6 +140,8 @@ class Transaction < ActiveRecord::Base
       MerchantESolutionsTransaction.new
     when 'litle'
       LitleTransaction.new
+    when 'authorize_net'
+      AuthorizeNetTransaction.new
     end
   end
 

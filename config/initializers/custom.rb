@@ -10,6 +10,9 @@ ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device.sync = true
 ActiveMerchant::Billing::LitleGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_litle.log", "a+")  
 ActiveMerchant::Billing::LitleGateway.wiredump_device.sync = true
 
+ActiveMerchant::Billing::AuthorizeNetCimGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_auth_net.log", "a+")  
+ActiveMerchant::Billing::AuthorizeNetCimGateway.wiredump_device.sync = true
+
 
 ActiveRecord::Batches.send(:include, CleanFindInBatches)
 

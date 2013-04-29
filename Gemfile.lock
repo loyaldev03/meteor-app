@@ -15,6 +15,7 @@ GIT
 GIT
   remote: git://github.com/stoneacre/active_merchant
   revision: b02f7b646ead74c772f82441aaa842b5c9e0adf3
+  branch: i26130-authorize_net_cim
   specs:
     activemerchant (1.32.0)
       active_utils (>= 1.0.2)

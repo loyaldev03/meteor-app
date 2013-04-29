@@ -103,6 +103,5 @@ group :test do
   gem "timecop"
 end
 
-gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant"
-
+gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant", :branch => 'i26130-authorize_net_cim'
 gem 'LitleOnline'
