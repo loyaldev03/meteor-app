@@ -124,13 +124,13 @@ class Transaction < ActiveRecord::Base
   end
 
   # answer credit card token
-  def self.store!(am_credit_card, pgc, email)
+  def self.store!(am_credit_card, pgc, member)
     if pgc.mes?
       MerchantESolutionsTransaction.store!(am_credit_card, pgc)
     elsif pgc.litle?
       LitleTransaction.store!(am_credit_card, pgc)
     elsif pgc.authorize_net?
-      AuthorizeNetTransaction.store!(am_credit_card, pgc, email)
+      AuthorizeNetTransaction.store!(am_credit_card, pgc, member)
     end
   end
 

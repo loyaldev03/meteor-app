@@ -90,12 +90,12 @@ class CreditCard < ActiveRecord::Base
     Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member, Settings.operation_types.credit_card_activated)
   end
 
-  def get_token(pgc, first_name, last_name, email, allow_cc_blank = false)
-    am = CreditCard.am_card(number, expire_month, expire_year, first_name || member.first_name, last_name || member.last_name)
+  def get_token(pgc, pmember, allow_cc_blank = false)
+    am = CreditCard.am_card(number, expire_month, expire_year, pmember.first_name || member.first_name, pmember.last_name || member.last_name)
     if am.valid?
       self.cc_type = am.brand
       begin
-        self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration, email || member.email)
+        self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration, pmember)
       rescue Exception => e
         logger.error e.inspect
         self.errors[:number] << I18n.t('error_messages.get_token_mes_error')
@@ -108,6 +108,7 @@ class CreditCard < ActiveRecord::Base
       self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
       self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
     end
+    self.token
   end
   
   def update_expire(year, month, current_agent = nil)
