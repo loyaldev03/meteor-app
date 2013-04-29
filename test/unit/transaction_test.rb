@@ -79,6 +79,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "controlled refund (refund completely a transaction)" do
     active_member = create_active_member(@terms_of_membership)
     amount = @terms_of_membership.installment_amount
+    active_member.update_attribute :next_retry_bill_date, Time.zone.now
     answer = active_member.bill_membership
     active_member.reload
     assert_equal active_member.status, 'active'
@@ -95,7 +96,6 @@ class TransactionTest < ActiveSupport::TestCase
       end
     end
   end
-
 
   test "Monthly member billed 24 months" do 
     active_merchant_stubs
@@ -455,5 +455,28 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal member.bill_date, nbd 
       assert_equal member.next_retry_bill_date, nbd 
     end
+  end
+
+  test "Should event bill a member, and also refund it." do
+    member = enroll_member(@terms_of_membership, 0, true)
+    amount = 200
+    assert_difference("Transaction.count") do
+      assert_difference("Operation.count") do
+        member.no_recurrent_billing(amount,"testing event")
+      end
+    end
+    operation = Operation.last
+    transaction = Transaction.last
+
+    assert_equal(operation.description, "Member billed successfully $#{amount} Transaction id: #{transaction.id}. Reason: testing event")
+    assert_equal(operation.operation_type, Settings.operation_types.no_recurrent_billing)
+    assert_equal(transaction.full_label, "Sale : This transaction has been approved. Reason: testing event")
+    assert transaction.success?
+
+    answer = Transaction.refund(amount, transaction)
+    assert_equal answer[:code], Settings.error_codes.success, answer[:message]
+    transaction.reload
+    assert_equal transaction.refunded_amount, amount
+    assert_equal transaction.amount_available_to_refund, 0.0
   end
 end

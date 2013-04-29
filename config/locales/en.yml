@@ -77,6 +77,7 @@ en:
     create_csv_file: 'Create CSV File'
     create_xls_file: 'Create XLS File'
     export_all_to_xls: 'Export all to XLS'
+    no_recurrent_billing: 'Bill no recurrent amount'
   admin:
     agents:
       index:
