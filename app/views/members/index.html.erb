@@ -175,6 +175,22 @@
                       </td>
                     </tr>
                   <% end %>
+                  </tr>
+                  <tr>
+                    <td> <%= t('activerecord.attributes.member.bill_date') %> </td>
+                    <td>
+                      <table>
+                        <tr>
+                          <td> <%= t('activerecord.attributes.member.bill_date_from') %> </td>
+                          <td> <%= text_field :member, :billing_date_start, :class => 'text-field   datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:billing_date_start] if params[:member]) %> </td>
+                        </tr>
+                        <tr>
+                          <td> <%= t('activerecord.attributes.member.bill_date_to') %> </td>
+                          <td> <%= text_field :member, :billing_date_end, :class => 'text-field   datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:billing_date_end] if params[:member]) %> </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
                 </table>
               </td>
             </tr>
