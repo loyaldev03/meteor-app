@@ -438,6 +438,8 @@ class Member < ActiveRecord::Base
   def bill_event(amount, description)
     if amount.blank? or description.blank?
       answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
+    elsif amount.to_f <= 0.0
+      answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
     else
       if can_bill_membership?
         trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
