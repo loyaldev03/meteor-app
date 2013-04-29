@@ -435,6 +435,40 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def no_recurrent_billing(amount, description)
+    if amount.blank? or description.blank?
+      answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
+    elsif amount.to_f <= 0.0
+      answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
+    else
+      if can_bill_membership?
+        trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
+        trans.transaction_type = "sale"
+        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
+        answer = trans.process
+        if trans.success?
+          message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
+          trans.update_attribute :response_result, trans.response_result+". Reason: #{description}"
+          answer = { :message => message, :code => Settings.error_codes.success }
+          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing)
+        else
+          answer = { :message => trans.response_result, :code => Settings.error_codes.no_reccurent_billing_error }
+          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing_with_error)
+        end
+      else
+        if not self.club.billing_enable
+          answer = { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
+        else
+          answer = { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+        end
+      end
+    end
+    answer
+  rescue Exception => e
+    Airbrake.notify(:error_class => "Billing:event_billing", :error_message => e, :parameters => { :member => self.inspect })
+    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.no_reccurent_billing_error }
+  end
+
   def error_to_s(delimiter = "\n")
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end
