@@ -1,6 +1,6 @@
 <%= render :partial => "shared/member_information" %>
 
-<%= form_tag(member_bill_event_path) do %>
+<%= form_tag(member_no_recurrent_billing_path) do %>
 	<table class="table table-bordered" > 
 		<tr>
 			<th>
@@ -16,7 +16,7 @@
 		</tr>
 		<tr>
 			<th>
-        <%= submit_tag t('buttons.bill_extra_amount'), :class => 'btn btn-primary' %>
+        <%= submit_tag t('buttons.no_recurrent_billing'), :class => 'btn btn-primary' %>
         <%= link_to t('buttons.cancel'), show_member_path, :class => 'btn' %> 
 			</th>
 		</tr>

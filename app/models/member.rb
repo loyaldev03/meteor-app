@@ -435,7 +435,7 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def bill_event(amount, description)
+  def no_recurrent_billing(amount, description)
     if amount.blank? or description.blank?
       answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
     elsif amount.to_f <= 0.0
@@ -448,11 +448,12 @@ class Member < ActiveRecord::Base
         answer = trans.process
         if trans.success?
           message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
-          transaction = Transaction.find(trans.id)
-          transaction.update_attribute :response_result, transaction.response_result+". Reason: #{description}"
+          trans.update_attribute :response_result, trans.response_result+". Reason: #{description}"
           answer = { :message => message, :code => Settings.error_codes.success }
+          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing)
         else
           answer = { :message => trans.response_result, :code => Settings.error_codes.could_not_event_bill }
+          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing_with_error)
         end
       else
         if not self.club.billing_enable
@@ -462,7 +463,6 @@ class Member < ActiveRecord::Base
         end
       end
     end
-    Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.event_billing)
     answer
   rescue Exception => e
     Airbrake.notify(:error_class => "Billing:event_billing", :error_message => e, :parameters => { :member => self.inspect })

@@ -462,14 +462,14 @@ class TransactionTest < ActiveSupport::TestCase
     amount = 200
     assert_difference("Transaction.count") do
       assert_difference("Operation.count") do
-        member.bill_event(amount,"testing event")
+        member.no_recurrent_billing(amount,"testing event")
       end
     end
     operation = Operation.last
     transaction = Transaction.last
 
     assert_equal(operation.description, "Member billed successfully $#{amount} Transaction id: #{transaction.id}. Reason: testing event")
-    assert_equal(operation.operation_type, Settings.operation_types.event_billing)
+    assert_equal(operation.operation_type, Settings.operation_types.no_recurrent_billing)
     assert_equal(transaction.full_label, "Sale : This transaction has been approved. Reason: testing event")
     assert transaction.success?
 

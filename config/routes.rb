@@ -62,7 +62,7 @@ SacPlatform::Application.routes.draw do
         match '/add_club_cash' => 'members#add_club_cash', as: 'member_add_club_cash'
         match '/approve' => 'members#approve', as: 'member_approve', :via => [:post]
         match '/reject' => 'members#reject', as: 'member_reject', :via => [:post]  
-        match '/bill_event' => 'members#bill_event', as: 'member_bill_event', :via => [:get, :post]  
+        match '/no_recurrent_billing' => 'members#no_recurrent_billing', as: 'member_no_recurrent_billing', :via => [:get, :post]  
         match '/' => 'members#show', as: 'show_member', :via => [:get, :post]
 
         post '/sync' => 'members#sync', as: 'member_sync'

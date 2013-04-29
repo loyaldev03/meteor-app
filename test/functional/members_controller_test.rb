@@ -11,7 +11,7 @@ class MembersControllerTest < ActionController::TestCase
   end
 
   def generate_post_bill_event(amount, description)
-    post :bill_event, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id, amount: amount, description: description
+    post :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id, amount: amount, description: description
   end
 
   test "Change Next Bill Date for today" do
@@ -32,7 +32,7 @@ class MembersControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['admin', 'supervisor'].each do |role|
       @agent.update_attribute :roles, [role]
-      get :bill_event, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id
+      get :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id
       assert_response :success
     end
   end
@@ -43,7 +43,7 @@ class MembersControllerTest < ActionController::TestCase
     club_role.agent_id = @agent.id
     ['representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
       @agent.update_attribute :roles, [role]
-      get :bill_event, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id
+      get :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id
       assert_response :unauthorized
     end
   end

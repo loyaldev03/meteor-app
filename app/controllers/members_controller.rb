@@ -335,9 +335,9 @@ class MembersController < ApplicationController
     redirect_to show_member_path
   end
 
-  def bill_event
+  def no_recurrent_billing
     if request.post?
-      answer = @current_member.bill_event(params[:amount], params[:description])
+      answer = @current_member.no_recurrent_billing(params[:amount], params[:description])
       if answer[:code] == "000"
         flash[:notice] = answer[:message]
         redirect_to show_member_path

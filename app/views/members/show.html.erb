@@ -98,9 +98,9 @@
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
         <% if @current_member.can_bill_membership? and can? :bill_event, Member %>
-          <%= link_to I18n.t('buttons.bill_extra_amount'), member_bill_event_path, :class => "btn btn-large-w btn-info" %>
+          <%= link_to I18n.t('buttons.no_recurrent_billing'), member_no_recurrent_billing_path, :class => "btn btn-large-w btn-info" %>
         <% else %>
-          <%= link_to I18n.t('buttons.bill_extra_amount'), "#", :class => "btn btn-large-w btn-info", :disabled => 'disabled' %>
+          <%= link_to I18n.t('buttons.no_recurrent_billing'), "#", :class => "btn btn-large-w btn-info", :disabled => 'disabled' %>
         <% end %>
       </div>
     </div>
