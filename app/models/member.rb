@@ -435,6 +435,30 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def bill_event(amount, description)
+    if amount.blank? or description.blank?
+      answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
+    else
+      trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
+      trans.transaction_type = "event_billing"
+      trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
+      answer = trans.process
+      if trans.success?
+        message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
+        transaction = Transaction.find(trans.id)
+        transaction.update_attribute :response_result, transaction.response_result+". Reason: #{description}"
+        answer = { :message => message, :code => Settings.error_codes.success }
+      else
+        answer = { :message => trans.response_result, :code => Settings.error_codes.could_not_event_bill }
+      end
+    end
+    Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.event_billing)
+    answer
+  rescue Exception => e
+    Airbrake.notify(:error_class => "Billing:event_billing", :error_message => e, :parameters => { :member => self.inspect })
+    { :message => I18n.t('error_messages.airbrake_error_message')+"#{e}", :code => Settings.error_codes.could_not_event_bill }
+  end
+
   def error_to_s(delimiter = "\n")
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end

@@ -37,6 +37,7 @@ defaults: &defaults
     membership_billing_without_pgc: 109
     chargeback: 110
     error_on_enrollment_billing: 111
+    event_billing: 112
     #profile
     cancel: 200 
     future_cancel: 201
@@ -172,6 +173,7 @@ defaults: &defaults
     credit_card_blacklisted: '9508'
     credit_card_blank: '9509'
     refund_invalid: '9788'
+    could_not_event_bill: '9883'
     member_club_dont_allow: '9884'
     nothing_to_change_tom: '9885'
     member_status_dont_allow: '9886'

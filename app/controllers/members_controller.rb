@@ -335,6 +335,18 @@ class MembersController < ApplicationController
     redirect_to show_member_path
   end
 
+  def bill_event
+    if request.post?
+      answer = @current_member.bill_event(params[:amount], params[:description])
+      if answer[:code] == "000"
+        flash[:notice] = answer[:message]
+        redirect_to show_member_path
+      else
+        flash.now[:error] = answer[:message]
+      end
+    end
+  end
+
   private 
     def check_permissions
       my_authorize! params[:action].to_sym, Member, @current_club.id

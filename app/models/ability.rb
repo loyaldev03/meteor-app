@@ -73,6 +73,7 @@ class Ability
       cannot :api_cancel, Member
       cannot :api_find_all_by_updated, Member
       cannot :api_find_all_by_created, Member
+      cannot :bill_event, Member
       can :manage, Operation
       can :list, Membership
       can :manage, CreditCard
@@ -134,6 +135,7 @@ class Ability
       cannot :api_change_next_bill_date, Member
       cannot :api_find_all_by_updated, Member
       cannot :api_find_all_by_created, Member
+      cannot :bill_event, Member
       can :manage, Operation
       can :list, Membership
       can :manage, CreditCard
