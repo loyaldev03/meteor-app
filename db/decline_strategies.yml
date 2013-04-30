@@ -8553,3 +8553,85 @@
     limit: "0"
   attributes_cache: {}
 
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: related to redmine issue 27151
+    days: "6"
+    response_code: "005"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "662"
+    gateway: mes
+    limit: "6"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: related to redmine issue 27151
+    days: "6"
+    response_code: "054"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "667"
+    gateway: mes
+    limit: "5"
+  attributes_cache: {}
+
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: related to redmine issue 27151
+    days: "6"
+    response_code: "054"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "663"
+    gateway: mes
+    limit: "5"
+  attributes_cache: {}
+
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: related to redmine issue 27151
+    days: "6"
+    response_code: "051"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "664"
+    gateway: mes
+    limit: "6"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: related to redmine issue 27151
+    days: "5"
+    response_code: "051"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "665"
+    gateway: mes
+    limit: "8"
+  attributes_cache: {}
+
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: related to redmine issue 27151
+    days: "0"
+    response_code: "014"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "666"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+
