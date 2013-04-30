@@ -114,12 +114,12 @@ div.dataTables_filter input {
   background-color: #B0D3E6;
 }
 
-.datepicker_for_search {
-  width: 120px;
+.datepicker_for_search_nbd {
+  width: 80px;
 }
 
 .datepicker_for_search_billed_date{
-  width: 120px;
+  width: 80px;
 }
 
 .btn-large-w {
