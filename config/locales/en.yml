@@ -227,6 +227,9 @@ en:
         last_synced_at: 'Last successful sync'
         last_sync_error: 'Last failed sync'
         status_blacklisted: '- Blisted'
+        billed_date: 'Billed date'
+        billed_date_from: 'From:'
+        billed_date_to: 'To:'
         sync_status_priorities:
           synced: success
           unsynced: warning
