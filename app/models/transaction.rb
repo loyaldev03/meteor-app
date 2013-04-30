@@ -214,7 +214,7 @@ class Transaction < ActiveRecord::Base
     end
 
     def save_custom_response(answer, trans_success=false)
-      self.success= trans_success
+      self.success=trans_success
       self.response=answer
       self.response_code=answer[:code]
       self.response_result=answer[:message]
@@ -236,5 +236,4 @@ class Transaction < ActiveRecord::Base
         { :message=>"Error: " + answer.message, :code=>self.response_code }
       end      
     end  
-
 end
