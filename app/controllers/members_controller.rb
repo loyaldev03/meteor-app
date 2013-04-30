@@ -33,6 +33,8 @@ class MembersController < ApplicationController
                        .with_phone_local_number(params[:member][:phone_local_number])
                        .with_sync_status(params[:member][:sync_status])
                        .with_external_id(params[:member][:external_id])
+                       .with_billed_date_from(params[:member][:billing_date_start])
+                       .with_billed_date_to(params[:member][:billing_date_end])
                        .where(:club_id => @current_club)
                        .needs_approval(params[:member][:needs_approval])
                        .order('members.id')

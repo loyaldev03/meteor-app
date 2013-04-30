@@ -94,22 +94,25 @@ class Member < ActiveRecord::Base
   }
   scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }
   scope :with_id, lambda { |value| where('members.id = ?', value.strip) unless value.blank? }
-  scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
-  scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value.strip) unless value.blank? }
-  scope :with_phone_area_code, lambda { |value| where('phone_area_code = ?', value.strip) unless value.blank? }
-  scope :with_phone_local_number, lambda { |value| where('phone_local_number = ?', value.strip) unless value.blank? }
-  scope :with_first_name_like, lambda { |value| where('first_name like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_last_name_like, lambda { |value| where('last_name like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_address_like, lambda { |value| where('address like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_city_like, lambda { |value| where('city like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_country_like, lambda { |value| where('country like ?', value) unless value.blank? }
-  scope :with_state_like, lambda { |value| where('state like ?', value) unless value.blank? }
-  scope :with_zip, lambda { |value| where('zip like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_email_like, lambda { |value| where('email like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value.strip) unless value.blank? }
-  scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_external_id, lambda{ |value| where("external_id = ?",value) unless value.blank? }
+  scope :with_next_retry_bill_date, lambda { |value| where('members.next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
+  scope :with_phone_country_code, lambda { |value| where('members.phone_country_code = ?', value.strip) unless value.blank? }
+  scope :with_phone_area_code, lambda { |value| where('members.phone_area_code = ?', value.strip) unless value.blank? }
+  scope :with_phone_local_number, lambda { |value| where('members.phone_local_number = ?', value.strip) unless value.blank? }
+  scope :with_first_name_like, lambda { |value| where('members.first_name like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_last_name_like, lambda { |value| where('members.last_name like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_address_like, lambda { |value| where('members.address like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_city_like, lambda { |value| where('members.city like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_country_like, lambda { |value| where('members.country like ?', value) unless value.blank? }
+  scope :with_state_like, lambda { |value| where('members.state like ?', value) unless value.blank? }
+  scope :with_zip, lambda { |value| where('members.zip like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_email_like, lambda { |value| where('members.email like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('credit_cards.last_digits = ?', value.strip) unless value.blank? }
+  scope :with_member_notes, lambda{ |value| joins(:member_notes).where('member_notes.description like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_external_id, lambda{ |value| where("members.external_id = ?",value) unless value.blank? }
   scope :needs_approval, lambda{ |value| where('members.status = ?', 'applied') unless value == '0' }
+  scope :with_billed_date_from, lambda{ |value| joins(:transactions).where('date(transactions.created_at) >= ?', value) unless value.blank? }
+  scope :with_billed_date_to, lambda{ |value| joins(:transactions).where('date(transactions.created_at) <= ?', value) unless value.blank? }
+
 
   state_machine :status, :initial => :none, :action => :save_state do
     ###### member gets applied =====>>>>
