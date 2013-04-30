@@ -94,33 +94,27 @@
                   <tr>
                     <td><%= t('activerecord.attributes.member.city') %></td>
                     <td><%= text_field :member, :city, :class => 'test_field',
-                                     :value => (params[:member][:city] if params[:member]) %>
-                    </td>
+                                     :value => (params[:member][:city] if params[:member]) %> </td>
                   </tr>
                   <tr>
                     <td><%= t('activerecord.attributes.member.country') %></td>
-                    <td>
-                      <%= select_tag('member[country]', options_for_select(Member.supported_countries.map { |cc| [Member.country_name(cc), cc]}),
-                        :prompt => t('buttons.select_country')) %>
-                    </td>
+                    <td> <%= select_tag('member[country]', options_for_select(Member.supported_countries.map { |cc| [Member.country_name(cc), cc]}),
+                        :prompt => t('buttons.select_country')) %> </td>
                   </tr>
                   <tr>
                     <td><%= t('activerecord.attributes.member.state') %></td>
                     <td id="states_td">
-                      <%= render :partial => 'states', :locals => { :selected_state => (params[:member][:state] if params[:member])}%>
-                    </td>
+                      <%= render :partial => 'states', :locals => { :selected_state => (params[:member][:state] if params[:member])}%> </td>
                   </tr>
                   <tr>
                     <td><%= t('activerecord.attributes.member.address') %></td>
                     <td><%= text_field :member, :address, :class => 'test_field',
-                                     :value => (params[:member][:address] if params[:member]) %>
-                    </td>
+                                     :value => (params[:member][:address] if params[:member]) %> </td>
                   </tr>
                   <tr>
                     <td><%= t('activerecord.attributes.member.zip') %></td>
                     <td><%= text_field :member, :zip, :class => 'test_field',
-                                     :value => (params[:member][:zip] if params[:member]) %>
-                    </td>
+                                     :value => (params[:member][:zip] if params[:member]) %></td>
                   </tr>
                 </table>
               </td>
@@ -139,54 +133,42 @@
               <td style="height: 233px;">
                 <table class="hidden_table_border">
                   <tr>
-                    <td><%= t('activerecord.attributes.credit_card.next_bill_date') %></td>
-                    <td>
-                      <%= text_field :member, :next_retry_bill_date, :class => 'text_field datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:next_retry_bill_date] if params[:member]) %> 
-                    </td>
+                    <td> <%= t('activerecord.attributes.credit_card.next_bill_date') %></td>
+                    <td> <%= text_field :member, :next_retry_bill_date, :class => 'text_field datepicker_for_search_nbd', :readonly => 'readonly', :value => (params[:member][:next_retry_bill_date] if params[:member]) %> </td>
                   </tr>
                   <tr>
                     <td>CC <%= t('activerecord.attributes.credit_card.last_digits') %></td>
-                    <td>
-                      <%= text_field :member, :last_digits, :class => 'text_field',
-                                     :value => (params[:member][:last_digits] if params[:member]) %> 
-                    </td>
+                    <td> <%= text_field :member, :last_digits, :class => 'text_field',
+                                     :value => (params[:member][:last_digits] if params[:member]) %> </td>
                   </tr>
                   <tr>
                     <td><%= t('activerecord.attributes.member.member_notes') %></td>
-                    <td>
-                      <%= text_field :member, :notes, :class => 'text_field',
-                                     :value => (params[:member][:notes] if params[:member]) %> 
-                    </td>
+                    <td> <%= text_field :member, :notes, :class => 'text_field',
+                                     :value => (params[:member][:notes] if params[:member]) %> </td>
                   </tr>
                   <tr>
                     <td> <%= t('activerecord.attributes.member.needs_approval') %></td>
-                    <td>
-                      <%= check_box :member, :needs_approval, :checked => (params[:member][:needs_approval] if params[:member]) %> 
-                          
-                    </td>
+                    <td> <%= check_box :member, :needs_approval, :checked => (params[:member][:needs_approval] if params[:member]) %> </td>
                   </tr>
                   <% if @current_club.requires_external_id %>
                     <tr>
                       <td> <%= t('activerecord.attributes.member.external_id') %></td>
-                      <td>
-                        <%= text_field :member, :external_id, :class => 'text-field',
-                                       :value => (params[:member][:external_id] if params[:member]) %> 
-                            
-                      </td>
+                      <td> <%= text_field :member, :external_id, :class => 'text-field',
+                                       :value => (params[:member][:external_id] if params[:member]) %> </td>
                     </tr>
                   <% end %>
                   </tr>
                   <tr>
-                    <td> <%= t('activerecord.attributes.member.bill_date') %> </td>
+                    <td> <%= t('activerecord.attributes.member.billed_date') %> </td>
                     <td>
                       <table>
                         <tr>
-                          <td> <%= t('activerecord.attributes.member.bill_date_from') %> </td>
-                          <td> <%= text_field :member, :billing_date_start, :class => 'text-field   datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:billing_date_start] if params[:member]) %> </td>
+                          <td> <%= t('activerecord.attributes.member.billed_date_from') %> </td>
+                          <td> <%= text_field :member, :billing_date_start, :class => 'text-field datepicker_for_search_billed_date', :readonly => 'readonly', :value => (params[:member][:billing_date_start] if params[:member]) %> </td>
                         </tr>
                         <tr>
-                          <td> <%= t('activerecord.attributes.member.bill_date_to') %> </td>
-                          <td> <%= text_field :member, :billing_date_end, :class => 'text-field   datepicker_for_search', :readonly => 'readonly', :value => (params[:member][:billing_date_end] if params[:member]) %> </td>
+                          <td> <%= t('activerecord.attributes.member.billed_date_to') %> </td>
+                          <td> <%= text_field :member, :billing_date_end, :class => 'text-field datepicker_for_search_billed_date', :readonly => 'readonly', :value => (params[:member][:billing_date_end] if params[:member]) %> </td>
                         </tr>
                       </table>
                     </td>

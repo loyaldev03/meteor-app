@@ -110,8 +110,8 @@ class Member < ActiveRecord::Base
   scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_external_id, lambda{ |value| where("external_id = ?",value) unless value.blank? }
   scope :needs_approval, lambda{ |value| where('members.status = ?', 'applied') unless value == '0' }
-  scope :with_billing_date_from, lambda{ |value| where('next_retry_bill_date >= ?', value) unless value.blank? }
-  scope :with_billing_date_to, lambda{ |value| where('next_retry_bill_date <= ?', value.to_date+1.day) unless value.blank? }
+  scope :with_billed_date_from, lambda{ |value| joins(:transactions).where('date(transactions.created_at) >= ?', value) unless value.blank? }
+  scope :with_billed_date_to, lambda{ |value| joins(:transactions).where('date(transactions.created_at) <= ?', value) unless value.blank? }
 
 
   state_machine :status, :initial => :none, :action => :save_state do

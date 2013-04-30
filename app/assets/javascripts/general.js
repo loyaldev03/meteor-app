@@ -157,7 +157,10 @@ function member_index_functions(){
     return false;
   });
 
-  $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
+  $(".datepicker_for_search_nbd").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
+                                           showOn: "both", buttonImage: "/icon-calendar.png", 
+                                           buttonImageOnly: true});
+  $(".datepicker_for_search_billed_date").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd", 
                                            showOn: "both", buttonImage: "/icon-calendar.png", 
                                            buttonImageOnly: true});
   $('#members .pagination a').on('click', function () {  

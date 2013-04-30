@@ -108,6 +108,10 @@ div.dataTables_filter input {
   width: 120px;
 }
 
+.datepicker_for_search_billed_date{
+  width: 120px;
+}
+
 .btn-large-w {
   width: 160px; 
 }

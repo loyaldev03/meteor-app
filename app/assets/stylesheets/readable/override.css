@@ -105,9 +105,11 @@ div.dataTables_filter input {
   color: #FDFDFA;
 }
 
-  
-
 .datepicker_for_search {
+  width: 120px;
+}
+
+.datepicker_for_search_billed_date{
   width: 120px;
 }
 
