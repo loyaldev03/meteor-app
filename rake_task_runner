@@ -20,7 +20,7 @@ cd /var/www/$2/current && rake members:cancel  >> $LOGFILE 2>&1
 cd /var/www/$2/current && rake members:process_sync  >> $LOGFILE 2>&1
 
 if [ "$1" == "production" ]; then
-#  cd /var/www/$2/current && rake mes:chargeback_report  >> $LOGFILE 2>&1 
+  cd /var/www/$2/current && rake mes:chargeback_report  >> $LOGFILE 2>&1 
   cd /var/www/$2/current && rake mes:account_updater_process_answers  >> $LOGFILE 2>&1
   cd /var/www/$2/current && rake mes:account_updater_send_file_to_process  >> $LOGFILE 2>&1 
 fi

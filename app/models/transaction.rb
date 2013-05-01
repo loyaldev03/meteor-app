@@ -143,7 +143,6 @@ class Transaction < ActiveRecord::Base
       amount = amount.to_f
       # Lock transaction, so no one can use this record while we refund this member.
       sale_transaction = Transaction.find sale_transaction_id, :lock => true
-      trans = Transaction.new
       if amount <= 0.0
         return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
       elsif sale_transaction.amount_available_to_refund < amount
