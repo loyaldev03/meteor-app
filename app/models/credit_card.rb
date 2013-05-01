@@ -95,7 +95,7 @@ class CreditCard < ActiveRecord::Base
     if am.valid?
       self.cc_type = am.brand
       begin
-        self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration, pmember)
+        self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
       rescue Exception => e
         logger.error e.inspect
         self.errors[:number] << I18n.t('error_messages.get_token_mes_error')
