@@ -103,5 +103,11 @@ group :test do
   gem "timecop"
 end
 
-gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant", :branch => 'i26130-authorize_net_cim'
+gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant"
 gem 'LitleOnline'
+
+# TODO => remove the following requires after tokenization is implemented
+### only for Auth.Net  without tokenization.
+gem 'encryptor'
+###################
+

@@ -393,6 +393,7 @@ DEPENDENCIES
   delayed_job_active_record
   devise (= 2.0.4)
   easy_roles
+  encryptor
   factory_girl_rails
   faker
   faraday (= 0.8.5)
