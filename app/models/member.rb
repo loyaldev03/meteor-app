@@ -1008,18 +1008,43 @@ def self.sync_members_to_pardot
 
   def self.process_sync 
     base = Member.where("status = 'lapsed' AND api_id != ''")
+    tz = Time.zone.now
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members lapsed and api_id not null, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each do |member|
-        member.api_member.destroy!
-        if member.last_sync_error.include?("There is no user with ID")
-          member.update_attribute :api_id, nil
+        api_m = member.api_member
+        unless api_m.nil?
+          api_m.destroy!
+          Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
         end
-        Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
       end
     end
+    Rails.logger.info "    ... took #{Time.zone.now - tz}"
+
+    base = Member.where('last_sync_error like "There is no user with ID"')
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members with error sync related to wrong api_id, processing #{base.count} members"
+    tz = Time.zone.now
+    index = 0
+    base.each do |member|
+      index = index+1
+      Rails.logger.info "  *[#{index}] processing member ##{member.id}"
+      member.update_attribute :api_id, nil
+      unless member.lapsed?
+        api_m = member.api_member
+        unless api_m.nil?
+          if api_m.save!(force: true)
+            unless member.last_sync_error_at
+              Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
+            end
+          end
+        end
+      end
+    end
+    Rails.logger.info "    ... took #{Time.zone.now - tz}"
+
     base = Member.where("sync_status IN ('with_error', 'not_synced') and status != 'lapsed' ").limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{base.count} members"
+    tz = Time.zone.now
     index = 0
     base.each do |member|
       index = index+1
@@ -1033,6 +1058,7 @@ def self.sync_members_to_pardot
         end
       end
     end       
+    Rails.logger.info "    ... took #{Time.zone.now - tz}"
   end
 
   def self.process_email_sync_error
