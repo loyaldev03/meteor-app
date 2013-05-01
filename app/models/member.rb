@@ -34,7 +34,6 @@ class Member < ActiveRecord::Base
       :gender, :type_of_phone_number, :preferences
 
   serialize :preferences, JSON
-  serialize :additional_data, JSON
 
   before_create :record_date
   before_save :wrong_address_logic
@@ -446,7 +445,6 @@ class Member < ActiveRecord::Base
     end
     
     member = Member.find_by_email_and_club_id(member_params[:email], club.id)
-
     # credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
     credit_card = CreditCard.new credit_card_params
 
@@ -468,6 +466,7 @@ class Member < ActiveRecord::Base
       member.skip_api_sync! if member.api_id.present? || skip_api_sync
       member.update_member_data_by_params member_params
       # first update first name and last name, then validate credti card
+      credit_card.get_token(tom.payment_gateway_configuration, member, cc_blank)
     end
 
     answer = member.validate_if_credit_card_already_exist(tom, credit_card_params[:number], credit_card_params[:expire_year], credit_card_params[:expire_month], true, cc_blank, current_agent)

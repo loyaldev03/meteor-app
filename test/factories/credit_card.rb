@@ -32,4 +32,11 @@ FactoryGirl.define do
     token '1111222233334444' # litle always use the same token on dev site
   end
 
+  factory :credit_card_american_express_authorize_net, class: CreditCard do
+    active true
+    expire_month { (Date.today + 2.month).month }
+    expire_year { (Date.today + 2.year).year }
+    number "370000000000002" # credit card number is provided by Auth.Net
+  end
+
 end

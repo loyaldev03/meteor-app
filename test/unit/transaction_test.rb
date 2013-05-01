@@ -424,11 +424,14 @@ class TransactionTest < ActiveSupport::TestCase
   def club_with_authorize_net
     @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
     @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
+    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)
   end
 
   test "Bill membership with Authorize net" do
     club_with_authorize_net
-    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false)
+    require 'ruby-debug'
+    debugger
+    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
     amount = @authorize_net_terms_of_membership.installment_amount
     Timecop.travel(active_member.next_retry_bill_date) do
       answer = active_member.bill_membership
@@ -439,12 +442,12 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Enroll with Authorize net" do
     club_with_authorize_net
-    enroll_member(@authorize_net_terms_of_membership, 23, false)
+    enroll_member(@authorize_net_terms_of_membership, 23, false, @credit_card_authorize_net)
   end
 
   test "Full refund with Authorize net" do
     club_with_authorize_net
-    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false)
+    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
     amount = @authorize_net_terms_of_membership.installment_amount
     Timecop.travel(active_member.next_retry_bill_date) do
       answer = active_member.bill_membership
@@ -461,7 +464,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Partial refund with Authorize net" do
     club_with_authorize_net
-    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false)
+    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
     amount = @authorize_net_terms_of_membership.installment_amount
     Timecop.travel(active_member.next_retry_bill_date) do
       answer = active_member.bill_membership

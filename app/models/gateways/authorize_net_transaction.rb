@@ -7,7 +7,6 @@ class AuthorizeNetTransaction < Transaction
   end
 
   # answer credit card token
-  # AM::Store::Answer => #<ActiveMerchant::Billing::Response:0x000000083fdc40 @params={"litleOnlineResponse"=>{"message"=>"Valid Format", "response"=>"0", "version"=>"8.16", "xmlns"=>"http://www.litle.com/schema", "registerTokenResponse"=>{"customerId"=>"", "id"=>"", "reportGroup"=>"Default Report Group", "litleTxnId"=>"630745122415368266", "litleToken"=>"1111222233334444", "response"=>"000", "responseTime"=>"2013-04-08T16:54:24", "message"=>"Approved"}}}, @message="Approved", @success=true, @test=true, @authorization="1111222233334444", @fraud_review=nil, @avs_result={"code"=>nil, "message"=>nil, "street_match"=>nil, "postal_match"=>nil}, @cvv_result={"code"=>nil, "message"=>nil}>
   def self.store!(am_credit_card, pgc)
     Encryptor.encrypt(am_credit_card.number, :key => Digest::SHA256.hexdigest(SECRET_KEY_FOR_TOKEN))
   end
@@ -19,17 +18,19 @@ class AuthorizeNetTransaction < Transaction
   private
 
     def credit_card_token
-      number = Encryptor.encrypt(self.token, :key => Digest::SHA256.hexdigest(SECRET_KEY_FOR_TOKEN))
+      number = Encryptor.decrypt(self.token, :key => Digest::SHA256.hexdigest(SECRET_KEY_FOR_TOKEN))
       CreditCard.am_card(number, expire_month, expire_year, first_name, last_name)
     end
 
+    # #<ActiveMerchant::Billing::Response:0x000000085d7458 @params={"response_code"=>3, "response_reason_code"=>"6", "response_reason_text"=>"(TESTMODE) The credit card number is invalid.", "avs_result_code"=>"P", "transaction_id"=>"0", "card_code"=>"", "action"=>"AUTH_CAPTURE"}, @message="(TESTMODE) The credit card number is invalid", @success=false, @test=true, @authorization="0", @fraud_review=false, @avs_result={"code"=>"P", "message"=>"Postal code matches, but street address not verified.", "street_match"=>nil, "postal_match"=>"Y"}, @cvv_result={"code"=>nil, "message"=>nil}>
     def save_response(answer)
       self.response = answer
       self.success = answer.success?
+      logger.error answer.inspect
       if answer.params
-        self.response_transaction_id=answer.params['litleOnlineResponse']['litleTxnId']
-        self.response_auth_code=answer.params['auth_code']
-        self.response_code=answer.params['litleOnlineResponse']['response']
+        self.response_transaction_id=answer.params['transaction_id']
+        # self.response_auth_code=answer.params['auth_code']
+        self.response_code=answer.params['response_code']
       end
       self.response_result=answer.message
       save
@@ -37,8 +38,8 @@ class AuthorizeNetTransaction < Transaction
     end
 
     def load_gateway(recurrent = false)
-      @login_data = { :login => login, :password => password, :test => !pgc.production? }
-      @gateway = ActiveMerchant::Billing::AuthorizeNetCimGateway.new @login_data
+      @login_data = { :login => login, :password => password, :test => !production? }
+      @gateway = ActiveMerchant::Billing::AuthorizeNetGateway.new @login_data
     end
 
 end
