@@ -583,7 +583,7 @@ test "Try billing a member with credit card ok, and within a club that allows bi
       setup_member
       @saved_member.club.update_attribute( :billing_enable, false)
       visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-      assert find(:xpath, "//a[@id='no_reurrent_bill_btn' and @disabled='disabled']")
+      assert find(:xpath, "//a[@id='no_recurrent_bill_btn' and @disabled='disabled']")
       click_link_or_button("Bill no recurrent amount")
       assert page.has_selector?('#blacklist_btn')
     end
