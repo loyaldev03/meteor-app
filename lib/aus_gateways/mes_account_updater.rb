@@ -235,7 +235,7 @@ module MesAccountUpdater
           :reason => columns[14], :first_time => columns[15],
           :reason_code => columns[16], :cb_ref_number => columns[17]
         }
-        next if CHARGEBACKS_TO_NOT_PROCESS.include?(args[:reason])
+        next if MesAccountUpdater::CHARGEBACKS_TO_NOT_PROCESS.include?(args[:reason])
         transaction_chargebacked = Transaction.find_by_payment_gateway_configuration_id_and_response_transaction_id gateway.id, args[:trident_transaction_id]
         member = Member.find_by_id_and_club_id(args[:client_reference_number], gateway.club_id)
         begin
