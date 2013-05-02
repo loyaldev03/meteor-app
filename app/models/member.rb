@@ -383,11 +383,11 @@ class Member < ActiveRecord::Base
         prev_membership_id = current_membership.id
         res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
         if res[:code] == Settings.error_codes.success
+          Membership.find(prev_membership_id).cancel_because_of_save_the_sale
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
             "Save the sale from TOM(#{old_tom_id}) to TOM(#{new_tom_id})", self, Settings.operation_types.save_the_sale)
         end
         # update manually this fields because we cant cancel member
-        Membership.find(prev_membership_id).cancel_because_of_save_the_sale
         res
       end
     else

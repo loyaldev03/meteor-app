@@ -14,7 +14,6 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should create a member" do
-    member = FactoryGirl.build(:member)
     assert !member.save, member.errors.inspect
     member.club = @terms_of_membership_with_gateway.club
     Delayed::Worker.delay_jobs = true
@@ -378,5 +377,19 @@ class MemberTest < ActiveSupport::TestCase
     member = FactoryGirl.create(:member_with_api, :club_id => @club.id)
 
     answer = member.add_club_cash(agent, 12385243.2)
+  end
+
+  test "save the sale should not update membership if it failed" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @saved_member = create_active_member(@terms_of_membership, :provisional_member_with_cc)
+    answer = {:code => 500, message => "Error on sts"}
+    Member.any_instance.stubs(:enroll).returns(answer)
+
+    @saved_member.save_the_sale @terms_of_membership2.id
+    @saved_member.reload
+      
+    assert_equal @saved_member.current_membership.status, @saved_member.status
+    assert_equal @saved_member.current_membership.cancel_date, nil
   end
 end
