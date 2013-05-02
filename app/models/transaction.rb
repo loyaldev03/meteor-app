@@ -67,7 +67,7 @@ class Transaction < ActiveRecord::Base
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
-    self.membership = membership || member.current_membership
+    self.membership_id = membership.nil? ? member.current_membership.id : membership.id 
     self.save
     @options = {
       :order_id => invoice_number,
@@ -156,7 +156,7 @@ class Transaction < ActiveRecord::Base
       if trans.success?
         sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
         sale_transaction.save
-        Auditory.audit(agent, trans, "Refund success $#{amount}", sale_transaction.member, Settings.operation_types.credit)
+        Auditory.audit(agent, trans, "Refund success $#{amount} on transaction #{sale_transaction.id}", sale_transaction.member, Settings.operation_types.credit)
         Communication.deliver!(:refund, sale_transaction.member)
       else
         Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
