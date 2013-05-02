@@ -1,5 +1,4 @@
 defaults: &defaults
-  cc_encryption_key: reibel3y5estrada8
   max_reactivations: 3
   days_to_wait_to_cancel_fulfillments: 2
   next_retry_on_missing_decline: 20.days
@@ -309,9 +308,12 @@ defaults: &defaults
 
 development:
   <<: *defaults
+  xxxyyyzzz: reibel3y5estrada8
+
 
 test:
   <<: *defaults
+  xxxyyyzzz: reibel3y5estrada8
 
 production:
   <<: *defaults
@@ -326,15 +328,19 @@ production:
   mes_aus_service:
     folder: <%= "#{Rails.root}/mes_account_updater_files" %>
     url: https://www.merchante-solutions.com/
+  xxxyyyzzz: 7faf4f991bc44841a00423b8db9602bb
 
 
 prototype:
   <<: *defaults
+  xxxyyyzzz: reibel3y5estrada8
 
 staging:
   <<: *defaults
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   email_to_send_product_list: 'ddanch@stoneacreinc.com,tbrady@stoneacreinc.com'
+  xxxyyyzzz: reibel3y5estrada8
 
 demo:
   <<: *defaults
+  xxxyyyzzz: reibel3y5estrada82012

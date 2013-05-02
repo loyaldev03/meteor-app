@@ -200,7 +200,7 @@ class Transaction < ActiveRecord::Base
       if payment_gateway_configuration.nil?
         save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
       else
-        load_gateway
+        load_gateway        
         refund_response=@gateway.refund(amount_to_send, refund_response_transaction_id, @options)
         save_response(refund_response)
       end

@@ -1,6 +1,4 @@
 class AuthorizeNetTransaction < Transaction
-  SECRET_KEY_FOR_TOKEN = "7faf4f991bc44841a00423b8db9602bb"
-
   def member=(member)
     super(member)
     self.invoice_number = self.member_id
@@ -8,7 +6,7 @@ class AuthorizeNetTransaction < Transaction
 
   # answer credit card token
   def self.store!(am_credit_card, pgc)
-    Encryptor.encrypt(am_credit_card.number, :key => Digest::SHA256.hexdigest(SECRET_KEY_FOR_TOKEN))
+    Base64::encode64(Encryptor.encrypt(am_credit_card.number, :key => Digest::SHA256.hexdigest(Settings.xxxyyyzzz), :algorithm => 'bf'))
   end
 
   def fill_transaction_type_for_credit(sale_transaction)
@@ -18,7 +16,7 @@ class AuthorizeNetTransaction < Transaction
   private
 
     def credit_card_token
-      number = Encryptor.decrypt(self.token, :key => Digest::SHA256.hexdigest(SECRET_KEY_FOR_TOKEN))
+      number = Encryptor.decrypt(Base64::decode64(self.token), :key => Digest::SHA256.hexdigest(Settings.xxxyyyzzz), :algorithm => 'bf')
       CreditCard.am_card(number, expire_month, expire_year, first_name, last_name)
     end
 
@@ -40,6 +38,7 @@ class AuthorizeNetTransaction < Transaction
     def load_gateway(recurrent = false)
       @login_data = { :login => login, :password => password, :test => !production? }
       @gateway = ActiveMerchant::Billing::AuthorizeNetGateway.new @login_data
+      @options[:card_number] = credit_card_token.number
     end
 
 end
