@@ -584,8 +584,11 @@ class Member < ActiveRecord::Base
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
         # is completed succesfully
+        credit_card.reload
         trans.member_id = self.id
         trans.credit_card_id = credit_card.id
+        trans.membership_id = self.current_membership.id
+        trans.last_digits = credit_card.last_digits
         trans.save
         credit_card.accepted_on_billing
       end
