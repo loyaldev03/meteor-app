@@ -64,8 +64,8 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @example_request 
-  #   curl -v -k -X POST --data-ascii "{\"member\":{\"first_name\":\"alice\",\"last_name\":\"brennan\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"deadbeef\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"},\"product_sku\":\"KIT-CARD\",\"enrollment_info\":{\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members?api_key=G6qq3KzWQVi9zgfFVXud
-  # @example_request_description Requesting enroll of a valid member.
+  #   curl -v -k -X POST --data-ascii "{\"member\":{\"first_name\":\"alice\",\"last_name\":\"brennan\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice2ad@brennan.com\",\"country\":\"US\",\"prospect_id\":\"deadbeef\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"},\"product_sku\":\"KIT-CARD\",\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\",\"marketing_code\":\"marketing code\",\"fulfillment_code\":\"1\",\"ip_address\":\"192.168.1.1\",\"user_agent\":\"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537...\"}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members?api_key=eJnrP5rbXGPZZkiSrUPV
+  # @example_request_description Requesting enroll of a valid member, with params in json format.
   #
   # @example_response 
   #   {"message":"Member enrolled successfully $0.0 on TOM(1) -test2-","code":"000","member_id":11349950166,"autologin_url":""}
@@ -138,7 +138,7 @@ class Api::MembersController < ApplicationController
   #
   # @example_request 
   #   curl -v -k -X PUT --data-ascii "{\"member\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members/1?api_key=G6qq3KzWQVi9zgfFVXud
-  # @example_request_description Requesting enroll of a valid member.
+  # @example_request_description Requesting enroll of a valid member, with params in json format.
   #
   # @example_response 
   #   {"message":"Member updated successfully","code":"000","member_id":1}
