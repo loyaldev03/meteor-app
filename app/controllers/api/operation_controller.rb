@@ -14,7 +14,7 @@ class Api::OperationController < ApplicationController
   #     <li><strong>900</strong> vip_event_registration </li>
   #     <li><strong>901</strong> vip_event_cancelation </li>
   #   </ul>
-  # @optional [String] operation_date Date when the operation was done. If this value is nil we save that operation with Time.zone.now. (Format "yyyy-mm-dd")
+  # @optional [String] operation_date Date when the operation was done. If this value is nil we save that operation with Time.zone.now + offset. (Format "yyyy-mm-dd +xxxx"). If no offset is given, we will assume that it is "+0000".
   # @optional [Integer] description Description of the operation. It is a text field.
   # @response_field [String] code Code related to the method result.
   # @response_field [String] message Shows the method results and also informs the errors.
@@ -29,12 +29,12 @@ class Api::OperationController < ApplicationController
   #
 	def create
     begin
-    	member = Member.find(params[:member_id])      
+    	member = Member.find(params[:member_id])
     	Auditory.audit(@current_agent, member, params[:description], member, params[:operation_type], params[:operation_date])
 			render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
 		rescue Exception => e
 			render json: { :message => "Operation was not created. Errors: #{e}", :code => Settings.error_codes.operation_not_saved}
-		end			
+		end
 	end
 
   # TODO: Add a list of operation types: 

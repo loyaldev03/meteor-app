@@ -204,8 +204,8 @@ class Api::MembersController < ApplicationController
   # @response_field [Hash] current_membership Information related to the member's membership at the moment.
   #  <ul>
   #     <li><strong>status</strong> String with member's current status. </li>
-  #     <li><strong>join_date</strong> String with date when the member join. This date is updated each time the member is recovered, or it is saved the sale. </li>
-  #     <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is no date schedule this value will be null. </li>
+  #     <li><strong>join_date</strong> String with date when the member join. This date is updated each time the member is recovered, or it is saved the sale. It is in datetime with the offset format. </li>
+  #     <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is no date schedule this value will be null. It is in datetime with the offset format. If member does not have cancel date set, this value will be blank. </li>
   #  </ul>
   # @response_field [Hash] member Hash with member information.
   #  <ul>
@@ -222,10 +222,10 @@ class Api::MembersController < ApplicationController
   #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). </li>
   #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" </li>
   #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. </li>
-  #     <li><strong>bill_date</strong> Date when the billing will be done. </li>
+  #     <li><strong>bill_date</strong> Date when the billing will be done. It is in datetime with the offset format. If member does not have bill date set, this value will be blank </li>
   #     <li><strong>wrong_address</strong> Reason the member was set as undeliverable. </li>
   #     <li><strong>wrong_phone_number</strong> Reason the member was set as unreachable. </li>
-  #     <li><strong>member_since_date</strong> Date when the member was created. This date is saved with date format. </li>
+  #     <li><strong>member_since_date</strong> Date when the member was created. It is in datetime with the offset format. </li>
   #     <li><strong>reactivation_times</strong> Integer value that tells us how many times this member was recovered. </li>
   #     <li><strong>blacklisted</strong> Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted) </li>
   #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. </li>
@@ -264,7 +264,7 @@ class Api::MembersController < ApplicationController
         phone_local_number: member.phone_local_number, 
         type_of_phone_number: member.type_of_phone_number,
         gender: member.gender,
-        bill_date: member.next_retry_bill_date,
+        bill_date: member.next_retry_bill_date.nil? ? '' : member.next_retry_bill_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}"),
         wrong_address: member.wrong_address,
         wrong_phone_number: member.wrong_phone_number,
         member_since_date: member.member_since_date,
@@ -281,8 +281,8 @@ class Api::MembersController < ApplicationController
       },
       current_membership:{
         status: membership.status,
-        join_date: membership.join_date,
-        cancel_date: membership.cancel_date
+        join_date: membership.join_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}"),
+        cancel_date: membership.cancel_date.nil? ? '' : membership.cancel_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}")
       }
     }
     response.merge!( external_id: member.external_id ) if member.club.requires_external_id
