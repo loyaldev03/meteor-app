@@ -69,13 +69,13 @@ class Api::MembersController < ApplicationController
   #
   # @example_response 
   #   {"message":"Member enrolled successfully $0.0 on TOM(1) -test2-","code":"000","member_id":11349950166,"autologin_url":""}
-  # @example_response_description Example response to the previos example request.
+  # @example_response_description Example response to the previous example request.
   #
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] code Code related to the method result.
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.
   # @response_field [Hash] errors A hash with members and credit card errors.
-  # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account.
+  # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account. This value wll be returned as blank in case the club is not related to drupal.
   #
   def create
     tom = TermsOfMembership.find(params[:member][:terms_of_membership_id])  
