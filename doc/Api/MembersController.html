@@ -452,7 +452,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							<span class="description">
 								
 									
-										Requesting enroll of a valid member.
+										Requesting enroll of a valid member, with params in json format.
 									
 								
 							</span>
@@ -460,7 +460,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<strong class="type">Request</strong>
 								
 									
-										curl -v -k -X POST --data-ascii "{\"member\":{\"api_id\":\"999\",\"first_name\":\"alice\",\"last_name\":\"brennan\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"deadbeef\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"},\"product_sku\":\"KIT-CARD\",\"enrollment_info\":{\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members?api_key=G6qq3KzWQVi9zgfFVXud
+										curl -v -k -X POST --data-ascii "{\"member\":{\"first_name\":\"alice\",\"last_name\":\"brennan\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice2ad@brennan.com\",\"country\":\"US\",\"prospect_id\":\"deadbeef\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"},\"product_sku\":\"KIT-CARD\",\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\",\"marketing_code\":\"marketing code\",\"fulfillment_code\":\"1\",\"ip_address\":\"192.168.1.1\",\"user_agent\":\"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537...\"}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members?api_key=eJnrP5rbXGPZZkiSrUPV
 									
 								
 							</span>
@@ -617,7 +617,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							<span class="description">
 								
 									
-										Requesting enroll of a valid member.
+										Requesting enroll of a valid member, with params in json format.
 									
 								
 							</span>
@@ -1415,7 +1415,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Mon Apr 22 15:41:01 2013 with ruby-1.9.3
+  Generated on Fri May  3 12:27:21 2013 with ruby-1.9.3
 </div>
 
   </body>

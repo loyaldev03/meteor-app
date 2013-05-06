@@ -66,7 +66,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Enrollment without approval" do
     active_merchant_stubs
-    assert_difference('Operation.count',1) do
+    assert_difference('Operation.count',2) do   #Enroll and club cash operations.
       assert_difference('Fulfillment.count') do
         member = enroll_member(@terms_of_membership)
         assert_not_nil member.next_retry_bill_date, "NBD should not be nil"
@@ -80,6 +80,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "controlled refund (refund completely a transaction)" do
     active_member = create_active_member(@terms_of_membership)
     amount = @terms_of_membership.installment_amount
+    active_member.update_attribute :next_retry_bill_date, Time.zone.now
     answer = active_member.bill_membership
     active_member.reload
     assert_equal active_member.status, 'active'
@@ -96,7 +97,6 @@ class TransactionTest < ActiveSupport::TestCase
       end
     end
   end
-
 
   test "Monthly member billed 24 months" do 
     active_merchant_stubs
@@ -123,6 +123,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
 
     next_month = Time.zone.now + member.terms_of_membership.provisional_days.days
+    club_cash = @terms_of_membership.club_cash_amount
     1.upto(24) do |time|
       Timecop.travel(next_month + time.month) do
         Member.bill_all_members_up_today
@@ -132,6 +133,10 @@ class TransactionTest < ActiveSupport::TestCase
         assert_equal member.bill_date, member.next_retry_bill_date
         assert_equal member.quota, time+1
         assert_equal member.recycled_times, 0
+        if (member.current_membership.quota%12 == 0 and member.current_membership.quota != 12)
+          assert_equal member.club_cash_amount, club_cash+@terms_of_membership.club_cash_amount
+          club_cash = member.club_cash_amount
+        end  
       end
     end
   end
@@ -336,7 +341,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
     member = enroll_member(@tom, 0, true)
 
-    assert_difference("Operation.count",4) do  # communictaion | renewal schedule NBD | add club cash | billing
+    assert_difference("Operation.count",3) do  # communictaion | renewal schedule NBD | billing
       assert_difference("Transaction.count") do
         member.bill_membership
       end
@@ -350,7 +355,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
     member = enroll_member(@tom, 0, true)
     
-    assert_difference("Operation.count",4) do  #  communictaion | renewal schedule NBD | add club cash | billing
+    assert_difference("Operation.count",3) do  #  communictaion | renewal schedule NBD | billing
       assert_difference("Transaction.count") do
         member.bill_membership
       end
@@ -472,5 +477,121 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
+  test "should not update NBD after save the sale from monthly-tom to monthly-tom" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    member = enroll_member(@terms_of_membership, 0, true)
+    nbd_initial = member.next_retry_bill_date
 
+    assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership.provisional_days.days, :format => :only_date)
+    assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership.provisional_days.days, :format => :only_date)
+    member.save_the_sale @terms_of_membership2.id
+    member.reload
+    
+    assert_equal nbd_initial, member.next_retry_bill_date
+    assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership2.provisional_days.days, :format => :only_date)
+    assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd_initial, :format => :only_date)
+    nbd = member.bill_date + eval(@terms_of_membership2.installment_type)
+
+    Timecop.freeze( member.next_retry_bill_date ) do
+      Member.bill_all_members_up_today
+      member.reload
+      assert_equal member.bill_date, nbd 
+      assert_equal member.next_retry_bill_date, nbd 
+    end
+  end
+
+  test "should not update NBD after save the sale from monthly-tom to yearly-tom" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    member = enroll_member(@terms_of_membership, 0, true)
+    nbd_initial = member.next_retry_bill_date
+
+    assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership.provisional_days.days, :format => :only_date)
+    assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership.provisional_days.days, :format => :only_date)
+    member.save_the_sale @terms_of_membership2.id
+    member.reload
+
+    assert_equal nbd_initial, member.next_retry_bill_date
+    assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership2.provisional_days.days, :format => :only_date)
+    assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd_initial, :format => :only_date)
+    nbd = member.bill_date + eval(@terms_of_membership2.installment_type)
+
+    Timecop.freeze( member.next_retry_bill_date ) do
+      Member.bill_all_members_up_today
+      member.reload
+      assert_equal member.bill_date, nbd 
+      assert_equal member.next_retry_bill_date, nbd 
+    end
+  end
+
+  test "should not update NBD after save the sale from yearly-tom to monthly-tom" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    member = enroll_member(@terms_of_membership, 0, true)
+    nbd_initial = member.next_retry_bill_date
+
+    assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now, :format => :only_date)
+    assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(member.bill_date+@terms_of_membership.provisional_days.days, :format => :only_date)
+    member.save_the_sale @terms_of_membership2.id
+    member.reload
+
+    assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership2.provisional_days.days, :format => :only_date)
+    assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd_initial, :format => :only_date)
+    nbd = member.bill_date + eval(@terms_of_membership2.installment_type)
+
+    Timecop.freeze( member.next_retry_bill_date ) do
+      Member.bill_all_members_up_today
+      member.reload
+      assert_equal member.bill_date, nbd 
+      assert_equal member.next_retry_bill_date, nbd 
+    end
+  end
+
+  test "should not update NBD after save the sale from yearly-tom to yearly-tom" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    member = enroll_member(@terms_of_membership, 0, true)
+    nbd = member.next_retry_bill_date
+
+    assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now, :format => :only_date)
+    assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(member.bill_date+@terms_of_membership.provisional_days.days, :format => :only_date)
+    member.save_the_sale @terms_of_membership2.id
+    member.reload
+
+    assert_equal nbd, member.next_retry_bill_date
+    nbd = member.bill_date + eval(@terms_of_membership2.installment_type)
+    assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now, :format => :only_date)
+    assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(member.bill_date+@terms_of_membership2.provisional_days.days, :format => :only_date)
+
+    Timecop.freeze( member.next_retry_bill_date ) do
+      Member.bill_all_members_up_today
+      member.reload
+      assert_equal member.bill_date, nbd 
+      assert_equal member.next_retry_bill_date, nbd 
+    end
+  end
+
+  test "Should event bill a member, and also refund it." do
+    member = enroll_member(@terms_of_membership, 0, true)
+    amount = 200
+    assert_difference("Transaction.count") do
+      assert_difference("Operation.count") do
+        member.no_recurrent_billing(amount,"testing event")
+      end
+    end
+    operation = Operation.last
+    transaction = Transaction.last
+
+    assert_equal(operation.description, "Member billed successfully $#{amount} Transaction id: #{transaction.id}. Reason: testing event")
+    assert_equal(operation.operation_type, Settings.operation_types.no_recurrent_billing)
+    assert_equal(transaction.full_label, "Sale : This transaction has been approved. Reason: testing event")
+    assert transaction.success?
+
+    answer = Transaction.refund(amount, transaction)
+    assert_equal answer[:code], Settings.error_codes.success, answer[:message]
+    transaction.reload
+    assert_equal transaction.refunded_amount, amount
+    assert_equal transaction.amount_available_to_refund, 0.0
+  end
 end

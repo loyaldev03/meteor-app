@@ -33,6 +33,8 @@ class MembersController < ApplicationController
                        .with_phone_local_number(params[:member][:phone_local_number])
                        .with_sync_status(params[:member][:sync_status])
                        .with_external_id(params[:member][:external_id])
+                       .with_billed_date_from(params[:member][:billing_date_start])
+                       .with_billed_date_to(params[:member][:billing_date_end])
                        .where(:club_id => @current_club)
                        .needs_approval(params[:member][:needs_approval])
                        .order('members.id')
@@ -333,6 +335,18 @@ class MembersController < ApplicationController
     Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.resend_welcome_error)
     Airbrake.notify(:error_class => "Member:resend_welcome", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path
+  end
+
+  def no_recurrent_billing
+    if request.post?
+      answer = @current_member.no_recurrent_billing(params[:amount], params[:description])
+      if answer[:code] == "000"
+        flash[:notice] = answer[:message]
+        redirect_to show_member_path
+      else
+        flash.now[:error] = answer[:message]
+      end
+    end
   end
 
   private 

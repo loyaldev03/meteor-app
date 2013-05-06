@@ -77,6 +77,7 @@ en:
     create_csv_file: 'Create CSV File'
     create_xls_file: 'Create XLS File'
     export_all_to_xls: 'Export all to XLS'
+    no_recurrent_billing: 'Bill no recurrent amount'
   admin:
     agents:
       index:
@@ -226,6 +227,9 @@ en:
         last_synced_at: 'Last successful sync'
         last_sync_error: 'Last failed sync'
         status_blacklisted: '- Blisted'
+        billed_date: 'Billed date'
+        billed_date_from: 'From:'
+        billed_date_to: 'To:'
         sync_status_priorities:
           synced: success
           unsynced: warning

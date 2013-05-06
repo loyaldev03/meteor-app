@@ -84,6 +84,7 @@ group :development do
   gem 'yard-rest'
   gem 'redcarpet'
   gem "bullet"
+  gem 'ruby-prof'
 end
 
 group :prototype do

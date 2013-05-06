@@ -94,22 +94,25 @@ class Member < ActiveRecord::Base
   }
   scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }
   scope :with_id, lambda { |value| where('members.id = ?', value.strip) unless value.blank? }
-  scope :with_next_retry_bill_date, lambda { |value| where('next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
-  scope :with_phone_country_code, lambda { |value| where('phone_country_code = ?', value.strip) unless value.blank? }
-  scope :with_phone_area_code, lambda { |value| where('phone_area_code = ?', value.strip) unless value.blank? }
-  scope :with_phone_local_number, lambda { |value| where('phone_local_number = ?', value.strip) unless value.blank? }
-  scope :with_first_name_like, lambda { |value| where('first_name like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_last_name_like, lambda { |value| where('last_name like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_address_like, lambda { |value| where('address like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_city_like, lambda { |value| where('city like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_country_like, lambda { |value| where('country like ?', value) unless value.blank? }
-  scope :with_state_like, lambda { |value| where('state like ?', value) unless value.blank? }
-  scope :with_zip, lambda { |value| where('zip like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_email_like, lambda { |value| where('email like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('last_digits = ?', value.strip) unless value.blank? }
-  scope :with_member_notes, lambda{ |value| joins(:member_notes).where('description like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_external_id, lambda{ |value| where("external_id = ?",value) unless value.blank? }
+  scope :with_next_retry_bill_date, lambda { |value| where('members.next_retry_bill_date BETWEEN ? AND ?', value.to_date.to_time_in_current_zone.beginning_of_day, value.to_date.to_time_in_current_zone.end_of_day) unless value.blank? }
+  scope :with_phone_country_code, lambda { |value| where('members.phone_country_code = ?', value.strip) unless value.blank? }
+  scope :with_phone_area_code, lambda { |value| where('members.phone_area_code = ?', value.strip) unless value.blank? }
+  scope :with_phone_local_number, lambda { |value| where('members.phone_local_number = ?', value.strip) unless value.blank? }
+  scope :with_first_name_like, lambda { |value| where('members.first_name like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_last_name_like, lambda { |value| where('members.last_name like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_address_like, lambda { |value| where('members.address like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_city_like, lambda { |value| where('members.city like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_country_like, lambda { |value| where('members.country like ?', value) unless value.blank? }
+  scope :with_state_like, lambda { |value| where('members.state like ?', value) unless value.blank? }
+  scope :with_zip, lambda { |value| where('members.zip like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_email_like, lambda { |value| where('members.email like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('credit_cards.last_digits = ?', value.strip) unless value.blank? }
+  scope :with_member_notes, lambda{ |value| joins(:member_notes).where('member_notes.description like ?', '%'+value.strip+'%') unless value.blank? }
+  scope :with_external_id, lambda{ |value| where("members.external_id = ?",value) unless value.blank? }
   scope :needs_approval, lambda{ |value| where('members.status = ?', 'applied') unless value == '0' }
+  scope :with_billed_date_from, lambda{ |value| joins(:transactions).where('date(transactions.created_at) >= ?', value) unless value.blank? }
+  scope :with_billed_date_to, lambda{ |value| joins(:transactions).where('date(transactions.created_at) <= ?', value) unless value.blank? }
+
 
   state_machine :status, :initial => :none, :action => :save_state do
     ###### member gets applied =====>>>>
@@ -126,7 +129,7 @@ class Member < ActiveRecord::Base
     after_transition [ :none, :lapsed ] => # enroll and reactivation
                         :provisional, :do => 'schedule_first_membership(true)'
     after_transition [ :provisional, :active ] => 
-                        :provisional, :do => 'schedule_first_membership(true, true)' # save the sale
+                        :provisional, :do => 'schedule_first_membership(true, true, true, true)' # save the sale
     after_transition :applied => 
                         :provisional, :do => 'schedule_first_membership(false)'
     ###### <<<<<<========
@@ -213,17 +216,26 @@ class Member < ActiveRecord::Base
   end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
-  def schedule_first_membership(set_join_date, skip_send_fulfillment = false)
+  def schedule_first_membership(set_join_date, skip_send_fulfillment = false, nbd_update_for_sts = false, skip_add_club_cash = false)
     send_fulfillment unless skip_send_fulfillment
+    add_club_cash(nil,terms_of_membership.club_cash_amount, 'club cash on enroll') unless skip_add_club_cash
+
     membership = current_membership
-    membership.join_date = Time.zone.now if set_join_date
-    membership.save
-    if terms_of_membership.monthly?
-      self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
-      self.next_retry_bill_date = self.bill_date
+    if set_join_date
+      membership.update_attribute :join_date, Time.zone.now
+    end
+    if nbd_update_for_sts
+      if terms_of_membership.monthly? # we need this if to avoid Bug #27211
+        self.bill_date = self.next_retry_bill_date
+      end
     else
-      self.bill_date = membership.join_date
-      self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
+      if terms_of_membership.monthly?
+        self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
+        self.next_retry_bill_date = self.bill_date
+      else
+        self.bill_date = membership.join_date
+        self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
+      end
     end
     self.save(:validate => false)
   end
@@ -371,11 +383,11 @@ class Member < ActiveRecord::Base
         prev_membership_id = current_membership.id
         res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
         if res[:code] == Settings.error_codes.success
+          Membership.find(prev_membership_id).cancel_because_of_save_the_sale
           Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
             "Save the sale from TOM(#{old_tom_id}) to TOM(#{new_tom_id})", self, Settings.operation_types.save_the_sale)
         end
         # update manually this fields because we cant cancel member
-        Membership.find(prev_membership_id).cancel_because_of_save_the_sale
         res
       end
     else
@@ -424,6 +436,40 @@ class Member < ActiveRecord::Base
         { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
       end
     end
+  end
+
+  def no_recurrent_billing(amount, description)
+    if amount.blank? or description.blank?
+      answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
+    elsif amount.to_f <= 0.0
+      answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
+    else
+      if can_bill_membership?
+        trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
+        trans.transaction_type = "sale"
+        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
+        answer = trans.process
+        if trans.success?
+          message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
+          trans.update_attribute :response_result, trans.response_result+". Reason: #{description}"
+          answer = { :message => message, :code => Settings.error_codes.success }
+          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing)
+        else
+          answer = { :message => trans.response_result, :code => Settings.error_codes.no_reccurent_billing_error }
+          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing_with_error)
+        end
+      else
+        if not self.club.billing_enable
+          answer = { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
+        else
+          answer = { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+        end
+      end
+    end
+    answer
+  rescue Exception => e
+    Airbrake.notify(:error_class => "Billing:event_billing", :error_message => e, :parameters => { :member => self.inspect })
+    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.no_reccurent_billing_error }
   end
 
   def error_to_s(delimiter = "\n")
@@ -541,6 +587,8 @@ class Member < ActiveRecord::Base
         # is completed succesfully
         trans.member_id = self.id
         trans.credit_card_id = credit_card.id
+        trans.membership_id = self.current_membership.id
+        trans.last_digits = credit_card.last_digits
         trans.save
         credit_card.accepted_on_billing
       end
@@ -675,15 +723,17 @@ class Member < ActiveRecord::Base
     end
   end
 
-  # Adds club cash when membership billing is success.
+  # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing")
-    amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
-    self.add_club_cash(nil, amount, message)
-    if club_cash_transactions_enabled
-      if self.club_cash_expire_date.nil? # first club cash assignment
-        self.club_cash_expire_date = join_date + 1.year
+    if current_membership.quota%12==0 and current_membership.quota!=12
+      amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
+      self.add_club_cash(nil, amount, message)
+      if club_cash_transactions_enabled
+        if self.club_cash_expire_date.nil? # first club cash assignment
+          self.club_cash_expire_date = join_date + 1.year
+        end
+        self.save(:validate => false)
       end
-      self.save(:validate => false)
     end
   rescue Exception => e
     # refs #21133
@@ -961,18 +1011,43 @@ def self.sync_members_to_pardot
 
   def self.process_sync 
     base = Member.where("status = 'lapsed' AND api_id != ''")
+    tz = Time.zone.now
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members lapsed and api_id not null, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each do |member|
-        member.api_member.destroy!
-        if member.last_sync_error.include?("There is no user with ID")
-          member.update_attribute :api_id, nil
+        api_m = member.api_member
+        unless api_m.nil?
+          api_m.destroy!
+          Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
         end
-        Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
       end
     end
+    Rails.logger.info "    ... took #{Time.zone.now - tz}"
+
+    base = Member.where('last_sync_error like "There is no user with ID"')
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members with error sync related to wrong api_id, processing #{base.count} members"
+    tz = Time.zone.now
+    index = 0
+    base.each do |member|
+      index = index+1
+      Rails.logger.info "  *[#{index}] processing member ##{member.id}"
+      member.update_attribute :api_id, nil
+      unless member.lapsed?
+        api_m = member.api_member
+        unless api_m.nil?
+          if api_m.save!(force: true)
+            unless member.last_sync_error_at
+              Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
+            end
+          end
+        end
+      end
+    end
+    Rails.logger.info "    ... took #{Time.zone.now - tz}"
+
     base = Member.where("sync_status IN ('with_error', 'not_synced') and status != 'lapsed' ").limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{base.count} members"
+    tz = Time.zone.now
     index = 0
     base.each do |member|
       index = index+1
@@ -986,6 +1061,7 @@ def self.sync_members_to_pardot
         end
       end
     end       
+    Rails.logger.info "    ... took #{Time.zone.now - tz}"
   end
 
   def self.process_email_sync_error

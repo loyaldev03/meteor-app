@@ -74,9 +74,9 @@ class MembersBillTest < ActionController::IntegrationTest
   end
 
 
-#   ############################################################
-#   # TEST
-#   ############################################################
+  ############################################################
+  # TEST
+  ############################################################
 
   test "create a member billing enroll > 0" do
     active_merchant_stubs
@@ -529,4 +529,76 @@ class MembersBillTest < ActionController::IntegrationTest
     within("#communication"){ assert page.has_content?("hard_decline") }
     within("#communication"){ assert page.has_content?("cancellation") }
   end
+
+
+test "Try billing a member with credit card ok, and within a club that allows billing." do
+    setup_member
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)      
+    click_link_or_button("Bill no recurrent amount")
+    fill_in('amount', :with => '100')
+    fill_in('description', :with => 'asd')
+    click_link_or_button ("Bill no recurrent amount")
+
+    trans = Transaction.last
+    assert page.has_content? "Member billed successfully $100 Transaction id: #{trans.uuid}. Reason: asd"
+
+
+    within(".nav-tabs") {click_on 'Operations'}
+    within("#operations") {assert page.has_content? "Member billed successfully $100 Transaction id: #{trans.uuid}. Reason: asd"}
+    within(".nav-tabs") {click_on 'Transactions'}  
+    within("#transactions_table") do
+      assert page.has_content?("Sale : This transaction has been approved")
+      assert page.has_content?("100")
+      assert page.has_selector?('#refund')
+    end
+  end
+
+  test "Try billing a member without providing the amount and/or description" do
+    setup_member
+     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+     click_link_or_button("Bill no recurrent amount")
+     click_link_or_button("Bill no recurrent amount")
+     assert page.has_content?("Amount and description cannot be blank.")
+    fill_in('amount', :with => '100')
+    click_link_or_button ("Bill no recurrent amount")
+    assert page.has_content?("Amount and description cannot be blank.")
+    fill_in('amount', :with => '')
+    fill_in('description', :with => 'asd')
+    click_link_or_button("Bill no recurrent amount")
+    assert page.has_content?("Amount and description cannot be blank.")
+    end
+
+    test "Try billing a member without providing the amount and/or description." do
+      setup_member
+      visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+      click_link_or_button("Bill no recurrent amount")
+      fill_in('amount', :with => '-100')
+      fill_in('description', :with => 'asd')
+      click_link_or_button("Bill no recurrent amount")
+      assert page.has_content?("Amount must be greater than 0.")
+    end
+
+
+    test "Try billing a member within a club that do not allow billing." do
+      setup_member
+      @saved_member.club.update_attribute( :billing_enable, false)
+      visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+      assert find(:xpath, "//a[@id='no_recurrent_bill_btn' and @disabled='disabled']")
+      click_link_or_button("Bill no recurrent amount")
+      assert page.has_selector?('#blacklist_btn')
+    end
+
+    test "Try billing a member with blank credit card." do
+      setup_member(nil,false)
+      unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)      
+      @saved_member = create_member(unsaved_member,nil,nil, true)
+      click_link_or_button("Bill no recurrent amount")
+      fill_in('amount', :with => '100')
+      fill_in('description', :with => 'asd')
+      click_link_or_button("Bill no recurrent amount") 
+      assert page.has_content?("Credit card is blank we wont bill")   
+    end
 end
+
+
+    
