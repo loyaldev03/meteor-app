@@ -1,6 +1,6 @@
 
 <h2>How we handle authentication </h2>
-Authentication is handled using the "api\_key" argument on each API call. This api\_key is the authentication token of the agent that is commiting the request. If the agent is not allowed, we will stop processing the request, and proceed to return a message telling that the agent is not authorized. Have in mind that this "api\_token" is reseted on every login, and can be obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>
+Authentication is handled using the "api\_key" argument on each API call. This api\_key is the authentication token of the agent that is commiting the request. If the agent is not allowed, we will stop processing the request, and proceed to return a message telling that the agent is not authorized. Have in mind that this "api\_token" is reseted on every login, and can be obtained using token's POST api method. <a href="TokensController.html">TokensMethods</a>. This value can be send within the HTTP request body, or also within the query string on the url.
 
 <h2>Error codes </h2>
 We always answer with an string variable called "code". Acording to the method result we will set this "code" variable in order to match the result. (We are answering "000" for success, and with an especific value for each kind of error).
