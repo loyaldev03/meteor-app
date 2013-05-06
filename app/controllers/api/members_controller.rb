@@ -342,7 +342,7 @@ class Api::MembersController < ApplicationController
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
-  # @required [String] next_bill_date Date to be stored as date where we should bill this member. This date is stored with date format. (Format "yyyy-mm-dd" or “dd/mm/yyyy”)
+  # @required [String] next_bill_date Date when we should bill this member, an it is stored with datetime format. It also supports UTC format. Have in mind that in this case it is not necessary to send the offset, since we set it according to the club's configuration.(Format "yyyy-mm-dd", “dd/mm/yyyy” or "yyyy-mm-ddThh:mm:ss") (Eg: "2013-04-23" or "2013-04-23T15:17:09") 
   # @response_field [String] message Shows the method result.
   # @response_field [Integer] code Code related to the method result.
   # @response_field [Hash] errors A hash with member and next_bill_date errors. 

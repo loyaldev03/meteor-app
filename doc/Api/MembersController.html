@@ -953,7 +953,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<li>
 									<span class="name">next_bill_date</span>
 									<span class="type">String</span>
-									<span class="text">Date to be stored as date where we should bill this member. This date is stored with date format. (Format "yyyy-mm-dd" or “dd/mm/yyyy”)</span>
+									<span class="text">Date when we should bill this member, an it is stored with datetime format. It also supports UTC format. Have in mind that in this case it is not necessary to send the offset, since we set it according to the club's configuration.(Format "yyyy-mm-dd", “dd/mm/yyyy” or "yyyy-mm-ddThh:mm:ss") (Eg: "2013-04-23" or "2013-04-23T15:17:09")</span>
 								</li>
 							</ul>
 						
@@ -1415,7 +1415,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Mon May  6 12:53:33 2013 with ruby-1.9.3
+  Generated on Mon May  6 13:07:46 2013 with ruby-1.9.3
 </div>
 
   </body>
