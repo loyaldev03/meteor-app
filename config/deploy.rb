@@ -27,6 +27,7 @@ task :link_config_files do
   puts "  * Creating shared symlinks... "
   run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
   run "ln -nfs #{release_path}/doc #{release_path}/public/doc"
+  run "ln -nfs #{shared_path}/mes_account_updater_files #{release_path}/mes_account_updater_files"
   run "ln -nfs #{shared_path}/assets #{release_path}/public/assets"
   run "if [ -e #{release_path}/rake_task_runner ]; then chmod +x #{release_path}/rake_task_runner; fi"
 end
