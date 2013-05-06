@@ -20,8 +20,6 @@ class Prospect < ActiveRecord::Base
             :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description
 
 
-  delegate :club, :to => :terms_of_membership
-
   def pardot_prospect
     @pardot_prospect ||= if !self.club.pardot_sync?
       nil
