@@ -347,7 +347,7 @@
 								<li>
 									<span class="name">operation_date</span>
 									<span class="type">String</span>
-									<span class="text">Date when the operation was done. If this value is nil we save that operation with Time.zone.now. (Format "yyyy-mm-dd")</span>
+									<span class="text">Date when the operation was done. If this value is nil we save that operation with actual time + offset. (Format "yyyy-mm-dd +xxxx"). If no offset is given, we will assume that it is "+0000".</span>
 								</li>
 							</ul>
 						
@@ -405,7 +405,7 @@
 								<strong class="type">Request</strong>
 								
 									
-										curl -v -k -X POST -d "api_key=G6qq3KzWQVi9zgfFVXud&operation_type=900&operation_date=2013-2-12&description=Enrolled vip registration" https://dev.stoneacrehq.com:3000/api/v1/members/1/operation
+										curl -v -k -X POST -d "api_key=G6qq3KzWQVi9zgfFVXud&operation_type=900&operation_date=2013-2-12T15:20:12-04:00&description=Enrolled vip registration" https://dev.stoneacrehq.com:3000/api/v1/members/1/operation
 									
 								
 							</span>
@@ -449,7 +449,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Fri May  3 12:27:21 2013 with ruby-1.9.3
+  Generated on Mon May  6 13:07:46 2013 with ruby-1.9.3
 </div>
 
   </body>

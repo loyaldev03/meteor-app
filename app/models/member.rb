@@ -250,12 +250,13 @@ class Member < ActiveRecord::Base
       answer = { :message => I18n.t('error_messages.next_bill_date_blank'), :code => Settings.error_codes.next_bill_date_blank, :errors => errors }
     elsif next_bill_date.to_datetime < Time.zone.now.to_date
       errors = { :next_bill_date => 'Is prior to actual date' }
-      answer   = { :message => "Next bill date should be older that actual date.", :code => Settings.error_codes.next_bill_date_prior_actual_date, :errors => errors }
-    elsif self.valid? and not self.active_credit_card.expired?  
-      self.next_retry_bill_date = next_bill_date.to_datetime
-      self.bill_date = next_bill_date.to_datetime
+      answer = { :message => "Next bill date should be older that actual date.", :code => Settings.error_codes.next_bill_date_prior_actual_date, :errors => errors }
+    elsif self.valid? and not self.active_credit_card.expired?
+      next_bill_date = next_bill_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(self.club.time_zone).utc_offset)/(60*60)}")
+      self.next_retry_bill_date = next_bill_date
+      self.bill_date = next_bill_date
       self.save(:validate => false)
-      message = "Next bill date changed to #{next_bill_date}"
+      message = "Next bill date changed to #{next_bill_date.to_date}"
       Auditory.audit(current_agent, self, message, self, Settings.operation_types.change_next_bill_date)
       answer = {:message => message, :code => Settings.error_codes.success }
     else
@@ -841,8 +842,9 @@ class Member < ActiveRecord::Base
           answer = { :message => "Cancel date is already set to that date", :code => Settings.error_codes.wrong_data }
         else
           if can_be_canceled?
+            cancel_date = cancel_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(self.club.time_zone).utc_offset)/(60*60)}")
             self.current_membership.update_attribute :cancel_date, cancel_date
-            answer = { :message => "Member cancellation scheduled to #{cancel_date} - Reason: #{message}", :code => Settings.error_codes.success }
+            answer = { :message => "Member cancellation scheduled to #{cancel_date.to_date} - Reason: #{message}", :code => Settings.error_codes.success }
             Auditory.audit(current_agent, self, answer[:message], self, Settings.operation_types.future_cancel)
           else
             answer = { :message => "Member is not in cancelable status.", :code => Settings.error_codes.cancel_date_blank }
