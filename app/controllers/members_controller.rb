@@ -27,6 +27,7 @@ class MembersController < ApplicationController
                        .with_email_like(params[:member][:email])
                        .with_next_retry_bill_date(params[:member][:next_retry_bill_date])
                        .with_credit_card_last_digits(params[:member][:last_digits])
+                       .with_credit_card_token(params[:member][:cc_token])
                        .with_member_notes(params[:member][:notes])
                        .with_phone_country_code(params[:member][:phone_country_code])
                        .with_phone_area_code(params[:member][:phone_area_code])
