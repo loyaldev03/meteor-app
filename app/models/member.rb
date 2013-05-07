@@ -829,7 +829,8 @@ class Member < ActiveRecord::Base
   end
 
   def chargeback!(transaction_chargebacked, args)
-    trans = Transaction.new_chargeback(transaction_chargebacked, args)
+    trans = Transaction.obtain_transaction_by_gateway(transaction_chargebacked.gateway)
+    trans.new_chargeback(transaction_chargebacked, args)
     self.blacklist nil, "Chargeback - "+args[:reason]
   end
 
