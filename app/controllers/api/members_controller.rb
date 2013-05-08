@@ -204,8 +204,8 @@ class Api::MembersController < ApplicationController
   # @response_field [Hash] current_membership Information related to the member's membership at the moment.
   #  <ul>
   #     <li><strong>status</strong> String with member's current status. </li>
-  #     <li><strong>join_date</strong> String with date when the member join. This date is updated each time the member is recovered, or it is saved the sale. </li>
-  #     <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is no date schedule this value will be null. </li>
+  #     <li><strong>join_date</strong> String with date when the member join. This date is updated each time the member is recovered, or it is saved the sale. It is in datetime with the offset format. (Eg: "2013-04-23T15:17:09-04:00" ) </li>
+  #     <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is no date schedule this value will be null. It is in datetime with the offset format. If member does not have cancel date set, this value will be blank. (Eg: "2013-04-23T15:17:09-04:00" )  </li>
   #  </ul>
   # @response_field [Hash] member Hash with member information.
   #  <ul>
@@ -222,10 +222,10 @@ class Api::MembersController < ApplicationController
   #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). </li>
   #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" </li>
   #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. </li>
-  #     <li><strong>bill_date</strong> Date when the billing will be done. </li>
+  #     <li><strong>bill_date</strong> Date when the billing will be done. It is in datetime with the offset format. If member does not have bill date set, this value will be blank. (Eg: "2013-04-23T15:17:09-04:00" ) </li>
   #     <li><strong>wrong_address</strong> Reason the member was set as undeliverable. </li>
   #     <li><strong>wrong_phone_number</strong> Reason the member was set as unreachable. </li>
-  #     <li><strong>member_since_date</strong> Date when the member was created. This date is saved with date format. </li>
+  #     <li><strong>member_since_date</strong> Date when the member was created. It is in datetime with the offset format. </li>
   #     <li><strong>reactivation_times</strong> Integer value that tells us how many times this member was recovered. </li>
   #     <li><strong>blacklisted</strong> Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted) </li>
   #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. </li>
@@ -239,7 +239,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example with curl. 
   #
   # @example_response
-  #   {"code":"000","member":{"first_name":"Carla","last_name":"Ares","email":"carla.ares@gmail.com","address":"Gorriti 37856","city":"CABA","state":"IN","zip":"12345","birth_date":null,"phone_country_code":123,"phone_area_code":123,"phone_local_number":1234,"type_of_phone_number":"other","gender":"M","bill_date":null,"wrong_address":null,"wrong_phone_number":null,"member_since_date":"2013-01-15T18:03:07Z","reactivation_times":0,"blacklisted":false,"member_group_type_id":"VIP","preferences":{"example_color":"blue","example_team":"esto se guarda en alg\u00fan lugar?"}},"credit_card":{"last_4_digits":"0398","expire_month":7,"expire_year":2015},"current_membership":{"status":"lapsed","join_date":"2013-01-15T18:03:19Z","cancel_date":"2013-04-11T00:00:00Z"}}
+  #   {"code":"000","member":{"first_name":"Megan","last_name":"Brenann","email":"alice@brennan.com","address":"SomeSt","city":"Dresden","state":"AL","zip":"12345","birth_date":"1989-09-03","phone_country_code":1,"phone_area_code":123,"phone_local_number":1123,"type_of_phone_number":"other","gender":"","bill_date":null,"wrong_address":null,"wrong_phone_number":null,"member_since_date":"2013-01-15T13:03:07-05:00","reactivation_times":0,"external_id":null,"blacklisted":false,"member_group_type":"VIP","preferences":{"example_color":"blue","example_team":"example"}},"credit_card":{"last_4_digits":"8431","expire_month":2,"expire_year":2014},"current_membership":{"status":"lapsed","join_date":"2013-01-15T13:03:19-05:00","cancel_date":"2013-04-10T20:00:00-04:00"}}
   # @example_response_description on Example response to the previos example request.
   #
   def show
@@ -264,10 +264,10 @@ class Api::MembersController < ApplicationController
         phone_local_number: member.phone_local_number, 
         type_of_phone_number: member.type_of_phone_number,
         gender: member.gender,
-        bill_date: member.next_retry_bill_date,
+        bill_date: member.next_retry_bill_date.nil? ? '' : member.next_retry_bill_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}").to_s,
         wrong_address: member.wrong_address,
         wrong_phone_number: member.wrong_phone_number,
-        member_since_date: member.member_since_date,
+        member_since_date: member.member_since_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}").to_s,
         reactivation_times: member.reactivation_times,
         external_id: member.external_id,
         blacklisted: member.blacklisted,
@@ -281,8 +281,8 @@ class Api::MembersController < ApplicationController
       },
       current_membership:{
         status: membership.status,
-        join_date: membership.join_date,
-        cancel_date: membership.cancel_date
+        join_date: membership.join_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}").to_s,
+        cancel_date: membership.cancel_date.nil? ? '' : membership.cancel_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}").to_s
       }
     }
     response.merge!( external_id: member.external_id ) if member.club.requires_external_id
@@ -342,7 +342,7 @@ class Api::MembersController < ApplicationController
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
-  # @required [String] next_bill_date Date to be stored as date where we should bill this member. This date is stored with date format. (Format "yyyy-mm-dd" or “dd/mm/yyyy”)
+  # @required [String] next_bill_date Date when we should bill this member, an it is stored with datetime format. It also supports UTC format. Have in mind that in this case it is not necessary to send the offset, since we set it according to the club's configuration.(Format "yyyy-mm-dd", “dd/mm/yyyy” or "yyyy-mm-ddThh:mm:ss") (Eg: "2013-04-23" or "2013-04-23T15:17:09") 
   # @response_field [String] message Shows the method result.
   # @response_field [Integer] code Code related to the method result.
   # @response_field [Hash] errors A hash with member and next_bill_date errors. 

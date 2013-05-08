@@ -3,6 +3,7 @@ class Prospect < ActiveRecord::Base
 
   has_many :enrollment_infos
   belongs_to :terms_of_membership
+  belongs_to :club
 
   serialize :preferences, JSON
   serialize :referral_parameters, JSON
@@ -19,8 +20,6 @@ class Prospect < ActiveRecord::Base
             :campaign_medium, :campaign_description, :campaign_medium_version , :terms_of_membership_id, 
             :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description
 
-
-  delegate :club, :to => :terms_of_membership
 
   def pardot_prospect
     @pardot_prospect ||= if !self.club.pardot_sync?

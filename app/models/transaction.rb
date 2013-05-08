@@ -120,12 +120,18 @@ class Transaction < ActiveRecord::Base
     gateway == "litle"
   end
 
+  def authorize_net?
+    gateway == "authorize_net"
+  end
+
   # answer credit card token
   def self.store!(am_credit_card, pgc)
     if pgc.mes?
       MerchantESolutionsTransaction.store!(am_credit_card, pgc)
     elsif pgc.litle?
       LitleTransaction.store!(am_credit_card, pgc)
+    elsif pgc.authorize_net?
+      AuthorizeNetTransaction.store!(am_credit_card, pgc)
     end
   end
 
@@ -135,6 +141,8 @@ class Transaction < ActiveRecord::Base
       MerchantESolutionsTransaction.new
     when 'litle'
       LitleTransaction.new
+    when 'authorize_net'
+      AuthorizeNetTransaction.new
     end
   end
 
@@ -192,7 +200,7 @@ class Transaction < ActiveRecord::Base
       if payment_gateway_configuration.nil?
         save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
       else
-        load_gateway
+        load_gateway        
         refund_response=@gateway.refund(amount_to_send, refund_response_transaction_id, @options)
         save_response(refund_response)
       end

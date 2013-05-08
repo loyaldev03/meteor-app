@@ -218,7 +218,7 @@ class Member < ActiveRecord::Base
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
   def schedule_first_membership(set_join_date, skip_send_fulfillment = false, nbd_update_for_sts = false, skip_add_club_cash = false)
     send_fulfillment unless skip_send_fulfillment
-    add_club_cash(nil,terms_of_membership.club_cash_amount, 'club cash on enroll') unless skip_add_club_cash
+    self.delay.add_club_cash(nil,terms_of_membership.club_cash_amount, 'club cash on enroll') unless skip_add_club_cash
 
     membership = current_membership
     if set_join_date
@@ -250,12 +250,13 @@ class Member < ActiveRecord::Base
       answer = { :message => I18n.t('error_messages.next_bill_date_blank'), :code => Settings.error_codes.next_bill_date_blank, :errors => errors }
     elsif next_bill_date.to_datetime < Time.zone.now.to_date
       errors = { :next_bill_date => 'Is prior to actual date' }
-      answer   = { :message => "Next bill date should be older that actual date.", :code => Settings.error_codes.next_bill_date_prior_actual_date, :errors => errors }
-    elsif self.valid? and not self.active_credit_card.expired?  
-      self.next_retry_bill_date = next_bill_date.to_datetime
-      self.bill_date = next_bill_date.to_datetime
+      answer = { :message => "Next bill date should be older that actual date.", :code => Settings.error_codes.next_bill_date_prior_actual_date, :errors => errors }
+    elsif self.valid? and not self.active_credit_card.expired?
+      next_bill_date = next_bill_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(self.club.time_zone).utc_offset)/(60*60)}")
+      self.next_retry_bill_date = next_bill_date
+      self.bill_date = next_bill_date
       self.save(:validate => false)
-      message = "Next bill date changed to #{next_bill_date}"
+      message = "Next bill date changed to #{next_bill_date.to_date}"
       Auditory.audit(current_agent, self, message, self, Settings.operation_types.change_next_bill_date)
       answer = {:message => message, :code => Settings.error_codes.success }
     else
@@ -490,16 +491,16 @@ class Member < ActiveRecord::Base
       return { :message => I18n.t('error_messages.club_is_not_enable_for_new_enrollments', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.club_is_not_enable_for_new_enrollments }      
     end
     
+    member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     # credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
     credit_card = CreditCard.new credit_card_params
-    credit_card.get_token(tom.payment_gateway_configuration, member_params[:first_name], member_params[:last_name], cc_blank)
 
-    member = Member.find_by_email_and_club_id(member_params[:email], club.id)
     if member.nil?
       member = Member.new
       member.update_member_data_by_params member_params
       member.skip_api_sync! if member.api_id.present? || skip_api_sync
       member.club = club
+      credit_card.get_token(tom.payment_gateway_configuration, member, cc_blank)
       unless member.valid? and credit_card.errors.size == 0
         return { :message => I18n.t('error_messages.member_data_invalid'), :code => Settings.error_codes.member_data_invalid, 
                  :errors => member.errors_merged(credit_card) }
@@ -512,14 +513,15 @@ class Member < ActiveRecord::Base
       member.skip_api_sync! if member.api_id.present? || skip_api_sync
       member.update_member_data_by_params member_params
       # first update first name and last name, then validate credti card
+      credit_card.get_token(tom.payment_gateway_configuration, member, cc_blank)
     end
 
     answer = member.validate_if_credit_card_already_exist(tom, credit_card_params[:number], credit_card_params[:expire_year], credit_card_params[:expire_month], true, cc_blank, current_agent)
-    unless answer[:code] == Settings.error_codes.success
-      return answer
+    if answer[:code] == Settings.error_codes.success
+      member.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, member_params, false, false)
+    else
+      answer
     end
-
-    member.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, member_params, false, false)
   end
 
   def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, member_params = nil, skip_credit_card_validation = false, skip_product_validation = false)
@@ -828,7 +830,8 @@ class Member < ActiveRecord::Base
   end
 
   def chargeback!(transaction_chargebacked, args)
-    trans = Transaction.new_chargeback(transaction_chargebacked, args)
+    trans = Transaction.obtain_transaction_by_gateway(transaction_chargebacked.gateway)
+    trans.new_chargeback(transaction_chargebacked, args)
     self.blacklist nil, "Chargeback - "+args[:reason]
   end
 
@@ -839,8 +842,9 @@ class Member < ActiveRecord::Base
           answer = { :message => "Cancel date is already set to that date", :code => Settings.error_codes.wrong_data }
         else
           if can_be_canceled?
+            cancel_date = cancel_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(self.club.time_zone).utc_offset)/(60*60)}")
             self.current_membership.update_attribute :cancel_date, cancel_date
-            answer = { :message => "Member cancellation scheduled to #{cancel_date} - Reason: #{message}", :code => Settings.error_codes.success }
+            answer = { :message => "Member cancellation scheduled to #{cancel_date.to_date} - Reason: #{message}", :code => Settings.error_codes.success }
             Auditory.audit(current_agent, self, answer[:message], self, Settings.operation_types.future_cancel)
           else
             answer = { :message => "Member is not in cancelable status.", :code => Settings.error_codes.cancel_date_blank }
@@ -1131,7 +1135,7 @@ def self.sync_members_to_pardot
     answer = { :message => "Credit card valid", :code => Settings.error_codes.success}
     family_memberships_allowed = tom.club.family_memberships_allowed
     new_credit_card = CreditCard.new(:number => number, :expire_month => new_month, :expire_year => new_year)
-    new_credit_card.get_token(tom.payment_gateway_configuration, first_name, last_name)
+    new_credit_card.get_token(tom.payment_gateway_configuration, self)
     credit_cards = new_credit_card.token.nil? ? [] : CreditCard.joins(:member).where(:token => new_credit_card.token, :members => { :club_id => club.id } )
 
     if credit_cards.empty? or allow_cc_blank

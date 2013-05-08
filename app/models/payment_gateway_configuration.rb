@@ -21,6 +21,10 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   def litle?
     self.gateway == 'litle'
   end
+  def authorize_net?
+    self.gateway == "authorize_net"
+  end
+
   def production?
     self.mode == 'production'
   end

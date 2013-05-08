@@ -1160,6 +1160,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     
     @member.set_as_provisional
     @member.set_as_active
+
     assert_difference('Operation.count') do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
     end

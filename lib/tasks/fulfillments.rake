@@ -13,7 +13,11 @@ namespace :fulfillments do
 		fulfillment_file.product = "KIT-CARD"
 		fulfillment_file.save!
 
-		fulfillments = Fulfillment.includes(:member).where( ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? AND ? and fulfillments.status = 'not_processed'", fulfillment_file.club_id, Time.zone.now-7.days, Time.zone.now ])
+		fulfillments = Fulfillment.includes(:member).where( 
+			["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
+		  	AND ? and fulfillments.status = 'not_processed' 
+			  AND fulfillments.product_sku like 'KIT-CARD'", fulfillment_file.club_id, 
+			Time.zone.now-7.days, Time.zone.now ])
 
 		fulfillments.each do |fulfillment|
 	    fulfillment_file.fulfillments << fulfillment
@@ -47,5 +51,7 @@ namespace :fulfillments do
     
     temp.close 
     temp.unlink
+
+    fulfillment_file.processed
 	end
 end

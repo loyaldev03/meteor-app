@@ -62,6 +62,7 @@ class Api::ProspectsController < ApplicationController
     my_authorize! :manage_prospects_api, Prospect, tom.club_id
   	response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
   	prospect = Prospect.new(params[:prospect])
+    prospect.club_id = tom.club_id
   	if prospect.save
   	  response[:message] = "Prospect was successfuly saved."
       response[:code] = Settings.error_codes.success

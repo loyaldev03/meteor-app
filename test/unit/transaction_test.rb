@@ -14,7 +14,8 @@ class TransactionTest < ActiveSupport::TestCase
     FactoryGirl.create(:without_grace_period_decline_strategy_yearly)
   end
 
-  def enroll_member(tom, amount=23, cc_blank=false)
+  def enroll_member(tom, amount=23, cc_blank=false, cc_card = nil)
+    credit_card = cc_card.nil? ? @credit_card : cc_card
     answer = Member.enroll(tom, @current_agent, amount, 
       { first_name: @member.first_name,
         last_name: @member.last_name, address: @member.address, city: @member.city, gender: 'M',
@@ -22,8 +23,8 @@ class TransactionTest < ActiveSupport::TestCase
         phone_country_code: @member.phone_country_code, phone_area_code: @member.phone_area_code,
         type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US', 
         product_sku: Settings.kit_card_product }, 
-      { number: @credit_card.number, 
-        expire_year: @credit_card.expire_year, expire_month: @credit_card.expire_month },
+      { number: credit_card.number, 
+        expire_year: credit_card.expire_year, expire_month: credit_card.expire_month },
       cc_blank)
 
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
@@ -360,6 +361,120 @@ class TransactionTest < ActiveSupport::TestCase
       end
     end
     assert_equal member.status, "active"
+  end
+
+  # Tets Litle transactions
+  def club_with_litle
+    @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
+    @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
+    @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)
+  end
+
+  test "Bill membership with Litle" do
+    club_with_litle
+    @credit_card = @credit_card_litle # overwrite credit card
+    active_member = enroll_member(@litle_terms_of_membership, 100, false, @credit_card_litle)
+    amount = @litle_terms_of_membership.installment_amount
+    Timecop.travel(active_member.next_retry_bill_date) do
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.status, 'active'
+    end
+  end
+
+  test "Enroll with Litle" do
+    club_with_litle
+    enroll_member(@litle_terms_of_membership, 100, false, @credit_card_litle)
+  end
+
+  test "Full refund with Litle" do
+    club_with_litle
+    @credit_card = @credit_card_litle # overwrite credit card
+    active_member = enroll_member(@litle_terms_of_membership, 100, false, @credit_card_litle)
+    amount = @litle_terms_of_membership.installment_amount
+    Timecop.travel(active_member.next_retry_bill_date) do
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.status, 'active'
+      trans = active_member.transactions.last
+      answer = Transaction.refund(amount, trans)
+      assert_equal answer[:code], Settings.error_codes.success, answer[:message]
+      trans.reload
+      assert_equal trans.refunded_amount, amount
+      assert_equal trans.amount_available_to_refund, 0.0
+    end
+  end
+
+  test "Partial refund with Litle" do
+    club_with_litle
+    @credit_card = @credit_card_litle # overwrite credit card
+    active_member = enroll_member(@litle_terms_of_membership, 100, false, @credit_card_litle)
+    amount = @litle_terms_of_membership.installment_amount
+    Timecop.travel(active_member.next_retry_bill_date) do
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.status, 'active'
+      trans = active_member.transactions.last
+      refunded_amount = amount-0.34
+      answer = Transaction.refund(refunded_amount, trans)
+      assert_equal answer[:code], Settings.error_codes.success, answer[:message]
+      trans.reload
+      assert_equal trans.refunded_amount, refunded_amount
+      assert_not_equal trans.amount_available_to_refund, 0.0
+    end
+  end
+
+
+  # Tets Authorize net transactions
+  def club_with_authorize_net
+    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
+    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
+    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)
+  end
+
+  test "Bill membership with Authorize net" do
+    club_with_authorize_net
+    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
+    amount = @authorize_net_terms_of_membership.installment_amount
+    Timecop.travel(active_member.next_retry_bill_date) do
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.status, 'active'
+    end
+  end
+
+  test "Enroll with Authorize net" do
+    club_with_authorize_net
+    enroll_member(@authorize_net_terms_of_membership, 23, false, @credit_card_authorize_net)
+  end
+
+  test "Full refund with Authorize net" do
+    club_with_authorize_net
+    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
+    amount = @authorize_net_terms_of_membership.installment_amount
+    Timecop.travel(active_member.next_retry_bill_date) do
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.status, 'active'
+      trans = active_member.transactions.last
+      answer = Transaction.refund(amount, trans)
+      assert_equal answer[:code], "3", answer[:message] # refunds cant be processed on Auth.net test env
+    end
+  end
+
+  test "Partial refund with Authorize net" do
+    club_with_authorize_net
+    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
+    amount = @authorize_net_terms_of_membership.installment_amount
+    Timecop.travel(active_member.next_retry_bill_date) do
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.status, 'active'
+      trans = active_member.transactions.last
+      refunded_amount = amount-0.34
+      answer = Transaction.refund(refunded_amount, trans)
+      assert_equal answer[:code], "3", answer[:message] # refunds cant be processed on Auth.net test env
+    end
   end
 
   test "should not update NBD after save the sale from monthly-tom to monthly-tom" do

@@ -14,7 +14,7 @@ GIT
 
 GIT
   remote: git://github.com/stoneacre/active_merchant
-  revision: b02f7b646ead74c772f82441aaa842b5c9e0adf3
+  revision: f309232b1c2986f2da3217760931c28664ab3e86
   specs:
     activemerchant (1.32.0)
       active_utils (>= 1.0.2)
@@ -284,6 +284,7 @@ GEM
     ruby-pardot (1.0)
       crack
       httparty
+    ruby-prof (0.13.0)
     ruby2ruby (2.0.3)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.0)
@@ -392,6 +393,7 @@ DEPENDENCIES
   delayed_job_active_record
   devise (= 2.0.4)
   easy_roles
+  encryptor
   factory_girl_rails
   faker
   faraday (= 0.8.5)
@@ -416,6 +418,7 @@ DEPENDENCIES
   ruby-debug-base19x (~> 0.11.30.pre4)
   ruby-debug19
   ruby-pardot
+  ruby-prof
   rvm-capistrano
   sass-rails (~> 3.2.3)
   selenium-webdriver

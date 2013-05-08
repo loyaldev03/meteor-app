@@ -84,6 +84,7 @@ group :development do
   gem 'yard-rest'
   gem 'redcarpet'
   gem "bullet"
+  gem 'ruby-prof'
 end
 
 group :prototype do
@@ -104,5 +105,10 @@ group :test do
 end
 
 gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant"
-
 gem 'LitleOnline'
+
+# TODO => remove the following requires after tokenization is implemented
+### only for Auth.Net  without tokenization.
+gem 'encryptor'
+###################
+
