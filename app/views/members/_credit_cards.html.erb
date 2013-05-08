@@ -3,7 +3,9 @@
   <thead>
     <tr>
       <th> <%= t('activerecord.attributes.credit_card.last_digits') %> </th>
-      <th> <%= t('activerecord.attributes.credit_card.token') %> </th>
+      <% if can? :see_cc_token, CreditCard %>
+        <th> <%= t('activerecord.attributes.credit_card.token') %> </th>
+      <% end %>
       <th> <%= t('activerecord.attributes.credit_card.expire_date') %> </th>
       <th> <%= t('activerecord.attributes.credit_card.added_at') %> </th>
       <th> <%= t('activerecord.attributes.credit_card.last_successful_bill_date') %> </th>
@@ -22,7 +24,9 @@
         <% end %>
         >
       <td> <%= cc.last_digits %> </td>
-      <td> <%= cc.token %> </td>
+      <% if can? :see_cc_token, CreditCard %>
+        <td> <%= cc.token %> </td>
+      <% end %>
       <td> <%= cc.expire_month %> / <%= cc.expire_year %> </td>
       <td> <%= I18n.l cc.created_at, :format => :only_date %> </td>
       <td> <%= I18n.l cc.last_successful_bill_date, :format => :dashed if !cc.last_successful_bill_date.nil? %> </td>
