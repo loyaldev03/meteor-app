@@ -22,6 +22,7 @@ class Ability
     cannot :manage, Transaction
     cannot :manage_club_cash_api, ClubCashTransaction
     cannot :see_sync_status, Member
+    cannot :see_cc_token, CreditCard
     cannot :api_enroll, Member
     cannot :api_update, Member
     cannot :api_profile, Member
@@ -78,6 +79,7 @@ class Ability
       can :list, Membership
       can :manage, CreditCard
       cannot :destroy, CreditCard
+      cannot :see_cc_token, CreditCard
       can :manage, MemberNote
       can :show, TermsOfMembership
       can :list, Transaction
@@ -140,6 +142,7 @@ class Ability
       can :list, Membership
       can :manage, CreditCard
       cannot :destroy, CreditCard
+      cannot :see_cc_token, CreditCard
       can :manage, MemberNote
       can :show, TermsOfMembership
       can :list, Transaction
