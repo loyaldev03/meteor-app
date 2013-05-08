@@ -3,6 +3,7 @@ class Prospect < ActiveRecord::Base
 
   has_many :enrollment_infos
   belongs_to :terms_of_membership
+  belongs_to :club
 
   serialize :preferences, JSON
   serialize :referral_parameters, JSON
