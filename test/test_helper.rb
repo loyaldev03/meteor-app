@@ -154,10 +154,16 @@ module ActionController
       end
     end
         
-    def create_member_by_sloop(agent, member, credit_card, enrollment_info, terms_of_membership, validate = true)
-      
-      credit_card = FactoryGirl.build(:credit_card) if credit_card.nil?
+    def create_member_by_sloop(agent, member, credit_card, enrollment_info, terms_of_membership, validate = true, cc_blank = false)
       enrollment_info = FactoryGirl.build(:enrollment_info) if enrollment_info.nil?
+
+      if cc_blank
+        credit_card_to_load = FactoryGirl.build(:blank_credit_card)
+      elsif credit_card.nil?
+        credit_card_to_load = FactoryGirl.build(:credit_card)
+      else
+        credit_card_to_load = credit_card
+      end
 
       ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
         Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
@@ -165,7 +171,8 @@ module ActionController
                                         :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
             )
       )
-      active_merchant_stubs_store(credit_card.number)
+
+      active_merchant_stubs_store(credit_card_to_load.number)
       post( api_members_url , { member: {:first_name => member.first_name, 
                                 :last_name => member.last_name,
                                 :address => member.address,
@@ -182,16 +189,16 @@ module ActionController
                                 :enrollment_amount => enrollment_info.enrollment_amount,
                                 :terms_of_membership_id => terms_of_membership.id,
                                 :birth_date => member.birth_date,
-                                :credit_card => {:number => credit_card.number,
-                                                 :expire_month => credit_card.expire_month,
-                                                 :expire_year => credit_card.expire_year },
+                                :credit_card => {:number => credit_card_to_load.number,
+                                                 :expire_month => credit_card_to_load.expire_month,
+                                                 :expire_year => credit_card_to_load.expire_year },
                                 :product_sku => enrollment_info.product_sku,
                                 :product_description => enrollment_info.product_description,
                                 :mega_channel => enrollment_info.mega_channel,
                                 :marketing_code => enrollment_info.marketing_code,
                                 :fulfillment_code => enrollment_info.fulfillment_code,
                                 :ip_address => enrollment_info.ip_address
-                                },
+                                }, :setter => { :cc_blank => cc_blank },
                                 :api_key => agent.authentication_token, :format => :json})
       if validate
         assert_response :success

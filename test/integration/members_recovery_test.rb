@@ -10,7 +10,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     init_test_setup
   end
 
-  def setup_member(cancel = true)
+  def setup_member(cancel = true, create_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @club = FactoryGirl.create(:simple_club_with_gateway)
     @partner = @club.partner
@@ -20,17 +20,20 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
     FactoryGirl.create(:batch_agent)
     
-    unsaved_member = FactoryGirl.build(:member_with_api)
-    create_member_by_sloop(@admin_agent, unsaved_member, nil, nil, @terms_of_membership_with_gateway)
-    
-    @saved_member = Member.find_by_email(unsaved_member.email)
 
-    if cancel    
-      cancel_date = Time.zone.now + 1.days
-      message = "Member cancellation scheduled to #{cancel_date} - Reason: #{@member_cancel_reason.name}"
-      @saved_member.cancel! cancel_date, message, @admin_agent
-      @saved_member.set_as_canceled!
-	  end
+    if create_member
+      unsaved_member = FactoryGirl.build(:member_with_api)
+      create_member_by_sloop(@admin_agent, unsaved_member, nil, nil, @terms_of_membership_with_gateway)
+      
+      @saved_member = Member.find_by_email(unsaved_member.email)
+
+      if cancel    
+        cancel_date = Time.zone.now + 1.days
+        message = "Member cancellation scheduled to #{cancel_date} - Reason: #{@member_cancel_reason.name}"
+        @saved_member.cancel! cancel_date, message, @admin_agent
+        @saved_member.set_as_canceled!
+  	  end
+    end
     sign_in_as(@admin_agent)
   end
 
@@ -290,4 +293,38 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@new_terms_of_membership_with_gateway.id}) -#{@new_terms_of_membership_with_gateway.name}-")
     end
   end
+
+  # Complimentary members should be active (Recover)
+  test "Complimentary members should be active (Enroll)" do
+    setup_member false, false
+    @terms_of_membership_with_gateway.provisional_days = 0
+    @terms_of_membership_with_gateway.installment_amount = 0.0
+    @terms_of_membership_with_gateway.save
+    enrollment_info = FactoryGirl.build :complete_enrollment_info_with_cero_amount, :product_sku => 'KIT-CARD'
+    unsaved_member = FactoryGirl.build(:member_with_api)
+    
+    assert_difference('Member.count') do
+      create_member_by_sloop(@admin_agent, unsaved_member, nil, enrollment_info, @terms_of_membership_with_gateway, true, true)
+      @saved_member = Member.last
+    end
+    assert_difference('Transaction.count')do
+      @saved_member.bill_membership
+    end
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within('#table_membership_information')do
+      within('#td_mi_status'){ assert page.has_content?("active") }
+    end  
+    assert_equal @saved_member.status, 'active'
+
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within('#table_membership_information')do
+      within('#td_mi_status'){ assert page.has_content?("lapsed") }
+    end  
+    assert_equal @saved_member.status, 'lapsed'
+
+    recover_member( @saved_member, @terms_of_membership_with_gateway )
+    validate_member_recovery( @saved_member, @terms_of_membership_with_gateway )
+  end
+
 end
