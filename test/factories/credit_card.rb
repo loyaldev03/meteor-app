@@ -16,6 +16,14 @@ FactoryGirl.define do
     token "c25ccfecae10384698a44360444dead7"
   end
 
+  factory :blank_credit_card, class: CreditCard do
+    active true
+    expire_month { (Date.today).month }
+    expire_year { (Date.today).year }
+    number "0000000000"
+    token "a"
+  end
+
   factory :credit_card_american_express, class: CreditCard do
     active true
     expire_month { (Date.today + 2.month).month }
