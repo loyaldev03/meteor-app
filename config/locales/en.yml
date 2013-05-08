@@ -36,6 +36,7 @@ en:
   all_times: 'All times'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
+  loading: 'Loading'
   menu: 
     logout: 'Logout'
     agents: 'Agents'
@@ -261,6 +262,7 @@ en:
         expire_year: 'Expire year'
         blacklisted: 'Blacklisted'
         last_digits: 'Last 4 digits'
+        token: 'Token'
         active: 'active'
         type_unknown: 'unknown'
       operation:

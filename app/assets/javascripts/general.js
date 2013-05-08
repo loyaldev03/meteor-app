@@ -1,5 +1,4 @@
 $(document).ready( function() {
-
   $('.confirm').click( function(event){
     var answer = confirm('Are you sure?');
     return answer 
@@ -53,6 +52,35 @@ $(document).ready( function() {
     });
   });
 });
+
+function startAjaxLoader(){
+  var opts = {
+    lines: 9, // The number of lines to draw
+    length: 4, // The length of each line
+    width: 3, // The line thickness
+    radius: 7, // The radius of the inner circle
+    corners: 1, // Corner roundness (0..1)
+    rotate: 0, // The rotation offset
+    direction: 1, // 1: clockwise, -1: counterclockwise
+    color: '#000', // #rgb or #rrggbb
+    speed: 1, // Rounds per second
+    trail: 35, // Afterglow percentage
+    shadow: false, // Whether to render a shadow
+    hwaccel: false, // Whether to use hardware acceleration
+    className: 'spinner', // The CSS class to assign to the spinner
+    zIndex: 2e9, // The z-index (defaults to 2000000000)
+    top: 'auto', // Top position relative to parent in px
+    left: 'auto' // Left position relative to parent in px
+  };
+  var spinner = new Spinner(opts).spin();
+  $("#ajax_loader").append(spinner.el);
+  $("#ajax_loader").slideDown("slow");
+};
+
+function endAjaxLoader(){
+  $("#ajax_loader").slideUp();
+  $('.spinner').remove();
+};
 
 function agent_index_functions(column_count){
   $('#agents_table').dataTable({
@@ -152,8 +180,13 @@ function new_product_functions(){
 
 function member_index_functions(){
   $('#index_search_form').submit(function (){
+    startAjaxLoader();
+    $('#submit_button').attr('disabled', 'disabled')
     update_select_only = false;
-    $.get(this.action, $(this).serialize(), null, 'script'); 
+    $.get(this.action, $(this).serialize(), null, 'script').done(function(data) {
+      endAjaxLoader();
+      $('#submit_button').removeAttr('disabled');
+    });
     return false;
   });
 
@@ -193,6 +226,7 @@ function new_member_functions(){
                                 yearRange: '1900',
                                 buttonImageOnly: true});
   $('#new_member').submit( function(event) {
+    startAjaxLoader();
     $('#error_explanation').hide();
     $('#submit_button').attr('disabled', 'disabled');
     event.preventDefault();
@@ -201,6 +235,7 @@ function new_member_functions(){
       url: "/api/v1/members",
       data: $("#new_member").serialize(),
       success: function(data) {
+        endAjaxLoader();
         $('input').parent().parent().removeClass("error");
         if (data.code == 000) {
           alert (data.message);
@@ -272,6 +307,7 @@ function edit_member_functions(){
                                 yearRange: '1900',
                                 buttonImageOnly: true});
   $('form').submit( function(event) {
+    startAjaxLoader();
     $('#submit_button').attr('disabled', 'disabled');
     event.preventDefault();
     $.ajax({
@@ -279,6 +315,7 @@ function edit_member_functions(){
       url: "/api/v1/members/"+id,
       data: $('form').serialize(),
       success: function(data) {
+        endAjaxLoader();
         alert(data.message);
         $('input').parent().parent().removeClass("error");
         if (data.code == 000)
@@ -317,6 +354,7 @@ function club_cash_functions(){
 
   $('#error_explanation').hide();
   $('form').submit( function(event) {
+    startAjaxLoader();
     $('#submit_button').attr('disabled', 'disabled');
     event.preventDefault(); 
     $.ajax({
@@ -324,9 +362,10 @@ function club_cash_functions(){
       url: "/api/v1/members/"+id+"/club_cash_transaction",
       data: $("form").serialize(),
       success: function(data) {
+        endAjaxLoader();
         if (data.code == 000){
-          window.location.replace('../'+id);
           alert(data.message);
+          window.location.replace('../'+id);
         }else{
           $('#submit_button').removeAttr("disabled");
           $('#error_explanation').show();

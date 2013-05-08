@@ -183,9 +183,10 @@
   </thead>
   <tbody>
     <tr>
-      <th>
-        <%= t("activerecord.attributes.credit_card.last_digits") %>
-      </th>
+      <th> <%= t("activerecord.attributes.credit_card.last_digits") %> </th>
+      <% if can? :see_cc_token, CreditCard %>
+        <th> <%= t('activerecord.attributes.credit_card.token') %> </th>
+      <% end %>
       <th><%= t("activerecord.attributes.credit_card.expire_date") %></th>
       <th> <%= t('activerecord.attributes.credit_card.added_at') %> </th>
       <th> <%= t('activerecord.attributes.credit_card.last_successful_bill_date') %> </th>
@@ -196,6 +197,9 @@
           <%= @active_credit_card.last_digits %>
           (<%= @active_credit_card.cc_type.nil? ?  t('activerecord.attributes.credit_card.type_unknown') : @active_credit_card.cc_type %>)
         </td>
+        <% if can? :see_cc_token, CreditCard %>
+          <td> <%= @active_credit_card.token %> </td>
+        <% end %>
         <td><%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %></td>
         <td id="td_mi_credit_cards_first_created_at"> <%= I18n.l @active_credit_card.created_at, :format => :only_date %></td>
         <td id="td_mi_last_successful_bill_date"> <%= I18n.l @active_credit_card.last_successful_bill_date, :format => :only_date if !@active_credit_card.last_successful_bill_date.nil? %> </td>
