@@ -21,11 +21,11 @@ class Api::OperationController < ApplicationController
   #
   # @example_request
   #   curl -v -k -X POST -d "api_key=G6qq3KzWQVi9zgfFVXud&operation_type=900&operation_date=2013-2-12T15:20:12-04:00&description=Enrolled vip registration" https://dev.stoneacrehq.com:3000/api/v1/members/1/operation
-  # @example_request_description Example with curl. 
+  # @example_request_description Example of valid request.
   #
   # @example_response
   #   {"message":"Operation created succesfully.","code":"000"}
-  # @example_response_description Example response to the previos example request.
+  # @example_response_description Example response to valid request.
   #
 	def create
     begin

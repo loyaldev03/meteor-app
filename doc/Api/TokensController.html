@@ -403,7 +403,7 @@
 							<span class="description">
 								
 									
-										Example response to the previos example request.
+										Example response to valid request
 									
 								
 							</span>
@@ -426,7 +426,7 @@
 								<li>
 									<span class="name">id</span>
 									<span class="type">String</span>
-									<span class="text">Token's id to destroy. Have in mind this is part of the url.</span>
+									<span class="text">Token to destroy. Have in mind this is part of the url.</span>
 								</li>
 							</ul>
 						
@@ -468,6 +468,47 @@
 			
 			
 			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Example with curl. We are passing in this example an empty body, just to make it work. (-d "")
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										curl -X PUT -d "" https://dev.stoneacrehq.com:3000/api/v1/tokens/dodzJDdoaYZ1XNrn7axF
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										{"token":"G6qq3KzWQVi9zgfFVXud"}
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Example response to a valid request.
+									
+								
+							</span>
+						</div>
+					
+				</div>
+			
 		</div>	
     
   </div>
@@ -489,7 +530,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Mon May  6 13:07:46 2013 with ruby-1.9.3
+  Generated on Thu May  9 12:07:51 2013 with ruby-1.9.3
 </div>
 
   </body>
