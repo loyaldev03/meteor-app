@@ -3,7 +3,7 @@
   <thead>
     <tr>
       <th> <%= t('activerecord.attributes.credit_card.last_digits') %> </th>
-      <% if can? :see_cc_token, CreditCard %>
+      <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
         <th> <%= t('activerecord.attributes.credit_card.token') %> </th>
       <% end %>
       <th> <%= t('activerecord.attributes.credit_card.expire_date') %> </th>
@@ -24,7 +24,7 @@
         <% end %>
         >
       <td> <%= cc.last_digits %> </td>
-      <% if can? :see_cc_token, CreditCard %>
+      <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
         <td> <%= cc.token %> </td>
       <% end %>
       <td> <%= cc.expire_month %> / <%= cc.expire_year %> </td>
