@@ -1,4 +1,3 @@
-<%= render :partial => "shared/member_information" %>
 <table class="table table-bordered table-condensed" id="table_information">
   <thead>
   <tr> <th> <%= t('activerecord.term_of_membership') %> </th> </tr>
@@ -66,4 +65,10 @@
   </tbody>
 </table>
 
-<%= link_to t('buttons.return_to_member_show'), show_member_path, :class => "btn" %>
+<%= link_to t('buttons.return_to_member_show'), '#', :class => "btn", :id => 'return_btn' %>
+
+
+
+<script>
+  $(document).ready(show_terms_of_membership_functions());
+</script>

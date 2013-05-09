@@ -38,13 +38,13 @@ SacPlatform::Application.routes.draw do
       match '/members/new' => 'members#new', as: 'new_member'
       match '/members' => 'members#index', as: 'members', :via => [:get, :post]
       match '/members/search_result' => 'members#search_result', as: 'members_search_result', :via => [:get]
+      match '/terms_of_memberships/:id' => 'terms_of_memberships#show', as: 'terms_of_membership', :via => [:get]
 
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
         match '/operations' => 'operations#index', as: 'operations', :via => [:post, :get]
         resources :operations, :only => [:show, :update]
         resources :member_notes, :only => [ :new, :create ]
-        resources :terms_of_memberships, :only => [ :show ]
         resources :transactions, :only => [ :index ]
         resources :memberships, :only => [ :index ]
         resources :club_cash_transactions, :only => [:index]
