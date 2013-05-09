@@ -8869,3 +8869,30 @@
     gateway: mes
     limit: "0"
   attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: 'refs #27300 - No Credit Acct.'
+    days: "6"
+    response_code: "039"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "684"
+    gateway: mes
+    limit: "4
+  attributes_cache: {}
+
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: 'refs #27300 - No Credit Acct.'
+    days: "6"
+    response_code: "039"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "685"
+    gateway: mes
+    limit: "4
+  attributes_cache: {}
