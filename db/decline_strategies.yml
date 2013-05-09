@@ -8790,3 +8790,82 @@
     gateway: mes
     limit: "1"
   attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: Ask consumer for new payment vehicle, Otherwise No Retry
+    days: "0"
+    response_code: "041"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "680"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: Ask consumer for new payment vehicle, Otherwise No Retry
+    days: "0"
+    response_code: "041"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "681"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: Ask consumer for new payment vehicle, Otherwise No Retry
+    days: "0"
+    response_code: "043"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "682"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: Ask consumer for new payment vehicle, Otherwise No Retry
+    days: "0"
+    response_code: "043"
+    decline_type: soft
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "683"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: 'refs #27307'
+    days: "0"
+    response_code: "007"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "684"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: 'refs #27307'
+    days: "0"
+    response_code: "007"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "685"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
