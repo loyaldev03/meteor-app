@@ -719,3 +719,10 @@ function resend_fulfillment(url){
     });
   });
 }
+
+function show_terms_of_membership_functions(){
+  $('#return_btn').click( function(event){
+    event.preventDefault();
+    window.history.back();
+  });
+}
