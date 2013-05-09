@@ -54,7 +54,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
   test "add club cash amount" do
     setup_member
-    visit show_member_path(:partner_psrefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
     add_club_cash(@saved_member, 15, "Generic description")
     @saved_member.reload

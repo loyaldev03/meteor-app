@@ -35,11 +35,10 @@ class ClubTest < ActionController::IntegrationTest
     within("#my_clubs_table_filter") do
       find(:css, "input").set(saved_club.name)
     end
-    sleep 10
+    sleep 2
     within("#my_clubs_table") do
       page.has_content?(saved_club.name)
     end
-    sleep 10
   end
 
   test "create blank club" do
