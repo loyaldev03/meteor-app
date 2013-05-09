@@ -392,7 +392,8 @@ module ActionController
 
   def save_the_sale(member, new_terms_of_membership, validate = true)
     assert_difference('Fulfillment.count',0) do 
-      old_membership = member.current_membership  
+      old_membership = member.current_membership
+      next_retry_bill_date_old = member.next_retry_bill_date
       visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
 
       click_on 'Save the sale'    
@@ -404,6 +405,7 @@ module ActionController
         member.reload
         old_membership.reload
         assert_equal old_membership.status, "lapsed"
+        assert_equal next_retry_bill_date_old, member.next_retry_bill_date
         assert_equal member.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
         assert_equal member.status, member.current_membership.status
         within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
