@@ -50,6 +50,62 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button 'Set wrong phone number'
   end
 
+      # test "Bill date filter" do
+    #     setup_member
+        
+
+    # end
+
+      test "Search option in My Clubs should not affect front end perfomance" do
+    saved_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    visit my_clubs_path
+    within("#my_clubs_table_filter") do
+      find(:css, "input").set(saved_club.name)
+    end
+    sleep 10
+    within("#my_clubs_table") do
+      page.has_content?(saved_club.name)
+    end
+    sleep 10
+  end
+
+    test "changing the cancel date" do
+      setup_member
+
+      cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+      click_link_or_button 'cancel'
+      sleep 1
+      page.execute_script("window.jQuery('#cancel_date').next().click()")
+      within("#ui-datepicker-div") do
+        if ((Time.zone.now+1.day).month != Time.zone.now.month)
+          within(".ui-datepicker-header")do
+          find(".ui-icon-circle-triangle-e").click
+          end
+        end
+      end
+    first(:link, "#{(Time.zone.now+1.day).day}").click
+    select(cancel_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_link_or_button 'Cancel member'
+    sleep 2
+    click_link_or_button 'cancel'
+    sleep 1
+      page.execute_script("window.jQuery('#cancel_date').next().click()")
+      within("#ui-datepicker-div") do
+        if ((Time.zone.now+2.day).month != Time.zone.now.month)
+          within(".ui-datepicker-header")do
+          first(:link, "#{(Time.zone.now+1.day).day}").click
+          end
+        end
+      end
+    click_on("#{(Time.zone.now+2.day).day}")
+    select(cancel_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_link_or_button 'Cancel member'
+    sleep 2
+    end
+
  #  test "edit member" do
  #    setup_member
  #    visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)

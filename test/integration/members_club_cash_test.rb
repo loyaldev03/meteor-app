@@ -38,9 +38,23 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
   # Remove/Add Club Cash
   # See club cash transaction history (Only Clubs without Drupal domain)
+
+  # test "Message after Club Cash addition" do
+  #   setup_member
+
+  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+  #   within("#table_membership_information"){ click_on 'Add club cash' }
+    
+  #   fill_in 'club_cash_transaction[amount]', :with => 5
+  #   fill_in 'club_cash_transaction[description]', :with => "description"
+  #   click_on 'Save club cash transaction'
+
+  #   ACA HAY QUE ENCONTRAR UNA FORMA DE QUE VALIDE EL POPIN CON CAPYBARA 
+  # end
+
   test "add club cash amount" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    visit show_member_path(:partner_psrefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
     add_club_cash(@saved_member, 15, "Generic description")
     @saved_member.reload
@@ -61,6 +75,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
   end
 
   # Error message when adding a wrong club cash
+
   test "invalid characters on club cash" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)

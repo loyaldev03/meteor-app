@@ -49,7 +49,6 @@ class SaveTheSaleTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
-
   test "save the sale from active to provisional with enrollment info related to product not available at inventory" do
     setup_member(false, true)
     assert_equal @saved_member.status, "active"
@@ -67,7 +66,6 @@ class SaveTheSaleTest < ActionController::IntegrationTest
   test "save the sale from provisional to provisional" do
     setup_member
     assert_equal @saved_member.status, "provisional"
-    
     assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
         save_the_sale(@saved_member, @new_terms_of_membership_with_gateway)

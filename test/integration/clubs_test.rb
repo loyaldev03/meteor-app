@@ -28,6 +28,20 @@ class ClubTest < ActionController::IntegrationTest
     assert page.has_content?("The club #{unsaved_club.name} was successfully created")
   end
 
+
+  test "Search option in My Clubs should not affect front end perfomance" do
+    saved_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    visit my_clubs_path
+    within("#my_clubs_table_filter") do
+      find(:css, "input").set(saved_club.name)
+    end
+    sleep 10
+    within("#my_clubs_table") do
+      page.has_content?(saved_club.name)
+    end
+    sleep 10
+  end
+
   test "create blank club" do
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
