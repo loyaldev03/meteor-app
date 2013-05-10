@@ -1350,19 +1350,21 @@ def self.sync_members_to_pardot
         trans.update_attribute :decline_strategy_id, decline.id
         if decline.hard_decline?
           message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
+          operation_type = Settings.operation_types.membership_billing_hard_decline
           cancel_member = true
         else
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           self.next_retry_bill_date = decline.days.days.from_now
           if self.recycled_times > (decline.limit-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
+            operation_type = Settings.operation_types.membership_billing_hard_decline_by_limit
             cancel_member = true
           end
         end
       end
       self.save(:validate => false)
       if cancel_member
-        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_hard_decline)
+        Auditory.audit(nil, trans, message, self, operation_type )
         self.cancel! Time.zone.now, "HD cancellation"
         set_as_canceled!
         Communication.deliver!(:hard_decline, self)

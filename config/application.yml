@@ -38,6 +38,7 @@ defaults: &defaults
     error_on_enrollment_billing: 111
     no_recurrent_billing: 112
     no_recurrent_billing_with_error: 113
+    membership_billing_hard_decline_by_limit: 114
     #profile
     cancel: 200 
     future_cancel: 201
