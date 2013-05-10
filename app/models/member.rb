@@ -1013,7 +1013,7 @@ def self.sync_members_to_pardot
     end
   end
 
-  def set_fulfillments.process_sync 
+  def self.process_sync 
     base = Member.where('status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )')
     tz = Time.zone.now
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members lapsed and api_id not null, processing #{base.count} members"
