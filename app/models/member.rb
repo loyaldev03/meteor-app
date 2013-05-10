@@ -1076,8 +1076,8 @@ def self.sync_members_to_pardot
       group.each do |member|
         member_list << member
       end
-    end  
-    Notifier.members_with_duplicated_email_sync_error(member_list).deliver!
+    end
+    Notifier.members_with_duplicated_email_sync_error(member_list).deliver! if member_list.count != 0
   end
 
   def self.send_happy_birthday
