@@ -14,6 +14,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should create a member" do
+    member = FactoryGirl.build(:member)
     assert !member.save, member.errors.inspect
     member.club = @terms_of_membership_with_gateway.club
     Delayed::Worker.delay_jobs = true
