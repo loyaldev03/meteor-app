@@ -113,6 +113,16 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
+  # test "Recover a member using CS which was enrolled with a product sku that does not have stock" do
+  #   setup_member(true, true)
+  #   prods = Product.find_all_by_sku @saved_member.enrollment_infos.first.product_sku.split(',')
+  #   prods.each {|p| p.update_attributes :stock =>  0, :allow_backorder => false }
+  #   recover_member(:unsaved_member,:terms_of_membership_with_gateway)
+  #   sleep 4
+
+  # end
+
+
   test "recovery a member with provisional TOM" do
     setup_member
     recover_member(@saved_member,@new_terms_of_membership_with_gateway)

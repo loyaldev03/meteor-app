@@ -63,6 +63,20 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     end
   end
 
+  test "save the sale from active to provisional with enrollment info related to product available at inventory" do
+    setup_member(false, true)
+    assert_equal @saved_member.status, "active"
+    
+    prods = Product.find_all_by_sku @saved_member.enrollment_infos.first.product_sku.split(',')
+    prods.each {|p| p.update_attributes :stock =>  0, :allow_backorder => true }
+
+    assert_difference('Membership.count') do 
+      assert_difference('EnrollmentInfo.count') do
+        save_the_sale(@saved_member, @new_terms_of_membership_with_gateway)
+      end
+    end
+  end
+
   test "save the sale from provisional to provisional" do
     setup_member
     assert_equal @saved_member.status, "provisional"

@@ -50,62 +50,45 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button 'Set wrong phone number'
   end
 
-      # test "Bill date filter" do
-    #     setup_member
-        
-
-    # end
-
-      test "Search option in My Clubs should not affect front end perfomance" do
-    saved_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    visit my_clubs_path
-    within("#my_clubs_table_filter") do
-      find(:css, "input").set(saved_club.name)
-    end
-    sleep 10
-    within("#my_clubs_table") do
-      page.has_content?(saved_club.name)
-    end
-    sleep 10
-  end
-
-    test "changing the cancel date" do
-      setup_member
-
-      cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-      click_link_or_button 'cancel'
-      sleep 1
-      page.execute_script("window.jQuery('#cancel_date').next().click()")
-      within("#ui-datepicker-div") do
-        if ((Time.zone.now+1.day).month != Time.zone.now.month)
-          within(".ui-datepicker-header")do
-          find(".ui-icon-circle-triangle-e").click
+      test "Bill date filter" do
+        setup_member
+        unsaved_member=FactoryGirl.build(:member_with_api, :club_id => @club.id)
+        unsaved_member_2=FactoryGirl.build(:member_with_api, :club_id => @club.id)
+        credit_cardd=FactoryGirl.build(:credit_card_american_express)
+        c = create_member(unsaved_member, credit_cardd)
+        c2 = create_member(unsaved_member_2)
+        tran_1 = FactoryGirl.create(:transaction, :member_id => c.id)
+        tran_1.update_attribute(:created_at, Time.zone.now + 10.days)
+        tran_2 = FactoryGirl.create(:transaction, :member_id => c2.id)
+        visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+        sleep 2
+        within("#member_billing_date_start") do
+          page.execute_script("window.jQuery('#member_billing_date_start').next().click()")
+        end
+        within("#ui-datepicker-div") do
+          if ((Time.zone.now+9.day).month != Time.zone.now.month)
+            within(".ui-datepicker-header")do
+              find(".ui-icon-circle-triangle-e").click
+            end
           end
         end
-      end
-    first(:link, "#{(Time.zone.now+1.day).day}").click
-    select(cancel_reason.name, :from => 'reason')
-    confirm_ok_js
-    click_link_or_button 'Cancel member'
-    sleep 2
-    click_link_or_button 'cancel'
-    sleep 1
-      page.execute_script("window.jQuery('#cancel_date').next().click()")
-      within("#ui-datepicker-div") do
-        if ((Time.zone.now+2.day).month != Time.zone.now.month)
-          within(".ui-datepicker-header")do
-          first(:link, "#{(Time.zone.now+1.day).day}").click
+        click_on("#{(Time.zone.now+9.day).day}")
+        sleep 1
+        within("#member_billing_date_end") do
+          page.execute_script("window.jQuery('#member_billing_date_end').next().click()")
+        end
+        within("#ui-datepicker-div") do
+          if ((Time.zone.now+11.day).month != Time.zone.now.month)
+            within(".ui-datepicker-header")do
+              find(".ui-icon-circle-triangle-e").click
+            end
           end
         end
+        click_on("#{(Time.zone.now+11.day).day}")
+        sleep 2
+        click_link_or_button('Search')
+        sleep 30000
       end
-    click_on("#{(Time.zone.now+2.day).day}")
-    select(cancel_reason.name, :from => 'reason')
-    confirm_ok_js
-    click_link_or_button 'Cancel member'
-    sleep 2
-    end
-
  #  test "edit member" do
  #    setup_member
  #    visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -1268,32 +1251,34 @@ class MemberProfileEditTest < ActionController::IntegrationTest
  #    end
  #  end 
 
-  test "Send Prebill email (7 days before NBD)" do
-    setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name 
-    @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
-    @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
+# EL SIGUIENTE ESTABA COMENTADO:
 
-    sleep 1
-    Member.send_prebill
+#   test "Send Prebill email (7 days before NBD)" do
+#     setup_member
+#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+#     assert find_field('input_first_name').value == @saved_member.first_name 
+#     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
+#     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
 
-    sleep 5 #Wait untill script finish.
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+#     sleep 1
+#     Member.send_prebill
 
-    within(".nav-tabs"){ click_on 'Communications' }
-    within("#communication") do
-      assert page.has_content?("Test prebill")
-      assert page.has_content?("prebill")
-      assert_equal(Communication.last.template_type, 'prebill')
-    end
+#     sleep 5 #Wait untill script finish.
+#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+#     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+
+#     within(".nav-tabs"){ click_on 'Communications' }
+#     within("#communication") do
+#       assert page.has_content?("Test prebill")
+#       assert page.has_content?("prebill")
+#       assert_equal(Communication.last.template_type, 'prebill')
+#     end
    
-    within(".nav-tabs"){ click_on 'Operations' }
-    within("#operations_table") do
-      assert page.has_content?("Communication 'Test prebill' sent")
-    end
-  end
+#     within(".nav-tabs"){ click_on 'Operations' }
+#     within("#operations_table") do
+#       assert page.has_content?("Communication 'Test prebill' sent")
+#     end
+#   end
 
  # test "Sorting transaction table" do
  #    setup_member

@@ -158,6 +158,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
+
   test "create member" do
   	setup_member(false)
 

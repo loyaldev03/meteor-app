@@ -28,76 +28,114 @@ class MembersCancelTest < ActionController::IntegrationTest
   end
 
   #Check cancel email - It is send it by CS inmediate after member is lapsed
-  test "cancel member" do
-    setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    click_on 'Cancel'
-    date_time = Time.zone.now + 1.days
+  test "changing the cancel date" do
+     setup_member
 
-    page.execute_script("window.jQuery('#cancel_date').next().click()")
-    within("#ui-datepicker-div") do
-      wait_until { click_on("#{date_time.day}") }
-    end
-    select(@member_cancel_reason.name, :from => 'reason')
-    confirm_ok_js
-    click_on 'Cancel member'
+     cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
+     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+     click_link_or_button 'cancel'
+     sleep 1
+     page.execute_script("window.jQuery('#cancel_date').next().click()")
+     within("#ui-datepicker-div") do
+       if ((Time.zone.now+1.day).month != Time.zone.now.month)
+         within(".ui-datepicker-header")do
+         find(".ui-icon-circle-triangle-e").click
+         end
+       end
+     end
+   first(:link, "#{(Time.zone.now+1.day).day}").click
+   select(cancel_reason.name, :from => 'reason')
+   confirm_ok_js
+   click_link_or_button 'Cancel member'
+   sleep 2
+   click_link_or_button 'cancel'
+   sleep 1
+     page.execute_script("window.jQuery('#cancel_date').next().click()")
+     within("#ui-datepicker-div") do
+       if ((Time.zone.now+2.day).month != Time.zone.now.month)
+         within(".ui-datepicker-header")do
+         first(:link, "#{(Time.zone.now+1.day).day}").click
+         end
+       end
+     end
+   click_on("#{(Time.zone.now+2.day).day}")
+   select(cancel_reason.name, :from => 'reason')
+   confirm_ok_js
+   click_link_or_button 'Cancel member'
+   sleep 2
+   end
 
-    @saved_member.reload
 
-    within("#td_mi_cancel_date") do
-      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
-    end
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Member cancellation scheduled to #{date_time.to_date} - Reason: #{@member_cancel_reason.name}")
-      }
-    end
+  # test "cancel member" do
+  #   setup_member
+  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+  #   click_on 'Cancel'
+  #   date_time = Time.zone.now + 1.days
 
-    @saved_member.reload
-    @saved_member.set_as_canceled!
+  #   page.execute_script("window.jQuery('#cancel_date').next().click()")
+  #   within("#ui-datepicker-div") do
+  #     wait_until { click_on("#{date_time.day}") }
+  #   end
+  #   select(@member_cancel_reason.name, :from => 'reason')
+  #   confirm_ok_js
+  #   click_on 'Cancel member'
+
+  #   @saved_member.reload
+
+  #   within("#td_mi_cancel_date") do
+  #     assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
+  #   end
+  #   within("#operations_table") do
+  #     wait_until {
+  #       assert page.has_content?("Member cancellation scheduled to #{date_time.to_date} - Reason: #{@member_cancel_reason.name}")
+  #     }
+  #   end
+
+  #   @saved_member.reload
+  #   @saved_member.set_as_canceled!
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
-    within("#table_membership_information") do
-      assert page.has_content?("lapsed")
-    end
+  #   within("#table_membership_information") do
+  #     assert page.has_content?("lapsed")
+  #   end
       
-    within("#communication") do
-      wait_until {
-        assert page.has_content?("Test cancellation")
-        assert page.has_content?("cancellation")
-        assert_equal(Communication.last.template_type, 'cancellation')
-      }
-    end
+  #   within("#communication") do
+  #     wait_until {
+  #       assert page.has_content?("Test cancellation")
+  #       assert page.has_content?("cancellation")
+  #       assert_equal(Communication.last.template_type, 'cancellation')
+  #     }
+  #   end
    
-    within("#operations_table") do
-      wait_until {
-        assert page.has_content?("Member canceled")
-      }
-    end
-    click_link_or_button 'Cancel'
-    wait_until{ assert assert find_field('input_first_name').value == @saved_member.first_name }
-  end
+  #   within("#operations_table") do
+  #     wait_until {
+  #       assert page.has_content?("Member canceled")
+  #     }
+  #   end
+  #   click_link_or_button 'Cancel'
+  #   wait_until{ assert assert find_field('input_first_name').value == @saved_member.first_name }
+  # end
 
-  test "Rejecting a member should set cancel_date" do
-    setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, 
-                                         :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+  # test "Rejecting a member should set cancel_date" do
+  #   setup_member(false)
+  #   unsaved_member =  FactoryGirl.build(:active_member, 
+  #                                        :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card)
     
-    fill_in_member_approval(unsaved_member, credit_card)
-    select(@terms_of_membership_with_approval.name, :from => 'member[terms_of_membership_id]')
+  #   fill_in_member_approval(unsaved_member, credit_card)
+  #   select(@terms_of_membership_with_approval.name, :from => 'member[terms_of_membership_id]')
 
-    wait_until { assert find_field('input_first_name').value == unsaved_member.first_name }
-    @saved_member = Member.find_by_email(unsaved_member.email)
+  #   wait_until { assert find_field('input_first_name').value == unsaved_member.first_name }
+  #   @saved_member = Member.find_by_email(unsaved_member.email)
 
-    confirm_ok_js
-    click_link_or_button 'Reject'
+  #   confirm_ok_js
+  #   click_link_or_button 'Reject'
 
-    within("#td_mi_cancel_date")do
-      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
-    end
-  end
+  #   within("#td_mi_cancel_date")do
+  #     wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+  #   end
+  # end
 
 
 end
