@@ -221,7 +221,7 @@ class TransactionTest < ActiveSupport::TestCase
           assert_not_nil member.cancel_date
           assert_equal 0, member.quota
           assert_equal 0, member.recycled_times
-          assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_hard_decline).count
+          assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_hard_decline_by_limit).count
         else
           nbd = nbd + @sd_strategy.days.days
           assert_equal nbd, member.next_retry_bill_date
