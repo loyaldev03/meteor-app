@@ -103,6 +103,12 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
   sleep 3
+=======
+  test "edit member" do
+    setup_member
+    visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    
+>>>>>>> master
     within("#table_demographic_information") {
       assert find_field('member[first_name]').value == @saved_member.first_name
       assert find_field('member[last_name]').value == @saved_member.last_name
@@ -135,17 +141,12 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "set undeliverable address" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    sleep 3
     click_link_or_button 'Set undeliverable'
-    sleep 3
     confirm_ok_js
-    sleep 3
     click_link_or_button 'Set wrong address'
-    sleep 3
     within("#table_demographic_information") {
       assert page.has_content?("This address is undeliverable")
     }
-    sleep 3
   end
 
   test "add notable at classification" do
@@ -1266,8 +1267,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
   end 
 
-EL SIGUIENTE ESTABA COMENTADO:
-
   test "Send Prebill email (7 days before NBD)" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -1329,7 +1328,7 @@ EL SIGUIENTE ESTABA COMENTADO:
 
   test "Update a member with CC blacklisted inside the same Club" do
     setup_member false, true
-    s@saved_member.active_credit_card.update_attribute :blacklisted, true 
+    @saved_member.active_credit_card.update_attribute :blacklisted, true 
 
     unsaved_member =  FactoryGirl.build(:provisional_member_with_cc, :club_id => @club.id, :email => 'testing@withthisemail.com')
     credit_card = FactoryGirl.build(:credit_card)

@@ -107,6 +107,7 @@ class Member < ActiveRecord::Base
   scope :with_zip, lambda { |value| where('members.zip like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_email_like, lambda { |value| where('members.email like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('credit_cards.last_digits = ?', value.strip) unless value.blank? }
+  scope :with_credit_card_token, lambda{ |value| joins(:credit_cards).where('credit_cards.token = ?', value) unless value.blank? }
   scope :with_member_notes, lambda{ |value| joins(:member_notes).where('member_notes.description like ?', '%'+value.strip+'%') unless value.blank? }
   scope :with_external_id, lambda{ |value| where("members.external_id = ?",value) unless value.blank? }
   scope :needs_approval, lambda{ |value| where('members.status = ?', 'applied') unless value == '0' }
@@ -218,7 +219,7 @@ class Member < ActiveRecord::Base
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
   def schedule_first_membership(set_join_date, skip_send_fulfillment = false, nbd_update_for_sts = false, skip_add_club_cash = false)
     send_fulfillment unless skip_send_fulfillment
-    add_club_cash(nil,terms_of_membership.club_cash_amount, 'club cash on enroll') unless skip_add_club_cash
+    self.delay.add_club_cash(nil,terms_of_membership.club_cash_amount, 'club cash on enroll') unless skip_add_club_cash
 
     membership = current_membership
     if set_join_date

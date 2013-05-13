@@ -8634,4 +8634,159 @@
     limit: "0"
   attributes_cache: {}
 
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27307"
+    days: "0"
+    response_code: "062"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "669"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
 
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27307"
+    days: "0"
+    response_code: "062"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "668"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27307"
+    days: "0"
+    response_code: "063"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "671"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27307"
+    days: "0"
+    response_code: "063"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "670"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27307"
+    days: "0"
+    response_code: "057"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "672"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27307"
+    days: "0"
+    response_code: "057"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "673"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27307"
+    days: "0"
+    response_code: "004"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "674"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27307"
+    days: "0"
+    response_code: "004"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "675"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27300"
+    days: "0"
+    response_code: "078"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.year"
+    id: "676"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27300"
+    days: "0"
+    response_code: "078"
+    decline_type: hard
+    credit_card_type: all
+    installment_type: "1.month"
+    id: "677"
+    gateway: mes
+    limit: "0"
+  attributes_cache: {}
+
+- !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27300"
+    days: "3"
+    response_code: "012"
+    decline_type: soft
+    credit_card_type: master
+    installment_type: "1.year"
+    id: "678"
+    gateway: mes
+    limit: "1"
+  attributes_cache: {}
+
+  - !ruby/object:DeclineStrategy 
+  attributes: 
+    notes: "added because of refs #27300"
+    days: "3"
+    response_code: "012"
+    decline_type: soft
+    credit_card_type: master
+    installment_type: "1.month"
+    id: "679"
+    gateway: mes
+    limit: "1"
+  attributes_cache: {}

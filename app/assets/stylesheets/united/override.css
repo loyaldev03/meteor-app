@@ -126,3 +126,33 @@ div.dataTables_filter input {
  }
 
 .required_asterick:after { content:" *"; }
+
+#ajax_loader {
+  position: fixed;
+  background-color: #EBE9EA;
+  text-align: left;
+  border-radius: 6px 6px 6px 6px;
+  width: 130px;
+  height: 35px;
+  border: 2px solid #D2D2D2;
+  overflow: hidden; 
+  left: 45%;
+  top: 0px;
+  display: none;
+  z-index: 200000;
+}
+
+#ajax_loader p{
+  position:absolute;
+  float:left;
+  font-size: 20px;
+  font-weight: bold;
+  top: 25%;
+  left: 5px;
+}
+
+.spinner{
+  float:right;
+  top: 18px;
+  right: 18px;
+}

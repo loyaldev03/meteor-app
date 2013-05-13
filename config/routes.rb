@@ -3,19 +3,21 @@ SacPlatform::Application.routes.draw do
 
   namespace :api do
     scope 'v1' do
-      resources :tokens,:only => [:create, :destroy]
+      resources :tokens,:only => [:create]
+      match 'tokens/:id' => 'tokens#destroy', as: 'destroy', :via => [:put]
       resources :members, :only => [:create, :show, :update] do
         resources :club_cash_transaction, only: [:create]
         resources :operation, only: [:create]
       end
+      match 'members/:id/profile' => 'members#show', as: 'show', :via => [:post]
       match 'members/:id/next_bill_date' => 'members#next_bill_date', as: 'next_bill_date', :via => [:put]
+      match 'members/find_all_by_updated/:club_id/:start_date/:end_date' => 'members#find_all_by_updated', as: 'find_all_by_updated', :via => [:post]
+      match 'members/find_all_by_created/:club_id/:start_date/:end_date' => 'members#find_all_by_created', as: 'find_all_by_created', :via => [:post]
       match 'members/:id/club_cash' => 'members#club_cash', as: 'club_cash', :via => [:put]
       match 'members/:id/cancel' => 'members#cancel', as: 'cancel', :via => [:put]
-      match 'members/find_all_by_updated/:club_id/:start_date/:end_date' => 'members#find_all_by_updated', as: 'find_all_by_updated', :via => [:get]
-      match 'members/find_all_by_created/:club_id/:start_date/:end_date' => 'members#find_all_by_created', as: 'find_all_by_created', :via => [:get]
-      match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get]
-      match '/products/get_list_of_stock' => 'products#get_list_of_stock', as: 'get_list_of_stock', :via => [:get]
-      resources :prospects, :only => [:create]      
+      match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get, :post]
+      match '/products/get_list_of_stock' => 'products#get_list_of_stock', as: 'get_list_of_stock', :via => [:get, :post]
+      resources :prospects, :only => [:create]
     end
   end
 
