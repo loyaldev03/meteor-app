@@ -132,6 +132,8 @@ class Transaction < ActiveRecord::Base
       LitleTransaction.store!(am_credit_card, pgc)
     elsif pgc.authorize_net?
       AuthorizeNetTransaction.store!(am_credit_card, pgc)
+    else
+      raise "No payment gateway configuration set for gateway \"#{pgc.gateway}\""
     end
   end
 
