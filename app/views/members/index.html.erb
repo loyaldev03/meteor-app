@@ -168,11 +168,11 @@
                     <td> <%= t('activerecord.attributes.member.billed_date') %> </td>
                     <td>
                       <table>
-                        <tr>
+                        <tr id = "billed_at_start_date">
                           <td> <%= t('activerecord.attributes.member.billed_date_from') %> </td>
                           <td> <%= text_field :member, :billing_date_start, :class => 'text-field datepicker_for_search_billed_date', :readonly => 'readonly', :value => (params[:member][:billing_date_start] if params[:member]) %> </td>
                         </tr>
-                        <tr>
+                        <tr id = "billed_at_end_date">
                           <td> <%= t('activerecord.attributes.member.billed_date_to') %> </td>
                           <td> <%= text_field :member, :billing_date_end, :class => 'text-field datepicker_for_search_billed_date', :readonly => 'readonly', :value => (params[:member][:billing_date_end] if params[:member]) %> </td>
                         </tr>

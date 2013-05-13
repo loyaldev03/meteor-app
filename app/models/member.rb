@@ -1014,7 +1014,7 @@ def self.sync_members_to_pardot
   end
 
   def self.process_sync 
-    base = Member.where("status = 'lapsed' AND api_id != ''")
+    base = Member.where('status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )')
     tz = Time.zone.now
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members lapsed and api_id not null, processing #{base.count} members"
     base.find_in_batches do |group|
@@ -1028,7 +1028,7 @@ def self.sync_members_to_pardot
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
 
-    base = Member.where('last_sync_error like "There is no user with ID"')
+    base = Member.where('last_sync_error like "There is no user with ID%"')
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members with error sync related to wrong api_id, processing #{base.count} members"
     tz = Time.zone.now
     index = 0

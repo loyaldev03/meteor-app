@@ -89,6 +89,10 @@ class MembersSearchTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
+  # test "Search members by token" do
+      
+  # end 
+
   test "search members by next bill date" do
     setup_search
     page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
@@ -105,7 +109,9 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search member by first name" do
     setup_search
-    search_member("member[first_name]", "#{@search_member.first_name}", @search_member)
+    search_member("member[first_name]", "#{@search_member.first_name  # test "Search members by token" do
+      
+  # end }", @search_member)
   end
 
   test "search member with empty form" do

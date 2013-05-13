@@ -50,10 +50,65 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button 'Set wrong phone number'
   end
 
+
+  ###########################################################
+  # TESTS
+  ###########################################################
+
+      test "Bill date filter" do
+        setup_member(true,false)
+        unsaved_member=FactoryGirl.build(:member_with_api, :club_id => @club.id)
+        unsaved_member_2=FactoryGirl.build(:member_with_api, :club_id => @club.id)
+        credit_cardd=FactoryGirl.build(:credit_card_american_express)
+        c = create_member(unsaved_member, credit_cardd)
+        c2 = create_member(unsaved_member_2)
+        tran_1 = FactoryGirl.create(:transaction, :member_id => c.id)
+        tran_1.update_attribute(:created_at, Time.zone.now + 10.days)
+        tran_2 = FactoryGirl.create(:transaction, :member_id => c2.id)
+        visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+        sleep 3
+        within("#member_billing_date_start") do
+          page.execute_script("window.jQuery('#member_billing_date_start').next().click()")
+        end
+        within("#ui-datepicker-div") do
+          if ((Time.zone.now+9.day).month != Time.zone.now.month)
+            within(".ui-datepicker-header")do
+              find(".ui-icon-circle-triangle-e").click
+            end
+          end
+        end
+        click_on("#{(Time.zone.now+9.day).day}")
+        sleep 3
+        within("#member_billing_date_end") do
+          page.execute_script("window.jQuery('#member_billing_date_end').next().click()")
+        end
+        within("#ui-datepicker-div") do
+          if ((Time.zone.now+11.day).month != Time.zone.now.month)
+            within(".ui-datepicker-header")do
+              find(".ui-icon-circle-triangle-e").click
+            end
+          end
+        end
+        click_on("#{(Time.zone.now+11.day).day}")
+        sleep 3
+        click_link_or_button('Search')
+        sleep 3
+        assert page.has_content?("#{c.first_name}")
+        assert page.has_no_content?("#{c2.first_name}")
+        sleep 3
+      end
+
+
+  test "edit member" do
+    setup_member
+    visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+  sleep 3
+=======
   test "edit member" do
     setup_member
     visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
+>>>>>>> master
     within("#table_demographic_information") {
       assert find_field('member[first_name]').value == @saved_member.first_name
       assert find_field('member[last_name]').value == @saved_member.last_name

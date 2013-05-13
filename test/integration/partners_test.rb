@@ -17,6 +17,23 @@ class PartnersTest < ActionController::IntegrationTest
     assert page.has_content?(I18n.t('errors.messages.blank')) #page.has_content?("errors")
   end
 
+
+  test "Required fields marks in New Partner page" do
+    visit admin_partners_path
+    assert page.has_content?('Partners')
+    click_link_or_button 'New Partner'
+    within("#div_prefix") do
+      assert page.has_css?('.required_asterick')
+    end
+    within("#div_name") do
+      assert page.has_css?('.required_asterick')
+    end
+    within("#div_domain_url") do
+      assert page.has_css?('.required_asterick')
+    end
+  end
+  
+
   test "create partner" do
     unsaved_partner = FactoryGirl.build(:partner)
     unsaved_domain = FactoryGirl.build(:simple_domain)

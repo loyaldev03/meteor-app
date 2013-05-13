@@ -36,8 +36,25 @@ class MembersClubCashTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
-  # Remove/Add Club Cash
+  # # Remove/Add Club Cash
   # See club cash transaction history (Only Clubs without Drupal domain)
+
+  # test "Message after Club Cash addition" do
+  #   setup_member
+
+  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+  #   within("#table_membership_information"){ click_on 'Add club cash' }
+
+  #   fill_in 'club_cash_transaction[amount]', :with => 5
+  #   fill_in 'club_cash_transaction[description]', :with => "description"
+  #   click_on 'Save club cash transaction'
+  #   sleep 1
+  #   page.driver.browser.switch_to.alert.accept 
+    # console error: NoMethodError: undefined method `username' for nil:NilClass
+    # /home/pablo/Documents/sac-platform/app/datatables/operations_datatable.rb:14:in `data'
+    # /home/pablo/Documents/sac-platform/app/datatables/datatable.rb:18:in `as_json'
+  # end
+
   test "add club cash amount" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -61,6 +78,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
   end
 
   # Error message when adding a wrong club cash
+
   test "invalid characters on club cash" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
