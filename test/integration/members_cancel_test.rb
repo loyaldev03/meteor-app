@@ -28,6 +28,44 @@ class MembersCancelTest < ActionController::IntegrationTest
   end
 
   #Check cancel email - It is send it by CS inmediate after member is lapsed
+  test "changing the cancel date" do
+     setup_member
+
+     cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
+     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+     click_link_or_button 'cancel'
+     sleep 1
+     page.execute_script("window.jQuery('#cancel_date').next().click()")
+     within("#ui-datepicker-div") do
+       if ((Time.zone.now+1.day).month != Time.zone.now.month)
+         within(".ui-datepicker-header")do
+         find(".ui-icon-circle-triangle-e").click
+         end
+       end
+     end
+   first(:link, "#{(Time.zone.now+1.day).day}").click
+   select(cancel_reason.name, :from => 'reason')
+   confirm_ok_js
+   click_link_or_button 'Cancel member'
+   sleep 2
+   click_link_or_button 'cancel'
+   sleep 1
+     page.execute_script("window.jQuery('#cancel_date').next().click()")
+     within("#ui-datepicker-div") do
+       if ((Time.zone.now+2.day).month != Time.zone.now.month)
+         within(".ui-datepicker-header")do
+         first(:link, "#{(Time.zone.now+1.day).day}").click
+         end
+       end
+     end
+   click_on("#{(Time.zone.now+2.day).day}")
+   select(cancel_reason.name, :from => 'reason')
+   confirm_ok_js
+   click_link_or_button 'Cancel member'
+   sleep 2
+   end
+
+
   test "cancel member" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
