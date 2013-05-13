@@ -174,7 +174,7 @@
   <thead>
     <tr class="box_title">
       <th><h4>Active Credit Card</h4></th>
-      <td style="border: none; text-align: right;" colspan="3">
+      <td style="border: none; text-align: right;" colspan="5">
         <%= link_to(new_credit_card_path, :class => "btn btn-success", :disabled => (cannot? :create, CreditCard), :id => "add_credit_card") do %> 
           <i class="icon-plus"></i> Add a credit card
         <% end %>
@@ -184,7 +184,7 @@
   <tbody>
     <tr>
       <th> <%= t("activerecord.attributes.credit_card.last_digits") %> </th>
-      <% if can? :see_cc_token, CreditCard %>
+      <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
         <th> <%= t('activerecord.attributes.credit_card.token') %> </th>
       <% end %>
       <th><%= t("activerecord.attributes.credit_card.expire_date") %></th>
@@ -197,7 +197,7 @@
           <%= @active_credit_card.last_digits %>
           (<%= @active_credit_card.cc_type.nil? ?  t('activerecord.attributes.credit_card.type_unknown') : @active_credit_card.cc_type %>)
         </td>
-        <% if can? :see_cc_token, CreditCard %>
+        <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
           <td> <%= @active_credit_card.token %> </td>
         <% end %>
         <td><%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %></td>

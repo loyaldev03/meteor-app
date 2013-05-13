@@ -11,8 +11,8 @@ class Api::ProductsController < ApplicationController
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [String] sku Sku of the product we are interested in. This parameter is the product description. 
   # @required [String] club_id Id of the club the product belongs to. 
-  # @response_field [Integer] stock Actual stock of the product. This value is an integer type. This value is returned if there was no error.
-  # @response_field [Integer] allow_backorder Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag is returned if there was no error.  
+  # @response_field [Integer] stock Actual stock of the product. This value is an integer type. This will returned only when the method run without finding any kind of error.  
+  # @response_field [Integer] allow_backorder Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag will returned only when there was no error.  
   # @response_field [String] code Code related to the method result.
   # @response_field [String] message Shows the method errors.
   # 
@@ -54,11 +54,11 @@ class Api::ProductsController < ApplicationController
   # @response_field [String] message Shows the method errors.
   # 
   # @example_request
-  #   curl -v -k -X POST -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD,AnoterOne,NCARFLAGTONYSTEWART" https://dev.stoneacrehq.com:3000/api/v1/products/get_list_of_stock
+  #   curl -v -k -X POST -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD,AnoterOne,carflag" https://dev.stoneacrehq.com:3000/api/v1/products/get_list_of_stock
   # @example_request_description Example of valid request. 
   #
   # @example_response
-  #   {"code":"000","product_list":[{"sku":"KIT-CARD","stock":9746,"allow_backorder":true}],"skus_could_not_found":["AnoterOne","NCARFLAGTONYSTEWART"]}
+  #   {"code":"000","product_list":[{"sku":"KIT-CARD","stock":9746,"allow_backorder":true}],"skus_could_not_found":["AnoterOne","carflag"]}
   # @example_response_description Example response to valid request.
   #
   def get_list_of_stock

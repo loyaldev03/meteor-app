@@ -152,11 +152,13 @@
                     <td> <%= text_field :member, :last_digits, :class => 'text_field',
                                      :value => (params[:member][:last_digits] if params[:member]) %> </td>
                   </tr>
-                  <tr>
-                    <td>CC <%= t('activerecord.attributes.credit_card.token') %></td>
-                    <td> <%= text_field :member, :cc_token, :class => 'text_field',
-                                     :value => (params[:member][:cc_token] if params[:member]) %> </td>
-                  </tr>
+                  <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
+                    <tr>
+                      <td>CC <%= t('activerecord.attributes.credit_card.token') %></td>
+                      <td> <%= text_field :member, :cc_token, :class => 'text_field',
+                                       :value => (params[:member][:cc_token] if params[:member]) %> </td>
+                    </tr>
+                  <% end %>
                   <tr>
                     <td><%= t('activerecord.attributes.member.member_notes') %></td>
                     <td> <%= text_field :member, :notes, :class => 'text_field',

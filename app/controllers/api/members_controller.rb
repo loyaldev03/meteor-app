@@ -42,7 +42,7 @@ class Api::MembersController < ApplicationController
   #     <li><strong>referral_parameters</strong> [optional]</li>
   #     <li><strong>referral_path</strong> [optional]</li>
   #     <li><strong>user_id</strong> User ID alias UID is an md5 hash of the user's IP address and user-agent information. [optional]</li>
-  #     <li><strong>landing_url</strong> Url from where te submit comes from. [optional]</li>
+  #     <li><strong>landing_url</strong> Url from where the submit comes from. [optional]</li>
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. This information is selected by the member. This information is stored with format as hash encoded with json. [optional] </li>
   #     <li><strong>cookie_value</strong> Cookie from where the enrollment is being submitted.[optional]</li>
   #     <li><strong>cookie_set</strong> If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side. [optional]</li>
@@ -60,7 +60,7 @@ class Api::MembersController < ApplicationController
   # @optional [Hash] setter Variable used to pass some boolean values as "cc_blank". It must have the following information:
   #   <ul>
   #     <li><strong>cc_blank</strong> Boolean variable which will tell us to allow or not enrolling a member with a blank credit card. If it is true, send credit_card with the following attributes: number=>"0000000000" and expire_month and expired_year setted as today's month and year respectively. </li>
-  #     <li><strong>skip_api_sync</strong> Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal) [optional]</li>
+  #     <li><strong>skip_api_sync</strong> Boolean variable which tell us if we have to sync or not user to remote api (e.g drupal). If this value is true, we will skip the synchronization. (1=true, 0=false) [optional]</li>
   #   </ul>
   #
   # @example_request
@@ -454,7 +454,7 @@ class Api::MembersController < ApplicationController
   end
 
   ##
-  # Set member's cancelation date to be canceled. In case the member is already cancel, or it has the canselation date set, we won't excecute the request. 
+  # Sets member's cancelation date. In case the member is already canceled, or it has the cancelation date set, we won't excecute the request. 
   #
   # @resource /api/v1/members/:id/cancel
   # @action PUT

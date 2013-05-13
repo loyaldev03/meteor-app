@@ -62,6 +62,10 @@ class Club < ActiveRecord::Base
     club_cash_enable
   end
 
+  def use_pgc_authorize_net?
+    self.payment_gateway_configurations.first.gateway == 'authorize_net'
+  end
+
   private
     def add_default_member_groups
       ['VIP', 'Celebrity', 'Notable', 'Charter Member'].each do |name|
