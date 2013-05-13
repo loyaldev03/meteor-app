@@ -49,49 +49,136 @@ class MembersSearchTest < ActionController::IntegrationTest
  #  # UTILS
  #  ############################################################
 
-  def fill_in_member(unsaved_member, credit_card)
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New Member'
-
-    within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        select(unsaved_member.gender, :from => 'member[gender]')
-        fill_in 'member[address]', :with => unsaved_member.address
-        select_country_and_state(unsaved_member.country)
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
-      }
-    end
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
-        fill_in 'member[email]', :with => unsaved_member.email
-      }
-    end
-    within("#table_credit_card")do
-      wait_until{
-        fill_in 'member[credit_card][number]', :with => credit_card.number
-        select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
-        select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
-      }
-    end
-    alert_ok_js
-    click_link_or_button 'Create Member'    
-  end
+  # borrar a futuro
+  # def fill_in_member(unsaved_member, credit_card)
+  #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  #   click_link_or_button 'New Member'
+  #   sleep 1
+  #   within("#table_demographic_information")do
+  #       fill_in 'member[first_name]', :with => unsaved_member.first_name
+  #       select(unsaved_member.gender, :from => 'member[gender]')
+  #       fill_in 'member[address]', :with => unsaved_member.address
+  #       select_country_and_state(unsaved_member.country)
+  #       fill_in 'member[city]', :with => unsaved_member.city
+  #       fill_in 'member[last_name]', :with => unsaved_member.last_name
+  #       fill_in 'member[zip]', :with => unsaved_member.zip
+  #   end
+  #   within("#table_contact_information")do
+  #       fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
+  #       fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
+  #       fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
+  #       select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
+  #       fill_in 'member[email]', :with => unsaved_member.email
+  #   end
+  #   within("#table_credit_card")do
+  #       fill_in 'member[credit_card][number]', :with => credit_card.number
+  #       select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
+  #       select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
+  #   end
+  #   alert_ok_js
+  #   click_link_or_button 'Create Member'    
+  # end
 
 
   ###########################################################
   # TESTS
   ###########################################################
 
-  # test "Search members by token" do
-      
-  # end 
+  test "Search members by token - Admin rol" do
+    setup_member(false)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    sleep 1
+    fill_in "member[cc_token]", :with => saved_credit_card.token
+    sleep 1
+    click_on 'Search'
+    assert page.has_content?("#{unsaved_member.first_name}")
+    sleep 1
+  end 
+
+  test "Search members by token - Supervisor rol" do
+    setup_member(false)
+    @admin_agent.update_attribute(:roles,["supervisor"])
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    sleep 1
+    fill_in "member[cc_token]", :with => saved_credit_card.token
+    sleep 1
+    click_on 'Search'
+    assert page.has_content?("#{unsaved_member.first_name}")
+    sleep 1
+  end 
+
+    test "Search members by token - Representative rol" do
+    setup_member(false)
+    @admin_agent.update_attribute(:roles,["representative"])
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    sleep 1
+    assert has_no_content?("CC Token")
+    end 
+
+  test "View token in member record - Admin rol" do
+    setup_member(false)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within("#table_active_credit_card") do
+      assert page.has_content?("#{saved_credit_card.token}")
+    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards") do
+    assert page.has_content?("#{saved_credit_card.token}")
+    end
+  end 
+
+  test "View token in member record - Supervisor rol" do
+    setup_member(false)
+    @admin_agent.update_attribute(:roles,["supervisor"])
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within("#table_active_credit_card") do
+      assert page.has_content?("#{saved_credit_card.token}")
+    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards") do
+    assert page.has_content?("#{saved_credit_card.token}")
+    end
+  end 
+
+  test "View token in member record - Representative rol" do
+    setup_member(false)
+    @admin_agent.update_attribute(:roles,["representative"])
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert has_no_content?("CC Token")
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within("#table_active_credit_card") do
+      assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards") do
+    assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+    sleep 1
+  end 
 
   test "search members by next bill date" do
     setup_search
@@ -109,9 +196,8 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search member by first name" do
     setup_search
-    search_member("member[first_name]", "#{@search_member.first_name  # test "Search members by token" do
-      
-  # end }", @search_member)
+    search_member("member[first_name]","#{@search_member.first_name}")
+
   end
 
   test "search member with empty form" do
