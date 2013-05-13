@@ -39,6 +39,8 @@ defaults: &defaults
     no_recurrent_billing: 112
     no_recurrent_billing_with_error: 113
     membership_billing_hard_decline_by_limit: 114
+    downgraded_because_of_hard_decline: 115
+    downgraded_because_of_hard_decline_by_limit: 116
     #profile
     cancel: 200 
     future_cancel: 201

@@ -1330,6 +1330,7 @@ def self.sync_members_to_pardot
                 DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
                   trans.response_code, type, "all")
       cancel_member = false
+      downgrade_member = !self.terms_of_membership.downgrade_tom.nil?
 
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
@@ -1341,8 +1342,8 @@ def self.sync_members_to_pardot
             "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
           :parameters => { :member => self.inspect })
         if self.recycled_times < Settings.number_of_retries_on_missing_decline
-          Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
           increment!(:recycled_times, 1)
+          Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
           return message
         end
         cancel_member = true
@@ -1350,27 +1351,38 @@ def self.sync_members_to_pardot
         trans.update_attribute :decline_strategy_id, decline.id
         if decline.hard_decline?
           message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-          operation_type = Settings.operation_types.membership_billing_hard_decline
+          operation_type = (downgrade_tom.nil? ? Settings.operation_types.membership_billing_hard_decline : Settings.operation_types.downgraded_because_of_hard_decline)
           cancel_member = true
+          limit_reached = false
         else
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           self.next_retry_bill_date = decline.days.days.from_now
           if self.recycled_times > (decline.limit-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-            operation_type = Settings.operation_types.membership_billing_hard_decline_by_limit
+            operation_type = (downgrade_tom.nil? ? Settings.operation_types.membership_billing_hard_decline_by_limit : Settings.operation_types.downgraded_because_of_hard_decline_by_limit)
             cancel_member = true
+            limit_reached = true
           end
         end
       end
       self.save(:validate => false)
       if cancel_member
-        Auditory.audit(nil, trans, message, self, operation_type )
-        self.cancel! Time.zone.now, "HD cancellation"
-        set_as_canceled!
-        Communication.deliver!(:hard_decline, self)
+        if downgrade_member
+
+          #TODO: COMPLETE THIS PART. WE SHOULD CHANGE THE TOM. AND ALSO AUDIT
+
+          operation_type = (limit_reached ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.downgraded_because_of_hard_decline)
+          Auditory.audit(nil, trans, message, self, operation_type )
+        else
+          self.cancel! Time.zone.now, "HD cancellation"
+          set_as_canceled!
+          operation_type = (limit_reached ? Settings.operation_types.membership_billing_hard_decline_by_limit : Settings.operation_types.membership_billing_hard_decline)
+          Auditory.audit(nil, trans, message, self, operation_type )
+          Communication.deliver!(:hard_decline, self)    
+        end
       else
-        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_soft_decline)
         increment!(:recycled_times, 1)
+        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_soft_decline)
         Communication.deliver!(:soft_decline, self)
       end
       message
