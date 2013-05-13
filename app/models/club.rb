@@ -63,7 +63,8 @@ class Club < ActiveRecord::Base
   end
 
   def use_pgc_authorize_net?
-    self.payment_gateway_configurations.first.gateway == 'authorize_net'
+    pgc = self.payment_gateway_configurations.first
+    not pgc.nil? and pgc.gateway == 'authorize_net'
   end
 
   private
