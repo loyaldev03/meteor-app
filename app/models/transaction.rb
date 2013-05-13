@@ -181,7 +181,7 @@ class Transaction < ActiveRecord::Base
   private
 
     def amount_to_send
-      (amount.to_f * 100).to_i
+      (amount.to_f * 100).round
     end
 
     def credit
