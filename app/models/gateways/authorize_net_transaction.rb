@@ -11,6 +11,7 @@ class AuthorizeNetTransaction < Transaction
 
   def fill_transaction_type_for_credit(sale_transaction)
     self.transaction_type = "refund"
+    self.refund_response_transaction_id = sale_transaction.response_transaction_id
   end 
 
   private
