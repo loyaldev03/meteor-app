@@ -907,13 +907,66 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_not_equal(old_token, token)
   end
 
-  # #TODO: FIX THIS TEST!
   # #Update a profile with CC used by another member and Family Membership = False
   test "Error Member when CC is already used (Sloop) and Family memberships = false" do
     setup_enviroment
     sign_in @admin_user
     active_merchant_stubs
     
+    @current_agent = @admin_user
+    @former_member = create_active_member(@terms_of_membership, :member_with_api)
+    @terms_of_membership.club = @former_member.club
+    @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
+    
+    @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+    @enrollment_info = FactoryGirl.build :enrollment_info
+
+    @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
+    @credit_card = FactoryGirl.build :credit_card_master_card
+    active_merchant_stubs_store(@credit_card.number)
+  
+    assert_equal @terms_of_membership.club.family_memberships_allowed, false
+    assert_difference("Member.count",0) do
+      assert_difference("CreditCard.count",0) do
+        generate_post_message
+        assert_equal @response.body, '{"message":"We'+"'"+'re sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: 123 456 7891.","code":"9507","errors":{"number":"Credit card is already in use"}}'
+      end
+    end
+  end
+
+  # #Update a profile with CC used by another member and Family Membership = False
+  test "Error Member when CC is already used (Sloop) and Family memberships = false with little gateway" do
+    setup_enviroment
+    sign_in @admin_user
+    active_merchant_stubs
+    @club = FactoryGirl.create(:simple_club_with_litle_gateway)
+    @current_agent = @admin_user
+    @former_member = create_active_member(@terms_of_membership, :member_with_api)
+    @terms_of_membership.club = @former_member.club
+    @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
+    
+    @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+    @enrollment_info = FactoryGirl.build :enrollment_info
+
+    @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
+    @credit_card = FactoryGirl.build :credit_card_master_card
+    active_merchant_stubs_store(@credit_card.number)
+  
+    assert_equal @terms_of_membership.club.family_memberships_allowed, false
+    assert_difference("Member.count",0) do
+      assert_difference("CreditCard.count",0) do
+        generate_post_message
+        assert_equal @response.body, '{"message":"We'+"'"+'re sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: 123 456 7891.","code":"9507","errors":{"number":"Credit card is already in use"}}'
+      end
+    end
+  end
+
+  # #Update a profile with CC used by another member and Family Membership = False
+  test "Error Member when CC is already used (Sloop) and Family memberships = false with authorize_net gateway" do
+    setup_enviroment
+    sign_in @admin_user
+    active_merchant_stubs
+    @club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
     @current_agent = @admin_user
     @former_member = create_active_member(@terms_of_membership, :member_with_api)
     @terms_of_membership.club = @former_member.club
