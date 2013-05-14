@@ -238,7 +238,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
     @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     @terms_of_membership.update_attribute :downgrade_tom_id, @terms_of_membership_for_downgrade.id
-       
+
     member = enroll_member(@terms_of_membership)
     nbd = member.bill_date
     bill_date = member.bill_date

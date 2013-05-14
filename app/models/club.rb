@@ -35,7 +35,7 @@ class Club < ActiveRecord::Base
                            :url => "/system/:attachment/:id/:style/:filename",
                            :styles => { :header => "120x40", :thumb => "100x100#", :small  => "150x150>" }
 
-  DEFAULT_PRODUCT = ['KIT-CARD']
+  DEFAULT_PRODUCT = ['KIT-CARD','CARFLAG']
 
   def full_name
     [ partner.name, name ].join(' ')

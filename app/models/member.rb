@@ -376,44 +376,35 @@ class Member < ActiveRecord::Base
 
   ###############################################
 
-  def change_terms_of_membership(new_tom_id, agent = nil)
+  def change_terms_of_membership(new_tom_id, agent = nil, operation_message, operation_type)
     if can_save_the_sale?
       if new_tom_id.to_i == terms_of_membership.id
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
-        @old_tom_id = terms_of_membership.id
-        @prev_membership_id = current_membership.id
+        prev_membership_id = current_membership.id
         res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
+        if res[:code] == Settings.error_codes.success
+          Membership.find(prev_membership_id).cancel_because_of_membership_change
+          Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
+            operation_message, self, operation_type)
+        # update manually this fields because we cant cancel member
+        end
         res
-      end
+      end     
     else
       { :message => "Member status does not allows us to save the sale.", :code => Settings.error_codes.member_status_dont_allow }
     end
   end
 
   def save_the_sale(new_tom_id, agent = nil)
-    answer = change_terms_of_membership(new_tom_id, agent)
-    if answer[:code] == Settings.error_codes.success
-      Membership.find(@prev_membership_id).cancel_because_of_save_the_sale
-      Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
-        "Save the sale from TOM(#{@old_tom_id}) to TOM(#{new_tom_id})", self, Settings.operation_types.save_the_sale)
-    end
-    # update manually this fields because we cant cancel member
-    answer
+    message = "Save the sale from TOM(#{self.terms_of_membership.id}) to TOM(#{new_tom_id})"
+    change_terms_of_membership(new_tom_id, agent, message, Settings.operation_types.save_the_sale)
   end
 
   def downgrade_member(agent = nil)
     new_tom_id = self.terms_of_membership.downgrade_tom.id
-    answer = change_terms_of_membership(new_tom_id, agent)
-    if answer[:code] == Settings.error_codes.success
-      Membership.find(@prev_membership_id).cancel_because_of_save_the_sale
-      Auditory.audit(agent, TermsOfMembership.find(new_tom_id),
-        "Downgraded member from TOM(#{@old_tom_id}) to TOM(#{new_tom_id})", self, Settings.operation_types.downgrade_member)
-    else 
-      raise "#{answer[:code]} - #{answer[:message]}"
-    end
-    # update manually this fields because we cant cancel member
-    answer
+    message = "Downgraded member from TOM(#{self.terms_of_membership.id}) to TOM(#{new_tom_id})"
+    change_terms_of_membership(new_tom_id, agent, message, Settings.operation_types.downgrade_member)
   end
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
@@ -1391,14 +1382,14 @@ def self.sync_members_to_pardot
           operation_type = (recycle_limit ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.downgraded_because_of_hard_decline )
           Auditory.audit(nil, trans, message, self, operation_type )
         else
+          Auditory.audit(nil, trans, message, self, operation_type )
           self.cancel! Time.zone.now, "HD cancellation"
           set_as_canceled!
-          Auditory.audit(nil, trans, message, self, operation_type )
           Communication.deliver!(:hard_decline, self)    
         end
       else
-        increment!(:recycled_times, 1)
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_soft_decline)
+        increment!(:recycled_times, 1)
         Communication.deliver!(:soft_decline, self)
       end
       message
