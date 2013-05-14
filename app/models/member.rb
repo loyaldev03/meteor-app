@@ -392,7 +392,7 @@ class Member < ActiveRecord::Base
         res
       end     
     else
-      { :message => "Member status does not allows us to save the sale.", :code => Settings.error_codes.member_status_dont_allow }
+      { :message => "Member status does not allows us to change the terms of membership.", :code => Settings.error_codes.member_status_dont_allow }
     end
   end
 
@@ -402,9 +402,12 @@ class Member < ActiveRecord::Base
   end
 
   def downgrade_member
-    new_tom_id = self.terms_of_membership.downgrade_tom.id
+    new_tom_id = self.terms_of_membership.downgrade_tom_id
     message = "Downgraded member from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
-    change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_member)
+    answer = change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_member)
+    if answer[:code] != Settings.error_codes.success
+      Airbrake.notify(:error_class => "DowngradeMember::Error", :error_message => answer[:message], :parameters => { :member => self.inspect, :answer => answer })
+    end
   end
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
