@@ -318,7 +318,7 @@ class Member < ActiveRecord::Base
   end
 
   # Returns true if member is active or provisional.
-  def can_save_the_sale?
+  def can_change_tom?
     self.active? or self.provisional?
   end
 
@@ -377,7 +377,7 @@ class Member < ActiveRecord::Base
   ###############################################
 
   def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil)
-    if can_save_the_sale?
+    if can_change_tom?
       if new_tom_id.to_i == terms_of_membership.id
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else

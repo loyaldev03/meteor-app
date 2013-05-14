@@ -726,3 +726,10 @@ function show_terms_of_membership_functions(){
     window.history.back();
   });
 }
+
+function save_the_sale_functions(){
+  $('#save_the_sale_button').click( function(event){
+    $(this).attr('disabled', 'disabled');
+    startAjaxLoader();
+  });
+}
