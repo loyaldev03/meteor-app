@@ -382,9 +382,10 @@ class Member < ActiveRecord::Base
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
         prev_membership_id = current_membership.id
-        res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
+        new_tom = TermsOfMembership.find(new_tom_id)
+        res = enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
         if res[:code] == Settings.error_codes.success
-          Auditory.audit(agent, TermsOfMembership.find(new_tom_id), operation_message, self, operation_type)
+          Auditory.audit(agent, new_tom, operation_message, self, operation_type)
           Membership.find(prev_membership_id).cancel_because_of_membership_change
         # update manually this fields because we cant cancel member
         end
@@ -396,14 +397,14 @@ class Member < ActiveRecord::Base
   end
 
   def save_the_sale(new_tom_id, agent = nil)
-    message = "Save the sale from TOM(#{self.terms_of_membership.id}) to TOM(#{new_tom_id})"
+    message = "Save the sale from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
     change_terms_of_membership(new_tom_id, message, Settings.operation_types.save_the_sale, agent)
   end
 
-  def downgrade_member(agent = nil)
+  def downgrade_member
     new_tom_id = self.terms_of_membership.downgrade_tom.id
-    message = "Downgraded member from TOM(#{self.terms_of_membership.id}) to TOM(#{new_tom_id})"
-    change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_member, agent)
+    message = "Downgraded member from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
+    change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_member)
   end
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
@@ -1340,7 +1341,6 @@ def self.sync_members_to_pardot
                   trans.response_code, type, "all")
       cancel_member = false
 
-      # if decline.nil?
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
         message = "Billing error. No decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
@@ -1376,7 +1376,7 @@ def self.sync_members_to_pardot
       self.save(:validate => false)
 
       if cancel_member
-        if self.terms_of_membership.downgrade_tom
+        if self.terms_of_membership.downgrade_tom_id
           downgrade_member
           operation_type = (recycle_limit ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.downgraded_because_of_hard_decline )
           Auditory.audit(nil, trans, message, self, operation_type )
