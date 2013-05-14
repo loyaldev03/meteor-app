@@ -376,7 +376,7 @@ class Member < ActiveRecord::Base
 
   ###############################################
 
-  def change_terms_of_membership(new_tom_id, agent = nil, operation_message, operation_type)
+  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil)
     if can_save_the_sale?
       if new_tom_id.to_i == terms_of_membership.id
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
@@ -384,9 +384,8 @@ class Member < ActiveRecord::Base
         prev_membership_id = current_membership.id
         res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
         if res[:code] == Settings.error_codes.success
+          Auditory.audit(agent, TermsOfMembership.find(new_tom_id), operation_message, self, operation_type)
           Membership.find(prev_membership_id).cancel_because_of_membership_change
-          Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
-            operation_message, self, operation_type)
         # update manually this fields because we cant cancel member
         end
         res
@@ -398,13 +397,13 @@ class Member < ActiveRecord::Base
 
   def save_the_sale(new_tom_id, agent = nil)
     message = "Save the sale from TOM(#{self.terms_of_membership.id}) to TOM(#{new_tom_id})"
-    change_terms_of_membership(new_tom_id, agent, message, Settings.operation_types.save_the_sale)
+    change_terms_of_membership(new_tom_id, message, Settings.operation_types.save_the_sale, agent)
   end
 
   def downgrade_member(agent = nil)
     new_tom_id = self.terms_of_membership.downgrade_tom.id
     message = "Downgraded member from TOM(#{self.terms_of_membership.id}) to TOM(#{new_tom_id})"
-    change_terms_of_membership(new_tom_id, agent, message, Settings.operation_types.downgrade_member)
+    change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_member, agent)
   end
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
@@ -1352,8 +1351,8 @@ def self.sync_members_to_pardot
             "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
           :parameters => { :member => self.inspect })
         if self.recycled_times < Settings.number_of_retries_on_missing_decline
-          increment!(:recycled_times, 1)
           Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
+          increment!(:recycled_times, 1)
           return message
         end
         cancel_member = true
