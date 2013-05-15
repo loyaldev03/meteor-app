@@ -182,14 +182,12 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-
-
   ######################################
   ############ DECLINE ###################
   test "Monthly member SD until gets HD" do 
     active_merchant_stubs_store
     active_merchant_stubs
-
+ 
     member = enroll_member(@terms_of_membership)
     nbd = member.bill_date
     bill_date = member.bill_date
@@ -222,6 +220,53 @@ class TransactionTest < ActiveSupport::TestCase
           assert_equal 0, member.quota
           assert_equal 0, member.recycled_times
           assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_hard_decline_by_limit).count
+        else
+          nbd = nbd + @sd_strategy.days.days
+          assert_equal nbd, member.next_retry_bill_date
+          assert_equal bill_date, member.bill_date
+          assert_not_equal member.bill_date, member.next_retry_bill_date
+          assert_equal 0, member.quota
+          assert_equal time, member.recycled_times
+          assert_equal time, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_soft_decline).count
+        end
+      end
+    end
+  end
+
+  test "Monthly member SD until gets HD will downgrade the member" do 
+    active_merchant_stubs_store
+    active_merchant_stubs
+    @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    @terms_of_membership.update_attribute :downgrade_tom_id, @terms_of_membership_for_downgrade.id
+
+    member = enroll_member(@terms_of_membership)
+    nbd = member.bill_date
+    bill_date = member.bill_date
+    
+    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
+
+    # bill members the day trial days expires. Member should be billed but SD'd
+    Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
+      Member.bill_all_members_up_today
+      member.reload
+      nbd = nbd + @sd_strategy.days.days
+      assert_equal nbd.to_date, member.next_retry_bill_date.to_date
+      assert_equal bill_date, member.bill_date
+      assert_not_equal member.bill_date, member.next_retry_bill_date
+      assert_equal 0, member.quota
+      assert_equal 1, member.recycled_times
+    end
+
+    # SD retries
+    2.upto(15) do |time|
+      Timecop.travel(nbd) do
+        Member.bill_all_members_up_today
+        member.reload
+        if @terms_of_membership_for_downgrade.id == member.terms_of_membership.id
+          assert_nil member.cancel_date
+          assert_not_nil member.bill_date          
+          assert_not_nil member.next_retry_bill_date          
+          assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.downgraded_because_of_hard_decline_by_limit).count
         else
           nbd = nbd + @sd_strategy.days.days
           assert_equal nbd, member.next_retry_bill_date
@@ -301,6 +346,42 @@ class TransactionTest < ActiveSupport::TestCase
         assert_nil active_member.bill_date, "bill_date should be nil"
         assert_equal active_member.recycled_times, 0, "recycled_times should be 0"
       end
+    end
+  end
+
+  test "Billing with SD reaches the recycle limit, and HD downgrade the member." do 
+    @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    @terms_of_membership.update_attribute :downgrade_tom_id, @terms_of_membership_for_downgrade.id
+        
+    active_merchant_stubs_store
+    assert_difference('Operation.count', 3) do
+      active_member = create_active_member(@terms_of_membership)
+      active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
+      amount = @terms_of_membership.installment_amount
+      active_member.recycled_times = 4
+      active_member.save
+      answer = active_member.bill_membership
+      active_member.reload
+      assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
+      assert active_member.provisional?
+      assert_equal active_member.recycled_times, 4, "recycled_times remain the same"
+      assert_equal active_member.terms_of_membership.id, @terms_of_membership_for_downgrade.id
+    end
+  end
+
+  test "Billing with HD downgrade the member when configured to do so" do 
+    @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    @terms_of_membership.update_attribute :downgrade_tom_id, @terms_of_membership_for_downgrade.id
+    
+    active_merchant_stubs_store
+    assert_difference('Operation.count', 3) do
+      active_member = create_active_member(@terms_of_membership)
+      active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
+      amount = @terms_of_membership.installment_amount
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.recycled_times, 0, "recycled_times should be 0"
+      assert_equal active_member.terms_of_membership.id, @terms_of_membership_for_downgrade.id
     end
   end
 

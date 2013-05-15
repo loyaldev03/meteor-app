@@ -46,7 +46,7 @@
         <%= link_to 'Edit', edit_member_path, :class => "btn btn-success btn-large-w", :id => 'edit', :disabled => (cannot? :api_update, Member) %>
       </div>
       <div class="span4">
-        <% disable_save_sale = @current_member.can_save_the_sale? == false  %>
+        <% disable_save_sale = @current_member.can_change_tom? == false  %>
         <%= link_to("Save the sale", (!disable_save_sale ? member_save_the_sale_path : "#"), :id => 'save_the_sale' ,:class => "btn btn-large-w #{(disable_save_sale ? "disabled" : "btn-info")}", :disabled => (cannot? :save_sale, Member)) %>
       </div>
       <div class="span4">
