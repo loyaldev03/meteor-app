@@ -1382,7 +1382,7 @@ def self.sync_members_to_pardot
       if cancel_member
         if self.terms_of_membership.downgrade_tom_id
           operation_type = (recycle_limit ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.downgraded_because_of_hard_decline )
-          Auditory.audit(nil, trans, message+"#{recycled_times}", self, operation_type )
+          Auditory.audit(nil, trans, message, self, operation_type )
           downgrade_member
         else
           Auditory.audit(nil, trans, message, self, operation_type )
