@@ -277,7 +277,8 @@ module ActionController
 
   def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
     fill_in_member(unsaved_member, credit_card, tom_type, cc_blank)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    sleep 1
+    assert find_field('input_first_name').value == unsaved_member.first_name
     Member.find_by_email(unsaved_member.email)
   end
 

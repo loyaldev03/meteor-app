@@ -84,6 +84,92 @@ class MembersSearchTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
+  test "Do not display token field (club with auth.net) - Admin" do
+    setup_member(false)
+    @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert has_no_content?("CC Token")
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    sleep 1
+    within("#table_active_credit_card") do
+      assert page.has_no_content?("#{saved_credit_card.token}")
+     end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    sleep 1
+    within("#credit_cards") do
+     assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+  end
+
+
+  test "Do not display token field (club with auth.net) - Supervisor" do
+    setup_member(false)
+    @admin_agent.update_attribute(:roles,["supervisor"])
+    @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert has_no_content?("CC Token")
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    sleep 1
+    within("#table_active_credit_card") do
+      assert page.has_no_content?("#{saved_credit_card.token}")
+     end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    sleep 1
+    within("#credit_cards") do
+     assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+  end
+
+  test "Do not display token field (club with auth.net) - Representative" do
+    setup_member(false)
+    @admin_agent.update_attribute(:roles,["representative"])
+    @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert has_no_content?("CC Token")
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    sleep 1
+    within("#table_active_credit_card") do
+      assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    sleep 1
+    within("#credit_cards") do
+     assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+  end
+
+  # test "Do not enroll a member with wrong payment gateway" do
+  #   setup_member(false)
+  #   @club.payment_gateway_configurations.first.update_attribute(:gateway,'fail')
+  #   unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   visit my_clubs_path
+  #   sleep 1
+  #   click_link_or_button 'members' 
+  #   sleep 1
+  #   click_link_or_button 'new_member'
+  #   sleep 1
+  #   credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+  #   @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+  #   sleep 1
+  #   click_link_or_button 'commit'
+  #   within("#error_explanation") do
+  #     assert page.has_content?("Member information is invalid.")
+  #     assert page.has_content?("number: An error was encountered while processing your request.")
+  #   end
+  # end
+
   test "Search members by token - Admin rol" do
     setup_member(false)
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
