@@ -728,8 +728,8 @@ function show_terms_of_membership_functions(){
 }
 
 function save_the_sale_functions(){
-  $('#save_the_sale_button').click( function(event){
-    $(this).attr('disabled', 'disabled');
+  $('form').submit( function(event) {
+  $('#save_the_sale_button').attr('disabled', 'disabled');
     startAjaxLoader();
   });
 }
