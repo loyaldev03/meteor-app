@@ -1361,7 +1361,7 @@ def self.sync_members_to_pardot
         cancel_member = true
       else
         trans.update_attribute :decline_strategy_id, decline.id
-        recycle_limit = self.recycled_times > (decline.limit-1)
+        recycle_limit = false
         if decline.hard_decline?
           message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           operation_type = Settings.operation_types.membership_billing_hard_decline
@@ -1369,9 +1369,10 @@ def self.sync_members_to_pardot
         else
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           self.next_retry_bill_date = decline.days.days.from_now
-          if recycle_limit
+          if self.recycled_times > (decline.limit-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
             operation_type = Settings.operation_types.membership_billing_hard_decline_by_limit
+            recycle_limit = true
             cancel_member = true
           end
         end
@@ -1380,9 +1381,9 @@ def self.sync_members_to_pardot
 
       if cancel_member
         if self.terms_of_membership.downgrade_tom_id
-          downgrade_member
           operation_type = (recycle_limit ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.downgraded_because_of_hard_decline )
-          Auditory.audit(nil, trans, message, self, operation_type )
+          Auditory.audit(nil, trans, message+"#{recycled_times}", self, operation_type )
+          downgrade_member
         else
           Auditory.audit(nil, trans, message, self, operation_type )
           self.cancel! Time.zone.now, "HD cancellation"
