@@ -1189,5 +1189,17 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     add_club_cash(@saved_member, 10, "Generic description",true)
   end
 
+  test "Do not enroll a member with wrong payment gateway" do
+    setup_member(false)
+    @club.payment_gateway_configurations.first.update_attribute(:gateway,'fail')
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    fill_in_member(unsaved_member, credit_card, @terms_of_membership_with_gateway.name)
+    
+    within("#error_explanation") do
+      assert page.has_content?("Member information is invalid.")
+      assert page.has_content?("number: An error was encountered while processing your request.")
+    end
+  end
 end
 

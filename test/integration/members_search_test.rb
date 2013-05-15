@@ -150,26 +150,6 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
   end
 
-  # test "Do not enroll a member with wrong payment gateway" do
-  #   setup_member(false)
-  #   @club.payment_gateway_configurations.first.update_attribute(:gateway,'fail')
-  #   unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-  #   visit my_clubs_path
-  #   sleep 1
-  #   click_link_or_button 'members' 
-  #   sleep 1
-  #   click_link_or_button 'new_member'
-  #   sleep 1
-  #   credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-  #   @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
-  #   sleep 1
-  #   click_link_or_button 'commit'
-  #   within("#error_explanation") do
-  #     assert page.has_content?("Member information is invalid.")
-  #     assert page.has_content?("number: An error was encountered while processing your request.")
-  #   end
-  # end
-
   test "Search members by token - Admin rol" do
     setup_member(false)
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
