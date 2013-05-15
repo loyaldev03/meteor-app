@@ -318,7 +318,7 @@ class Member < ActiveRecord::Base
   end
 
   # Returns true if member is active or provisional.
-  def can_save_the_sale?
+  def can_change_tom?
     self.active? or self.provisional?
   end
 
@@ -376,24 +376,37 @@ class Member < ActiveRecord::Base
 
   ###############################################
 
-  def save_the_sale(new_tom_id, agent = nil)
-    if can_save_the_sale?
+  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil)
+    if can_change_tom?
       if new_tom_id.to_i == terms_of_membership.id
         { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
       else
-        old_tom_id = terms_of_membership.id
         prev_membership_id = current_membership.id
-        res = enroll(TermsOfMembership.find(new_tom_id), self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
+        new_tom = TermsOfMembership.find(new_tom_id)
+        res = enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
         if res[:code] == Settings.error_codes.success
-          Membership.find(prev_membership_id).cancel_because_of_save_the_sale
-          Auditory.audit(agent, TermsOfMembership.find(new_tom_id), 
-            "Save the sale from TOM(#{old_tom_id}) to TOM(#{new_tom_id})", self, Settings.operation_types.save_the_sale)
-        end
+          Auditory.audit(agent, new_tom, operation_message, self, operation_type)
+          Membership.find(prev_membership_id).cancel_because_of_membership_change
         # update manually this fields because we cant cancel member
+        end
         res
-      end
+      end     
     else
-      { :message => "Member status does not allows us to save the sale.", :code => Settings.error_codes.member_status_dont_allow }
+      { :message => "Member status does not allows us to change the terms of membership.", :code => Settings.error_codes.member_status_dont_allow }
+    end
+  end
+
+  def save_the_sale(new_tom_id, agent = nil)
+    message = "Save the sale from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
+    change_terms_of_membership(new_tom_id, message, Settings.operation_types.save_the_sale, agent)
+  end
+
+  def downgrade_member
+    new_tom_id = self.terms_of_membership.downgrade_tom_id
+    message = "Downgraded member from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
+    answer = change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_member)
+    if answer[:code] != Settings.error_codes.success
+      Airbrake.notify(:error_class => "DowngradeMember::Error", :error_message => answer[:message], :parameters => { :member => self.inspect, :answer => answer })
     end
   end
 
@@ -1348,6 +1361,7 @@ def self.sync_members_to_pardot
         cancel_member = true
       else
         trans.update_attribute :decline_strategy_id, decline.id
+        recycle_limit = false
         if decline.hard_decline?
           message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           operation_type = Settings.operation_types.membership_billing_hard_decline
@@ -1358,16 +1372,24 @@ def self.sync_members_to_pardot
           if self.recycled_times > (decline.limit-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
             operation_type = Settings.operation_types.membership_billing_hard_decline_by_limit
+            recycle_limit = true
             cancel_member = true
           end
         end
       end
       self.save(:validate => false)
+
       if cancel_member
-        Auditory.audit(nil, trans, message, self, operation_type )
-        self.cancel! Time.zone.now, "HD cancellation"
-        set_as_canceled!
-        Communication.deliver!(:hard_decline, self)
+        if self.terms_of_membership.downgrade_tom_id
+          operation_type = (recycle_limit ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.downgraded_because_of_hard_decline )
+          Auditory.audit(nil, trans, message, self, operation_type )
+          downgrade_member
+        else
+          Auditory.audit(nil, trans, message, self, operation_type )
+          self.cancel! Time.zone.now, "HD cancellation"
+          set_as_canceled!
+          Communication.deliver!(:hard_decline, self)    
+        end
       else
         Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_soft_decline)
         increment!(:recycled_times, 1)
