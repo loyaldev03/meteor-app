@@ -5,7 +5,7 @@ namespace :fulfillments do
 		fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
 
 		if Rails.env=='prototype'
-			fulfillment_file.club = Club.find 2
+			fulfillment_file.club = Club.find 41
 		elsif Rails.env=='production'
 			fulfillment_file.club = Club.find 4
 		end
@@ -55,10 +55,6 @@ namespace :fulfillments do
     fulfillment_file.processed
 	end
 
-
-
-
-
 	desc "Create fulfillment report for sloops products reated to Naamma."
 	task :generate_sloop_naamma_report => :environment do
 		require 'csv'
@@ -68,7 +64,7 @@ namespace :fulfillments do
 		fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
 
 		if Rails.env=='prototype'
-			fulfillment_file.club = Club.find 2
+			fulfillment_file.club = Club.find 41
 		elsif Rails.env=='production'
 			fulfillment_file.club = Club.find 4
 		end
