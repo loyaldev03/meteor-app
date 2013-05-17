@@ -13,7 +13,7 @@ def add_fulfillment(member)
     phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.id.to_s
     phoenix_f.product_package = KIT_CARD_FULFILLMENT
     phoenix_f.product_sku = KIT_CARD_FULFILLMENT
-    renewdate = member.join_date_time + (Date.today.year - member.join_date_time.year).years
+    renewdate = member.phoenix_join_date_time + (Date.today.year - member.phoenix_join_date_time.year).years
     phoenix_f.renewable_at = (renewdate > Date.today ? renewdate : renewdate.next_year)
     phoenix_f.assigned_at = (phoenix_f.renewable_at - 1.year)
     phoenix_f.recurrent = true
@@ -64,8 +64,8 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   @e_info.landing_url = campaign.landing_url
   @e_info.terms_of_membership_id = tom_id
   @e_info.preferences = JSON.generate({  })
-  @e_info.created_at = member.join_date_time
-  @e_info.updated_at = member.join_date_time
+  @e_info.created_at = member.phoenix_join_date_time
+  @e_info.updated_at = member.phoenix_join_date_time
   @e_info.campaign_medium = campaign.campaign_medium
   @e_info.campaign_description = campaign.campaign_description
   @e_info.campaign_medium_version = campaign.campaign_medium_version
@@ -73,9 +73,9 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   if @e_info.prospect_id.nil?
     prospect = ProspectProspect.where(" member_id_updated = '#{member.id}' ").first
     if prospect.nil? #https://redmine.xagax.com/issues/25731#note-7
-      @e_info.prospect_id = new_prospect(member, campaign, tom_id, member.join_date_time).id
+      @e_info.prospect_id = new_prospect(member, campaign, tom_id, member.phoenix_join_date_time).id
     else
-      @e_info.prospect_id = new_prospect(prospect, campaign, tom_id, member.join_date_time).id
+      @e_info.prospect_id = new_prospect(prospect, campaign, tom_id, member.phoenix_join_date_time).id
     end
   end
   @e_info.save if @e_info.changed?
@@ -85,10 +85,10 @@ def set_membership_data(tom_id, member)
   membership = PhoenixMembership.find_by_member_id(@member.id) || PhoenixMembership.new(:member_id => @member.id)
   membership.terms_of_membership_id = tom_id
   membership.created_by_id = DEFAULT_CREATED_BY
-  membership.join_date = member.join_date_time
+  membership.join_date = member.phoenix_join_date_time
   membership.status = @member.status
   membership.quota = member.quota
-  membership.created_at = member.join_date_time
+  membership.created_at = member.phoenix_join_date_time
   membership.updated_at = member.updated_at
   membership.member_id = @member.id
   membership.cancel_date = member.cancelled_at
@@ -115,10 +115,11 @@ end
 
 # 2- import new members.
 def add_new_members
-  BillingMember.where(" imported_at IS NULL and is_prospect = false " +
-      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND join_date_time IS NOT NULL " +
-      " AND blacklisted = true AND phoenix_status = 'lapsed' AND phoenix_email IS NOT NULL " +
-      " AND credit_card_token IS NOT NULL ").find_in_batches do |group|
+  BillingMember.where(" imported_at IS NULL and IFNULL(is_prospect,0)=0 " +
+      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date_time IS NOT NULL " +
+      " AND phoenix_status IS NOT NULL AND phoenix_email IS NOT NULL " +
+      " AND credit_card_token IS NOT NULL " +
+      "").find_in_batches do |group|
 
     puts "cant #{group.count}"
     group.each do |member| 

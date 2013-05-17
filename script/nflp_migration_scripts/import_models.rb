@@ -52,13 +52,11 @@ require 'attr_encrypted'
 require 'settingslogic'
 require 'json'
 
-CLUB = x # NFLP
+CLUB = 6 # NFLP
 DEFAULT_CREATED_BY = 1 # batch
-PAYMENT_GW_CONFIGURATION_LITLE = 2 
+PAYMENT_GW_CONFIGURATION_LITLE = 6
 TEST_EMAIL = false # if true email will be replaced with a fake one
 USE_PROD_DB = false
-SITE_ID = 2010001547 # lyris site id
-MEMBER_GROUP_TYPE = 19 # MemberGroupType.new :club_id => CLUB, :name => "Chapters"
 TIMEZONE = 'Eastern Time (US & Canada)'
 
 CREDIT_CARD_NULL = "a"
@@ -66,8 +64,8 @@ USE_MEMBER_LIST = false
 
 
 if USE_PROD_DB
-  #puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
-  #exit
+  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
+  exit
 end
 
 unless USE_PROD_DB
