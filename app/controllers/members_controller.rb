@@ -249,12 +249,18 @@ class MembersController < ApplicationController
     old_id = @current_member.api_id
     if params[:member]
       @current_member.api_id = params[:member][:api_id] 
-      if @current_member.save
-        message = "Member's api_id changed from #{old_id.inspect} to #{@current_member.api_id.inspect}"
-        Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_drupal_remote_id_set)
-        redirect_to show_member_path, notice: 'Sync data updated'
-      else
-        redirect_to show_member_path, notice: "Sync data cannot be updated #{@current_member.errors.to_hash}"
+      begin
+        if @current_member.save
+          message = "Member's api_id changed from #{old_id.inspect} to #{@current_member.api_id.inspect}"
+          Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_drupal_remote_id_set)
+          redirect_to show_member_path, notice: 'Sync data updated'
+        else
+          flash[:error] = "Sync data cannot be updated #{@current_member.errors.to_hash}"
+          redirect_to show_member_path
+        end
+      rescue ActiveRecord::RecordNotUnique
+        flash[:error] = "Sync data cannot be updated. Api id already exists"
+        redirect_to show_member_path
       end
     end
   end

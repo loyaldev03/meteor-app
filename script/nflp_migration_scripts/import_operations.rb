@@ -31,7 +31,7 @@ end
 # Customer Services Reactivate
 # Billing Component Reactivate
 def load_reactivations
-  CustomerServicesOperations.where(" (name like '%Customer Services Reactivate%' or name = 'Billing Component Reactivate') and imported_at IS NULL " 
+  CustomerServicesOperations.where(" name like '%Reactivated%' and imported_at IS NULL " 
     ).find_in_batches do |group|
     puts "cant #{group.count}"
     group.each do |op|

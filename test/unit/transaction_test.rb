@@ -539,7 +539,7 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal active_member.status, 'active'
       trans = active_member.transactions.last
       answer = Transaction.refund(amount, trans)
-      assert_equal answer[:code], "3", answer[:message] # refunds cant be processed on Auth.net test env
+      assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
     end
   end
 
@@ -554,7 +554,7 @@ class TransactionTest < ActiveSupport::TestCase
       trans = active_member.transactions.last
       refunded_amount = amount-0.34
       answer = Transaction.refund(refunded_amount, trans)
-      assert_equal answer[:code], "3", answer[:message] # refunds cant be processed on Auth.net test env
+      assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
     end
   end
 

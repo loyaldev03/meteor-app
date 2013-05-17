@@ -73,9 +73,9 @@ def add_enrollment_info(phoenix, member, tom_id, campaign = nil)
   if @e_info.prospect_id.nil?
     prospect = ProspectProspect.where(" member_id_updated = '#{member.id}' ").first
     if prospect.nil? #https://redmine.xagax.com/issues/25731#note-7
-      @e_info.prospect_id = new_prospect(member, campaign, tom_id).id
+      @e_info.prospect_id = new_prospect(member, campaign, tom_id, member.join_date_time).id
     else
-      @e_info.prospect_id = new_prospect(prospect, campaign, tom_id).id
+      @e_info.prospect_id = new_prospect(prospect, campaign, tom_id, member.join_date_time).id
     end
   end
   @e_info.save if @e_info.changed?

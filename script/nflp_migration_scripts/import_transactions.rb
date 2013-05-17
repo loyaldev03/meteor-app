@@ -81,12 +81,6 @@ def load_refunds_controlled
 
 	      next if current_t.nil?
 	
-        if current_t.gateway == 'litle'
-          transaction_type = 'authorization_capture'
-        else
-          transaction_type = 'sale'
-        end
-
         @member = current_t.member
 
         phoenix_t = PhoenixTransaction.find_by_member_id_and_created_at_and_updated_at_and_response_code @member.id, current_t.created_at, current_t.updated_at, '000'
@@ -174,7 +168,11 @@ def load_enrollment_transactions
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
-            transaction.transaction_type = 'authorization_capture'
+            if @campaign.sale_authcapt == 1
+              transaction.transaction_type = 'sale'
+            else
+              transaction.transaction_type = 'authorization_capture'
+            end
             transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
             transaction.response = response.message
@@ -239,7 +237,11 @@ def load_membership_transactions
             transaction.gateway = response.phoenix_gateway
             transaction.set_payment_gateway_configuration(transaction.gateway)
             transaction.recurrent = false
-            transaction.transaction_type = 'authorization_capture'
+            if @campaign.sale_authcapt == 1
+              transaction.transaction_type = 'sale'
+            else
+              transaction.transaction_type = 'authorization_capture'
+            end
             transaction.invoice_number = response.invoice_number(authorization)
             transaction.amount = response.amount
             transaction.response = response.message
@@ -260,7 +262,11 @@ def load_membership_transactions
                             "Member billed successfully $#{transaction.amount} Transaction id: #{transaction.id}", 
                             Settings.operation_types.membership_billing, transaction.created_at, transaction.updated_at)
 	            process_chargeback_from_transaction(transaction, authorization, 'membership')
-            elsif [  .........  ].include?(transaction.response_code.to_i)
+            elsif [  "111", "126", "191", "301", "308", "310", "311", "321", "323",
+                      "324", "325","326","327","328","351","352","353","354","357",
+                      "360","362","363","364","365","366","367","369","400","610",
+                      "611","612","701","702","703","705","706","712","714","950",
+                      "951","952","953","954"  ].include?(transaction.response_code.to_s)
               add_operation(transaction.created_at, 'Transaction', transaction.id, 
                             "Hard Declined: #{transaction.response_code} #{transaction.gateway}: #{transaction.response_result}", 
                             Settings.operation_types.membership_billing_hard_decline, transaction.created_at, transaction.updated_at)

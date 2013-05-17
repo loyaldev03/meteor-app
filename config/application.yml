@@ -260,10 +260,6 @@ defaults: &defaults
         length: 
           :minimum: 1
           :maximum: 8
-      api_id:
-        uniqueness:
-          :allow_blank: true
-          :scope: :club_id
         numericality:
           :only_integer: true
           :allow_nil: true
