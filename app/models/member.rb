@@ -379,7 +379,7 @@ class Member < ActiveRecord::Base
   def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil)
     if can_change_tom?
       new_tom = TermsOfMembership.find new_tom_id
-      unless new_tom.club_id != self.club_id
+      if new_tom.club_id == self.club_id
         if new_tom_id.to_i == terms_of_membership.id
           { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
         else
@@ -394,7 +394,7 @@ class Member < ActiveRecord::Base
           res
         end
       else
-        { :message => "Tom(#{new_tom_id}) to chane belongs to another club.", :code => Settings.error_codes.tom_to_downgrade_belongs_to_different_club }
+        { :message => "Tom(#{new_tom_id}) to change belongs to another club.", :code => Settings.error_codes.tom_to_downgrade_belongs_to_different_club }
       end
     else
       { :message => "Member status does not allows us to change the terms of membership.", :code => Settings.error_codes.member_status_dont_allow }
@@ -856,7 +856,7 @@ class Member < ActiveRecord::Base
   end
 
   def cancel!(cancel_date, message, current_agent = nil)
-    unless message.blank?
+    if not message.blank?
       if cancel_date.to_date >= Time.zone.now.to_date
         if self.cancel_date == cancel_date
           answer = { :message => "Cancel date is already set to that date", :code => Settings.error_codes.wrong_data }
