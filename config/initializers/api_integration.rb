@@ -7,7 +7,7 @@ Drupal.enable_integration! unless Rails.env.test?
 # Wordpress.logger = Rails.logger
 # Wordpress.enable_integration! unless Rails.env.test?
 
-require 'sac_pardot/pardot'
-Pardot.logger = Rails.logger
+#require 'sac_pardot/pardot'
+#Pardot.logger = Rails.logger
 # in test env, integration should be manually enabled in specific tests
-Pardot.enable_integration! unless Rails.env.test?
+#Pardot.enable_integration! unless Rails.env.test?

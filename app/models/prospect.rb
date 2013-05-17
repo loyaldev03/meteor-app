@@ -21,28 +21,28 @@ class Prospect < ActiveRecord::Base
             :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description
 
 
-  def pardot_prospect
-    @pardot_prospect ||= if !self.club.pardot_sync?
-      nil
-    else
-      Pardot::Prospect.new self
-    end
-  end
+  # def pardot_prospect
+  #   @pardot_prospect ||= if !self.club.pardot_sync?
+  #     nil
+  #   else
+  #     Pardot::Prospect.new self
+  #   end
+  # end
 
   def full_phone_number
     "(#{self.phone_country_code}) #{self.phone_area_code} - #{self.phone_local_number}"
   end
 
 
-  def sync_to_remote_domain
-    time_elapsed = Benchmark.ms do
-      pardot_prospect.save! unless pardot_prospect.nil?
-    end
-    logger.info "Pardot::sync took #{time_elapsed}ms"
-  rescue Exception => e
-    Airbrake.notify(:error_class => "Prospect:sync", :error_message => e, :parameters => { :prospect => self.inspect })
-  end
-  handle_asynchronously :sync_to_remote_domain
+  # def sync_to_remote_domain
+  #   time_elapsed = Benchmark.ms do
+  #     pardot_prospect.save! unless pardot_prospect.nil?
+  #   end
+  #   logger.info "Pardot::sync took #{time_elapsed}ms"
+  # rescue Exception => e
+  #   Airbrake.notify(:error_class => "Prospect:sync", :error_message => e, :parameters => { :prospect => self.inspect })
+  # end
+  # handle_asynchronously :sync_to_remote_domain
 
 
 end
