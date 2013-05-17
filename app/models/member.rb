@@ -378,19 +378,24 @@ class Member < ActiveRecord::Base
 
   def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil)
     if can_change_tom?
-      if new_tom_id.to_i == terms_of_membership.id
-        { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
-      else
-        prev_membership_id = current_membership.id
-        new_tom = TermsOfMembership.find(new_tom_id)
-        res = enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
-        if res[:code] == Settings.error_codes.success
-          Auditory.audit(agent, new_tom, operation_message, self, operation_type)
-          Membership.find(prev_membership_id).cancel_because_of_membership_change
-        # update manually this fields because we cant cancel member
+      new_tom = TermsOfMembership.find new_tom_id
+      unless new_tom.club_id != self.club_id
+        if new_tom_id.to_i == terms_of_membership.id
+          { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
+        else
+          prev_membership_id = current_membership.id
+          new_tom = TermsOfMembership.find(new_tom_id)
+          res = enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
+          if res[:code] == Settings.error_codes.success
+            Auditory.audit(agent, new_tom, operation_message, self, operation_type)
+            Membership.find(prev_membership_id).cancel_because_of_membership_change
+          # update manually this fields because we cant cancel member
+          end
+          res
         end
-        res
-      end     
+      else
+        { :message => "Tom(#{new_tom_id}) to chane belongs to another club.", :code => Settings.error_codes.tom_to_downgrade_belongs_to_different_club }
+      end
     else
       { :message => "Member status does not allows us to change the terms of membership.", :code => Settings.error_codes.member_status_dont_allow }
     end
@@ -408,6 +413,7 @@ class Member < ActiveRecord::Base
     if answer[:code] != Settings.error_codes.success
       Airbrake.notify(:error_class => "DowngradeMember::Error", :error_message => answer[:message], :parameters => { :member => self.inspect, :answer => answer })
     end
+    answer
   end
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
@@ -1380,7 +1386,7 @@ def self.sync_members_to_pardot
       self.save(:validate => false)
 
       if cancel_member
-        if self.terms_of_membership.downgrade_tom_id
+        if self.terms_of_membership.downgrade_tom_id.to_i > 0
           operation_type = (recycle_limit ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.downgraded_because_of_hard_decline )
           Auditory.audit(nil, trans, message, self, operation_type )
           downgrade_member
