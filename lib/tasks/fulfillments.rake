@@ -8,8 +8,10 @@ namespace :fulfillments do
 			fulfillment_file.club = Club.find 41
 		elsif Rails.env=='production'
 			fulfillment_file.club = Club.find 4
+		elsif Rails.env=='staging'
+			fulfillment_file.club = Club.find 17
 		end
-			
+
 		fulfillment_file.product = "KIT-CARD"
 		fulfillment_file.save!
 
@@ -19,10 +21,6 @@ namespace :fulfillments do
 			  AND fulfillments.product_sku like 'KIT-CARD'", fulfillment_file.club_id, 
 			Time.zone.now-7.days, Time.zone.now ])
 
-		fulfillments.each do |fulfillment|
-	    fulfillment_file.fulfillments << fulfillment
-	    fulfillment.set_as_in_process
-  	end
 		fulfillment_file.save!
 
     package = Axlsx::Package.new									
@@ -40,6 +38,7 @@ namespace :fulfillments do
 		      			  (I18n.l membership.cancel_date, :format => :only_date_short if membership.cancel_date ) 
 		      			]
 		    	sheet.add_row row 
+	   			fulfillment_file.fulfillments << fulfillment
 		    end
     	end
     end
@@ -52,8 +51,10 @@ namespace :fulfillments do
     temp.close 
     temp.unlink
 
+	  fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
     fulfillment_file.processed
 	end
+
 
 	desc "Create fulfillment report for sloops products reated to Naamma."
 	task :generate_sloop_naamma_report => :environment do
@@ -67,6 +68,8 @@ namespace :fulfillments do
 			fulfillment_file.club = Club.find 41
 		elsif Rails.env=='production'
 			fulfillment_file.club = Club.find 4
+		elsif Rails.env=='staging'
+			fulfillment_file.club = Club.find 17
 		end
 
 		fulfillments = Fulfillment.includes(:member).where( 
@@ -86,9 +89,7 @@ namespace :fulfillments do
 				  				member.city, member.state, "#{member.zip}"	,
 				  				I18n.l(member.join_date, :format => :only_date_short), 
 		      			  member.full_phone_number]
-
 		     	fulfillment_file.fulfillments << fulfillment
-	  		  fulfillment.set_as_in_process
 		    end
 			end
 		end
@@ -106,10 +107,13 @@ namespace :fulfillments do
   	  	ftp.chdir(folder)
   	  end
 	    ftp.putbinaryfile(temp_file, File.basename(temp_file))
-    ensure
-    	ftp.quit()
+    rescue Exception => e
+			Airbrake.notify(:error_class => 'NaammaSloopReport:create', :parameters => { :error => e, :fulfillment_file => fulfillment_file })
+		ensure
+			ftp.quit()
     end
 
+	  fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
     fulfillment_file.processed
     File.delete(temp_file)
 	end
