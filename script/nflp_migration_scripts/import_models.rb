@@ -81,7 +81,7 @@ unless USE_PROD_DB
 
   ActiveRecord::Base.configurations["billing"] = { 
     :adapter => "mysql2",
-    :database => "onmc_billing",
+    :database => "membership_component",
     :host => "127.0.0.1",
     :username => "root",
     :password => "" 
@@ -89,7 +89,7 @@ unless USE_PROD_DB
 
   ActiveRecord::Base.configurations["customer_services"] = { 
     :adapter => "mysql2",
-    :database => "onmc_customer_service",
+    :database => "customer_service",
     :host => "127.0.0.1",
     :username => "root",
     :password => "" 
@@ -97,7 +97,7 @@ unless USE_PROD_DB
 
   ActiveRecord::Base.configurations["prospect"] = { 
     :adapter => "mysql2",
-    :database => "onmc_prospects",
+    :database => "prospect_component",
     :host => "127.0.0.1",
     :username => "root",
     :password => "" 
@@ -430,7 +430,7 @@ def get_terms_of_membership_name(tom_id)
 end
 
 
-def new_prospect(object, campaign, tom_id)
+def new_prospect(object, campaign, tom_id, created_at)
   phoenix = PhoenixProspect.new 
   phoenix.first_name = object.first_name
   phoenix.last_name = object.last_name
@@ -443,8 +443,8 @@ def new_prospect(object, campaign, tom_id)
   phoenix.phone_country_code = object.phone_country_code
   phoenix.phone_area_code = object.phone_area_code
   phoenix.phone_local_number = object.phone_local_number
-  phoenix.created_at = object.created_at
-  phoenix.updated_at = object.created_at # It has a reason. updated_at was modified by us ^_^
+  phoenix.created_at = created_at
+  phoenix.updated_at = created_at # It has a reason. updated_at was modified by us ^_^
   phoenix.birth_date = object.birth_date
   phoenix.joint = campaign.is_joint
   phoenix.marketing_code = campaign.marketing_code
