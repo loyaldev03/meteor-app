@@ -8,10 +8,10 @@ class Prospect < ActiveRecord::Base
   serialize :preferences, JSON
   serialize :referral_parameters, JSON
 
-  after_create :after_create_sync_to_remote_domain
-  def after_create_sync_to_remote_domain
-    sync_to_remote_domain unless pardot_prospect.nil?
-  end
+  # after_create :after_create_sync_to_remote_domain
+  # def after_create_sync_to_remote_domain
+  #   sync_to_remote_domain unless pardot_prospect.nil?
+  # end
 
   attr_accessible :first_name, :last_name, :address, :city, :state, :zip, :email,:phone_country_code, 
    				  :phone_area_code ,:phone_local_number, :birth_date, :preferences, :gender, 
