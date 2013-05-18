@@ -184,7 +184,38 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert page.has_content? I18n.t('error_messages.club_is_not_enable_for_new_enrollments', :cs_phone_number => @club.cs_phone_number)
   end
 
-  test "Create a member with CC blank" do
+
+# VER CON SEBASTIAN
+  # test "Litle payment gateway (Enrollment amount)" do
+  #   setup_member(false)
+  #   @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
+  #   @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+  #   unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card)
+  #   enrollment_info = FactoryGirl.build(:enrollment_info)
+  #   create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
+  #   @saved_member=Member.find_by_email(unsaved_member.email)
+  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+  #   Time.zone = @club.time_zone
+  #   bill_member(@saved_member, false, nil, true)
+  # end
+
+# VER CON SEBASTIAN
+  # test "Litle payment gateway (Installment amount)" do
+  #   setup_member(false)
+  #   @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
+  #   @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+  #   unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card)
+  #   enrollment_info = FactoryGirl.build(:enrollment_info)
+  #   create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
+  #   @saved_member=Member.find_by_email(unsaved_member.email)
+  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+  #   Time.zone = @club.time_zone
+  #   bill_member(@saved_member, false, nil, true)
+  # end
+
+  test "Create a member with CC blank"
     setup_member(false)
 
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
@@ -1195,11 +1226,25 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member, credit_card, @terms_of_membership_with_gateway.name)
-    
+    sleep 1
     within("#error_explanation") do
       assert page.has_content?("Member information is invalid.")
       assert page.has_content?("number: An error was encountered while processing your request.")
     end
+  end
+
+  test "Do not enroll a member when it does not have payment gateway" do
+    setup_member(false)
+    @club.payment_gateway_configurations.first.update_attribute(:club_id,nil)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    fill_in_member(unsaved_member, credit_card, @terms_of_membership_with_gateway.name)
+    sleep 1
+    within("#error_explanation") do
+      assert page.has_content?("Member information is invalid.")
+      assert page.has_content?("number: An error was encountered while processing your request.")
+    end
+    sleep 1
   end
 end
 
