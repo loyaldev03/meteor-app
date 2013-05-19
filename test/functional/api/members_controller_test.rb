@@ -18,6 +18,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
 
     @preferences = {'color' => 'green','car'=> 'dodge'}
+    @additional_data = {'team' => 'GoGreen','match'=> 'monday_morning'}
     # request.env["devise.mapping"] = Devise.mappings[:agent]
  
 
@@ -66,6 +67,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                               :terms_of_membership_id => @terms_of_membership.id,
                               :birth_date => @member.birth_date,
                               :preferences => @preferences,
+                              :additional_data => @additional_data,
                               :credit_card => {:number => @credit_card.number,
                                                :expire_month => @credit_card.expire_month,
                                                :expire_year => @credit_card.expire_year },
@@ -97,7 +99,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Store the membership id at enrollment_infos table when enrolling a new member
   # Admin should enroll/create member with preferences
   # Billing membership by Provisional amount
-  test "Admin should enroll/create member with preferences" do
+  test "Admin should enroll/create member with preferences and additional_data" do
     setup_enviroment
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
@@ -125,6 +127,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     enrollment_info = EnrollmentInfo.last
     assert_equal(enrollment_info.membership_id, membership.id)
     assert_equal(saved_member.club_cash_amount, @terms_of_membership.club_cash_amount)
+    assert_equal(saved_member.additional_data, @additional_data)
     transaction = Transaction.last
     assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
   end
