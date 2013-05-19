@@ -31,9 +31,10 @@ class Member < ActiveRecord::Base
       :last_name, :next_retry_bill_date, 
       :bill_date, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
       :wrong_phone_number, :credit_cards_attributes, :birth_date,
-      :gender, :type_of_phone_number, :preferences
+      :gender, :type_of_phone_number, :preferences, :additional_data
 
   serialize :preferences, JSON
+  serialize :additional_data, JSON
 
   before_create :record_date
   before_save :wrong_address_logic
@@ -843,7 +844,7 @@ class Member < ActiveRecord::Base
     [ :first_name, :last_name, :address, :state, :city, :country, :zip,
       :email, :birth_date, :gender,
       :phone_country_code, :phone_area_code, :phone_local_number, 
-      :member_group_type_id, :preferences, :external_id ].each do |key|
+      :member_group_type_id, :preferences, :external_id, :additional_data ].each do |key|
           self.send("#{key}=", params[key]) if params.include? key
     end
     self.type_of_phone_number = params[:type_of_phone_number].to_s.downcase if params.include? :type_of_phone_number

@@ -330,6 +330,21 @@
     </tbody>
   </table>
 
+  <table id="table_additional_data" class="table table-bordered table-condensed table-nohover">
+    <thead>
+      <tr class="box_title"><th><h4>Additional Data</h4></th></tr>
+    </thead>
+    <tbody>
+      <% unless @current_member.additional_data.nil? %>
+        <% @current_member.additional_data.each do |key, value| %>
+          <tr><td> <%= key %>: <%= value %> </td></tr>
+        <% end %>
+      <% else %>
+        <tr><td> <%= t('activerecord.attributes.member.has_no_additional_data_set') %> </td></tr>
+      <% end %>
+    </tbody>
+  </table>
+
 
 <ul class="nav nav-tabs">
   <li class="active"><a href="#operations" data-toggle="tab">Operations</a></li>

@@ -225,6 +225,7 @@ en:
         needs_approval: 'Needs approval'
         unset_wrong_phone_number: 'Phone setted as wrong. Would you like to unset it?'
         has_no_preferences_saved: 'There are no preferences saved.'
+        has_no_additional_data_set: 'There is no additional data saved.'
         last_synced_at: 'Last successful sync'
         last_sync_error: 'Last failed sync'
         status_blacklisted: '- Blisted'
