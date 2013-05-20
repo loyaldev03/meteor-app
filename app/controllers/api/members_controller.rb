@@ -50,7 +50,6 @@ class Api::MembersController < ApplicationController
   #     <li><strong>campaign_description</strong> The name of the campaign. [optional]</li>
   #     <li><strong>campaign_medium_version</strong> [optional]</li>
   #     <li><strong>joint</strong> It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level.  [optional]</li>
-  #     <li><strong>additional_data</strong> Data will be saved as a key:value pair in json format. This will contain any kind of additional data which will depend on the club where the member is enrolled. [optional]</li>
   #     <li><strong>credit_card</strong> Hash with credit cards information. It must have the following information:</li>
   #     <ul>
   #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
@@ -136,7 +135,6 @@ class Api::MembersController < ApplicationController
   #     <li><strong>member_group_type_id</strong> Id of the member's group type where he belongs to. Each club can has many classifications for its member's, like 'VIP' or 'Celebrity'. [optional]</li>
   #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. [optional]</li>
   #     <li><strong>api_id</strong> Id related to our frontend. This is only being use when we are hosting the frontend. (e.g. Autologin URL - Update member data). [optional]</li>
-  #     <li><strong>additional_data</strong> Data will be saved as a key:value pair in json format. This will contain any kind of additional data which will depend on the club where the member is enrolled. [optional]</li>
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. This information is selected by the member. This information is stored with format as hash encoded with json. [optional] </li>
   #     <li><strong>credit_card</strong> Hash with credit cards information. [optional]</li>
   #     <ul>
@@ -252,7 +250,6 @@ class Api::MembersController < ApplicationController
   #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. </li>
   #     <li><strong>member_group_type</strong> Group type the member belongs to. </li>
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. </li>
-  #     <li><strong>additional_data</strong> Data will be saved as a key:value pair in json format. This will contain any kind of additional data which will depend on the club where the member is enrolled. [optional]</li>
   # @response_field [String] message Shows the method errors. This message will be only shown when there was an error. 
   # @response_field [String] code Code related to the method result.
   # 
