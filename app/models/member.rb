@@ -430,7 +430,7 @@ class Member < ActiveRecord::Base
         Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
         { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
       else
-        trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
+        trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
         trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
         answer = trans.process
@@ -457,6 +457,9 @@ class Member < ActiveRecord::Base
         { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
       end
     end
+  rescue Exception => e
+    Airbrake.notify(:error_class => "Billing:membership", :error_message => e, :parameters => { :member => self.inspect })
+    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
   def no_recurrent_billing(amount, description)
@@ -466,7 +469,7 @@ class Member < ActiveRecord::Base
       answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
     else
       if can_bill_membership?
-        trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
+        trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
         trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
         answer = trans.process
@@ -579,7 +582,7 @@ class Member < ActiveRecord::Base
     self.current_membership = membership
 
     if amount.to_f != 0.0
-      trans = Transaction.obtain_transaction_by_gateway(tom.payment_gateway_configuration.gateway)
+      trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
       answer = trans.process
@@ -850,7 +853,7 @@ class Member < ActiveRecord::Base
   end
 
   def chargeback!(transaction_chargebacked, args)
-    trans = Transaction.obtain_transaction_by_gateway(transaction_chargebacked.gateway)
+    trans = Transaction.obtain_transaction_by_gateway!(transaction_chargebacked.gateway)
     trans.new_chargeback(transaction_chargebacked, args)
     self.blacklist nil, "Chargeback - "+args[:reason]
   end

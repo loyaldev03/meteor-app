@@ -462,6 +462,16 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal active_member.status, 'active'
     end
   end
+  
+  test "Bill membership with wrong payment gateway cofiguration set" do
+    member = enroll_member(@terms_of_membership)
+    member.club.payment_gateway_configurations.first.update_attribute :gateway, "random_gateway"
+    Timecop.travel(member.next_retry_bill_date) do
+      answer = member.bill_membership
+      puts answer 
+      assert answer[:message].include?("Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience")
+    end
+  end 
 
   test "Enroll with Litle" do
     club_with_litle
