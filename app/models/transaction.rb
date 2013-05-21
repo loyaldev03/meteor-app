@@ -145,6 +145,8 @@ class Transaction < ActiveRecord::Base
       LitleTransaction.new
     when 'authorize_net'
       AuthorizeNetTransaction.new
+    else
+      raise "No payment gateway configuration set for gateway \"#{gateway}\""
     end
   end
 
