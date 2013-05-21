@@ -431,7 +431,7 @@ class Member < ActiveRecord::Base
         Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
         { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
       else
-        trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
+        trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
         trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
         answer = trans.process
@@ -458,6 +458,9 @@ class Member < ActiveRecord::Base
         { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
       end
     end
+  rescue Exception => e
+    Airbrake.notify(:error_class => "Billing:membership", :error_message => e, :parameters => { :member => self.inspect })
+    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
   def no_recurrent_billing(amount, description)
@@ -467,7 +470,7 @@ class Member < ActiveRecord::Base
       answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
     else
       if can_bill_membership?
-        trans = Transaction.obtain_transaction_by_gateway(terms_of_membership.payment_gateway_configuration.gateway)
+        trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
         trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
         answer = trans.process
@@ -580,7 +583,7 @@ class Member < ActiveRecord::Base
     self.current_membership = membership
 
     if amount.to_f != 0.0
-      trans = Transaction.obtain_transaction_by_gateway(tom.payment_gateway_configuration.gateway)
+      trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
       answer = trans.process
@@ -617,7 +620,9 @@ class Member < ActiveRecord::Base
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
 
-      { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :autologin_url => self.full_autologin_url.to_s }
+      response = { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :autologin_url => self.full_autologin_url.to_s, :status => self.status }
+      response.merge!(:api_role => tom.api_role.split(',')) if not club.club_cash_transactions_enabled
+      response
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "Member:enroll" : "Member:recovery/save the sale") + " -- member turned invalid while enrolling"
@@ -670,21 +675,21 @@ class Member < ActiveRecord::Base
     @skip_api_sync = true
   end
 
-  def pardot_sync?
-    self.club.pardot_sync?
-  end
+  # def pardot_sync?
+  #   self.club.pardot_sync?
+  # end
 
-  def pardot_member
-    @pardot_member ||= if !self.pardot_sync?
-      nil
-    else
-      Pardot::Member.new self
-    end
-  end
+  # def pardot_member
+  #   @pardot_member ||= if !self.pardot_sync?
+  #     nil
+  #   else
+  #     Pardot::Member.new self
+  #   end
+  # end
 
-  def skip_pardot_sync!
-    @skip_pardot_sync = true
-  end
+  # def skip_pardot_sync!
+  #   @skip_pardot_sync = true
+  # end
 
   def synced?
     sync_status=="synced"
@@ -851,7 +856,7 @@ class Member < ActiveRecord::Base
   end
 
   def chargeback!(transaction_chargebacked, args)
-    trans = Transaction.obtain_transaction_by_gateway(transaction_chargebacked.gateway)
+    trans = Transaction.obtain_transaction_by_gateway!(transaction_chargebacked.gateway)
     trans.new_chargeback(transaction_chargebacked, args)
     self.blacklist nil, "Chargeback - "+args[:reason]
   end
@@ -903,23 +908,23 @@ class Member < ActiveRecord::Base
     end
   end
 
-def self.sync_members_to_pardot
-    index = 0
-    base = Member.where("date(updated_at) >= ? ", Time.zone.now.yesterday.to_date).limit(2000)
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_pardot, processing #{base.count} members"
-    base.each do |member|
-      tz = Time.zone.now
-      begin
-        index = index+1
-        Rails.logger.info "  *[#{index}] processing member ##{member.id}"
-        member.sync_to_pardot unless member.pardot_member.nil?
-      rescue Exception => e
-        Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
-        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-      end
-      Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
-    end
-  end    
+  # def self.sync_members_to_pardot
+  #   index = 0
+  #   base = Member.where("date(updated_at) >= ? ", Time.zone.now.yesterday.to_date).limit(2000)
+  #   Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_pardot, processing #{base.count} members"
+  #   base.each do |member|
+  #     tz = Time.zone.now
+  #     begin
+  #       index = index+1
+  #       Rails.logger.info "  *[#{index}] processing member ##{member.id}"
+  #       member.sync_to_pardot unless member.pardot_member.nil?
+  #     rescue Exception => e
+  #       Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+  #       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+  #     end
+  #     Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+  #   end
+  # end    
 
   # Method used from rake task and also from tests!
   def self.bill_all_members_up_today
@@ -1258,14 +1263,14 @@ def self.sync_members_to_pardot
   end
   handle_asynchronously :desnormalize_preferences
 
-  def sync_to_pardot(options = {})
-    time_elapsed = Benchmark.ms do
-      pardot_member.save!(options) unless pardot_member.nil?
-    end
-    logger.info "Pardot::sync took #{time_elapsed}ms"
-  rescue Exception => e
-    Airbrake.notify(:error_class => "Pardot:sync", :error_message => e, :parameters => { :member => self.inspect })
-  end
+  # def sync_to_pardot(options = {})
+  #   time_elapsed = Benchmark.ms do
+  #     pardot_member.save!(options) unless pardot_member.nil?
+  #   end
+  #   logger.info "Pardot::sync took #{time_elapsed}ms"
+  # rescue Exception => e
+  #   Airbrake.notify(:error_class => "Pardot:sync", :error_message => e, :parameters => { :member => self.inspect })
+  # end
 
   private
     def schedule_renewal
