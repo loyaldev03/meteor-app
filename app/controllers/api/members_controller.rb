@@ -68,7 +68,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Requesting enroll of a valid member, with params in json format.
   #
   # @example_response 
-  #   {"message":"Member enrolled successfully $0.0 on TOM(1) -test2-","code":"000","member_id":11349950166,"autologin_url":""}
+  #   {"message":"Member enrolled successfully $0.0 on TOM(1) -test2-","code":"000","member_id":11349950166,"autologin_url":"","status":"provisional"}
   # @example_response_description Example response to a valid request
   #
   # @example_request
@@ -89,6 +89,11 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account. This value wll be returned as blank in case the club is not related to drupal.
+  # @response_field [String] status Member's membership status after enrolling. There are two possibles status when the member is enrolled:
+  #   <ul>
+  #     <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
+  #     <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
+  #   </ul> 
   #
   def create
     tom = TermsOfMembership.find(params[:member][:terms_of_membership_id])  
