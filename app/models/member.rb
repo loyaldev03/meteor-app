@@ -617,7 +617,7 @@ class Member < ActiveRecord::Base
       message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
 
       response = { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :autologin_url => self.full_autologin_url.to_s, :status => self.status }
-      response.merge!(:drupal_role => tom.drupal_role) if club.club_cash_transactions_enabled?
+      response.merge!(:api_role => tom.api_role.split(',')) if not club.club_cash_transactions_enabled?
       response
     rescue Exception => e
       logger.error e.inspect

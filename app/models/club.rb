@@ -54,7 +54,7 @@ class Club < ActiveRecord::Base
   end
 
   # Improvements #25771 - Club cash transactions will be managed by Drupal User Points plugin. 
-  def club_cash_transactions_enabled
+  def club_cash_transactions_enabled?
     api_type != 'Drupal::Member'
   end
 

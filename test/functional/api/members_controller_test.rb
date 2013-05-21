@@ -13,6 +13,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     
     @club = FactoryGirl.create(:simple_club_with_gateway)
     @club_with_family = FactoryGirl.create(:simple_club_with_gateway_with_family)
+    @club_with_api = FactoryGirl.create(:club_with_api)
     @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
     @terms_of_membership_with_family = FactoryGirl.create :terms_of_membership_with_gateway_with_family, :club_id => @club_with_family.id
     @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
@@ -127,6 +128,32 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(saved_member.club_cash_amount, @terms_of_membership.club_cash_amount)
     transaction = Transaction.last
     assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
+  end
+
+  test "Admin should enroll/create member within club related to drupal" do
+    setup_enviroment
+    sign_in @admin_user
+    @club = @club_with_api
+    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count')do
+      assert_difference('EnrollmentInfo.count')do
+        assert_difference('Transaction.count')do
+          assert_difference('MemberPreference.count',@preferences.size) do 
+            assert_difference('Member.count') do
+              generate_post_message
+              assert_response :success
+            end
+          end
+        end
+      end
+    end
+    assert @response.body.include? '"api_role":["91284557"]'
   end
 
   test "Member should not be enrolled if the email is already is used." do
