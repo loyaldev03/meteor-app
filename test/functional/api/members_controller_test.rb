@@ -19,7 +19,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
 
     @preferences = {'color' => 'green','car'=> 'dodge'}
-    @additional_data = {'team' => 'GoGreen','match'=> 'monday_morning'}
     # request.env["devise.mapping"] = Devise.mappings[:agent]
  
 

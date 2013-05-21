@@ -315,36 +315,33 @@
 </table>
 
 
-  <table id="table_enrollment_info" class="table table-bordered table-condensed table-nohover">
-    <thead>
-      <tr class="box_title"><th><h4>Preferences</h4></th></tr>
-    </thead>
-    <tbody>
-      <% unless @current_member.preferences.nil? %>
-        <% @current_member.preferences.each do |key, value| %>
-          <tr><td> <%= key %>: <%= value %> </td></tr>
-        <% end %>
-      <% else %>
-        <tr><td> <%= t('activerecord.attributes.member.has_no_preferences_saved') %> </td></tr>
+<table id="table_enrollment_info" class="table table-bordered table-condensed table-nohover">
+  <thead>
+    <tr class="box_title"><th><h4>Preferences</h4></th></tr>
+  </thead>
+  <tbody>
+    <% unless @current_member.preferences.nil? %>
+      <% @current_member.preferences.each do |key, value| %>
+        <tr><td> <%= key %>: <%= value %> </td></tr>
       <% end %>
-    </tbody>
-  </table>
+    <% else %>
+      <tr><td> <%= t('activerecord.attributes.member.has_no_preferences_saved') %> </td></tr>
+    <% end %>
+  </tbody>
+</table>
 
+<% unless @current_member.additional_data.nil? %>
   <table id="table_additional_data" class="table table-bordered table-condensed table-nohover">
     <thead>
       <tr class="box_title"><th><h4>Additional Data</h4></th></tr>
     </thead>
     <tbody>
-      <% unless @current_member.additional_data.nil? %>
-        <% @current_member.additional_data.each do |key, value| %>
-          <tr><td> <%= key %>: <%= value %> </td></tr>
-        <% end %>
-      <% else %>
-        <tr><td> <%= t('activerecord.attributes.member.has_no_additional_data_set') %> </td></tr>
+      <% @current_member.additional_data.each do |key, value| %>
+        <tr><td> <%= key %>: <%= value %> </td></tr>
       <% end %>
     </tbody>
   </table>
-
+<% end %>
 
 <ul class="nav nav-tabs">
   <li class="active"><a href="#operations" data-toggle="tab">Operations</a></li>
