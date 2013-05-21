@@ -137,7 +137,7 @@ class Transaction < ActiveRecord::Base
     end
   end
 
-  def self.obtain_transaction_by_gateway(gateway)
+  def self.obtain_transaction_by_gateway!(gateway)
     case gateway
     when 'mes'
       MerchantESolutionsTransaction.new
@@ -159,7 +159,7 @@ class Transaction < ActiveRecord::Base
       elsif sale_transaction.amount_available_to_refund < amount
         return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
       end
-      trans = Transaction.obtain_transaction_by_gateway(sale_transaction.gateway)
+      trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
       trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership)
       trans.fill_transaction_type_for_credit(sale_transaction)
       answer = trans.process
