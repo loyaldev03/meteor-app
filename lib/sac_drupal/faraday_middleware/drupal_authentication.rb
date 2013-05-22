@@ -11,7 +11,7 @@ module Drupal
       end
 
       def call(env)
-        cookie = false
+        cookie, res = false, nil
         if self.cookie
           Drupal.logger.debug " ** using existing cookie for #{@options[:url]}: #{self.cookie}"
           cookie = true
@@ -22,8 +22,11 @@ module Drupal
         env[:request_headers]['Cookie'] = self.cookie
         old_body = env[:body] # lets store the first body. because it will be overwritten after call/token regeneration
 
-        res = @app.call(env)
-
+        time_elapsed = Benchmark.ms do
+          res = @app.call(env)
+        end
+        Drupal.logger.info "Drupal::#{env[:url]} took #{time_elapsed}ms"
+  
         if res.status == 401 && cookie # retry if cookie is invalid
           Drupal.logger.debug(" ** invalidating %.2f seconds-old cookie. old body #{old_body.inspect}" % self.cookie_age)
           self.invalidate_cookie!
@@ -31,7 +34,10 @@ module Drupal
 
           env[:request_headers]['Cookie'] = self.cookie
           env[:body] = old_body
-          res = @app.call(env)
+          time_elapsed = Benchmark.ms do
+            res = @app.call(env)
+          end
+          Drupal.logger.info "Drupal::#{env[:url]} took #{time_elapsed}ms"
         end
         res
       end
