@@ -6,6 +6,7 @@
 		<td>id</td> 
 		<td>Club</td> 
 		<td>Email</td> 
+		<td>Status</td> 
 		<td>Profile link </p>
 		<td>Drupal domain link </p>
 	</tr>
@@ -14,6 +15,7 @@
 			<td><%= member.id %> - <%= member.full_name %></td> 
 			<td><%= member.club.id %> - <%= member.club.name %></td> 
 			<td><%= member.email %></td> 
+			<td><%= member.status %></td> 
 			<td><%= link_to 'Link', show_member_url(member.club.partner.prefix, member.club.name, member.id)  %></td>
 			<td>	
 				<% member.club.domains.each do |drupal_domain| %>
