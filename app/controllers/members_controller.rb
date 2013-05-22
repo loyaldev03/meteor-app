@@ -295,9 +295,10 @@ class MembersController < ApplicationController
       Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_manually_synced_to_drupal)
       redirect_to show_member_path, notice: message    
     end
-  rescue Exception => e
+  rescue
     flash[:error] = t('error_messages.airbrake_error_message')
-    Airbrake.notify(:error_class => "Member:sync", :error_message => e, :parameters => { :member => @current_member.inspect })
+    message = "Error on members#resend_welcome: #{$!}" 
+    Airbrake.notify(:error_class => "Member:sync", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path
   end
 
