@@ -297,7 +297,7 @@ class MembersController < ApplicationController
     end
   rescue
     flash[:error] = t('error_messages.airbrake_error_message')
-    message = "Error on members#resend_welcome: #{$!}" 
+    message = "Error on members#sync: #{$!}" 
     Airbrake.notify(:error_class => "Member:sync", :error_message => message, :parameters => { :member => @current_member.inspect })
     redirect_to show_member_path
   end
