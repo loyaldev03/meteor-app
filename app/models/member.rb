@@ -363,7 +363,7 @@ class Member < ActiveRecord::Base
   end
 
   def can_add_club_cash?
-    if club_cash_transactions_enabled
+    if is_not_drupal?
       return true
     elsif not (self.api_id.blank? or self.api_id.nil?)
       return true
@@ -621,7 +621,7 @@ class Member < ActiveRecord::Base
       message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
 
       response = { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :autologin_url => self.full_autologin_url.to_s, :status => self.status }
-      response.merge!(:api_role => tom.api_role.split(',')) if not club.club_cash_transactions_enabled
+      response.merge!(:api_role => tom.api_role.split(',')) unless self.is_not_drupal?
       response
     rescue Exception => e
       logger.error e.inspect
@@ -728,13 +728,13 @@ class Member < ActiveRecord::Base
 
   ##################### Club cash ####################################
 
-  delegate :club_cash_transactions_enabled, :to => :club
+  delegate :is_not_drupal?, :to => :club
 
   # Resets member club cash in case of a cancelation.
   def nillify_club_cash
     if club.allow_club_cash_transaction?
       add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation')
-      if club_cash_transactions_enabled
+      if is_not_drupal?
         self.club_cash_expire_date = nil
         self.save(:validate => false)
       end
@@ -744,7 +744,7 @@ class Member < ActiveRecord::Base
   # Resets member club cash in case the club cash has expired.
   def reset_club_cash
     add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.')
-    if club_cash_transactions_enabled
+    if is_not_drupal?
       self.club_cash_expire_date = self.club_cash_expire_date + 12.months
       self.save(:validate => false)
     end
@@ -755,7 +755,7 @@ class Member < ActiveRecord::Base
     if current_membership.quota%12==0 and current_membership.quota!=12
       amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
       self.add_club_cash(nil, amount, message)
-      if club_cash_transactions_enabled
+      if is_not_drupal?
         if self.club_cash_expire_date.nil? # first club cash assignment
           self.club_cash_expire_date = join_date + 1.year
         end
@@ -778,7 +778,7 @@ class Member < ActiveRecord::Base
         elsif amount.to_f == 0
           answer[:message] = I18n.t("error_messages.club_cash_transaction_invalid_amount")
           answer[:errors] = { :amount => "Invalid amount" } 
-        elsif club_cash_transactions_enabled
+        elsif is_not_drupal?
           if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
             cct = ClubCashTransaction.new(:amount => amount, :description => description)
             cct.member = self
