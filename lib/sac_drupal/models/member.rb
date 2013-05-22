@@ -175,6 +175,12 @@ module Drupal
             } 
           ]
         },
+        reoles: {
+          und: [
+            value: m.current_membership.terms_of_membership.api_role
+          ] 
+        },
+
       }
 
       if self.new_record?
