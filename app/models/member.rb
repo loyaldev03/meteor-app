@@ -56,10 +56,7 @@ class Member < ActiveRecord::Base
 
   def after_save_sync_to_remote_domain(type)
     unless @skip_api_sync || api_member.nil?
-      time_elapsed = Benchmark.ms do
-        api_member.save!
-      end
-      logger.info "Drupal::sync took #{time_elapsed}ms"
+      api_member.save!
     end
   rescue Exception => e
     # refs #21133
