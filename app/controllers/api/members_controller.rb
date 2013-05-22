@@ -344,7 +344,7 @@ class Api::MembersController < ApplicationController
       response = { :message => "Check amount value, please. Amount cannot be blank or null.", :code => Settings.error_codes.wrong_data }
     elsif not member.club.allow_club_cash_transaction?
       response = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
-    elsif not member.club.is_not_api_type?
+    elsif not member.club.is_not_drupal?
       member.skip_api_sync!
       member.club_cash_amount = params[:amount]
       member.club_cash_expire_date = params[:expire_date]
