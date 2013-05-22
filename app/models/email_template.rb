@@ -6,6 +6,7 @@ class EmailTemplate < ActiveRecord::Base
 
   TEMPLATE_TYPES =  [ :active, # sent when member changes its status to active
     :cancellation, # sent when member changes its status to lapsed
+    :rejection, # sent when member is rejected, and it is set from applied to lapsed
     :prebill, # sent 7 days before we bill member
     :refund, # sent when CS does a refund.
     :birthday, # sent if birthday is on enrollment_info
