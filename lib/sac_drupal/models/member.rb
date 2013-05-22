@@ -107,6 +107,11 @@ module Drupal
     def fieldmap
       m = self.member
 
+      role_list = {}
+      m.current_membership.terms_of_membership.api_role.split(',').each do |role|
+        role_list = role_list.merge!({role => role})
+      end
+
       map = { 
         mail: m.email,
         field_profile_firstname: { 
@@ -175,6 +180,7 @@ module Drupal
             } 
           ]
         },
+        roles: role_list,
       }
 
       if self.new_record?

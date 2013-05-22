@@ -348,7 +348,7 @@
   <li><a href="#notes" data-toggle="tab">Notes</a></li>
   <li><a href="#credit_cards" data-toggle="tab">Credit Cards</a></li>
   <li><a href="#transactions" data-toggle="tab">Transactions</a></li>
-  <% if @current_club.club_cash_transactions_enabled %>
+  <% if @current_club.is_not_drupal? %>
     <% if @current_club.allow_club_cash_transaction? %>
       <li><a href="#club_cash_transactions" data-toggle="tab">Club Cash</a></li>
     <% end %>  
@@ -382,7 +382,7 @@
       <%= render :partial => 'transactions' %>
     </div>
   </div>
-  <% if @current_club.club_cash_transactions_enabled %>
+  <% if @current_club.is_not_drupal? %>
     <% if @current_club.allow_club_cash_transaction? %>
       <div class="tab-pane" id="club_cash_transactions">
         <div class="tab_body_padding">
