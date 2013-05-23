@@ -205,4 +205,15 @@ class ClubTest < ActionController::IntegrationTest
     assert page.has_content?("number: Credit card is blacklisted")
   end
 
+  test "Display a club without PGC" do
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @partner = @club.partner
+    Time.zone = @club.time_zone
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    @club.payment_gateway_configurations.first.update_attribute(:club_id,nil)
+    visit my_clubs_path
+    click_link_or_button 'members'
+    assert page.has_no_content?("We're sorry, but something went wrong.")
+  end
 end

@@ -277,7 +277,8 @@ module ActionController
 
   def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
     fill_in_member(unsaved_member, credit_card, tom_type, cc_blank)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    sleep 1
+    assert find_field('input_first_name').value == unsaved_member.first_name
     Member.find_by_email(unsaved_member.email)
   end
 
@@ -290,8 +291,8 @@ module ActionController
 
     answer = member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id)
-    
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix =>member.club.name, :member_prefix => member.id)
+    sleep 1
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
     end
