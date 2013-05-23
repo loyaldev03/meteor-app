@@ -108,7 +108,7 @@ module Drupal
       m = self.member
 
       role_list = {}
-      m.current_membership.terms_of_membership.api_role.split(',').each do |role|
+      m.current_membership.terms_of_membership.api_role.to_s.split(',').each do |role|
         role_list = role_list.merge!({role => role})
       end
 
