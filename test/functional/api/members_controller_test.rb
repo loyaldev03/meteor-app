@@ -1519,6 +1519,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert !(@response.body.include? last.id.to_s)
   end
 
+  
+  # StatzHub - Add an Api method to cancel a member
+  # Cancel date using a Curl call
   test "Admin should cancel memeber" do
     setup_enviroment
     sign_in @admin_user

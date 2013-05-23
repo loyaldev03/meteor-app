@@ -55,6 +55,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
       do_post
       assert_response :success
     end
+    assert_equal(Prospect.first.club_id, @club_id)
   end
 
   test "api user should create a prospect" do

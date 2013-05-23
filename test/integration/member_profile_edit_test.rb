@@ -66,7 +66,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
         tran_1.update_attribute(:created_at, Time.zone.now + 10.days)
         tran_2 = FactoryGirl.create(:transaction, :member_id => c2.id)
         visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-        sleep 3
         within("#member_billing_date_start") do
           page.execute_script("window.jQuery('#member_billing_date_start').next().click()")
         end
@@ -78,7 +77,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
           end
         end
         click_on("#{(Time.zone.now+9.day).day}")
-        sleep 3
+        sleep 1
         within("#member_billing_date_end") do
           page.execute_script("window.jQuery('#member_billing_date_end').next().click()")
         end
@@ -90,12 +89,9 @@ class MemberProfileEditTest < ActionController::IntegrationTest
           end
         end
         click_on("#{(Time.zone.now+11.day).day}")
-        sleep 3
         click_link_or_button('Search')
-        sleep 3
         assert page.has_content?("#{c.first_name}")
         assert page.has_no_content?("#{c2.first_name}")
-        sleep 3
       end
 
   test "edit member" do
