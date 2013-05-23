@@ -50,7 +50,6 @@ class SaveTheSaleTest < ActionController::IntegrationTest
   ###########################################################
 
   
-  # TO REVIEW
   test "save the sale from active to provisional with enrollment info related to product not available at inventory" do
     setup_member(false, true)
     assert_equal @saved_member.status, "active"
@@ -65,7 +64,6 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     end
   end
 
-  # TO REVIEW
   test "save the sale from active to provisional with enrollment info related to product without stock" do
     setup_member(false, true)
     assert_equal @saved_member.status, "active"
@@ -80,7 +78,6 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     end
   end
 
-  # TO REVIEW
   test "save the sale from active to provisional with enrollment info related to product available at inventory" do
     setup_member(false, true)
     assert_equal @saved_member.status, "active"

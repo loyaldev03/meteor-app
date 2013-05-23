@@ -207,7 +207,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
   end
 
-  Display external_id at member search
+  # Display external_id at member search
   test "create a member inside a club with external_id in true" do
   	setup_member(false)
   	@club.requires_external_id = true
