@@ -28,7 +28,7 @@ def generate_decline_strategies(file)
     ["1.year", "1.month", "1000.years"].each do |installment_type|
       ds = DeclineStrategy.new
       ds.gateway = 'authorize_net'
-      ds.installment_type =   
+      ds.installment_type =  installment_type 
       ds.credit_card_type = "all"
       ds.response_code = row[0]
       ds.notes = row[1]
