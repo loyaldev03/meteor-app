@@ -177,7 +177,7 @@ def load_enrollment_transactions
             transaction.amount = response.amount
             transaction.response = response.message
             transaction.response_code = "%03d" % response.code.to_i
-            transaction.response_result = transaction.message
+            transaction.response_result = response.message
             if response.code.to_i == 0
               transaction.response_transaction_id = authorization.transaction_id
             end
@@ -226,7 +226,7 @@ def load_membership_transactions
       unless authorization.nil?
         begin
           tz = Time.now.utc
-          @member = response.member(authorization)
+          @member = authorization.member
           unless @member.nil?
             @log.info "  * processing Membership Auth response ##{response.id}"
             transaction = PhoenixTransaction.new
@@ -246,7 +246,7 @@ def load_membership_transactions
             transaction.amount = response.amount
             transaction.response = response.message
             transaction.response_code = "%03d" % response.code.to_i
-            transaction.response_result = transaction.message
+            transaction.response_result = response.message
             if response.code.to_i == 0
               transaction.response_transaction_id = authorization.transaction_id
             end

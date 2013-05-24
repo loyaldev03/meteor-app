@@ -60,7 +60,6 @@ USE_PROD_DB = false
 TIMEZONE = 'Eastern Time (US & Canada)'
 
 CREDIT_CARD_NULL = "a"
-USE_MEMBER_LIST = false
 
 
 if USE_PROD_DB
@@ -292,9 +291,6 @@ class BillingEnrollmentAuthorizationResponse < ActiveRecord::Base
   def invoice_number(a)
     "#{self.created_at.to_date}-#{a.member_id}"
   end
-  def member
-    PhoenixMember.find_by_id_and_club_id(self.member_id, CLUB)
-  end
   def amount
     phoenix_amount
   end
@@ -303,6 +299,9 @@ class BillingEnrollmentAuthorization < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "enrollments" 
   self.record_timestamps = false
+  def member
+    PhoenixMember.find_by_id_and_club_id(self.member_id, CLUB)
+  end
 end
 class BillingMembershipAuthorizationResponse < ActiveRecord::Base
   establish_connection "billing" 
@@ -310,9 +309,6 @@ class BillingMembershipAuthorizationResponse < ActiveRecord::Base
   self.record_timestamps = false
   def phoenix_gateway
     'litle'
-  end
-  def member
-    PhoenixMember.find_by_id_and_club_id(self.member_id, CLUB)
   end
   def invoice_number(a)
     "#{self.created_at.to_date}-#{a.member_id}"
@@ -325,6 +321,9 @@ class BillingMembershipAuthorization < ActiveRecord::Base
   establish_connection "billing" 
   self.table_name = "memberships" 
   self.record_timestamps = false
+  def member
+    PhoenixMember.find_by_id_and_club_id(self.member_id, CLUB)
+  end
 end
 class BillingChargeback < ActiveRecord::Base
   establish_connection "billing" 
@@ -350,7 +349,16 @@ class CustomerServicesNoteType < ActiveRecord::Base
   establish_connection "customer_services" 
   self.table_name = "enumerations" 
   self.record_timestamps = false
-  # TODO: ojo que aca es numerations!!!
+end
+class DocumentCategory < CustomerServicesNoteType
+end
+class IssuePriority < CustomerServicesNoteType
+end
+class TimeEntryActivity < CustomerServicesNoteType
+end
+class MemberCancelReason < CustomerServicesNoteType
+end
+class NoteType < CustomerServicesNoteType
 end
 class CustomerServicesUser < ActiveRecord::Base
   establish_connection "customer_services" 
@@ -374,7 +382,7 @@ def get_agent(author = 999)
     if u.empty?
       DEFAULT_CREATED_BY
     else
-      a = PhoenixAgent.find_by_username(u[0].login)
+      a = PhoenixAgent.find_by_username(u[0].login) || PhoenixAgent.find_by_email(u[0].mail)
       if a.nil?
         a = PhoenixAgent.new :username => u[0].login, :first_name => u[0].firstname, :last_name => u[0].lastname, 
             :email => u[0].mail
@@ -402,8 +410,8 @@ end
 def get_campaign_and_tom_id(cid)
   @campaign = BillingCampaign.find_by_id(cid)
   @tom_id = nil
-  if not @campaign.nil? and @campaign.phoenix_tom_id.to_i > 0
-    @tom_id = @campaign.phoenix_tom_id.to_i + 18
+  if not @campaign.nil? and @campaign.tom_id.to_i > 0
+    @tom_id = @campaign.tom_id.to_i + 18
   end
 end
 
@@ -436,7 +444,8 @@ def new_prospect(object, campaign, tom_id, created_at)
   phoenix.city = object.city
   phoenix.state = object.state
   phoenix.zip = object.zip
-  phoenix.country = object.country
+  # TODO: falta agregar en la DB. pedido a diego 24/05
+  # phoenix.country = object.country
   phoenix.email = object.email_to_import
   phoenix.phone_country_code = object.phone_country_code
   phoenix.phone_area_code = object.phone_area_code
@@ -458,7 +467,8 @@ def new_prospect(object, campaign, tom_id, created_at)
   phoenix.campaign_medium_version = campaign.campaign_medium_version
   phoenix.preferences = JSON.generate({ :old_id => object.id })
   phoenix.referral_parameters = JSON.generate({})
-  phoenix.gender = object.gender
+  # TODO: falta agregar en la DB. pedido a diego 24/05
+  # phoenix.gender = object.gender
   phoenix.save!
   phoenix
 end
