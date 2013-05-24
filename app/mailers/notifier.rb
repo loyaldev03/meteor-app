@@ -32,16 +32,14 @@ class Notifier < ActionMailer::Base
     mail :to => to, :subject => "pillar to #{email}"
   end
 
-  def active_with_approval(agent,member)
-    @agent = agent
+  def active_with_approval(emails,member)
     @member = member
-    mail :to => agent.email, :subject => "Member activation needs approval"
+    mail :to => emails, :subject => "Member activation needs approval"
   end
 
-  def recover_with_approval(agent,member)
-    @agent = agent
+  def recover_with_approval(emails,member)
     @member = member
-    mail :to => agent.email, :subject => "Member recovering needs approval"
+    mail :to => emails, :subject => "Member recovering needs approval"
   end
 
   def call_these_members(csv)
