@@ -5,14 +5,12 @@ require './import_models'
 @log = Logger.new('log/import_members.log', 10, 10024000)
 ActiveRecord::Base.logger = @log
 
-KIT_CARD_FULFILLMENT = "KIT-CARD"
-
 def add_fulfillment(member)
   if @campaign.product_sku.to_s.size > 3
     phoenix_f = PhoenixFulfillment.find_or_create_by_member_id @member.id
-    phoenix_f.tracking_code = KIT_CARD_FULFILLMENT+@member.id.to_s
-    phoenix_f.product_package = KIT_CARD_FULFILLMENT
-    phoenix_f.product_sku = KIT_CARD_FULFILLMENT
+    phoenix_f.tracking_code = @campaign.product_sku.to_s+@member.id.to_s
+    phoenix_f.product_package = @campaign.product_sku.to_s
+    phoenix_f.product_sku = @campaign.product_sku.to_s
     renewdate = member.phoenix_join_date_time + (Date.today.year - member.phoenix_join_date_time.year).years
     phoenix_f.renewable_at = (renewdate > Date.today ? renewdate : renewdate.next_year)
     phoenix_f.assigned_at = (phoenix_f.renewable_at - 1.year)
@@ -40,11 +38,12 @@ def set_member_data(phoenix, member)
   phoenix.phone_country_code = member.phone_country_code
   phoenix.phone_area_code = member.phone_area_code
   phoenix.phone_local_number = member.phone_local_number
-  phoenix.reactivation_times = member.phoenix_reactivations
+  # TODO: falta agregar en la DB. pedido a diego 24/05
+  # phoenix.reactivation_times = member.phoenix_reactivations
   phoenix.preferences = JSON.generate({  })
-  # phoenix.gender
+  phoenix.gender = member.gender
   phoenix.blacklisted = member.blacklisted
-  phoenix.api_id = member.drupal_account_id
+  phoenix.api_id = member.api_id
   phoenix.club_cash_expire_date = nil
   phoenix.club_cash_amount = 0
   phoenix.created_at = member.created_at

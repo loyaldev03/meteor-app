@@ -632,7 +632,7 @@ class Member < ActiveRecord::Base
       message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
 
       response = { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :autologin_url => self.full_autologin_url.to_s, :status => self.status }
-      response.merge!(:api_role => tom.api_role.split(',')) unless self.is_not_drupal?
+      response.merge!(:api_role => tom.api_role.to_s.split(',')) unless self.is_not_drupal?
       response
     rescue Exception => e
       logger.error e.inspect
