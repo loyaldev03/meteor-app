@@ -31,7 +31,7 @@ class MembersCancelTest < ActionController::IntegrationTest
   ###########################################################
   # TESTS
   ###########################################################
-TO FIX
+# TO FIX
   test "Downgrade a member when credit card is blank - Same club" do
     setup_member(false)
     credit_card = FactoryGirl.build(:blank_credit_card)
@@ -50,17 +50,7 @@ TO FIX
     end
   end
 
-  # test "See Additional Member Data" do
-  #   @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-  #   @club = FactoryGirl.create(:simple_club_with_gateway)
-  #   @partner = @club.partner
-  #   Time.zone = @club.time_zone
-  #   @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-  #   @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
-    
-  # end
-
-TO FIX
+# TO FIX
   test "Downgrade a member - Different club" do
     setup_member(false)
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -81,7 +71,7 @@ TO FIX
   end
 
 
-TO FIX
+# TO FIX
   test "Downgrade a member when soft recycled is limit - Same club" do
     setup_member(false)
     credit_card = FactoryGirl.build(:credit_card_master_card)
