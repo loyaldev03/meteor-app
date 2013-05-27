@@ -56,6 +56,7 @@ class MembersBillTest < ActionController::IntegrationTest
       end
     end
   end
+  
 # TODO MEJORAR:
   def change_next_bill_date(date)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
