@@ -96,7 +96,7 @@ namespace :fulfillments do
 		fulfillment_file.product = "SLOOPS"
 		fulfillment_file.save!
     
-    begin	
+    begin
 		  ftp = Net::FTP.new('ftp.stoneacreinc.com')
   		ftp.login(user = "phoenix", passwd = "ph03n1xFTPu$3r")
 			folder = fulfillment_file.club.name
@@ -110,7 +110,7 @@ namespace :fulfillments do
   	  fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
 	  	fulfillment_file.processed
     rescue Exception => e
-			Airbrake.notify(:error_class => 'NaammaSloopReport:create', :parameters => { :error => e, :fulfillment_file => fulfillment_file })
+			Airbrake.notify(:error_class => 'NaammaSloopReport:create', :parameters => { :error => e, :fulfillment_file => fulfillment_file.inspect })
 		ensure
 			ftp.quit()
     end
