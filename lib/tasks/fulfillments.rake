@@ -107,14 +107,14 @@ namespace :fulfillments do
   	  	ftp.chdir(folder)
   	  end
 	    ftp.putbinaryfile(temp_file, File.basename(temp_file))
+  	  fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
+	  	fulfillment_file.processed
     rescue Exception => e
 			Airbrake.notify(:error_class => 'NaammaSloopReport:create', :parameters => { :error => e, :fulfillment_file => fulfillment_file })
 		ensure
 			ftp.quit()
     end
 
-	  fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
-    fulfillment_file.processed
-    File.delete(temp_file)
+	  File.delete(temp_file)
 	end
 end
