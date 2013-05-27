@@ -34,7 +34,6 @@ class MembersCancelTest < ActionController::IntegrationTest
      cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
      click_link_or_button 'cancel'
-     sleep 1
      page.execute_script("window.jQuery('#cancel_date').next().click()")
      within("#ui-datepicker-div") do
        if ((Time.zone.now+1.day).month != Time.zone.now.month)
@@ -47,15 +46,13 @@ class MembersCancelTest < ActionController::IntegrationTest
    select(cancel_reason.name, :from => 'reason')
    confirm_ok_js
    click_link_or_button 'Cancel member'
-   sleep 2
    click_link_or_button 'cancel'
-   sleep 1
      page.execute_script("window.jQuery('#cancel_date').next().click()")
      within("#ui-datepicker-div") do
-       if ((Time.zone.now+2.day).month != Time.zone.now.month)
-         within(".ui-datepicker-header")do
-         first(:link, "#{(Time.zone.now+1.day).day}").click
-         end
+        if ((Time.zone.now+2.day).month != Time.zone.now.month)
+          find(".ui-icon-circle-triangle-e").click
+        end
+        first(:link, "#{(Time.zone.now+1.day).day}").click
        end
      end
    click_on("#{(Time.zone.now+2.day).day}")
