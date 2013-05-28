@@ -13,3 +13,10 @@ rake assets:precompile
 In order to create the doc you must run: 	
 yardoc --plugin rest --title "Api Documentation" --readme readme_api_doc.rdoc
 
+
+# in order to put phoenix into mantainance mode:
+rake maintenance:start
+# remove phoenix from mantainance mode:
+rake maintenance:end
+
+while in mantainance mode, API and Web will not be reachable.
