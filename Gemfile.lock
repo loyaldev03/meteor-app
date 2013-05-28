@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/mark-moseley/linecache
+  revision: 869c6a65155068415925067e480741bd0a71527e
+  specs:
+    linecache19 (0.5.12)
+      ruby_core_source (>= 0.1.4)
+
+GIT
   remote: git://github.com/rweng/jquery-datatables-rails.git
   revision: 494f752b8eb8350f33841c822a67d014c869219f
   specs:
@@ -199,8 +206,6 @@ GEM
       actionpack (>= 3.1)
       less (~> 2.2.0)
     libv8 (3.11.8.17)
-    linecache19 (0.5.13)
-      ruby_core_source (>= 0.1.4)
     mail (2.4.4)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
@@ -396,7 +401,7 @@ DEPENDENCIES
   jquery-datatables-rails!
   jquery-rails (= 2.0.3)
   jquery-ui-rails (= 1.1.0)
-  linecache19 (= 0.5.13)
+  linecache19!
   mocha
   mysql2 (= 0.3.11)
   newrelic_rpm
