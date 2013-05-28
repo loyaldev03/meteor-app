@@ -77,9 +77,9 @@ gem 'newrelic_rpm'
 # To use debugger
 group :development do
   # gem 'ruby-debug19', :require => 'ruby-debug'
-  gem 'linecache19', :git => 'git://github.com/mark-moseley/linecache'
+  gem 'linecache19', '0.5.13'
   gem 'ruby-debug-base19x', '~> 0.11.30.pre4'
-  gem 'ruby-debug19'
+  # gem 'ruby-debug19'
   gem "rails-erd"
   gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
   gem "yard", "~> 0.8.2.1"
