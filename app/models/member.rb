@@ -980,15 +980,18 @@ class Member < ActiveRecord::Base
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{base.count} templates"
     index_member = 0
     base.each do |res|
-      begin 
-        index_member = index_member+1
-        Rails.logger.info "  *[#{index_member}] processing member ##{member.id}"
-        member = Member.find res[0]
+      begin
+        tz = Time.zone.now
+        member_id = res[0]
         template_id = res[1]
+        index_member = index_member+1
+        Rails.logger.info "   *[#{index_member}] processing member ##{member_id}"
+        member = Member.find member_id
         Communication.deliver!(template_id, member)
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member_id}"
       rescue Exception => e
         Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => EmailTemplate.find(res[0]).inspect, :membership => member.current_membership.inspect })
-        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"  
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
   end
