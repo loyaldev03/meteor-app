@@ -67,25 +67,24 @@ class MembersCancelTest < ActionController::IntegrationTest
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
   end
 
-  # test "Downgrade a member - Different club" do
-  #   setup_member(false)
-  #   credit_card = FactoryGirl.build(:credit_card_master_card)
-  #   @club_2 = FactoryGirl.create(:simple_club_with_gateway)
-  #   @unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-  #   @saved_member = create_member(@unsaved_member, credit_card, @terms_of_membership_with_gateway.name, false)
-  #   @terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club_2.id)
-  #   @terms_of_membership_with_gateway.update_attribute(:downgrade_tom_id, @terms_of_membership_with_gateway_to_downgrade.id)
-    
-  #   active_merchant_stubs_process(@hd_decline.response_code, @hd_decline.notes)
-  #   @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
+  test "Downgrade a member - Different club" do
+    setup_member(false)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    @club_2 = FactoryGirl.create(:simple_club_with_gateway)
+    @unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    @saved_member = create_member(@unsaved_member, credit_card, @terms_of_membership_with_gateway.name, false)
+    @terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club_2.id)
+    @terms_of_membership_with_gateway.update_attribute(:downgrade_tom_id, @terms_of_membership_with_gateway_to_downgrade.id)  
+    active_merchant_stubs_process(@hd_decline.response_code, @hd_decline.notes)
+    @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
 
-  #   answer = @saved_member.bill_membership
-  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    answer = @saved_member.bill_membership
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
-  #   within("#operations_table") do
-  #     assert page.has_content?("Hard Declined: 9997 mes: Credit card is blank we wont bill")
-  #   end
-  # end
+    within("#operations_table") do
+      assert page.has_content?("Hard Declined: 9997 mes: Credit card is blank we wont bill")
+    end
+  end
 
   test "Downgrade a member when soft recycled is limit - Same club" do
     setup_member(false)
@@ -108,80 +107,80 @@ class MembersCancelTest < ActionController::IntegrationTest
     end
   end
 
-  # test "changing the cancel date" do
-  #   setup_member
+  test "changing the cancel date" do
+    setup_member
 
-  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-  #   click_link_or_button 'cancel'
-  #   select_from_datepicker("cancel_date", Time.zone.now+1.day)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    click_link_or_button 'cancel'
+    select_from_datepicker("cancel_date", Time.zone.now+1.day)
 
-  #   select(@member_cancel_reason.name, :from => 'reason')
+    select(@member_cancel_reason.name, :from => 'reason')
 
-  #   confirm_ok_js
-  #   click_link_or_button 'Cancel member'
-  #   click_link_or_button 'cancel'
-  #   select_from_datepicker("cancel_date", Time.zone.now+2.day)
+    confirm_ok_js
+    click_link_or_button 'Cancel member'
+    click_link_or_button 'cancel'
+    select_from_datepicker("cancel_date", Time.zone.now+2.day)
 
-  #   select(@member_cancel_reason.name, :from => 'reason')
-  #   confirm_ok_js
-  #   click_link_or_button 'Cancel member'
-  # end
+    select(@member_cancel_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_link_or_button 'Cancel member'
+  end
 
-  # #Check cancel email - It is send it by CS inmediate after member is lapsed
-  # test "cancel member" do
-  #   setup_member
-  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-  #   click_on 'Cancel'
-  #   date_time = Time.zone.now + 1.days
+  #Check cancel email - It is send it by CS inmediate after member is lapsed
+  test "cancel member" do
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    click_on 'Cancel'
+    date_time = Time.zone.now + 1.days
 
-  #   select_from_datepicker("cancel_date", date_time)
-  #   select(@member_cancel_reason.name, :from => 'reason')
-  #   confirm_ok_js
-  #   click_on 'Cancel member'
+    select_from_datepicker("cancel_date", date_time)
+    select(@member_cancel_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_on 'Cancel member'
 
-  #   @saved_member.reload
+    @saved_member.reload
 
-  #   within("#td_mi_cancel_date") do
-  #     assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
-  #   end
-  # 
-  #   within('.nav-tabs'){ click_on "Operations"}
-  #   within("#operations_table") do
-  #     assert page.has_content?("Member cancellation scheduled to #{date_time.to_date} - Reason: #{@member_cancel_reason.name}")
-  #   end
+    within("#td_mi_cancel_date") do
+      assert page.has_content?(I18n.l(@saved_member.cancel_date, :format => :only_date))
+    end
+  
+    within('.nav-tabs'){ click_on "Operations"}
+    within("#operations_table") do
+      assert page.has_content?("Member cancellation scheduled to #{date_time.to_date} - Reason: #{@member_cancel_reason.name}")
+    end
 
-  #   @saved_member.reload
-  #   @saved_member.set_as_canceled!
+    @saved_member.reload
+    @saved_member.set_as_canceled!
     
-  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
-  #   within("#table_membership_information"){ assert page.has_content?("lapsed") }
+    within("#table_membership_information"){ assert page.has_content?("lapsed") }
     
-  #   within('.nav-tabs'){ click_on "Operations"}
-  #   within("#operations_table"){ assert page.has_content?("Member canceled") }
-  #   within('.nav-tabs'){ click_on "Communications"}
-  #   within("#communication") do
-  #     assert page.has_content?("Test cancellation")
-  #     assert page.has_content?("cancellation")
-  #   end
-  #   assert_equal(Communication.last.template_type, 'cancellation')
+    within('.nav-tabs'){ click_on "Operations"}
+    within("#operations_table"){ assert page.has_content?("Member canceled") }
+    within('.nav-tabs'){ click_on "Communications"}
+    within("#communication") do
+      assert page.has_content?("Test cancellation")
+      assert page.has_content?("cancellation")
+    end
+    assert_equal(Communication.last.template_type, 'cancellation')
    
-  #   click_link_or_button 'Cancel'
-  #   assert assert find_field('input_first_name').value == @saved_member.first_name
-  # end
+    click_link_or_button 'Cancel'
+    assert assert find_field('input_first_name').value == @saved_member.first_name
+  end
 
-  # test "Rejecting a member should set cancel_date" do
-  #   setup_member(false)
-  #   unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-  #   credit_card = FactoryGirl.build(:credit_card_master_card)
+  test "Rejecting a member should set cancel_date" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
     
-  #   @saved_member = create_member(unsaved_member, credit_card, @terms_of_membership_with_approval.name)
+    @saved_member = create_member(unsaved_member, credit_card, @terms_of_membership_with_approval.name)
 
-  #   confirm_ok_js
-  #   click_link_or_button 'Reject'
+    confirm_ok_js
+    click_link_or_button 'Reject'
 
-  #   within("#td_mi_cancel_date")do
-  #     assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-  #   end
-  # end
+    within("#td_mi_cancel_date")do
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+    end
+  end
 end
