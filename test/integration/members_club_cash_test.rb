@@ -136,7 +136,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     sign_in_as(@admin_agent)
     @saved_member.bill_membership
-    sleep(3) #To wait until billing is finished.
+    sleep(1) #To wait until billing is finished.
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
   
     within("#operations_table")do

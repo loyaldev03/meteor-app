@@ -56,6 +56,7 @@ class MembersBillTest < ActionController::IntegrationTest
       end
     end
   end
+  
 # TODO MEJORAR:
   def change_next_bill_date(date)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -81,12 +82,12 @@ class MembersBillTest < ActionController::IntegrationTest
   # TEST
   ############################################################
 
+
   test "Change Next Bill Date" do
     setup_member(nil,true)
     bill_member(@saved_member,false,nil,false)
     next_bill_date = Time.zone.now+1.day
     change_next_bill_date(next_bill_date)
-    sleep 2
     assert page.has_content?("Next bill date changed to #{next_bill_date.to_date}")
   end
 

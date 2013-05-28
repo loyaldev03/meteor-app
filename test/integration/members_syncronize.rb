@@ -13,10 +13,10 @@ class MembersSyncronize < ActionController::IntegrationTest
  def setup_environment 
     Drupal.enable_integration!
     Drupal.test_mode!
-    Pardot.enable_integration!
+    # Pardot.enable_integration! ==> NoMethodError: undefined method `enable_integration!' for Pardot:Module
 
     response = '{"id"=>"1810071", "campaign_id"=>"831", "salutation"=>nil, "first_name"=>nil, "last_name"=>nil, "email"=>"cal+sda@ggmail.com", "password"=>nil, "company"=>nil, "website"=>nil, "job_title"=>nil, "department"=>nil, "country"=>nil, "address_one"=>nil, "address_two"=>nil, "city"=>nil, "state"=>nil, "territory"=>nil, "zip"=>nil, "phone"=>nil, "fax"=>nil, "source"=>nil, "annual_revenue"=>nil, "employees"=>nil, "industry"=>nil, "years_in_business"=>nil, "comments"=>nil, "notes"=>nil, "score"=>"0", "grade"=>nil, "last_activity_at"=>nil, "recent_interaction"=>"Never active", "crm_lead_fid"=>nil, "crm_contact_fid"=>nil, "crm_owner_fid"=>nil, "crm_account_fid"=>nil, "crm_opportunity_fid"=>nil, "crm_opportunity_created_at"=>nil, "crm_opportunity_updated_at"=>nil, "crm_opportunity_value"=>nil, "crm_opportunity_status"=>nil, "crm_last_sync"=>nil, "crm_is_sale_won"=>nil, "is_do_not_email"=>nil, "is_do_not_call"=>nil, "opted_out"=>nil, "short_code"=>"fcc52", "is_reviewed"=>nil, "is_starred"=>nil, "created_at"=>"2012-11-13 07:45:46", "updated_at"=>"2012-11-13 07:45:47", "campaign"=>{"id"=>"831", "name"=>"Website Tracking"}, "profile"=>{"id"=>"281", "name"=>"Default", "profile_criteria"=>[{"id"=>"1361", "name"=>"Company Size", "matches"=>"Unknown"}, {"id"=>"1371", "name"=>"Industry", "matches"=>"Unknown"}, {"id"=>"1381", "name"=>"Location", "matches"=>"Unknown"}, {"id"=>"1391", "name"=>"Job Title", "matches"=>"Unknown"}, {"id"=>"1401", "name"=>"Department", "matches"=>"Unknown"}]}, "visitors"=>nil, "visitor_activities"=>nil, "lists"=>nil}'
-    Pardot::Member.any_instance.stubs(:save!).returns(response)
+    # Pardot::Member.any_instance.stubs(:save!).returns(response)
 
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @club = FactoryGirl.create(:club_with_api)
@@ -33,9 +33,93 @@ class MembersSyncronize < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
    end
 
+  def update_api_id(member, api_id, validate = true)
+   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name,   :member_prefix => @saved_member.id)
+    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+
+    within(".nav-tabs"){ click_on("Sync Status") }
+    within("#sync_status")do
+      wait_until{
+        click_link_or_button 'Edit'
+        fill_in "member[api_id]", :with => "1234"
+        confirm_ok_js
+        click_on 'Update'
+      }
+    end
+
+   if validate
+      assert page.has_content?("Sync data updated")
+      within(".nav-tabs") do
+         click_on("Operations")
+      end
+      within("#operations_table") do
+         assert page.has_content?("Member's api_id changed from nil to \"#{api_id}\"")
+      end
+
+      within(".nav-tabs") do
+        click_on("Sync Status")
+      end
+      within("#span_api_id")do
+        assert page.has_content?(@saved_member.api_id.to_s)
+      end
+    end
+  end
+
+
   ############################################################
   # TEST
   ############################################################
+
+  test "Do not allow use the same api_id" do
+    setup_environment
+    unsaved_member=FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    @saved_member = create_member(unsaved_member, credit_card)
+    @saved_member.update_attribute(:api_id, "1234")
+    api_first_member=@saved_member.api_id
+    unsaved_member2=FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card2=FactoryGirl.build(:credit_card_american_express)
+    @saved_member2 = create_member(unsaved_member2, credit_card2)
+    visit show_member_path(:partner_prefix => @saved_member2.club.partner.prefix, :club_prefix => @saved_member2.club.name, :member_prefix => @saved_member2.id)
+    within(".nav-tabs"){ click_on("Sync Status") }
+    within("#sync_status")do
+        click_link_or_button 'Edit'
+        fill_in "member[api_id]", :with => "1234"
+        confirm_ok_js
+        click_on 'Update'
+    end
+    assert page.has_content?("Sync data cannot be updated. Api id already exists")
+  end
+
+  test "Allow enter api_id empty" do
+    setup_environment
+    unsaved_member=FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    @saved_member = create_member(unsaved_member, credit_card)
+    @saved_member.update_attribute(:api_id, "1234")
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+    within(".nav-tabs"){ click_on("Sync Status") }
+    within("#sync_status")do
+        click_link_or_button 'Edit'
+        fill_in "member[api_id]", :with => ""
+        confirm_ok_js
+        click_on 'Update'
+    end
+    within("#operations_table") do
+      assert page.has_content?("Member's api_id changed from \"1234\" to nil")
+    end
+  end
+
+  # generate stubs related to conn in order to set as nill the api_id
+  # test "Allow enter api_id empty when Cancel a member" do
+  #   setup_environment
+  #   unsaved_member=FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card)
+  #   @saved_member = create_member(unsaved_member, credit_card)
+  #   @saved_member.update_attribute(:api_id, "1234")
+  #   @saved_member.set_as_canceled!
+  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+  # end
 
   test "Syncronize a club - club has a good drupal domain" do
     setup_environment 
@@ -218,31 +302,28 @@ class MembersSyncronize < ActionController::IntegrationTest
     @saved_member.update_attribute(:last_synced_at, Time.zone.now)
     
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    assert find_field('input_first_name').value == unsaved_member.first_name
 
     within(".nav-tabs"){ click_on("Sync Status") }
     within("#sync_status")do
-      wait_until{
         click_link_or_button 'Edit'
         fill_in "member[api_id]", :with => "1234"
         confirm_ok_js
         click_on 'Update'
-      }
     end
-    wait_until{ page.has_content?("Sync data updated") }
+    assert page.has_content?("Sync data updated")
 
     within(".nav-tabs") do
       click_on("Operations")
     end
-    within("#operations_table"){
-      wait_until{ page.has_content?("Member's api_id changed from nil to \"1234\"") }
-    }
-
+    within("#operations_table") do
+      assert page.has_content?("Member's api_id changed from nil to \"1234\"")
+    end
     within(".nav-tabs") do
       click_on("Sync Status")
     end
     within("#span_api_id")do
-      wait_until { assert page.has_content?(@saved_member.api_id.to_s) }
+      assert page.has_content?(@saved_member.api_id.to_s)
     end
   end
 

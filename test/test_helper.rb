@@ -53,6 +53,11 @@ class ActiveSupport::TestCase
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns(answer)
   end
 
+  def active_merchant_stubs_process(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
+     answer = ActiveMerchant::Billing::Response.new(success, message, { "transaction_id"=>CREDIT_CARD_TOKEN[number], "error_code"=> code, "auth_response_text"=>"No Match" })
+     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:process).returns(answer)
+   end
+
   def create_active_member(tom, member_type = :active_member, enrollment_type = :enrollment_info, member_args = {}, membership_args = {}, use_default_active_merchant_stub = true)
     if use_default_active_merchant_stub
       active_merchant_stubs 
@@ -141,7 +146,6 @@ module ActionController
     def search_member(field_selector, value, validate_obj)
       fill_in field_selector, :with => value unless value.nil?
       click_on 'Search'
-      sleep 5
       within("#members") do
         assert page.has_content?(validate_obj.status)
         assert page.has_content?("#{validate_obj.id}")
@@ -206,6 +210,21 @@ module ActionController
     end
 
 
+  def select_from_datepicker(name, date)
+    page.execute_script("window.jQuery('#"+name+"').next().click()")
+    within("#ui-datepicker-div") do
+      if date.month != Time.zone.now.month
+        if (date.month > Time.zone.now.month)
+          (date.month-Time.zone.now.month).times{ find(".ui-icon-circle-triangle-e").click }
+        end
+        if (date.month < Time.zone.now.month)
+          (Time.zone.now.month-date.month).times{ find(".ui-icon-circle-triangle-w").click }
+        end
+      end
+      first(:link, date.day.to_s).click
+    end
+  end
+
   def fill_in_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
     visit members_path( :partner_prefix => unsaved_member.club.partner.prefix, :club_prefix => unsaved_member.club.name )
     click_link_or_button 'New Member'
@@ -228,12 +247,15 @@ module ActionController
       fill_in 'member[zip]', :with => unsaved_member.zip
     end
 
-    # TODO : FIX THIS.
-    # page.execute_script("window.jQuery('#member_birth_date').next().click()")
-    # within(".ui-datepicker-calendar") do
-    #   click_on("1")
+    # page.execute_script("window.jQuery('#birt_date').next().click()")
+    # within("#ui-datepicker-div") do
+    #     if ((Time.zone.now+2.day).month != Time.zone.now.month)
+    #       find(".ui-icon-circle-triangle-e").click
+    #     end
+    #     first(:link, "#{(Time.zone.now+1.day).day}").click
+    #   end
     # end
-    
+
     within("#table_contact_information")do
       fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
       fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
@@ -277,7 +299,6 @@ module ActionController
 
   def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
     fill_in_member(unsaved_member, credit_card, tom_type, cc_blank)
-    sleep 1
     assert find_field('input_first_name').value == unsaved_member.first_name
     Member.find_by_email(unsaved_member.email)
   end
@@ -292,47 +313,43 @@ module ActionController
     answer = member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
     visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix =>member.club.name, :member_prefix => member.id)
-    sleep 1
+    
+    # if current_membership.quota%12==0 and current_membership.quota!=12
+    #   within("#table_membership_information")do
+    #     within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
+    #   end
+    # end
     within("#table_membership_information")do
-      within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
+      within("#td_mi_next_retry_bill_date")do
+        assert page.has_content?(I18n.l(next_bill_date, :format => :only_date))
+      end
+      assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date )
     end
-    within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
-
-
-    within("#table_membership_information")do
-      wait_until{ assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date ) } 
-    end
-
-    #sleep(5)
 
     within("#operations") do
-      wait_until {
-        assert page.has_selector?("#operations_table")
-        assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
-      }
+      assert page.has_selector?("#operations_table")
+      assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
     end
 
     within(".nav-tabs"){ click_on 'Transactions' }
     within("#transactions") do 
-      wait_until {
-        assert page.has_selector?("#transactions_table")
-        Transaction.all.each do |transaction|
-          assert page.has_content?(transaction.full_label.truncate(50))
-        end
-        # assert page.has_content?("Sale : This transaction has been approved")
-        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
-      }
+      assert page.has_selector?("#transactions_table")
+      Transaction.all.each do |transaction|
+        assert page.has_content?(transaction.full_label.truncate(50))
+      end
+      # assert page.has_content?("Sale : This transaction has been approved")
+      assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
     end
 
     within("#transactions_table") do
-     wait_until{ assert page.has_selector?('#refund') }
+      assert page.has_selector?('#refund')
     end
     
     if do_refund
       transaction = Transaction.last
       visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id, :transaction_id => transaction.id)
 
-      wait_until{ assert page.has_content?(transaction.amount_available_to_refund.to_s) }
+      assert page.has_content?(transaction.amount_available_to_refund.to_s)
 
       # final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
       final_amount = Transaction.first.amount_available_to_refund
@@ -345,24 +362,18 @@ module ActionController
       end
       
       within("#operations_table") do 
-        wait_until {
-          assert page.has_content?("Communication 'Test refund' sent")
-          assert page.has_content?("Refund success $#{final_amount}")
-        }
+        assert page.has_content?("Communication 'Test refund' sent")
+        assert page.has_content?("Refund success $#{final_amount}")
       end
       within(".nav-tabs"){ click_on 'Transactions' }
       within("#transactions_table") do 
-        wait_until {
-          assert page.has_content?("Credit : This transaction has been approved")
-          assert page.has_content?(final_amount)
-        }
+        assert page.has_content?("Credit : This transaction has been approved")
+        assert page.has_content?(final_amount)
       end
       within(".nav-tabs"){ click_on 'Communications' }
       within("#communication") do 
-        wait_until {
-          assert page.has_content?("Test refund")
-          assert page.has_content?("refund")
-        }
+        assert page.has_content?("Test refund")
+        assert page.has_content?("refund")
       end
     end
   end
