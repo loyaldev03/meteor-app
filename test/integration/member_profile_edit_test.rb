@@ -54,6 +54,24 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
+  # test "Add additional data to member"
+  test "See Additional Member Data" do
+    setup_member
+    @saved_member.update_attribute :additional_data, {'data_field_one' => 'green','data_field_two'=> 'dodge'}
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within("#table_additional_data") do
+      assert page.has_content?("data_field_one: green")
+      assert page.has_content?("data_field_two: dodge")
+    end
+  end
+
+  test "See Additional Member Data" do
+    setup_member
+    @saved_member.update_attribute(:additional_data, nil)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert page.has_no_content?("#table_additional_data")
+  end  
+
   test "Bill date filter" do
     setup_member(false,false)
     unsaved_member=FactoryGirl.build(:member_with_api, :club_id => @club.id)
