@@ -284,7 +284,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_difference('Product.find(@product.id).stock',-1) do
       create_member_throught_sloop(enrollment_info)
     end
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.last
@@ -322,7 +321,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_difference('Product.find(@product.id).stock',-1) do
       create_member_throught_sloop(enrollment_info)
     end
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.last
@@ -358,7 +356,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.last
@@ -395,7 +392,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.last
@@ -430,7 +426,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'product not in the list')
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.last
@@ -466,7 +461,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_difference('Fulfillment.count',0){
       create_member_throught_sloop(enrollment_info)
     }
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -488,7 +482,6 @@ test "Enroll a member with recurrent product and it on the list" do
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.last
@@ -544,7 +537,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
     initial_stock = @product.stock
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.last
@@ -598,7 +590,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.last
@@ -663,7 +654,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.last
@@ -701,7 +691,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'CARD')
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.last
@@ -766,7 +755,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
+    
     @saved_member = Member.find_by_email(@member.email)
 
     @saved_member.fulfillments.each do |fulfillment|
@@ -810,7 +799,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
@@ -859,7 +847,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.find_by_product_sku('KIT')
@@ -912,7 +899,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.find_by_product_sku('KIT')
@@ -949,7 +935,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.find_by_product_sku('KIT')
@@ -1016,7 +1001,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.find_by_product_sku('KIT')
@@ -1077,7 +1061,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
     @saved_member.set_as_active
     @saved_member.update_attribute(:recycled_times,0)
@@ -1125,7 +1108,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
     @saved_member.set_as_active
     @saved_member.update_attribute(:recycled_times,0)
@@ -1169,7 +1151,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku )
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
     @saved_member.set_as_active
     @saved_member.current_membership.update_attribute(:quota, 12)
@@ -1701,7 +1682,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'kit-card')
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     click_link_or_button("My Clubs")
@@ -1733,7 +1713,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     click_link_or_button("My Clubs")
@@ -1766,7 +1745,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
@@ -1818,7 +1796,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
@@ -1869,7 +1846,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     fulfillment = Fulfillment.last
     fulfillment.set_as_processing
     fulfillment.set_as_sent
@@ -1920,7 +1896,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
     fulfillment = Fulfillment.last
     fulfillment.set_as_processing
     fulfillment.set_as_sent
@@ -1973,8 +1948,6 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product_other.sku},CARD,KIT")
 
     create_member_throught_sloop(enrollment_info)
-    sleep(1)
-
     @saved_member = Member.find_by_email(@member.email)
     fulfillment_card = Fulfillment.find_by_product_sku(product_card.sku)
     fulfillment_kit = Fulfillment.find_by_product_sku(product_kit.sku)

@@ -50,49 +50,44 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button 'Set wrong phone number'
   end
 
-
   ###########################################################
   # TESTS
   ###########################################################
 
-      test "Bill date filter" do
-        setup_member(true,false)
-        unsaved_member=FactoryGirl.build(:member_with_api, :club_id => @club.id)
-        unsaved_member_2=FactoryGirl.build(:member_with_api, :club_id => @club.id)
-        credit_cardd=FactoryGirl.build(:credit_card_american_express)
-        c = create_member(unsaved_member, credit_cardd)
-        c2 = create_member(unsaved_member_2)
-        tran_1 = FactoryGirl.create(:transaction, :member_id => c.id)
-        tran_1.update_attribute(:created_at, Time.zone.now + 10.days)
-        tran_2 = FactoryGirl.create(:transaction, :member_id => c2.id)
-        visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-        within("#member_billing_date_start") do
-          page.execute_script("window.jQuery('#member_billing_date_start').next().click()")
-        end
-        within("#ui-datepicker-div") do
-          if ((Time.zone.now+9.day).month != Time.zone.now.month)
-            within(".ui-datepicker-header")do
-              find(".ui-icon-circle-triangle-e").click
-            end
-          end
-        end
-        click_on("#{(Time.zone.now+9.day).day}")
-        sleep 1
-        within("#member_billing_date_end") do
-          page.execute_script("window.jQuery('#member_billing_date_end').next().click()")
-        end
-        within("#ui-datepicker-div") do
-          if ((Time.zone.now+11.day).month != Time.zone.now.month)
-            within(".ui-datepicker-header")do
-              find(".ui-icon-circle-triangle-e").click
-            end
-          end
-        end
-        click_on("#{(Time.zone.now+11.day).day}")
-        click_link_or_button('Search')
-        assert page.has_content?("#{c.first_name}")
-        assert page.has_no_content?("#{c2.first_name}")
-      end
+  # test "Add additional data to member"
+  # test "Do not display Additional data section if it does not have"
+  test "See Additional Member Data" do
+    setup_member
+    @saved_member.update_attribute(:additional_data, nil)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert page.has_no_content?("#table_additional_data")
+    @saved_member.update_attribute :additional_data, {'data_field_one' => 'green','data_field_two'=> 'dodge'}
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within("#table_additional_data") do
+      assert page.has_content?("data_field_one: green")
+      assert page.has_content?("data_field_two: dodge")
+    end
+  end
+
+  test "Bill date filter" do
+    setup_member(false,false)
+    unsaved_member=FactoryGirl.build(:member_with_api, :club_id => @club.id)
+    unsaved_member_2=FactoryGirl.build(:member_with_api, :club_id => @club.id)
+    credit_cardd=FactoryGirl.build(:credit_card_american_express)
+    c = create_member(unsaved_member, credit_cardd)
+    c2 = create_member(unsaved_member_2)
+    tran_1 = FactoryGirl.create(:transaction, :member_id => c.id)
+    tran_1.update_attribute(:created_at, Time.zone.now + 10.days)
+    tran_2 = FactoryGirl.create(:transaction, :member_id => c2.id)
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+
+    select_from_datepicker("member_billing_date_start", Time.zone.now+9.days)
+    select_from_datepicker("member_billing_date_end", Time.zone.now+11.days)
+
+    click_link_or_button('Search')
+    assert page.has_content?("#{c.first_name}")
+    assert page.has_no_content?("#{c2.first_name}")
+  end
 
   test "edit member" do
     setup_member
@@ -275,17 +270,11 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     assert_equal @saved_member.wrong_phone_number, 'Unreachable'
 
     click_link_or_button "Edit"
-    within("#table_contact_information")do
-      wait_until{
-        check('setter[wrong_phone_number]')
-      }
-    end
+    within("#table_contact_information"){ check('setter[wrong_phone_number]') }
     alert_ok_js
     click_link_or_button 'Update Member'
 
-    within("#table_contact_information")do
-      assert !page.has_css?('tr.yellow')
-    end 
+    within("#table_contact_information"){ assert !page.has_css?('tr.yellow') }
     @saved_member.reload
     assert_equal @saved_member.wrong_phone_number, nil
   end
@@ -295,16 +284,10 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     set_as_undeliverable_member(@saved_member,'reason')
 
     click_link_or_button "Edit"
-    within("#table_demographic_information")do
-      wait_until{
-        fill_in 'member[address]', :with => 'another address'
-      }
-    end
+    within("#table_demographic_information"){ fill_in 'member[address]', :with => 'another address' }
     alert_ok_js
     click_link_or_button 'Update Member'
-    within("#table_demographic_information")do
-      assert !page.has_css?('tr.yellow')
-    end 
+    within("#table_demographic_information"){ assert !page.has_css?('tr.yellow') }
     @saved_member.reload
     assert_equal @saved_member.wrong_phone_number, nil
   end
@@ -386,17 +369,11 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     set_as_unreachable_member(@saved_member,'Unreachable')    
    
     click_link_or_button "Edit"
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => '9876'
-      }
-    end
+    within("#table_contact_information"){ fill_in 'member[phone_country_code]', :with => '9876' }
     alert_ok_js
     click_link_or_button 'Update Member'
 
-    within("#table_contact_information")do
-      assert !page.has_css?('tr.yellow')
-    end 
+    within("#table_contact_information"){ assert !page.has_css?('tr.yellow') }
     @saved_member.reload
 
     assert_equal @saved_member.wrong_phone_number, nil
@@ -407,98 +384,61 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   
     click_link_or_button "Edit"
     within("#table_contact_information")do
-      wait_until{ fill_in 'member[phone_area_code]', :with => '9876' }
+      fill_in 'member[phone_area_code]', :with => '9876'
     end
     alert_ok_js
     click_link_or_button 'Update Member'
 
-    within("#table_contact_information")do
-      assert !page.has_css?('tr.yellow')
-    end 
+    within("#table_contact_information"){ assert !page.has_css?('tr.yellow') }
     @saved_member.reload
     assert_equal @saved_member.wrong_phone_number, nil
     #By changing phone_local_number
 
     set_as_unreachable_member(@saved_member,'Unreachable')    
    
-    within("#table_contact_information")do
-      assert page.has_css?('tr.yellow')
-    end 
+    within("#table_contact_information"){ assert page.has_css?('tr.yellow') } 
     @saved_member.reload
     assert_equal @saved_member.wrong_phone_number, 'Unreachable'
 
     click_link_or_button "Edit"
-    within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_local_number]', :with => '9876'
-      }
-    end
+    within("#table_contact_information"){ fill_in 'member[phone_local_number]', :with => '9876' }
     alert_ok_js
     click_link_or_button 'Update Member'
 
-    within("#table_contact_information")do
-      assert !page.has_css?('tr.yellow')
-    end 
+    within("#table_contact_information"){ assert !page.has_css?('tr.yellow') }
     @saved_member.reload
     assert_equal @saved_member.wrong_phone_number, nil
   end
-
 
   test "change type of phone number" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
-    within("#table_contact_information")do
-      wait_until{
-        assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
-      }
-    end
+    within("#table_contact_information"){ assert page.has_content?(@saved_member.type_of_phone_number.capitalize) }
 
     click_link_or_button 'Edit'
 
-    within("#table_contact_information")do
-      wait_until{
-        select('Mobile', :from => 'member[type_of_phone_number]')
-      }
-    end
+    within("#table_contact_information"){ select('Mobile', :from => 'member[type_of_phone_number]') }
     alert_ok_js
     click_link_or_button 'Update Member'
-    wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
-      @saved_member.reload  
-    }
-    within("#table_contact_information")do
-      wait_until{
-        assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
-      }
-    end
+    assert find_field('input_first_name').value == @saved_member.first_name
+    @saved_member.reload  
+    within("#table_contact_information"){ assert page.has_content?(@saved_member.type_of_phone_number.capitalize) }
   end
 
   test "edit member's type of phone number" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
-    within("#table_contact_information")do
-      wait_until{
-        assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
-      }
-    end
+    within("#table_contact_information"){ assert page.has_content?(@saved_member.type_of_phone_number.capitalize) }
     click_link_or_button 'Edit'
     
-    within("#table_contact_information")do
-      wait_until{
-        select('Mobile', :from => 'member[type_of_phone_number]')
-      }
-    end
+    within("#table_contact_information"){ select('Mobile', :from => 'member[type_of_phone_number]') }
 
     alert_ok_js
     click_link_or_button 'Update Member'
 
-    within("#table_contact_information")do
-      wait_until{
-        assert page.has_content?('Mobile')
-      }
-    end
+    within("#table_contact_information"){ assert page.has_content?('Mobile') }
     assert_equal Member.last.type_of_phone_number, 'mobile'
   end
 
@@ -506,33 +446,23 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#personal_details")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
-      }
+      fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
+      fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
+      fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
     end
     click_link_or_button 'Search'
-    within("#members")do
-      wait_until{
-        find(".icon-pencil").click
-      }
-    end  
+    within("#members"){ find(".icon-pencil").click }
     within("#table_contact_information")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => 'TYUIYTRTYUYT'
-        fill_in 'member[phone_area_code]', :with => 'TYUIYTRTYUYT'
-        fill_in 'member[phone_local_number]', :with => 'TYUIYTRTYUYT'
-      }
+      fill_in 'member[phone_country_code]', :with => 'TYUIYTRTYUYT'
+      fill_in 'member[phone_area_code]', :with => 'TYUIYTRTYUYT'
+      fill_in 'member[phone_local_number]', :with => 'TYUIYTRTYUYT'
     end
     alert_ok_js
     click_link_or_button 'Update Member'
     within("#error_explanation")do
-      wait_until{
-        assert page.has_content?('phone_country_code: is not a number')
-        assert page.has_content?('phone_area_code: is not a number')
-        assert page.has_content?('phone_local_number: is not a number')
-      }
+      assert page.has_content?('phone_country_code: is not a number')
+      assert page.has_content?('phone_area_code: is not a number')
+      assert page.has_content?('phone_local_number: is not a number')
     end
   end
 
@@ -542,36 +472,28 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#personal_details")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
-      }
+      fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
+      fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
+      fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        find(".icon-pencil").click
-      }
+      find(".icon-pencil").click
     end   
     within("#table_contact_information")do
-      wait_until{
-        assert find_field('member[type_of_phone_number]').value == @saved_member.type_of_phone_number
-        assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
-        assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
-        assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
-        select('Home', :from => 'member[type_of_phone_number]' )
-      }
+      assert find_field('member[type_of_phone_number]').value == @saved_member.type_of_phone_number
+      assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
+      assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
+      assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
+      select('Home', :from => 'member[type_of_phone_number]' )
     end
     alert_ok_js
     click_link_or_button 'Update Member'
     sleep(3)
     @saved_member.reload
     within("#table_contact_information")do
-      wait_until{
-        assert page.has_content?(@saved_member.full_phone_number)
-        assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
-      }
+      assert page.has_content?(@saved_member.full_phone_number)
+      assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
     end
   end
 
@@ -580,35 +502,27 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#personal_details")do
-      wait_until{
-        fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
-      }
+      fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
+      fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
+      fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        find(".icon-pencil").click
-      }
+      find(".icon-pencil").click
     end   
     within("#table_contact_information")do
-      wait_until{
-        assert find_field('member[type_of_phone_number]').value == @saved_member.type_of_phone_number
-        assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
-        assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
-        assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
-        select('Other', :from => 'member[type_of_phone_number]' )
-      }
+      assert find_field('member[type_of_phone_number]').value == @saved_member.type_of_phone_number
+      assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
+      assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
+      assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
+      select('Other', :from => 'member[type_of_phone_number]' )
     end
     alert_ok_js
     click_link_or_button 'Update Member'
 
     within("#table_contact_information")do
-      wait_until{
-        assert page.has_content?(@saved_member.full_phone_number)
-        assert page.has_content?('Other')
-      }
+      assert page.has_content?(@saved_member.full_phone_number)
+      assert page.has_content?('Other')
     end
   end
 
@@ -616,7 +530,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#personal_details") do
-      fill_in 'member[member_id]', :with => @saved_member.id.to_s
+      fill_in 'member[id]', :with => @saved_member.id.to_s
       fill_in 'member[first_name]', :with => @saved_member.first_name
       fill_in 'member[last_name]', :with => @saved_member.last_name
     end
@@ -635,18 +549,12 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#personal_details")do
-      wait_until{
-        fill_in 'member[member_id]', :with => @saved_member.id
-        fill_in 'member[first_name]', :with => @saved_member.first_name
-        fill_in 'member[last_name]', :with => @saved_member.last_name
-      }
+      fill_in 'member[id]', :with => @saved_member.id
+      fill_in 'member[first_name]', :with => @saved_member.first_name
+      fill_in 'member[last_name]', :with => @saved_member.last_name
     end
     click_link_or_button 'Search'
-    within("#members")do
-      wait_until{
-        find(".icon-pencil").click
-      }
-    end   
+    within("#members"){ find(".icon-pencil").click }
     select('Celebrity', :from => 'member[member_group_type_id]')
 
     alert_ok_js
@@ -659,13 +567,12 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member(false)
     @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
     @terms_of_membership_with_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id, :club_id => @club_external_id.id)
-
     @member_with_external_id = create_active_member(@terms_of_membership_with_external_id, :active_member_with_external_id, nil, {}, { :created_by => @admin_agent })
 
     visit members_path(:partner_prefix => @terms_of_membership_with_external_id.club.partner.prefix, :club_prefix => @terms_of_membership_with_external_id.club.name)
     assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
     
-    within("#payment_details"){ fill_in "member[external_id]", :with => @member_with_external_id.external_id }
+    within("#personal_details"){ fill_in "member[external_id]", :with => @member_with_external_id.external_id }
     click_link_or_button 'Search'
     within("#members"){ find(".icon-pencil").click }   
 
@@ -687,21 +594,13 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     click_link_or_button 'Edit'
 
-    within("#table_demographic_information")do
-      wait_until{
-        select('Female', :from => 'member[gender]')
-      }
-    end
+    within("#table_demographic_information"){ select('Female', :from => 'member[gender]') }
     alert_ok_js
     click_link_or_button 'Update Member'
 
-    wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
-      @saved_member.reload
-    }
-    wait_until{
-      assert find_field('input_gender').value == ('Female')
-    }
+    assert find_field('input_first_name').value == @saved_member.first_name
+    @saved_member.reload
+    assert find_field('input_gender').value == ('Female')
     assert_equal @saved_member.gender, 'F'
   end
 
@@ -715,84 +614,38 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     click_link_or_button 'Edit'
 
-    within("#table_demographic_information")do
-      wait_until{
-        select('Male', :from => 'member[gender]')
-      }
-    end
+    within("#table_demographic_information"){ select('Male', :from => 'member[gender]') }
     alert_ok_js
     click_link_or_button 'Update Member'
-    wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
-      @saved_member.reload
-    }
-    wait_until{
-      assert find_field('input_gender').value == ('Male')
-    }
+    assert find_field('input_first_name').value == @saved_member.first_name
+    @saved_member.reload
+    assert find_field('input_gender').value == ('Male')
     assert_equal @saved_member.gender, 'M'
-  end
-
-  test "canceled date will not be changed when it is set." do
-    setup_member
-    cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-
-    click_link_or_button 'Cancel'
-    page.execute_script("window.jQuery('#cancel_date').next().click()")
-    within("#ui-datepicker-div") do
-      if ((Time.zone.now+1.day).month != Time.zone.now.month)
-        within(".ui-datepicker-header")do
-          wait_until { find(".ui-icon-circle-triangle-e").click }
-        end
-      end
-      wait_until { click_on("#{(Time.zone.now+1.day).day}") }
-    end
-    select(cancel_reason.name, :from => 'reason')
-    confirm_ok_js
-    click_link_or_button 'Cancel member'
-
-    @saved_member.reload  
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    wait_until{ assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") }    
-    wait_until{ assert find(:xpath, "//a[@id='cancel' and @disabled='disabled']") }
   end
 
   test "Should not show destroy button on credit card when this one is the last one" do
     setup_member
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-    within(".nav-tabs")do
-      click_on("Credit Cards")
-    end 
-    within("#credit_cards")do
-      wait_until { assert page.has_no_selector?("#destroy") }
-    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards"){ assert page.has_no_selector?("#destroy") } 
 
     @saved_member.set_as_canceled!
     @saved_member.update_attribute(:blacklisted, true)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-    within(".nav-tabs")do
-      click_on("Credit Cards")
-    end 
-    within("#credit_cards")do
-      wait_until { assert page.has_no_selector?("#destroy") }
-    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards"){ assert page.has_no_selector?("#destroy") }
 
     @saved_member.update_attribute(:blacklisted, false)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-    within(".nav-tabs")do
-      click_on("Credit Cards")
-    end 
-    within("#credit_cards")do
-      wait_until { assert page.has_no_selector?("#destroy") }
-    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards"){ assert page.has_no_selector?("#destroy") }
   end
 
   # Do not allow to remove credit card from members that are Blacklisted
@@ -803,47 +656,35 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     second_credit_card = FactoryGirl.create(:credit_card_american_express , :member_id => @saved_member.id, :active => false)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-    within(".nav-tabs")do
-      click_on("Credit Cards")
-    end 
-    within("#credit_cards")do
-      wait_until { assert page.has_no_selector?("#destroy") }
-    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards"){ assert page.has_no_selector?("#destroy") }
 
     @saved_member.update_attribute(:status, "provisional")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
-    within(".nav-tabs")do
-      click_on("Credit Cards")
-    end 
-    within("#credit_cards")do
-      wait_until { assert page.has_no_selector?("#destroy") }
-    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards"){ assert page.has_no_selector?("#destroy") }
 
     @saved_member.set_as_canceled!
     @saved_member.update_attribute(:blacklisted, true)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-    within(".nav-tabs")do
-      click_on("Credit Cards")
-    end 
-    within("#credit_cards")do
-      wait_until { assert page.has_no_selector?("#destroy") }
-    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards"){ assert page.has_no_selector?("#destroy") }
 
     @saved_member.update_attribute(:blacklisted, false)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within(".nav-tabs")do
       click_on("Credit Cards")
     end 
     within("#credit_cards")do
-      wait_until { assert page.has_selector?("#destroy") }
+      assert page.has_selector?("#destroy")
       confirm_ok_js
       click_link_or_button("Destroy")
     end
@@ -884,11 +725,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     bill_member(@saved_member, false)
 
     within('.nav-tabs'){ click_on 'Fulfillments' }
-    within("#fulfillments") do 
-      wait_until {
-        assert page.has_content?("KIT-CARD")
-      }
-    end
+    within("#fulfillments"){ assert page.has_content?("KIT-CARD") }
   end
 
   test "member save the sale full save" do
@@ -900,12 +737,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_on 'Full save'
      
     assert page.has_content?("Full save done")
-    
-    within("#operations_table") do 
-      wait_until {
-        assert page.has_content?("Full save done")
-      }
-    end
+    within("#operations_table"){ assert page.has_content?("Full save done") }
   end
  
  
@@ -1057,12 +889,12 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "Next Bill Date for monthly memberships" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name 
 
     next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
 
     within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_no_content?(I18n.l(@saved_member.current_membership.join_date+1.month, :format => :only_date)) }
+      assert page.has_no_content?(I18n.l(@saved_member.current_membership.join_date+1.month, :format => :only_date)) 
     end
   end  
 
@@ -1072,7 +904,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
   end  
 
   test "Provisional member" do
@@ -1080,17 +912,13 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     @saved_member.current_membership.join_date = Time.zone.now-3.day
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     
-    within("#td_mi_status")do
-      wait_until{ assert page.has_content?("provisional") }
-    end
+    within("#td_mi_status"){ assert page.has_content?("provisional") }
 
-    within(".nav-tabs") do
-      click_on("Operations")
-    end
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
-      wait_until{ assert page.has_content?("Member enrolled successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-") }
+      assert page.has_content?("Member enrolled successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
     end
   end 
 
@@ -1109,27 +937,22 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    within(".nav-tabs") do
-      click_on("Transactions")
-    end
+    assert find_field('input_first_name').value == @saved_member.first_name
+    
+    within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table_wrapper")do
-      wait_until{
-        assert page.has_selector?('#refund')
-        click_link_or_button("Refund")
-      }
+      assert page.has_selector?('#refund')
+      click_link_or_button("Refund")
     end
     wait_until{ fill_in 'refund_amount', :with => final_amount }
     click_link_or_button 'Refund'
 
     wait_until{ page.has_content?("This transaction has been approved") }
 
-    within(".nav-tabs") do
-      click_on("Operations")
-    end
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
-      wait_until{ assert page.has_content?("Refund success $#{final_amount.to_f}") }
-      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed)) }
+      assert page.has_content?("Refund success $#{final_amount.to_f}")
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
     end
   end 
 
@@ -1141,23 +964,17 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    within(".nav-tabs") do
-      click_on("Transactions")
-    end
+    within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table_wrapper")do
-      wait_until{
-        assert page.has_selector?('#refund')
-        click_link_or_button("Refund")
-      }
+      assert page.has_selector?('#refund')
+      click_link_or_button("Refund")
     end
-    wait_until{ fill_in 'refund_amount', :with => final_amount }
+    fill_in 'refund_amount', :with => final_amount
     click_link_or_button 'Refund'
 
-    wait_until{ page.has_content?("This transaction has been approved") }
+    page.has_content?("This transaction has been approved")
 
-    within(".nav-tabs") do
-      click_on("Operations")
-    end
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
       wait_until{ assert page.has_content?("Refund success $#{final_amount.to_f}") }
       wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed)) }
@@ -1173,16 +990,10 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     @saved_member.bill_membership
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     
-    within(".nav-tabs") do
-      click_on("Transactions")
-    end
-    within("#transactions_table")do
-      wait_until{
-        assert page.has_no_selector?('#refund')
-      }
-    end
+    within(".nav-tabs"){ click_on("Transactions") }
+    within("#transactions_table"){ assert page.has_no_selector?('#refund') }
   end
 
   test "Billing membership amount on the Next Bill Date" do
@@ -1196,10 +1007,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     Member.bill_all_members_up_today
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-
-    within("#table_membership_information")do
-      within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
-    end
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date_after_billing, :format => :only_date)) }
 
@@ -1226,17 +1034,14 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    within(".nav-tabs") do
-      click_on("Transactions")
-    end
+    assert find_field('input_first_name').value == @saved_member.first_name
+
+    within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table_wrapper")do
-      wait_until{
-        assert page.has_selector?('#refund')
-        click_link_or_button("Refund")
-      }
+      assert page.has_selector?('#refund')
+      click_link_or_button("Refund")
     end
-    wait_until{ fill_in 'refund_amount', :with => final_amount }
+    fill_in 'refund_amount', :with => final_amount
     click_link_or_button 'Refund'
     wait_until{ page.has_content?("This transaction has been approved") }
 
@@ -1244,15 +1049,12 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_on 'Full save'
     assert page.has_content?("Full save done")
     
-    within(".nav-tabs") do
-      click_on("Operations")
-    end
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
-      wait_until{ assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
-      wait_until{ assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") }
-      wait_until{ assert page.has_content?("Refund success $#{final_amount.to_f}") }
-      wait_until{ assert page.has_content?("Full save done") }
-      # wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed)) }
+      assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-")
+      assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
+      assert page.has_content?("Refund success $#{final_amount.to_f}")
+      assert page.has_content?("Full save done")
     end
   end 
 
@@ -1263,10 +1065,9 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
 
-    sleep 1
     Member.send_prebill
 
-    sleep 5 #Wait untill script finish.
+    sleep 2 #Wait untill script finish.
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
 
