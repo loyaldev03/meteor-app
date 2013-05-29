@@ -128,13 +128,10 @@ namespace :fulfillments do
 		if Rails.env=='prototype'
 			fulfillment_file.club = Club.find 2
 		elsif Rails.env=='production'
-			fulfillment_file.club = Club.find 4
+			fulfillment_file.club = Club.find 6
 		elsif Rails.env=='staging'
-			fulfillment_file.club = Club.find 9
+			fulfillment_file.club = Club.find 19
 		end
-
-		fulfillment_file.club = Club.find 2
-
 
 		fulfillments = Fulfillment.includes(:member).where( 
 			["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
@@ -153,7 +150,7 @@ namespace :fulfillments do
 		  	fulfillments.each do |fulfillment|
 		  		member = fulfillment.member
 		      row = [ member.id.to_s, member.first_name, member.last_name,
-		      			  I18n.l(member.join_date, :format => :only_date_short),
+		      			  I18n.l(member.next_retry_bill_date, :format => :only_date_short),
 		      			  I18n.l(member.member_since_date, :format => :only_date_short), 
 									fulfillment.product.name,
 									fulfillment.fulfillment.product_sku		      			   

@@ -85,7 +85,7 @@ class Notifier < ActionMailer::Base
   def fulfillment_nfla_kit_card_report(fulfillment_xls_file, quantity)
     @quantity = quantity
     attachments["fulfillments_xls_file#{Date.today}.xlsx"] = File.read(fulfillment_xls_file)
-    mail :to => 'clawler@stoneacreinc.com',
+    mail :to => Rails.env=='production' ? 'clawler@stoneacreinc.com' : 'sonia@xagax.com',
          :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NFLA kit-card fulfillments report"
   end
 
