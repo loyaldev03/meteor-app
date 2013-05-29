@@ -71,6 +71,8 @@ class Communication < ActiveRecord::Base
       Notifier.active(email).deliver!
     when :cancellation
       Notifier.cancellation(email).deliver!
+    when :rejection
+      Notifier.rejection(email).deliver!
     when :prebill
       Notifier.pre_bill(email).deliver!
     when :refund

@@ -12,6 +12,10 @@ class Notifier < ActionMailer::Base
     mail :to => to, :subject => "cancellation to #{email}"
   end
 
+  def rejection(email)
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "rejection to #{email}"
+  end
   def active(email)
     to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
     mail :to => to, :subject => "active to #{email}"
@@ -32,16 +36,14 @@ class Notifier < ActionMailer::Base
     mail :to => to, :subject => "pillar to #{email}"
   end
 
-  def active_with_approval(agent,member)
-    @agent = agent
+  def active_with_approval(emails,member)
     @member = member
-    mail :to => agent.email, :subject => "Member activation needs approval"
+    mail :to => emails, :subject => "Member activation needs approval"
   end
 
-  def recover_with_approval(agent,member)
-    @agent = agent
+  def recover_with_approval(emails,member)
     @member = member
-    mail :to => agent.email, :subject => "Member recovering needs approval"
+    mail :to => emails, :subject => "Member recovering needs approval"
   end
 
   def call_these_members(csv)

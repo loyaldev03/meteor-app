@@ -140,7 +140,7 @@ class Member < ActiveRecord::Base
     after_transition [:provisional, :active ] => 
                         :lapsed, :do => [:cancellation, :nillify_club_cash]
     after_transition :applied => 
-                        :lapsed, :do => :set_member_as_rejected
+                        :lapsed, :do => [:set_member_as_rejected, :send_rejection_communication]
     ###### <<<<<<========
     after_transition all => all, :do => :propagate_membership_data
 
@@ -187,15 +187,25 @@ class Member < ActiveRecord::Base
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_active_needs_approval_email
-    representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
-    representatives.each { |representative| Notifier.active_with_approval(representative.agent,self).deliver! }
+    send_active_needs_approval_email_dj
   end
+  def send_active_needs_approval_email_dj
+    representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
+    emails = representatives.collect { |representative| representative.agent.email }.join(',')
+    Notifier.active_with_approval(emails,self).deliver!
+  end
+  handle_asynchronously :send_active_needs_approval_email_dj
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_recover_needs_approval_email
-    representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
-    representatives.each { |representative| Notifier.recover_with_approval(representative.agent,self).deliver! }
+    send_recover_needs_approval_email_dj
   end
+  def send_recover_needs_approval_email_dj
+    representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
+    emails = representatives.collect { |representative| representative.agent.email }.join(',')
+    Notifier.recover_with_approval(emails,self).deliver!
+  end
+  handle_asynchronously :send_recover_needs_approval_email_dj
 
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
   def increment_reactivations
@@ -212,6 +222,10 @@ class Member < ActiveRecord::Base
   def set_member_as_rejected
     decrement!(:reactivation_times, 1) if reactivation_times > 0 # we increment when it gets applied. If we reject the member we have to get back
     self.current_membership.update_attribute(:cancel_date, Time.zone.now)
+  end
+
+  def send_rejection_communication
+    Communication.deliver!(:rejection, self)
   end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
@@ -618,7 +632,7 @@ class Member < ActiveRecord::Base
       message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
 
       response = { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :autologin_url => self.full_autologin_url.to_s, :status => self.status }
-      response.merge!(:api_role => tom.api_role.split(',')) unless self.is_not_drupal?
+      response.merge!(:api_role => tom.api_role.to_s.split(',')) unless self.is_not_drupal?
       response
     rescue Exception => e
       logger.error e.inspect

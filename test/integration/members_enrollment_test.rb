@@ -184,6 +184,17 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert page.has_content? I18n.t('error_messages.club_is_not_enable_for_new_enrollments', :cs_phone_number => @club.cs_phone_number)
   end
 
+  test "Join a member with auth.net PGC" do
+    setup_member(false)
+    @club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
+    Time.zone = @club.time_zone
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)  
+    created_member = create_member(unsaved_member, nil, nil, false)
+  end
+
+
   test "Create a member with CC blank" do
     setup_member(false)
 
@@ -1189,5 +1200,30 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     add_club_cash(@saved_member, 10, "Generic description",true)
   end
 
-end
+  test "Do not enroll a member with wrong payment gateway" do
+    setup_member(false)
+    @club.payment_gateway_configurations.first.update_attribute(:gateway,'fail')
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    fill_in_member(unsaved_member, credit_card, @terms_of_membership_with_gateway.name)
+    sleep 1
+    within("#error_explanation") do
+      assert page.has_content?("Member information is invalid.")
+      assert page.has_content?("number: An error was encountered while processing your request.")
+    end
+  end
 
+  test "Do not enroll a member when it does not have payment gateway" do
+    setup_member(false)
+    @club.payment_gateway_configurations.first.update_attribute(:club_id,nil)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    fill_in_member(unsaved_member, credit_card, @terms_of_membership_with_gateway.name)
+    sleep 1
+    within("#error_explanation") do
+      assert page.has_content?("Member information is invalid.")
+      assert page.has_content?("number: An error was encountered while processing your request.")
+    end
+    sleep 1
+  end
+end

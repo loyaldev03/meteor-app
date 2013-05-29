@@ -76,7 +76,7 @@ class Transaction < ActiveRecord::Base
         :address1 => address,
         :city     => city,
         :state    => state,
-        :zip      => zip.gsub(/[a-zA-Z-]/, ''),
+        :zip      => zip.to_s.gsub(/[a-zA-Z-]/, ''),
         :phone    => phone_number
       },
       :expiration_date => "%02d%s" % [ self.expire_month.to_i, self.expire_year.to_s.last(2) ]

@@ -56,27 +56,86 @@ class MembersBillTest < ActionController::IntegrationTest
       end
     end
   end
-
+  
+# TODO MEJORAR:
   def change_next_bill_date(date)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     click_link_or_button 'Change'
-    wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
-
+    page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date'))
     unless date.nil?
       page.execute_script("window.jQuery('#next_bill_date').next().click()")
-
-      within(".ui-datepicker-calendar") do
-        wait_until { first(:link, date.to_s).click }
+      within("#ui-datepicker-div") do
+        if (date.month != Time.zone.now.month)
+          within(".ui-datepicker-header")do
+            find(".ui-icon-circle-triangle-e").click
+          end
+        end
+        first(:link, date.day.to_s).click
       end
-    end
     click_link_or_button 'Change next bill date'
+    end
   end
 
 
   ############################################################
   # TEST
   ############################################################
+
+
+  test "Change Next Bill Date" do
+    setup_member(nil,true)
+    bill_member(@saved_member,false,nil,false)
+    next_bill_date = Time.zone.now+1.day
+    change_next_bill_date(next_bill_date)
+    assert page.has_content?("Next bill date changed to #{next_bill_date.to_date}")
+  end
+
+  test "See HD for 'Soft recycle limit'" do
+    setup_member
+    EnrollmentInfo.last.update_attribute(:enrollment_amount, 0.0)
+    @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+    @hd_strategy = FactoryGirl.create(:hard_decline_strategy) 
+    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
+
+    within('#table_membership_information') do
+      within('#td_mi_recycled_times') do
+        assert page.has_content? "0"
+      end
+      within('#td_mi_status') do
+        assert page.has_content?('provisional')
+      end
+    end
+    recycle_time = 0
+    2.upto(15) do |time|
+      @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
+      answer = @saved_member.bill_membership
+      recycle_time = recycle_time+1
+      @saved_member.reload
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+
+      if @saved_member.next_retry_bill_date.nil?
+        within('#table_membership_information') do
+          within('#td_mi_recycled_times') do
+            assert page.has_content? "0"
+          end
+          within('#td_mi_status') do
+            assert page.has_content?('lapsed')
+          end
+        end
+      else
+        within('#table_membership_information') do
+          within('#td_mi_recycled_times') do
+            variable=recycle_time.to_s
+            assert page.has variable
+          end
+          within('#td_mi_status') do
+            assert page.has_content?('provisional')
+          end
+        end
+      end
+    end
+  end
 
   test "create a member billing enroll > 0" do
     active_merchant_stubs
@@ -214,21 +273,22 @@ class MembersBillTest < ActionController::IntegrationTest
     wait_until{ assert page.has_content?(I18n.t('error_messages.next_bill_date_blank')) }
   end  
 
-  # TODO: FIX ME!
-  # test "Change Next Bill Date for tomorrow" do
-  #   setup_member
-  #   @saved_member.set_as_canceled
-  #   @saved_member.recover(@terms_of_membership_with_gateway) 
-  #   @saved_member.set_as_active
 
-  #   next_bill_date = Time.zone.now + 1.day
-  #   change_next_bill_date(next_bill_date.day)
-  #   wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+  test "Change Next Bill Date for tomorrow" do
+    setup_member
+    @saved_member.set_as_canceled
+    @saved_member.recover(@terms_of_membership_with_gateway) 
+    @saved_member.set_as_active
+
+    next_bill_date = Time.zone.now + 1.day
+    change_next_bill_date(next_bill_date)
+    assert find_field('input_first_name').value == @saved_member.first_name
     
-  #   within("#td_mi_next_retry_bill_date")do
-  #     wait_until{ assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
-  #   end
-  # end  
+    within("#td_mi_next_retry_bill_date")do
+      assert page.has_content?(I18n.l(next_bill_date, :format => :only_date))
+    end
+    sleep 5
+  end  
 
   test "Next Bill Date for monthly memberships" do
     setup_member
@@ -598,7 +658,36 @@ test "Try billing a member with credit card ok, and within a club that allows bi
       click_link_or_button("Bill no recurrent amount") 
       assert page.has_content?("Credit card is blank we wont bill")   
     end
-end
 
-
+  # stubs isnt working correctly
+  # test "Litle payment gateway (Enrollment amount)" do
+  #   setup_member(false)
+  #   @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
+  #   Time.zone = @club.time_zone
+  #   @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :provisional_days => 0)
     
+  #   unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card)
+  #   enrollment_info = FactoryGirl.build(:enrollment_info)
+  #   create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
+  #   @saved_member=Member.find_by_email(unsaved_member.email)
+  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+  #   transaction = Transaction.last
+  #   make_a_refund(transaction, transaction.amount_available_to_refund)
+  # end
+
+  # stubs isnt working correctly
+  # test "Litle payment gateway (Installment amount)" do
+  #   setup_member(false)
+  #   @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
+  #   @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+  #   unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card)
+  #   enrollment_info = FactoryGirl.build(:enrollment_info, :enrollment_amount => false)
+  #   create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
+  #   @saved_member=Member.find_by_email(unsaved_member.email)
+  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+  #   Time.zone = @club.time_zone
+  #   bill_member(@saved_member, true, nil, true)
+  # end    
+end

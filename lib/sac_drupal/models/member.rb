@@ -58,8 +58,8 @@ module Drupal
       uri = @token && @token.url && URI.parse(@token.url)
       self.member.update_column :autologin_url, uri.path if uri
       @token
-    rescue
-      Airbrake.notify(:error_class => 'Drupal:Member:login_token', :parameters => { :member => self.member.inspect })
+    rescue Exception => e
+      Airbrake.notify(:error_class => 'Drupal:Member:login_token', :error_message => e, :parameters => { :member => self.member.inspect })
       nil
     end
 
@@ -108,7 +108,7 @@ module Drupal
       m = self.member
 
       role_list = {}
-      m.current_membership.terms_of_membership.api_role.split(',').each do |role|
+      m.current_membership.terms_of_membership.api_role.to_s.split(',').each do |role|
         role_list = role_list.merge!({role => role})
       end
 
