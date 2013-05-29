@@ -82,6 +82,13 @@ class Notifier < ActionMailer::Base
          :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NAAMMA fulfillments report"
   end
 
+  def fulfillment_nfla_kit_card_report(fulfillment_xls_file, quantity)
+    @quantity = quantity
+    attachments["fulfillments_xls_file#{Date.today}.xlsx"] = File.read(fulfillment_xls_file)
+    mail :to => 'clawler@stoneacreinc.com',
+         :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NFLA kit-card fulfillments report"
+  end
+
 end
  
 
