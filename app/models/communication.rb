@@ -10,6 +10,8 @@ class Communication < ActiveRecord::Base
     else
       if template_type.class == EmailTemplate
         template = template_type
+      elsif template_type.is_a? Integer 
+        template = EmailTemplate.find template_type
       else
         template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
       end

@@ -976,37 +976,22 @@ class Member < ActiveRecord::Base
   end
 
   def self.send_pillar_emails
-    # TODO: join EmailTemplate and Member querys
-    base = EmailTemplate.where(["template_type = ? ", :pillar])
+    base = ActiveRecord::Base.connection.execute("SELECT memberships.member_id,email_templates.id FROM memberships INNER JOIN terms_of_memberships ON terms_of_memberships.id = memberships.terms_of_membership_id INNER JOIN email_templates ON email_templates.terms_of_membership_id = terms_of_memberships.id WHERE (email_templates.template_type = 'pillar' AND date(join_date) = DATE_SUB(CURRENT_DATE(), INTERVAL email_templates.days_after_join_date DAY) AND status IN ('active','provisional'))")
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{base.count} templates"
-    index_template = 0
     index_member = 0
-    base.find_in_batches do |group|
-      group.each do |template| 
+    base.each do |res|
+      begin
         tz = Time.zone.now
-        begin
-          index_template = index_template+1 
-          Rails.logger.info "  *[#{index_template}] processing template ##{template.id}"
-          Membership.find_in_batches(:conditions => 
-              [ " date(join_date) = ? AND terms_of_membership_id = ? AND status IN (?) ", 
-                (Time.zone.now - template.days_after_join_date.days).to_date, 
-                template.terms_of_membership_id, ['active', 'provisional'] ]) do |group1|
-            group1.each do |membership| 
-              begin
-                index_member = index_member+1
-                Rails.logger.info "  *[#{index_member}] processing member ##{membership.member_id}"
-                Communication.deliver!(template, membership.member)
-              rescue Exception => e
-                Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect, :membership => membership.inspect })
-                Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-              end
-            end
-          end
-        rescue Exception => e
-          Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect })
-          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        end
-        Rails.logger.info "    ... took #{Time.zone.now - tz} for template ##{template.id}"
+        member_id = res[0]
+        template_id = res[1]
+        index_member = index_member+1
+        Rails.logger.info "   *[#{index_member}] processing member ##{member_id}"
+        member = Member.find member_id
+        Communication.deliver!(template_id, member)
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member_id}"
+      rescue Exception => e
+        Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => EmailTemplate.find(res[0]).inspect, :membership => member.current_membership.inspect })
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
   end
