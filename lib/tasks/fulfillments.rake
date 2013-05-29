@@ -153,7 +153,7 @@ namespace :fulfillments do
 		      			  I18n.l(member.next_retry_bill_date, :format => :only_date_short),
 		      			  I18n.l(member.member_since_date, :format => :only_date_short), 
 									fulfillment.product.name,
-									fulfillment.fulfillment.product_sku		      			   
+									fulfillment.product_sku		      			   
 		      			]
 		    	sheet.add_row row 
 	   			fulfillment_file.fulfillments << fulfillment
