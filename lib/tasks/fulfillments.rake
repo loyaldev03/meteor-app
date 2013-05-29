@@ -119,7 +119,7 @@ namespace :fulfillments do
 	end
 
 
-	desc "Create fulfillment report for sloops products reated to Naamma."
+	desc "Create fulfillment report for kit-card products reated to NFLA."
 	task :generate_kit_card_nfla_report => :environment do
 		require 'csv'
 		fulfillment_file = FulfillmentFile.new 
