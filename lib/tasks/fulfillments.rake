@@ -164,7 +164,7 @@ namespace :fulfillments do
     temp = Tempfile.new("nfla_kit-card_report.xlsx") 
     
     package.serialize temp.path
-    Notifier.fulfillment_nfla_report.html(temp, fulfillment_file.fulfillments.count).deliver!
+    Notifier.fulfillment_nfla_report(temp, fulfillment_file.fulfillments.count).deliver!
     
     temp.close 
     temp.unlink
