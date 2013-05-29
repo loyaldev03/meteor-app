@@ -120,7 +120,7 @@ namespace :fulfillments do
 
 
   desc "Create fulfillment report for kit-card products reated to NFLA. We search for sloops fulfillments instead of kit-card, since NFLA uses sloops."
-  task :generate_kit_card_nfla_report => :environment do
+  task :generate_nfla_report => :environment do
     require 'csv'
     fulfillment_file = FulfillmentFile.new 
     fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
@@ -153,7 +153,7 @@ namespace :fulfillments do
                   I18n.l(member.next_retry_bill_date, :format => :only_date_short),
                   I18n.l(member.member_since_date, :format => :only_date_short), 
                   fulfillment.product.name,
-                  fulfillment.fulfillment.product_sku                  
+                  fulfillment.product_sku                  
                 ]
           sheet.add_row row 
           fulfillment_file.fulfillments << fulfillment
@@ -164,7 +164,7 @@ namespace :fulfillments do
     temp = Tempfile.new("nfla_kit-card_report.xlsx") 
     
     package.serialize temp.path
-    Notifier.fulfillment_nfla_kit_card_report(temp, fulfillment_file.fulfillments.count).deliver!
+    Notifier.fulfillment_nfla_report.html(temp, fulfillment_file.fulfillments.count).deliver!
     
     temp.close 
     temp.unlink
