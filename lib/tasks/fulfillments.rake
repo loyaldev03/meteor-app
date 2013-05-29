@@ -117,4 +117,59 @@ namespace :fulfillments do
 
 	  File.delete(temp_file)
 	end
+
+
+	desc "Create fulfillment report for kit-card products reated to NFLA."
+	task :generate_kit_card_nfla_report => :environment do
+		require 'csv'
+		fulfillment_file = FulfillmentFile.new 
+		fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
+
+		if Rails.env=='prototype'
+			fulfillment_file.club = Club.find 2
+		elsif Rails.env=='production'
+			fulfillment_file.club = Club.find 6
+		elsif Rails.env=='staging'
+			fulfillment_file.club = Club.find 19
+		end
+
+		fulfillments = Fulfillment.includes(:member).where( 
+			["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
+		  	AND ? and fulfillments.status = 'not_processed' 
+			  AND fulfillments.product_sku like 'KIT-CARD'", fulfillment_file.club_id, 
+			Time.zone.now-7.days, Time.zone.now ])
+
+		fulfillment_file.product = "KIT-CARD"
+		fulfillment_file.save!
+
+    package = Axlsx::Package.new									
+    package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
+    	sheet.add_row [ 'Code','first Name', 'Last Name', 'Member Valid Thru', 'Member Since', 
+    		             'Product Name', 'Product Sku' ]
+    	unless fulfillments.empty?
+		  	fulfillments.each do |fulfillment|
+		  		member = fulfillment.member
+		      row = [ member.id.to_s, member.first_name, member.last_name,
+		      			  I18n.l(member.next_retry_bill_date, :format => :only_date_short),
+		      			  I18n.l(member.member_since_date, :format => :only_date_short), 
+									fulfillment.product.name,
+									fulfillment.fulfillment.product_sku		      			   
+		      			]
+		    	sheet.add_row row 
+	   			fulfillment_file.fulfillments << fulfillment
+		    end
+    	end
+    end
+
+    temp = Tempfile.new("nfla_kit-card_report.xlsx") 
+    
+    package.serialize temp.path
+    Notifier.fulfillment_nfla_kit_card_report(temp, fulfillment_file.fulfillments.count).deliver!
+    
+    temp.close 
+    temp.unlink
+
+	  fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
+    fulfillment_file.processed
+	end
 end
