@@ -471,7 +471,7 @@ class Member < ActiveRecord::Base
     end
   rescue Exception => e
     Airbrake.notify(:error_class => "Billing:membership", :error_message => e, :parameters => { :member => self.inspect })
-    { :message => "#{e}", :code => Settings.error_codes.membership_billing_error } 
+    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
   def no_recurrent_billing(amount, description)
