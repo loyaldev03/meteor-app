@@ -61,13 +61,14 @@ class Transaction < ActiveRecord::Base
     ActiveMerchant::Billing::Base.mode = ( pgc.production? ? :production : :test )
   end
 
-  def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil)
+  def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, operation_type_to_set = nil)
     self.terms_of_membership_id = terms_of_membership_id || member.terms_of_membership.id
     self.member = member
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
     self.membership_id = membership.nil? ? member.current_membership.id : membership.id 
+    self.operation_type = operation_type_to_set unless operation_type_to_set.nil?
     self.save
     @options = {
       :order_id => invoice_number,
@@ -162,7 +163,7 @@ class Transaction < ActiveRecord::Base
         return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
       end
       trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
-      trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership)
+      trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership, Settings.operation_types.credit)
       trans.fill_transaction_type_for_credit(sale_transaction)
       answer = trans.process
       if trans.success?

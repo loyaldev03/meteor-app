@@ -444,7 +444,7 @@ class Member < ActiveRecord::Base
       else
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
-        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
+        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
         answer = trans.process
         if trans.success?
           unless set_as_active
@@ -471,7 +471,7 @@ class Member < ActiveRecord::Base
     end
   rescue Exception => e
     Airbrake.notify(:error_class => "Billing:membership", :error_message => e, :parameters => { :member => self.inspect })
-    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
+    { :message => "#{e}", :code => Settings.error_codes.membership_billing_error } 
   end
 
   def no_recurrent_billing(amount, description)
@@ -483,7 +483,7 @@ class Member < ActiveRecord::Base
       if can_bill_membership?
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
-        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration)
+        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.no_recurrent_billing)
         answer = trans.process
         if trans.success?
           message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
@@ -1307,10 +1307,8 @@ class Member < ActiveRecord::Base
       end
 
       message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership.id}) -#{terms_of_membership.name}-"
-      Auditory.audit(agent, 
-        (trans.nil? ? terms_of_membership : trans), 
-        message, self, operation_type)
-      
+      Auditory.audit(agent, (trans.nil? ? terms_of_membership : trans), message, self, operation_type)
+      trans.update_attribute :operation_type, operation_type unless trans.nil?
       message
     end
 
@@ -1363,6 +1361,7 @@ class Member < ActiveRecord::Base
           :parameters => { :member => self.inspect })
         if self.recycled_times < Settings.number_of_retries_on_missing_decline
           Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_without_decline_strategy)
+          trans.update_attribute :operation_type, Settings.operation_types.membership_billing_without_decline_strategy
           increment!(:recycled_times, 1)
           return message
         end
@@ -1399,10 +1398,12 @@ class Member < ActiveRecord::Base
           Communication.deliver!(:hard_decline, self)    
         end
       else
-        Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing_soft_decline)
+        operation_type = Settings.operation_types.membership_billing_soft_decline
+        Auditory.audit(nil, trans, message, self, operation_type)
         increment!(:recycled_times, 1)
         Communication.deliver!(:soft_decline, self)
       end
+      trans.update_attribute :operation_type, operation_type
       message
     end
 
