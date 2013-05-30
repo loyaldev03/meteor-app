@@ -144,7 +144,7 @@ namespace :fulfillments do
 
     package = Axlsx::Package.new                  
     package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
-      sheet.add_row [ 'Code','first Name', 'Last Name', 'Member Valid Thru', 'Member Since', 
+      sheet.add_row [ 'Code','First Name', 'Last Name', 'Member Valid Thru', 'Member Since', 
                      'Product Name', 'Product Sku' ]
       unless fulfillments.empty?
         fulfillments.each do |fulfillment|
