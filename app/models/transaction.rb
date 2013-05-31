@@ -173,6 +173,7 @@ class Transaction < ActiveRecord::Base
         Communication.deliver!(:refund, sale_transaction.member)
       else
         Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
+        trans.update_attribute :operation_type, Settings.operation_types.credit_error
       end
       answer
     end

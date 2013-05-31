@@ -586,23 +586,23 @@ class TransactionTest < ActiveSupport::TestCase
   #   assert_equal Transaction.find_by_transaction_type('credit').operation_type, Settings.operation_types.credit
   # end
 
-  test "Partial refund with Authorize net" do
-    club_with_authorize_net
-    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
-    amount = @authorize_net_terms_of_membership.installment_amount
-    Timecop.travel(active_member.next_retry_bill_date) do
-      answer = active_member.bill_membership
-      active_member.reload
-      assert_equal active_member.status, 'active'
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
-      refunded_amount = amount-0.34
-      answer = Transaction.refund(refunded_amount, trans)
-      assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
-      assert_equal trans.operation_type, Settings.operation_types.credit
-      assert_equal trans.transaction_type, 'refund'
-    end
-  end
+  # test "Partial refund with Authorize net" do
+  #   club_with_authorize_net
+  #   active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
+  #   amount = @authorize_net_terms_of_membership.installment_amount
+  #   Timecop.travel(active_member.next_retry_bill_date) do
+  #     answer = active_member.bill_membership
+  #     active_member.reload
+  #     assert_equal active_member.status, 'active'
+  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+  #     refunded_amount = amount-0.34
+  #     answer = Transaction.refund(refunded_amount, trans)
+  #     assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
+  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+  #     assert_equal trans.operation_type, Settings.operation_types.credit
+  #     assert_equal trans.transaction_type, 'refund'
+  #   end
+  # end
 
   test "should not update NBD after save the sale from monthly-tom to monthly-tom" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
