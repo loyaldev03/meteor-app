@@ -242,7 +242,7 @@ module MesAccountUpdater
           if transaction_chargebacked.nil?
             raise "Chargeback ##{args[:control_number]} could not be processed. member or transaction_chargebacked are null! #{line}"
           elsif member.nil?
-            transaction.member.chargeback! transaction_chargebacked, args
+            transaction_chargebacked.member.chargeback! transaction_chargebacked, args
           elsif transaction_chargebacked.member_id == member.id
             member.chargeback! transaction_chargebacked, args
           else
