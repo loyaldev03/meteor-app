@@ -67,8 +67,8 @@ class Transaction < ActiveRecord::Base
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
-    self.membership_id = membership.nil? ? member.current_membership.id : membership.id 
-    self.operation_type = operation_type_to_set unless operation_type_to_set.nil?
+    self.membership_id = membership.nil? ? member.current_membership_id : membership.id 
+    self.operation_type = operation_type_to_set
     self.save
     @options = {
       :order_id => invoice_number,

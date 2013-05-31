@@ -1373,33 +1373,30 @@ class Member < ActiveRecord::Base
         trans.decline_strategy_id = decline.id
         if decline.hard_decline?
           message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-          operation_type = (tom.downgrade_tom_id.to_i > 0 ? Settings.operation_types.downgraded_because_of_hard_decline : Settings.operation_types.membership_billing_hard_decline)
+          operation_type = (tom.downgradable? ? Settings.operation_types.downgraded_because_of_hard_decline : Settings.operation_types.membership_billing_hard_decline)
           cancel_member = true
         else
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           self.next_retry_bill_date = decline.days.days.from_now
+          operation_type = Settings.operation_types.membership_billing_soft_decline
           if self.recycled_times > (decline.limit-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-            operation_type = (tom.downgrade_tom_id.to_i > 0 ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.membership_billing_hard_decline_by_limit)
+            operation_type = (tom.downgradable? > 0 ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.membership_billing_hard_decline_by_limit)
             cancel_member = true
           end
         end
       end
       self.save(:validate => false)
-
+      Auditory.audit(nil, trans, message, self, operation_type )
       if cancel_member
-        if tom.downgrade_tom_id.to_i > 0
-          Auditory.audit(nil, trans, message, self, operation_type )
+        if tom.downgradable?
           downgrade_member
         else
-          Auditory.audit(nil, trans, message, self, operation_type )
           self.cancel! Time.zone.now, "HD cancellation"
           set_as_canceled!
           Communication.deliver!(:hard_decline, self)    
         end
       else
-        operation_type = Settings.operation_types.membership_billing_soft_decline
-        Auditory.audit(nil, trans, message, self, operation_type)
         increment!(:recycled_times, 1)
         Communication.deliver!(:soft_decline, self)
       end

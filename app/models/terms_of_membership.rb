@@ -50,6 +50,10 @@ class TermsOfMembership < ActiveRecord::Base
   def payment_gateway_configuration
     club.payment_gateway_configurations.find_by_mode(mode)
   end
+  
+  def downgradable?
+    self.downgrade_tom_id.to_i > 0
+  end
 
   private
 
