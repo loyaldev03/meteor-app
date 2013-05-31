@@ -82,6 +82,7 @@ defaults: &defaults
     note_added: 238
     remote_club_cash_transaction: 239
     downgrade_member: 240
+    unblacklisted: 241
     #communication
     active_email: 300     
     prebill_email: 301    

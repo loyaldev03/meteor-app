@@ -830,6 +830,23 @@ class Member < ActiveRecord::Base
     answer
   end
 
+  # Bug #27501 this method was added just to be used from console.
+  def unblacklist(agent = nil)
+    if self.blacklisted?
+      Member.transaction do
+        begin
+          self.blacklisted = false
+          self.save(:validate => false)
+          Auditory.audit(agent, self, "Un-blacklisted member and all its credit cards.", self, Settings.operation_types.unblacklisted)
+          self.credit_cards.each { |cc| cc.unblacklist }
+        rescue Exception => e
+          Airbrake.notify(:error_class => "Member::unblacklist", :error_message => e, :parameters => { :member => self.inspect })
+          raise ActiveRecord::Rollback
+        end
+      end
+    end
+  end
+
   def blacklist(agent, reason)
     answer = { :message => "Member already blacklisted", :success => false }
     unless self.blacklisted?
