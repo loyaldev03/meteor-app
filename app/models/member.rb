@@ -1343,7 +1343,8 @@ class Member < ActiveRecord::Base
 
     def set_decline_strategy(trans)
       # soft / hard decline
-      type = terms_of_membership.installment_type
+      tom = terms_of_membership
+      type = tom.installment_type
       decline = DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
                   trans.response_code, type, trans.cc_type) || 
                 DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
@@ -1353,14 +1354,15 @@ class Member < ActiveRecord::Base
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
         message = "Billing error. No decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
+        operation_type = Settings.operation_types.membership_billing_without_decline_strategy
         self.next_retry_bill_date = Time.zone.now + eval(Settings.next_retry_on_missing_decline)
         self.save(:validate => false)
-        Airbrake.notify(:error_class => "Decline rule not found TOM ##{terms_of_membership.id}", 
+        Airbrake.notify(:error_class => "Decline rule not found TOM ##{tom.id}", 
           :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.cc_type}. " + 
             "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
           :parameters => { :member => self.inspect })
         if self.recycled_times < Settings.number_of_retries_on_missing_decline
-          operation_type = Settings.operation_types.membership_billing_without_decline_strategy
+          operation_type = Settings.operation_types.membership_billing_without_decline_strategy_limit
           Auditory.audit(nil, trans, message, self, operation_type)
           trans.update_attribute :operation_type, Settings.operation_types.membership_billing_without_decline_strategy
           increment!(:recycled_times, 1)
@@ -1368,19 +1370,17 @@ class Member < ActiveRecord::Base
         end
         cancel_member = true
       else
-        trans.update_attribute :decline_strategy_id, decline.id
-        recycle_limit = false
+        trans.decline_strategy_id = decline.id
         if decline.hard_decline?
           message = "Hard Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-          operation_type = Settings.operation_types.membership_billing_hard_decline
+          operation_type = (tom.downgrade_tom_id.to_i > 0 ? Settings.operation_types.downgraded_because_of_hard_decline : Settings.operation_types.membership_billing_hard_decline)
           cancel_member = true
         else
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           self.next_retry_bill_date = decline.days.days.from_now
           if self.recycled_times > (decline.limit-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-            operation_type = Settings.operation_types.membership_billing_hard_decline_by_limit
-            recycle_limit = true
+            operation_type = (tom.downgrade_tom_id.to_i > 0 ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.membership_billing_hard_decline_by_limit)
             cancel_member = true
           end
         end
@@ -1388,8 +1388,7 @@ class Member < ActiveRecord::Base
       self.save(:validate => false)
 
       if cancel_member
-        if self.terms_of_membership.downgrade_tom_id.to_i > 0
-          operation_type = (recycle_limit ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.downgraded_because_of_hard_decline )
+        if tom.downgrade_tom_id.to_i > 0
           Auditory.audit(nil, trans, message, self, operation_type )
           downgrade_member
         else
@@ -1404,7 +1403,8 @@ class Member < ActiveRecord::Base
         increment!(:recycled_times, 1)
         Communication.deliver!(:soft_decline, self)
       end
-      trans.update_attribute :operation_type, operation_type
+      trans.operation_type = operation_type
+      trans.save
       message
     end
 
