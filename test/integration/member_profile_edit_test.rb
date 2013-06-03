@@ -663,7 +663,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     @saved_member.update_attribute(:status, "provisional")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within(".nav-tabs"){ click_on("Credit Cards") }
     within("#credit_cards"){ assert page.has_no_selector?("#destroy") }
@@ -688,7 +688,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       confirm_ok_js
       click_link_or_button("Destroy")
     end
-    wait_until{ assert page.has_content?("Credit Card #{second_credit_card.last_digits} was successfully destroyed") }
+    assert page.has_content?("Credit Card #{second_credit_card.last_digits} was successfully destroyed")
   end
   test "create a member billing enroll > 0" do
     active_merchant_stubs
@@ -786,10 +786,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
     
     within("#operations_table") do 
-      wait_until {
-        assert page.has_content?("Communication 'Test refund' sent")
-        assert page.has_content?("Refund success $#{final_amount}")
-      }
+      assert page.has_content?("Communication 'Test refund' sent")
+      assert page.has_content?("Refund success $#{final_amount}")
     end
   end 
 
@@ -810,10 +808,10 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     @saved_member.set_as_canceled
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
    
     within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+      assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date))
     end
   end
 
@@ -824,7 +822,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
    
-    within("#td_mi_next_retry_bill_date"){ wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) } }
+    within("#td_mi_next_retry_bill_date"){ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
   end
 
   test "Change member from Lapse status to Provisional statuss" do
@@ -834,7 +832,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.recover(@terms_of_membership_with_gateway)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     
     @saved_member.reload 
     next_bill_date = @saved_member.current_membership.join_date + (@terms_of_membership_with_gateway.provisional_days).days
@@ -852,13 +850,13 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.recover(@terms_of_membership_with_gateway)
     @saved_member.set_as_active
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     
     click_link_or_button 'Change'
-    wait_until { page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) }
+    page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date'))
 
     click_link_or_button 'Change next bill date'
-    wait_until{ assert page.has_content?(I18n.t('error_messages.next_bill_date_blank')) }
+    assert page.has_content?(I18n.t('error_messages.next_bill_date_blank'))
   end  
 
   test "Change Next Bill Date for tomorrow" do
@@ -944,10 +942,10 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       assert page.has_selector?('#refund')
       click_link_or_button("Refund")
     end
-    wait_until{ fill_in 'refund_amount', :with => final_amount }
+    fill_in 'refund_amount', :with => final_amount
     click_link_or_button 'Refund'
 
-    wait_until{ page.has_content?("This transaction has been approved") }
+    page.has_content?("This transaction has been approved")
 
     within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
@@ -963,7 +961,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table_wrapper")do
       assert page.has_selector?('#refund')
@@ -976,8 +974,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
-      wait_until{ assert page.has_content?("Refund success $#{final_amount.to_f}") }
-      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed)) }
+    assert page.has_content?("Refund success $#{final_amount.to_f}")
+    assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
     end
   end 
 
@@ -1043,7 +1041,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
     fill_in 'refund_amount', :with => final_amount
     click_link_or_button 'Refund'
-    wait_until{ page.has_content?("This transaction has been approved") }
+    page.has_content?("This transaction has been approved")
 
     visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
     click_on 'Full save'
@@ -1069,7 +1067,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     sleep 2 #Wait untill script finish.
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within(".nav-tabs"){ click_on 'Communications' }
     within("#communication") do

@@ -93,7 +93,7 @@ class RolesTest < ActionController::IntegrationTest
 
     within("#change_partner")do
       Club.all.each do |club|
-        wait_until{ assert page.has_content?("#{club.partner.prefix} - #{club.name}") }
+        assert page.has_content?("#{club.partner.prefix} - #{club.name}")
       end
     end
   end
@@ -128,9 +128,9 @@ class RolesTest < ActionController::IntegrationTest
       select(club3.name, :from => 'agent[club_roles_attributes][2][club_id]')
       click_link_or_button 'Add'
     end
-    wait_until{ assert page.has_content?("admin for") }
-    wait_until{ assert page.has_content?("supervisor for") }
-    wait_until{ assert page.has_content?("representative for") }
+    assert page.has_content?("admin for")
+    assert page.has_content?("supervisor for")
+    assert page.has_content?("representative for")
   end
 
   test "Admin should see full breadcrumb" do
@@ -138,12 +138,12 @@ class RolesTest < ActionController::IntegrationTest
     setup_member
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within(".breadcrumb")do
-      wait_until{ assert page.has_content?("Partner") }
-      wait_until{ assert page.has_content?("Club") }
-      wait_until{ assert page.has_content?("Show") }
+      assert page.has_content?("Partner")
+      assert page.has_content?("Club")
+      assert page.has_content?("Show")
     end
   end
 
@@ -154,13 +154,11 @@ class RolesTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within('.nav-tabs'){ click_on('Credit Cards')}
     within("#credit_cards") do
-      wait_until{ 
-        wait_until{ assert page.has_selector?("#destroy") }
-      }
+      assert page.has_selector?("#destroy")
     end
   end
 
@@ -170,9 +168,9 @@ class RolesTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled!
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-    wait_until { find(:xpath, "//a[@id='recovery']").click }
+    find(:xpath, "//a[@id='recovery']").click
     assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
   end
 
@@ -189,7 +187,7 @@ class RolesTest < ActionController::IntegrationTest
 
     within("#change_partner")do
       Club.all.each do |club|
-        wait_until{ assert page.has_content?("#{club.partner.prefix} - #{club.name}") }
+        assert page.has_content?("#{club.partner.prefix} - #{club.name}")
       end
     end
     within("#my_clubs_table")do
@@ -202,12 +200,12 @@ class RolesTest < ActionController::IntegrationTest
     setup_member
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within(".breadcrumb")do
-      wait_until{ assert page.has_no_content?("Partner") }
-      wait_until{ assert page.has_no_content?("Club") }
-      wait_until{ assert page.has_content?("Show") }
+      assert page.has_no_content?("Partner")
+      assert page.has_no_content?("Club")
+      assert page.has_content?("Show")
     end
   end
 
@@ -220,7 +218,7 @@ class RolesTest < ActionController::IntegrationTest
     add_credit_card(@saved_member,credit_card)
 
     credit_card = CreditCard.last
-    wait_until{ page.has_content?("Credit card #{credit_card.last_digits} added and activated.") }
+    page.has_content?("Credit card #{credit_card.last_digits} added and activated.")
   end
 
   test "Profile Supervisor - Delete Credit Card" do
@@ -230,13 +228,11 @@ class RolesTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within('.nav-tabs'){ click_on('Credit Cards')}
-    within("#credit_cards") do
-      wait_until{ 
-        wait_until{ assert page.has_selector?("#destroy") }
-      }
+    within("#credit_cards") do 
+      assert page.has_selector?("#destroy")
     end
   end
 
@@ -263,9 +259,9 @@ class RolesTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled!
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-    wait_until { find(:xpath, "//a[@id='recovery']").click }
+    find(:xpath, "//a[@id='recovery']").click
     assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
   end
 
@@ -289,7 +285,7 @@ class RolesTest < ActionController::IntegrationTest
 
     within("#change_partner")do
       Club.all.each do |club|
-        wait_until{ assert page.has_content?("#{club.partner.prefix} - #{club.name}") }
+        assert page.has_content?("#{club.partner.prefix} - #{club.name}")
       end
     end
   end
@@ -299,12 +295,12 @@ class RolesTest < ActionController::IntegrationTest
     setup_member
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within(".breadcrumb")do
-      wait_until{ assert page.has_no_content?("Partner") }
-      wait_until{ assert page.has_no_content?("Club") }
-      wait_until{ assert page.has_content?("Show") }
+      assert page.has_no_content?("Partner")
+      assert page.has_no_content?("Club")
+      assert page.has_content?("Show")
     end
   end
 
@@ -316,15 +312,13 @@ class RolesTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     assert find(:xpath, "//a[@id='link_member_set_undeliverable' and @disabled='disabled']")
 
     within('.nav-tabs'){ click_on('Credit Cards')}
     within("#credit_cards") do
-      wait_until{ 
-        wait_until{ assert page.has_no_selector?("#destroy") }
-      }
+      assert page.has_no_selector?("#destroy")
     end
   end
 
@@ -335,26 +329,22 @@ class RolesTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within("#table_active_credit_card") do
-      wait_until{ 
         assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
-        assert page.has_no_content?("#{@saved_member.active_credit_card.token}") 
-      }
+        assert page.has_no_content?("#{@saved_member.active_credit_card.token}")
     end
 
     within('.nav-tabs'){ click_on 'Credit Cards'}
     within('.tab-content') do
       within("#credit_cards") do
-        wait_until{ 
           assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
-          assert page.has_no_content?("#{@saved_member.active_credit_card.token}") 
-        }
+          assert page.has_no_content?("#{@saved_member.active_credit_card.token}")
       end
     end
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    wait_until{ assert page.has_selector?("#new_member") } 
+    assert page.has_selector?("#new_member")
   end
 
 # Profile Representative - "Add a Credit Card" 
@@ -366,7 +356,7 @@ class RolesTest < ActionController::IntegrationTest
     add_credit_card(@saved_member,credit_card)
 
     credit_card = CreditCard.last
-    wait_until{ page.has_content?("Credit card #{credit_card.last_digits} added and activated.") }
+    page.has_content?("Credit card #{credit_card.last_digits} added and activated.")
   end
 
   test "Representative role - Recover a member" do
@@ -375,9 +365,9 @@ class RolesTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled!
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-    wait_until { find(:xpath, "//a[@id='recovery']").click }
+    find(:xpath, "//a[@id='recovery']").click
     assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
   end
 
@@ -395,12 +385,12 @@ class RolesTest < ActionController::IntegrationTest
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do
       Club.all.each do |club|
-        wait_until{ assert page.has_content?("#{club.name}") }
+        assert page.has_content?("#{club.name}")
       end 
     end
     within("#change_partner")do
       Club.all.each do |club|
-        wait_until{ assert page.has_content?("#{club.partner.prefix} - #{club.name}") }
+        assert page.has_content?("#{club.partner.prefix} - #{club.name}")
       end
     end
   end
@@ -418,12 +408,12 @@ class RolesTest < ActionController::IntegrationTest
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do
       Club.all.each do |club|
-      wait_until{ assert page.has_content?("#{club.name}") }
+        assert page.has_content?("#{club.name}")
       end
     end
     within("#change_partner")do
       Club.all.each do |club|
-        wait_until{ assert page.has_content?("#{club.partner.prefix} - #{club.name}") }
+        assert page.has_content?("#{club.partner.prefix} - #{club.name}")
       end
     end
   end
@@ -432,12 +422,12 @@ class RolesTest < ActionController::IntegrationTest
     setup_agency
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within(".breadcrumb")do
-      wait_until{ assert page.has_no_content?("Partner") }
-      wait_until{ assert page.has_no_content?("Club") }
-      wait_until{ assert page.has_content?("Show") }
+      assert page.has_no_content?("Partner")
+      assert page.has_no_content?("Club")
+      assert page.has_content?("Show")
     end
   end
 
@@ -447,13 +437,11 @@ class RolesTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within('.nav-tabs'){ click_on('Credit Cards')}
     within("#credit_cards") do
-      wait_until{ 
-        wait_until{ assert page.has_no_selector?("#destroy") }
-      }
+      assert page.has_no_selector?("#destroy")
     end
   end 
 
@@ -463,9 +451,9 @@ test "Agency role - Recover a member" do
     @saved_member.set_as_canceled!
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-    wait_until { assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
+    assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
   end
 
    ##############################################################
@@ -505,7 +493,7 @@ test "Agency role - Recover a member" do
     add_credit_card(@saved_member,credit_card)
 
     credit_card = CreditCard.last
-    wait_until{ page.has_content?("Credit card #{credit_card.last_digits} added and activated.") }
+    page.has_content?("Credit card #{credit_card.last_digits} added and activated.")
     within("#table_active_credit_card"){
       assert page.has_content?(credit_card.last_digits)
     }
@@ -536,12 +524,12 @@ test "Agency role - Recover a member" do
     setup_supervisor
     setup_member
     visit products_path(@club.partner.prefix, @club.name)
-    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+    assert page.has_content?("401 You are Not Authorized.")
 
     @agent.roles = ['representative']
     @agent.save
     visit products_path(@club.partner.prefix, @club.name)
-    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+    assert page.has_content?("401 You are Not Authorized.")
 
     @agent.roles = ['admin']
     @agent.save
@@ -562,8 +550,8 @@ test "Agency role - Recover a member" do
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do
-      wait_until{ assert page.has_content?("#{first_club.name}") }
-      wait_until{ assert page.has_content?("#{second_club.name}") }
+      assert page.has_content?("#{first_club.name}")
+      assert page.has_content?("#{second_club.name}")
     end
   end
 
@@ -584,28 +572,28 @@ test "Agency role - Recover a member" do
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do
-      wait_until{ assert page.has_content?("#{first_club.name}") }
-      wait_until{ assert page.has_content?("#{second_club.name}") }
-      wait_until{ assert page.has_content?("#{third_club.name}") }
-      wait_until{ assert page.has_content?("#{fourth_club.name}") }
-      wait_until{ assert page.has_content?("#{fifth_club.name}") }
+      assert page.has_content?("#{first_club.name}")
+      assert page.has_content?("#{second_club.name}")
+      assert page.has_content?("#{third_club.name}")
+      assert page.has_content?("#{fourth_club.name}")
+      assert page.has_content?("#{fifth_club.name}")
     end
 
     visit members_path( :partner_prefix => partner.prefix, :club_prefix => first_club.name)
-    wait_until { assert page.has_selector?("#new_member") }  
+    assert page.has_selector?("#new_member")  
 
     visit members_path( :partner_prefix => partner.prefix, :club_prefix => second_club.name)
-    wait_until { assert page.has_selector?("#new_member") }  
+    assert page.has_selector?("#new_member")  
 
     visit members_path( :partner_prefix => partner.prefix, :club_prefix => third_club.name)
-    wait_until { assert page.has_content?("401 You are Not Authorized.") }
-    wait_until { assert page.has_no_selector?("#new_member") }  
+    assert page.has_content?("401 You are Not Authorized.")
+    assert page.has_no_selector?("#new_member")  
 
     visit members_path( :partner_prefix => partner.prefix, :club_prefix => fourth_club.name)
-    wait_until { assert page.has_no_selector?("#new_member") }  
+    assert page.has_no_selector?("#new_member")  
 
     visit members_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
-    wait_until { assert page.has_selector?("#new_member") }  
+    assert page.has_selector?("#new_member")  
   end
 
   test "Agents that can admin products. (without global role)" do
@@ -626,44 +614,44 @@ test "Agency role - Recover a member" do
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do
-      wait_until{ assert page.has_content?("#{first_club.name}") }
-      wait_until{ assert page.has_content?("#{second_club.name}") }
-      wait_until{ assert page.has_content?("#{third_club.name}") }
-      wait_until{ assert page.has_content?("#{fourth_club.name}") }
-      wait_until{ assert page.has_content?("#{fifth_club.name}") }
+      assert page.has_content?("#{first_club.name}")
+      assert page.has_content?("#{second_club.name}")
+      assert page.has_content?("#{third_club.name}")
+      assert page.has_content?("#{fourth_club.name}")
+      assert page.has_content?("#{fifth_club.name}")
     end
 
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => first_club.name)
-    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+    assert page.has_content?("401 You are Not Authorized.")
 
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => second_club.name)
-    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+    assert page.has_content?("401 You are Not Authorized.")
 
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => third_club.name)
-    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+    assert page.has_content?("401 You are Not Authorized.")
 
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => fourth_club.name)
-    wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
-    wait_until { assert page.has_selector?("#new_product") }
-    wait_until { assert page.has_content?("Edit") }
-    wait_until { assert page.has_content?("Show") }
+    assert page.has_no_content?("401 You are Not Authorized.")
+    assert page.has_selector?("#new_product")
+    assert page.has_content?("Edit")
+    assert page.has_content?("Show")
     click_link_or_button "New Product"
-      wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+    assert page.has_no_content?("401 You are Not Authorized.")
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => fourth_club.name)
     click_link_or_button "Edit"
-      wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+    assert page.has_no_content?("401 You are Not Authorized.")
 
 
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
-    wait_until { assert page.has_no_content?("401 You are Not Authorized. ") }
-    wait_until { assert page.has_selector?("#new_product") }
-    wait_until { assert page.has_content?("Edit") }
-    wait_until { assert page.has_content?("Show") }
+    assert page.has_no_content?("401 You are Not Authorized. ")
+    assert page.has_selector?("#new_product")
+    assert page.has_content?("Edit")
+    assert page.has_content?("Show")
     click_link_or_button "New Product"
-      wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+      assert page.has_no_content?("401 You are Not Authorized.")
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
     click_link_or_button "Edit"
-      wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+      assert page.has_no_content?("401 You are Not Authorized.")
   end
 
   test "Agents that can admin fulfillments. (without global role)" do
@@ -683,27 +671,27 @@ test "Agency role - Recover a member" do
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do
-      wait_until{ assert page.has_content?("#{first_club.name}") }
-      wait_until{ assert page.has_content?("#{second_club.name}") }
-      wait_until{ assert page.has_content?("#{third_club.name}") }
-      wait_until{ assert page.has_content?("#{fourth_club.name}") }
-      wait_until{ assert page.has_content?("#{fifth_club.name}") }
+      assert page.has_content?("#{first_club.name}")
+      assert page.has_content?("#{second_club.name}")
+      assert page.has_content?("#{third_club.name}")
+      assert page.has_content?("#{fourth_club.name}")
+      assert page.has_content?("#{fifth_club.name}")
     end
 
     visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => first_club.name)
-    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+    assert page.has_content?("401 You are Not Authorized.")
 
     visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => second_club.name)
-    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+    assert page.has_content?("401 You are Not Authorized.")
 
     visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => third_club.name)
-    wait_until { assert page.has_content?("401 You are Not Authorized.") }
+    assert page.has_content?("401 You are Not Authorized.")
 
     visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => fourth_club.name)
-    wait_until { assert page.has_no_content?("401 You are Not Authorized.") }
+    assert page.has_no_content?("401 You are Not Authorized.")
 
     visit fulfillments_index_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
-    wait_until { assert page.has_no_content?("401 You are Not Authorized. ") }
+    assert page.has_no_content?("401 You are Not Authorized. ")
   end
 
   test "Should not be able to destroy a credit card when member was chargebacked" do
@@ -718,13 +706,11 @@ test "Agency role - Recover a member" do
                                    :created_by_id => @agent.id )
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within('.nav-tabs'){ click_on('Credit Cards')}
-    within("#credit_cards") do
-      wait_until{ 
-        wait_until{ assert page.has_no_selector?("#destroy") }
-      }
+    within("#credit_cards") do 
+      assert page.has_no_selector?("#destroy")
     end
   end
  
@@ -734,7 +720,7 @@ test "Agency role - Recover a member" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
-    wait_until { assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     within("#table_active_credit_card")do
       assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
       assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")

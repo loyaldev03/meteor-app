@@ -36,11 +36,9 @@ class MembersBlacklistTest < ActionController::IntegrationTest
   def validate_blacklisted_member(member, validate_cancel_date = false)
     member.reload
     text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
-    wait_until{
-      assert page.has_content?(text_reason)
-      assert page.has_content?("Blacklisted!!!")
-      assert_equal member.blacklisted, true
-    }
+    assert page.has_content?(text_reason)
+    assert page.has_content?("Blacklisted!!!")
+    assert_equal member.blacklisted, true
 
     if validate_cancel_date
       within("#td_mi_cancel_date") do
@@ -97,7 +95,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     @saved_member.reload
     
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within("#td_mi_status") do
       assert page.has_content?('lapsed')
@@ -117,44 +115,53 @@ class MembersBlacklistTest < ActionController::IntegrationTest
   end
 
   test "create member with blacklist CC" do
-    setup_member
+    setup_member(false)
+    credit_card = FactoryGirl.create(:credit_card_master_card)
+    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
+    
+    bl_credit_card = FactoryGirl.build(:credit_card)
+    @saved_member = create_member(unsaved_member, bl_credit_card, @terms_of_membership_with_gateway.name, false)
     blacklist_member(@saved_member,@member_blacklist_reason.name)
     validate_blacklisted_member(@saved_member)
-    bl_credit_card = @saved_member.active_credit_card
 
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    create_new_member(unsaved_member, bl_credit_card, unsaved_member.email, @partner, @club, @terms_of_membership_with_gateway)
-
-    wait_until { assert page.has_content?(I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => @club.cs_phone_number)) }
+    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
+    @saved_member2 = fill_in_member(unsaved_member, bl_credit_card, @terms_of_membership_with_gateway.name, false)
+    assert page.has_content?(I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => @club.cs_phone_number))
     assert Member.count == 1
   end
 
   test "create member with blacklist email" do
-    setup_member
+    setup_member(false)
+    credit_card = FactoryGirl.create(:credit_card_master_card)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    
+    bl_credit_card = FactoryGirl.build(:credit_card)
+    @saved_member = create_member(unsaved_member, bl_credit_card, @terms_of_membership_with_gateway.name, false)
     blacklist_member(@saved_member,@member_blacklist_reason.name)
     validate_blacklisted_member(@saved_member)
 
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id, :email => @saved_member.email)
-    create_member(unsaved_member,nil, @terms_of_membership_with_gateway.name, true)
-    wait_until { assert page.has_content?(I18n.t('error_messages.member_email_blacklisted', :cs_phone_number => @club.cs_phone_number)) }
+    unsaved_member2 = FactoryGirl.build(:active_member, :club_id => @club.id, :email => unsaved_member.email)
+    @saved_member2 = fill_in_member(unsaved_member2, bl_credit_card, @terms_of_membership_with_gateway.name, false)
+    assert page.has_content?(I18n.t('error_messages.member_email_blacklisted', :cs_phone_number => @club.cs_phone_number))
     assert Member.count == 1
   end
 
-  test "create member from another club width blacklist CC" do
-    setup_member
+  test "create member from another club with blacklist CC" do
+    setup_member(false)
+    @club2 = FactoryGirl.create(:simple_club_with_litle_gateway)
+    @partner2 = @club2.partner
+    @terms_of_membership_with_gateway2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club2.id)
+    credit_card = FactoryGirl.create(:credit_card_master_card)
+    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
+    
+    bl_credit_card = FactoryGirl.build(:credit_card)
+    @saved_member = create_member(unsaved_member, bl_credit_card, @terms_of_membership_with_gateway.name, false)
     blacklist_member(@saved_member,@member_blacklist_reason.name)
     validate_blacklisted_member(@saved_member)
-    bl_credit_card = @saved_member.active_credit_card
 
-    partner_new = FactoryGirl.create(:partner)
-    club_new = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner_new.id)
-    Time.zone = club_new.time_zone
-    terms_of_membership_with_gateway_new = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => club_new.id)
-    unsaved_member = FactoryGirl.build(:active_member)
-    create_member(unsaved_member, bl_credit_card, terms_of_membership_with_gateway_new.name, false)
-
-    assert page.has_content?("#{unsaved_member.first_name} #{unsaved_member.last_name}")
-    assert Member.count == 2
+    unsaved_member2 = FactoryGirl.build(:member_with_cc, :club_id => @club2.id)
+    @saved_member2 = fill_in_member(unsaved_member2, bl_credit_card, @terms_of_membership_with_gateway2.name, false)
+     
   end
 
   test "Blacklist a member with status Lapsed" do
@@ -164,7 +171,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     
     blacklist_member(@saved_member,@member_blacklist_reason.name)
     validate_blacklisted_member(@saved_member
-)  end
+  end
 
   test "Blacklist a member with status Active" do
     setup_member
@@ -191,7 +198,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     @saved_member.update_attribute(:blacklisted,true)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
-    wait_until { assert find(:xpath, "//a[@id='blacklist_btn' and @disabled='disabled']") }
+    assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='blacklist_btn' and @disabled='disabled']")
   end
 end

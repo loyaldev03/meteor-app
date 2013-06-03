@@ -48,9 +48,7 @@ class DomainTest < ActionController::IntegrationTest
     saved_domain = FactoryGirl.create(:simple_domain, :partner_id => @partner.id)
     visit admin_partners_path
     within("#partners_table") do
-      wait_until{
-        click_link_or_button 'Dashboard'
-      }
+      click_link_or_button 'Dashboard'
     end
     click_link_or_button 'Domains'
     assert page.has_content?(saved_domain.url)
@@ -60,9 +58,7 @@ class DomainTest < ActionController::IntegrationTest
     saved_domain = FactoryGirl.create(:simple_domain, :partner_id => @partner.id)
     visit domains_path(@partner.prefix)
     within("#domains_table") do
-      wait_until{
-        click_link_or_button 'Edit'
-      }
+      click_link_or_button 'Edit'
     end
     fill_in 'domain[url]', :with => 'http://test.com.ar'
     fill_in 'domain[description]', :with => 'new description'

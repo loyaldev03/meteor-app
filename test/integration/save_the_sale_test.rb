@@ -220,9 +220,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     assert page.has_content?("Full save done")
     
     within("#operations_table") do 
-      wait_until {
         assert page.has_content?("Full save done")
-      }
     end
   end 
 

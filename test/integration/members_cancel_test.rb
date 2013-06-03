@@ -67,6 +67,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
   end
 
+  #TO FIX
   # test "Downgrade a member - Different club" do
   #   setup_member(false)
   #   credit_card = FactoryGirl.build(:credit_card_master_card)
