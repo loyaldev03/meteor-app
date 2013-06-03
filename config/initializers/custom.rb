@@ -7,11 +7,11 @@ require 'axlsx'
 ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant.log", "a+")  
 ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device.sync = true
 
-ActiveMerchant::Billing::LitleGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_litle.log", "a+")  
-ActiveMerchant::Billing::LitleGateway.wiredump_device.sync = true
+LitleOnline::Configuration.logger = Logger.new("#{Rails.root}/log/active_merchant_litle.log")  
+LitleOnline::Configuration.logger.level = Logger::DEBUG
 
-ActiveMerchant::Billing::AuthorizeNetCimGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_auth_net.log", "a+")  
-ActiveMerchant::Billing::AuthorizeNetCimGateway.wiredump_device.sync = true
+ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_auth_net.log", "a+")  
+ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device.sync = true
 
 
 ActiveRecord::Batches.send(:include, CleanFindInBatches)
