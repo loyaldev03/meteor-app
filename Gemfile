@@ -16,11 +16,13 @@ gem 'acts_as_list'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'foreman'
-gem 'god'
 gem 'rvm-capistrano'
 gem 'capistrano-campfire', '0.2.0'
 gem 'tinder', '1.9.2'
-gem "ruby-pardot"
+# uncomment if pardot is enabled again
+# gem "ruby-pardot"
+
+gem 'turnout'
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -74,10 +76,7 @@ gem 'newrelic_rpm'
 
 # To use debugger
 group :development do
-  # gem 'ruby-debug19', :require => 'ruby-debug'
-  gem 'linecache19', :git => 'git://github.com/mark-moseley/linecache'
-  gem 'ruby-debug-base19x', '~> 0.11.30.pre4'
-  gem 'ruby-debug19'
+  gem 'debugger'
   gem "rails-erd"
   gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
   gem "yard", "~> 0.8.2.1"
