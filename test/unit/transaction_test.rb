@@ -73,6 +73,9 @@ class TransactionTest < ActiveSupport::TestCase
         assert_not_nil member.join_date, "join date should not be nil"
         assert_not_nil member.bill_date, "bill date should not be nil"
         assert_equal member.recycled_times, 0, "recycled_times should be 0"
+        trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first
+        assert_equal trans.operation_type, Settings.operation_types.enrollment_billing
+        assert_equal trans.transaction_type, 'sale'
       end
     end
   end
@@ -87,13 +90,17 @@ class TransactionTest < ActiveSupport::TestCase
     assert_difference('Operation.count', +2) do
       assert_difference('Transaction.count') do
         assert_difference('Communication.count') do
-          trans = active_member.transactions.last
+          trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+          assert_equal trans.operation_type, Settings.operation_types.membership_billing
           answer = Transaction.refund(amount, trans)
           assert_equal answer[:code], Settings.error_codes.success, answer[:message]
           trans.reload
           assert_equal trans.refunded_amount, amount
           assert_equal trans.amount_available_to_refund, 0.0
-        end
+
+          trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ? and transaction_type = ?', active_member.id, 'refund']).first
+          assert_equal trans.operation_type, Settings.operation_types.credit
+        end 
       end
     end
   end
@@ -293,6 +300,9 @@ class TransactionTest < ActiveSupport::TestCase
         assert_equal active_member.next_retry_bill_date.to_date, @sd_strategy.days.days.from_now.to_date, "next_retry_bill_date should #{@sd_strategy.days.days.from_now}"
         assert_equal active_member.bill_date, nbd, "bill_date should not be touched #{nbd}"
         assert_equal active_member.recycled_times, 1, "recycled_times should be 1"
+        trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+        assert_equal trans.operation_type, Settings.operation_types.membership_billing_soft_decline
+        assert_equal trans.transaction_type, 'sale'
       end
     end
   end
@@ -328,6 +338,9 @@ class TransactionTest < ActiveSupport::TestCase
         assert_nil active_member.next_retry_bill_date, "next_retry_bill_date should be nil"
         assert_nil active_member.bill_date, "bill_date should be nil"
         assert_equal active_member.recycled_times, 0, "recycled_times should be 0"
+        trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+        assert_equal trans.operation_type, Settings.operation_types.membership_billing_hard_decline_by_limit
+        assert_equal trans.transaction_type, 'sale'
       end
     end
   end
@@ -345,6 +358,9 @@ class TransactionTest < ActiveSupport::TestCase
         assert_nil active_member.next_retry_bill_date, "next_retry_bill_date should be nil"
         assert_nil active_member.bill_date, "bill_date should be nil"
         assert_equal active_member.recycled_times, 0, "recycled_times should be 0"
+        trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+        assert_equal trans.operation_type, Settings.operation_types.membership_billing_hard_decline
+        assert_equal trans.transaction_type, 'sale'
       end
     end
   end
@@ -366,6 +382,9 @@ class TransactionTest < ActiveSupport::TestCase
       assert active_member.provisional?
       assert_equal active_member.recycled_times, 4, "recycled_times remain the same"
       assert_equal active_member.terms_of_membership.id, @terms_of_membership_for_downgrade.id
+      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+      assert_equal trans.operation_type, Settings.operation_types.downgraded_because_of_hard_decline_by_limit
+      assert_equal trans.transaction_type, 'sale'    
     end
   end
 
@@ -382,6 +401,9 @@ class TransactionTest < ActiveSupport::TestCase
       active_member.reload
       assert_equal active_member.recycled_times, 0, "recycled_times should be 0"
       assert_equal active_member.terms_of_membership.id, @terms_of_membership_for_downgrade.id
+      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+      assert_equal trans.operation_type, Settings.operation_types.downgraded_because_of_hard_decline
+      assert_equal trans.transaction_type, 'sale'    
     end
   end
 
@@ -393,6 +415,9 @@ class TransactionTest < ActiveSupport::TestCase
     answer = active_member.bill_membership
     active_member.reload
     assert_equal active_member.next_retry_bill_date.to_date, (Time.zone.now + eval(Settings.next_retry_on_missing_decline)).to_date, "Next retry bill date incorrect"
+    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+    assert_equal trans.operation_type, Settings.operation_types.membership_billing_without_decline_strategy
+    assert_equal trans.transaction_type, 'sale'     
   end
   ############################################
 
@@ -460,6 +485,9 @@ class TransactionTest < ActiveSupport::TestCase
       answer = active_member.bill_membership
       active_member.reload
       assert_equal active_member.status, 'active'
+      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+      assert_equal trans.operation_type, Settings.operation_types.membership_billing
+      assert_equal trans.transaction_type, 'sale'
     end
   end
   
@@ -468,7 +496,6 @@ class TransactionTest < ActiveSupport::TestCase
     member.club.payment_gateway_configurations.first.update_attribute :gateway, "random_gateway"
     Timecop.travel(member.next_retry_bill_date) do
       answer = member.bill_membership
-      puts answer 
       assert answer[:message].include?("Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience")
     end
   end 
@@ -487,12 +514,15 @@ class TransactionTest < ActiveSupport::TestCase
       answer = active_member.bill_membership
       active_member.reload
       assert_equal active_member.status, 'active'
-      trans = active_member.transactions.last
+      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
       answer = Transaction.refund(amount, trans)
       assert_equal answer[:code], Settings.error_codes.success, answer[:message]
       trans.reload
       assert_equal trans.refunded_amount, amount
       assert_equal trans.amount_available_to_refund, 0.0
+      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+      assert_equal trans.operation_type, Settings.operation_types.credit
+      assert_equal trans.transaction_type, 'credit'
     end
   end
 
@@ -505,16 +535,18 @@ class TransactionTest < ActiveSupport::TestCase
       answer = active_member.bill_membership
       active_member.reload
       assert_equal active_member.status, 'active'
-      trans = active_member.transactions.last
+      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
       refunded_amount = amount-0.34
       answer = Transaction.refund(refunded_amount, trans)
       assert_equal answer[:code], Settings.error_codes.success, answer[:message]
       trans.reload
       assert_equal trans.refunded_amount, refunded_amount
       assert_not_equal trans.amount_available_to_refund, 0.0
+      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+      assert_equal trans.operation_type, Settings.operation_types.credit
+      assert_equal trans.transaction_type, 'credit'
     end
   end
-
 
   # Tets Authorize net transactions
   def club_with_authorize_net
@@ -523,50 +555,54 @@ class TransactionTest < ActiveSupport::TestCase
     @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)
   end
 
-  test "Bill membership with Authorize net" do
-    club_with_authorize_net
-    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
-    amount = @authorize_net_terms_of_membership.installment_amount
-    Timecop.travel(active_member.next_retry_bill_date) do
-      answer = active_member.bill_membership
-      active_member.reload
-      assert_equal active_member.status, 'active'
-    end
-  end
+  # test "Bill membership with Authorize net" do
+  #   club_with_authorize_net
+  #   active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
+  #   amount = @authorize_net_terms_of_membership.installment_amount
+  #   Timecop.travel(active_member.next_retry_bill_date) do
+  #     answer = active_member.bill_membership
+  #     active_member.reload
+  #     assert_equal active_member.status, 'active'
+  #   end
+  # end
 
-  test "Enroll with Authorize net" do
-    club_with_authorize_net
-    enroll_member(@authorize_net_terms_of_membership, 23, false, @credit_card_authorize_net)
-  end
+  # test "Enroll with Authorize net" do
+  #   club_with_authorize_net
+  #   enroll_member(@authorize_net_terms_of_membership, 23, false, @credit_card_authorize_net)
+  # end
 
-  test "Full refund with Authorize net" do
-    club_with_authorize_net
-    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
-    amount = @authorize_net_terms_of_membership.installment_amount
-    Timecop.travel(active_member.next_retry_bill_date) do
-      answer = active_member.bill_membership
-      active_member.reload
-      assert_equal active_member.status, 'active'
-      trans = active_member.transactions.last
-      answer = Transaction.refund(amount, trans)
-      assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
-    end
-  end
+  # test "Full refund with Authorize net" do
+  #   club_with_authorize_net
+  #   active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
+  #   amount = @authorize_net_terms_of_membership.installment_amount
+  #   Timecop.travel(active_member.next_retry_bill_date) do
+  #     answer = active_member.bill_membership
+  #     active_member.reload
+  #     assert_equal active_member.status, 'active'
+  #     trans = active_member.transactions.last
+  #     answer = Transaction.refund(amount, trans)
+  #     assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
+  #   end
+  #   assert_equal Transaction.find_by_transaction_type('credit').operation_type, Settings.operation_types.credit
+  # end
 
-  test "Partial refund with Authorize net" do
-    club_with_authorize_net
-    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
-    amount = @authorize_net_terms_of_membership.installment_amount
-    Timecop.travel(active_member.next_retry_bill_date) do
-      answer = active_member.bill_membership
-      active_member.reload
-      assert_equal active_member.status, 'active'
-      trans = active_member.transactions.last
-      refunded_amount = amount-0.34
-      answer = Transaction.refund(refunded_amount, trans)
-      assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
-    end
-  end
+  # test "Partial refund with Authorize net" do
+  #   club_with_authorize_net
+  #   active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
+  #   amount = @authorize_net_terms_of_membership.installment_amount
+  #   Timecop.travel(active_member.next_retry_bill_date) do
+  #     answer = active_member.bill_membership
+  #     active_member.reload
+  #     assert_equal active_member.status, 'active'
+  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+  #     refunded_amount = amount-0.34
+  #     answer = Transaction.refund(refunded_amount, trans)
+  #     assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
+  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+  #     assert_equal trans.operation_type, Settings.operation_types.credit
+  #     assert_equal trans.transaction_type, 'refund'
+  #   end
+  # end
 
   test "should not update NBD after save the sale from monthly-tom to monthly-tom" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
@@ -671,6 +707,10 @@ class TransactionTest < ActiveSupport::TestCase
         member.no_recurrent_billing(amount,"testing event")
       end
     end
+    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first
+    assert_equal trans.operation_type, Settings.operation_types.no_recurrent_billing
+    assert_equal trans.transaction_type, 'sale'
+
     operation = Operation.last
     transaction = Transaction.last
 
@@ -684,5 +724,8 @@ class TransactionTest < ActiveSupport::TestCase
     transaction.reload
     assert_equal transaction.refunded_amount, amount
     assert_equal transaction.amount_available_to_refund, 0.0
+    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first
+    assert_equal trans.operation_type, Settings.operation_types.credit
+    assert_equal trans.transaction_type, 'refund'
   end
 end

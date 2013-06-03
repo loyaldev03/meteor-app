@@ -41,6 +41,7 @@ defaults: &defaults
     membership_billing_hard_decline_by_limit: 114
     downgraded_because_of_hard_decline: 115
     downgraded_because_of_hard_decline_by_limit: 116
+    membership_billing_without_decline_strategy_limit: 117
     #profile
     cancel: 200 
     future_cancel: 201
@@ -91,6 +92,9 @@ defaults: &defaults
     pillar_email: 304
     hard_decline_email: 305
     soft_decline_email: 306
+    rejection_email: 307
+    birthday_email: 308
+    no_email_error: 309
     #fulfillments
     from_not_processed_to_in_process: 400
     from_not_processed_to_on_hold: 401
