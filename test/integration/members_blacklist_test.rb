@@ -170,7 +170,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     @saved_member.reload
     
     blacklist_member(@saved_member,@member_blacklist_reason.name)
-    validate_blacklisted_member(@saved_member
+    validate_blacklisted_member(@saved_member)
   end
 
   test "Blacklist a member with status Active" do

@@ -94,12 +94,10 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     assert has_no_content?("CC Token")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    sleep 1
     within("#table_active_credit_card") do
       assert page.has_no_content?("#{saved_credit_card.token}")
      end
     within(".nav-tabs"){ click_on("Credit Cards") }
-    sleep 1
     within("#credit_cards") do
      assert page.has_no_content?("#{saved_credit_card.token}")
     end
@@ -117,12 +115,10 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     assert has_no_content?("CC Token")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    sleep 1
     within("#table_active_credit_card") do
       assert page.has_no_content?("#{saved_credit_card.token}")
      end
     within(".nav-tabs"){ click_on("Credit Cards") }
-    sleep 1
     within("#credit_cards") do
      assert page.has_no_content?("#{saved_credit_card.token}")
     end
@@ -139,12 +135,10 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     assert has_no_content?("CC Token")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    sleep 1
     within("#table_active_credit_card") do
       assert page.has_no_content?("#{saved_credit_card.token}")
     end
     within(".nav-tabs"){ click_on("Credit Cards") }
-    sleep 1
     within("#credit_cards") do
      assert page.has_no_content?("#{saved_credit_card.token}")
     end
@@ -157,12 +151,9 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
     saved_credit_card = @saved_member.active_credit_card
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    sleep 1
     fill_in "member[cc_token]", :with => saved_credit_card.token
-    sleep 1
     click_on 'Search'
     assert page.has_content?("#{unsaved_member.first_name}")
-    sleep 1
   end 
 
   test "Search members by token - Supervisor rol" do
@@ -173,12 +164,9 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
     saved_credit_card = @saved_member.active_credit_card
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    sleep 1
     fill_in "member[cc_token]", :with => saved_credit_card.token
-    sleep 1
     click_on 'Search'
     assert page.has_content?("#{unsaved_member.first_name}")
-    sleep 1
   end 
 
     test "Search members by token - Representative rol" do
@@ -189,7 +177,6 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
     saved_credit_card = @saved_member.active_credit_card
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    sleep 1
     assert has_no_content?("CC Token")
     end 
 
@@ -243,7 +230,6 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#credit_cards") do
     assert page.has_no_content?("#{saved_credit_card.token}")
     end
-    sleep 1
   end 
 
   test "search members by next bill date" do
@@ -821,8 +807,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") 
     # wait_until{ find(:xpath, "//a[@id='sync_cancel' and @disable='disable']") }
 
-    click_link_or_button 'Cancel'
-    sleep 1 
+    click_link_or_button 'Cancel' 
     assert find_field('input_first_name').value == @saved_member.first_name
   end
 
