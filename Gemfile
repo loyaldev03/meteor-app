@@ -16,11 +16,11 @@ gem 'acts_as_list'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'foreman'
-gem 'god'
 gem 'rvm-capistrano'
 gem 'capistrano-campfire', '0.2.0'
 gem 'tinder', '1.9.2'
-gem "ruby-pardot"
+# uncomment if pardot is enabled again
+# gem "ruby-pardot"
 
 gem 'turnout'
 
