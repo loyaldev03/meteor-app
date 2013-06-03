@@ -489,7 +489,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Update Member'
-    sleep(3)
     @saved_member.reload
     within("#table_contact_information")do
       assert page.has_content?(@saved_member.full_phone_number)
@@ -1086,7 +1085,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
 
     11.times{ @saved_member.bill_membership }
-    sleep 1
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within(".nav-tabs"){ click_on("Transactions") }
@@ -1102,7 +1100,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
 
     11.times{ @saved_member.bill_membership }
-    sleep 1
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     within(".nav-tabs"){ click_on("Memberships") }

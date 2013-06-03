@@ -439,7 +439,6 @@ module ActionController
     select(new_tom.name, :from => 'terms_of_membership_id')
     confirm_ok_js
     click_on "Recover"
-    sleep 1
     if validate
       wait_until{ assert find_field('input_first_name').value == member.first_name }
       within("#td_mi_reactivation_times")do

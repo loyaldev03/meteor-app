@@ -996,7 +996,6 @@ test "Enroll a member with recurrent product and it on the list" do
     assert_equal(product.stock, 0)
     fulfillment.renew!
 
-    sleep 1
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
     within(".nav-tabs") do

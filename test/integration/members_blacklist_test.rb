@@ -146,6 +146,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     assert Member.count == 1
   end
 
+  #TO REVIEW
   test "create member from another club with blacklist CC" do
     setup_member(false)
     @club2 = FactoryGirl.create(:simple_club_with_litle_gateway)
@@ -161,7 +162,6 @@ class MembersBlacklistTest < ActionController::IntegrationTest
 
     unsaved_member2 = FactoryGirl.build(:member_with_cc, :club_id => @club2.id)
     @saved_member2 = fill_in_member(unsaved_member2, bl_credit_card, @terms_of_membership_with_gateway2.name, false)
-     
   end
 
   test "Blacklist a member with status Lapsed" do

@@ -382,7 +382,6 @@ class MembersSyncronize < ActionController::IntegrationTest
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
     
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    sleep 1
     @saved_member = Member.last
 
     @saved_member.update_attribute(:updated_at, Time.zone.now-1)
@@ -401,7 +400,6 @@ class MembersSyncronize < ActionController::IntegrationTest
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    sleep 1
     @saved_member = Member.last
 
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)

@@ -104,8 +104,6 @@ class RolesTest < ActionController::IntegrationTest
       @agent_no_role = FactoryGirl.create :confirmed_agent
     7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
-    sleep 1
-
     club1 = Club.first
     club2 = Club.find(2)
     club3 = Club.find(3)
@@ -1010,6 +1008,5 @@ test "Agency role - Recover a member" do
     #   setup_member
     #   visit fulfillments_index_path( :partner_prefix => @partner.prefix, :club_prefix => @club.name)
 
-    #   sleep 5000
     # end
 end

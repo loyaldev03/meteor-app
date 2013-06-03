@@ -280,7 +280,6 @@ class MembersBillTest < ActionController::IntegrationTest
     within("#td_mi_next_retry_bill_date")do
       assert page.has_content?(I18n.l(next_bill_date, :format => :only_date))
     end
-    sleep 5
   end  
 
   test "Next Bill Date for monthly memberships" do
@@ -449,7 +448,6 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
     Member.send_prebill
 
-    sleep 2
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
 
@@ -475,7 +473,6 @@ class MembersBillTest < ActionController::IntegrationTest
     
     Member.send_prebill
 
-    sleep 2
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
 
@@ -501,7 +498,6 @@ class MembersBillTest < ActionController::IntegrationTest
     
     Member.send_prebill
 
-    sleep 2
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
 

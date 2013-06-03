@@ -146,7 +146,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @saved_member.current_membership.update_attribute(:join_date, Time.zone.now - amount_of_days.day)
     Member.send_pillar_emails
     sleep 5
-
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){ click_on 'Communications' }
     within("#communication"){ assert page.has_content?(template_name) }
@@ -301,7 +300,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   #   click_link_or_button 'Create Member'
     
   #   within("#error_explanation")do
-  #       sleep 500
   #       assert page.has_content?(I18n.t('error_messages.get_token_mes_error')
   #   end
   # end
@@ -571,7 +569,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){ click_on 'Operations'}
     within("#dataTableSelect"){ select('profile', :from => 'operation[operation_type]') }
-    sleep 2
     within("#operations_table")do
       assert page.has_content?('Blacklisted member. Reason: Too much spam - 200')
       assert page.has_content?('Blacklisted member. Reason: Too much spam - 201')
@@ -588,19 +585,16 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :operation_type => 300,
                                 :description => 'Communication sent - 300')
     }
-    sleep 2
     3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 301,
                                 :description => 'Communication sent - 301')
     }
-    sleep 2
     3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 302,
                                 :description => 'Communication sent - 302')
     }
-    sleep 2
     4.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 303,
@@ -609,7 +603,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){ click_on 'Operations'}
     within("#dataTableSelect"){ select('communications', :from => 'operation[operation_type]') }
-    sleep 2
     within("#operations_table") do
       assert page.has_content?("Communication sent - 303")
       assert page.has_content?("Communication sent - 302")
@@ -633,7 +626,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
                                 :description => 'Member was updated successfully last - 1000')
     within('.nav-tabs'){ click_on 'Operations'}
     within("#dataTableSelect"){ select('others', :from => 'operation[operation_type]') }
-    sleep 2
     within("#operations_table"){ assert page.has_content?('Member was updated successfully last - 1000') }
   end
 
@@ -853,7 +845,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     click_link_or_button 'Edit'
     page.execute_script("window.jQuery('#member_birth_date').next().click()")
-    sleep 1
     within(".ui-datepicker-header")do
       find(".ui-datepicker-prev").click
     end
@@ -881,7 +872,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
-    sleep 1
     within("#table_membership_information") do
       assert page.has_content?("active")
     end
@@ -1182,7 +1172,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member, credit_card, @terms_of_membership_with_gateway.name)
-    sleep 1
     within("#error_explanation") do
       assert page.has_content?("Member information is invalid.")
       assert page.has_content?("number: An error was encountered while processing your request.")
@@ -1195,7 +1184,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member, credit_card, @terms_of_membership_with_gateway.name)
-    sleep 1
     within("#error_explanation") do
       assert page.has_content?("Member information is invalid.")
       assert page.has_content?("number: An error was encountered while processing your request.")

@@ -115,7 +115,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   #   prods = Product.find_all_by_sku @saved_member.enrollment_infos.first.product_sku.split(',')
   #   prods.each {|p| p.update_attributes :stock =>  0, :allow_backorder => false }
   #   recover_member(@saved_member,:terms_of_membership_with_gateway)
-  #   sleep 4
   # end
 
 

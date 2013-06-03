@@ -53,7 +53,6 @@ class MembersSearchTest < ActionController::IntegrationTest
   # def fill_in_member(unsaved_member, credit_card)
   #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   #   click_link_or_button 'New Member'
-  #   sleep 1
   #   within("#table_demographic_information")do
   #       fill_in 'member[first_name]', :with => unsaved_member.first_name
   #       select(unsaved_member.gender, :from => 'member[gender]')
