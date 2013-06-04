@@ -248,7 +248,12 @@ class MembersController < ApplicationController
   def update_sync
     old_id = @current_member.api_id
     if params[:member]
-      @current_member.api_id = ( params[:member][:api_id].blank? ? nil : params[:member][:api_id] ) 
+      if params[:member][:api_id].blank?
+        @current_member.api_id = nil
+        @current_member.api_id_unset!
+      else
+        @current_member.api_id = params[:member][:api_id]
+      end
       begin
         if @current_member.save
           message = "Member's api_id changed from #{old_id.inspect} to #{@current_member.api_id.inspect}"
