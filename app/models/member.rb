@@ -1381,7 +1381,7 @@ class Member < ActiveRecord::Base
           operation_type = Settings.operation_types.membership_billing_soft_decline
           if self.recycled_times > (decline.limit-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-            operation_type = (tom.downgradable? > 0 ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.membership_billing_hard_decline_by_limit)
+            operation_type = (tom.downgradable? ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.membership_billing_hard_decline_by_limit)
             cancel_member = true
           end
         end
