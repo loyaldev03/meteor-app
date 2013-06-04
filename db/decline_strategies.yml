@@ -14777,3 +14777,51 @@
     created_at: 2013-05-28 10:56:31.000000000 Z
     updated_at: 2013-05-28 10:56:31.000000000 Z
     id: 987
+
+- !ruby/object:DeclineStrategy
+  attributes:
+    gateway: mes
+    installment_type: 1.month
+    credit_card_type: all
+    response_code: '014'
+    limit: 0
+    days: 0
+    decline_type: soft
+    notes: related to redmine issue 27533
+    deleted_at: 
+    created_at: 2013-05-28 10:56:31.000000000 Z
+    updated_at: 2013-05-28 10:56:31.000000000 Z
+    id: 988
+
+- !ruby/object:DeclineStrategy
+  attributes:
+    gateway: mes
+    installment_type: 1.year
+    credit_card_type: all
+    response_code: '096'
+    limit: 1
+    days: 2
+    decline_type: soft
+    notes: related to redmine issue 27522
+    deleted_at: 
+    created_at: 2013-05-28 10:56:31.000000000 Z
+    updated_at: 2013-05-28 10:56:31.000000000 Z
+    id: 989
+
+
+- !ruby/object:DeclineStrategy
+  attributes:
+    gateway: mes
+    installment_type: 1.month
+    credit_card_type: all
+    response_code: '096'
+    limit: 1
+    days: 2
+    decline_type: soft
+    notes: related to redmine issue 27522
+    deleted_at: 
+    created_at: 2013-05-28 10:56:31.000000000 Z
+    updated_at: 2013-05-28 10:56:31.000000000 Z
+    id: 990
+
+
