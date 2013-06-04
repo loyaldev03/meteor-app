@@ -79,6 +79,7 @@ en:
     create_xls_file: 'Create XLS File'
     export_all_to_xls: 'Export all to XLS'
     no_recurrent_billing: 'Bill no recurrent amount'
+    manual_billing: 'Bill manual transaction'
   admin:
     agents:
       index:
@@ -138,8 +139,12 @@ en:
       transaction:
         refundable: 'Refundable'
         refund_amount_help: 'Amount to refund'
+        payment_type: 'Payment type'
+        transaction_type: 'Transaction type'
         transaction_types: 
           sale: Sale
+          sale_manual_check: 'Sale Manual Check'
+          sale_manual_cash: 'Sale Manual Cash'
           refund: Credit
           credit: Credit
           void: Credit
@@ -149,6 +154,7 @@ en:
         date: 'Date'
         description: 'Description'
         amount: 'Amount'
+        amount_help: "(Min %{minimun_amount})"
         gw_trans: 'Gw trans'
         cc_related: 'CC Last 4 Digits'
         not_found: 'No transactions were found.'
