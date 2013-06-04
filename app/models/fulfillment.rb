@@ -188,7 +188,7 @@ class Fulfillment < ActiveRecord::Base
           Rails.logger.info "  *[#{index}] processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
           fulfillment.renew!
         rescue Exception => e
-          Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :fulfillment => fulfillment.inspect })
+          Auditory.report_issue("Member::Fulfillment", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :fulfillment => fulfillment.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end

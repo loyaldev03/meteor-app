@@ -145,7 +145,7 @@ class MembersController < ApplicationController
         end
       rescue Exception => e
         flash.now[:error] = t('error_messages.airbrake_error_message')
-        Airbrake.notify(:error_class => "Member:cancel", :error_message => e, :parameters => { :member => @current_member.inspect })
+        Auditory.report_issue("Member:cancel", e, { :member => @current_member.inspect })
       end
     end
   end
@@ -288,7 +288,7 @@ class MembersController < ApplicationController
   #   end
   # rescue
   #   flash[:error] = t('error_messages.airbrake_error_message')
-  #   Airbrake.notify(:error_class => "Member:pardot_sync", :error_message => "Error on members#pardot_sync: #{$!}", :parameters => { :member => @current_member.inspect })
+  #   Auditory.report_issue("Member:pardot_sync", "Error on members#pardot_sync: #{$!}", { :member => @current_member.inspect })
   #   redirect_to show_member_path
   # end
 
@@ -307,7 +307,7 @@ class MembersController < ApplicationController
   rescue
     flash[:error] = t('error_messages.airbrake_error_message')
     message = "Error on members#sync: #{$!}" 
-    Airbrake.notify(:error_class => "Member:sync", :error_message => message, :parameters => { :member => @current_member.inspect })
+    Auditory.report_issue("Member:sync", message, { :member => @current_member.inspect })
     redirect_to show_member_path
   end
 
@@ -331,7 +331,7 @@ class MembersController < ApplicationController
   rescue
     flash[:error] = t('error_messages.airbrake_error_message')
     message = "Error on members#reset_password: #{$!}"
-    Airbrake.notify(:error_class => "Member:reset_password", :error_message => message, :parameters => { :member => @current_member.inspect })
+    Auditory.report_issue("Member:reset_password", message, { :member => @current_member.inspect })
     redirect_to show_member_path
   end
 
@@ -347,7 +347,7 @@ class MembersController < ApplicationController
   rescue
     flash[:error] = t('error_messages.airbrake_error_message')
     message = "Error on members#resend_welcome: #{$!}"
-    Airbrake.notify(:error_class => "Member:resend_welcome", :error_message => message, :parameters => { :member => @current_member.inspect })
+    Auditory.report_issue("Member:resend_welcome", message, { :member => @current_member.inspect })
     redirect_to show_member_path
   end
 
