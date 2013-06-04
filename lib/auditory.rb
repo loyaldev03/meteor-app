@@ -18,6 +18,6 @@ class Auditory
     end
   end
   def self.report_issue(error = "Special Error", message = '', params = {})
-    Airbrake.notify(:error_class   => error, message, params)    
+    Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)    
   end
 end
