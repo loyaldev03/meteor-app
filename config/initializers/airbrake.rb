@@ -15,7 +15,7 @@ Airbrake.configure do |config|
 end
 
 ZENDESK_API_CLIENT = ZendeskAPI::Client.new do |config|
-  config.username = "support-ruby@xagax.com"
+  config.username = "gustavo@xagax.com"
   config.password = "kjsa8703"
   config.url = "https://stoneacre.zendesk.com/api/v2"
 end
