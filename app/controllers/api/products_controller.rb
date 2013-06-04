@@ -63,7 +63,7 @@ class Api::ProductsController < ApplicationController
   #
   def get_list_of_stock
     my_authorize! :manage_product_api, Product, params[:club_id]
-    skus = params[:sku].split(',')
+    skus = params[:sku].to_s.split(',')
     if skus.count == 0 or params[:club_id].blank?
       response = { code: Settings.error_codes.wrong_data, message: 'Please check params, There seems to be some missing.' }
     else
