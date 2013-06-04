@@ -77,7 +77,7 @@ class FulfillmentsController < ApplicationController
         flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
       rescue Exception => e
         flash.now[:error] = t('error_messages.airbrake_error_message')
-        Airbrake.notify(:error_class => "FulfillmentFile turn inalid when generating it.", :error_message => e, :parameters => { :fulfillment_file => ff.inspect })
+        Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
       end
     else
       flash.now[:error] = t('error_messages.fulfillment_file_cant_be_empty')
@@ -106,7 +106,7 @@ class FulfillmentsController < ApplicationController
     flash[:notice] = "Fulfillment file marked as sent successfully"
   rescue
     flash[:error] = t('error_messages.airbrake_error_message')
-    Airbrake.notify(:error_class => "FulfillmentFile:mark_file_as_sent", :parameters => { :file => file.inspect })
+    Auditory.report_issue("FulfillmentFile:mark_file_as_sent", $!, { :file => file.inspect })
   ensure
     redirect_to list_fulfillment_files_path
   end

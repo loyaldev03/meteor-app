@@ -51,7 +51,7 @@ class Member < ActiveRecord::Base
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
     # Because maybe we have already bill this member.
-    Airbrake.notify(:error_class => "Member:account_cancel:sync", :error_message => e, :parameters => { :member => self.inspect })
+    Auditory.report_issue("Member:account_cancel:sync", e, { :member => self.inspect })
   end
 
   def after_save_sync_to_remote_domain(type)
@@ -62,7 +62,7 @@ class Member < ActiveRecord::Base
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
     # Because maybe we have already bill this member.
-    Airbrake.notify(:error_class => "Member:#{type.to_s}:sync", :error_message => e, :parameters => { :member => self.inspect })
+    Auditory.report_issue("Member:#{type.to_s}:sync", e, { :member => self.inspect })
   end
 
   validates :country, 
@@ -281,7 +281,7 @@ class Member < ActiveRecord::Base
   rescue ArgumentError => e
     return { :message => "Next bill date wrong format.", :errors => { :next_bill_date => "invalid date"}, :code => Settings.error_codes.wrong_data } 
   rescue Exception => e
-    Airbrake.notify(:error_class => "Member:change_next_bill_date", :error_message => e, :parameters => { :member => self.inspect })
+    Auditory.report_issue("Member:change_next_bill_date", e, { :member => self.inspect })
     return { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.could_not_change_next_bill_date }
   end
 
@@ -423,7 +423,7 @@ class Member < ActiveRecord::Base
     message = "Downgraded member from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
     answer = change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_member)
     if answer[:code] != Settings.error_codes.success
-      Airbrake.notify(:error_class => "DowngradeMember::Error", :error_message => answer[:message], :parameters => { :member => self.inspect, :answer => answer })
+      Auditory.report_issue("DowngradeMember::Error", answer[:message], { :member => self.inspect, :answer => answer })
     end
     answer
   end
@@ -439,7 +439,7 @@ class Member < ActiveRecord::Base
       if terms_of_membership.payment_gateway_configuration.nil?
         message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
         Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
-        Airbrake.notify(:error_class => "Billing", :error_message => message, :parameters => { :member => self.inspect, :membership => current_membership.inspect })
+        Auditory.report_issue("Billing", message, { :member => self.inspect, :membership => current_membership.inspect })
         { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
       else
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
@@ -448,7 +448,7 @@ class Member < ActiveRecord::Base
         answer = trans.process
         if trans.success?
           unless set_as_active
-            Airbrake.notify(:error_class => "Billing::set_as_active", :error_message => "we cant set as active this member.", :parameters => { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+            Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
           end
           schedule_renewal
           assign_club_cash
@@ -470,7 +470,7 @@ class Member < ActiveRecord::Base
       end
     end
   rescue Exception => e
-    Airbrake.notify(:error_class => "Billing:membership", :error_message => e, :parameters => { :member => self.inspect })
+    Auditory.report_issue("Billing:membership", e, { :member => self.inspect })
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
@@ -504,7 +504,7 @@ class Member < ActiveRecord::Base
     end
     answer
   rescue Exception => e
-    Airbrake.notify(:error_class => "Billing:event_billing", :error_message => e, :parameters => { :member => self.inspect })
+    Auditory.report_issue("Billing:event_billing", e, { :member => self.inspect })
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.no_reccurent_billing_error }
   end
 
@@ -637,7 +637,7 @@ class Member < ActiveRecord::Base
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "Member:enroll" : "Member:recovery/save the sale") + " -- member turned invalid while enrolling"
-      Airbrake.notify(:error_class => error_message, :error_message => e, :parameters => { :member => self.inspect, :credit_card => credit_card.inspect, :enrollment_info => enrollment_info.inspect })
+      Auditory.report_issue(error_message, e, { :member => self.inspect, :credit_card => credit_card.inspect, :enrollment_info => enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing)
       { :message => I18n.t('error_messages.member_not_saved', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.member_not_saved }
@@ -664,7 +664,7 @@ class Member < ActiveRecord::Base
         f.save
         answer = f.decrease_stock!
         unless answer[:code] == Settings.error_codes.success
-          Airbrake.notify(:error_class => answer[:message], :error_message => answer[:message], :parameters => { :member => self.inspect, :credit_card => self.active_credit_card, :enrollment_info => self.current_membership.enrollment_info })
+          Auditory.report_issue(answer[:message], answer[:message], { :member => self.inspect, :credit_card => self.active_credit_card.inspect, :enrollment_info => self.current_membership.enrollment_info.inspect })
         end
       end
     end
@@ -776,7 +776,7 @@ class Member < ActiveRecord::Base
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop billing!! 
-    Airbrake.notify(:error_class => "Member:assign_club_cash:sync", :error_message => e, :parameters => { :member => self.inspect, :amount => amount, :message => message })
+    Auditory.report_issue("Member:assign_club_cash:sync", e, { :member => self.inspect, :amount => amount, :message => message })
   end
   
   # Adds club cash transaction. 
@@ -822,7 +822,7 @@ class Member < ActiveRecord::Base
         end
       rescue Exception => e
         answer[:errors] = cct.errors_merged(self) unless cct.nil?
-        Airbrake.notify(:error_class => 'Club cash Transaction', :error_message => e.to_s + answer[:message], :parameters => { :member => self.inspect, :amount => amount, :description => description, :club_cash_transaction => (cct.inspect unless cct.nil?) })
+        Auditory.report_issue('Club cash Transaction', e.to_s + answer[:message], { :member => self.inspect, :amount => amount, :description => description, :club_cash_transaction => (cct.inspect unless cct.nil?) })
         answer[:message] = I18n.t('error_messages.airbrake_error_message')
         raise ActiveRecord::Rollback
       end
@@ -840,7 +840,7 @@ class Member < ActiveRecord::Base
           Auditory.audit(agent, self, "Un-blacklisted member and all its credit cards.", self, Settings.operation_types.unblacklisted)
           self.credit_cards.each { |cc| cc.unblacklist }
         rescue Exception => e
-          Airbrake.notify(:error_class => "Member::unblacklist", :error_message => e, :parameters => { :member => self.inspect })
+          Auditory.report_issue("Member::unblacklist", e, { :member => self.inspect })
           raise ActiveRecord::Rollback
         end
       end
@@ -863,7 +863,7 @@ class Member < ActiveRecord::Base
           end
           answer = { :message => message, :code => Settings.error_codes.success }
         rescue Exception => e
-          Airbrake.notify(:error_class => "Member::blacklist", :error_message => e, :parameters => { :member => self.inspect })
+          Auditory.report_issue("Member::blacklist", e, { :member => self.inspect })
           answer = { :message => I18n.t('error_messages.airbrake_error_message'), :success => Settings.error_codes.member_could_no_be_blacklisted }
           raise ActiveRecord::Rollback
         end
@@ -947,7 +947,7 @@ class Member < ActiveRecord::Base
   #       Rails.logger.info "  *[#{index}] processing member ##{member.id}"
   #       member.sync_to_pardot unless member.pardot_member.nil?
   #     rescue Exception => e
-  #       Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+  #       Auditory.report_issue("Pardot::MemberSync", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
   #       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   #     end
   #     Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -967,7 +967,7 @@ class Member < ActiveRecord::Base
         Rails.logger.info "  *[#{index+1}] processing member ##{member.id} nbd: #{member.next_retry_bill_date}"
         member.bill_membership
       rescue Exception => e
-        Airbrake.notify(:error_class => "Billing::Today", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect, :credit_card => member.active_credit_card.inspect })
+        Auditory.report_issue("Billing::Today", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect, :credit_card => member.active_credit_card.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -983,8 +983,7 @@ class Member < ActiveRecord::Base
         Rails.logger.info "   *[#{index}] processing member ##{member.id}"
         member.refresh_autologin_url!
       rescue
-        Airbrake.notify error_class: "Members::Members", 
-          error_message: "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect }
+        Auditory.report_issue("Members::Members", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
@@ -1002,7 +1001,7 @@ class Member < ActiveRecord::Base
         Communication.deliver!(template, member)
         Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
       rescue Exception => e
-        Airbrake.notify(:error_class => "Members::SendPillar", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :template => template.inspect, :membership => member.current_membership.inspect })
+        Auditory.report_issue("Members::SendPillar", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :template => template.inspect, :membership => member.current_membership.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
@@ -1018,7 +1017,7 @@ class Member < ActiveRecord::Base
         Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
         member.reset_club_cash
       rescue Exception => e
-        Airbrake.notify(:error_class => "Member::ClubCash", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+        Auditory.report_issue("Member::ClubCash", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -1035,7 +1034,7 @@ class Member < ActiveRecord::Base
         Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
         Member.find(member.id).set_as_canceled!
       rescue Exception => e
-        Airbrake.notify(:error_class => "Members::Cancel", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+        Auditory.report_issue("Members::Cancel", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -1117,7 +1116,7 @@ class Member < ActiveRecord::Base
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
           Communication.deliver!(:birthday, member)
         rescue Exception => e
-          Airbrake.notify(:error_class => "Members::send_happy_birthday", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+          Auditory.report_issue("Members::send_happy_birthday", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -1135,7 +1134,7 @@ class Member < ActiveRecord::Base
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
           member.send_pre_bill
         rescue Exception => e
-          Airbrake.notify(:error_class => "Billing::SendPrebill", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+          Auditory.report_issue("Billing::SendPrebill", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
@@ -1187,7 +1186,7 @@ class Member < ActiveRecord::Base
               new_active_credit_card.set_as_active!
             end
           rescue Exception => e
-            Airbrake.notify(:error_class => "Members::update_credit_card_from_drupal", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :new_active_credit_card => new_active_credit_card.inspect, :member => self.inspect })
+            Auditory.report_issue("Members::update_credit_card_from_drupal", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :new_active_credit_card => new_active_credit_card.inspect, :member => self.inspect })
             raise ActiveRecord::Rollback
           end
         end
@@ -1241,7 +1240,7 @@ class Member < ActiveRecord::Base
         end        
       rescue Exception => e
         answer = { :errors => e, :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.invalid_credit_card }
-        Airbrake.notify(:error_class => "Member:update_credit_card", :error_message => e, :parameters => { :member => self.inspect, :credit_card => new_credit_card.inspect })
+        Auditory.report_issue("Member:update_credit_card", e, { :member => self.inspect, :credit_card => new_credit_card.inspect })
         raise ActiveRecord::Rollback
       end
     end
@@ -1265,7 +1264,7 @@ class Member < ActiveRecord::Base
   #   end
   #   logger.info "Pardot::sync took #{time_elapsed}ms"
   # rescue Exception => e
-  #   Airbrake.notify(:error_class => "Pardot:sync", :error_message => e, :parameters => { :member => self.inspect })
+  #   Auditory.report_issue("Pardot:sync", e, { :member => self.inspect })
   # end
 
   private
@@ -1357,10 +1356,10 @@ class Member < ActiveRecord::Base
         operation_type = Settings.operation_types.membership_billing_without_decline_strategy
         self.next_retry_bill_date = Time.zone.now + eval(Settings.next_retry_on_missing_decline)
         self.save(:validate => false)
-        Airbrake.notify(:error_class => "Decline rule not found TOM ##{tom.id}", 
-          :error_message => "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.cc_type}. " + 
+        Auditory.report_issue("Decline rule not found TOM ##{tom.id}", 
+          "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.cc_type}. " + 
             "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
-          :parameters => { :member => self.inspect })
+          { :member => self.inspect })
         if self.recycled_times < Settings.number_of_retries_on_missing_decline
           operation_type = Settings.operation_types.membership_billing_without_decline_strategy_limit
           Auditory.audit(nil, trans, message, self, operation_type)

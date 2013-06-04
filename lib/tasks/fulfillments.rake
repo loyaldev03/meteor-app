@@ -110,7 +110,7 @@ namespace :fulfillments do
       fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
       fulfillment_file.processed
     rescue Exception => e
-      Airbrake.notify(:error_class => 'NaammaSloopReport:create', :parameters => { :error => e, :fulfillment_file => fulfillment_file.inspect })
+      Auditory.report_issue('NaammaSloopReport:create', e, { :fulfillment_file => fulfillment_file.inspect })
     ensure
       ftp.quit()
     end

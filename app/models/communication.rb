@@ -32,7 +32,7 @@ class Communication < ActiveRecord::Base
           c.deliver_action_mailer
         else
           message = "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
-          Airbrake.notify(:error_class => "Communication Client", :error_message => message)
+          Auditory.report_issue("Communication Client", message)
           logger.error "* * * * * Client not supported"
         end
       end
@@ -58,7 +58,7 @@ class Communication < ActiveRecord::Base
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
-    Airbrake.notify(:error_class => "Communication deliver_lyris", :error_message => e, :parameters => { :member => member.inspect, 
+    Auditory.report_issue("Communication deliver_lyris", e, { :member => member.inspect, 
       :current_membership => member.current_membership.inspect, :communication => self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
@@ -87,7 +87,7 @@ class Communication < ActiveRecord::Base
       Notifier.soft_decline(member).deliver!
     else
       message = "Deliver action could not be done."
-      Airbrake.notify(:error_class => "Communication deliver_action_mailer", :error_message => message, :parameters => { :member => member.inspect, :communication => self.inspect })
+      Auditory.report_issue("Communication deliver_action_mailer", message, { :member => member.inspect, :communication => self.inspect })
       logger.error "Template type #{template_type} not supported."
     end
     update_attributes :sent_success => true, :processed_at => Time.zone.now, :response => response
@@ -95,7 +95,7 @@ class Communication < ActiveRecord::Base
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
-    Airbrake.notify(:error_class => "Communication deliver_action_mailer", :error_message => e, :parameters => { :member => member.inspect, :communication => self.inspect })
+    Auditory.report_issue("Communication deliver_action_mailer", e, { :member => member.inspect, :communication => self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_action_mailer
