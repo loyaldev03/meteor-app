@@ -56,7 +56,7 @@ class Member < ActiveRecord::Base
 
   def after_save_sync_to_remote_domain(type)
     unless @skip_api_sync || api_member.nil?
-      api_member.save!(api_id_unset: @api_id_unset)
+      api_member.save!
     end
   rescue Exception => e
     # refs #21133
@@ -684,10 +684,6 @@ class Member < ActiveRecord::Base
 
   def skip_api_sync!
     @skip_api_sync = true
-  end
-
-  def api_id_unset!
-    @api_id_unset = true
   end
 
   # def pardot_sync?

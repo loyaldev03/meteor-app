@@ -249,8 +249,12 @@ class MembersController < ApplicationController
     old_id = @current_member.api_id
     if params[:member]
       if params[:member][:api_id].blank?
+        @current_member.skip_api_sync!
         @current_member.api_id = nil
-        @current_member.api_id_unset!
+        @current_member.last_sync_error = nil
+        @current_member.last_sync_error_at = nil
+        @current_member.last_synced_at = nil
+        @current_member.sync_status = "not_synced"
       else
         @current_member.api_id = params[:member][:api_id]
       end
