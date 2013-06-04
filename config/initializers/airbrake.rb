@@ -14,6 +14,11 @@ Airbrake.configure do |config|
   config.secure = true                                           # sends data to your server via SSL (optional.)
 end
 
+ZENDESK_API_CLIENT = ZendeskAPI::Client.new do |config|
+  config.username = "support-ruby@xagax.com"
+  config.password = "kjsa8703"
+  config.url = "https://stoneacre.zendesk.com/api/v2"
+end
 
 # do not verify certificate
 module Airbrake

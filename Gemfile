@@ -61,6 +61,7 @@ gem 'jquery-rails', '2.0.3'
 gem 'acts_as_paranoid'
 
 gem "airbrake"
+gem "zendesk_api"
 
 
 # To use ActiveModel has_secure_password
