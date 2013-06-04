@@ -17,7 +17,7 @@ module Drupal
         rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
           Drupal.logger.info "  => #{$!.to_s}"
         ensure
-          update_member(res, false, options[:api_id_unset])
+          update_member(res, options)
           res
         end
       end
@@ -43,7 +43,7 @@ module Drupal
     rescue Faraday::Error::ParsingError # Drupal sends invalid application/json
       Drupal.logger.info "  => #{$!.to_s}"
     ensure
-      update_member(res, true)
+      update_member(res, { destroy: true })
       res
     end
 
@@ -82,9 +82,9 @@ module Drupal
       self.member.club.drupal
     end
 
-    def update_member(res, destroy = false, api_id_unset = false)
+    def update_member(res, options={})
       if res
-        data = if api_id_unset
+        data = if options[:api_id_unset]
           {
             last_sync_error: nil,
             last_sync_error_at: nil,
@@ -92,7 +92,7 @@ module Drupal
           } 
         elsif res.status == 200
           {
-            api_id: ( destroy ? nil : res.body['uid'] ),
+            api_id: ( options[:destroy] ? nil : res.body['uid'] ),
             last_synced_at: Time.now,
             last_sync_error: nil,
             last_sync_error_at: nil,
