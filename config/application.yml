@@ -42,6 +42,8 @@ defaults: &defaults
     downgraded_because_of_hard_decline: 115
     downgraded_because_of_hard_decline_by_limit: 116
     membership_billing_without_decline_strategy_limit: 117
+    membership_manual_cash_billing: 118
+    membership_manual_check_billing: 119
     #profile
     cancel: 200 
     future_cancel: 201
@@ -182,6 +184,8 @@ defaults: &defaults
     credit_card_blacklisted: '9508'
     credit_card_blank: '9509'
     refund_invalid: '9788'
+    manual_billing_with_less_amount_than_permitted: '9880'
+    manual_billing_error: '9881'
     membership_billing_error: '9882' 
     no_reccurent_billing_error: '9883'
     member_club_dont_allow: '9884'

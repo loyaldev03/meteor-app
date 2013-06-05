@@ -343,6 +343,10 @@ class Member < ActiveRecord::Base
     status_enable_to_bill? and self.club.billing_enable
   end
 
+  def manual_billing?
+    self.manual_payment
+  end
+
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
   def can_recover?
     # TODO: Add logic to recover some one max 3 times in 5 years
@@ -504,8 +508,36 @@ class Member < ActiveRecord::Base
     end
     answer
   rescue Exception => e
-    Auditory.report_issue("Billing:event_billing", e, { :member => self.inspect })
+    Auditory.report_issue("Billing:no_recurrent_billing", e, { :member => self.inspect, :amount => amount, :description => description })
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.no_reccurent_billing_error }
+  end
+
+  def manual_billing(amount, payment_type)
+    if amount.blank? or payment_type.blank?
+      answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
+    elsif amount.to_f < current_membership.terms_of_membership.installment_amount
+      answer = { :message => "Amount to bill cannot be less than terms of membership installment amount.", :code => Settings.error_codes.manual_billing_with_less_amount_than_permitted }
+    else
+      trans = Transaction.new
+      trans.transaction_type = "sale_manual_#{payment_type}"
+      operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
+      trans.prepare_for_manual(self, amount, operation_type)
+      trans.process
+      schedule_renewal(true)
+      assign_club_cash
+      message = "Member manually billed successfully $#{amount} Transaction id: #{trans.id}"
+      Auditory.audit(nil, trans, message, self, operation_type)
+      answer = { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
+      unless self.manual_payment
+        self.manual_payment = true 
+        self.save(:validate => false)
+      end
+      answer
+    end
+  rescue Exception => e
+    logger.error e.inspect
+    Auditory.report_issue("Billing:manual_billing", e, { :member => self.inspect, :amount => amount, :payment_type => payment_type })
+    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
   def error_to_s(delimiter = "\n")
@@ -958,7 +990,7 @@ class Member < ActiveRecord::Base
   def self.bill_all_members_up_today
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
-    base = Member.where("next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status NOT IN ('applied','lapsed')", Time.zone.now).
+    base = Member.where("next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status NOT IN ('applied','lapsed') AND manual_payment = false", Time.zone.now).
            limit(2000)    
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:billing rake task, processing #{base.count} members"
     base.to_enum.with_index.each do |member,index| 
@@ -1268,12 +1300,13 @@ class Member < ActiveRecord::Base
   # end
 
   private
-    def schedule_renewal
-      new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
-      # refs #15935
-      if terms_of_membership.monthly? and self.recycled_times > 1
+    def schedule_renewal(manual = false)
+      if manual or (terms_of_membership.monthly? and self.recycled_times > 1) 
         new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
+      else
+        new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
       end
+      # refs #15935
       self.current_membership.increment!(:quota, terms_of_membership.quota)
       self.recycled_times = 0
       self.bill_date = new_bill_date

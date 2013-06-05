@@ -65,6 +65,7 @@ SacPlatform::Application.routes.draw do
         match '/approve' => 'members#approve', as: 'member_approve', :via => [:post]
         match '/reject' => 'members#reject', as: 'member_reject', :via => [:post]  
         match '/no_recurrent_billing' => 'members#no_recurrent_billing', as: 'member_no_recurrent_billing', :via => [:get, :post]  
+        match '/manual_billing' => 'members#manual_billing', as: 'member_manual_billing', :via => [:get, :post]
         match '/' => 'members#show', as: 'show_member', :via => [:get, :post]
 
         post '/sync' => 'members#sync', as: 'member_sync'
