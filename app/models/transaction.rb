@@ -84,6 +84,16 @@ class Transaction < ActiveRecord::Base
     }    
   end
 
+  def prepare_for_manual(member, amount, operation_type_to_set = nil)
+    self.terms_of_membership_id = member.terms_of_membership.id
+    self.member = member
+    self.amount = amount
+    self.membership_id = member.current_membership_id 
+    self.operation_type = operation_type_to_set
+    self.gateway = :manual
+    self.save    
+  end
+
   def can_be_refunded?
     [ 'sale' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted? and self.success?
   end
@@ -93,9 +103,9 @@ class Transaction < ActiveRecord::Base
       when "sale"
         sale
       when "sale_manual_cash"
-        sale_manual_cash
+        sale_manual
       when "sale_manual_check"
-        sale_manual_check
+        sale_manual
       #when "authorization"
       #  authorization
       #when "capture"
@@ -231,12 +241,7 @@ class Transaction < ActiveRecord::Base
       end
     end
 
-    def sale_manual_cash
-      purchase_response = { :message => "Manual transaction success. Amount #{number_to_currency(self.amount)}", :code => Settings.error_codes.success }
-      save_custom_response(purchase_response, true)
-    end
-
-    def sale_manual_check
+    def sale_manual
       purchase_response = { :message => "Manual transaction success. Amount #{number_to_currency(self.amount)}", :code => Settings.error_codes.success }
       save_custom_response(purchase_response, true)
     end
