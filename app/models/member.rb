@@ -523,7 +523,7 @@ class Member < ActiveRecord::Base
       operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
       trans.prepare_for_manual(self, amount, operation_type)
       trans.process
-      schedule_renewal
+      schedule_renewal(true)
       assign_club_cash
       message = "Member manually billed successfully $#{amount} Transaction id: #{trans.id}"
       Auditory.audit(nil, trans, message, self, operation_type)
@@ -1300,8 +1300,12 @@ class Member < ActiveRecord::Base
   # end
 
   private
-    def schedule_renewal
-      new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
+    def schedule_renewal(manual = false)
+      if manual 
+        new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
+      else
+        new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
+      end
       # refs #15935
       if terms_of_membership.monthly? and self.recycled_times > 1
         new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
