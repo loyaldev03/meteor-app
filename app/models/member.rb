@@ -522,8 +522,12 @@ class Member < ActiveRecord::Base
       trans.transaction_type = "sale_manual_#{payment_type}"
       operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
       trans.prepare_for_manual(self, amount, operation_type)
-      answer = trans.process
-      Auditory.audit(nil, trans, answer[:message], self, operation_type)
+      trans.process
+      schedule_renewal
+      assign_club_cash
+      message = "Member manually billed successfully $#{amount} Transaction id: #{trans.id}"
+      Auditory.audit(nil, trans, message, self, operation_type)
+      answer = { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
       self.update_attribute :manual_payment, true unless self.manual_payment
       answer
     end

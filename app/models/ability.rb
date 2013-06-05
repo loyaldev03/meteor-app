@@ -138,6 +138,7 @@ class Ability
       cannot :api_find_all_by_updated, Member
       cannot :api_find_all_by_created, Member
       cannot :no_recurrent_billing, Member
+      cannot :manual_billing, Member
       can :manage, Operation
       can :list, Membership
       can :manage, CreditCard

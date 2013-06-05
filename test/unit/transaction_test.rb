@@ -189,6 +189,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
+
   ######################################
   ############ DECLINE ###################
   test "Monthly member SD until gets HD" do 
@@ -196,7 +197,10 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
  
     member = enroll_member(@terms_of_membership)
+    member_manual_billing = enroll_member(@terms_of_membership)
+    member_manual_billing.update_attribute :manual_payment, true
     nbd = member.bill_date
+    nbd_manual = member_manual_billing.bill_date
     bill_date = member.bill_date
     
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
@@ -205,6 +209,7 @@ class TransactionTest < ActiveSupport::TestCase
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
       Member.bill_all_members_up_today
       member.reload
+      member_manual_billing.reload
       nbd = nbd + @sd_strategy.days.days
       assert_equal nbd.to_date, member.next_retry_bill_date.to_date
       assert_equal bill_date, member.bill_date
@@ -728,4 +733,20 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal trans.operation_type, Settings.operation_types.credit
     assert_equal trans.transaction_type, 'refund'
   end
+
+  test "Member with manual payment set should not be included on billing script" do
+    member_manual_billing = enroll_member(@terms_of_membership)
+    member_manual_billing.update_attribute :manual_payment, true
+    nbd_manual = member_manual_billing.bill_date
+
+    Timecop.travel(Time.zone.now + member_manual_billing.terms_of_membership.provisional_days.days) do
+      assert_difference("Operation.count",0)do
+        assert_difference("Transaction.count",0)do
+          Member.bill_all_members_up_today
+        end
+      end
+    end
+    assert_equal member_manual_billing.next_retry_bill_date, nbd_manual
+  end
+
 end
