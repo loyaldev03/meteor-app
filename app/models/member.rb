@@ -512,21 +512,23 @@ class Member < ActiveRecord::Base
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.no_reccurent_billing_error }
   end
 
-  def manual_billing(amount, transaction_type)
-    if amount.blank?
-      answer = { :message => "Amount cannot be blank.", :code => Settings.error_codes.wrong_data }
-    elsif amount < current_membership.terms_of_membership.installment_amount
+  def manual_billing(amount, payment_type)
+    if amount.blank? or payment_type.blank?
+      answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
+    elsif amount.to_f < current_membership.terms_of_membership.installment_amount
       answer = { :message => "Amount to bill cannot be less than terms of membership installment amount.", :code => Settings.error_codes.manual_billing_with_low_amount }
     else
       trans = Transaction.new
-      trans.transaction_type = "sale_manual_#{transaction_type}"
-      trans.prepare_for_manual(self, amount, Settings.operation_types["membership_manual_#{transaction_type}_billing"])
+      trans.transaction_type = "sale_manual_#{payment_type}"
+      operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
+      trans.prepare_for_manual(self, amount, operation_type)
       answer = trans.process
-      Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types["membership_manual_#{transaction_type}_billing"])
+      Auditory.audit(nil, trans, answer[:message], self, operation_type)
       self.update_attribute :manual_payment, true unless self.manual_payment
       answer
     end
   rescue Exception => e
+    logger.error e.inspect
     Auditory.report_issue("Billing:manual_billing", e, { :member => self.inspect })
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end

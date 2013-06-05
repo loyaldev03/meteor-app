@@ -242,7 +242,7 @@ class Transaction < ActiveRecord::Base
     end
 
     def sale_manual
-      purchase_response = { :message => "Manual transaction success. Amount #{number_to_currency(self.amount)}", :code => Settings.error_codes.success }
+      purchase_response = { :message => "Manual transaction success. Amount $#{self.amount}", :code => Settings.error_codes.success }
       save_custom_response(purchase_response, true)
     end
 
