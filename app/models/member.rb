@@ -343,6 +343,10 @@ class Member < ActiveRecord::Base
     status_enable_to_bill? and self.club.billing_enable
   end
 
+  def manual_billing?
+    self.manual_payment
+  end
+
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
   def can_recover?
     # TODO: Add logic to recover some one max 3 times in 5 years

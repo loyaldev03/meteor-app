@@ -363,10 +363,17 @@ class MembersController < ApplicationController
     end
   end
 
+  def manual_billing
+    @tom = @current_member.current_membership.terms_of_membership
+    if request.post?
+
+
+    end
+  end
+
   private 
     def check_permissions
       my_authorize! params[:action].to_sym, Member, @current_club.id
     end
-
 end
 
