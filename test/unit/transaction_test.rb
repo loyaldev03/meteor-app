@@ -748,5 +748,4 @@ class TransactionTest < ActiveSupport::TestCase
     end
     assert_equal member_manual_billing.next_retry_bill_date, nbd_manual
   end
-
 end
