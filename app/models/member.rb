@@ -508,8 +508,25 @@ class Member < ActiveRecord::Base
     end
     answer
   rescue Exception => e
-    Auditory.report_issue("Billing:event_billing", e, { :member => self.inspect })
+    Auditory.report_issue("Billing:no_recurrent_billing", e, { :member => self.inspect })
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.no_reccurent_billing_error }
+  end
+
+  def manual_billing(amount, transaction_type)
+    if amount.blank?
+      answer = { :message => "Amount cannot be blank.", :code => Settings.error_codes.wrong_data }
+    elsif amount < current_membership.terms_of_membership.installment_amount
+      answer = { :message => "Amount to bill cannot be less than terms of membership installment amount.", :code => }
+    else
+      trans = Transaction.new
+      trans.transaction_type = "sale_manual_#{transaction_type}"
+      #ref verificar pgc ... :manual... should we create a new one??
+      trans.prepare(self, active_credit_card, amount, :manual, nil, nil, Settings.operation_types["membership_manual_#{c}_billing"])
+      answer = trans.process
+    end
+  rescue Exception => e
+    Auditory.report_issue("Billing:manual_billing", e, { :member => self.inspect })
+    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
   def error_to_s(delimiter = "\n")

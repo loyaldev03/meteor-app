@@ -11,7 +11,7 @@ class TermsOfMembership < ActiveRecord::Base
 
   acts_as_paranoid
 
-  after_create :setup_defaul_email_templates
+  after_create :setup_defaul_email_templates, :create_manual_pgc
 
   validates :name, :presence => true
   validates :mode, :presence => true
@@ -73,6 +73,14 @@ class TermsOfMembership < ActiveRecord::Base
             et.save
           end
         end
+      end
+    end
+
+    def create_manual_pgc
+      if self.club.billing_enable
+        pgc = PaymentGatewayConfiguration.new :gateway => "manual"
+        pgc.club_id = self.club_id
+        pgc.save
       end
     end
 end

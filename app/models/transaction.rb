@@ -92,6 +92,10 @@ class Transaction < ActiveRecord::Base
     case transaction_type
       when "sale"
         sale
+      when "sale_manual_cash"
+        sale_manual_cash
+      when "sale_manual_check"
+        sale_manual_check
       #when "authorization"
       #  authorization
       #when "capture"
@@ -225,6 +229,16 @@ class Transaction < ActiveRecord::Base
         purchase_response = @gateway.purchase(amount_to_send, credit_card_token, @options)
         save_response(purchase_response)
       end
+    end
+
+    def sale_manual_cash
+      purchase_response = { :message => "Manual transaction success. Amount #{number_to_currency(self.amount)}", :code => Settings.error_codes.success }
+      save_custom_response(purchase_response, true)
+    end
+
+    def sale_manual_check
+      purchase_response = { :message => "Manual transaction success. Amount #{number_to_currency(self.amount)}", :code => Settings.error_codes.success }
+      save_custom_response(purchase_response, true)
     end
 
     def save_custom_response(answer, trans_success=false)

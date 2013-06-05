@@ -354,7 +354,7 @@ class MembersController < ApplicationController
   def no_recurrent_billing
     if request.post?
       answer = @current_member.no_recurrent_billing(params[:amount], params[:description])
-      if answer[:code] == "000"
+      if answer[:code] == Settings.error_codes.success
         flash[:notice] = answer[:message]
         redirect_to show_member_path
       else
@@ -366,8 +366,13 @@ class MembersController < ApplicationController
   def manual_billing
     @tom = @current_member.current_membership.terms_of_membership
     if request.post?
-
-
+      answer = @current_member.manual_billing(params[:amount], params[:transaction_type])
+      if answer[:code] == Settings.error_codes.success
+        flash[:notice] = answer[:message]
+        redirect_to show_member_path
+      else
+        flash.now[:error] = answer[:message]
+      end
     end
   end
 
