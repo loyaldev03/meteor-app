@@ -84,7 +84,7 @@ class Transaction < ActiveRecord::Base
     }    
   end
 
-  def prepare_for_manual(member, amount, operation_type_to_set = nil)
+  def prepare_for_manual(member, amount, operation_type_to_set)
     self.terms_of_membership_id = member.terms_of_membership.id
     self.member = member
     self.amount = amount
@@ -102,9 +102,7 @@ class Transaction < ActiveRecord::Base
     case transaction_type
       when "sale"
         sale
-      when "sale_manual_cash"
-        sale_manual
-      when "sale_manual_check"
+      when "sale_manual_cash", "sale_manual_check"
         sale_manual
       #when "authorization"
       #  authorization

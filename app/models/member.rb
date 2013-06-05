@@ -508,7 +508,7 @@ class Member < ActiveRecord::Base
     end
     answer
   rescue Exception => e
-    Auditory.report_issue("Billing:no_recurrent_billing", e, { :member => self.inspect })
+    Auditory.report_issue("Billing:no_recurrent_billing", e, { :member => self.inspect, :amount => amount, :description => description })
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.no_reccurent_billing_error }
   end
 
@@ -516,7 +516,7 @@ class Member < ActiveRecord::Base
     if amount.blank? or payment_type.blank?
       answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
     elsif amount.to_f < current_membership.terms_of_membership.installment_amount
-      answer = { :message => "Amount to bill cannot be less than terms of membership installment amount.", :code => Settings.error_codes.manual_billing_with_low_amount }
+      answer = { :message => "Amount to bill cannot be less than terms of membership installment amount.", :code => Settings.error_codes.manual_billing_with_less_amount_than_permitted }
     else
       trans = Transaction.new
       trans.transaction_type = "sale_manual_#{payment_type}"
@@ -528,12 +528,15 @@ class Member < ActiveRecord::Base
       message = "Member manually billed successfully $#{amount} Transaction id: #{trans.id}"
       Auditory.audit(nil, trans, message, self, operation_type)
       answer = { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
-      self.update_attribute :manual_payment, true unless self.manual_payment
+      unless self.manual_payment
+        self.manual_payment = true 
+        self.save(:validate => false)
+      end
       answer
     end
   rescue Exception => e
     logger.error e.inspect
-    Auditory.report_issue("Billing:manual_billing", e, { :member => self.inspect })
+    Auditory.report_issue("Billing:manual_billing", e, { :member => self.inspect, :amount => amount, :payment_type => payment_type })
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
@@ -987,7 +990,7 @@ class Member < ActiveRecord::Base
   def self.bill_all_members_up_today
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
-    base = Member.where("next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status NOT IN ('applied','lapsed') AND manual_payment = 0", Time.zone.now).
+    base = Member.where("next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status NOT IN ('applied','lapsed') AND manual_payment = false", Time.zone.now).
            limit(2000)    
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:billing rake task, processing #{base.count} members"
     base.to_enum.with_index.each do |member,index| 
