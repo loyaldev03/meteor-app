@@ -197,8 +197,6 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
  
     member = enroll_member(@terms_of_membership)
-    unsaved_member = FactoryGirl.build(:member)
-    cc_card = FactoryGirl.build(:credit_card_american_express)
     nbd = member.bill_date
     bill_date = member.bill_date
     
