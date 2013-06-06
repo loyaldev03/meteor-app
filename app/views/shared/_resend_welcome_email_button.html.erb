@@ -1,6 +1,6 @@
-<% unless @current_member.lapsed? %>
+<% if @current_member.can_relate_to_api? %>
   <% large_button = ( use_large_button ? "btn-large-w" : "") %>
-  <% if !@current_member.api_member || @current_member.api_id.blank? %>
+  <% if @current_member.api_id.blank? %>
     <%= 
       link_to "#", 
         class: "btn btn-info #{large_button} disabled",
