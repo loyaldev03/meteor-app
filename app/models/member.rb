@@ -31,7 +31,7 @@ class Member < ActiveRecord::Base
       :last_name, :next_retry_bill_date, 
       :bill_date, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
       :wrong_phone_number, :credit_cards_attributes, :birth_date,
-      :gender, :type_of_phone_number, :preferences
+      :gender, :type_of_phone_number, :preferences, :manual_payment
 
   serialize :preferences, JSON
   serialize :additional_data, JSON
@@ -523,6 +523,9 @@ class Member < ActiveRecord::Base
       operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
       trans.prepare_for_manual(self, amount, operation_type)
       trans.process
+      unless set_as_active
+        Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+      end
       schedule_renewal(true)
       assign_club_cash
       message = "Member manually billed successfully $#{amount} Transaction id: #{trans.id}"
@@ -909,7 +912,7 @@ class Member < ActiveRecord::Base
     [ :first_name, :last_name, :address, :state, :city, :country, :zip,
       :email, :birth_date, :gender,
       :phone_country_code, :phone_area_code, :phone_local_number, 
-      :member_group_type_id, :preferences, :external_id ].each do |key|
+      :member_group_type_id, :preferences, :external_id, :manual_payment ].each do |key|
           self.send("#{key}=", params[key]) if params.include? key
     end
     self.type_of_phone_number = params[:type_of_phone_number].to_s.downcase if params.include? :type_of_phone_number

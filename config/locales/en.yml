@@ -237,6 +237,7 @@ en:
         billed_date: 'Billed date'
         billed_date_from: 'From:'
         billed_date_to: 'To:'
+        manual_payment: 'Manual payment'
         sync_status_priorities:
           synced: success
           unsynced: warning

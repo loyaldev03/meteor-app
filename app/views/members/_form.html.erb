@@ -143,14 +143,21 @@
             <%= f.select :type_of_phone_number, [['Mobile', 'mobile'],['Home', 'home'],['Other','other']], :class => 'select_field', :include_blank => true %>
           </td>  
         </tr>
-        <% if @member.new_record? %>
-          <tr class = "control-group">
+        <tr class = "control-group">
+          <% if @member.new_record? %>
             <th>
               <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline required_asterick' %>
             </th>
-            <td> 
+            <th> 
               <%= select_tag('member[terms_of_membership_id]', options_from_collection_for_select(@terms_of_memberships, "id", "name")) %>
-            </td>  
+            </th>  
+          <% elsif can? :manual_billing, Member and not @member.manual_payment %>
+            <th>
+            <%= f.label :manual_payment, t('activerecord.attributes.member.manual_payment'), :class => 'help-inline' %>
+            </th>
+            <th> 
+              <%= check_box :member, :manual_payment %>
+            </th>
           </tr>
         <% end %>
       </table>
