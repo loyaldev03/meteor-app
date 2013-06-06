@@ -14,7 +14,7 @@ class TransactionTest < ActiveSupport::TestCase
     FactoryGirl.create(:without_grace_period_decline_strategy_yearly)
   end
 
-  def enroll_member(tom, amount=23, cc_blank=false, cc_card = nil, unsaved_member = nil)
+  def enroll_member(tom, amount=23, cc_blank=false, cc_card = nil)
     credit_card = cc_card.nil? ? @credit_card : cc_card
     answer = Member.enroll(tom, @current_agent, amount, 
       { first_name: @member.first_name,
