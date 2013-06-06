@@ -1,4 +1,7 @@
 defaults: &defaults
+  exact_target:
+    username: ax
+    password: ax
   max_reactivations: 3
   days_to_wait_to_cancel_fulfillments: 2
   next_retry_on_missing_decline: 20.days
@@ -320,6 +323,7 @@ test:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
 
+
 production:
   <<: *defaults
   call_these_members_recipients: 'rmosher@stoneacreinc.com,wbryant@stoneacreinc.com,mfulginiti@stoneacreinc.com,kflynn@stoneacreinc.com'
@@ -334,6 +338,9 @@ production:
     folder: <%= "#{Rails.root}/mes_account_updater_files" %>
     url: https://www.merchante-solutions.com/
   xxxyyyzzz: 7faf4f991bc44841a00423b8db9602bb
+  exact_target:
+    username: martin@xagax.com
+    password: charly-martin2013
 
 
 prototype:

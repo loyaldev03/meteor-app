@@ -23,6 +23,7 @@ gem 'tinder', '1.9.2'
 gem "ruby-pardot"
 
 gem 'turnout'
+gem 'exact_target_sdk', github: 'stoneacre/exact_target_sdk'
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -76,10 +77,7 @@ gem 'newrelic_rpm'
 
 # To use debugger
 group :development do
-  # gem 'ruby-debug19', :require => 'ruby-debug'
-  gem 'linecache19', '0.5.13'
-  gem 'ruby-debug-base19x', '~> 0.11.30.pre4'
-  # gem 'ruby-debug19'
+  gem 'debugger'
   gem "rails-erd"
   gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
   gem "yard", "~> 0.8.2.1"
