@@ -21,13 +21,13 @@ ZENDESK_API_CLIENT = ZendeskAPI::Client.new do |config|
 end
 
 # do not verify certificate
-module Airbrake
-  class Sender
-    alias old_setup_http_connection setup_http_connection
-    def setup_http_connection
-      http = old_setup_http_connection
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if http.use_ssl?
-      http
-    end
-  end
-end
+#module Airbrake
+#  class Sender
+#    alias old_setup_http_connection setup_http_connection
+#    def setup_http_connection
+#      http = old_setup_http_connection
+#      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if http.use_ssl?
+#      http
+#    end
+#  end
+#end

@@ -66,10 +66,6 @@ GEM
       activerecord (>= 3.0)
     acts_as_paranoid (0.4.2)
       activerecord (~> 3.2)
-    airbrake (3.1.12)
-      activesupport
-      builder
-      json
     arel (3.0.2)
     attr_encrypted (1.2.1)
       encryptor (>= 1.1.1)
@@ -365,7 +361,6 @@ DEPENDENCIES
   activemerchant!
   acts_as_list
   acts_as_paranoid
-  airbrake
   attr_encrypted
   axlsx
   bootstrap-will_paginate
