@@ -347,6 +347,10 @@ class Member < ActiveRecord::Base
     self.manual_payment
   end
 
+  def has_link_to_api?
+    not self.api_member and not self.lapsed?
+  end 
+
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
   def can_recover?
     # TODO: Add logic to recover some one max 3 times in 5 years

@@ -358,7 +358,7 @@
   <% end %>
   <li><a href="#fulfillments" data-toggle="tab">Fulfillments</a></li>
   <li><a href="#communication" data-toggle="tab">Communications</a></li>
-  <% if @current_member.api_member and can? :see_sync_status, Member %>
+  <% if @current_member.has_link_to_api? and can? :see_sync_status, Member %>
     <li><a href="#sync_status" data-toggle="tab" id="sync_status_tab">Sync Status</a></li>
   <% end %>
   <li><a href="#memberships" data-toggle="tab">Memberships</a></li>
@@ -404,7 +404,7 @@
       <%= render :partial => 'communications', :locals => { :communications => @communications} %>
     </div>
   </div>
-  <% if @current_member.api_member and can? :see_sync_status, Member %>
+  <% if @current_member.has_link_to_api? and can? :see_sync_status, Member %>
     <div class="tab-pane" id="sync_status">
       <div class="tab_body_padding">
         <%= render :partial => 'sync_status', :locals => { :member => @current_member} %>
