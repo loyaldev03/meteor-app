@@ -347,7 +347,7 @@ class Member < ActiveRecord::Base
     self.manual_payment
   end
 
-  def can_relate_to_api?
+  def has_link_to_api?
     not self.api_member and not self.lapsed?
   end 
 
