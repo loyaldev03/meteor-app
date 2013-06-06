@@ -18,9 +18,9 @@ class Auditory
     end
   end
   def self.report_issue(error = "Special Error", message = '', params = {})
-    Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)    
+    # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)    
     ZendeskAPI::Ticket.create(ZENDESK_API_CLIENT, 
-      :subject => error, 
+      :subject => "[#{Rails.env}] #{error}", 
       :comment => { :value => message + ". Parameters: " + params.inspect }, 
       :submitter_id => ZENDESK_API_CLIENT.current_user.id, 
       :assignee_id => ZENDESK_API_CLIENT.current_user.id, 
