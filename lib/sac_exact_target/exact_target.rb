@@ -7,11 +7,9 @@ module SacExactTarget
     require 'sac_exact_target/models/member'
     require 'sac_exact_target/models/prospect'
     require 'sac_exact_target/models/club_extensions'
-    require 'sac_exact_target/models/member_extensions'
 
     logger.info "  * extending Prospect, Member and Club"
     Club.send :include, SacExactTarget::ClubExtensions
-    Member.send :include, SacExactTarget::ClubExtensions
 
     nil
   end
