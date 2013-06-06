@@ -1229,7 +1229,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
     end
     @member.reload
-    assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
+    assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
   end
 
   test "Update member's next_bill_date active status" do
@@ -1245,7 +1245,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
     end
     @member.reload
-    assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
+    assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
   end
 
   test "Update member's next_bill_date applied status" do
@@ -1377,7 +1377,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       generate_put_next_bill_date( I18n.l(next_bill_date, :format => :only_date) )
      end
      @member.reload
-     assert_equal I18n.l(@member.next_retry_bill_date, :format => :only_date), I18n.l(next_bill_date, :format => :only_date)
+     assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(next_bill_date, :format => :only_date)
    end
 
   test "get members updated between given dates" do
@@ -1561,7 +1561,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_response :success
     end
     @member.reload
-    assert_equal I18n.l(@member.current_membership.cancel_date, :format => :only_date), cancel_date
+    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
   end
 
   test "Should not cancel member when reason is blank" do
@@ -1656,6 +1656,6 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_response :success
     end
     @member.reload
-    assert_equal I18n.l(@member.current_membership.cancel_date, :format => :only_date), cancel_date
+    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
   end
 end

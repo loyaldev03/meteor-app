@@ -197,10 +197,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
  
     member = enroll_member(@terms_of_membership)
-    member_manual_billing = enroll_member(@terms_of_membership)
-    member_manual_billing.update_attribute :manual_payment, true
     nbd = member.bill_date
-    nbd_manual = member_manual_billing.bill_date
     bill_date = member.bill_date
     
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
@@ -209,7 +206,6 @@ class TransactionTest < ActiveSupport::TestCase
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
       Member.bill_all_members_up_today
       member.reload
-      member_manual_billing.reload
       nbd = nbd + @sd_strategy.days.days
       assert_equal nbd.to_date, member.next_retry_bill_date.to_date
       assert_equal bill_date, member.bill_date
