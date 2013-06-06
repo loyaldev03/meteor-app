@@ -1047,19 +1047,33 @@ class Member < ActiveRecord::Base
 
   # Method used from rake task and also from tests!
   def self.cancel_all_member_up_today
-    base =  Member.joins(:current_membership).where("date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
+    base =  Member.includes(:current_membership).where("date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:cancel_all_member_up_today rake task, processing #{base.count} members"
-    base.to_enum.with_index.each do |member,index| 
+    base.to_enum.with_index.each do |member, index| 
       tz = Time.zone.now
       begin
         Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-        Member.find(member.id).set_as_canceled!
+        member.set_as_canceled!
       rescue Exception => e
         Auditory.report_issue("Members::Cancel", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
     end
+
+    base = Member.includes(:current_membership).where("manual_payment = true AND date(bill_date) < ? AND memberships.status != ?", Time.zone.now, 'lapsed')
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:cancel_all_member_up_today rake task for manual billing, processing #{base.count} members"
+    base.to_enum.with_index.each do |member, index|
+      tz = Time.zone.now
+      begin
+        Rails.logger.info " *[#{index+1}] processing member ##{member.id}"
+        member.set_as_canceled!
+      rescue
+        Auditory.report_issue("Members::Cancel", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
+      end
+      Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+    end 
   end
 
   def self.process_sync 
