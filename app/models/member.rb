@@ -467,7 +467,7 @@ class Member < ActiveRecord::Base
       end
     end
   rescue Exception => e
-    Auditory.report_issue("Billing:membership", e, { :member => self })
+    Auditory.report_issue("Billing:membership", e, { :member => self.inspect })
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
