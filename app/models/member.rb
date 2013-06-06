@@ -451,14 +451,7 @@ class Member < ActiveRecord::Base
         trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
         answer = trans.process
         if trans.success?
-          unless set_as_active
-            Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
-          end
-          schedule_renewal
-          assign_club_cash
-          message = "Member billed successfully $#{amount} Transaction id: #{trans.id}"
-          Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
-          { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
+          proceed_with_billing_logic(trans, Settings.operation_types.membership_billing, false ,"Billing")
         else
           message = set_decline_strategy(trans)
           answer # TODO: should we answer set_decline_strategy message too?
@@ -523,11 +516,7 @@ class Member < ActiveRecord::Base
       operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
       trans.prepare_for_manual(self, amount, operation_type)
       trans.process
-      schedule_renewal(true)
-      assign_club_cash
-      message = "Member manually billed successfully $#{amount} Transaction id: #{trans.id}"
-      Auditory.audit(nil, trans, message, self, operation_type)
-      answer = { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
+      answer = proceed_with_billing_logic(trans, operation_type, true, "Billing:manual_billing")
       unless self.manual_payment
         self.manual_payment = true 
         self.save(:validate => false)
@@ -909,7 +898,7 @@ class Member < ActiveRecord::Base
     [ :first_name, :last_name, :address, :state, :city, :country, :zip,
       :email, :birth_date, :gender,
       :phone_country_code, :phone_area_code, :phone_local_number, 
-      :member_group_type_id, :preferences, :external_id ].each do |key|
+      :member_group_type_id, :preferences, :external_id, :manual_payment ].each do |key|
           self.send("#{key}=", params[key]) if params.include? key
     end
     self.type_of_phone_number = params[:type_of_phone_number].to_s.downcase if params.include? :type_of_phone_number
@@ -1342,6 +1331,17 @@ class Member < ActiveRecord::Base
       Auditory.audit(agent, (trans.nil? ? terms_of_membership : trans), message, self, operation_type)
       trans.update_attribute :operation_type, operation_type unless trans.nil?
       message
+    end
+
+    def proceed_with_billing_logic(trans, operation_type, manual, bill_type="Billing")
+      unless set_as_active
+        Auditory.report_issue("#{bill_type}::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+      end
+      schedule_renewal(manual)
+      assign_club_cash
+      message = "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}"
+      Auditory.audit(nil, trans, message, self, operation_type)
+      { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
     end
 
     def fulfillments_products_to_send
