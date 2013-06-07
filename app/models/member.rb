@@ -348,7 +348,7 @@ class Member < ActiveRecord::Base
   end
 
   def has_link_to_api?
-    not self.api_member and not self.lapsed?
+    self.api_member and not self.lapsed?
   end 
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
