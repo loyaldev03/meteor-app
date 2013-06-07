@@ -32,15 +32,8 @@ module SacExactTarget
   #     self.member.pardot_id.nil?
   #   end
 
-  # private
+  private
 
-  #   # will raise a SacExactTarget::ResponseError if login fails
-  #   # will raise a SacExactTarget::NetError if the http call fails
-  #   def conn
-  #     c = self.member.club.pardot
-  #     c.authenticate
-  #     c
-  #   end
 
   #   def update_member(res, destroy = false)
   #     data = if res.class == Hash and res.has_key? 'id'
@@ -62,12 +55,42 @@ module SacExactTarget
   #     self.member.reload rescue self.member
   #   end
 
-  #   def fieldmap(options)
-  #     m = self.member
-  #     cm = m.current_membership
-  #     SacExactTarget.logger.debug "Pardot JSON request: " + map.inspect
-  #     map
-  #   end
+    def fieldmap(options)
+      [ 
+        'First_name' => 'first_name',
+        'Last_name' => 'last_name',
+        'Address_one' => 'address',
+        'City' => 'city',
+        'State' => 'state',
+        'Zip' => 'zip',
+        'Country' => 'country',
+        'Birth_date' => 'birth_date',
+        'Club' => 'club_id', 
+        'Client' => '',
+        'Membership_status' => '',
+        'Terms_of_membership' => 'terms_of_membership_id',
+        'Member_since_date' => '',
+        'Wrong_address' => '',
+        'Join_date' => '',
+        'Cancel_date' => '',
+        'Marketing_code' => 'marketing_code',
+        'Mega_channel' => 'mega_channel',
+        'Fulfillment_code' => 'fulfillment_code',
+        'Campaign_medium' => 'campaign_medium',
+        'Product_sku' => 'product_sku',
+        'Landing_URL' => 'landing_url',
+        'Enrollment_amount' => '',
+        'Installment_amount' => '',
+        'Next_bill_date' => '',
+        'External_id' => '',
+        'Club_cash_amount' => '',
+        'Quota' => '',
+        'Refunded_amount' => '',
+        'Gender' => 'gender',
+        'Wrong_Phone' => '',
+        'Phone' => 'full_phone_number'
+      ]
+    end
   end
 end
 

@@ -24,6 +24,7 @@ module Pardot
         end
       end
     end     
+    
     module InstanceMethods
       def sync_to_pardot(options = {})
         time_elapsed = Benchmark.ms do
