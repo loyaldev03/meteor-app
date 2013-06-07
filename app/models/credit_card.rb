@@ -45,6 +45,11 @@ class CreditCard < ActiveRecord::Base
     update_attribute :last_successful_bill_date, Time.zone.now
   end
 
+  # Bug #27501 this method was added just to be used from console.
+  def unblacklist
+    update_attribute :blackslites, false
+  end
+
   def blacklist
     update_attribute :blacklisted, true
   end

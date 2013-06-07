@@ -199,7 +199,7 @@ module MesAccountUpdater
                 new_credit_card.cc_type = new_account_type_am
                 answer = cc.member.add_new_credit_card(new_credit_card)
                 unless answer[:code] == Settings.error_codes.success
-                  Airbrake.notify(:error_class => "MES::aus_update_process", :parameters => { :credit_card => cc.inspect, :answer => answer, :line => line })
+                  Auditory.report_issue("MES::aus_update_process", response_code, { :credit_card => cc.inspect, :answer => answer, :line => line })
                 end
               when 'NEWEXP'
                 Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.member, Settings.operation_types.aus_recycle_credit_card)
@@ -239,15 +239,17 @@ module MesAccountUpdater
         transaction_chargebacked = Transaction.find_by_payment_gateway_configuration_id_and_response_transaction_id gateway.id, args[:trident_transaction_id]
         member = Member.find_by_id_and_club_id(args[:client_reference_number], gateway.club_id)
         begin
-          if transaction_chargebacked.nil? || member.nil?
+          if transaction_chargebacked.nil?
             raise "Chargeback ##{args[:control_number]} could not be processed. member or transaction_chargebacked are null! #{line}"
+          elsif member.nil?
+            transaction_chargebacked.member.chargeback! transaction_chargebacked, args
           elsif transaction_chargebacked.member_id == member.id
             member.chargeback! transaction_chargebacked, args
           else
             raise "Chargeback ##{args[:control_number]} could not be processed. member and transaction_chargebacked are different! #{line}"
           end
         rescue 
-          Airbrake.notify(:error_class => "MES::chargeback_report", :parameters => { :gateway => gateway.inspect, :member => member.inspect, :line => line, :transaction_chargebacked => transaction_chargebacked.inspect })
+          Auditory.report_issue("MES::chargeback_report", $!, { :gateway => gateway.inspect, :member => member.inspect, :line => line, :transaction_chargebacked => transaction_chargebacked.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end

@@ -16,11 +16,11 @@ gem 'acts_as_list'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'foreman'
-gem 'god'
 gem 'rvm-capistrano'
 gem 'capistrano-campfire', '0.2.0'
 gem 'tinder', '1.9.2'
-gem "ruby-pardot"
+# uncomment if pardot is enabled again
+# gem "ruby-pardot"
 
 gem 'turnout'
 gem 'exact_target_sdk', github: 'stoneacre/exact_target_sdk'
@@ -61,7 +61,8 @@ gem 'jquery-rails', '2.0.3'
 
 gem 'acts_as_paranoid'
 
-gem "airbrake"
+#gem "airbrake"
+gem "zendesk_api"
 
 
 # To use ActiveModel has_secure_password

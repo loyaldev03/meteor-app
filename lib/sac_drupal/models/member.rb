@@ -59,7 +59,7 @@ module Drupal
       self.member.update_column :autologin_url, uri.path if uri
       @token
     rescue Exception => e
-      Airbrake.notify(:error_class => 'Drupal:Member:login_token', :error_message => e, :parameters => { :member => self.member.inspect })
+      Auditory.report_issue('Drupal:Member:login_token', e, { :member => self.member.inspect })
       nil
     end
 
@@ -230,6 +230,3 @@ module Drupal
     end
   end
 end
-
-
-

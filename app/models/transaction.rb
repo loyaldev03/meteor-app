@@ -61,13 +61,14 @@ class Transaction < ActiveRecord::Base
     ActiveMerchant::Billing::Base.mode = ( pgc.production? ? :production : :test )
   end
 
-  def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil)
+  def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, operation_type_to_set = nil)
     self.terms_of_membership_id = terms_of_membership_id || member.terms_of_membership.id
     self.member = member
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
-    self.membership_id = membership.nil? ? member.current_membership.id : membership.id 
+    self.membership_id = membership.nil? ? member.current_membership_id : membership.id 
+    self.operation_type = operation_type_to_set
     self.save
     @options = {
       :order_id => invoice_number,
@@ -83,6 +84,16 @@ class Transaction < ActiveRecord::Base
     }    
   end
 
+  def prepare_for_manual(member, amount, operation_type_to_set)
+    self.terms_of_membership_id = member.terms_of_membership.id
+    self.member = member
+    self.amount = amount
+    self.membership_id = member.current_membership_id 
+    self.operation_type = operation_type_to_set
+    self.gateway = :manual
+    self.save    
+  end
+
   def can_be_refunded?
     [ 'sale' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted? and self.success?
   end
@@ -91,6 +102,8 @@ class Transaction < ActiveRecord::Base
     case transaction_type
       when "sale"
         sale
+      when "sale_manual_cash", "sale_manual_check"
+        sale_manual
       #when "authorization"
       #  authorization
       #when "capture"
@@ -162,7 +175,7 @@ class Transaction < ActiveRecord::Base
         return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
       end
       trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
-      trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership)
+      trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership, Settings.operation_types.credit)
       trans.fill_transaction_type_for_credit(sale_transaction)
       answer = trans.process
       if trans.success?
@@ -172,6 +185,7 @@ class Transaction < ActiveRecord::Base
         Communication.deliver!(:refund, sale_transaction.member)
       else
         Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
+        trans.update_attribute :operation_type, Settings.operation_types.credit_error
       end
       answer
     end
@@ -223,6 +237,11 @@ class Transaction < ActiveRecord::Base
         purchase_response = @gateway.purchase(amount_to_send, credit_card_token, @options)
         save_response(purchase_response)
       end
+    end
+
+    def sale_manual
+      purchase_response = { :message => "Manual transaction success. Amount $#{self.amount}", :code => Settings.error_codes.success }
+      save_custom_response(purchase_response, true)
     end
 
     def save_custom_response(answer, trans_success=false)

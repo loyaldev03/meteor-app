@@ -37,6 +37,7 @@ en:
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
   loading: 'Loading'
+  index: '#'
   menu: 
     logout: 'Logout'
     agents: 'Agents'
@@ -79,6 +80,7 @@ en:
     create_xls_file: 'Create XLS File'
     export_all_to_xls: 'Export all to XLS'
     no_recurrent_billing: 'Bill no recurrent amount'
+    manual_billing: 'Bill manual transaction'
   admin:
     agents:
       index:
@@ -138,8 +140,12 @@ en:
       transaction:
         refundable: 'Refundable'
         refund_amount_help: 'Amount to refund'
+        payment_type: 'Payment type'
+        transaction_type: 'Transaction type'
         transaction_types: 
           sale: Sale
+          sale_manual_check: 'Sale Manual Check'
+          sale_manual_cash: 'Sale Manual Cash'
           refund: Credit
           credit: Credit
           void: Credit
@@ -149,6 +155,7 @@ en:
         date: 'Date'
         description: 'Description'
         amount: 'Amount'
+        amount_help: "(Min %{minimun_amount})"
         gw_trans: 'Gw trans'
         cc_related: 'CC Last 4 Digits'
         not_found: 'No transactions were found.'
@@ -231,6 +238,7 @@ en:
         billed_date: 'Billed date'
         billed_date_from: 'From:'
         billed_date_to: 'To:'
+        manual_payment: 'Manual payment'
         sync_status_priorities:
           synced: success
           unsynced: warning

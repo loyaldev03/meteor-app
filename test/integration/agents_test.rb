@@ -100,7 +100,6 @@ class AgentsTest < ActionController::IntegrationTest
     do_data_table_search("#agents_table_filter", confirmed_agent.email)
 
     within("#agents_table") do
-      sleep 10
       assert page.has_content?(confirmed_agent.email)
       click_link_or_button 'Edit'
     end

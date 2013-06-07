@@ -40,7 +40,7 @@ class Prospect < ActiveRecord::Base
   #   end
   #   logger.info "Pardot::sync took #{time_elapsed}ms"
   # rescue Exception => e
-  #   Airbrake.notify(:error_class => "Prospect:sync", :error_message => e, :parameters => { :prospect => self.inspect })
+  #   Auditory.report_issue("Prospect:sync", e, { :prospect => self.inspect })
   # end
   # handle_asynchronously :sync_to_remote_domain
 

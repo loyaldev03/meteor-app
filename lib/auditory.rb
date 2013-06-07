@@ -17,7 +17,17 @@ class Auditory
       Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
     end
   end
-  def self.add_redmine_ticket(error = "Special Error", message = '', params = {})
-    Airbrake.notify(:error_class   => error, :error_message => "#{error}: #{message}", :parameters    => params)    
+  def self.report_issue(error = "Special Error", message = '', params = {})
+    # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)
+    unless ["test","development"].include? Rails.env
+      ZendeskAPI::Ticket.create(ZENDESK_API_CLIENT, 
+        :subject => "[#{Rails.env}] #{error}", 
+        :comment => { :value => message.to_s + ". Parameters: " + params.inspect },  
+        :submitter_id => ZENDESK_API_CLIENT.current_user.id, 
+        :assignee_id => ZENDESK_API_CLIENT.current_user.id, 
+        :type => "incident",
+        :tags => "support-ruby",
+        :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
+    end
   end
 end

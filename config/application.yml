@@ -45,6 +45,9 @@ defaults: &defaults
     membership_billing_hard_decline_by_limit: 114
     downgraded_because_of_hard_decline: 115
     downgraded_because_of_hard_decline_by_limit: 116
+    membership_billing_without_decline_strategy_limit: 117
+    membership_manual_cash_billing: 118
+    membership_manual_check_billing: 119
     #profile
     cancel: 200 
     future_cancel: 201
@@ -86,6 +89,7 @@ defaults: &defaults
     note_added: 238
     remote_club_cash_transaction: 239
     downgrade_member: 240
+    unblacklisted: 241
     #communication
     active_email: 300     
     prebill_email: 301    
@@ -94,6 +98,9 @@ defaults: &defaults
     pillar_email: 304
     hard_decline_email: 305
     soft_decline_email: 306
+    rejection_email: 307
+    birthday_email: 308
+    no_email_error: 309
     #fulfillments
     from_not_processed_to_in_process: 400
     from_not_processed_to_on_hold: 401
@@ -181,6 +188,8 @@ defaults: &defaults
     credit_card_blacklisted: '9508'
     credit_card_blank: '9509'
     refund_invalid: '9788'
+    manual_billing_with_less_amount_than_permitted: '9880'
+    manual_billing_error: '9881'
     membership_billing_error: '9882' 
     no_reccurent_billing_error: '9883'
     member_club_dont_allow: '9884'

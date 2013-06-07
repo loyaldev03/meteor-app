@@ -46,13 +46,13 @@ class MembersBillTest < ActionController::IntegrationTest
     click_on 'Refund'
 
     if check_refund
-      wait_until{ page.has_content?("This transaction has been approved") }
+      page.has_content?("This transaction has been approved")
       within(".nav-tabs") do
         click_on("Operations")
       end
       within("#operations_table")do
         assert page.has_content?("Communication 'Test refund' sent")
-        wait_until{ assert page.has_content?("Refund success $#{amount.to_f}") }
+        assert page.has_content?("Refund success $#{amount.to_f}")
       end
     end
   end
@@ -169,9 +169,7 @@ class MembersBillTest < ActionController::IntegrationTest
   #     click_on("Fulfillments")
   #   end
   #   within("#fulfillments") do 
-  #     wait_until {
-  #       assert page.has_content?("kit-kard")
-  #     }
+  #     assert page.has_content?("kit-kard")
   #   end
   # end
  
@@ -191,7 +189,6 @@ class MembersBillTest < ActionController::IntegrationTest
     active_merchant_stubs
     setup_member
     bill_member(@saved_member, true, (@terms_of_membership_with_gateway.installment_amount / 2))
-    
     amount_to_refund = (@terms_of_membership_with_gateway.installment_amount / 2) + 1
     assert_difference('Transaction.count', 0) do 
       make_a_refund(Transaction.last, amount_to_refund, false)
@@ -209,7 +206,6 @@ class MembersBillTest < ActionController::IntegrationTest
     active_merchant_stubs
     setup_member
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
-
     bill_member(@saved_member, true, final_amount)
     assert_difference('Transaction.count') do 
       make_a_refund(Transaction.last, final_amount)
@@ -220,7 +216,6 @@ class MembersBillTest < ActionController::IntegrationTest
     active_merchant_stubs
     setup_member
     bill_member(@saved_member, false)
-    
     assert_difference('Transaction.count', 0) do 
       make_a_refund(Transaction.last, "&%$", false)
     end
@@ -230,10 +225,10 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     @saved_member.set_as_canceled
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
    
     within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+      assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date))
     end
   end
 
@@ -242,10 +237,10 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.set_as_active!
     @saved_member.set_as_canceled
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
    
     within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
+      assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date))
     end
   end
 
@@ -254,12 +249,12 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled
     @saved_member.recover(@terms_of_membership_with_gateway)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     
     next_bill_date = @saved_member.current_membership.join_date + @terms_of_membership_with_gateway.provisional_days
     
     within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date)) }
+      assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date))
     end
   end
   
@@ -270,7 +265,7 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.set_as_active
     
     change_next_bill_date(nil)
-    wait_until{ assert page.has_content?(I18n.t('error_messages.next_bill_date_blank')) }
+    assert page.has_content?(I18n.t('error_messages.next_bill_date_blank'))
   end  
 
 
@@ -279,26 +274,21 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled
     @saved_member.recover(@terms_of_membership_with_gateway) 
     @saved_member.set_as_active
-
     next_bill_date = Time.zone.now + 1.day
     change_next_bill_date(next_bill_date)
     assert find_field('input_first_name').value == @saved_member.first_name
-    
     within("#td_mi_next_retry_bill_date")do
       assert page.has_content?(I18n.l(next_bill_date, :format => :only_date))
     end
-    sleep 5
   end  
 
   test "Next Bill Date for monthly memberships" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-
+    assert find_field('input_first_name').value == @saved_member.first_name
     next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
-
     within("#td_mi_next_retry_bill_date")do
-      wait_until{ assert page.has_no_content?(I18n.l(@saved_member.current_membership.join_date+1.month, :format => :only_date)) }
+      assert page.has_no_content?(I18n.l(@saved_member.current_membership.join_date+1.month, :format => :only_date))
     end
   end  
 
@@ -306,18 +296,14 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     @terms_of_membership_with_gateway.update_attribute(:installment_amount, 45.56)
     active_merchant_stubs("34234", "decline stubbed", false)
-
     @saved_member.bill_membership
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-
+    assert find_field('input_first_name').value == @saved_member.first_name
     within(".nav-tabs") do
       click_on("Transactions")
     end
     within("#transactions_table_wrapper")do
-      wait_until{
-        assert page.has_no_selector?('#refund')
-      }
+      assert page.has_no_selector?('#refund')
     end
   end
 
@@ -325,17 +311,15 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Successful payment." do
     setup_member
     @saved_member.current_membership.join_date = Time.zone.now-3.day
-    
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-
+    assert find_field('input_first_name').value == @saved_member.first_name
     within(".nav-tabs") do
       click_on("Operations")
     end
     within("#operations_table")do
-      wait_until{ assert page.has_content?("Member billed successfully $100.0 Transaction id: #{Transaction.last.id}") }
+      assert page.has_content?("Member billed successfully $100.0 Transaction id: #{Transaction.last.id}")
     end
   end  
 
@@ -343,17 +327,17 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     @saved_member.current_membership.join_date = Time.zone.now-3.day
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     
     within("#td_mi_status")do
-      wait_until{ assert page.has_content?("provisional") }
+      assert page.has_content?("provisional")
     end
 
     within(".nav-tabs") do
       click_on("Operations")
     end
     within("#operations_table")do
-      wait_until{ assert page.has_content?("Member enrolled successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-") }
+      assert page.has_content?("Member enrolled successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
     end
   end 
 
@@ -372,12 +356,12 @@ class MembersBillTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     within(".nav-tabs") do
       click_on("Transactions")
     end
     within("#transactions_table_wrapper")do
-      wait_until{ assert page.has_selector?('#refund') }
+      assert page.has_selector?('#refund')
     end    
     make_a_refund(Transaction.last, final_amount)
   end 
@@ -388,53 +372,42 @@ class MembersBillTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     within(".nav-tabs") do
       click_on("Transactions")
     end
     within("#transactions_table_wrapper")do
-      wait_until{ assert page.has_selector?('#refund') }
+      assert page.has_selector?('#refund')
     end
     make_a_refund(Transaction.last, final_amount)
-
-    wait_until{ page.has_content?("This transaction has been approved") }
+    page.has_content?("This transaction has been approved")
   end 
 
   test "Billing membership amount on the Next Bill Date" do
     active_merchant_stubs
     setup_member
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
-
     next_bill_date = @saved_member.current_membership.join_date + eval(@terms_of_membership_with_gateway.installment_type)
     next_bill_date_after_billing = @saved_member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)
-
     Member.bill_all_members_up_today
-
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
     end
-
     within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date_after_billing, :format => :only_date)) }
-
     within("#operations") do
-      wait_until {
-        assert page.has_selector?("#operations_table")
-        assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
-      }
+      assert page.has_selector?("#operations_table")
+      assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
     end
 
     within("#transactions") do 
-      wait_until {
-        assert page.has_selector?("#transactions_table")
-        assert page.has_content?("Sale : This transaction has been approved")
-        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
-      }
+      assert page.has_selector?("#transactions_table")
+      assert page.has_content?("Sale : This transaction has been approved")
+      assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
     end
 
     within("#transactions_table") do
-      wait_until{ assert page.has_selector?('#refund') }
+      assert page.has_selector?('#refund')
     end
   end 
 
@@ -444,46 +417,39 @@ class MembersBillTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     within(".nav-tabs") do
       click_on("Transactions")
     end
     within("#transactions_table_wrapper")do
-      wait_until{
-        assert page.has_selector?('#refund')
-      }
+      assert page.has_selector?('#refund')
     end
     make_a_refund(Transaction.last, final_amount, true)
-
     visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-
     click_on 'Full save'
     assert page.has_content?("Full save done")
-    
     within(".nav-tabs") do
       click_on("Operations")
     end
     within("#operations_table")do
-      wait_until{ assert page.has_content?("Member enrolled successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-") }
-      wait_until{ assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") }
-      wait_until{ assert page.has_content?("Refund success $#{final_amount.to_f}") }
-      wait_until{ assert page.has_content?("Full save done") }
-      wait_until{ assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed)) }
+      assert page.has_content?("Member enrolled successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
+      assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
+      assert page.has_content?("Refund success $#{final_amount.to_f}")
+      assert page.has_content?("Full save done")
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
     end
   end 
 
   test "Send Prebill email (7 days before NBD)" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }    
+    assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
-    
     Member.send_prebill
 
-    sleep 2
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within('.nav-tabs'){ click_on 'Communications' }
     within("#communication") do
@@ -500,16 +466,15 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Do not Send Prebill email (7 days before NBD) when member's installment_amount is 0" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }    
+    assert find_field('input_first_name').value == @saved_member.first_name
     @terms_of_membership_with_gateway.update_attribute :installment_amount, 0.0
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
     
     Member.send_prebill
 
-    sleep 2
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within('.nav-tabs'){ click_on 'Communications' }
     within("#communication") do 
@@ -525,7 +490,7 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Do not Send Prebill email (7 days before NBD) when member's recycled_times is not 0" do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }    
+    assert find_field('input_first_name').value == @saved_member.first_name   
     @saved_member.recycled_times = 1
     @saved_member.next_retry_bill_date = Time.zone.now+7.day
     @saved_member.bill_date = Time.zone.now+7.day
@@ -533,9 +498,8 @@ class MembersBillTest < ActionController::IntegrationTest
     
     Member.send_prebill
 
-    sleep 2
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within('.nav-tabs'){ click_on 'Communications' }
     within("#communication") do 
@@ -579,7 +543,7 @@ class MembersBillTest < ActionController::IntegrationTest
     end
 
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
 
     within("#operations"){ assert page.has_content?("Communication 'Test hard_decline' sent") } 

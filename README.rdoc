@@ -13,10 +13,13 @@ rake assets:precompile
 In order to create the doc you must run: 	
 yardoc --plugin rest --title "Api Documentation" --readme readme_api_doc.rdoc
 
-
 # in order to put phoenix into mantainance mode:
 rake maintenance:start
 # remove phoenix from mantainance mode:
 rake maintenance:end
 
 while in mantainance mode, API and Web will not be reachable.
+In order to update the db/declinestrategies.yml file, run:
+rake db:data:dump MODEL=DeclineStrategy
+After that make sure to replace: 
+"- !ruby/ActiveRecord:DeclineStrategy" with "- !ruby/object:DeclineStrategy"

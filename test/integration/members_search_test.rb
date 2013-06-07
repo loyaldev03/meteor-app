@@ -53,7 +53,6 @@ class MembersSearchTest < ActionController::IntegrationTest
   # def fill_in_member(unsaved_member, credit_card)
   #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   #   click_link_or_button 'New Member'
-  #   sleep 1
   #   within("#table_demographic_information")do
   #       fill_in 'member[first_name]', :with => unsaved_member.first_name
   #       select(unsaved_member.gender, :from => 'member[gender]')
@@ -94,12 +93,10 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     assert has_no_content?("CC Token")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    sleep 1
     within("#table_active_credit_card") do
       assert page.has_no_content?("#{saved_credit_card.token}")
      end
     within(".nav-tabs"){ click_on("Credit Cards") }
-    sleep 1
     within("#credit_cards") do
      assert page.has_no_content?("#{saved_credit_card.token}")
     end
@@ -117,12 +114,10 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     assert has_no_content?("CC Token")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    sleep 1
     within("#table_active_credit_card") do
       assert page.has_no_content?("#{saved_credit_card.token}")
      end
     within(".nav-tabs"){ click_on("Credit Cards") }
-    sleep 1
     within("#credit_cards") do
      assert page.has_no_content?("#{saved_credit_card.token}")
     end
@@ -139,12 +134,10 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     assert has_no_content?("CC Token")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    sleep 1
     within("#table_active_credit_card") do
       assert page.has_no_content?("#{saved_credit_card.token}")
     end
     within(".nav-tabs"){ click_on("Credit Cards") }
-    sleep 1
     within("#credit_cards") do
      assert page.has_no_content?("#{saved_credit_card.token}")
     end
@@ -157,12 +150,9 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
     saved_credit_card = @saved_member.active_credit_card
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    sleep 1
     fill_in "member[cc_token]", :with => saved_credit_card.token
-    sleep 1
     click_on 'Search'
     assert page.has_content?("#{unsaved_member.first_name}")
-    sleep 1
   end 
 
   test "Search members by token - Supervisor rol" do
@@ -173,12 +163,9 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
     saved_credit_card = @saved_member.active_credit_card
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    sleep 1
     fill_in "member[cc_token]", :with => saved_credit_card.token
-    sleep 1
     click_on 'Search'
     assert page.has_content?("#{unsaved_member.first_name}")
-    sleep 1
   end 
 
     test "Search members by token - Representative rol" do
@@ -189,7 +176,6 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
     saved_credit_card = @saved_member.active_credit_card
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    sleep 1
     assert has_no_content?("CC Token")
     end 
 
@@ -243,7 +229,6 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#credit_cards") do
     assert page.has_no_content?("#{saved_credit_card.token}")
     end
-    sleep 1
   end 
 
   test "search members by next bill date" do
@@ -281,10 +266,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_search
     click_on 'Search'
     
-    wait_until {
       assert page.has_selector?(".pagination")
       assert page.has_content?(Member.first.full_name)
-    }
 
     within(".pagination") do
       assert page.has_content?("1")
@@ -294,7 +277,6 @@ class MembersSearchTest < ActionController::IntegrationTest
       assert page.has_content?("Next")
     end
     within("#members")do
-      wait_until {
         if page.has_content?(Member.last.full_name)
           assert true
         else
@@ -315,63 +297,46 @@ class MembersSearchTest < ActionController::IntegrationTest
             end
           end
         end
-      }
     end
   end
 
   test "Organize Member results by Pagination" do
     setup_search
     click_on 'Search'
-    wait_until {
       assert page.has_no_selector?(".pagination")
-    }
     within("#members")do
-      wait_until {
         assert page.has_content?(Member.find_by_id(24).full_name)
-      }
     end
 
-    wait_until {
       assert page.has_selector?(".pagination")
       assert page.has_content?(Member.first.full_name)
-    }
     within("#members")do
-      wait_until {
         click_on("2")
         if page.has_content?(Member.find_by_id(26).full_name)
           assert true
         else
           assert false, "The last member was not found"
         end
-      }
     end
 
-    wait_until {
       assert page.has_selector?(".pagination")
-    }
     within("#members")do
-      wait_until {
         click_on("3")
         if page.has_content?(Member.find_by_id(51).full_name)
           assert true
         else
           assert false, "The last member was not found"
         end
-      }
     end
 
-    wait_until {
-      assert page.has_selector?(".pagination")
-    }
+    assert page.has_selector?(".pagination")
     within("#members")do
-      wait_until {
         click_on("4")
         if page.has_content?(Member.find_by_id(76).full_name)
           assert true
         else
           assert false, "The last member was not found"
         end
-      }
     end
   end
 
@@ -386,9 +351,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_search
     search_member("member[id]", "#{@search_member.id}", @search_member)
     within("#members") do
-      wait_until {
-        assert page.has_content?("#{@search_member.id}")
-      }
+      assert page.has_content?("#{@search_member.id}")
     end
     page.execute_script("window.jQuery('.odd:first a:first').find('.icon-zoom-in').click()")
 
@@ -457,15 +420,11 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_search
     member_to_seach = Member.first
     within("#personal_details")do
-      wait_until{
-        fill_in "member[email]", :with => member_to_seach.email
-      }
+      fill_in "member[email]", :with => member_to_seach.email
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(member_to_seach.full_name)
-      }
+      assert page.has_content?(member_to_seach.full_name)
     end
   end
 
@@ -473,17 +432,13 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_search
     member_to_seach = Member.first
     within("#personal_details")do
-      wait_until{
-        fill_in "member[phone_country_code]", :with => member_to_seach.phone_country_code
-        fill_in "member[phone_area_code]", :with => member_to_seach.phone_area_code
-        fill_in "member[phone_local_number]", :with => member_to_seach.phone_local_number
-      }
+      fill_in "member[phone_country_code]", :with => member_to_seach.phone_country_code
+      fill_in "member[phone_area_code]", :with => member_to_seach.phone_area_code
+      fill_in "member[phone_local_number]", :with => member_to_seach.phone_local_number
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(member_to_seach.full_name)
-      }
+      assert page.has_content?(member_to_seach.full_name)
     end
   end
 
@@ -491,15 +446,11 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_search
     member_to_seach = Member.first
     within("#contact_details")do
-      wait_until{
-        fill_in "member[address]", :with => member_to_seach.address
-      }
+      fill_in "member[address]", :with => member_to_seach.address
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(member_to_seach.full_name)
-      }
+      assert page.has_content?(member_to_seach.full_name)
     end
   end
 
@@ -507,15 +458,11 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_search
     member_to_seach = Member.first
     within("#contact_details")do
-      wait_until{
-        fill_in "member[city]", :with => member_to_seach.city
-      }
+      fill_in "member[city]", :with => member_to_seach.city
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(member_to_seach.full_name)
-      }
+      assert page.has_content?(member_to_seach.full_name)
     end
   end
 
@@ -523,15 +470,11 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_search
     member_to_seach = Member.first
     within("#contact_details")do
-      wait_until{
-        select_country_and_state(member_to_seach.country)
-      }
+      select_country_and_state(member_to_seach.country)
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(member_to_seach.full_name)
-      }
+      assert page.has_content?(member_to_seach.full_name)
     end
   end
 
@@ -539,15 +482,11 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_search
     member_to_seach = Member.first
     within("#contact_details")do
-      wait_until{
-        fill_in "member[zip]", :with => member_to_seach.zip
-      }
+      fill_in "member[zip]", :with => member_to_seach.zip
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(member_to_seach.full_name)
-      }
+      assert page.has_content?(member_to_seach.full_name)
     end
   end
 
@@ -556,39 +495,27 @@ class MembersSearchTest < ActionController::IntegrationTest
     member_to_seach = Member.first
     member_to_seach.update_attribute(:zip, 12345)
     within("#contact_details")do
-      wait_until{
-        fill_in "member[zip]", :with => "12"
-      }
+      fill_in "member[zip]", :with => "12"
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(member_to_seach.full_name)
-      }
+      assert page.has_content?(member_to_seach.full_name)
     end
 
     within("#contact_details")do
-      wait_until{
-        fill_in "member[zip]", :with => "34"
-      }
+      fill_in "member[zip]", :with => "34"
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(member_to_seach.full_name)
-      }
+      assert page.has_content?(member_to_seach.full_name)
     end
 
     within("#contact_details")do
-      wait_until{
-        fill_in "member[zip]", :with => "45"
-      }
+      fill_in "member[zip]", :with => "45"
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(member_to_seach.full_name)
-      }
+      assert page.has_content?(member_to_seach.full_name)
     end
   end
 
@@ -596,15 +523,11 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_search
     member_to_seach = Member.first
     within("#payment_details")do
-      wait_until{
-        fill_in "member[last_digits]", :with => member_to_seach.active_credit_card.last_digits
-      }
+      fill_in "member[last_digits]", :with => member_to_seach.active_credit_card.last_digits
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(member_to_seach.full_name)
-      }
+      assert page.has_content?(member_to_seach.full_name)
     end
   end
 
@@ -616,15 +539,11 @@ class MembersSearchTest < ActionController::IntegrationTest
                                      :disposition_type_id => @disposition_type.id)
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#payment_details")do
-      wait_until{
         fill_in "member[notes]", :with => @saved_member.member_notes.first.description
-      }
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
         assert page.has_content?(@saved_member.full_name)
-      }
     end
   end
 
@@ -637,40 +556,32 @@ class MembersSearchTest < ActionController::IntegrationTest
                                      :disposition_type_id => @disposition_type.id)
     member_to_seach = Member.first
     within("#personal_details")do
-      wait_until{
-        fill_in "member[id]", :with => @saved_member.id
-        fill_in "member[first_name]", :with => @saved_member.first_name
-        fill_in "member[last_name]", :with => @saved_member.last_name
-        fill_in "member[email]", :with => @saved_member.email
-        fill_in "member[phone_country_code]", :with => @saved_member.phone_country_code
-        fill_in "member[phone_area_code]", :with => @saved_member.phone_area_code
-        fill_in "member[phone_local_number]", :with => @saved_member.phone_local_number
-      }
+      fill_in "member[id]", :with => @saved_member.id
+      fill_in "member[first_name]", :with => @saved_member.first_name
+      fill_in "member[last_name]", :with => @saved_member.last_name
+      fill_in "member[email]", :with => @saved_member.email
+      fill_in "member[phone_country_code]", :with => @saved_member.phone_country_code
+      fill_in "member[phone_area_code]", :with => @saved_member.phone_area_code
+      fill_in "member[phone_local_number]", :with => @saved_member.phone_local_number
     end
     within("#contact_details")do
-      wait_until{
-        fill_in "member[city]", :with => @saved_member.city
-        select_country_and_state(@saved_member.country)
-        fill_in "member[address]", :with => @saved_member.address
-        fill_in "member[zip]", :with => @saved_member.zip
-      }
+      fill_in "member[city]", :with => @saved_member.city
+      select_country_and_state(@saved_member.country)
+      fill_in "member[address]", :with => @saved_member.address
+      fill_in "member[zip]", :with => @saved_member.zip
     end
     page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
     within("#ui-datepicker-div") do
       click_on("#{Time.zone.now.day}")
     end
     within("#payment_details")do
-      wait_until{
-        fill_in "member[last_digits]", :with => @saved_member.active_credit_card.last_digits
-        fill_in "member[notes]", :with => @saved_member.member_notes.first.description
-      }
+      fill_in "member[last_digits]", :with => @saved_member.active_credit_card.last_digits
+      fill_in "member[notes]", :with => @saved_member.member_notes.first.description
     end
 
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(@saved_member.full_name)
-      }
+      assert page.has_content?(@saved_member.full_name)
     end
   end
 
@@ -683,40 +594,32 @@ class MembersSearchTest < ActionController::IntegrationTest
                                        :disposition_type_id => @disposition_type.id)
     member_to_seach = Member.first
     within("#personal_details")do
-      wait_until{
-        fill_in "member[id]", :with => " #{@saved_member.id} "
-        fill_in "member[first_name]", :with => " #{@saved_member.first_name} "
-        fill_in "member[last_name]", :with => " #{@saved_member.last_name} "
-        fill_in "member[email]", :with => " #{@saved_member.email} "
-        fill_in "member[phone_country_code]", :with => " #{@saved_member.phone_country_code} "
-        fill_in "member[phone_area_code]", :with => " #{@saved_member.phone_area_code} "
-        fill_in "member[phone_local_number]", :with => " #{@saved_member.phone_local_number} "
-      }
+      fill_in "member[id]", :with => " #{@saved_member.id} "
+      fill_in "member[first_name]", :with => " #{@saved_member.first_name} "
+      fill_in "member[last_name]", :with => " #{@saved_member.last_name} "
+      fill_in "member[email]", :with => " #{@saved_member.email} "
+      fill_in "member[phone_country_code]", :with => " #{@saved_member.phone_country_code} "
+      fill_in "member[phone_area_code]", :with => " #{@saved_member.phone_area_code} "
+      fill_in "member[phone_local_number]", :with => " #{@saved_member.phone_local_number} "
     end
     within("#contact_details")do
-      wait_until{
-        fill_in "member[city]", :with => " #{@saved_member.city} "
-        select_country_and_state(@saved_member.country)
-        fill_in "member[address]", :with => " #{@saved_member.address} "
-        fill_in "member[zip]", :with => " #{@saved_member.zip} "
-      }
+      fill_in "member[city]", :with => " #{@saved_member.city} "
+      select_country_and_state(@saved_member.country)
+      fill_in "member[address]", :with => " #{@saved_member.address} "
+      fill_in "member[zip]", :with => " #{@saved_member.zip} "
     end
     page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
     within("#ui-datepicker-div") do
       click_on("#{Time.zone.now.day}")
     end
     within("#payment_details")do
-      wait_until{
-        fill_in "member[last_digits]", :with => " #{@saved_member.active_credit_card.last_digits} "
-        fill_in "member[notes]", :with => " #{@saved_member.member_notes.first.description} "
-      }
+      fill_in "member[last_digits]", :with => " #{@saved_member.active_credit_card.last_digits} "
+      fill_in "member[notes]", :with => " #{@saved_member.member_notes.first.description} "
     end
 
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?(@saved_member.full_name)
-      }
+      assert page.has_content?(@saved_member.full_name)
     end
   end
 
@@ -730,20 +633,16 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @member_with_external_id.club.partner.prefix, :club_prefix => @member_with_external_id.club.name)
     assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
     within("#payment_details")do
-      wait_until{
-        fill_in "member[external_id]", :with => @member_with_external_id.external_id
-      }
+      fill_in "member[external_id]", :with => @member_with_external_id.external_id
     end
     click_link_or_button 'Search'
 
     within("#members")do
-      wait_until{
-        assert page.has_content?(@member_with_external_id.status)
-        assert page.has_content?(@member_with_external_id.id.to_s)
-        assert page.has_content?(@member_with_external_id.external_id.to_s)
-        assert page.has_content?(@member_with_external_id.full_name)
-        assert page.has_content?(@member_with_external_id.full_address)
-      }
+      assert page.has_content?(@member_with_external_id.status)
+      assert page.has_content?(@member_with_external_id.id.to_s)
+      assert page.has_content?(@member_with_external_id.external_id.to_s)
+      assert page.has_content?(@member_with_external_id.full_name)
+      assert page.has_content?(@member_with_external_id.full_address)
     end
   end
 
@@ -756,25 +655,19 @@ class MembersSearchTest < ActionController::IntegrationTest
                                      :disposition_type_id => @disposition_type.id)
     member_to_seach = Member.first
     within("#personal_details")do
-      wait_until{
-        fill_in "member[id]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-        fill_in "member[first_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-        fill_in "member[last_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-        fill_in "member[email]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-      }
+      fill_in "member[id]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+      fill_in "member[first_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+      fill_in "member[last_name]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+      fill_in "member[email]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
     end
     within("#contact_details")do
-      wait_until{
-        fill_in "member[city]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-        fill_in "member[address]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-        fill_in "member[zip]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-      }
+      fill_in "member[city]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+      fill_in "member[address]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
+      fill_in "member[zip]", :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?('No records were found.')
-      }
+      assert page.has_content?('No records were found.')
     end
   end
 
@@ -788,16 +681,12 @@ class MembersSearchTest < ActionController::IntegrationTest
                                      :disposition_type_id => @disposition_type.id)
     member_to_seach = Member.first
     within("#personal_details")do
-      wait_until{
-        fill_in "member[first_name]", :with => 'Random text'
-      }
+      fill_in "member[first_name]", :with => 'Random text'
     end
 
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?('No records were found.')
-      }
+      assert page.has_content?('No records were found.')
     end
   end
 
@@ -815,15 +704,11 @@ class MembersSearchTest < ActionController::IntegrationTest
 
     member_to_seach = Member.first
     within("#payment_details")do
-      wait_until{
-        check('member[needs_approval]')
-      }
+      check('member[needs_approval]')
     end
     click_link_or_button 'Search'
     within("#members")do
-      wait_until{
-        assert page.has_content?("#{@saved_member.full_name}")
-      }
+      assert page.has_content?("#{@saved_member.full_name}")
     end
   end
 
@@ -842,15 +727,11 @@ class MembersSearchTest < ActionController::IntegrationTest
     confirm_ok_js
     click_link_or_button 'Approve'
 
-    wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
-    }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     @saved_member.reload
     within("#table_membership_information") do  
-      wait_until{
-        within("#td_mi_status") { assert page.has_content?('provisional') }
-      }
+      within("#td_mi_status") { assert page.has_content?('provisional') }
     end
   end
 
@@ -869,15 +750,11 @@ class MembersSearchTest < ActionController::IntegrationTest
     confirm_ok_js
     click_link_or_button 'Reject'
 
-    wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
-    }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     @saved_member.reload
     within("#table_membership_information") do  
-      wait_until{
-        within("#td_mi_status") { assert page.has_content?('lapsed') }
-      }
+      within("#td_mi_status") { assert page.has_content?('lapsed') }
     end
   end
 
@@ -889,12 +766,10 @@ class MembersSearchTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member,credit_card)
     @saved_member = Member.find_by_email(unsaved_member.email)
-    wait_until{
       assert find_field('input_first_name').value == @saved_member.first_name
       assert find_field('input_last_name').value == @saved_member.last_name
       assert find_field('input_gender').value == I18n.t('activerecord.attributes.member.no_gender')
       assert find_field('input_member_group_type').value == (@saved_member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : @saved_member.member_group_type.name)
-    }
   end
 
   test "create member without type of phone number" do
@@ -905,11 +780,9 @@ class MembersSearchTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member,credit_card)
     @saved_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
-    wait_until{
-      assert find_field('input_first_name').value == @saved_member.first_name
-    }
+    assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload
-    wait_until{ assert_equal(@saved_member.type_of_phone_number, '') }
+    assert_equal(@saved_member.type_of_phone_number, '')
   end
  
   #TODO: Improve test... we should validate that the 'Cancel' button is being disabled.
@@ -917,7 +790,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_member
     cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     click_link_or_button 'Cancel'
     page.execute_script("window.jQuery('#cancel_date').next().click()")
@@ -929,13 +802,12 @@ class MembersSearchTest < ActionController::IntegrationTest
     click_link_or_button 'Cancel member'
 
     @saved_member.reload
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    wait_until{ assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") }    
+    assert find_field('input_first_name').value == @saved_member.first_name
+    assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") 
     # wait_until{ find(:xpath, "//a[@id='sync_cancel' and @disable='disable']") }
 
-    click_link_or_button 'Cancel'
-    sleep 1 
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    click_link_or_button 'Cancel' 
+    assert find_field('input_first_name').value == @saved_member.first_name
   end
 
   # See a member is blacklisted in the search results
@@ -950,7 +822,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     click_link_or_button 'Search'
 
     within("#members")do
-      wait_until{ assert page.has_content?("Lapsed - Blisted") }
+      assert page.has_content?("Lapsed - Blisted")
     end
   end
 end

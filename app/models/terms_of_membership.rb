@@ -11,7 +11,7 @@ class TermsOfMembership < ActiveRecord::Base
 
   acts_as_paranoid
 
-  after_create :setup_defaul_email_templates
+  after_create :setup_default_email_templates
 
   validates :name, :presence => true
   validates :mode, :presence => true
@@ -50,6 +50,10 @@ class TermsOfMembership < ActiveRecord::Base
   def payment_gateway_configuration
     club.payment_gateway_configurations.find_by_mode(mode)
   end
+  
+  def downgradable?
+    self.downgrade_tom_id.to_i > 0
+  end
 
   private
 
@@ -57,7 +61,7 @@ class TermsOfMembership < ActiveRecord::Base
       errors.add :base, :club_payment_gateway_configuration unless self.payment_gateway_configuration
     end
 
-    def setup_defaul_email_templates
+    def setup_default_email_templates
       if development?
         EmailTemplate::TEMPLATE_TYPES.each do |type|
           if type!=:rejection or (type==:rejection and self.needs_enrollment_approval)

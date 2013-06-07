@@ -11,7 +11,13 @@ class MembersControllerTest < ActionController::TestCase
   end
 
   def generate_post_bill_event(amount, description)
-    post :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id, amount: amount, description: description
+    post :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, 
+                                member_prefix: @saved_member.id, amount: amount, description: description
+  end
+
+  def generate_post_manual_bill(amount, payment_type)
+    post :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, 
+                                member_prefix: @saved_member.id, amount: amount, payment_type: payment_type
   end
 
   test "Change Next Bill Date for today" do
@@ -52,7 +58,7 @@ class MembersControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['admin', 'supervisor'].each do |role|
       @agent.update_attribute :roles, [role]
-        generate_post_bill_event(200, "testing billing event")
+      generate_post_bill_event(200, "testing billing event")
       assert_response :success
     end
   end
@@ -71,5 +77,23 @@ class MembersControllerTest < ActionController::TestCase
     generate_post_bill_event(-100, "testing billing event")
     assert_response :success
     assert @response.body.include?("Amount must be greater than 0.")
+  end
+
+  test "should manual bill" do
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    ['admin', 'supervisor', 'representative'].each do |role|
+      @agent.update_attribute :roles, [role]
+      generate_post_manual_bill(200, "cash")
+      assert_response :success
+    end
+  end
+
+  test "should not manual bill" do
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    ['api', 'agency', 'fulfillment_managment'].each do |role|
+      @agent.update_attribute :roles, [role]
+      generate_post_manual_bill(200, "cash")
+      assert_response :unauthorized
+    end
   end
 end

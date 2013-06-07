@@ -95,6 +95,7 @@
         <%= render :partial => 'shared/login_remotely_button', :locals => { use_large_button: true } %>
       </div>
     </div>
+
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
         <% if @current_member.can_bill_membership? and can? :no_recurrent_billing, Member %>
@@ -103,15 +104,17 @@
           <%= link_to I18n.t('buttons.no_recurrent_billing'), "#", :class => "btn btn-large-w btn-info", :disabled => 'disabled', :id => "no_recurrent_bill_btn" %>
         <% end %>
       </div>
-    </div>
-    <div class="row-fluid" style="margin-top: 8px;">
+      <div class="span4">
+        <% if @current_member.can_bill_membership? and can? :manual_billing, Member %>
+          <%= link_to I18n.t('buttons.manual_billing'), member_manual_billing_path, :class => "btn btn-large-w btn-info", :id => "manual_billing_btn" %>
+        <% else %>
+          <%= link_to I18n.t('buttons.manual_billing'), "#", :class => "btn btn-large-w btn-info", :disabled => 'disabled', :id => "manual_billing_btn" %>
+        <% end %>       
+      </div>
       <div class="span4">
       </div>
     </div>
-    <div class="row-fluid" style="margin-top: 8px;">
-      <div class="span4">
-      </div>
-    </div>
+  </div>
 </div>
 
 
@@ -355,7 +358,7 @@
   <% end %>
   <li><a href="#fulfillments" data-toggle="tab">Fulfillments</a></li>
   <li><a href="#communication" data-toggle="tab">Communications</a></li>
-  <% if @current_member.api_member and can? :see_sync_status, Member %>
+  <% if @current_member.has_link_to_api? and can? :see_sync_status, Member %>
     <li><a href="#sync_status" data-toggle="tab" id="sync_status_tab">Sync Status</a></li>
   <% end %>
   <li><a href="#memberships" data-toggle="tab">Memberships</a></li>
@@ -401,7 +404,7 @@
       <%= render :partial => 'communications', :locals => { :communications => @communications} %>
     </div>
   </div>
-  <% if @current_member.api_member and can? :see_sync_status, Member %>
+  <% if @current_member.has_link_to_api? and can? :see_sync_status, Member %>
     <div class="tab-pane" id="sync_status">
       <div class="tab_body_padding">
         <%= render :partial => 'sync_status', :locals => { :member => @current_member} %>
