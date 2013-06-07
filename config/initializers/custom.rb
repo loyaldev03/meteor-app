@@ -4,14 +4,6 @@ require 'clean_find_in_batches'
 require 'csv'
 require 'axlsx'
 
-# require 'exact_target'
-# ExactTarget.configure do |config|
-#   config.username = 'martin@xagax.com'
-#   config.password = 'carla&martin911'
-#   config.logger = Logger.new("#{Rails.root}/log/exact_target.log")
-#   config.base_url = 'https://webservice.test.exacttarget.com/etframework.wsdl'
-# end
-
 ExactTargetSDK.config(:username => 'martin@xagax.com', 
   :password => 'carla&martin911', 
   :endpoint => 'https://webservice.s6.exacttarget.com/Service.asmx',
