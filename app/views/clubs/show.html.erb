@@ -60,22 +60,14 @@
 </p>
 
 
-
-<h3>Pardot</h3>
-<p>
-  <strong><%= model_class.human_attribute_name(:pardot_email) %>:</strong><br>
-  <%= @club.pardot_email.blank? ? "It has no pardot email assosiated" : @club.pardot_email %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:pardot_user_key) %>:</strong><br>
-  <%= @club.pardot_user_key %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:pardot_password) %>:</strong><br>
-  <%= @club.pardot_password %>
-</p>
-
-
+<h3>Marketing Tool attributes</h3>
+<ul>
+  <% @club.marketing_tool_attributes.each do |key,value| %>
+    <li>
+      <strong><%= key %>:</strong>&nbsp;<%= value %>
+    </li>
+  <% end unless @club.marketing_tool_attributes.nil? %>
+</ul>
 
 
 <div class="form-actions">

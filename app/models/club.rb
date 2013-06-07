@@ -37,6 +37,11 @@ class Club < ActiveRecord::Base
 
   DEFAULT_PRODUCT = ['KIT-CARD']
 
+  # marketing_tool_attributes possible keys:
+  # Pardot : pardot_email, pardot_user_key, pardot_password
+  # Exact Target : et_bussines_unit, et_prospect_list, et_members_list
+  serialize :marketing_tool_attributes, JSON
+
   def full_name
     [ partner.name, name ].join(' ')
   end
@@ -50,7 +55,21 @@ class Club < ActiveRecord::Base
   end
 
   def pardot_sync?
-    [self.pardot_email, self.pardot_password, self.pardot_user_key].none?(&:blank?)
+    self.marketing_tool_attributes and 
+    [ 
+      self.marketing_tool_attributes['pardot_email'], 
+      self.marketing_tool_attributes['pardot_password'], 
+      self.marketing_tool_attributes['pardot_user_key']
+    ].none?(&:blank?)
+  end
+
+  def exact_target_sync?
+    self.marketing_tool_attributes and 
+    [ 
+      self.marketing_tool_attributes['et_bussines_unit'], 
+      self.marketing_tool_attributes['et_prospect_list'], 
+      self.marketing_tool_attributes['et_members_list']
+    ].none?(&:blank?)
   end
 
   # Improvements #25771 - Club cash transactions will be managed by Drupal User Points plugin. 

@@ -66,7 +66,9 @@ namespace :members do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      Member.sync_members_to_pardot
+      if defined? Pardot::Member
+        Member.sync_members_to_pardot
+      end
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:sync_members_to_pardot task"
     end
