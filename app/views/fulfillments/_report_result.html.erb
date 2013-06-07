@@ -1,5 +1,5 @@
 <% if @fulfillments %>
-	<table class="table table-bordered table-condensed" id="report_results">
+	<table class="table table-bordered table-condensed tablesorter" id="report_results">
 		<thead>
 		<tr>
 			<td colspan="8">
@@ -10,8 +10,7 @@
 				<%= (link_to t('buttons.export_all_to_xls'), download_xls_fulfillments_path, :class => 'btn btn-primary', :id => "export_all_to_xls_btn" ) if @file %>
 			</td>
 		</tr>
-		</thead>
-		<thead>
+		<tr>
 			<th> <%= t('activerecord.attributes.member.id') %> </th>
 			<th> <%= t('activerecord.attributes.fulfillment.member') %> </th>
 			<th> <%= t('activerecord.attributes.fulfillment.assigned_at') %> </th>
@@ -22,9 +21,10 @@
 			<th> 
 				<%= check_box_tag "fulfillment_select_all", 1, false, :id => 'fulfillment_select_all' %> Select All
 				<% if @status == 'not_processed' %>
-					<%= link_to t('buttons.create_xls_file'), "#", :class => 'btn btn-primary', :id => 'create_xls_file' %>
+					<%= link_to t('buttons.create_xls_file'), "#", :class => 'btn btn-primary', :id => 'create_xls_file'%>
 				<% end %>
 			</th>    
+		</tr>
 		</thead>
 		<tbody>
 			<% if @fulfillments.empty? %>
