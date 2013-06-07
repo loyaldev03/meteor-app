@@ -1,4 +1,8 @@
 defaults: &defaults
+  exact_target:
+    username: martin@xagax.com
+    password: charly-martin2013
+    bussines_unit_for_test: '6177869'
   max_reactivations: 3
   days_to_wait_to_cancel_fulfillments: 2
   next_retry_on_missing_decline: 20.days
@@ -328,6 +332,7 @@ development:
 test:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
+
 
 production:
   <<: *defaults

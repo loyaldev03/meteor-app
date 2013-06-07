@@ -11,19 +11,20 @@
 			</td>
 		</tr>
 		<tr>
+			<th> <%= t('index') %> </th>
 			<th> <%= t('activerecord.attributes.member.id') %> </th>
 			<th> <%= t('activerecord.attributes.fulfillment.member') %> </th>
 			<th> <%= t('activerecord.attributes.fulfillment.assigned_at') %> </th>
 			<th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>   
 			<th> <%= t('activerecord.attributes.fulfillment.product_sku') %> </th>
-			<th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th>    
+			<th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th> 
 			<th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
 			<th> 
 				<%= check_box_tag "fulfillment_select_all", 1, false, :id => 'fulfillment_select_all' %> Select All
 				<% if @status == 'not_processed' %>
 					<%= link_to t('buttons.create_xls_file'), "#", :class => 'btn btn-primary', :id => 'create_xls_file'%>
 				<% end %>
-			</th>    
+			</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -32,8 +33,9 @@
 					<td colspan="8"><div class="alert">No results were found for this filter.</div></td>
 				</tr>
 			<% end %>
-			<% @fulfillments.each do |fulfillment| %>
+			<% @fulfillments.each_with_index do |fulfillment, index| %>
 				<tr>
+					<td> <%= index+1 %></td>
 					<td> <a href="<%= show_member_path(:member_prefix => fulfillment.member.id) %>" > <%= fulfillment.member.id %></a></td>
 					<td> <%= fulfillment.member.full_name %> </td>
 					<td> <%= I18n.l fulfillment.assigned_at, :format => :only_date %> </td>

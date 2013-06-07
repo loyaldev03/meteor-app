@@ -19,6 +19,16 @@ GIT
       nokogiri
 
 GIT
+  remote: git://github.com/stoneacre/exact_target_sdk.git
+  revision: 34990c883913c0040b7c0aadb065bd1c6bc43ca1
+  specs:
+    exact_target_sdk (0.8.0)
+      activemodel (~> 3.0)
+      activesupport (~> 3.0)
+      guid (~> 0.1)
+      savon (<= 0.9.9)
+
+GIT
   remote: https://github.com/brynary/rack-bug.git
   revision: 1e6d33664fb21a5f08836e5d8a9d7bfcc47c8d81
   branch: rails3
@@ -218,6 +228,7 @@ GEM
       net-ssh (>= 2.6.5)
     newrelic_rpm (3.6.2.96)
     nokogiri (1.5.9)
+    nori (1.1.5)
     orm_adapter (0.0.7)
     paperclip (3.4.2)
       activemodel (>= 3.0.0)
@@ -273,6 +284,14 @@ GEM
       railties (~> 3.2.0)
       sass (>= 3.1.10)
       tilt (~> 1.3)
+    savon (0.9.8)
+      akami (~> 1.0)
+      builder (>= 2.1.2)
+      gyoku (>= 0.4.0)
+      httpi (~> 0.9)
+      nokogiri (>= 1.4.0)
+      nori (~> 1.0)
+      wasabi (~> 2.0)
     selenium-webdriver (2.33.0)
       childprocess (>= 0.2.5)
       multi_json (~> 1.0)
@@ -334,6 +353,8 @@ GEM
     uuidtools (2.1.4)
     warden (1.1.1)
       rack (>= 1.0)
+    wasabi (2.3.0)
+      nokogiri (>= 1.4.0)
     websocket (1.0.7)
     will_paginate (3.0.4)
     wirble (0.1.3)
@@ -379,6 +400,7 @@ DEPENDENCIES
   devise (= 2.0.4)
   easy_roles
   encryptor
+  exact_target_sdk!
   factory_girl_rails
   faker
   faraday (= 0.8.5)

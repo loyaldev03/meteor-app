@@ -3,6 +3,11 @@ require 'lyris_service'
 require 'clean_find_in_batches'
 require 'axlsx'
 
+ExactTargetSDK.config(:username => 'martin@xagax.com', 
+  :password => 'carla&martin911', 
+  :endpoint => 'https://webservice.s6.exacttarget.com/Service.asmx',
+  :namespace => 'https://webservice.s6.exacttarget.com/etframework.wsdl')
+
 ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant.log", "a+")  
 ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device.sync = true
 

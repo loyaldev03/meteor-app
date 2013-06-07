@@ -23,6 +23,7 @@ gem 'tinder', '1.9.2'
 # gem "ruby-pardot"
 
 gem 'turnout'
+gem 'exact_target_sdk', github: 'stoneacre/exact_target_sdk'
 
 # Gems used only for assets and not required
 # in production environments by default.
