@@ -596,6 +596,7 @@ function set_product_type_at_fulfillments_index(settings_kit_card_product, setti
 function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message, settings_kit_card_product, settings_others_product){
   $("#report_results").tablesorter({
     headers: { 
+      0: { sorter: false }, 
       7: { sorter: false }, 
       8: { sorter: false } 
     } 
