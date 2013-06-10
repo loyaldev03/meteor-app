@@ -7,6 +7,11 @@ class Notifier < ActionMailer::Base
     mail :to => to, :subject => "Pre bill email to #{email}"
   end
 
+  def manual_payment_pre_bill(email)
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "Manual Payment Pre bill email to #{email}"
+  end
+
   def cancellation(email)
     to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
     mail :to => to, :subject => "cancellation to #{email}"
