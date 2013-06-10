@@ -64,7 +64,9 @@ module Drupal
       end
 
       def generate_token
-        res = simple_connection(true).get TOKEN_PATH
+        res = simple_connection
+        res.headers['Cookie'] = self.cookie
+        res.get TOKEN_PATH
         if res.status == 200
           res.body.strip
         else
@@ -105,18 +107,17 @@ module Drupal
         self.cookie
       end
 
-      def auth_headers(send_cookie = false)
+      def auth_headers
         {
           'Content-Type' => 'application/x-www-form-urlencoded', 
           'Accept'       => 'application/json'
-        }.merge!(send_cookie ? { 'Cookie' => self.cookie } : {})
+        }
       end
 
-      def simple_connection(send_cookie = false)
+      def simple_connection
         @simple_connection ||= Faraday.new(url: @options[:url]) do |http| 
-          http.headers = auth_headers(send_cookie)
+          http.headers = auth_headers
           http.use Drupal::FaradayMiddleware::FullLogger, Drupal.logger
-
           http.adapter :net_http 
         end
       end
