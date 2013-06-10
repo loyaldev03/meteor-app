@@ -64,9 +64,9 @@ module Drupal
       end
 
       def generate_token
-        res = simple_connection
-        res.headers['Cookie'] = self.cookie
-        res.get TOKEN_PATH
+        conn = simple_connection
+        conn.headers['Cookie'] = self.cookie
+        res = conn.get TOKEN_PATH
         if res.status == 200
           res.body.strip
         else
