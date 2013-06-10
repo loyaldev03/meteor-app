@@ -4,6 +4,7 @@ module Drupal
       class AuthError < StandardError; end
       SESSION_PATH = '/api/system/connect'.freeze
       LOGIN_PATH = '/api/user/login'.freeze
+      TOKEN_PATH = '/services/session/token'.freeze
 
       def initialize(app, options)
         super(app)
@@ -20,6 +21,7 @@ module Drupal
         end
 
         env[:request_headers]['Cookie'] = self.cookie
+        env[:request_headers]['X-CSRF-Token'] = self.generate_token
         old_body = env[:body] # lets store the first body. because it will be overwritten after call/token regeneration
 
         time_elapsed = Benchmark.ms do
@@ -33,6 +35,7 @@ module Drupal
           self.regenerate_cookie!
 
           env[:request_headers]['Cookie'] = self.cookie
+          env[:request_headers]['X-CSRF-Token'] = self.generate_token
           env[:body] = old_body
           time_elapsed = Benchmark.ms do
             res = @app.call(env)
@@ -58,6 +61,16 @@ module Drupal
 
       def cookie
         store && store[@options[:url]] && store[@options[:url]][:body]
+      end
+
+      def generate_token
+        res = simple_connection.get TOKEN_PATH
+        if res.status == 200
+          res.body
+        else
+          Drupal.logger.error AuthError.new("HTTP #{res.status} when getting token") 
+          nil
+        end
       end
 
       def cookie_age
