@@ -266,10 +266,6 @@ defaults: &defaults
         length: 
           :minimum: 1
           :maximum: 8
-        numericality:
-          :only_integer: true
-          :allow_nil: true
-          :allow_blank: true
     sets:
       western:
         first_name:

@@ -36,24 +36,22 @@ class MembersClubCashTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
-  # # Remove/Add Club Cash
+  # Remove/Add Club Cash
   # See club cash transaction history (Only Clubs without Drupal domain)
 
-  # test "Message after Club Cash addition" do
-  #   setup_member
+  test "Message after Club Cash addition" do
+    setup_member
 
-  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-  #   within("#table_membership_information"){ click_on 'Add club cash' }
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+    within("#table_membership_information"){ click_on 'Add club cash' }
 
-  #   fill_in 'club_cash_transaction[amount]', :with => 5
-  #   fill_in 'club_cash_transaction[description]', :with => "description"
-  #   click_on 'Save club cash transaction'
-  #   sleep 1
-  #   page.driver.browser.switch_to.alert.accept 
-    # console error: NoMethodError: undefined method `username' for nil:NilClass
-    # /home/pablo/Documents/sac-platform/app/datatables/operations_datatable.rb:14:in `data'
-    # /home/pablo/Documents/sac-platform/app/datatables/datatable.rb:18:in `as_json'
-  # end
+    fill_in 'club_cash_transaction[amount]', :with => 5
+    fill_in 'club_cash_transaction[description]', :with => "description"
+    click_on 'Save club cash transaction'
+    sleep 1
+    page.driver.browser.switch_to.alert.accept 
+    
+  end
 
   test "add club cash amount" do
     setup_member
@@ -257,6 +255,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
       end
     end
     assert @saved_member.club_cash_expire_date == nil
+    @saved_member.current_membership.update_attribute :quota, 12
     @saved_member.bill_membership 
     assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount )
     @saved_member.reload
@@ -289,7 +288,9 @@ class MembersClubCashTest < ActionController::IntegrationTest
     click_link_or_button('Update Member')
     assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload
+    @saved_member.current_membership.update_attribute :quota, 12
     @saved_member.bill_membership 
+    puts @saved_member.club_cash_amount
     assert_equal(@saved_member.club_cash_amount, 200 )
     @saved_member.reload
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -322,14 +323,20 @@ class MembersClubCashTest < ActionController::IntegrationTest
     end
   end
 
+  # Error:
+  # RuntimeError: Object must be a Date, DateTime or Time object. nil given.
   test "Add club cash amount using the amount on member TOM enrollment amount = 0" do
+    FactoryGirl.create(:batch_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:complete_enrollment_info_with_cero_amount)
     create_member_throught_sloop(enrollment_info, @terms_of_membership_with_gateway)
     @saved_member = Member.last
+    puts @response.body
+    Operation.all.each{|x| puts "#{x.created_by_id} - #{x.description}"}
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
         assert page.has_content?('0.0')
