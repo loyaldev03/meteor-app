@@ -38,12 +38,16 @@ class Admin::AgentsController < ApplicationController
   def update
     @clubs = Club.all
     cleanup_for_update!(params[:agent])
-    if @agent.update_attributes(params[:agent])
+    if params[:agent][:club_roles_attributes].present? and not params[:agent][:roles].blank?
+      flash.now[:error] = 'Cannot set both global and club roles at the same time'
+      render :action => "edit" 
+    elsif @agent.update_attributes(params[:agent])
       redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') 
     else
       render :action => "edit" 
     end
   end
+
 
   # DELETE /agents/1
   def destroy
@@ -68,9 +72,13 @@ class Admin::AgentsController < ApplicationController
         end
         if hash[:club_roles_attributes].present?
           hash[:club_roles_attributes].reject! { |k,v| !v[:_destroy] && (v[:role].blank? || v[:club_id].blank?) }
+        end        
+        if hash[:roles].blank?
+          hash[:roles] = []
         end
       end
     end
+
   
 
 end

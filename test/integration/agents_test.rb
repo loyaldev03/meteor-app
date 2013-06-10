@@ -257,4 +257,31 @@ class AgentsTest < ActionController::IntegrationTest
 
     page.has_content?("Your password was changed successfully. You are now signed in.")
   end
+
+  test "create agent with global role and them remove that role." do
+    setup_environment
+    visit new_admin_agent_path
+    unsaved_agent = FactoryGirl.build(:agent)
+
+    fill_in 'agent[email]', :with => unsaved_agent.email
+    fill_in 'agent[username]', :with => unsaved_agent.username
+    fill_in 'agent[password]', :with => unsaved_agent.password
+    fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
+    check('agent_roles_admin')
+
+    click_link_or_button 'Create Agent'
+
+    assert page.has_content?("Agent was successfully created")
+    click_link_or_button 'Edit'
+    uncheck('agent_roles_admin')
+
+    click_link_or_button 'Update Agent'
+    assert page.has_content?("Agent was successfully updated")
+
+    within("#global_roles") do
+      assert page.has_no_content?("admin")
+    end
+    saved_agent = Agent.find_by_username(unsaved_agent.username)
+    assert saved_agent.roles.empty?
+  end 
 end
