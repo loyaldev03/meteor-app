@@ -8,6 +8,7 @@ class EmailTemplate < ActiveRecord::Base
     :cancellation, # sent when member changes its status to lapsed
     :rejection, # sent when member is in applied status, and it is rejected by one of our agents
     :prebill, # sent 7 days before we bill member
+    :manual_payment_prebill # sent 14 days before next billing day.
     :refund, # sent when CS does a refund.
     :birthday, # sent if birthday is on enrollment_info
     :pillar, # emails sent after join date and active/prov status. they use days_after_join_date attribute

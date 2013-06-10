@@ -670,7 +670,7 @@ class Member < ActiveRecord::Base
   end
 
   def send_pre_bill
-    Communication.deliver!(:prebill, self) if can_bill_membership?
+    Communication.deliver!( self.manual_payment ? :manual_payment_prebill : :prebill, self) if can_bill_membership?
   end
 
   def send_fulfillment
@@ -1121,10 +1121,13 @@ class Member < ActiveRecord::Base
   end
 
   def self.send_prebill
-    base = Member.where([" date(next_retry_bill_date) = ? AND recycled_times = 0 AND terms_of_memberships.installment_amount != 0.0", 
-      (Time.zone.now + 7.days).to_date ]).includes(:current_membership => :terms_of_membership) 
+    base = Member.where([" (date(next_retry_bill_date) = ? AND recycled_times = 0) 
+                           OR (date(next_retry_bill_date) = ? AND manual_payment = true) 
+                           AND terms_of_memberships.installment_amount != 0.0", 
+    (Time.zone.now + 7.days).to_date, (Time.zone.now + 14.days).to_date ]).includes(:current_membership => :terms_of_membership) 
+
     base.find_in_batches do |group|
-      group.to_enum.with_index.each do |member,index| 
+      group.each_with_index do |member,index| 
         tz = Time.zone.now
         begin
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
