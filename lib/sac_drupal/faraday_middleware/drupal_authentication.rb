@@ -64,9 +64,11 @@ module Drupal
       end
 
       def generate_token
-        res = simple_connection.get TOKEN_PATH
+        conn = simple_connection
+        conn.headers['Cookie'] = self.cookie
+        res = conn.get TOKEN_PATH
         if res.status == 200
-          res.body
+          res.body.strip
         else
           Drupal.logger.error AuthError.new("HTTP #{res.status} when getting token") 
           nil
@@ -116,7 +118,6 @@ module Drupal
         @simple_connection ||= Faraday.new(url: @options[:url]) do |http| 
           http.headers = auth_headers
           http.use Drupal::FaradayMiddleware::FullLogger, Drupal.logger
-
           http.adapter :net_http 
         end
       end
