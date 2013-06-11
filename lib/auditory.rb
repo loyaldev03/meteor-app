@@ -22,7 +22,7 @@ class Auditory
     unless ["test","development"].include? Rails.env
       ZendeskAPI::Ticket.create(ZENDESK_API_CLIENT, 
         :subject => "[#{Rails.env}] #{error}", 
-        :comment => { :value => message.to_s +"\nBacktrace:\n "+caller.join("\n") + "\n\n\n Parameters: " + params.inspect },  
+        :comment => { :value => message.to_s + "\nBacktrace:\n " + caller.join("\n") + "\n\n\n Parameters: " + params.inspect },  
         :submitter_id => ZENDESK_API_CLIENT.current_user.id, 
         :assignee_id => ZENDESK_API_CLIENT.current_user.id, 
         :type => "incident",
