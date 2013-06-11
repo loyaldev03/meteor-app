@@ -115,7 +115,7 @@ module Drupal
       end
 
       def simple_connection
-        @simple_connection ||= Faraday.new(url: @options[:url]) do |http| 
+        Faraday.new(url: @options[:url]) do |http| 
           http.headers = auth_headers
           http.use Drupal::FaradayMiddleware::FullLogger, Drupal.logger
           http.adapter :net_http 
