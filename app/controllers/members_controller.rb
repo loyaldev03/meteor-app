@@ -279,7 +279,7 @@ class MembersController < ApplicationController
     if am
       am.save!(force: true)
       if @current_member.last_sync_error_at
-        message = "Synchronization failed: #{@current_member.last_sync_error.html_safe}"
+        message = "Synchronization failed: #{@current_member.last_sync_error ? @current_member.last_sync_error.html_safe : ''}"
       else
         message = "Member synchronized"
       end
