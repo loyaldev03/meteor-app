@@ -741,3 +741,10 @@ function save_the_sale_functions(){
     startAjaxLoader();
   });
 }
+
+function recover_member_functions(){
+  $('form').submit( function(event) {
+  $('#recover_button').attr('disabled', 'disabled');
+    startAjaxLoader();
+  }); 
+}
