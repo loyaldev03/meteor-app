@@ -1308,7 +1308,7 @@ class Member < ActiveRecord::Base
       end
       schedule_renewal(manual)
       assign_club_cash
-      message = "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}"
+      message = (manual ? "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}" : "Member billed successfully $#{trans.amount} Transaction id: #{trans.id}" )
       Auditory.audit(nil, trans, message, self, operation_type)
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
     end
