@@ -83,13 +83,13 @@ class MembersBillTest < ActionController::IntegrationTest
   ############################################################
 
 
-  # test "Change Next Bill Date" do
-  #   setup_member(nil,true)
-  #   bill_member(@saved_member,false,nil,false)
-  #   next_bill_date = Time.zone.now+1.day
-  #   change_next_bill_date(next_bill_date)
-  #   assert page.has_content?("Next bill date changed to #{next_bill_date.to_date}")
-  # end
+  test "Change Next Bill Date" do
+    setup_member(nil,true)
+    bill_member(@saved_member,false,nil,false)
+    next_bill_date = Time.zone.now+1.day
+    change_next_bill_date(next_bill_date)
+    assert page.has_content?("Next bill date changed to #{next_bill_date.to_date}")
+  end
 
   test "See HD for 'Soft recycle limit'" do
     setup_member
@@ -111,7 +111,6 @@ class MembersBillTest < ActionController::IntegrationTest
       @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
       answer = @saved_member.bill_membership
       recycle_time = recycle_time+1
-      puts recycle_time
       @saved_member.reload
       visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 

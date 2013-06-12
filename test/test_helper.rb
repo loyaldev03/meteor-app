@@ -326,6 +326,7 @@ module ActionController
       assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date )
     end
 
+    within(".nav-tabs"){ click_on 'Operations' }
     within("#operations") do
       assert page.has_selector?("#operations_table")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
