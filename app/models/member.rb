@@ -1323,7 +1323,7 @@ class Member < ActiveRecord::Base
 
     def cancellation
       self.cancel_member_at_remote_domain
-      if (Time.zone.now.to_date - join_date.to_date).to_i < Settings.days_to_wait_to_cancel_fulfillments
+      if (Time.zone.now.to_date - join_date.to_date).to_i <= Settings.days_to_wait_to_cancel_fulfillments
         fulfillments.where_cancellable.each do |fulfillment| 
           former_status = fulfillment.status
           fulfillment.set_as_canceled
