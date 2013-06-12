@@ -818,7 +818,7 @@ class Member < ActiveRecord::Base
             answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
             answer[:errors] = { :amount => "Club cash amount is greater that member's actual club cash." }
           end
-        else
+        elsif not api_id.nil?
           Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
           message = last_sync_error || "Club cash processed at drupal correctly."
           if self.last_sync_error.nil?
