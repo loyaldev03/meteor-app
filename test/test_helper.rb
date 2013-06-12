@@ -400,10 +400,9 @@ module ActionController
     fill_in 'club_cash_transaction[amount]', :with => amount
     fill_in 'club_cash_transaction[description]', :with => description
     click_on 'Save club cash transaction'
-
     if validate
       within('.nav-tabs'){ click_on 'Operations' }
-      within("#operations_table"){assert page.has_content?("#{amount.to_f.abs} club cash was successfully #{amount>0 ? 'added' : 'deducted'}. Concept: #{description}")}
+      within("#operations_table"){assert page.has_content?("#{amount.to_f.abs} club cash was successfully #{amount>0 ? 'added' : 'deducted'}.. Concept: #{description}")}
       within('.nav-tabs'){ click_on 'Club Cash' }
       within("#td_mi_club_cash_amount") { assert page.has_content?((new_amount).to_s) }
     end

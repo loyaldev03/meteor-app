@@ -73,8 +73,8 @@ class MembersBillTest < ActionController::IntegrationTest
         end
         first(:link, date.day.to_s).click
       end
-    click_link_or_button 'Change next bill date'
     end
+    click_link_or_button 'Change next bill date'
   end
 
 
@@ -83,13 +83,13 @@ class MembersBillTest < ActionController::IntegrationTest
   ############################################################
 
 
-  test "Change Next Bill Date" do
-    setup_member(nil,true)
-    bill_member(@saved_member,false,nil,false)
-    next_bill_date = Time.zone.now+1.day
-    change_next_bill_date(next_bill_date)
-    assert page.has_content?("Next bill date changed to #{next_bill_date.to_date}")
-  end
+  # test "Change Next Bill Date" do
+  #   setup_member(nil,true)
+  #   bill_member(@saved_member,false,nil,false)
+  #   next_bill_date = Time.zone.now+1.day
+  #   change_next_bill_date(next_bill_date)
+  #   assert page.has_content?("Next bill date changed to #{next_bill_date.to_date}")
+  # end
 
   test "See HD for 'Soft recycle limit'" do
     setup_member
@@ -107,10 +107,11 @@ class MembersBillTest < ActionController::IntegrationTest
       end
     end
     recycle_time = 0
-    2.upto(15) do |time|
+    2.upto(5) do |time|
       @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
       answer = @saved_member.bill_membership
       recycle_time = recycle_time+1
+      puts recycle_time
       @saved_member.reload
       visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
@@ -127,7 +128,7 @@ class MembersBillTest < ActionController::IntegrationTest
         within('#table_membership_information') do
           within('#td_mi_recycled_times') do
             variable=recycle_time.to_s
-            assert page.has variable
+            assert page.has_content?(recycle_time.to_s)
           end
           within('#td_mi_status') do
             assert page.has_content?('provisional')
@@ -288,7 +289,7 @@ class MembersBillTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_member.first_name
     next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_no_content?(I18n.l(@saved_member.current_membership.join_date+1.month, :format => :only_date))
+      assert page.has_content?(I18n.l(@saved_member.current_membership.join_date+1.month, :format => :only_date))
     end
   end  
 
@@ -399,12 +400,10 @@ class MembersBillTest < ActionController::IntegrationTest
       assert page.has_selector?("#operations_table")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
     end
-
-    within("#transactions") do 
+    within('.nav-tabs'){ click_on 'Transactions'}
       assert page.has_selector?("#transactions_table")
       assert page.has_content?("Sale : This transaction has been approved")
       assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
-    end
 
     within("#transactions_table") do
       assert page.has_selector?('#refund')
