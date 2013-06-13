@@ -202,10 +202,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member(false)
 
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    created_member = create_member(unsaved_member,nil,nil,true)
+    created_member = create_member(unsaved_member,nil,@terms_of_membership_with_gateway.name,true)
 
     validate_view_member_base(created_member)
-
     within(".nav-tabs"){ click_on 'Operations' }
     within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
   end
@@ -261,8 +260,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
         assert page.has_content?("city: can't be blank,is invalid"), "Failure on city validation message"
         assert page.has_content?("zip: can't be blank,The zip code is not valid for the selected country."), "Failure on zip validation message"
     end
-
-
   end
 
   # TODO: FIX THIS TEST!
@@ -403,15 +400,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   test "create member without phone number" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id, 
-                                        :phone_country_code => nil, :phone_area_code => nil, :phone_local_number => nil)
-
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id, :phone_country_code => nil, :phone_area_code => nil, :phone_local_number => nil)
     fill_in_member(unsaved_member)
-
     within("#error_explanation") do
-        assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_country_code validation message"
-        assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
-        assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
+        assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)")
+        assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)")
+        assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)")
     end
   end
 
@@ -860,7 +854,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
   end 
 
-  #Check active email - It is send it by CS inmediate
+  # Check active email - It is send it by CS inmediate
   test "Check active email" do
     setup_member(false)
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
@@ -1154,14 +1148,13 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert page.has_content?('There was an error with your credit card information. Please verify your information and resubmit. {:number=>["is required"]}')
   end
 
-  # Remove/Add Club Cash on a member with lifetime TOM
+  # # Remove/Add Club Cash on a member with lifetime TOM
   test "Create a new member in the CS using the Lifetime TOM" do
     setup_member(false)
     @lifetime_terms_of_membership = FactoryGirl.create(:life_time_terms_of_membership, :club_id => @club.id)
 
     unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
     @saved_member = create_member(unsaved_member, nil, @lifetime_terms_of_membership.name, true)
-
     validate_view_member_base(@saved_member)
     add_club_cash(@saved_member, 10, "Generic description",true)
   end
