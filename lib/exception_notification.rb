@@ -13,6 +13,7 @@ class ExceptionNotifier
     def notify_exception(exception, options={})
       return if ignored_exception?(options[:ignore_exceptions], exception)
       env = options[:env]
+      Rails.logger.error exception
       Auditory.report_issue("#{env['action_controller.instance']}", exception, { :request => ActionDispatch::Request.new(env), :backtrace => exception.backtrace })
     end
 
@@ -31,12 +32,10 @@ class ExceptionNotifier
     @options = {}
     @options[:ignore_crawlers]    = options.delete(:ignore_crawlers) || []
     @options[:ignore_if]          = options.delete(:ignore_if) || lambda { |env, e| false }
-    Rails.logger.error "hola"
   end
 
   def call(env)
     @app.call(env)
-    Rails.logger.error "por aca pase"
   rescue Exception => exception
     options = @options.dup
 
