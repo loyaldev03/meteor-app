@@ -158,7 +158,7 @@ def load_enrollment_transactions
         begin
           tz = Time.now.utc
           @log.info "  * processing Enrollment Auth response ##{response.id}"
-          @member = response.member
+          @member = authorization.member
           unless @member.nil?
             transaction = PhoenixTransaction.new
             transaction.member_id = @member.id
