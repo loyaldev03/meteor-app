@@ -400,12 +400,11 @@ class MembersBillTest < ActionController::IntegrationTest
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
     end
     within('.nav-tabs'){ click_on 'Transactions'}
-      assert page.has_selector?("#transactions_table")
-      assert page.has_content?("Sale : This transaction has been approved")
-      assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
-
-    within("#transactions_table") do
-      assert page.has_selector?('#refund')
+      within("#transactions_table") do
+        assert page.has_selector?('#refund')
+        assert page.has_content?("Sale : This transaction has been approved")
+        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
+      end
     end
   end 
 
