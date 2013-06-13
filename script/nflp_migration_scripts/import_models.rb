@@ -1,31 +1,20 @@
 # 1- Get access to phoenix, billing_component, customer_services and prospect databases
 # Devel database
-# update onmc_billing.members set imported_at = NULL where imported_at IS NOT NULL;
-# update onmc_billing.chargebacks set imported_at = NULL where imported_at IS NOT NULL;
-# update onmc_billing.enrollment_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
-# update onmc_billing.membership_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
-# update onmc_customer_service.operations set imported_at = NULL where imported_at IS NOT NULL;
-# update onmc_customer_service.notes set imported_at = NULL where imported_at IS NOT NULL;
-# update onmc_prospects.prospects set imported_at = NULL where imported_at IS NOT NULL;
+# update membership_component.members set imported_at = NULL where imported_at IS NOT NULL;
+# update membership_component.chargebacks set imported_at = NULL where imported_at IS NOT NULL;
+# update membership_component.enrollment_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
+# update membership_component.membership_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
+# update customerservice.operations set imported_at = NULL where imported_at IS NOT NULL;
+# update customerservice.notes set imported_at = NULL where imported_at IS NOT NULL;
+# update prospect_component.prospects set imported_at = NULL where imported_at IS NOT NULL;
 # production database
-# update billingcomponent_production.members set imported_at = NULL where imported_at IS NOT NULL;
-# update billingcomponent_production.chargebacks set imported_at = NULL where imported_at IS NOT NULL;
-# update billingcomponent_production.enrollment_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
-# update billingcomponent_production.membership_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
-# update prospectcomponent.prospects set imported_at = NULL where imported_at IS NOT NULL;
-# update customerservice3.operations set imported_at = NULL where imported_at IS NOT NULL;
-# update customerservice3.notes set imported_at = NULL where imported_at IS NOT NULL;
-# phoenix database
-# use sac_production;
-# truncate credit_cards;
-# truncate enrollment_infos;
-# truncate prospect;
-# truncate fulfillments;
-# truncate members;
-# truncate memberships;
-# truncate member_notes;
-# truncate operations;
-# truncate transactions;
+# update membership_component.members set imported_at = NULL where imported_at IS NOT NULL;
+# update membership_component.chargebacks set imported_at = NULL where imported_at IS NOT NULL;
+# update membership_component.enrollment_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
+# update membership_component.membership_auth_responses set imported_at = NULL where imported_at IS NOT NULL;
+# update customerservice.operations set imported_at = NULL where imported_at IS NOT NULL;
+# update customerservice.notes set imported_at = NULL where imported_at IS NOT NULL;
+# update prospect_component.prospects set imported_at = NULL where imported_at IS NOT NULL;
 ##
 # 2- Update members already imported and Load new members 
 #     ruby script/custom/import_members.rb  
@@ -39,9 +28,7 @@
 # 5- Import transactions.
 #     ruby script/custom/import_transactions.rb  
 #
-# 6- Import .
-#     ruby script/custom/import_migration_day.rb  
-#
+
 
 
 require 'rubygems'
@@ -54,7 +41,7 @@ require 'json'
 
 CLUB = 6 # NFLP
 DEFAULT_CREATED_BY = 1 # batch
-PAYMENT_GW_CONFIGURATION_LITLE = 6
+PAYMENT_GW_CONFIGURATION_LITLE = 8 
 TEST_EMAIL = false # if true email will be replaced with a fake one
 USE_PROD_DB = false
 TIMEZONE = 'Eastern Time (US & Canada)'
@@ -444,8 +431,7 @@ def new_prospect(object, campaign, tom_id, created_at)
   phoenix.city = object.city
   phoenix.state = object.state
   phoenix.zip = object.zip
-  # TODO: falta agregar en la DB. pedido a diego 24/05
-  # phoenix.country = object.country
+  phoenix.country = object.country
   phoenix.email = object.email_to_import
   phoenix.phone_country_code = object.phone_country_code
   phoenix.phone_area_code = object.phone_area_code
@@ -467,8 +453,7 @@ def new_prospect(object, campaign, tom_id, created_at)
   phoenix.campaign_medium_version = campaign.campaign_medium_version
   phoenix.preferences = JSON.generate({ :old_id => object.id })
   phoenix.referral_parameters = JSON.generate({})
-  # TODO: falta agregar en la DB. pedido a diego 24/05
-  # phoenix.gender = object.gender
+  phoenix.gender = object.gender
   phoenix.save!
   phoenix
 end
