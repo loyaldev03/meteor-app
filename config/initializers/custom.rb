@@ -1,4 +1,6 @@
 require 'auditory'
+require 'exception_notification'
+SacPlatform::Application.config.middleware.use ExceptionNotifier
 require 'lyris_service'
 require 'clean_find_in_batches'
 require 'axlsx'
