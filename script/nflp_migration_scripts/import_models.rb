@@ -41,9 +41,9 @@ require 'json'
 
 CLUB = 6 # NFLP
 DEFAULT_CREATED_BY = 1 # batch
-PAYMENT_GW_CONFIGURATION_LITLE = 8 
-TEST_EMAIL = false # if true email will be replaced with a fake one
 USE_PROD_DB = false
+PAYMENT_GW_CONFIGURATION_LITLE = (USE_PROD_DB ? 8 : 6)
+TEST_EMAIL = false # if true email will be replaced with a fake one
 TIMEZONE = 'Eastern Time (US & Canada)'
 
 CREDIT_CARD_NULL = "a"
@@ -398,7 +398,7 @@ def get_campaign_and_tom_id(cid)
   @campaign = BillingCampaign.find_by_id(cid)
   @tom_id = nil
   if not @campaign.nil? and @campaign.tom_id.to_i > 0
-    @tom_id = @campaign.tom_id.to_i + 18
+    @tom_id = @campaign.tom_id.to_i + 46
   end
 end
 
