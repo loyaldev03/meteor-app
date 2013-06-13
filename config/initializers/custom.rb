@@ -1,6 +1,6 @@
 require 'auditory'
 require 'exception_notification'
-SacPlatform::Application.config.middleware.use ExceptionNotifier
+SacPlatform::Application.config.middleware.use ExceptionNotifier if ['production', 'staging', 'prototype'].include?(Rails.env)
 require 'lyris_service'
 require 'clean_find_in_batches'
 require 'axlsx'
