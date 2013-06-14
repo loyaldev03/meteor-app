@@ -94,7 +94,7 @@ module Drupal
           }
         else
           {
-            last_sync_error: res.body.class == Hash ? res.body["form_errors"] : res.body,
+            last_sync_error: res.body.class == Hash ? res.body["form_errors"].inspect : res.body,
             last_sync_error_at: Time.now,
             sync_status: "with_error"
           }
