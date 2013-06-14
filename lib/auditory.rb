@@ -20,14 +20,22 @@ class Auditory
   def self.report_issue(error = "Special Error", message = '', params = {})
     # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)
     unless ["test","development"].include? Rails.env
-      ZendeskAPI::Ticket.create(ZENDESK_API_CLIENT, 
-        :subject => "[#{Rails.env}] #{error}", 
-        :comment => { :value => message.to_s + "\nBacktrace:\n " + caller.join("\n") + "\n\n\n Parameters: " + params.inspect },  
+      comment = message.to_s + "\nBacktrace:\n " + caller.join("\n").to_s + "\n\n\n Parameters: " + params.inspect
+      temp = File.open("error_description.txt", 'w+') 
+      temp.write comment
+
+      ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT, 
+        :subject => "[#{Rails.env}] #{error}",
+        :comment => { :value => comment.truncate(10000) },  
         :submitter_id => ZENDESK_API_CLIENT.current_user.id, 
         :assignee_id => ZENDESK_API_CLIENT.current_user.id, 
         :type => "incident",
         :tags => "support-ruby",
         :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
+
+      ticket.comment.uploads << "error_description.txt"
+      ticket.save
+      temp.close
     end
   end
 end
