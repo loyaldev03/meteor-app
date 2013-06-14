@@ -38,11 +38,11 @@ def set_member_data(phoenix, member)
   phoenix.phone_country_code = member.phone_country_code
   phoenix.phone_area_code = member.phone_area_code
   phoenix.phone_local_number = member.phone_local_number
-  # TODO: falta agregar en la DB. pedido a diego 24/05
-  # phoenix.reactivation_times = member.phoenix_reactivations
+  phoenix.reactivation_times = member.phoenix_reactivations
   phoenix.preferences = JSON.generate({  })
   phoenix.gender = member.gender
-  phoenix.blacklisted = member.blacklisted
+  phoenix.blacklisted = false
+  phoenix.external_id = member.phoenix_external_id
   phoenix.api_id = member.api_id
   phoenix.club_cash_expire_date = nil
   phoenix.club_cash_amount = 0
@@ -114,11 +114,19 @@ end
 
 # 2- import new members.
 def add_new_members
+  # First import all the actives members
   BillingMember.where(" imported_at IS NULL and IFNULL(is_prospect,0)=0 " +
       " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date_time IS NOT NULL " +
-      " AND phoenix_status IS NOT NULL AND phoenix_email IS NOT NULL " +
+      " AND phoenix_status IS NOT NULL AND phoenix_status != 'lapsed' AND phoenix_email IS NOT NULL " +
       " AND credit_card_token IS NOT NULL " +
       "").find_in_batches do |group|
+
+  # Then import all the inactive members
+  # BillingMember.where(" imported_at IS NULL and IFNULL(is_prospect,0)=0 " +
+  #     " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date_time IS NOT NULL " +
+  #     " AND phoenix_status IS NOT NULL AND phoenix_status = 'lapsed' AND phoenix_email IS NOT NULL " +
+  #     " AND credit_card_token IS NOT NULL " +
+  #     "").find_in_batches do |group|
 
     puts "cant #{group.count}"
     group.each do |member| 
@@ -162,8 +170,6 @@ def add_new_members
         # create Membership data
         set_membership_data(@tom_id, member)
 
-        blacklist_ccs(member, phoenix)
-
         if member.phoenix_status == 'lapsed'
           remove_fulfillment
         else
@@ -183,12 +189,6 @@ def add_new_members
   end
 end
 
-def blacklist_ccs(member, phoenix)
-  if member.blacklisted
-    ccs = PhoenixCreditCard.find_all_by_member_id_and_blacklisted(phoenix.id, false)
-    ccs.each {|s| s.update_attribute :blacklisted, true }
-  end  
-end
 
 def fill_credit_card(phoenix_cc, member, phoenix)
   phoenix_cc.token = member.credit_card_token
@@ -202,6 +202,5 @@ def fill_credit_card(phoenix_cc, member, phoenix)
 end
 
 
-# update_members
 add_new_members
 
