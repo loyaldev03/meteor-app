@@ -326,6 +326,7 @@ module ActionController
       assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date )
     end
 
+    within(".nav-tabs"){ click_on 'Operations' }
     within("#operations") do
       assert page.has_selector?("#operations_table")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
@@ -400,7 +401,6 @@ module ActionController
     fill_in 'club_cash_transaction[amount]', :with => amount
     fill_in 'club_cash_transaction[description]', :with => description
     click_on 'Save club cash transaction'
-
     if validate
       within('.nav-tabs'){ click_on 'Operations' }
       within("#operations_table"){assert page.has_content?("#{amount.to_f.abs} club cash was successfully #{amount>0 ? 'added' : 'deducted'}. Concept: #{description}")}

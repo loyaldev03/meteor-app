@@ -26,10 +26,10 @@ class ClubTest < ActionController::IntegrationTest
     attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
     check('club[requires_external_id]')
     select('application', :from => 'club[theme]')
-    assert_difference('Club.count') do
+    assert_difference('Club.count', 1) do
       click_link_or_button 'Create Club'
+      assert page.has_content?("The club #{unsaved_club.name} was successfully created")
     end
-    assert page.has_content?("The club #{unsaved_club.name} was successfully created")
   end
 
 
