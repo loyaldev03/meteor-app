@@ -418,9 +418,21 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal active_member.next_retry_bill_date.to_date, (Time.zone.now + eval(Settings.next_retry_on_missing_decline)).to_date, "Next retry bill date incorrect"
     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
     assert_equal trans.operation_type, Settings.operation_types.membership_billing_without_decline_strategy
-    assert_equal trans.transaction_type, 'sale'     
+    assert_equal trans.transaction_type, 'sale' 
   end
-  ############################################
+
+  test "Billing declined, but there is no decline rule and limit is reached. Send email" do 
+    active_merchant_stubs_store
+    active_member = create_active_member(@terms_of_membership)
+    active_member.update_attribute :recycled_times, 5
+    active_merchant_stubs("34234", "decline stubbed", false) 
+    amount = @terms_of_membership.installment_amount
+    answer = active_member.bill_membership
+    active_member.reload
+    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+    assert_equal trans.operation_type, Settings.operation_types.membership_billing_without_decline_strategy_limit
+    assert_equal trans.transaction_type, 'sale' 
+  end
 
   # TODO: how do we stub faraday?
   test "Chargeback processing should create transaction, blacklist and cancel the member" do
