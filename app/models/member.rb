@@ -1067,6 +1067,12 @@ class Member < ActiveRecord::Base
             end
           end
         end
+      else
+        member.last_sync_error = nil
+        member.last_sync_error_at = nil
+        member.last_synced_at = nil
+        member.sync_status = "not_synced"
+        member.save
       end
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
