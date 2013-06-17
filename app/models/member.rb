@@ -43,6 +43,8 @@ class Member < ActiveRecord::Base
   after_destroy :cancel_member_at_remote_domain
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
+  after_create :after_marketing_tool_sync
+
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
@@ -1302,6 +1304,11 @@ class Member < ActiveRecord::Base
   end
   handle_asynchronously :desnormalize_preferences
 
+  def marketing_tool_sync
+    self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
+  end
+  handle_asynchronously :marketing_tool_sync
+
   private
     def schedule_renewal(manual = false)
       if manual or (terms_of_membership.monthly? and self.recycled_times > 1) 
@@ -1470,4 +1477,9 @@ class Member < ActiveRecord::Base
         end
       end
     end
+
+    def after_marketing_tool_sync
+      marketing_tool_sync
+    end
+
 end
