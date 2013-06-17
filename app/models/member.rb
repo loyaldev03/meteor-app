@@ -39,11 +39,11 @@ class Member < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
 
-  after_update 'after_save_sync_to_remote_domain(:update)'
+  after_update :after_save_sync_to_remote_domain
   after_destroy :cancel_member_at_remote_domain
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
-  after_create :after_marketing_tool_sync
+  after_save :after_marketing_tool_sync
 
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
@@ -56,7 +56,7 @@ class Member < ActiveRecord::Base
     Auditory.report_issue("Member:account_cancel:sync", e, { :member => self.inspect })
   end
 
-  def after_save_sync_to_remote_domain(type)
+  def after_save_sync_to_remote_domain
     unless @skip_api_sync || api_member.nil?
       api_member.save!
     end
