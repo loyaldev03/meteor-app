@@ -21,7 +21,7 @@ class Auditory
     # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)
     unless ["test","development"].include? Rails.env
       comment = message.to_s + "\nBacktrace:\n " + caller.join("\n").to_s + "\n\n\n Parameters: " + params.inspect
-      temp = File.open("error_description.txt", 'w+') 
+      temp = File.open("/tmp/error_description_#{Time.zone.now.to_i}.txt", 'w+') 
       temp.write comment
 
       ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT, 
