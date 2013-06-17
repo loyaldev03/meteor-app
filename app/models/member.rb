@@ -1057,7 +1057,12 @@ class Member < ActiveRecord::Base
     tz = Time.zone.now
     base.to_enum.with_index.each do |member,index|
       Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-      member.update_attribute :api_id, nil
+      member.api_id = nil 
+      member.last_sync_error = nil
+      member.last_sync_error_at = nil
+      member.last_synced_at = nil
+      member.sync_status = "not_synced"
+      member.save
       unless member.lapsed?
         api_m = member.api_member
         unless api_m.nil?
@@ -1067,12 +1072,6 @@ class Member < ActiveRecord::Base
             end
           end
         end
-      else
-        member.last_sync_error = nil
-        member.last_sync_error_at = nil
-        member.last_synced_at = nil
-        member.sync_status = "not_synced"
-        member.save
       end
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
