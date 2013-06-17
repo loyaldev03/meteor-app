@@ -7,10 +7,10 @@ module Pardot
     module InstanceMethods
       def pardot
         unless @pardot_client
-          unless [self.pardot_email, self.pardot_password, self.pardot_user_key].all?
+          unless [self.marketing_tool_attributes['pardot_email'], self.marketing_tool_attributes['pardot_password'], self.marketing_tool_attributes['pardot_user_key']].all?
             raise 'no pardot credentials configured'
           end
-          @pardot_client = Pardot::Client.new self.pardot_email, self.pardot_password, self.pardot_user_key
+          @pardot_client = Pardot::Client.new self.marketing_tool_attributes['pardot_email'], self.marketing_tool_attributes['pardot_password'], self.marketing_tool_attributes['pardot_user_key']
         end
         @pardot_client
       end

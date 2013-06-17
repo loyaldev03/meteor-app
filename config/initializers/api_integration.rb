@@ -20,4 +20,5 @@ SacExactTarget.enable_integration! unless Rails.env.test?
 ExactTargetSDK.config(:username => Settings.exact_target.username, 
              :password => Settings.exact_target.password, 
              :endpoint => 'https://webservice.s6.exacttarget.com/Service.asmx',
-             :namespace => 'http://exacttarget.com/wsdl/partnerAPI')
+             :namespace => 'http://exacttarget.com/wsdl/partnerAPI',
+             :open_timeout => 60)

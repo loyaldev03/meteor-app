@@ -1,5 +1,5 @@
 module SacExactTarget
-  class Member < Struct.new(:member)
+  class MemberModel < Struct.new(:member)
   #   def update!(options = {})
   #     if options[:force] || sync_fields.present? # change tracking
   #       begin
