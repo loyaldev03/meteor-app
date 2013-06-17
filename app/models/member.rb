@@ -1146,14 +1146,14 @@ class Member < ActiveRecord::Base
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
           Communication.deliver!(:birthday, member)
         rescue Exception => e
-          Auditory.report_issue("Members::send_happy_birthday", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
+          Auditory.report_issue("Members::sendHappyBirthday", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
       end
     end
   rescue Exception => e
-    Auditory.report_issue("Members::send_happy_birthday", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+    Auditory.report_issue("Members::sendHappyBirthday", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
     Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
