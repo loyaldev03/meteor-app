@@ -1062,7 +1062,7 @@ class Member < ActiveRecord::Base
       member.last_sync_error_at = nil
       member.last_synced_at = nil
       member.sync_status = "not_synced"
-      member.save
+      self.save(:validate => false)
       unless member.lapsed?
         api_m = member.api_member
         unless api_m.nil?
