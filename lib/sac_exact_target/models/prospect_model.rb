@@ -25,8 +25,10 @@ module SacExactTarget
       end
     end
 
+    # easy way to know if a subscriber key is a prospect or member. This method can be improved, filtering by List id.
+    # If subscriber is prospct we will find him. If its a member, subscriber key is the member id, 
+    # so, it wont be find it on prospect table
     def must_update?
-      # easy way to know if a subscriber key is a prospect or member. This method can be improved, filtering by List id.
       Prospect.find_by_uuid @subscriber.subscriber_key
     end
 
