@@ -2,10 +2,13 @@ module SacExactTarget
   class ProspectModel < Struct.new(:prospect)
     def save!
       return unless self.prospect.email
-      if must_create?
-        res = client.Create(subscriber(self.prospect.uuid))
+      client, options = ExactTargetSDK::Client.new, {}
+      res = if must_create?
+        options[:subscribe_to_list] = true
+        client.Create(subscriber(self.prospect.uuid, options))
       elsif must_update?
-        res = client.Update(subscriber(@subscriber.subscriber_key))
+        options[:subscribe_to_list] = false
+        client.Update(subscriber(@subscriber.subscriber_key, options))
       end
       if res.OverallStatus != "OK"
         Auditory.report_issue("SacExactTarget:Prospect:save", res.Results.first.status_message, { :result => res.inspect })
@@ -31,24 +34,24 @@ module SacExactTarget
       # Find by email . I didnt have luck looking for a subscriber by email and List.
       res = ExactTargetSDK::Subscriber.find [ ["EmailAddress", ExactTargetSDK::SimpleOperator::EQUALS, self.prospect.email] ]
       @subscriber = res.Results.collect do |result|
-        result.attributes.select {|d| d == { :name => "Club", :value => self.club_id } }
+        result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
       end.flatten.first
       @subscriber.nil?
     end
 
     private
 
-      def subscriber(subscriber_key)
-        client = ExactTargetSDK::Client.new
+      def subscriber(subscriber_key, options ={})
         list = [ ExactTargetSDK::List.new(ID: self.prospect.club.marketing_tool_attributes['et_prospect_list'], Status: 'Active', Action: 'create') ]
         attributes = fields_map.collect do |api_field, our_field| 
           ExactTargetSDK::Attributes.new(Name: api_field, Value: self.prospect.send(our_field)) unless self.prospect.send(our_field).blank?
         end.compact
-        attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: self.club_id)
+        attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
         id = ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
-        ExactTargetSDK::Subscriber.new('SubscriberKey' => subscriber_key, 
+        ExactTargetSDK::Subscriber.new({
+          'SubscriberKey' => subscriber_key, 
           'EmailAddress' => self.prospect.email, 'Client' => id, 'ObjectID' => true, 
-          'Attributes' => attributes, 'Lists' => list)        
+          'Attributes' => attributes }.merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ))        
       end
 
       def fields_map

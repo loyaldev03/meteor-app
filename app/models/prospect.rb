@@ -21,16 +21,17 @@ class Prospect < ActiveRecord::Base
     "(#{self.phone_country_code}) #{self.phone_area_code} - #{self.phone_local_number}"
   end
 
+  def remote_sync
+    self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::ProspectModel)
+    self.pardot_after_create_sync_to_remote_domain if defined?(Pardot::Prospect)
+  end
+  handle_asynchronously :remote_sync
+
   private 
 
     def after_remote_sync
       remote_sync
     end
 
-    def remote_sync
-      self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::ProspectModel)
-      self.pardot_after_create_sync_to_remote_domain if defined?(Pardot::Prospect)
-    end
-    handle_asynchronously :remote_sync
 
 end
