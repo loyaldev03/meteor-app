@@ -7,6 +7,9 @@ module Pardot
     require 'sac_pardot/models/member_extensions'
     Member.send :include, Pardot::MemberExtensions
  
+    require 'sac_pardot/models/prospect_extensions'
+    Prospect.send :include, Pardot::ProspectExtensions
+
     require 'sac_pardot/models/member'
     require 'sac_pardot/models/prospect'
     require 'sac_pardot/models/club_extensions'
