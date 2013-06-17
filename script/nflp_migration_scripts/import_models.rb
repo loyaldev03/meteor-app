@@ -41,7 +41,7 @@ require 'json'
 
 CLUB = 6 # NFLP
 DEFAULT_CREATED_BY = 1 # batch
-USE_PROD_DB = false
+USE_PROD_DB = true
 PAYMENT_GW_CONFIGURATION_LITLE = (USE_PROD_DB ? 8 : 6)
 TEST_EMAIL = false # if true email will be replaced with a fake one
 TIMEZONE = 'Eastern Time (US & Canada)'
@@ -50,8 +50,8 @@ CREDIT_CARD_NULL = "a"
 
 
 if USE_PROD_DB
-  puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
-  exit
+  #puts "by default do not continue. Uncomment this line if you want to run script. \n\t check configuration above." 
+  # exit
 end
 
 unless USE_PROD_DB

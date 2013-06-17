@@ -30,7 +30,7 @@ class Auditory
         :submitter_id => ZENDESK_API_CLIENT.current_user.id, 
         :assignee_id => ZENDESK_API_CLIENT.current_user.id, 
         :type => "incident",
-        :tags => "support-ruby",
+        :tags => (Rails.env == 'production' ? "support-ruby-production" : "support-ruby" ),
         :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
 
       ticket.comment.uploads << "error_description.txt"

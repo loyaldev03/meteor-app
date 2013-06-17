@@ -2,7 +2,7 @@
 
 require './import_models'
 
-@log = Logger.new('log/import_members.log', 10, 10024000)
+@log = Logger.new('log/import_members4.log', 10, 10024000)
 ActiveRecord::Base.logger = @log
 
 def add_fulfillment(member)
@@ -115,18 +115,18 @@ end
 # 2- import new members.
 def add_new_members
   # First import all the actives members
-  BillingMember.where(" imported_at IS NULL and IFNULL(is_prospect,0)=0 " +
-      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date_time IS NOT NULL " +
-      " AND phoenix_status IS NOT NULL AND phoenix_status != 'lapsed' AND phoenix_email IS NOT NULL " +
-      " AND credit_card_token IS NOT NULL " +
-      "").find_in_batches do |group|
-
-  # Then import all the inactive members
   # BillingMember.where(" imported_at IS NULL and IFNULL(is_prospect,0)=0 " +
   #     " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date_time IS NOT NULL " +
-  #     " AND phoenix_status IS NOT NULL AND phoenix_status = 'lapsed' AND phoenix_email IS NOT NULL " +
+  #     " AND phoenix_status IS NOT NULL AND phoenix_status != 'lapsed' AND phoenix_email IS NOT NULL " +
   #     " AND credit_card_token IS NOT NULL " +
-  #     "").find_in_batches do |group|
+  #     " AND id > 4134425 ").find_in_batches do |group|
+
+  # Then import all the inactive members
+  BillingMember.where(" imported_at IS NULL and IFNULL(is_prospect,0)=0 " +
+      " AND member_since_date IS NOT NULL AND campaign_id IS NOT NULL AND phoenix_join_date_time IS NOT NULL " +
+      " AND phoenix_status IS NOT NULL AND phoenix_status = 'lapsed' AND phoenix_email IS NOT NULL " +
+      " AND credit_card_token IS NOT NULL " +
+      " AND id <= 4134425 ").find_in_batches do |group|
 
     puts "cant #{group.count}"
     group.each do |member| 

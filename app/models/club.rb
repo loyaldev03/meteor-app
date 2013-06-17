@@ -66,7 +66,7 @@ class Club < ActiveRecord::Base
   def exact_target_sync?
     self.marketing_tool_attributes and 
     [ 
-      self.marketing_tool_attributes['et_bussines_unit'], 
+      self.marketing_tool_attributes['et_business_unit'], 
       self.marketing_tool_attributes['et_prospect_list'], 
       self.marketing_tool_attributes['et_members_list']
     ].none?(&:blank?)
