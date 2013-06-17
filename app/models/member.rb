@@ -965,6 +965,9 @@ class Member < ActiveRecord::Base
       Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
     end
     file.flock(File::LOCK_UN)
+  rescue Exception => e
+    Auditory.report_issue("Billing::Today", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.refresh_autologin
@@ -997,6 +1000,9 @@ class Member < ActiveRecord::Base
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
+  rescue Exception => e
+    Auditory.report_issue("Members::SendPillar", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   # Method used from rake task and also from tests!
@@ -1014,6 +1020,9 @@ class Member < ActiveRecord::Base
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
     end
+  rescue Exception => e
+    Auditory.report_issue("Members::ClubCash", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   # Method used from rake task and also from tests!
@@ -1035,6 +1044,9 @@ class Member < ActiveRecord::Base
         Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
       end
     end
+  rescue Exception => e
+    Auditory.report_issue("Members::Cancel", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.process_sync 
@@ -1043,10 +1055,15 @@ class Member < ActiveRecord::Base
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members lapsed and api_id not null, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each do |member|
-        api_m = member.api_member
-        unless api_m.nil?
-          api_m.destroy!
-          Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
+        begin
+          api_m = member.api_member
+          unless api_m.nil?
+            api_m.destroy!
+            Auditory.audit(nil, member, "Member's drupal account destroyed by batch script", member, Settings.operation_types.member_drupal_account_destroyed_batch)
+          end
+        rescue Exception => e
+          Auditory.report_issue("Members::Sync", e, {:member => member.inspect})
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
     end
@@ -1056,17 +1073,22 @@ class Member < ActiveRecord::Base
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members with error sync related to wrong api_id, processing #{base.count} members"
     tz = Time.zone.now
     base.to_enum.with_index.each do |member,index|
-      Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-      member.update_attribute :api_id, nil
-      unless member.lapsed?
-        api_m = member.api_member
-        unless api_m.nil?
-          if api_m.save!(force: true)
-            unless member.last_sync_error_at
-              Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
+      begin
+        Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
+        member.update_attribute :api_id, nil
+        unless member.lapsed?
+          api_m = member.api_member
+          unless api_m.nil?
+            if api_m.save!(force: true)
+              unless member.last_sync_error_at
+                Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
+              end
             end
           end
         end
+      rescue Exception => e
+        Auditory.report_issue("Members::Sync", e, {:member => member.inspect})
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
@@ -1075,17 +1097,26 @@ class Member < ActiveRecord::Base
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{base.count} members"
     tz = Time.zone.now
     base.to_enum.with_index.each do |member,index|
-      Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-      api_m = member.api_member
-      unless api_m.nil?
-        if api_m.save!(force: true)
-          unless member.last_sync_error_at
-            Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
+      begin
+        Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
+        api_m = member.api_member
+        unless api_m.nil?
+          if api_m.save!(force: true)
+            unless member.last_sync_error_at
+              Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
+            end
           end
         end
+      rescue Exception => e
+        Auditory.report_issue("Members::Sync", e, {:member => member.inspect})
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end       
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
+
+  rescue Exception => e
+    Auditory.report_issue("Members::Sync", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.process_email_sync_error
@@ -1098,6 +1129,9 @@ class Member < ActiveRecord::Base
       end
     end
     Notifier.members_with_duplicated_email_sync_error(member_list).deliver! if member_list.count != 0
+  rescue Exception => e
+    Auditory.report_issue("Members::SyncErrorEmail", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"  
   end
 
   def self.send_happy_birthday
@@ -1118,6 +1152,9 @@ class Member < ActiveRecord::Base
         Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
       end
     end
+  rescue Exception => e
+    Auditory.report_issue("Members::send_happy_birthday", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.send_prebill
@@ -1139,6 +1176,9 @@ class Member < ActiveRecord::Base
         Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
       end
     end
+  rescue Exception => e
+    Auditory.report_issue("Members::SendPrebill", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.supported_states(country='US')
