@@ -74,7 +74,7 @@ class Transaction < ActiveRecord::Base
       :order_id => invoice_number,
       :billing_address => {
         :name     => "#{first_name} #{last_name}",
-        :address1 => address,
+        :address1 => address[0..34], # Litle has this restriction of characters.
         :city     => city,
         :state    => state,
         :zip      => zip.to_s.gsub(/[a-zA-Z-]/, ''),
