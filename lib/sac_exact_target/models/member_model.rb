@@ -36,7 +36,6 @@ module SacExactTarget
       data = if res.OverallStatus != "OK"
         Auditory.report_issue("SacExactTarget:Member:save", res.Results.first.status_message, { :result => res.inspect })
         { 
-          exact_target_last_synced_at: nil,
           exact_target_synced_status: 'error',
           exact_target_last_sync_error: res.Results.first.status_message,
           exact_target_last_sync_error_at: Time.zone.now
