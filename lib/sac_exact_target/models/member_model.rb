@@ -3,7 +3,7 @@ module SacExactTarget
 
     def save!
       client, options = ExactTargetSDK::Client.new, {}
-      update_member(new_record? ? self.create! : self.update!)
+      update_member(new_record? ? create! : update!)
     end
 
     def new_record?
@@ -21,7 +21,7 @@ module SacExactTarget
       client, options = ExactTargetSDK::Client.new, {}
       options[:subscribe_to_list] = true
       # Remove email from prospect list
-      SacExactTarget::ProspectModel.destroy_by_email self.member.email
+      SacExactTarget::ProspectModel.destroy_by_email self.member.email, club_id
       # Add customer under member list
       client.Create(subscriber(self.member.id, options))
     end
@@ -54,7 +54,8 @@ module SacExactTarget
     end
 
     def subscriber(subscriber_key, options ={})
-      attributes, list = [], [ ExactTargetSDK::List.new(ID: self.member.club.marketing_tool_attributes['et_member_list'], Status: 'Active', Action: 'create') ]
+      # TODO: marketing_tool_attributes['et_members_list'] must be an extended method from club 
+      attributes, list = [], [ ExactTargetSDK::List.new(ID: self.member.club.marketing_tool_attributes['et_members_list'], Status: 'Active', Action: 'create') ]
       fieldmap.each do |api_field, our_field| 
         attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: self.member.send(our_field)) unless self.member.send(our_field).blank?
       end
@@ -74,8 +75,8 @@ module SacExactTarget
         'Attributes' => attributes.compact }.merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ))        
     end
 
-    def fieldmap(options)
-      [ 
+    def fieldmap
+      { 
         'First_name' => 'first_name',
         'Last_name' => 'last_name',
         'Address_one' => 'address',
@@ -91,23 +92,23 @@ module SacExactTarget
         'External_id' => 'external_id',
         'Club_cash_amount' => 'club_cash_amount',
         'Gender' => 'gender',
-        'Wrong_Phone' => 'wrong_phone',
+        'Wrong_Phone' => 'wrong_phone_number',
         'Phone' => 'full_phone_number'
-      ]
+      }
     end
 
-    def membership_fieldmap(options)
-      [ 
+    def membership_fieldmap
+      {
         'Membership_status' => 'status',
         'Terms_of_membership' => 'terms_of_membership_id',
         'Join_date' => 'join_date',
         'Cancel_date' => 'cancel_date',
         'Quota' => 'quota'
-      ]
+      }
     end
 
-    def enrollment_fieldmap(options)
-      [ 
+    def enrollment_fieldmap
+      { 
         'Marketing_code' => 'marketing_code',
         'Mega_channel' => 'mega_channel',
         'Fulfillment_code' => 'fulfillment_code',
@@ -115,16 +116,23 @@ module SacExactTarget
         'Product_sku' => 'product_sku',
         'Landing_URL' => 'landing_url',
         'Enrollment_amount' => 'enrollment_amount'
-      ]
+      }
     end
 
-    def aditional_fieldmap(options)
-      [ 
+    def aditional_fieldmap
+      { 
         'Installment_amount' => '',
         'Refunded_amount' => ''
-      ]
+      }
     end
 
+    def club_id
+      Rails.env == 'production' ? self.member.club_id : '9999'
+    end
+    
+    def business_unit_id
+      Rails.env == 'production' ? self.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
+    end
   end
 end
 

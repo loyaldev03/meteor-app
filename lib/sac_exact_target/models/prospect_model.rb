@@ -3,10 +3,12 @@ module SacExactTarget
     def save!
       return unless self.prospect.email
       client, options = ExactTargetSDK::Client.new, {}
-      res = if email_does_not_exist?
+      # Find by email . I didnt have luck looking for a subscriber by email and List.
+      subscriber = SacExactTarget::ProspectModel.find_by_email self.prospect.email, self.club_id
+      res = if subscriber.nil?
         options[:subscribe_to_list] = true
         client.Create(subscriber(self.prospect.uuid, options))
-      elsif email_belongs_to_prospect?
+      elsif SacExactTarget::ProspectModel.email_belongs_to_prospect?(@subscriber.subscriber_key)
         options[:subscribe_to_list] = false
         client.Update(subscriber(@subscriber.subscriber_key, options))
       end
@@ -15,8 +17,9 @@ module SacExactTarget
       end
     end
 
-    def self.destroy_by_email(email)
-      if not email_does_not_exist? and not (prospect = email_belongs_to_prospect?).nil?
+    def self.destroy_by_email(email, club_id)
+      subscriber = find_by_email(email, club_id)
+      if not subscriber.nil? and not (prospect = email_belongs_to_prospect?(subscriber.subscriber_key)).nil?
         prospect.exact_target_prospect.destroy!
       end
     end
@@ -31,23 +34,22 @@ module SacExactTarget
       end
     end
 
+    def self.find_by_email(email, club_id)
+      # Find by email . I didnt have luck looking for a subscriber by email and List.
+      res = ExactTargetSDK::Subscriber.find [ ["EmailAddress", ExactTargetSDK::SimpleOperator::EQUALS, email] ]
+      res.Results.collect do |result|
+        result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
+      end.flatten.first
+    end
+ 
+    # easy way to know if a subscriber key is a prospect or member. This method can be improved, filtering by List id.
+    # If subscriber is prospct we will find him. If its a member, subscriber key is the member id, 
+    # so, it wont be find it on prospect table
+    def self.email_belongs_to_prospect?(subscriber_key)
+      Prospect.find_by_uuid subscriber_key
+    end
+
     private
-
-      # easy way to know if a subscriber key is a prospect or member. This method can be improved, filtering by List id.
-      # If subscriber is prospct we will find him. If its a member, subscriber key is the member id, 
-      # so, it wont be find it on prospect table
-      def email_belongs_to_prospect?
-        Prospect.find_by_uuid @subscriber.subscriber_key
-      end
-
-      def email_does_not_exist?
-        # Find by email . I didnt have luck looking for a subscriber by email and List.
-        res = ExactTargetSDK::Subscriber.find [ ["EmailAddress", ExactTargetSDK::SimpleOperator::EQUALS, self.prospect.email] ]
-        @subscriber = res.Results.collect do |result|
-          result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
-        end.flatten.first
-        @subscriber.nil?
-      end
 
       def subscriber(subscriber_key, options ={})
         list = [ ExactTargetSDK::List.new(ID: self.prospect.club.marketing_tool_attributes['et_prospect_list'], Status: 'Active', Action: 'create') ]
