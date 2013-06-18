@@ -17,12 +17,15 @@ class Auditory
       Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
     end
   end
+  
   def self.report_issue(error = "Special Error", message = '', params = {})
     # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)
     unless ["test","development"].include? Rails.env
       comment = message.to_s + "\nBacktrace:\n " + caller.join("\n").to_s + "\n\n\n Parameters: " + params.inspect
-      temp = File.open("/tmp/error_description_#{Time.zone.now.to_i}.txt", 'w+') 
+      file_url = "/tmp/error_description_#{Time.zone.now.to_i}.txt"
+      temp = File.open(file_url, 'w+') 
       temp.write comment
+      temp.close
 
       ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT, 
         :subject => "[#{Rails.env}] #{error}",
@@ -33,9 +36,8 @@ class Auditory
         :tags => (Rails.env == 'production' ? "support-ruby-production" : "support-ruby" ),
         :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
 
-      ticket.comment.uploads << "error_description.txt"
+      ticket.comment.uploads << file_url
       ticket.save
-      temp.close
     end
   end
 end
