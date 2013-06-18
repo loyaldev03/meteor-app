@@ -64,7 +64,7 @@ class Member < ActiveRecord::Base
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
     # Because maybe we have already bill this member.
-    Auditory.report_issue("Member:#{type.to_s}:sync", e, { :member => self.inspect })
+    Auditory.report_issue("Member:drupal_sync", e, { :member => self.inspect })
   end
 
   validates :country, 
