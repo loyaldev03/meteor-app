@@ -57,15 +57,15 @@ module SacExactTarget
       # TODO: marketing_tool_attributes['et_members_list'] must be an extended method from club 
       attributes, list = [], [ ExactTargetSDK::List.new(ID: self.member.club.marketing_tool_attributes['et_members_list'], Status: 'Active', Action: 'create') ]
       fieldmap.each do |api_field, our_field| 
-        attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: self.member.send(our_field)) unless self.member.send(our_field).blank?
+        attributes << add_attribute(self.member, api_field, our_field)
       end
       membership = self.member.current_membership
       membership_fieldmap.each do |api_field, our_field| 
-        attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: membership.send(our_field)) unless membership.send(our_field).blank?
+        attributes << add_attribute(membership, api_field, our_field)
       end
       enrollment_info = membership.enrollment_info
       enrollment_fieldmap.each do |api_field, our_field| 
-        attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: enrollment_info.send(our_field)) unless enrollment_info.send(our_field).blank?
+        attributes << add_attribute(enrollment_info, api_field, our_field)
       end  
       attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
       id = ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
@@ -73,6 +73,17 @@ module SacExactTarget
         'SubscriberKey' => subscriber_key, 
         'EmailAddress' => self.member.email, 'Client' => id, 'ObjectID' => true, 
         'Attributes' => attributes.compact }.merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ))        
+    end
+
+    def add_attribute(object, api_field, our_field)
+      value = object.send(our_field)
+      unless value.blank?
+        if value.class == ActiveSupport::TimeWithZone
+          ExactTargetSDK::Attributes.new(Name: api_field, Value: I18n.l(value)) 
+        else
+          ExactTargetSDK::Attributes.new(Name: api_field, Value: value) 
+        end
+      end
     end
 
     def fieldmap
@@ -85,7 +96,6 @@ module SacExactTarget
         'Zip' => 'zip',
         'Country' => 'country',
         'Birth_date' => 'birth_date',
-        'Club' => 'club_id', 
         'Member_since_date' => 'member_since_date',
         'Wrong_address' => 'wrong_address',
         'Next_bill_date' => 'next_retry_bill_date',
