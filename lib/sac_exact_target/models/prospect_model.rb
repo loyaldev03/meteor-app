@@ -8,11 +8,11 @@ module SacExactTarget
       res = if subscriber.nil?
         options[:subscribe_to_list] = true
         client.Create(subscriber(self.prospect.uuid, options))
-      elsif SacExactTarget::ProspectModel.email_belongs_to_prospect?(@subscriber.subscriber_key)
+      elsif SacExactTarget::ProspectModel.email_belongs_to_prospect?(subscriber.subscriber_key)
         options[:subscribe_to_list] = false
-        client.Update(subscriber(@subscriber.subscriber_key, options))
+        client.Update(subscriber(subscriber.subscriber_key, options))
       end
-      SacExactTarget::report_error("SacExactTarget:Prospect:save", res)
+      SacExactTarget::report_error("SacExactTarget:Prospect:save", res) unless res.nil?
     end
 
     def self.destroy_by_email(email, club_id)
