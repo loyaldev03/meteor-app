@@ -241,6 +241,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "show dates according to club timezones" do
+    Time.zone = "UTC"
     saved_member = create_active_member(@terms_of_membership_with_gateway)
     saved_member.member_since_date = "Wed, 02 May 2012 19:10:51 UTC 00:00"
     saved_member.current_membership.join_date = "Wed, 03 May 2012 13:10:51 UTC 00:00"
