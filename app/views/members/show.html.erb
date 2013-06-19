@@ -176,8 +176,8 @@
 <table id="table_active_credit_card" class="table table-bordered table-condensed">
   <thead>
     <tr class="box_title">
-      <th><h4>Active Credit Card</h4></th>
-      <td style="border: none; text-align: right;" colspan="5">
+      <th colspan="2"><h4>Active Credit Card</h4></th>
+      <td style="border: none; text-align: right;" colspan="4">
         <%= link_to(new_credit_card_path, :class => "btn btn-mini btn-success", :disabled => (cannot? :create, CreditCard), :id => "add_credit_card") do %> 
           <i class="icon-plus"></i> Add a credit card
         <% end %>
