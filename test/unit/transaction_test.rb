@@ -213,11 +213,12 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal 0, member.quota
       assert_equal 1, member.recycled_times
     end
-
     # SD retries
+    member.reload
+    nbd = member.next_retry_bill_date
     2.upto(15) do |time|
       Timecop.travel(nbd) do
-        Member.bill_all_members_up_today
+        member.bill_membership
         member.reload
         if member.next_retry_bill_date.nil?
           cancel_date = member.cancel_date
@@ -252,10 +253,9 @@ class TransactionTest < ActiveSupport::TestCase
     bill_date = member.bill_date
     
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
-
     # bill members the day trial days expires. Member should be billed but SD'd
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
-      Member.bill_all_members_up_today
+      member.bill_membership
       member.reload
       nbd = nbd + @sd_strategy.days.days
       assert_equal nbd.to_date, member.next_retry_bill_date.to_date
@@ -264,8 +264,9 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal 0, member.quota
       assert_equal 1, member.recycled_times
     end
-
     # SD retries
+    member.reload
+    nbd = member.next_retry_bill_date
     2.upto(15) do |time|
       Timecop.travel(nbd) do
         Member.bill_all_members_up_today
@@ -533,7 +534,8 @@ class TransactionTest < ActiveSupport::TestCase
       trans.reload
       assert_equal trans.refunded_amount, amount
       assert_equal trans.amount_available_to_refund, 0.0
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', 
+                               :conditions => ['member_id = ? AND transaction_type = ?', active_member.id, 'credit']).first
       assert_equal trans.operation_type, Settings.operation_types.credit
       assert_equal trans.transaction_type, 'credit'
     end
