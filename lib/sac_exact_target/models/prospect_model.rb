@@ -4,7 +4,7 @@ module SacExactTarget
       return unless self.prospect.email
       client, options = ExactTargetSDK::Client.new, {}
       # Find by email . I didnt have luck looking for a subscriber by email and List.
-      subscriber = SacExactTarget::ProspectModel.find_by_email self.prospect.email, self.club_id
+      subscriber = SacExactTarget::ProspectModel.find_by_email self.prospect.email, club_id
       res = if subscriber.nil?
         options[:subscribe_to_list] = true
         client.Create(subscriber(self.prospect.uuid, options))
