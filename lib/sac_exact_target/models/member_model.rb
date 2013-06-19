@@ -34,7 +34,7 @@ module SacExactTarget
 
     def update_member(res)
       data = if res.OverallStatus != "OK"
-        Auditory.report_issue("SacExactTarget:Member:save", res.Results.first.status_message, { :result => res.inspect })
+        SacExactTarget::report_error("SacExactTarget:Member:save", res)
         { 
           exact_target_synced_status: 'error',
           exact_target_last_sync_error: res.Results.first.status_message,

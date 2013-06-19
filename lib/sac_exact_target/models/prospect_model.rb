@@ -12,9 +12,7 @@ module SacExactTarget
         options[:subscribe_to_list] = false
         client.Update(subscriber(@subscriber.subscriber_key, options))
       end
-      if res.OverallStatus != "OK"
-        Auditory.report_issue("SacExactTarget:Prospect:save", res.Results.first.status_message, { :result => res.inspect })
-      end
+      SacExactTarget::report_error("SacExactTarget:Prospect:save", res)
     end
 
     def self.destroy_by_email(email, club_id)
@@ -29,9 +27,7 @@ module SacExactTarget
       subscriber = ExactTargetSDK::Subscriber.new('SubscriberKey' => self.prospect.uuid, 
         'EmailAddress' => self.prospect.email, 'ObjectID' => true)
       res = client.Delete(subscriber)
-      if res.OverallStatus != "OK"
-        Auditory.report_issue("SacExactTarget:Prospect:destroy", res.Results.first.status_message, { :result => res.inspect })
-      end
+      SacExactTarget::report_error("SacExactTarget:Prospect:destroy", res)
     end
 
     def self.find_by_email(email, club_id)
@@ -52,7 +48,7 @@ module SacExactTarget
     private
 
       def subscriber(subscriber_key, options ={})
-        attributes, list =  {}, [ ExactTargetSDK::List.new(ID: self.prospect.club.marketing_tool_attributes['et_prospect_list'], Status: 'Active', Action: 'create') ]
+        attributes, list =  [], [ ExactTargetSDK::List.new(ID: self.prospect.club.marketing_tool_attributes['et_prospect_list'], Status: 'Active', Action: 'create') ]
         fields_map.collect do |api_field, our_field| 
           attributes << SacExactTarget.format_attribute(self.prospect, api_field, our_field)
         end
@@ -89,7 +85,7 @@ module SacExactTarget
       def club_id
         Rails.env == 'production' ? self.prospect.club_id : '9999'
       end
-      
+
       def business_unit_id
         Rails.env == 'production' ? self.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
       end

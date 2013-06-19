@@ -35,4 +35,12 @@ module SacExactTarget
     end
   end 
 
+  def self.report_error(result, error_message)
+    if result.OverallStatus != "OK"      
+      unless [ 12002 ].include?(result.Results.first.error_code.to_i)
+        Auditory.report_issue(error_message, result.Results.first.status_message, { :result => result.inspect })
+      end
+    end
+  end
+
 end
