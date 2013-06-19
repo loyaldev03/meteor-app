@@ -807,7 +807,7 @@ class Member < ActiveRecord::Base
             raise "Could not save club cash transaction" unless cct.valid? and self.valid?
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save(:validate => false)
-            message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }."+(description.blank? ? '' : ". Concept: #{description}")
+            message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }."+(description.blank? ? '' : " Concept: #{description}")
             if amount.to_f > 0
               Auditory.audit(agent, cct, message, self, Settings.operation_types.add_club_cash)
             elsif amount.to_f < 0 and amount.to_f.abs == club_cash_amount 
