@@ -77,7 +77,8 @@ module SacExactTarget
     def add_attribute(object, api_field, our_field)
       value = object.send(our_field)
       unless value.blank?
-        if value.class == ActiveSupport::TimeWithZone
+        case value.class 
+        when ActiveSupport::TimeWithZone, Date
           ExactTargetSDK::Attributes.new(Name: api_field, Value: I18n.l(value)) 
         else
           ExactTargetSDK::Attributes.new(Name: api_field, Value: value) 
