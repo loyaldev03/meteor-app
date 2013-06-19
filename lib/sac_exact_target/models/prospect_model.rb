@@ -12,7 +12,7 @@ module SacExactTarget
         options[:subscribe_to_list] = false
         client.Update(subscriber(subscriber.subscriber_key, options))
       end
-      SacExactTarget::report_error("SacExactTarget:Prospect:save", res)
+      SacExactTarget::report_error("SacExactTarget:Prospect:save", res) unless res.nil?
     end
 
     def self.destroy_by_email(email, club_id)
