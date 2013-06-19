@@ -391,7 +391,7 @@ class MembersBillTest < ActionController::IntegrationTest
     next_bill_date_after_billing = @saved_member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)
     Member.bill_all_members_up_today
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    within("#table_membership_information")do
+    within("#table_membership_information") do
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
     end
     within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date_after_billing, :format => :only_date)) }
@@ -400,11 +400,10 @@ class MembersBillTest < ActionController::IntegrationTest
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
     end
     within('.nav-tabs'){ click_on 'Transactions'}
-      within("#transactions_table") do
-        assert page.has_selector?('#refund')
-        assert page.has_content?("Sale : This transaction has been approved")
-        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
-      end
+    within("#transactions_table") do
+      assert page.has_selector?('#refund')
+      assert page.has_content?("Sale : This transaction has been approved")
+      assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
     end
   end 
 
@@ -576,10 +575,10 @@ test "Try billing a member with credit card ok, and within a club that allows bi
 
   test "Try billing a member without providing the amount and/or description" do
     setup_member
-     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-     click_link_or_button("Bill no recurrent amount")
-     click_link_or_button("Bill no recurrent amount")
-     assert page.has_content?("Amount and description cannot be blank.")
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+    click_link_or_button("Bill no recurrent amount")
+    click_link_or_button("Bill no recurrent amount")
+    assert page.has_content?("Amount and description cannot be blank.")
     fill_in('amount', :with => '100')
     click_link_or_button ("Bill no recurrent amount")
     assert page.has_content?("Amount and description cannot be blank.")
@@ -587,38 +586,37 @@ test "Try billing a member with credit card ok, and within a club that allows bi
     fill_in('description', :with => 'asd')
     click_link_or_button("Bill no recurrent amount")
     assert page.has_content?("Amount and description cannot be blank.")
-    end
+  end
 
-    test "Try billing a member without providing the amount and/or description." do
-      setup_member
-      visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-      click_link_or_button("Bill no recurrent amount")
-      fill_in('amount', :with => '-100')
-      fill_in('description', :with => 'asd')
-      click_link_or_button("Bill no recurrent amount")
-      assert page.has_content?("Amount must be greater than 0.")
-    end
+  test "Try billing a member without providing the amount and/or description." do
+    setup_member
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+    click_link_or_button("Bill no recurrent amount")
+    fill_in('amount', :with => '-100')
+    fill_in('description', :with => 'asd')
+    click_link_or_button("Bill no recurrent amount")
+    assert page.has_content?("Amount must be greater than 0.")
+  end
 
+  test "Try billing a member within a club that do not allow billing." do
+    setup_member
+    @saved_member.club.update_attribute( :billing_enable, false)
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+    assert find(:xpath, "//a[@id='no_recurrent_bill_btn' and @disabled='disabled']")
+    click_link_or_button("Bill no recurrent amount")
+    assert page.has_selector?('#blacklist_btn')
+  end
 
-    test "Try billing a member within a club that do not allow billing." do
-      setup_member
-      @saved_member.club.update_attribute( :billing_enable, false)
-      visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-      assert find(:xpath, "//a[@id='no_recurrent_bill_btn' and @disabled='disabled']")
-      click_link_or_button("Bill no recurrent amount")
-      assert page.has_selector?('#blacklist_btn')
-    end
-
-    test "Try billing a member with blank credit card." do
-      setup_member(nil,false)
-      unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)      
-      @saved_member = create_member(unsaved_member,nil,nil, true)
-      click_link_or_button("Bill no recurrent amount")
-      fill_in('amount', :with => '100')
-      fill_in('description', :with => 'asd')
-      click_link_or_button("Bill no recurrent amount") 
-      assert page.has_content?("Credit card is blank we wont bill")   
-    end
+  test "Try billing a member with blank credit card." do
+    setup_member(nil,false)
+    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)      
+    @saved_member = create_member(unsaved_member,nil,nil, true)
+    click_link_or_button("Bill no recurrent amount")
+    fill_in('amount', :with => '100')
+    fill_in('description', :with => 'asd')
+    click_link_or_button("Bill no recurrent amount") 
+    assert page.has_content?("Credit card is blank we wont bill")   
+  end
 
   # stubs isnt working correctly
   # test "Litle payment gateway (Enrollment amount)" do
