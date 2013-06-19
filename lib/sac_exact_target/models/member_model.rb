@@ -56,15 +56,15 @@ module SacExactTarget
       # TODO: marketing_tool_attributes['et_members_list'] must be an extended method from club 
       attributes, list = [], [ ExactTargetSDK::List.new(ID: self.member.club.marketing_tool_attributes['et_members_list'], Status: 'Active', Action: 'create') ]
       fieldmap.each do |api_field, our_field| 
-        attributes << add_attribute(self.member, api_field, our_field)
+        attributes << SacExactTarget.format_attribute(self.member, api_field, our_field)
       end
       membership = self.member.current_membership
       membership_fieldmap.each do |api_field, our_field| 
-        attributes << add_attribute(membership, api_field, our_field)
+        attributes << SacExactTarget.format_attribute(membership, api_field, our_field)
       end
       enrollment_info = membership.enrollment_info
       enrollment_fieldmap.each do |api_field, our_field| 
-        attributes << add_attribute(enrollment_info, api_field, our_field)
+        attributes << SacExactTarget.format_attribute(enrollment_info, api_field, our_field)
       end  
       attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
       id = ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
@@ -72,18 +72,6 @@ module SacExactTarget
         'SubscriberKey' => subscriber_key, 
         'EmailAddress' => self.member.email, 'Client' => id, 'ObjectID' => true, 
         'Attributes' => attributes.compact }.merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ))        
-    end
-
-    def add_attribute(object, api_field, our_field)
-      value = object.send(our_field)
-      unless value.blank?
-        case value.class 
-        when ActiveSupport::TimeWithZone, Date
-          ExactTargetSDK::Attributes.new(Name: api_field, Value: I18n.l(value)) 
-        else
-          ExactTargetSDK::Attributes.new(Name: api_field, Value: value) 
-        end
-      end
     end
 
     def fieldmap

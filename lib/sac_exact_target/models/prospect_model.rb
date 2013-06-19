@@ -52,16 +52,16 @@ module SacExactTarget
     private
 
       def subscriber(subscriber_key, options ={})
-        list = [ ExactTargetSDK::List.new(ID: self.prospect.club.marketing_tool_attributes['et_prospect_list'], Status: 'Active', Action: 'create') ]
-        attributes = fields_map.collect do |api_field, our_field| 
-          ExactTargetSDK::Attributes.new(Name: api_field, Value: self.prospect.send(our_field)) unless self.prospect.send(our_field).blank?
-        end.compact
+        attributes, list =  {}, [ ExactTargetSDK::List.new(ID: self.prospect.club.marketing_tool_attributes['et_prospect_list'], Status: 'Active', Action: 'create') ]
+        fields_map.collect do |api_field, our_field| 
+          attributes << SacExactTarget.format_attribute(self.prospect, api_field, our_field)
+        end
         attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
         id = ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
         ExactTargetSDK::Subscriber.new({
           'SubscriberKey' => subscriber_key, 
           'EmailAddress' => self.prospect.email, 'Client' => id, 'ObjectID' => true, 
-          'Attributes' => attributes }.merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ))        
+          'Attributes' => attributes.compact }.merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ))        
       end
 
       def fields_map
@@ -85,9 +85,11 @@ module SacExactTarget
           'Gender' => 'gender'
         }
       end
+
       def club_id
         Rails.env == 'production' ? self.prospect.club_id : '9999'
       end
+      
       def business_unit_id
         Rails.env == 'production' ? self.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
       end
