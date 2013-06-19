@@ -82,7 +82,6 @@ class MembersBillTest < ActionController::IntegrationTest
   # TEST
   ############################################################
 
-
   test "Change Next Bill Date" do
     setup_member(nil,true)
     bill_member(@saved_member,false,nil,false)
@@ -307,7 +306,6 @@ class MembersBillTest < ActionController::IntegrationTest
     end
   end
 
-
   test "Successful payment." do
     setup_member
     @saved_member.current_membership.join_date = Time.zone.now-3.day
@@ -461,22 +459,18 @@ class MembersBillTest < ActionController::IntegrationTest
 
   test "Do not Send Prebill email (7 days before NBD) when member's installment_amount is 0" do
     setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
     @terms_of_membership_with_gateway.update_attribute :installment_amount, 0.0
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
-    
     Member.send_prebill
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
 
-    within('.nav-tabs'){ click_on 'Communications' }
+    within('.nav-tabs'){ click_on 'Communications'}
     within("#communication") do 
       assert page.has_no_content?("prebill")
     end
-   
     within('.nav-tabs'){ click_on 'Operations' }
     within("#operations_table") do
       assert page.has_no_content?("Communication 'Test prebill' sent")
@@ -554,10 +548,10 @@ class MembersBillTest < ActionController::IntegrationTest
 test "Try billing a member with credit card ok, and within a club that allows billing." do
     setup_member
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)      
-    click_link_or_button("Bill no recurrent amount")
+    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     fill_in('amount', :with => '100')
     fill_in('description', :with => 'asd')
-    click_link_or_button ("Bill no recurrent amount")
+    click_link_or_button (I18n.t('buttons.no_recurrent_billing'))
 
     trans = Transaction.last
     assert page.has_content? "Member billed successfully $100 Transaction id: #{trans.uuid}. Reason: asd"
@@ -576,25 +570,25 @@ test "Try billing a member with credit card ok, and within a club that allows bi
   test "Try billing a member without providing the amount and/or description" do
     setup_member
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-    click_link_or_button("Bill no recurrent amount")
-    click_link_or_button("Bill no recurrent amount")
+    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
+    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     assert page.has_content?("Amount and description cannot be blank.")
     fill_in('amount', :with => '100')
-    click_link_or_button ("Bill no recurrent amount")
+    click_link_or_button (I18n.t('buttons.no_recurrent_billing'))
     assert page.has_content?("Amount and description cannot be blank.")
     fill_in('amount', :with => '')
     fill_in('description', :with => 'asd')
-    click_link_or_button("Bill no recurrent amount")
+    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     assert page.has_content?("Amount and description cannot be blank.")
   end
 
   test "Try billing a member without providing the amount and/or description." do
     setup_member
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-    click_link_or_button("Bill no recurrent amount")
+    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     fill_in('amount', :with => '-100')
     fill_in('description', :with => 'asd')
-    click_link_or_button("Bill no recurrent amount")
+    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     assert page.has_content?("Amount must be greater than 0.")
   end
 
@@ -603,7 +597,7 @@ test "Try billing a member with credit card ok, and within a club that allows bi
     @saved_member.club.update_attribute( :billing_enable, false)
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     assert find(:xpath, "//a[@id='no_recurrent_bill_btn' and @disabled='disabled']")
-    click_link_or_button("Bill no recurrent amount")
+    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     assert page.has_selector?('#blacklist_btn')
   end
 
@@ -611,42 +605,42 @@ test "Try billing a member with credit card ok, and within a club that allows bi
     setup_member(nil,false)
     unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)      
     @saved_member = create_member(unsaved_member,nil,nil, true)
-    click_link_or_button("Bill no recurrent amount")
+    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     fill_in('amount', :with => '100')
     fill_in('description', :with => 'asd')
-    click_link_or_button("Bill no recurrent amount") 
+    click_link_or_button(I18n.t('buttons.no_recurrent_billing')) 
     assert page.has_content?("Credit card is blank we wont bill")   
   end
 
-  # stubs isnt working correctly
-  # test "Litle payment gateway (Enrollment amount)" do
-  #   setup_member(false)
-  #   @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
-  #   Time.zone = @club.time_zone
-  #   @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :provisional_days => 0)
+  stubs isnt working correctly
+  test "Litle payment gateway (Enrollment amount)" do
+    setup_member(false)
+    @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
+    Time.zone = @club.time_zone
+    @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :provisional_days => 0)
     
-  #   unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-  #   credit_card = FactoryGirl.build(:credit_card_master_card)
-  #   enrollment_info = FactoryGirl.build(:enrollment_info)
-  #   create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
-  #   @saved_member=Member.find_by_email(unsaved_member.email)
-  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-  #   transaction = Transaction.last
-  #   make_a_refund(transaction, transaction.amount_available_to_refund)
-  # end
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
+    @saved_member=Member.find_by_email(unsaved_member.email)
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+    transaction = Transaction.last
+    make_a_refund(transaction, transaction.amount_available_to_refund)
+  end
 
-  # stubs isnt working correctly
-  # test "Litle payment gateway (Installment amount)" do
-  #   setup_member(false)
-  #   @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
-  #   @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-  #   unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-  #   credit_card = FactoryGirl.build(:credit_card_master_card)
-  #   enrollment_info = FactoryGirl.build(:enrollment_info, :enrollment_amount => false)
-  #   create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
-  #   @saved_member=Member.find_by_email(unsaved_member.email)
-  #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
-  #   Time.zone = @club.time_zone
-  #   bill_member(@saved_member, true, nil, true)
-  # end    
+  stubs isnt working correctly
+  test "Litle payment gateway (Installment amount)" do
+    setup_member(false)
+    @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
+    @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :enrollment_amount => false)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
+    @saved_member=Member.find_by_email(unsaved_member.email)
+    visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
+    Time.zone = @club.time_zone
+    bill_member(@saved_member, true, nil, true)
+  end    
 end

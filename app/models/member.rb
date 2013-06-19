@@ -1165,8 +1165,8 @@ class Member < ActiveRecord::Base
   end
 
   def self.send_prebill
-    base = Member.where([" (date(next_retry_bill_date) = ? AND recycled_times = 0) 
-                           OR (date(next_retry_bill_date) = ? AND manual_payment = true) 
+    base = Member.where([" ((date(next_retry_bill_date) = ? AND recycled_times = 0) 
+                           OR (date(next_retry_bill_date) = ? AND manual_payment = true)) 
                            AND terms_of_memberships.installment_amount != 0.0", 
     (Time.zone.now + 7.days).to_date, (Time.zone.now + 14.days).to_date ]).includes(:current_membership => :terms_of_membership) 
 
