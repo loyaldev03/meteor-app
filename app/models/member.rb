@@ -455,6 +455,7 @@ class Member < ActiveRecord::Base
       else
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
+        trans.response_result = I18n.t('error_messages.airbrake_error_message')
         trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
         answer = trans.process
         if trans.success?
@@ -475,13 +476,7 @@ class Member < ActiveRecord::Base
     end
   rescue Exception => e
     Auditory.report_issue("Billing:membership", e, { :member => self.inspect })
-    message = I18n.t('error_messages.airbrake_error_message')
-    { :message => message, :code => Settings.error_codes.membership_billing_error } 
-    if trans
-      trans.response_result = message
-      trans.response = { message: message }
-      trans.save
-    end   
+    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
   def no_recurrent_billing(amount, description)
