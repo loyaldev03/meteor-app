@@ -758,4 +758,17 @@ class TransactionTest < ActiveSupport::TestCase
     end
     assert_equal member_manual_billing.next_retry_bill_date, nbd_manual
   end
+
+  test "save response on transaction when an exception take place when processing it" do
+    member = enroll_member(@terms_of_membership, 0, true)
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    Transaction.any_instance.stubs(:process).raises("random error")
+
+    assert_difference("Transaction.count")do
+      member.bill_membership
+    end
+    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first
+    assert_equal trans.response_result, I18n.t('error_messages.airbrake_error_message')
+  end
+
 end

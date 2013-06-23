@@ -177,8 +177,11 @@
   <thead>
     <tr class="box_title">
       <th colspan="2"><h4>Active Credit Card</h4></th>
+      <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
+        <td style="border: none"></td>
+      <% end %>
       <td style="border: none; text-align: right;" colspan="4">
-        <%= link_to(new_credit_card_path, :class => "btn btn-mini btn-success", :disabled => (cannot? :create, CreditCard), :id => "add_credit_card") do %> 
+        <%= link_to(new_credit_card_path, :class => "btn btn-success", :disabled => (cannot? :create, CreditCard), :id => "add_credit_card") do %> 
           <i class="icon-plus"></i> Add a credit card
         <% end %>
       </td>

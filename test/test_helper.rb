@@ -56,7 +56,7 @@ class ActiveSupport::TestCase
   def active_merchant_stubs_process(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
      answer = ActiveMerchant::Billing::Response.new(success, message, { "transaction_id"=>CREDIT_CARD_TOKEN[number], "error_code"=> code, "auth_response_text"=>"No Match" })
      ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:process).returns(answer)
-   end
+  end
 
   def create_active_member(tom, member_type = :active_member, enrollment_type = :enrollment_info, member_args = {}, membership_args = {}, use_default_active_merchant_stub = true)
     if use_default_active_merchant_stub

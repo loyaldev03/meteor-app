@@ -444,6 +444,7 @@ class Member < ActiveRecord::Base
   end
 
   def bill_membership
+    trans = nil
     if can_bill_membership? and self.next_retry_bill_date <= Time.zone.now
       amount = terms_of_membership.installment_amount
       if terms_of_membership.payment_gateway_configuration.nil?
@@ -474,7 +475,13 @@ class Member < ActiveRecord::Base
     end
   rescue Exception => e
     Auditory.report_issue("Billing:membership", e, { :member => self.inspect })
-    { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
+    message = I18n.t('error_messages.airbrake_error_message')
+    { :message => message, :code => Settings.error_codes.membership_billing_error } 
+    if trans
+      trans.response_result = message
+      trans.response = { message: message }
+      trans.save
+    end   
   end
 
   def no_recurrent_billing(amount, description)
