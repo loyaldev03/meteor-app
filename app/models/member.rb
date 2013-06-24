@@ -378,6 +378,10 @@ class Member < ActiveRecord::Base
     )
   end
 
+  def last_refunded_amount
+    self.transactions.refunds.order('created_at DESC').limit(1).amount rescue 0.0
+  end
+
   # Returns true if member is not blacklisted and not lapsed
   def can_be_blacklisted?
     !self.blacklisted?

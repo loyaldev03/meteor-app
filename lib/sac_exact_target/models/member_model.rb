@@ -62,6 +62,10 @@ module SacExactTarget
       membership_fieldmap.each do |api_field, our_field| 
         attributes << SacExactTarget.format_attribute(membership, api_field, our_field)
       end
+      terms_of_membership = membership.terms_of_membership
+      terms_of_membership_fieldmap.each do |api_field, our_field| 
+        attributes << SacExactTarget.format_attribute(terms_of_membership, api_field, our_field)
+      end
       enrollment_info = membership.enrollment_info
       enrollment_fieldmap.each do |api_field, our_field| 
         attributes << SacExactTarget.format_attribute(enrollment_info, api_field, our_field)
@@ -91,7 +95,8 @@ module SacExactTarget
         'Club_cash_amount' => 'club_cash_amount',
         'Gender' => 'gender',
         'Wrong_Phone' => 'wrong_phone_number',
-        'Phone' => 'full_phone_number'
+        'Phone' => 'full_phone_number',
+        'Refunded_amount' => 'last_refunded_amount'
       }
     end
 
@@ -117,10 +122,9 @@ module SacExactTarget
       }
     end
 
-    def aditional_fieldmap
+    def terms_of_membership_fieldmap
       { 
-        'Installment_amount' => '',
-        'Refunded_amount' => ''
+        'Installment_amount' => 'installment_amount'
       }
     end
 

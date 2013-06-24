@@ -14,6 +14,8 @@ class Transaction < ActiveRecord::Base
 
   attr_accessor :refund_response_transaction_id
 
+  scope :refunds, lambda { where('transaction_type IN (?, ?)', 'credit', 'refund') }
+
   def full_label
     I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
       ( response_result.nil? ? '' : ' : ' + response_result)
