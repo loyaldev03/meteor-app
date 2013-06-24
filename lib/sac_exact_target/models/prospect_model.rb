@@ -7,7 +7,7 @@ module SacExactTarget
       subscriber = SacExactTarget::ProspectModel.find_by_email self.prospect.email, club_id
       res = if subscriber.nil?
         options[:subscribe_to_list] = true
-        client.Create(subscriber(self.prospect.uuid, options))
+        client.Create(subscriber(subscriber_key, options))
       elsif SacExactTarget::ProspectModel.email_belongs_to_prospect?(subscriber.subscriber_key)
         options[:subscribe_to_list] = false
         client.Update(subscriber(subscriber.subscriber_key, options))
@@ -24,7 +24,7 @@ module SacExactTarget
 
     def destroy!
       client = ExactTargetSDK::Client.new
-      subscriber = ExactTargetSDK::Subscriber.new('SubscriberKey' => self.prospect.uuid, 
+      subscriber = ExactTargetSDK::Subscriber.new('SubscriberKey' => subscriber_key, 
         'EmailAddress' => self.prospect.email, 'ObjectID' => true)
       res = client.Delete(subscriber)
       SacExactTarget::report_error("SacExactTarget:Prospect:destroy", res)
@@ -46,6 +46,9 @@ module SacExactTarget
     end
 
     private
+      def subscriber_key
+        Rails.env.production? ? self.prospect.uuid : "#{Rails.env}-#{self.prospect.uuid.to_s}"
+      end
 
       def subscriber(subscriber_key, options ={})
         attributes, list =  [], [ ExactTargetSDK::List.new(ID: self.prospect.club.marketing_tool_attributes['et_prospect_list'], Status: 'Active', Action: 'create') ]
@@ -83,11 +86,11 @@ module SacExactTarget
       end
 
       def club_id
-        Rails.env == 'production' ? self.prospect.club_id : '9999'
+        Rails.env.production? ? self.prospect.club_id : '9999'
       end
 
       def business_unit_id
-        Rails.env == 'production' ? self.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
+        Rails.env.production? ? self.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
       end
   end
 end

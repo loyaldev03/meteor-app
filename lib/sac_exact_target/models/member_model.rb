@@ -8,7 +8,7 @@ module SacExactTarget
 
     def new_record?
       # Find by subscriber key . I didnt have luck looking for a subscriber by email and List.
-      res = ExactTargetSDK::Subscriber.find [ ["SubscriberKey", ExactTargetSDK::SimpleOperator::EQUALS, self.member.id] ]
+      res = ExactTargetSDK::Subscriber.find [ ["SubscriberKey", ExactTargetSDK::SimpleOperator::EQUALS, subscriber_key ] ]
       @subscriber = res.Results.collect do |result|
         result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
       end.flatten.first
@@ -23,13 +23,13 @@ module SacExactTarget
       # Remove email from prospect list
       SacExactTarget::ProspectModel.destroy_by_email self.member.email, club_id
       # Add customer under member list
-      client.Create(subscriber(self.member.id, options))
+      client.Create(subscriber(subscriber_key, options))
     end
 
     def update!
       client, options = ExactTargetSDK::Client.new, {}
       options[:subscribe_to_list] = false
-      client.Update(subscriber(self.member.id, options))
+      client.Update(subscriber(subscriber_key, options))
     end
 
     def update_member(res)
@@ -124,12 +124,16 @@ module SacExactTarget
       }
     end
 
+    def subscriber_key
+      Rails.env.production? ? self.member.id : "#{Rails.env}-#{self.member.id.to_s}"
+    end
+
     def club_id
-      Rails.env == 'production' ? self.member.club_id : '9999'
+      Rails.env.production? ? self.member.club_id : '9999'
     end
     
     def business_unit_id
-      Rails.env == 'production' ? self.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
+      Rails.env.production? ? self.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
     end
   end
 end
