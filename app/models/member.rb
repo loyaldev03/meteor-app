@@ -1130,15 +1130,15 @@ class Member < ActiveRecord::Base
   end
 
   def self.process_email_sync_error
-    member_list = []
+    member_list = {}
     base = Member.where("sync_status = 'with_error' AND last_sync_error like 'The e-mail address%is already taken.%'")
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_email_sync_error rake task, processing #{base.count} members"
     base.find_in_batches do |group|
-      group.each do |member|
-        member_list << member
+      group.each_with_index do |member, index|
+        member_list.merge!("member"+index => member.inspect)
       end
     end
-    Notifier.members_with_duplicated_email_sync_error(member_list).deliver! if member_list.count != 0
+    Auditory.report_issue("Members::DuplicatedEmailSyncError.", "The following members are having problems with the syncronization due to duplicated emails.", member_list) if member_list.coumember_listnt != 0
   rescue Exception => e
     Auditory.report_issue("Members::SyncErrorEmail", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
     Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"  

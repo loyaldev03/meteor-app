@@ -21,9 +21,10 @@ class Auditory
   def self.report_issue(error = "Special Error", message = '', params = {})
     # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)
     unless ["test","development"].include? Rails.env
-      comment = message.to_s + "\nBacktrace:\n " + caller.join("\n").to_s + "\n\n\n Parameters: " + params.inspect
+      comment = message.to_s + "\nBacktrace:\n " + caller.join("\n").to_s + "\n\n\n Parameters: " + params.collect{|k,v| "#{k}: #{v}" }.join("\n")
+
       file_url = "/tmp/error_description_#{Time.zone.now.to_i}.txt"
-      temp = File.open(file_url, 'w+') 
+      temp = File.open(file_url, 'w+')
       temp.write comment
       temp.close
 
