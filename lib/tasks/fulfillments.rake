@@ -1,7 +1,11 @@
 namespace :fulfillments do  
   desc "Create fulfillment report for Brian Miller."
   task :generate_fulfillment_naamma_report => :environment do
-    begin
+    begin      fulfillments = Fulfillment.includes(:member).where( 
+        ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
+          AND ? and fulfillments.status = 'not_processed' 
+          AND fulfillments.product_sku like 'KIT-CARD'", fulfillment_file.club_id, 
+        Time.zone.now-7.days, Time.zone.now ])
       fulfillment_file = FulfillmentFile.new 
       fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
 
@@ -27,7 +31,7 @@ namespace :fulfillments do
       package = Axlsx::Package.new                  
       package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
         sheet.add_row [ 'First Name', 'Last Name', 'Member Number', 'Membership Type (fan/subscriber)', 
-                       'Address', 'City', 'State', 'Zip','Phone number' ,'Join date', 'Membership expiration date' ]
+                       'Address', 'City', 'State', 'Zip','Phone number', 'Join date', 'Membership expiration date', 'email' ]
         unless fulfillments.empty?
           fulfillments.each do |fulfillment|
             member = fulfillment.member
@@ -36,7 +40,8 @@ namespace :fulfillments do
                     membership.terms_of_membership.name, member.address, 
                     member.city, member.state, "=\"#{member.zip}\"", member.full_phone_number,
                     I18n.l(member.join_date, :format => :only_date_short), 
-                    (I18n.l membership.cancel_date, :format => :only_date_short if membership.cancel_date ) 
+                    (I18n.l membership.cancel_date, :format => :only_date_short if membership.cancel_date ).to_s,
+                    member.email
                   ]
             sheet.add_row row 
             fulfillment_file.fulfillments << fulfillment
