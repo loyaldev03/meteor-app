@@ -456,6 +456,7 @@ class Member < ActiveRecord::Base
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
         trans.response_result = I18n.t('error_messages.airbrake_error_message')
+        trans.response = { message: message } 
         trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
         answer = trans.process
         if trans.success?
