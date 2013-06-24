@@ -476,7 +476,9 @@ class Member < ActiveRecord::Base
       end
     end
   rescue Exception => e
-    Auditory.report_issue("Billing:membership", e, { :member => self.inspect })
+    params = { :member => self.inspect, :exception => e.to_s }
+    params.merge!( :transaction_id => trans.id ) if trans
+    Auditory.report_issue( "Billing:membership", e, params )
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
