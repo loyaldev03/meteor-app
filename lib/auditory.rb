@@ -18,27 +18,27 @@ class Auditory
     end
   end
   
-  def self.report_issue(error = "Special Error", message = '', params = {})
+  def self.report_issue(error = "Special Error", message = '', params = {}, add_backtrace = true)
     # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)
-    unless ["test","development"].include? Rails.env
-      comment = message.to_s + "\nBacktrace:\n " + caller.join("\n").to_s + "\n\n\n Parameters: " + params.collect{|k,v| "#{k}: #{v}" }.join("\n")
+      comment = message.to_s
+      comment = comment + "\nBacktrace:\n " + caller.join("\n").to_s if add_backtrace
+      comment = comment + "\n\n\n Parameters:\n" + params.collect{|k,v| "#{k}: #{v}" }.join("\n")
 
       file_url = "/tmp/error_description_#{Time.zone.now.to_i}.txt"
       temp = File.open(file_url, 'w+')
       temp.write comment
       temp.close
 
-      ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT, 
+      ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT,
         :subject => "[#{Rails.env}] #{error}",
-        :comment => { :value => comment.truncate(10000) },  
-        :submitter_id => ZENDESK_API_CLIENT.current_user.id, 
-        :assignee_id => ZENDESK_API_CLIENT.current_user.id, 
+        :comment => { :value => comment.truncate(10000) },
+        :submitter_id => ZENDESK_API_CLIENT.current_user.id,
+        :assignee_id => ZENDESK_API_CLIENT.current_user.id,
         :type => "incident",
         :tags => (Rails.env == 'production' ? "support-ruby-production" : "support-ruby" ),
         :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
 
       ticket.comment.uploads << file_url
       ticket.save
-    end
   end
 end
