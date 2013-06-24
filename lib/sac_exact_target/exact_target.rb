@@ -28,6 +28,8 @@ module SacExactTarget
       ExactTargetSDK::Attributes.new(Name: api_field, Value: I18n.l(value)) 
     elsif value.class == Date
       ExactTargetSDK::Attributes.new(Name: api_field, Value: I18n.l(value)) 
+    elsif value.class == BigDecimal
+      ExactTargetSDK::Attributes.new(Name: api_field, Value: value*100) 
     else
       ExactTargetSDK::Attributes.new(Name: api_field, Value: value) 
     end
