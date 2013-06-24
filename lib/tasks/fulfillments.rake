@@ -2,11 +2,6 @@ namespace :fulfillments do
   desc "Create fulfillment report for Brian Miller."
   task :generate_fulfillment_naamma_report => :environment do
     begin      
-      fulfillments = Fulfillment.includes(:member).where( 
-        ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
-          AND ? and fulfillments.status = 'not_processed' 
-          AND fulfillments.product_sku like 'KIT-CARD'", fulfillment_file.club_id, 
-        Time.zone.now-7.days, Time.zone.now ])
       fulfillment_file = FulfillmentFile.new 
       fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
 
