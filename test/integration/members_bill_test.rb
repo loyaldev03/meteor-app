@@ -612,7 +612,7 @@ test "Try billing a member with credit card ok, and within a club that allows bi
     assert page.has_content?("Credit card is blank we wont bill")   
   end
 
-  stubs isnt working correctly
+  # stubs isnt working correctly
   test "Litle payment gateway (Enrollment amount)" do
     setup_member(false)
     @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
