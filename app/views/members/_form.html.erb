@@ -230,7 +230,7 @@ Please, have in mind that fields with ' * ' are required.
   <table id="external_id" class="table table-bordered table-condensed table-nohover">
     <thead>
       <tr class="box_title">
-        <th colspan="3"><h4>Additional Information</h4> </th>
+        <th colspan="2"><h4>Additional Information</h4> </th>
       </tr>
     </thead>
     <tbody>
@@ -250,17 +250,14 @@ Please, have in mind that fields with ' * ' are required.
   </table>
 <% end %>
 
-<table>
- <tr class="control-group">
-    <th colspan="4"> <%= f.submit nil, :class => 'btn btn-primary', :id => 'submit_button' %>
-      <% if @member.new_record? %>
-        <%= link_to t(:cancel), :back, :class => 'btn' %>  
-      <% else %>
-        <%= link_to t('buttons.cancel_update'), show_member_path, :class => 'btn' %> 
-      <% end %>
-    </th>
-  </tr>
-</table>
+<div class="form-actions">
+  <%= f.submit nil, :class => 'btn btn-primary', :id => 'submit_button' %>
+  <% if @member.new_record? %>
+    <%= link_to t(:cancel), :back, :class => 'btn' %>  
+  <% else %>
+    <%= link_to t('buttons.cancel_update'), show_member_path, :class => 'btn' %> 
+  <% end %>
+</div>
 
 <% if @member.new_record? %>
   <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
