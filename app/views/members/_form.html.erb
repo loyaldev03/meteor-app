@@ -182,7 +182,7 @@
 <table id="table_credit_card" class="table table-bordered table-condensed table-nohover">
   <thead>
     <tr class="box_title">
-      <th colspan="2">
+      <th>
         <h4>Credit Card
         <%= f.label :allow_cc_blank,t('Allow blank credit card?'), :class => 'help-inline' %>
         <%= check_box :setter, :cc_blank %>
@@ -230,19 +230,21 @@ Please, have in mind that fields with ' * ' are required.
   <table id="external_id" class="table table-bordered table-condensed table-nohover">
     <thead>
       <tr class="box_title">
-        <th colspan="2"><h4>Additional Information</h4> </th>
+        <th><h4>Additional Information</h4> </th>
       </tr>
     </thead>
     <tbody>
-      <tr class = "control-group">
+      <tr>
         <td>
           <table class="hidden_table_border">
-          <th>
-          <%= f.label :external_id, t('activerecord.attributes.credit_card.external_id'), :class => 'help-inline' %>
-          </th>
-          <td> 
-            <%= f.text_field :external_id, :class => 'text_field input-small' %>
-          </td>
+            <tr class = "control-group">
+              <th>
+                <%= f.label :external_id, t('activerecord.attributes.credit_card.external_id'), :class => 'help-inline' %>
+              </th>
+              <td> 
+                <%= f.text_field :external_id, :class => 'text_field input-small' %>
+              </td>
+            </tr>
           </table>
         </td>  
       </tr>
