@@ -1139,10 +1139,14 @@ class Member < ActiveRecord::Base
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_email_sync_error rake task, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each_with_index do |member, index|
-        member_list.merge!("member"+index => member.inspect)
+        value = member.inspect
+        member.club.domains.each_with_index do |drupal_domain, index_domain|  
+          value = value + "domain#{index_domain+1} : #{drupal_domain.url}/admin/people"
+        end
+        member_list.merge!("member#{index+1}" => value)
       end
     end
-    Auditory.report_issue("Members::DuplicatedEmailSyncError.", "The following members are having problems with the syncronization due to duplicated emails.", member_list) if member_list.coumember_listnt != 0
+    Auditory.report_issue("Members::DuplicatedEmailSyncError.", "The following members are having problems with the syncronization due to duplicated emails.", member_list, false) if member_list.count != 0
   rescue Exception => e
     Auditory.report_issue("Members::SyncErrorEmail", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
     Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"  
