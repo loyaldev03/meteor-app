@@ -26,6 +26,8 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
       @fulfillment = FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'kit-card')
     end
 
+    kit_product = FactoryGirl.create(:product, :club_id => @club.id, :sku => 'KIT')
+
     sign_in_as(@admin_agent)
   end
 
@@ -778,6 +780,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "set as wrong address fulfillment at processing status" do
     setup_member(false)
+
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
 
     create_member_throught_sloop(enrollment_info)
