@@ -1143,7 +1143,7 @@ class Member < ActiveRecord::Base
         member_list.merge!("member#{index+1}" => member.inspect + "domain: #{member.club.api_domain.url}/admin/people")
       end
     end
-    Auditory.report_issue("Members::DuplicatedEmailSyncError.", "The following members are having problems with the syncronization due to duplicated emails.", member_list, false) if member_list.empty?
+    Auditory.report_issue("Members::DuplicatedEmailSyncError.", "The following members are having problems with the syncronization due to duplicated emails.", member_list, false) unless member_list.empty?
   rescue Exception => e
     Auditory.report_issue("Members::SyncErrorEmail", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
     Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"  
