@@ -19,6 +19,7 @@ class Auditory
   end
   
   def self.report_issue(error = "Special Error", message = '', params = {}, add_backtrace = true)
+    unless ["test","development"].include? Rails.env  
     # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)
       comment = message.to_s
       comment = comment + "\nBacktrace:\n " + caller.join("\n").to_s if add_backtrace
@@ -40,5 +41,6 @@ class Auditory
 
       ticket.comment.uploads << file_url
       ticket.save
+    end
   end
 end
