@@ -52,7 +52,7 @@ module SacExactTarget
       else
         { exact_target_sync_result: 'Success' }
       end
-      ::Prospect.where(id: self.prospect.id).limit(1).update_all(data)
+      ::Prospect.where(uuid: self.prospect.id).limit(1).update_all(data)
       self.prospect.reload rescue self.prospect
     end
 
