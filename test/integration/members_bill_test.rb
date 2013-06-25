@@ -629,7 +629,7 @@ test "Try billing a member with credit card ok, and within a club that allows bi
     make_a_refund(transaction, transaction.amount_available_to_refund)
   end
 
-  stubs isnt working correctly
+  # stubs isnt working correctly
   test "Litle payment gateway (Installment amount)" do
     setup_member(false)
     @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
