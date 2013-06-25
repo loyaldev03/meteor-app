@@ -14887,3 +14887,51 @@ attributes:
   created_at: 2013-06-25 19:09:22.000000000 Z
   updated_at: 2013-06-25 19:09:22.000000000 Z
   id: 994
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: authorize_net
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '2'
+  limit: 0
+  days: 0
+  decline_type: hard
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-25 20:46:17.000000000 Z
+  updated_at: 2013-06-25 20:46:17.000000000 Z
+  id: 995
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: authorize_net
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '2'
+  limit: 0
+  days: 0
+  decline_type: hard
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-25 20:46:18.000000000 Z
+  updated_at: 2013-06-25 20:46:18.000000000 Z
+  id: 996
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: authorize_net
+  installment_type: 1000.years
+  credit_card_type: all
+  response_code: '2'
+  limit: 0
+  days: 0
+  decline_type: hard
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-25 20:46:18.000000000 Z
+  updated_at: 2013-06-25 20:46:18.000000000 Z
+  id: 997
