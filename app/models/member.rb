@@ -1135,7 +1135,7 @@ class Member < ActiveRecord::Base
 
   def self.process_email_sync_error
     member_list = {}
-    base = Member.where("sync_status = 'with_error' AND last_sync_error like 'The e-mail address%is already taken.%'")
+    base = Member.where("sync_status = 'with_error' AND last_sync_error like '%The e-mail address%is already taken.%'")
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_email_sync_error rake task, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each_with_index do |member, index|
