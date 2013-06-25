@@ -12,7 +12,7 @@ module SacExactTarget
         options[:subscribe_to_list] = false
         client.Update(subscriber(subscriber.subscriber_key, options))
       end
-      SacExactTarget::report_error("SacExactTarget:Prospect:save", res) unless res.nil?
+      update_prospect(res)
     end
 
     def self.destroy_by_email(email, club_id)
@@ -43,6 +43,17 @@ module SacExactTarget
     # so, it wont be find it on prospect table
     def self.email_belongs_to_prospect?(subscriber_key)
       Prospect.find_by_uuid subscriber_key
+    end
+
+    def update_prospect(res)
+      data = if res.OverallStatus != "OK"
+        SacExactTarget::report_error("SacExactTarget:Member:save", res)
+        { exact_target_sync_result: res.Results.first.status_message }
+      else
+        { exact_target_sync_result: 'Success' }
+      end
+      ::Prospect.where(id: self.prospect.id).limit(1).update_all(data)
+      self.prospect.reload rescue self.prospect
     end
 
     private

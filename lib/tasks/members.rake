@@ -59,23 +59,6 @@ namespace :members do
     end
   end
 
-
-  desc "Sync members to pardot"
-  # This task should be run each day at 3 am ?
-  task :sync_members_to_pardot => :environment do
-    Rails.logger = Logger.new("#{Rails.root}/log/members_sync_members_to_pardot.log")
-    Rails.logger.level = Logger::DEBUG
-    ActiveRecord::Base.logger = Rails.logger
-    tall = Time.zone.now
-    begin
-      if defined? Pardot::Member
-        Member.sync_members_to_pardot
-      end
-    ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:sync_members_to_pardot task"
-    end
-  end
-
   desc "Send Happy birthday email to members"
   # This task should be run each day at 3 am ?
   task :send_happy_birthday => :environment do

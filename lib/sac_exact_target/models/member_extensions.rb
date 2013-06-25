@@ -1,7 +1,30 @@
 module SacExactTarget
   module MemberExtensions
     def self.included(base)
+      base.send :extend, ClassMethods
       base.send :include, InstanceMethods
+    end
+
+    module ClassMethods
+      def sync_members_to_exact_target
+        index = 0
+        base = Member.where(" exact_target_synced_status = 'not_synced' ")
+        Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_exact_target, processing #{base.count} members"
+        base.find_in_batches do |group|
+          group.each do |member|
+            tz = Time.zone.now
+            begin
+              index = index+1
+              Rails.logger.info "  *[#{index}] processing member ##{member.id}"
+              member.marketing_tool_sync
+            rescue Exception => e
+              Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+              Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+            end
+            Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+          end
+        end
+      end
     end
 
     module InstanceMethods
