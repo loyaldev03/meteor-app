@@ -247,7 +247,7 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search member by first name" do
     setup_search
-    search_member("member[first_name]","#{@search_member.first_name}")
+    search_member("member[first_name]","#{@search_member.first_name}", @search_member)
 
   end
 

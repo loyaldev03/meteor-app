@@ -133,7 +133,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
   test "cancel member and check if processing fulfillments were updated to canceled" do
     setup_member
-    @fulfillment.set_as_processing
+    @fulfillment.set_as_in_process
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
@@ -183,7 +183,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
   test "cancel member and check if undeliverable fulfillments were updated to canceled" do
     setup_member
-    @fulfillment.set_as_processing
+    @fulfillment.set_as_in_process
     @fulfillment.set_as_undeliverable
     
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -209,7 +209,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
   test "display 'Mark as sent' and 'Set as wrong number' when fulfillment is processing on memebr's profile." do
     setup_member
-    @fulfillment.set_as_processing    
+    @fulfillment.set_as_in_process    
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
@@ -502,7 +502,7 @@ test "Enroll a member with recurrent product and it on the list" do
     assert_equal(fulfillment.recurrent, true)
     assert_equal(fulfillment.status, 'not_processed')
 
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table"){click_link_or_button("Fulfillments")}
@@ -552,7 +552,7 @@ test "Enroll a member with recurrent product and it on the list" do
     assert_equal(fulfillment.recurrent, true)
     assert_equal(fulfillment.status, 'not_processed')
 
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
     fulfillment.set_as_sent
 
     click_link_or_button("My Clubs")
@@ -604,7 +604,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     fulfillment = Fulfillment.last
 
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
     fulfillment.set_as_sent
 
     click_link_or_button("My Clubs")
@@ -647,7 +647,7 @@ test "Enroll a member with recurrent product and it on the list" do
     assert_equal(fulfillment.recurrent, true)
     assert_equal(fulfillment.status, 'not_processed')
 
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
     fulfillment.set_as_sent
 
     click_link_or_button("My Clubs")
@@ -699,7 +699,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member = Member.find_by_email(@member.email)
 
     @saved_member.fulfillments.each do |fulfillment|
-      fulfillment.set_as_processing
+      fulfillment.set_as_in_process
     end
     click_link_or_button("My Clubs")
     within("#my_clubs_table"){click_link_or_button("Fulfillments")}
@@ -740,7 +740,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
     click_link_or_button("My Clubs")
     within("#my_clubs_table"){click_link_or_button("Fulfillments")}
     page.has_content?("Fulfillments")
@@ -784,7 +784,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member = Member.find_by_email(@member.email)
 
     fulfillment = Fulfillment.find_by_product_sku('KIT')
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
     click_link_or_button("My Clubs")
     within("#my_clubs_table"){click_link_or_button("Fulfillments")}
     page.has_content?("Fulfillments")
@@ -989,7 +989,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
 
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
     fulfillment.set_as_sent
     product = fulfillment.product
     product.update_attribute(:stock, 0)
@@ -1030,7 +1030,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member.current_membership.update_attribute(:join_date,Time.zone.now-1.year)
 
     fulfillment = Fulfillment.find_by_product_sku('KIT')
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
     fulfillment.member.set_wrong_address(@admin_agent,'spam')
     fulfillment.reload
     fulfillment.renew!
@@ -1068,7 +1068,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member.current_membership.update_attribute(:join_date,Time.zone.now-1.year)  
 
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
     fulfillment.set_as_sent
     
     fulfillment.renew!
@@ -1099,7 +1099,7 @@ test "Enroll a member with recurrent product and it on the list" do
   test "fulfillment status undeliverable" do
     setup_member
 
-    @fulfillment.set_as_processing
+    @fulfillment.set_as_in_process
     @saved_member.set_wrong_address(@admin_agent, 'admin')
 
     click_link_or_button("My Clubs")
@@ -1125,7 +1125,7 @@ test "Enroll a member with recurrent product and it on the list" do
   test "Resend fulfillment with status undeliverable - Product with stock" do
     setup_member
 
-    @fulfillment.set_as_processing
+    @fulfillment.set_as_in_process
     @saved_member.set_wrong_address(@admin_agent, 'admin')
     @fulfillment.reload
     click_link_or_button("My Clubs")
@@ -1174,7 +1174,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member = Member.find_by_email(@member.email)
     @fulfillment = Fulfillment.first
 
-    @fulfillment.set_as_processing
+    @fulfillment.set_as_in_process
     @saved_member.set_wrong_address(@admin_agent, 'admin')
 
     click_link_or_button("My Clubs")
@@ -1237,7 +1237,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "fulfillment record from processing to cancel status" do
     setup_member
-    @fulfillment.set_as_processing
+    @fulfillment.set_as_in_process
 
     @saved_member.set_as_canceled
     @saved_member.reload
@@ -1277,7 +1277,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "fulfillment record from undeliverable to cancel status" do
     setup_member
-    @fulfillment.set_as_processing
+    @fulfillment.set_as_in_process
     @saved_member.set_wrong_address(@admin_agent, 'admin')
     @fulfillment.reload
     assert_equal(@fulfillment.status, 'undeliverable')
@@ -1301,7 +1301,7 @@ test "Enroll a member with recurrent product and it on the list" do
   test "fulfillment record at sent status when member is canceled" do
     setup_member
 
-    @fulfillment.set_as_processing
+    @fulfillment.set_as_in_process
     @fulfillment.set_as_sent
     assert_equal(@fulfillment.status, 'sent')
     @saved_member.set_as_canceled
@@ -1369,7 +1369,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @product_recurrent = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
     @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true)
     @fulfillment_renewable.update_attribute(:renewable_at, Time.zone.now)
-    @fulfillment_renewable.set_as_processing
+    @fulfillment_renewable.set_as_in_process
     @fulfillment_renewable.set_as_sent
     
     Fulfillment.process_fulfillments_up_today
@@ -1406,7 +1406,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @product_recurrent = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
     @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true)
     @fulfillment_renewable.update_attribute(:renewable_at, Time.zone.now)
-    @fulfillment_renewable.set_as_processing
+    @fulfillment_renewable.set_as_in_process
     @fulfillment_renewable.set_as_undeliverable
     
     Fulfillment.process_fulfillments_up_today
@@ -1693,7 +1693,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     create_member_throught_sloop(enrollment_info)
     fulfillment = Fulfillment.last
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
     fulfillment.set_as_sent
 
     @saved_member = Member.find_by_email(@member.email)
@@ -1739,7 +1739,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     create_member_throught_sloop(enrollment_info)
     fulfillment = Fulfillment.last
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
     fulfillment.set_as_sent
 
     @saved_member = Member.find_by_email(@member.email)
@@ -1790,7 +1790,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillment_card = Fulfillment.find_by_product_sku(product_card.sku)
     fulfillment_kit = Fulfillment.find_by_product_sku(product_kit.sku)
     fulfillment_other = Fulfillment.find_by_product_sku(product_other.sku)
-    fulfillment_other.set_as_processing
+    fulfillment_other.set_as_in_process
     @saved_member.set_wrong_address(@admin_agent, 'reason')
 
     click_link_or_button("My Clubs")
@@ -1983,7 +1983,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member = Member.find_by_email(@member.email)
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
     
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
@@ -2123,7 +2123,7 @@ test "Enroll a member with recurrent product and it on the list" do
     create_member_throught_sloop(enrollment_info)
     @saved_member = Member.find_by_email(@member.email)
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
-    fulfillment.set_as_processing
+    fulfillment.set_as_in_process
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
