@@ -42,7 +42,11 @@ module SacExactTarget
     # If subscriber is prospct we will find him. If its a member, subscriber key is the member id, 
     # so, it wont be find it on prospect table
     def self.email_belongs_to_prospect?(subscriber_key)
-      Prospect.find_by_uuid subscriber_key
+      if Rails.env.production?
+        Prospect.find_by_uuid subscriber_key
+      else
+        Prospect.find_by_uuid subscriber_key.gsub(/[staging-|prototype-]/, '')
+      end
     end
 
     def update_prospect(res)
