@@ -47,6 +47,7 @@ module SacExactTarget
         logger.info "SacExactTarget::sync took #{time_elapsed}ms"
       rescue Exception => e
         Auditory.report_issue("Prospect:sync", e, { :prospect => self.inspect })
+        raise e
       end
 
     end
