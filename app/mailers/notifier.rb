@@ -58,12 +58,6 @@ class Notifier < ActionMailer::Base
          :bcc => 'platformadmins@xagax.com'
   end
 
-  def members_with_duplicated_email_sync_error(member_list)
-    @members = member_list
-    mail :to => Settings.email_to_use_on_duplicated_email_sync_error,
-         :subject => "[#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )} - Duplicated email sync error."
-  end
-
   def hard_decline(member)
     @member = member
     mail :to => member.email, :subject => "Membership cancellation [#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )}"
