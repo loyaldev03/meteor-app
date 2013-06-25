@@ -379,7 +379,8 @@ class Member < ActiveRecord::Base
   end
 
   def last_refunded_amount
-    self.transactions.refunds.order('created_at DESC').first.amount rescue 0.0
+    # default order by is created_at ASC
+    self.transactions.refunds.last.amount rescue 0.0
   end
 
   # Returns true if member is not blacklisted and not lapsed
