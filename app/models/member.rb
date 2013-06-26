@@ -555,6 +555,7 @@ class Member < ActiveRecord::Base
 
   def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = false, skip_api_sync = false)
     credit_card_params = {} if credit_card_params.blank? # might be [], we expect a Hash
+    credit_card_params = { :number => '0000000000', :expire_year => Time.zone.now.year, :expire_month => Time.zone.now.month } if cc_blank
     club = tom.club
 
     unless club.billing_enable

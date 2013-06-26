@@ -1570,4 +1570,30 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member.reload
     assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
   end
+
+  test "Admin should enroll/create member with blank_cc as true even if not cc information provided." do
+    sign_in @admin_user
+    @club = @club_with_api
+    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count')do
+      assert_difference('EnrollmentInfo.count')do
+        assert_difference('Transaction.count')do
+          assert_difference('MemberPreference.count',@preferences.size) do 
+            assert_difference('Member.count') do
+              generate_post_message({:setter => { :cc_blank => true }})
+              assert_response :success
+            end
+          end
+        end
+      end
+    end
+    assert @response.body
+  end
+
 end
