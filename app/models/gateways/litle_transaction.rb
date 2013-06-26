@@ -43,7 +43,7 @@ class LitleTransaction < Transaction
       if answer.params
         self.response_transaction_id=answer.params['litleOnlineResponse']['litleTxnId']
         self.response_auth_code=answer.params['auth_code']
-        self.response_code=answer.params['litleOnlineResponse']['response']
+        self.response_code=(answer.params['litleOnlineResponse']['saleResponse']['response'] rescue answer.params['litleOnlineResponse']['response'])
       end
       self.response_result=answer.message
       save
