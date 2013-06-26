@@ -45,7 +45,7 @@ module SacExactTarget
       if Rails.env.production?
         Prospect.find_by_uuid subscriber_key
       else
-        Prospect.find_by_uuid subscriber_key.gsub(/[staging-|prototype-]/, '')
+        Prospect.find_by_uuid subscriber_key.gsub(/(staging-|prototype-)/, '')
       end
     end
 
