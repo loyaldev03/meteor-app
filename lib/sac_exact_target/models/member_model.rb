@@ -2,7 +2,6 @@ module SacExactTarget
   class MemberModel < Struct.new(:member)
 
     def save!
-      client, options = ExactTargetSDK::Client.new, {}
       update_member(new_record? ? create! : update!)
     end
 
@@ -13,6 +12,18 @@ module SacExactTarget
         result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
       end.flatten.first
       @subscriber.nil?
+    end
+
+    def unsubscribe_subscriber!
+      client = ExactTargetSDK::Client.new
+      attributes = [ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)]
+      id = ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
+      s = ExactTargetSDK::Subscriber.new({
+        'SubscriberKey' => subscriber_key, 'Status' => 'Unsubscribed',
+        'EmailAddress' => self.member.email, 'Client' => id, 'ObjectID' => true,
+        'Attributes' => attributes
+      })
+      client.Update(s)
     end
 
   private
@@ -76,9 +87,8 @@ module SacExactTarget
         'SubscriberKey' => subscriber_key, 
         'EmailAddress' => self.member.email, 'Client' => id, 'ObjectID' => true, 
         'Attributes' => attributes.compact }.
-        merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ).
-        merge(self.member.blacklisted ? { 'Status' => 'Unsubscribed' } : {} )
-        )        
+        merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} )
+      )        
     end
 
     def fieldmap

@@ -38,7 +38,7 @@ module SacExactTarget
       res = ExactTargetSDK::Subscriber.find [ ["EmailAddress", ExactTargetSDK::SimpleOperator::EQUALS, email] ]
       res.Results.collect do |result|
         result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
-      end.flatten
+      end.flatten.compact
     end
 
     def self.find_by_email(email, club_id)

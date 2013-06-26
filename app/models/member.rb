@@ -874,6 +874,8 @@ class Member < ActiveRecord::Base
         begin
           self.blacklisted = true
           self.save(:validate => false)
+          # TODO: improve
+          # exact_target_member.unsubscribe_subscriber! if defined?(SacExactTarget::MemberModel)
           message = "Blacklisted member and all its credit cards. Reason: #{reason}."
           Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
           self.credit_cards.each { |cc| cc.blacklist }
