@@ -273,7 +273,10 @@ class MemberTest < ActiveSupport::TestCase
           assert_equal original_year, member.transactions.last.expire_year
           assert_equal member.recycled_times, 0
           assert_equal member.credit_cards.count, 1 # only one credit card
-          assert_equal member.credit_cards.first.expire_year, original_year # expire_year should not be changed.
+          
+          puts member.active_credit_card.expire_year
+          puts original_year+3
+          assert_equal member.active_credit_card.expire_year, original_year+3 # expire_year should be +3 years. 
         end
       end
     end

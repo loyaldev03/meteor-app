@@ -458,13 +458,15 @@ class Member < ActiveRecord::Base
         Auditory.report_issue("Billing", message, { :member => self.inspect, :membership => current_membership.inspect })
         { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
       else
+        acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
         trans.response_result = I18n.t('error_messages.airbrake_error_message')
         trans.response = { message: message } 
-        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
+        trans.prepare(self, acc, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
         answer = trans.process
         if trans.success?
+          active_credit_card.update_attribute :expire_year, acc.expire_year # lets update year if we recycle this member
           proceed_with_billing_logic(trans, Settings.operation_types.membership_billing, false ,"Billing")
         else
           message = set_decline_strategy(trans)
@@ -492,11 +494,13 @@ class Member < ActiveRecord::Base
       answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
     else
       if can_bill_membership?
+        acc = CreditCard.recycle_expired_rule(active_credit_card, recycled_times)
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
-        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.no_recurrent_billing)
+        trans.prepare(self, acc, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.no_recurrent_billing)
         answer = trans.process
         if trans.success?
+          active_credit_card.update_attribute :expire_year, acc.expire_year # lets update year if we recycle this member
           message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
           trans.update_attribute :response_result, trans.response_result+". Reason: #{description}"
           answer = { :message => message, :code => Settings.error_codes.success }
