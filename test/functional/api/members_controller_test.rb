@@ -49,7 +49,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                                 }.merge(options), :format => :json } )
   end  
 
-  def generate_post_message(options = {})
+  def generate_post_message(options = {},options2 = {})
     post( :create, { member: {:first_name => @member.first_name, 
                               :last_name => @member.last_name,
                               :address => @member.address,
@@ -63,7 +63,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                               :phone_country_code => @member.phone_country_code,
                               :phone_area_code => @member.phone_area_code,
                               :phone_local_number => @member.phone_local_number,
-                              :enrollment_amount => 34.34,
+                              :enrollment_amount => @enrollment_info.enrollment_amount,
                               :terms_of_membership_id => @terms_of_membership.id,
                               :birth_date => @member.birth_date,
                               :preferences => @preferences,
@@ -76,7 +76,7 @@ class Api::MembersControllerTest < ActionController::TestCase
                               :marketing_code => @enrollment_info.marketing_code,
                               :fulfillment_code => @enrollment_info.fulfillment_code,
                               :ip_address => @enrollment_info.ip_address
-                              }.merge(options),:format => :json } )
+                              }.merge(options),:format => :json }.merge(options2) )
   end
 
   def generate_put_next_bill_date(next_bill_date)
@@ -126,7 +126,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(enrollment_info.membership_id, membership.id)
     assert_equal(saved_member.club_cash_amount, @terms_of_membership.club_cash_amount)
     transaction = Transaction.last
-    assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
+    assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
   end
 
   test "Admin should enroll/create member within club related to drupal" do
@@ -1095,7 +1095,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       end
     end
     transaction = Transaction.last
-    assert_equal(transaction.amount, 34.34) #Enrollment amount = 34.34
+    assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
   end
 
   test "Should not create member's record when there is an error on MeS get token." do
@@ -1570,4 +1570,31 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member.reload
     assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
   end
+
+  test "Admin should enroll/create member with blank_cc as true even if not cc information provided." do
+    sign_in @admin_user
+    @club = @club_with_api
+    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info, :enrollment_amount => 0.0
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count')do
+      assert_difference('EnrollmentInfo.count')do
+        assert_difference('MemberPreference.count',@preferences.size) do 
+          assert_difference('Member.count') do
+            generate_post_message({}, {setter: { cc_blank: true }})
+            assert_response :success
+          end
+        end
+      end
+    end
+    credit_card = Member.last.active_credit_card
+    assert_equal credit_card.token, "a"
+    assert_equal credit_card.expire_month, Time.zone.now.month
+    assert_equal credit_card.expire_year, Time.zone.now.year
+  end
+
 end
