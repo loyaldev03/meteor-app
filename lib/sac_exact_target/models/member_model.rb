@@ -26,6 +26,19 @@ module SacExactTarget
       client.Update(s)
     end
 
+    def send_email
+      client = ExactTargetSDK::Client.new
+      id = ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
+      customer_key = '424' # provided by Parrish. Should be stored at Communications.
+      trigger_definition = ExactTargetSDK::TriggeredSendDefinition.new('CustomerKey' => customer_key)
+      s = ExactTargetSDK::Subscriber.new({ 'SubscriberKey' => subscriber_key, 'EmailAddress' => self.member.email })
+      trigger_to_send = ExactTargetSDK::TriggeredSend.new(
+        'TriggeredSendDefinition' => trigger_definition, 
+        'Client' => id,
+        'Subscribers' => [s] )
+      client.Create(trigger_to_send)
+    end
+
   private
 
     def create!
