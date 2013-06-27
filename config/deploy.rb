@@ -40,7 +40,7 @@ end
 task :bundle_install do
   puts "  **** bundle_install"
   run "id"
-  run "cd #{release_path}; bundle install"
+  run "cd #{release_path}; #{sudo} bundle install"
 end
 
 desc "Restart delayed jobs"

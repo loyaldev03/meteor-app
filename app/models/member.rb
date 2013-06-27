@@ -555,6 +555,7 @@ class Member < ActiveRecord::Base
 
   def self.enroll(tom, current_agent, enrollment_amount, member_params, credit_card_params, cc_blank = false, skip_api_sync = false)
     credit_card_params = {} if credit_card_params.blank? # might be [], we expect a Hash
+    credit_card_params = { number: '0000000000', expire_year: Time.zone.now.year, expire_month: Time.zone.now.month } if cc_blank
     club = tom.club
 
     unless club.billing_enable
@@ -1140,7 +1141,9 @@ class Member < ActiveRecord::Base
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_email_sync_error rake task, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each_with_index do |member, index|
-        member_list.merge!("member#{index+1}" => member.inspect + "domain: #{member.club.api_domain.url}/admin/people")
+        club = member.club
+        row = "ID: #{member.id} - Partner-Club: #{club.partner.name}-#{club.name} - Email: #{member.email} - Status: #{member.status} - Drupal domain link: #{member.club.api_domain.url}/admin/people}"
+        member_list.merge!("member#{index+1}" => row)
       end
     end
     Auditory.report_issue("Members::DuplicatedEmailSyncError.", "The following members are having problems with the syncronization due to duplicated emails.", member_list, false) unless member_list.empty?

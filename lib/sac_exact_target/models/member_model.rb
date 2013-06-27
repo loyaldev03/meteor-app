@@ -75,7 +75,10 @@ module SacExactTarget
       ExactTargetSDK::Subscriber.new({
         'SubscriberKey' => subscriber_key, 
         'EmailAddress' => self.member.email, 'Client' => id, 'ObjectID' => true, 
-        'Attributes' => attributes.compact }.merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ))        
+        'Attributes' => attributes.compact }.
+        merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ).
+        merge(self.member.blacklisted ? { 'Status' => 'Unsubscribed' } : {} )
+        )        
     end
 
     def fieldmap
