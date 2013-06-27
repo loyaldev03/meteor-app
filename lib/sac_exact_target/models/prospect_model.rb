@@ -42,7 +42,7 @@ module SacExactTarget
     end
 
     def self.find_by_email(email, club_id)
-      find_by_email(email, club_id).first
+      find_all_by_email(email, club_id).first
     end
  
     # easy way to know if a subscriber key is a prospect or member. This method can be improved, filtering by List id.
