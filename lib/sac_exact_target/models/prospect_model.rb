@@ -30,7 +30,7 @@ module SacExactTarget
       subscriber = ExactTargetSDK::Subscriber.new('SubscriberKey' => subscriber_key, 
         'EmailAddress' => self.prospect.email, 'ObjectID' => true)
       res = client.Delete(subscriber)
-      SacExactTarget::report_error("SacExactTarget:Prospect:destroy", res)
+      SacExactTarget::report_error("SacExactTarget:Prospect:destroy", res) if res.OverallStatus != "OK"
     end
 
     def self.find_all_by_email(email, club_id)
