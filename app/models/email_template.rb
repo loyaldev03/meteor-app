@@ -18,7 +18,7 @@ class EmailTemplate < ActiveRecord::Base
 
   validates :name, :template_type, :terms_of_membership_id, :presence => :true
 
-  CLIENTS = [ :amazon, :action_mailer, :lyris ]
+  CLIENTS = [ :exact_target, :action_mailer, :lyris ]
 
   def lyris?
     self.client == 'lyris'
@@ -26,6 +26,10 @@ class EmailTemplate < ActiveRecord::Base
 
   def action_mailer?
     self.client == 'action_mailer'
+  end
+
+  def exact_target?
+    self.client == 'exact_target'
   end
 
 end
