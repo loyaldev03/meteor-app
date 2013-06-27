@@ -122,7 +122,7 @@ class CreditCard < ActiveRecord::Base
   # 6 Days Later if not successful = (+4) 3/2015
   # 6 Days Later if not successful = (+1) 3/2012
   def self.recycle_expired_rule(acc, times)
-    if acc.expired?
+    if not acc.nil? and acc.expired?
       case times
       when 0
         new_year_exp=acc.expire_year + 3
