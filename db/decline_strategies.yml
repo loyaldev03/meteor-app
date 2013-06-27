@@ -14935,3 +14935,324 @@ attributes:
   created_at: 2013-06-25 20:46:18.000000000 Z
   updated_at: 2013-06-25 20:46:18.000000000 Z
   id: 997
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '307'
+  limit: 6
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 998
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '307'
+  limit: 6
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 999
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '349'
+  limit: 6
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1000
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '349'
+  limit: 6
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1001
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '304'
+  limit: 3
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1002
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '304'
+  limit: 3
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1003
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '350'
+  limit: 6
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1004
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '350'
+  limit: 6
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1005
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '305'
+  limit: 5
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1006
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '305'
+  limit: 5
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1007
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '303'
+  limit: 3
+  days: 3
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1008
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '303'
+  limit: 3
+  days: 3
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1009
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '110'
+  limit: 6
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1010
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '110'
+  limit: 6
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1011
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '120'
+  limit: 4
+  days: 5
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1012
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '120'
+  limit: 4
+  days: 5
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1013
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '127'
+  limit: 6
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1014
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '127'
+  limit: 6
+  days: 6
+  decline_type: soft
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1015
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.month
+  credit_card_type: all
+  response_code: '322'
+  limit: 0
+  days: 0
+  decline_type: hard
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1016
+
+
+- !ruby/object:DeclineStrategy
+attributes:
+  gateway: litle
+  installment_type: 1.year
+  credit_card_type: all
+  response_code: '322'
+  limit: 0
+  days: 0
+  decline_type: hard
+  notes: 
+  deleted_at: 
+  created_at: 2013-06-27 12:17:05.000000000 Z
+  updated_at: 2013-06-27 12:17:05.000000000 Z
+  id: 1017
+
