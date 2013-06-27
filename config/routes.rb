@@ -29,6 +29,7 @@ SacPlatform::Application.routes.draw do
       get :lock
       get :unlock
     end
+    resources :delay_jobs, :only => [ :index ]
   end
 
   scope '/partner/:partner_prefix' do
@@ -97,8 +98,6 @@ SacPlatform::Application.routes.draw do
     resources :domains
     match 'dashboard' => 'admin/partners#dashboard', as: 'admin_partner_dashboard'
   end
-
-
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
