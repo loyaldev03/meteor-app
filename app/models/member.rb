@@ -458,15 +458,16 @@ class Member < ActiveRecord::Base
         Auditory.report_issue("Billing", message, { :member => self.inspect, :membership => current_membership.inspect })
         { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
       else
-        active_credit_card.recycle_expired_rule(recycled_times) if active_credit_card
+        credit_card = active_credit_card
+        credit_card.recycle_expired_rule(recycled_times) if credit_card
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
         trans.response_result = I18n.t('error_messages.airbrake_error_message')
         trans.response = { message: message } 
-        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
+        trans.prepare(self, credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
         answer = trans.process
         if trans.success?
-          active_credit_card.save # lets update year if we recycle this member
+          credit_card.save # lets update year if we recycle this member
           proceed_with_billing_logic(trans, Settings.operation_types.membership_billing, false ,"Billing")
         else
           message = set_decline_strategy(trans)
