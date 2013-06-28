@@ -635,7 +635,9 @@ class Member < ActiveRecord::Base
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
       answer = trans.process
       unless trans.success?
-        Auditory.audit(agent, trans, "Transaction was not successful.", (self.new_record? ? nil : self), Settings.operation_types.error_on_enrollment_billing)
+        operation_type = Settings.operation_types.error_on_enrollment_billing
+        Auditory.audit(agent, trans, "Transaction was not successful.", (self.new_record? ? nil : self), operation_type)
+        trans.update_attribute :operation_type, operation_type
         return answer 
       end
     end
@@ -672,10 +674,12 @@ class Member < ActiveRecord::Base
       response
     rescue Exception => e
       logger.error e.inspect
+      operation_type = Settings.operation_types.error_on_enrollment_billing
       error_message = (self.id.nil? ? "Member:enroll" : "Member:recovery/save the sale") + " -- member turned invalid while enrolling"
       Auditory.report_issue(error_message, e, { :member => self.inspect, :credit_card => credit_card.inspect, :enrollment_info => enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
-      Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing)
+      Auditory.audit(agent, self, error_message, self, operation_type)
+      trans.update_attribute :operation_type, operation_type unless trans.nil?
       { :message => I18n.t('error_messages.member_not_saved', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.member_not_saved }
     end
   end
