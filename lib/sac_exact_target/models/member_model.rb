@@ -35,11 +35,7 @@ module SacExactTarget
         'TriggeredSendDefinition' => trigger_definition, 
         'Client' => id,
         'Subscribers' => [s] )
-      result = client.Create(trigger_to_send)
-      if result.OverallStatus != "OK"
-        raise result.Results.first.status_message
-      end
-      result.Results.first.status_message
+      client.Create(trigger_to_send)
     end
 
   private

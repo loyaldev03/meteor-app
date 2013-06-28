@@ -29,7 +29,7 @@ class Communication < ActiveRecord::Base
         if template.lyris?
           c.deliver_lyris
         elsif template.exact_target?
-          c.deliver_action_mailer
+          c.deliver_exact_target
         elsif template.action_mailer?
           c.deliver_action_mailer
         else
@@ -42,8 +42,11 @@ class Communication < ActiveRecord::Base
   end
 
   def deliver_exact_target
-    response = self.member.exact_target_member.send_email external_attributes[:customer_key]
-    update_attributes :sent_success => true, :processed_at => Time.zone.now, :response => response
+    result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
+    self.sent_success = (result.OverallStatus != "OK")
+    self.processed_at = Time.zone.now
+    self.response = result
+    self.save!
     Auditory.audit(nil, self, "Communication '#{template_name}' scheduled", member, Settings.operation_types["#{template_type}_email"])
   rescue Exception => e
     logger.error "* * * * * #{e}"
