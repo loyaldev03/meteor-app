@@ -514,10 +514,10 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end 
 
-  test "Enroll with Litle" do
-    club_with_litle
-    enroll_member(@litle_terms_of_membership, 100, false, @credit_card_litle)
-  end
+#   test "Enroll with Litle" do
+#     club_with_litle
+#     enroll_member(@litle_terms_of_membership, 100, false, @credit_card_litle)
+#   end
 
   test "Full refund with Litle" do
     club_with_litle
