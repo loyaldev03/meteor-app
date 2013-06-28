@@ -459,7 +459,7 @@ class Member < ActiveRecord::Base
         { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
       else
         credit_card = active_credit_card
-        credit_card.recycle_expired_rule(recycled_times) if credit_card
+        credit_card.recycle_expired_rule(recycled_times)
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
         trans.response_result = I18n.t('error_messages.airbrake_error_message')
