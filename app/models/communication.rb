@@ -43,7 +43,7 @@ class Communication < ActiveRecord::Base
 
   def deliver_exact_target
     result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
-    self.sent_success = (result.OverallStatus != "OK")
+    self.sent_success = (result.OverallStatus == "OK")
     self.processed_at = Time.zone.now
     self.response = result
     self.save!
