@@ -29,7 +29,7 @@ SacPlatform::Application.routes.draw do
       get :lock
       get :unlock
     end
-    resources :delay_jobs, :only => [ :index ]
+    resources :delayed_jobs, :only => [ :index ]
   end
 
   scope '/partner/:partner_prefix' do
