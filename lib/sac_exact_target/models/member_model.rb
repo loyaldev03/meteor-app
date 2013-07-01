@@ -165,7 +165,7 @@ module SacExactTarget
     end
 
     def club_id
-      Rails.env.production? ? self.member.club_id : '9999'
+      Rails.env.production? ? self.member.club_id.to_s : '9999'
     end
 
     def client_id
