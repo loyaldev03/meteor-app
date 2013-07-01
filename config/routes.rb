@@ -31,6 +31,8 @@ SacPlatform::Application.routes.draw do
     end
     resources :delayed_jobs, :only => [ :index ]
   end
+  
+  match 'admin/delayed_jobs/:id/reschedule' => 'admin/delayed_job#reschedule', as: 'delayed_job_reschedule', :via => [:post]
 
   scope '/partner/:partner_prefix' do
     resources :clubs

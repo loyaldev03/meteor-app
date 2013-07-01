@@ -81,6 +81,7 @@ en:
     export_all_to_xls: 'Export all to XLS'
     no_recurrent_billing: 'Bill 1-Time Transaction'
     manual_billing: 'Bill manual transaction'
+    reschedule: 'Reschedule'
   admin:
     agents:
       index:
@@ -339,6 +340,14 @@ en:
         package: Package
         package_help: 'This value is part of the Packageid on the fulfillment file. e.g: set as package NCARFLAG and platform will add the member id. The packageid obtained will be NCARFLAG20243911111'
         sku_help: 'Members get fulfills according to the list of SKUs stored while enrollment.'
+      delayed_job:
+        id: 'ID'
+        attempts: 'Attempts'
+        handler: 'Handler'
+        last_error: 'Last error'
+        run_at: 'Run at'
+        created_at: 'created_at'
+        rescheduled_job: "re-scheduled Job: %{job}"
   date:
     formats:
       default: "%m/%d/%Y"

@@ -125,6 +125,23 @@ function club_index_functions(column_count){
   });
 }
 
+function delay_jobs_index_functions(column_count){
+  $('#delayed_jobs_table').dataTable({
+    "sPaginationType": "bootstrap",
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aaSorting": [[ 0, "asc" ]],
+    "aoColumnDefs": [ { "sWidth": "100px", "aTargets": [ 1 ] },
+                      { "sWidth": "130px", "aTargets": [ 4,5,column_count ] },
+                      { "bSortable": false, "aTargets": [ column_count ] }],
+    "sAjaxSource": $('#delayed_jobs_table').data('source'),
+  });
+}
+
+
 function my_club_index_functions(column_count){
   $('#my_clubs_table').dataTable({
     "sPaginationType": "bootstrap",
