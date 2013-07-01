@@ -30,6 +30,7 @@ class MerchantESolutionsTransaction < Transaction
       self.response_code='000'
       self.response = args
       self.membership_id = sale_transaction.membership_id
+      self.operation_type = Settings.operation_types.chargeback
       self.save
       Auditory.audit(nil, self, "Chargeback processed $#{self.amount}", sale_transaction.member, Settings.operation_types.chargeback)
     end
