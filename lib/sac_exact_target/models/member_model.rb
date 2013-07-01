@@ -173,7 +173,7 @@ module SacExactTarget
     end
     
     def business_unit_id
-      Rails.env.production? ? self.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
+      Rails.env.production? ? self.member.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
     end
   end
 end
