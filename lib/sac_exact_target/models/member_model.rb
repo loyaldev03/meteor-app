@@ -43,7 +43,7 @@ module SacExactTarget
         ExactTargetSDK::Attributes.new(Name: 'Status', Value: status) 
       ]
       s = ExactTargetSDK::Subscriber.new({
-        'SubscriberKey' => subscriber_key, 
+        'SubscriberKey' => subscriber_key, 'Status' => status,
         'EmailAddress' => self.member.email, 'Client' => client_id, 'ObjectID' => true,
         'Attributes' => attributes
       })
