@@ -20,7 +20,7 @@ GIT
 
 GIT
   remote: git://github.com/stoneacre/exact_target_sdk.git
-  revision: 70d696732fbac4210f0aeba565b1356bcd4c1d04
+  revision: 79828fc37a071cbb71893915f671faa744f29cdb
   specs:
     exact_target_sdk (0.8.0)
       activemodel (~> 3.0)
