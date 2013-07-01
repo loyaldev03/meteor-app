@@ -2,14 +2,13 @@ module SacExactTarget
   class ProspectModel < Struct.new(:prospect)
     def save!
       return unless self.prospect.email
-      client, options = ExactTargetSDK::Client.new, {}
       # Find by email . I didnt have luck looking for a subscriber by email and List.
       subscriber = SacExactTarget::ProspectModel.find_by_email self.prospect.email, club_id
       res = if subscriber.nil?
-        options[:subscribe_to_list] = true
+        options = { :subscribe_to_list => true }
         client.Create(subscriber(subscriber_key, options))
       elsif SacExactTarget::ProspectModel.email_belongs_to_prospect?(subscriber.subscriber_key)
-        options[:subscribe_to_list] = false
+        options = { :subscribe_to_list => false }
         client.Update(subscriber(subscriber.subscriber_key, options))
       end
       update_prospect(res) unless res.nil?
@@ -26,7 +25,6 @@ module SacExactTarget
     end
 
     def destroy!
-      client = ExactTargetSDK::Client.new
       subscriber = ExactTargetSDK::Subscriber.new('SubscriberKey' => subscriber_key, 
         'EmailAddress' => self.prospect.email, 'ObjectID' => true)
       res = client.Delete(subscriber)
@@ -68,6 +66,15 @@ module SacExactTarget
     end
 
     private
+
+      def client
+        ExactTargetSDK::Client.new
+      end
+
+      def client_id
+        ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
+      end
+       
       def subscriber_key
         Rails.env.production? ? self.prospect.uuid : "#{Rails.env}-#{self.prospect.uuid.to_s}"
       end
@@ -78,10 +85,9 @@ module SacExactTarget
           attributes << SacExactTarget.format_attribute(self.prospect, api_field, our_field)
         end
         attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
-        id = ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
         ExactTargetSDK::Subscriber.new({
           'SubscriberKey' => subscriber_key, 
-          'EmailAddress' => self.prospect.email, 'Client' => id, 'ObjectID' => true, 
+          'EmailAddress' => self.prospect.email, 'Client' => client_id, 'ObjectID' => true, 
           'Attributes' => attributes.compact }.merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ))        
       end
 
