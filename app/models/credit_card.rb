@@ -140,8 +140,8 @@ class CreditCard < ActiveRecord::Base
         new_year_exp=Time.zone.now.year
       end
       if new_year_exp != self.expire_year.to_i
-        self.expire_year = new_year_exp
         Auditory.audit(nil, self, "Automatic Recycled Expired card from #{expire_month}/#{expire_year} to #{expire_month}/#{new_year_exp}", member, Settings.operation_types.automatic_recycle_credit_card)
+        self.expire_year = new_year_exp
       end
     end
   end 
