@@ -30,9 +30,9 @@ SacPlatform::Application.routes.draw do
       get :unlock
     end
     resources :delayed_jobs, :only => [ :index ]
+    match '/delayed_jobs/:id/reschedule' => 'delayed_jobs#reschedule', as: 'delayed_job_reschedule', :via => [:post]
   end
   
-  match 'admin/delayed_jobs/:id/reschedule' => 'admin/delayed_job#reschedule', as: 'delayed_job_reschedule', :via => [:post]
 
   scope '/partner/:partner_prefix' do
     resources :clubs

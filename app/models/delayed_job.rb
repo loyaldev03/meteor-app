@@ -2,7 +2,7 @@ class DelayedJob < ActiveRecord::Base
 
 
 	def reschedule 
-		self.run_at = Time.zone.now -3.days	
+		self.run_at = Time.zone.now-3.days	
 		self.save	
 	end
 
