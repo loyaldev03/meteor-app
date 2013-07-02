@@ -29,6 +29,7 @@ class Auditory
       temp = File.open(file_url, 'w+')
       temp.write comment
       temp.close
+      File.delete(file_url)
 
       ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT,
         :subject => "[#{Rails.env}] #{error}",
