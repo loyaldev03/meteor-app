@@ -43,6 +43,16 @@ module SacExactTarget
         raise e
       end
 
+      def unsubscribe
+        time_elapsed = Benchmark.ms do
+          exact_target_member.unsubscribe_subscriber!
+        end
+        logger.info "SacExactTarget::unsubscribe_subscriber took #{time_elapsed}ms"
+      rescue Exception => e
+        Auditory.report_issue("Member:unsubscribe_subscriber", e, { :member => self.inspect })
+        raise e
+      end
+        
       def exact_target_sync?
         self.club.exact_target_sync?
       end
