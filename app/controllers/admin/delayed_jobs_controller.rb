@@ -1,6 +1,9 @@
 class Admin::DelayedJobsController < ApplicationController
 
+
+
 	def index
+		my_authorize!(@current_agent, DelayedJob)
 		respond_to do |format|
 			format.html
 			format.json { render json: DelayedJobsDatatable.new(view_context,nil,nil,nil,@current_agent) }

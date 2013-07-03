@@ -64,6 +64,7 @@ class Ability
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent
       can :manage_operations_api, Operation
+      can :manage, DelayedJob
     elsif agent.has_role_with_club? 'representative', club_id
       can :manage, Member
       cannot :api_profile, Member
