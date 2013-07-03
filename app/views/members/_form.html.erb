@@ -156,7 +156,8 @@
             <%= f.label :manual_payment, t('activerecord.attributes.member.manual_payment'), :class => 'help-inline' %>
             </th>
             <th> 
-              <%= check_box :member, :manual_payment %>
+              <%= check_box :member, :manual_payment %>              
+              <%= render :partial => "shared/help", :locals => { :title => t('activerecord.attributes.member.manual_payment'), :content => t('activerecord.attributes.member.manual_payment_help')} %>
             </th>
           <% end %>
         </tr>
