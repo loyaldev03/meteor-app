@@ -35,6 +35,7 @@ class Ability
     cannot :manage_prospects_api, Prospect
     cannot :manage_token_api, Agent
     cannot :manage_operations_api, Operation
+    cannot :manage, DelayedJob
 
     if agent.has_role_with_club? 'admin', club_id
       can :manage, Member
