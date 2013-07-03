@@ -94,11 +94,12 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should let save two members with the same email in differents clubs" do
+    @second_club = FactoryGirl.create(:simple_club_with_gateway)
+
     member = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @terms_of_membership_with_gateway.club)
     member.club_id = 1
     member.save
-    member_two = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @terms_of_membership_with_gateway.club)
-    member_two.club_id = 14
+    member_two = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @second_club)
     assert member_two.save, "member cant be save #{member_two.errors.inspect}"
   end
 
