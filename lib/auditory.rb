@@ -41,6 +41,7 @@ class Auditory
 
       ticket.comment.uploads << file_url
       ticket.save
+      File.delete(file_url)
     end
   end
 end
