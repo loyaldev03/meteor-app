@@ -310,7 +310,9 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing with grace period disable on tom and missing CC" do
-    active_member = create_active_member(@terms_of_membership, :active_member_without_cc)
+    active_member = create_active_member( @terms_of_membership, :active_member_without_cc )
+    blank_cc = FactoryGirl.create( :blank_credit_card, :member_id => active_member.id )
+
     nbd = active_member.bill_date
     assert_difference('Operation.count', 5) do
       assert_difference('Communication.count', 2) do

@@ -46,5 +46,4 @@ FactoryGirl.define do
     expire_year { (Date.today + 2.year).year }
     number "370000000000002" # credit card number is provided by Auth.Net
   end
-
 end

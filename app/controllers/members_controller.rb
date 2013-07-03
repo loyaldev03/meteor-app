@@ -189,7 +189,6 @@ class MembersController < ApplicationController
         format.json { render json: { :message => answer[:message], :code => answer[:code] }} 
       end
     end
-
   end
 
   def set_unreachable
