@@ -158,6 +158,7 @@ defaults: &defaults
     from_bad_address_to_out_of_stock: 453
     from_bad_address_to_returned: 454
     from_bad_address_to_canceled: 455
+    automatic_recycle_credit_card: 456
     #vip
     vip_event_registration: 900
     vip_event_cancelation: 901 
@@ -236,9 +237,6 @@ defaults: &defaults
     - us
     defaults:
       email:
-        presence: true
-        uniqueness:
-          :scope: :club_id
         format: !ruby/regexp /^([0-9a-zA-Z\-_]([-_\.]?[+?]?[0-9a-zA-Z\-_])*@([0-9a-zA-Z]+[-_\.]?[0-9a-zA-Z]*\.)+[a-zA-Z]{2,9})$/
       club_id:
         presence: true

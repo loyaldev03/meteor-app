@@ -80,7 +80,8 @@ en:
     create_xls_file: 'Create XLS File'
     export_all_to_xls: 'Export all to XLS'
     no_recurrent_billing: 'Bill 1-Time Transaction'
-    manual_billing: 'Bill manual transaction'
+    manual_billing: 'Check/Cash Payment'
+    manual_billing_help: 'This Payment is a membership payment that will be applied to the membership and is received offline (not via credit card). Payments of this type will act as if they were credit card transactions adjusting next bill date accordingly.'
     reschedule: 'Reschedule'
   admin:
     agents:
@@ -239,7 +240,8 @@ en:
         billed_date: 'Billed date'
         billed_date_from: 'From:'
         billed_date_to: 'To:'
-        manual_payment: 'Manual payment'
+        manual_payment: 'Set to cash/check payments only'
+        manual_payment_help: 'Setting this flag will require Check/Cash payments transactions to remain active. Check/Cash payments should be made before the NBD or the member will be cancelled'
         sync_status_priorities:
           synced: success
           unsynced: warning

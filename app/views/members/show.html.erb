@@ -109,7 +109,8 @@
           <%= link_to I18n.t('buttons.manual_billing'), member_manual_billing_path, :class => "btn btn-large-w btn-info", :id => "manual_billing_btn" %>
         <% else %>
           <%= link_to I18n.t('buttons.manual_billing'), "#", :class => "btn btn-large-w btn-info", :disabled => 'disabled', :id => "manual_billing_btn" %>
-        <% end %>       
+        <% end %>
+        <%= render :partial => "shared/help", :locals => { :title => t('buttons.manual_billing'), :content => t('buttons.manual_billing_help')} %>
       </div>
       <div class="span4">
       </div>

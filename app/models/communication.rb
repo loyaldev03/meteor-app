@@ -28,6 +28,8 @@ class Communication < ActiveRecord::Base
 
         if template.lyris?
           c.deliver_lyris
+        elsif template.exact_target?
+          c.deliver_exact_target
         elsif template.action_mailer?
           c.deliver_action_mailer
         else
@@ -38,6 +40,22 @@ class Communication < ActiveRecord::Base
       end
     end
   end
+
+  def deliver_exact_target
+    result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
+    self.sent_success = (result.OverallStatus == "OK")
+    self.processed_at = Time.zone.now
+    self.response = result
+    self.save!
+    Auditory.audit(nil, self, "Communication '#{template_name}' scheduled", member, Settings.operation_types["#{template_type}_email"])
+  rescue Exception => e
+    logger.error "* * * * * #{e}"
+    update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
+    Auditory.report_issue("Communication deliver_exact_target", e, { :member => member.inspect, 
+      :current_membership => member.current_membership.inspect, :communication => self.inspect })
+    Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
+  end  
+  handle_asynchronously :deliver_exact_target
 
   def deliver_lyris
     lyris = LyrisService.new

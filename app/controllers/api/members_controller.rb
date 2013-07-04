@@ -207,8 +207,11 @@ class Api::MembersController < ApplicationController
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   rescue NoMethodError => e
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
-  rescue ActiveRecord::RecordNotUnique
-    render json: { :message => "Member information is invalid.", :code => Settings.error_codes.wrong_data, :errors => { :api_id => ["has already been taken"] }}
+  rescue ActiveRecord::RecordNotUnique => e
+    errors = {}
+    errors.merge!( :api_id => ["has already been taken"] ) if e.to_s.include?('api_id')
+    errors.merge!( :email => ["has already been taken"] ) if e.to_s.include?('email')
+    render json: { :message => "Member information is invalid.", :code => Settings.error_codes.wrong_data, :errors => errors }
   end
 
   ##

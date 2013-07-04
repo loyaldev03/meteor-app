@@ -14,23 +14,44 @@ module SacExactTarget
       @subscriber.nil?
     end
 
-    def unsubscribe_subscriber!
-      client = ExactTargetSDK::Client.new
-      attributes = [ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)]
-      id = ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
+    def unsubscribe!
+      change_status! 'Unsubscribed'
+    end
+
+    def subscribe!
+      change_status! 'Active'
+    end
+
+    def send_email(customer_key)
+      trigger_definition = ExactTargetSDK::TriggeredSendDefinition.new('CustomerKey' => customer_key)
+      s = ExactTargetSDK::Subscriber.new({ 'SubscriberKey' => subscriber_key, 'EmailAddress' => self.member.email })
+      trigger_to_send = ExactTargetSDK::TriggeredSend.new(
+        'TriggeredSendDefinition' => trigger_definition, 
+        'Client' => client_id,
+        'Subscribers' => [s] )
+      client.Create(trigger_to_send)
+    end
+
+  private
+    def client
+      ExactTargetSDK::Client.new
+    end
+
+    def change_status!(status)
+      attributes = [ 
+        ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id), 
+        ExactTargetSDK::Attributes.new(Name: 'Status', Value: status) 
+      ]
       s = ExactTargetSDK::Subscriber.new({
-        'SubscriberKey' => subscriber_key, 'Status' => 'Unsubscribed',
-        'EmailAddress' => self.member.email, 'Client' => id, 'ObjectID' => true,
+        'SubscriberKey' => subscriber_key, 'Status' => status,
+        'EmailAddress' => self.member.email, 'Client' => client_id, 'ObjectID' => true,
         'Attributes' => attributes
       })
       client.Update(s)
     end
 
-  private
-
     def create!
-      client, options = ExactTargetSDK::Client.new, {}
-      options[:subscribe_to_list] = true
+      options = { :subscribe_to_list => true }
       # Remove email from prospect list
       SacExactTarget::ProspectModel.destroy_by_email self.member.email, club_id
       # Add customer under member list
@@ -38,8 +59,7 @@ module SacExactTarget
     end
 
     def update!
-      client, options = ExactTargetSDK::Client.new, {}
-      options[:subscribe_to_list] = false
+      options = { :subscribe_to_list => false }
       client.Update(subscriber(subscriber_key, options))
     end
 
@@ -82,10 +102,9 @@ module SacExactTarget
         attributes << SacExactTarget.format_attribute(enrollment_info, api_field, our_field)
       end  
       attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
-      id = ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
       ExactTargetSDK::Subscriber.new({
         'SubscriberKey' => subscriber_key, 
-        'EmailAddress' => self.member.email, 'Client' => id, 'ObjectID' => true, 
+        'EmailAddress' => self.member.email, 'Client' => client_id, 'ObjectID' => true, 
         'Attributes' => attributes.compact }.
         merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} )
       )        
@@ -146,11 +165,15 @@ module SacExactTarget
     end
 
     def club_id
-      Rails.env.production? ? self.member.club_id : '9999'
+      Rails.env.production? ? self.member.club_id.to_s : '9999'
+    end
+
+    def client_id
+      ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
     end
     
     def business_unit_id
-      Rails.env.production? ? self.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
+      Rails.env.production? ? self.member.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
     end
   end
 end

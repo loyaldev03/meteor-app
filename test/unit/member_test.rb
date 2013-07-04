@@ -94,11 +94,12 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should let save two members with the same email in differents clubs" do
+    @second_club = FactoryGirl.create(:simple_club_with_gateway)
+
     member = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @terms_of_membership_with_gateway.club)
     member.club_id = 1
     member.save
-    member_two = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @terms_of_membership_with_gateway.club)
-    member_two.club_id = 14
+    member_two = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @second_club)
     assert member_two.save, "member cant be save #{member_two.errors.inspect}"
   end
 
@@ -263,17 +264,18 @@ class MemberTest < ActiveSupport::TestCase
     original_year = (Time.zone.now - 2.years).year
     member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
     member.reload
+
     assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 3) do
+      assert_difference('Operation.count', 4) do  #renewal, recycle, bill, set as active
         assert_difference('Transaction.count') do
           assert_equal member.recycled_times, 0
           answer = member.bill_membership
           member.reload
           assert_equal answer[:code], Settings.error_codes.success
-          assert_equal original_year, member.transactions.last.expire_year
+          assert_equal original_year+3, Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first.expire_year
           assert_equal member.recycled_times, 0
           assert_equal member.credit_cards.count, 1 # only one credit card
-          assert_equal member.credit_cards.first.expire_year, original_year # expire_year should not be changed.
+          assert_equal member.active_credit_card.expire_year, original_year+3 # expire_year should be +3 years. 
         end
       end
     end

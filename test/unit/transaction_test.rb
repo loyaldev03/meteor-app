@@ -310,7 +310,9 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing with grace period disable on tom and missing CC" do
-    active_member = create_active_member(@terms_of_membership, :active_member_without_cc)
+    active_member = create_active_member( @terms_of_membership, :active_member_without_cc )
+    blank_cc = FactoryGirl.create( :blank_credit_card, :member_id => active_member.id )
+
     nbd = active_member.bill_date
     assert_difference('Operation.count', 5) do
       assert_difference('Communication.count', 2) do
@@ -514,10 +516,10 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end 
 
-  test "Enroll with Litle" do
-    club_with_litle
-    enroll_member(@litle_terms_of_membership, 100, false, @credit_card_litle)
-  end
+#   test "Enroll with Litle" do
+#     club_with_litle
+#     enroll_member(@litle_terms_of_membership, 100, false, @credit_card_litle)
+#   end
 
   test "Full refund with Litle" do
     club_with_litle
@@ -622,7 +624,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "should not update NBD after save the sale from monthly-tom to monthly-tom" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    member = enroll_member(@terms_of_membership, 0, true)
+    member = enroll_member(@terms_of_membership, 0)
     nbd_initial = member.next_retry_bill_date
 
     assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership.provisional_days.days, :format => :only_date)
@@ -646,7 +648,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "should not update NBD after save the sale from monthly-tom to yearly-tom" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
-    member = enroll_member(@terms_of_membership, 0, true)
+    member = enroll_member(@terms_of_membership, 0)
     nbd_initial = member.next_retry_bill_date
 
     assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership.provisional_days.days, :format => :only_date)
@@ -670,7 +672,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "should not update NBD after save the sale from yearly-tom to monthly-tom" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    member = enroll_member(@terms_of_membership, 0, true)
+    member = enroll_member(@terms_of_membership, 0)
     nbd_initial = member.next_retry_bill_date
 
     assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now, :format => :only_date)
@@ -693,7 +695,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "should not update NBD after save the sale from yearly-tom to yearly-tom" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
-    member = enroll_member(@terms_of_membership, 0, true)
+    member = enroll_member(@terms_of_membership, 0)
     nbd = member.next_retry_bill_date
 
     assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now, :format => :only_date)
@@ -715,7 +717,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Should event bill a member, and also refund it." do
-    member = enroll_member(@terms_of_membership, 0, true)
+    member = enroll_member(@terms_of_membership, 0, false)
     amount = 200
     assert_difference("Transaction.count") do
       assert_difference("Operation.count") do
@@ -770,5 +772,4 @@ class TransactionTest < ActiveSupport::TestCase
     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first
     assert_equal trans.response_result, I18n.t('error_messages.airbrake_error_message')
   end
-
 end

@@ -458,13 +458,16 @@ class Member < ActiveRecord::Base
         Auditory.report_issue("Billing", message, { :member => self.inspect, :membership => current_membership.inspect })
         { :code => Settings.error_codes.tom_wihtout_gateway_configured, :message => message }
       else
+        credit_card = active_credit_card
+        credit_card.recycle_expired_rule(recycled_times)
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
         trans.response_result = I18n.t('error_messages.airbrake_error_message')
         trans.response = { message: message } 
-        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
+        trans.prepare(self, credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
         answer = trans.process
         if trans.success?
+          credit_card.save # lets update year if we recycle this member
           proceed_with_billing_logic(trans, Settings.operation_types.membership_billing, false ,"Billing")
         else
           message = set_decline_strategy(trans)
@@ -635,7 +638,9 @@ class Member < ActiveRecord::Base
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
       answer = trans.process
       unless trans.success?
-        Auditory.audit(agent, trans, "Transaction was not successful.", (self.new_record? ? nil : self), Settings.operation_types.error_on_enrollment_billing)
+        operation_type = Settings.operation_types.error_on_enrollment_billing
+        Auditory.audit(agent, trans, "Transaction was not successful.", (self.new_record? ? nil : self), operation_type)
+        trans.update_attribute :operation_type, operation_type
         return answer 
       end
     end
@@ -859,6 +864,7 @@ class Member < ActiveRecord::Base
           self.save(:validate => false)
           Auditory.audit(agent, self, "Un-blacklisted member and all its credit cards.", self, Settings.operation_types.unblacklisted)
           self.credit_cards.each { |cc| cc.unblacklist }
+          marketing_tool_sync_subscription
         rescue Exception => e
           Auditory.report_issue("Member::unblacklist", e, { :member => self.inspect })
           raise ActiveRecord::Rollback
@@ -874,8 +880,6 @@ class Member < ActiveRecord::Base
         begin
           self.blacklisted = true
           self.save(:validate => false)
-          # TODO: improve
-          # exact_target_member.unsubscribe_subscriber! if defined?(SacExactTarget::MemberModel)
           message = "Blacklisted member and all its credit cards. Reason: #{reason}."
           Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
           self.credit_cards.each { |cc| cc.blacklist }
@@ -883,6 +887,7 @@ class Member < ActiveRecord::Base
             self.cancel! Time.zone.now, "Automatic cancellation"
             self.set_as_canceled!
           end
+          marketing_tool_sync_unsubscription
           answer = { :message => message, :code => Settings.error_codes.success }
         rescue Exception => e
           Auditory.report_issue("Member::blacklist", e, { :member => self.inspect })
@@ -1321,6 +1326,18 @@ class Member < ActiveRecord::Base
     self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
   end
   handle_asynchronously :marketing_tool_sync
+
+  # used for member blacklist
+  def marketing_tool_sync_unsubscription
+    exact_target_member.unsubscribe! if defined?(SacExactTarget::MemberModel)
+  end
+  handle_asynchronously :marketing_tool_sync_unsubscription
+
+  # used for member unblacklist
+  def marketing_tool_sync_subscription
+    exact_target_member.subscribe! if defined?(SacExactTarget::MemberModel)
+  end
+  handle_asynchronously :marketing_tool_sync_subscription
 
   private
     def schedule_renewal(manual = false)
