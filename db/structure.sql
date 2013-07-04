@@ -33,7 +33,7 @@ CREATE TABLE `agents` (
   UNIQUE KEY `index_agents_on_confirmation_token` (`confirmation_token`),
   UNIQUE KEY `index_agents_on_reset_password_token` (`reset_password_token`),
   UNIQUE KEY `index_agents_on_unlock_token` (`unlock_token`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `club_cash_transactions` (
   `amount` decimal(11,2) DEFAULT '0.00',
@@ -289,7 +289,7 @@ CREATE TABLE `members` (
   `external_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `first_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `last_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `city` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `state` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -336,7 +336,6 @@ CREATE TABLE `members` (
   `exact_target_last_sync_error` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `exact_target_last_sync_error_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email_UNIQUE` (`club_id`,`email`),
   UNIQUE KEY `api_id_UNIQUE` (`club_id`,`api_id`),
   KEY `index_members_on_club_id` (`club_id`),
   KEY `index_members_on_email` (`email`)
@@ -461,7 +460,6 @@ CREATE TABLE `prospects` (
   `campaign_medium_version` text COLLATE utf8_unicode_ci,
   `uuid` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
   `club_id` int(11) DEFAULT NULL,
-  `exact_target_sync_result` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `index_prospects_on_uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -581,7 +579,3 @@ INSERT INTO schema_migrations (version) VALUES ('20130531173716');
 INSERT INTO schema_migrations (version) VALUES ('20130604175210');
 
 INSERT INTO schema_migrations (version) VALUES ('20130610160137');
-
-INSERT INTO schema_migrations (version) VALUES ('20130625122416');
-
-INSERT INTO schema_migrations (version) VALUES ('20130702172522');
