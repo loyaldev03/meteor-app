@@ -6,11 +6,9 @@ module SacExactTarget
     end
 
     def new_record?
-      # Find by subscriber key . I didnt have luck looking for a subscriber by email and List.
+      # Find by subscriber key. We cant get the list of Lists to which this subscriber is subscribe it on. 
       res = ExactTargetSDK::Subscriber.find [ ["SubscriberKey", ExactTargetSDK::SimpleOperator::EQUALS, subscriber_key ] ]
-      @subscriber = res.Results.collect do |result|
-        result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
-      end.flatten.first
+      @subscriber = res.Results.first
       @subscriber.nil?
     end
 
@@ -59,7 +57,9 @@ module SacExactTarget
     end
 
     def update!
-      options = { :subscribe_to_list => false }
+      # @subscriber does not have the list of Lists. So I have to check if it has a Club. 
+      # We assume that everyone in a Club has a list
+      options = { :subscribe_to_list => !@subscriber.attributes.select { |s| s[:name] == 'Club' and s[:value].nil? }.empty? }
       client.Update(subscriber(subscriber_key, options))
     end
 
