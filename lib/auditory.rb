@@ -22,8 +22,8 @@ class Auditory
     unless ["test","development"].include? Rails.env  
     # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)
       comment = message.to_s
-      comment = comment + "\nBacktrace:\n " + caller.join("\n").to_s if add_backtrace
       comment = comment + "\n\n\n Parameters:\n" + params.collect{|k,v| "#{k}: #{v}" }.join("\n")
+      comment = comment + "\nBacktrace:\n " + caller.join("\n").to_s if add_backtrace
 
       file_url = "/tmp/error_description_#{Time.zone.now.to_i}.txt"
       temp = File.open(file_url, 'w+')
