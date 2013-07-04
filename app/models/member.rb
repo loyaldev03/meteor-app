@@ -398,9 +398,9 @@ class Member < ActiveRecord::Base
   end
 
   def can_change_next_bill_date?
-    not self.next_retry_bill_date.nil? and not self.lapsed?
+    not self.applied? and not self.lapsed?
   end
-
+  
   ###############################################
 
   def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil)
