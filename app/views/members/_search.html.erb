@@ -9,6 +9,7 @@
       <% end %>
       <th> <%= t('activerecord.attributes.member.full_name') %> </th>
       <th> <%= t('activerecord.attributes.member.full_address') %> </th>
+      <th> <%= t('activerecord.attributes.member.member_classification_type') %> </th>
       <th style="width: 20px;">View</th>
       <th style="width: 20px;">Edit</th>
       <th style="width: 80px;">&nbsp;</th>
@@ -33,6 +34,7 @@
         <% end %>
         <td> <%= member.full_name %> </td>
         <td> <%= member.full_address %> </td>
+        <td> <%= member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : member.member_group_type.name %> </td>
         <td><a href="<%= show_member_path(:member_prefix => member.id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
         <td>
           <% if can? :edit, Member %>
