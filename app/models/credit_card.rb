@@ -102,6 +102,7 @@ class CreditCard < ActiveRecord::Base
       begin
         self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
       rescue Exception => e
+        Auditory.report_issue("CreditCard:GetToken", "Gateway response: " + e.to_s, { credit_card: self.inspect, member: pmember.inspect || self.member.inspect })
         logger.error e.inspect
         self.errors[:number] << I18n.t('error_messages.get_token_mes_error')
       end
