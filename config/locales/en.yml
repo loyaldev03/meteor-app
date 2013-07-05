@@ -209,7 +209,6 @@ en:
         join_date: 'Join date'
         club_cash_expire_date: 'Club cash expire date'
         next_retry_bill_date: 'Next bill date'
-        next_retry_bill_date_not_set: 'Not set'
         created_by: 'Created by'
         cancel_date: 'Cancel date'
         recycled_times: 'Recycled times'
