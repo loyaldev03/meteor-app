@@ -4,6 +4,8 @@ class DispositionType < Enumeration
 
   attr_accessible :name
 
+  validate :name, :uniqueness => true, :pressence => true
+
   def to_s
     name
   end
