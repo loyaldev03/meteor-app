@@ -14,11 +14,7 @@ private
       [
         disposition_type.id,
         disposition_type.name, 
-        (link_to(I18n.t(:edit),@url_helpers.edit_disposition_type_path(:partner_prefix=> @current_partner.prefix, :club_prefix => @current_club.name, :id => disposition_type.id ), :class => 'btn btn-mini')if @current_agent.can? :edit, DispositionType)+
-        (link_to(I18n.t(:destroy),@url_helpers.disposition_type_path(:partner_prefix=> @current_partner.prefix, :club_prefix => @current_club.name, :id => disposition_type),
-                      :method => :delete, 
-                      :confirm => I18n.t("are_you_sure"),
-                      :class => 'btn btn-mini btn-danger')if @current_agent.can? :delete, DispositionType)
+        (link_to(I18n.t(:edit),@url_helpers.edit_disposition_type_path(:partner_prefix=> @current_partner.prefix, :club_prefix => @current_club.name, :id => disposition_type.id ), :class => 'btn btn-mini')if @current_agent.can? :edit, DispositionType)
       ]
     end
   end

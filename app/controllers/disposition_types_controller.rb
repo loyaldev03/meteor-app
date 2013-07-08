@@ -35,14 +35,4 @@ class DispositionTypesController < ApplicationController
       render action: "edit" 
   	end
   end
-
-  def destroy
-    @disposition_type = DispositionType.find params[:id]
-    if @disposition_type.delete
-      redirect_to disposition_types_path, :notice => "Disposition type #{@disposition_type.name} was succesfuly deleted."
-    else 
-      redirect_to disposition_types_path(:id => @disposition_type), :flash => { error: "The disposition type #{@disposition_type.name} could not be destroyed."}
-    end
-  end
-
 end
