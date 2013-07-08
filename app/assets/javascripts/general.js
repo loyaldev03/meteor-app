@@ -765,3 +765,11 @@ function recover_member_functions(){
     startAjaxLoader();
   }); 
 }
+
+function admin_form_functions(){
+  $('#add_new_club_role').click( function(event){
+    event.preventDefault();
+    alert(hola);
+    $('#club_role_table').append("<tr><td><select id='agent_club_roles_attributes_0_role' name='agent[club_roles_attributes][0][role]'><option value=''> </option><option value='admin'> admin</option><option value='api'> api</option><option value='representative'> representative</option><option value='supervisor'> supervisor</option></select></tr></td>")
+  });
+}

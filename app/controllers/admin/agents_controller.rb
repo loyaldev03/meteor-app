@@ -27,7 +27,11 @@ class Admin::AgentsController < ApplicationController
   # POST /agents
   def create
     @clubs = Club.all
-    if @agent.save
+
+    if params[:agent][:club_roles_attributes].present? and not params[:agent][:roles].blank?
+      flash.now[:error] = 'Cannot set both global and club roles at the same time'
+      render :action => "new"      
+    elsif @agent.save
       redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
     else
       render :action => "new" 
@@ -47,7 +51,6 @@ class Admin::AgentsController < ApplicationController
       render :action => "edit" 
     end
   end
-
 
   # DELETE /agents/1
   def destroy

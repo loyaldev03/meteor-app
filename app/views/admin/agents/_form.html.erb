@@ -42,7 +42,8 @@
     <div class="control-group">
       <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
       <div class="controls">
-        <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;">
+        <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;" id="club_role_table">
+          <tr><td colspan="3"> <%= link_to 'Add', '#', :class => 'btn', :id=> "add_new_club_role" %> </td></tr>
           <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
           <%= f.fields_for :club_roles, @agent.club_roles do |role| %>
             <tr>
@@ -55,7 +56,7 @@
             <tr>
               <td><%= role.select :role, Agent::ROLES, include_blank: true %></td>
               <td><%= role.select :club_id, options_from_collection_for_select(@clubs, "id", "name") %></td>
-              <td><%= role.submit 'Add', :class => 'btn' %></td>
+              <td></td>
             </tr>
           <% end %>
         </table>
@@ -69,3 +70,9 @@
                 admin_agents_path, :class => 'btn' %>
   </div>
 <% end %>
+
+
+<script>
+  hola = "<%= Club.all.collect &:name %>"
+  $(document).ready(admin_form_functions());
+</script>
