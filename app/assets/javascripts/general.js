@@ -149,6 +149,7 @@ function delay_jobs_index_functions(column_count){
 function my_club_index_functions(column_count){
   $('#my_clubs_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -161,6 +162,7 @@ function my_club_index_functions(column_count){
 function domain_index_functions(column_count){
   $('#domains_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -176,6 +178,7 @@ function domain_index_functions(column_count){
 function product_index_functions(column_count){
   $('#products_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
