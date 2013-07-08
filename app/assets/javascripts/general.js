@@ -87,6 +87,7 @@ function agent_index_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
@@ -99,6 +100,7 @@ function agent_index_functions(column_count){
 function partner_index_functions(column_count){
   $('#partners_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -113,6 +115,7 @@ function partner_index_functions(column_count){
 function club_index_functions(column_count){
   $('#clubs_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -128,6 +131,7 @@ function club_index_functions(column_count){
 function delay_jobs_index_functions(column_count){
   $('#delayed_jobs_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
