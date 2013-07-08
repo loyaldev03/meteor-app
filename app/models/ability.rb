@@ -36,6 +36,7 @@ class Ability
     cannot :manage_token_api, Agent
     cannot :manage_operations_api, Operation
     cannot :manage, DelayedJob
+    cannot :manage, DispositionType
 
     if agent.has_role_with_club? 'admin', club_id
       can :manage, Member
@@ -66,6 +67,7 @@ class Ability
       can :manage_token_api, Agent
       can :manage_operations_api, Operation
       can :manage, DelayedJob
+      can :manage, DispositionType
     elsif agent.has_role_with_club? 'representative', club_id
       can :manage, Member
       cannot :api_profile, Member

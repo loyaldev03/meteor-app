@@ -15,6 +15,7 @@ class Club < ActiveRecord::Base
     through: :club_roles,
     uniq: true
   has_many :fulfillment_files
+  has_many :disposition_types
 
   belongs_to :api_domain,
     class_name:  'Domain',

@@ -82,6 +82,7 @@ SacPlatform::Application.routes.draw do
       end
 
       resources :products
+      resources :disposition_types, :except => [ :show ]
 
       match '/fulfillments' => 'fulfillments#index', as: 'fulfillments_index', :via => [:post, :get]
       scope '/fulfillments' do
