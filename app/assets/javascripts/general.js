@@ -440,7 +440,7 @@ function operation_member_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"fp>rt<"bottom"il>',
+	"sDom": '<"top"fp>rt<"bottom"li>',
     "bServerSide": true,
     "aaSorting": [[ 1, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ] }],
