@@ -133,6 +133,7 @@ en:
       products: 'Products'
       fulfillments: 'Fulfillments'
       fulfillment_files: 'Fulfillment Files'
+      disposition_types: 'Disposition Types'
     member: 'Member'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
@@ -258,6 +259,9 @@ en:
         cancel_date: 'Cancel date'
         tom: 'TOM'
         quota: 'Quota'
+      disposition_type:
+        id: 'ID'
+        name: 'Name'
       club:
         id: 'ID'
         name: 'Name'

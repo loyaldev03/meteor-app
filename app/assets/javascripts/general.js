@@ -145,6 +145,19 @@ function delay_jobs_index_functions(column_count){
   });
 }
 
+function disposition_types_index_functions(column_count){
+  $('#disposition_types_table').dataTable({
+    "sPaginationType": "bootstrap",
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aaSorting": [[ 0, "asc" ]],
+    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ column_count ] }],
+    "sAjaxSource": $('#disposition_types_table').data('source'),
+  });
+}
 
 function my_club_index_functions(column_count){
   $('#my_clubs_table').dataTable({

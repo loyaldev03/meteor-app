@@ -39,7 +39,7 @@ private
     delayed_jobs = DelayedJob.order("#{sort_column} #{sort_direction}")
     delayed_jobs = delayed_jobs.page(page).per_page(per_page)
     if params[:sSearch].present?
-      delayed_jobs = delayed_jobs.where("prefix like :search or name like :search", search: "%#{params[:sSearch]}%")
+      delayed_jobs = delayed_jobs.where("id like :search or handler like :search or last_error like :search", search: "%#{params[:sSearch]}%")
     end
     delayed_jobs
   end
