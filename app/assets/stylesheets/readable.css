@@ -27,12 +27,23 @@
 
 .dataTables_wrapper .dataTables_paginate {
 	float: right;
+	text-align: center;
 }
 
 #partners_table_wrapper.dataTables_wrapper .dataTables_paginate,
 #agents_table_wrapper.dataTables_wrapper .dataTables_paginate,
 #my_clubs_table_wrapper.dataTables_wrapper .dataTables_paginate {
 	float: left;
+}
+
+#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_filter.dataTables_filter,
+#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_length,
+#club_cash_transactions_table_wrapper.dataTables_wrapper .dataTables_paginate {
+	width: 32%;
+}
+
+#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_filter label {
+	width: 290px;
 }
 
 div.dataTables_length label {
