@@ -1,6 +1,6 @@
 # Do you want to put in mantainance mode the site during deployment?
 # Use :
-# cap -S put_in_mantainance_mode="true" prototype deploy
+# cap -S put_in_maintenance_mode="true" prototype deploy
 # default value is false
 
 set :stages, %w(production prototype staging demo)
@@ -183,7 +183,7 @@ task :assets, :roles => :web do
 end
 
 # mantainance_mode
-namespace :mantainance_mode do
+namespace :maintenance_mode do
   desc "Start"
   task :start, :roles => :web do
     run "cd #{release_path} && RAILS_ENV=#{rails_env} bundle exec rake maintenance:start"
@@ -199,9 +199,9 @@ end
 after "deploy:update_code", "link_config_files"
 after "deploy:update_code", "bundle_install"
 after "deploy:update_code", "assets"
-after "deploy:update", "mantainance_mode:start" if fetch(:put_in_mantainance_mode, false)
+after "deploy:update", "maintenance_mode:start" if fetch(:put_in_maintenance_mode, false)
 after "deploy:update", "deploy:migrate"
-after "deploy:update", "mantainance_mode:stop" if fetch(:put_in_mantainance_mode, false)
+after "deploy:update", "maintenance_mode:stop" if fetch(:put_in_maintenance_mode, false)
 after 'deploy:update', 'restart_delayed_jobs'
 after "deploy", "newrelic:notice_deployment"
 after 'deploy', 'notify_campfire'
