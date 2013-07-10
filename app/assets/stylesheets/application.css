@@ -178,5 +178,19 @@ div.dataTables_filter input {
 }
 
 .dataTables_wrapper .dataTables_paginate {
+	float: right;
+}
+
+#partners_table_wrapper.dataTables_wrapper .dataTables_paginate,
+#agents_table_wrapper.dataTables_wrapper .dataTables_paginate,
+#my_clubs_table_wrapper.dataTables_wrapper .dataTables_paginate {
 	float: left;
+}
+
+div.dataTables_length label {
+	width: 170px;
+}
+
+#members.tab-pane .pagination {
+	margin: 0em 0;
 }

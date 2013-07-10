@@ -18,3 +18,27 @@
  *= require dataTables/src/demo_table_jui
  *= require readable/override
 */
+
+.dataTables_wrapper .top, .dataTables_wrapper .bottom {
+	padding: 0;
+	background-color: transparent;
+	border: none;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+	float: right;
+}
+
+#partners_table_wrapper.dataTables_wrapper .dataTables_paginate,
+#agents_table_wrapper.dataTables_wrapper .dataTables_paginate,
+#my_clubs_table_wrapper.dataTables_wrapper .dataTables_paginate {
+	float: left;
+}
+
+div.dataTables_length label {
+	width: 170px;
+}
+
+#members.tab-pane .pagination {
+	margin: 0em 0;
+}
