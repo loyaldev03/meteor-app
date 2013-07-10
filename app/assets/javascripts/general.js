@@ -87,6 +87,7 @@ function agent_index_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
@@ -99,6 +100,7 @@ function agent_index_functions(column_count){
 function partner_index_functions(column_count){
   $('#partners_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -113,6 +115,7 @@ function partner_index_functions(column_count){
 function club_index_functions(column_count){
   $('#clubs_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -128,6 +131,7 @@ function club_index_functions(column_count){
 function delay_jobs_index_functions(column_count){
   $('#delayed_jobs_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -145,6 +149,7 @@ function delay_jobs_index_functions(column_count){
 function my_club_index_functions(column_count){
   $('#my_clubs_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -157,6 +162,7 @@ function my_club_index_functions(column_count){
 function domain_index_functions(column_count){
   $('#domains_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -172,6 +178,7 @@ function domain_index_functions(column_count){
 function product_index_functions(column_count){
   $('#products_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -433,6 +440,7 @@ function operation_member_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"li>',
     "bServerSide": true,
     "aaSorting": [[ 1, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ] }],
@@ -453,6 +461,7 @@ function transactions_member_functions(column_count){
     "bProcessing": true,
     "bFilter": false,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5,6 ] }],
@@ -466,6 +475,7 @@ function memberships_member_functions(column_count){
     "bProcessing": true,
     "bFilter": false,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bServerSide": true,
     "bLengthChange": false,
     "aaSorting": [[ 0, "desc" ]],
@@ -480,6 +490,7 @@ function fulfillment_files_functions() {
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bServerSide": true,
     "bSort": false,
     "bFilter": false,
@@ -498,6 +509,7 @@ function club_cash_transactions_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
