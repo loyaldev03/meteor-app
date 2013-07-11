@@ -1212,10 +1212,14 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
-    
-    @member.set_as_canceled
+
+    @member.set_as_provisional
+    @member.set_as_canceled!
     assert_difference('Operation.count',0) do
+      puts @member.status
+      puts @member.lapsed?
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      puts @response.body
     end
     assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
   end
@@ -1596,5 +1600,4 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal credit_card.expire_month, Time.zone.now.month
     assert_equal credit_card.expire_year, Time.zone.now.year
   end
-
 end
