@@ -38,7 +38,10 @@ class Ability
     cannot :manage, DelayedJob
     cannot :manage, DispositionType
 
-    if agent.has_role_with_club? 'admin', club_id
+    role = agent.roles.first || agent.which_is_the_role_for_this_club?(club_id)
+
+    case role
+    when 'admin' then
       can :manage, Member
       can :manage, Membership
       can :manage, CreditCard
@@ -68,7 +71,7 @@ class Ability
       can :manage_operations_api, Operation
       can :manage, DelayedJob
       can :manage, DispositionType
-    elsif agent.has_role_with_club? 'representative', club_id
+    when 'representative' then
       can :manage, Member
       cannot :api_profile, Member
       cannot :set_undeliverable, Member
@@ -89,7 +92,7 @@ class Ability
       can :list, Transaction
       can :refund, Transaction
       can :list, ClubCashTransaction
-    elsif agent.has_role_with_club? 'supervisor', club_id
+    when 'supervisor' then
       can :manage, Member
       cannot :api_profile, Member
       cannot :see_sync_status, Member
@@ -105,7 +108,7 @@ class Ability
       can :show, TermsOfMembership
       can :manage, Transaction
       can :manage, ClubCashTransaction
-    elsif agent.has_role_with_club? 'api', club_id
+    when 'api' then
       can :api_enroll, Member
       can :api_update, Member
       can :api_profile, Member
@@ -120,7 +123,7 @@ class Ability
       can :manage_token_api, Agent
       can :manage_operations_api, Operation
     # Agency role: Team de acquisicion 
-    elsif agent.has_role_with_club? 'agency', club_id
+    when 'agency' then
       can :manage, Product
       can :read, Fulfillment
       can :report, Fulfillment
@@ -133,7 +136,7 @@ class Ability
       can :list, Transaction
       can :list, ClubCashTransaction
     # Fulfillment Managment role: Team de Fulfillment
-    elsif agent.has_role_with_club? 'fulfillment_managment', club_id
+    when 'fulfillment_managment' then
       can :manage, Member
       cannot :api_profile, Member
       cannot :see_sync_status, Member

@@ -49,6 +49,10 @@ class Agent < ActiveRecord::Base
   accepts_nested_attributes_for :club_roles,
     allow_destroy: true
 
+  def which_is_the_role_for_this_club?(club_id)
+    self.club_roles.where(club_id: club_id).first
+  end
+
   def has_role_with_club?(role, club_id = nil)
     # logger.debug "role: #{role} club_id: #{club_id}        #{self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?}"
     club_id = club_id.to_param
