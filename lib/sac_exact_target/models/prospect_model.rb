@@ -56,7 +56,7 @@ module SacExactTarget
 
     def update_prospect(res)
       data = if res.OverallStatus != "OK"
-        SacExactTarget::report_error("SacExactTarget:Member:save", res)
+        SacExactTarget::report_error("SacExactTarget:Prospect:save", res)
         { exact_target_sync_result: res.Results.first.status_message }
       else
         { exact_target_sync_result: 'Success' }
