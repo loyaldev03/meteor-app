@@ -1088,6 +1088,7 @@ class Member < ActiveRecord::Base
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
 
     base = Member.where('last_sync_error like "There is no user with ID%"')
+                  .where('status = "lapsed" and last_sync_error like "The e-mail address <em class=\"placeholder\">%</em> is already taken."')
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members with error sync related to wrong api_id, processing #{base.count} members"
     tz = Time.zone.now
     base.to_enum.with_index.each do |member,index|
