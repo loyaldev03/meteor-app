@@ -1,5 +1,0 @@
-USE sac_production;
-FLUSH TABLES WITH READ LOCK;
-SHOW MASTER STATUS;
-SYSTEM master-slave-backup.sh
-UNLOCK TABLES; 
