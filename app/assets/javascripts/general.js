@@ -767,9 +767,39 @@ function recover_member_functions(){
 }
 
 function admin_form_functions(){
-  $('#add_new_club_role').click( function(event){
+  var count = 0;
+  $('#add_new_club_role').live("click", function(event){
     event.preventDefault();
-    alert(hola);
-    $('#club_role_table').append("<tr><td><select id='agent_club_roles_attributes_0_role' name='agent[club_roles_attributes][0][role]'><option value=''> </option><option value='admin'> admin</option><option value='api'> api</option><option value='representative'> representative</option><option value='supervisor'> supervisor</option></select></tr></td>")
+    if($("[id$='_club_id']:last option").size() == 1){
+      alert("Cannot add more club roles. No more clubs available.")
+    }else{
+      count++;
+      var options_for_role = "<option value=''> </option><option value='admin'> admin</option><option value='api'> api</option><option value='representative'> representative</option><option value='supervisor'> supervisor</option>"
+      var options_for_club_id = ""
+      $("[id$='_club_id']:last option").each(function()
+      {
+        if ($(this).val() != $("[id$='_club_id']").last().val() )
+          options_for_club_id = options_for_club_id+"<option value='"+$(this).val()+"'>"+$(this).text()+"</option>"
+      });
+      $('#club_role_table').append("<tr id='tr_club_rol_["+count+"]'><td><select id='agent_club_roles_attributes_"+count+"_role' name='agent[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select></td><td><select id='agent_club_roles_attributes_"+count+"_club_id' name='agent[club_roles_attributes]["+count+"][club_id]'>"+options_for_club_id+"</select></td><td></td></tr>")
+    }
   });
+
+  $("*[id$='_club_id']").live("change", function(){
+    if($(this).attr('id') != "agent_club_roles_attributes_"+count+"_club_id"){
+      if (confirm("Are you sure you want to change this club? All others club rol set will be deleted.")) {
+        for(i=1;i<=count;i++){
+          $("#club_role_table tr[id='tr_club_rol_["+i+"]']").remove();
+        }
+        count=0;
+      }
+    }
+  });
+
+  // $("#div_agent_roles").find("input:checkbox").click( function(){
+  //   var at_least_one_is_checked = $('#div_agent_roles :checkbox:checked').length > 0;
+  //   if(at_least_one_is_checked){
+      
+  //   }
+  // });
 }
