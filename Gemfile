@@ -10,15 +10,8 @@ gem 'uuidtools'
 
 gem "paperclip", "~> 3.0"
 
-gem 'attr_encrypted'
-
 gem 'acts_as_list'
 gem 'delayed_job_active_record'
-gem 'daemons'
-gem 'foreman'
-gem 'rvm-capistrano'
-gem 'capistrano-campfire', '0.2.0'
-gem 'tinder', '1.9.2'
 # uncomment if pardot is enabled again
 # gem "ruby-pardot"
 
@@ -86,12 +79,18 @@ group :development do
   gem 'redcarpet'
   gem "bullet"
   gem 'ruby-prof'
+  # -> deploy
+  gem 'rvm-capistrano'
+  gem 'capistrano-campfire', '0.2.0'
+  gem 'tinder', '1.9.2'
+  #####
+  gem 'daemons'
+  gem 'foreman'
 end
 
 group :prototype do
   gem "bullet"
 end
-
 
 group :test do
   gem 'factory_girl_rails'
