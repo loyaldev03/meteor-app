@@ -69,5 +69,7 @@
 
 
 <script>
+  roles = "<%= Agent::ROLES.join(',') %>"
+  clubs = "<%= Club.all.collect{|club| club.name+","+club.id.to_s}.join(";") %>"
   $(document).ready(admin_form_functions());
 </script>
