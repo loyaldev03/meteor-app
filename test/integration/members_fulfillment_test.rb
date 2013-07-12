@@ -453,7 +453,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
 
@@ -518,7 +518,7 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.find_field('product_type')
       check('all_times')
       select('processing', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
 
@@ -616,7 +616,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('sent', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
 
@@ -749,7 +749,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('processing', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1082,7 +1082,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('sent', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
 
     click_link_or_button('Report')
@@ -1111,7 +1111,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('undeliverable', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
     @fulfillment.reload
@@ -1137,7 +1137,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('undeliverable', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
     
@@ -1186,7 +1186,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('undeliverable', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
     @fulfillment.reload
@@ -1548,7 +1548,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1825,7 +1825,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('undeliverable', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1899,7 +1899,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1946,7 +1946,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      select('Others',:from => 'product_type')
+      choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
     within("#report_results")do
