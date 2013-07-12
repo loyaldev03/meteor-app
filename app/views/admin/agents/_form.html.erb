@@ -42,20 +42,6 @@
       <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;" id="club_role_table">
         <tr><td colspan="3"> <%= link_to 'Add', '#', :class => 'btn', :id=> "add_new_club_role" %> </td></tr>
         <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
-        <%= f.fields_for :club_roles, @agent.club_roles do |role| %>
-          <tr>
-            <td><%= role.object.role %></td>
-            <td><%= role.object.club_id %> <%= role.object.club.name %></td>
-            <td>Delete &nbsp;<%= role.check_box '_destroy' %></td>
-          </tr>
-        <% end %>
-        <%= f.fields_for :club_roles, @agent.club_roles.build do |role| %>
-          <tr>
-            <td><%= role.select :role, Agent::ROLES, include_blank: true %></td>
-            <td><%= role.select :club_id, options_from_collection_for_select(@clubs, "id", "name") %></td>
-            <td></td>
-          </tr>
-        <% end %>
       </table>
     </div>
   </div>

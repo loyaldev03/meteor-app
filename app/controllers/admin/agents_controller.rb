@@ -27,14 +27,20 @@ class Admin::AgentsController < ApplicationController
   # POST /agents
   def create
     @clubs = Club.all
-    cleanup_for_update!(params[:agent])
-    if params[:agent][:club_roles_attributes].present? and not params[:agent][:roles].blank?
-      flash.now[:error] = 'Cannot set both global and club roles at the same time'
-      render :action => "new"
-    elsif @agent.save
+    
+    # cleanup_for_update!(params[:agent])
+    # if params[:agent][:club_roles_attributes].present? and not params[:agent][:roles].blank?
+      # flash.now[:error] = 'Cannot set both global and club roles at the same time'
+      # render :action => "new"
+    # elsif @agent.save
+    if @agent.save
+      params[:club_roles_attributes].each do |club_role|
+        @agent.club_roles << ClubRole.new(club_role.last)
+      end
+      @agent.save
       redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
     else
-      flash.now[:error] = @agent.club_roles.inspect
+      flash.now[:error] = 
       render :action => "new"
     end
   end
@@ -74,9 +80,9 @@ class Admin::AgentsController < ApplicationController
           hash.delete(:password)
           hash.delete(:password_confirmation)
         end
-        if hash[:club_roles_attributes].present?
-          hash[:club_roles_attributes].reject! { |k,v| !v[:_destroy] && (v[:role].blank? || v[:club_id].blank?) }
-        end        
+        # if hash[:club_roles_attributes].present?
+          # hash[:club_roles_attributes].reject! { |k,v| !v[:_destroy] && (v[:role].blank? || v[:club_id].blank?) }
+        # end        
         if hash[:roles].blank?
           hash[:roles] = []
         end

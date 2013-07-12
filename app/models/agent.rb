@@ -46,8 +46,7 @@ class Agent < ActiveRecord::Base
   has_many :clubs, 
     through: :club_roles,
     uniq: true
-  accepts_nested_attributes_for :club_roles,
-    allow_destroy: true, :reject_if => :roles_present_or_invalid_agent
+  # accepts_nested_attributes_for :club_roles, allow_destroy: true, :reject_if => :roles_present_or_invalid_agent
 
   def has_role_with_club?(role, club_id = nil)
     # logger.debug "role: #{role} club_id: #{club_id}        #{self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?}"

@@ -768,33 +768,54 @@ function recover_member_functions(){
 
 function admin_form_functions(){
   var count = 0;
+  var club_list = clubs.split(";");
+  var role_list = roles.split(",");
+
   $('#add_new_club_role').live("click", function(event){
     event.preventDefault();
-    if($("[id$='_club_id']:last option").size() == 1){
+    
+    $("*[id$='_club_id'] option:selected").each( function(){
+      index = club_list.indexOf($(this).text()+","+$(this).val());
+      if(index >= 0)
+        club_list.splice(index,1);
+    });
+
+    if(club_list.length == 0){
       alert("Cannot add more club roles. No more clubs available.")
     }else{
       count++;
-      var options_for_role = "<option value=''> </option><option value='admin'> admin</option><option value='api'> api</option><option value='representative'> representative</option><option value='supervisor'> supervisor</option>"
+      var options_for_role = "<option value=''> </option>"
+      for (var i in role_list){
+        options_for_role = options_for_role+"<option value='"+role_list[i]+"'>"+role_list[i]+"</option>" 
+      };
       var options_for_club_id = ""
-      $("[id$='_club_id']:last option").each(function()
-      {
-        if ($(this).val() != $("[id$='_club_id']").last().val() )
-          options_for_club_id = options_for_club_id+"<option value='"+$(this).val()+"'>"+$(this).text()+"</option>"
-      });
-      $('#club_role_table').append("<tr id='tr_club_rol_["+count+"]'><td><select id='agent_club_roles_attributes_"+count+"_role' name='agent[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select></td><td><select id='agent_club_roles_attributes_"+count+"_club_id' name='agent[club_roles_attributes]["+count+"][club_id]'>"+options_for_club_id+"</select></td><td></td></tr>")
+      for (var i in club_list){  
+        club = club_list[i].split(',');
+        options_for_club_id = options_for_club_id+"<option value='"+club[1]+"'>"+club[0]+"</option>"
+      };
+      $('#club_role_table').append("<tr id='tr_club_rol_["+count+"]'><td><select id='club_roles_attributes_"+count+"_role' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select></td><td><select id='club_roles_attributes_"+count+"_club_id' name='[club_roles_attributes]["+count+"][club_id]'>"+options_for_club_id+"</select></td><td><input type='button' id='club_role_delete' name='"+count+"' class='btn btn-mini' value='Delete'></td></tr>")
     }
   });
 
-  $("*[id$='_club_id']").live("change", function(){
-    if($(this).attr('id') != "agent_club_roles_attributes_"+count+"_club_id"){
-      if (confirm("Are you sure you want to change this club? All others club rol set will be deleted.")) {
-        for(i=1;i<=count;i++){
-          $("#club_role_table tr[id='tr_club_rol_["+i+"]']").remove();
-        }
-        count=0;
-      }
+
+  $("#club_role_delete").live("click", function(){
+    if (confirm("Are you sure you want to delete this club role?")) {
+      $("#club_role_table tr[id='tr_club_rol_["+$(this).attr('name')+"]']").remove();
+      club_list = clubs.split(";");
     }
   });
+
+  // $("*[id$='_club_id']").live("change", function(){
+  //   if($(this).attr('id') != "agent_club_roles_attributes_"+count+"_club_id"){
+  //     if (confirm("Are you sure you want to change this club? All others club rol set will be deleted.")) {
+  //       for(i=1;i<=count;i++){
+  //         $("#club_role_table tr[id='tr_club_rol_["+i+"]']").remove();
+  //         club_list = clubs.split(";");
+  //       }
+  //       count=0;
+  //     }
+  // }
+  // });
 
   // $("#div_agent_roles").find("input:checkbox").click( function(){
   //   var at_least_one_is_checked = $('#div_agent_roles :checkbox:checked').length > 0;
