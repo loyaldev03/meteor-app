@@ -31,14 +31,4 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   def development?
     self.mode == 'development'
   end
-
-  def get_expired_cc_code
-    if self.mes?
-      return ['054']
-    elsif self.authorize_net?
-      return ['8','316']
-    elsif self.litle?
-      return ['305']
-    end
-  end
 end

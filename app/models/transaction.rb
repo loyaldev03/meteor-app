@@ -199,9 +199,16 @@ class Transaction < ActiveRecord::Base
   end
 
   def is_response_code_cc_expired?
-    payment_gateway_configuration.get_expired_cc_code.include? self.response_code 
+    expired_codes = []
+    if self.gateway == "mes"
+      expired_codes = ['054']
+    elsif self.gateway == "authorize_net"
+      expired_codes = ['8','316']
+    elsif self.gateway == "litle"
+      expired_codes = ['305']
+    end
+    expired_codes.include? self.response_code 
   end
-
 
   private
 
