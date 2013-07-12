@@ -198,6 +198,10 @@ class Transaction < ActiveRecord::Base
     amount - refunded_amount
   end
 
+  def is_response_code_cc_expired?
+    payment_gateway_configuration.get_expired_cc_code.include? self.response_code 
+  end
+
 
   private
 
