@@ -402,7 +402,7 @@ class Member < ActiveRecord::Base
   end
   
   def has_been_sd_cc_expired?
-    self.transactions.where(:membership_id => self.current_membership_id).each do |transaction|
+    self.transactions.where("membership_id = ? AND created_at > ?", self.current_membership_id, self.bill_date).each do |transaction|
       return true if transaction.is_response_code_cc_expired?
     end
     false
