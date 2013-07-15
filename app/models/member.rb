@@ -401,6 +401,13 @@ class Member < ActiveRecord::Base
     not self.applied? and not self.lapsed?
   end
   
+  def has_been_sd_cc_expired?
+    self.transactions.where("membership_id = ? AND created_at > ?", self.current_membership_id, self.bill_date).each do |transaction|
+      return true if transaction.is_response_code_cc_expired?
+    end
+    false
+  end
+
   ###############################################
 
   def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil)

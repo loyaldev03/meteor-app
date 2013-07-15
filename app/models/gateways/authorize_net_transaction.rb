@@ -1,4 +1,5 @@
 class AuthorizeNetTransaction < Transaction
+
   def member=(member)
     super(member)
     self.invoice_number = self.member_id

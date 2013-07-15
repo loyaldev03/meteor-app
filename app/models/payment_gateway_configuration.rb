@@ -31,5 +31,4 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   def development?
     self.mode == 'development'
   end
-
 end
