@@ -38,7 +38,7 @@ class Ability
     cannot :manage, DelayedJob
     cannot :manage, DispositionType
 
-    role = agent.roles.first || agent.which_is_the_role_for_this_club?(club_id)
+    role = agent.roles.first || agent.which_is_the_role_for_this_club?(club_id).role rescue nil
 
     case role
     when 'admin' then
