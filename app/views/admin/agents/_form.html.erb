@@ -50,6 +50,7 @@
             <td> <%= club_role.role %> </td>
             <td> <%= club_role.club.name %> </td>
             <td> Delete <%= check_box_tag "club_roles[delete][]", club_role.id %> </td>
+          </tr>
           <% end %>
         <% end %>
       </table>

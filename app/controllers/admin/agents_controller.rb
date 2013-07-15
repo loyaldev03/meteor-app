@@ -33,11 +33,8 @@ class Admin::AgentsController < ApplicationController
       render :action => "new"
     elsif @agent.save
       if params[:club_roles_attributes]
-        params[:club_roles_attributes].each do |club_role|
-          @agent.club_roles << ClubRole.new(club_role.last)
-        end
+        @agent.set_club_roles(params[:club_roles_attributes])
       end
-      @agent.save
       redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
     else
       render :action => "new"
@@ -53,16 +50,11 @@ class Admin::AgentsController < ApplicationController
       render :action => "edit" 
     elsif @agent.update_attributes(params[:agent])
       if params[:club_roles].present?
-        params[:club_roles][:delete].each do |club_role_id|
-          ClubRole.find(club_role_id).delete
-        end
+        @agent.delete_club_roles(params[:club_roles][:delete])
       end
       if params[:club_roles_attributes]
-        params[:club_roles_attributes].each do |club_role|
-          @agent.club_roles << ClubRole.new(club_role.last)
-        end
+        @agent.set_club_roles(params[:club_roles_attributes])
       end
-      @agent.save
       redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') 
     else
       render :action => "edit" 
@@ -90,9 +82,6 @@ class Admin::AgentsController < ApplicationController
           hash.delete(:password)
           hash.delete(:password_confirmation)
         end
-        # if hash[:club_roles_attributes].present?
-          # hash[:club_roles_attributes].reject! { |k,v| !v[:_destroy] && (v[:role].blank? || v[:club_id].blank?) }
-        # end        
         if hash[:roles].blank?
           hash[:roles] = []
         end

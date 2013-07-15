@@ -46,7 +46,6 @@ class Agent < ActiveRecord::Base
   has_many :clubs, 
     through: :club_roles,
     uniq: true
-  # accepts_nested_attributes_for :club_roles, allow_destroy: true, :reject_if => :roles_present_or_invalid_agent
 
   def has_role_with_club?(role, club_id = nil)
     # logger.debug "role: #{role} club_id: #{club_id}        #{self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?}"
@@ -87,6 +86,24 @@ class Agent < ActiveRecord::Base
     self.club_roles.select(:club_id).where("role != 'api'").collect &:club_id
   end
 
+  def set_club_roles(club_roles_info)
+    club_roles_info.each do |club_role|
+      ClubRole.transaction do
+        self.club_roles << ClubRole.create(club_role.last)
+      end
+    end
+  end
+
+  def delete_club_roles(club_roles_id)
+    club_roles_id.each do |club_role_id|
+      club_role = ClubRole.find(club_role_id)
+      ClubRole.transaction do
+        club_role.delete
+      end
+    end
+  end
+
+    
   protected
 
    # Attempt to find a user by it's email. If a record is found, send new
@@ -129,7 +146,4 @@ class Agent < ActiveRecord::Base
       where(["username = :value OR email = :value", { :value => login }]).first
    end
 
-  def roles_present_or_invalid_agent
-    not self.valid?
-  end
 end
