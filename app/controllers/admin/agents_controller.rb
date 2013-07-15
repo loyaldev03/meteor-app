@@ -48,7 +48,7 @@ class Admin::AgentsController < ApplicationController
   def update
     @clubs = Club.all
     cleanup_for_update!(params[:agent])
-    if params[:agent][:roles].present? and params[:agent][:club_roles_attributes].present?
+    if params[:agent][:roles].present? and params[:club_roles_attributes].present?
       flash.now[:error] = 'Cannot set both global and club roles at the same time'
       render :action => "edit" 
     elsif @agent.update_attributes(params[:agent])
