@@ -266,11 +266,11 @@ Please, have in mind that fields with ' * ' are required.
 <% if @member.new_record? %>
   <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
   <%= f.hidden_field :product_sku, :value => Club::DEFAULT_PRODUCT.join(',') %>
-  <%= f.hidden_field :mega_channel, :value => 'other' %>
-  <%= f.hidden_field :campaign_medium, :value => 'phone' %>
+  <%= f.hidden_field :mega_channel, :value => EnrollmentInfo::CS_MEGA_CHANNEL %>
+  <%= f.hidden_field :campaign_medium, :value => EnrollmentInfo::CS_CAMPAIGN_MEDIUM %>
   <%= f.hidden_field :landing_url, :value => request.env['HTTP_HOST'] %>
-  <%= f.hidden_field :referral_path, :value => request.env['REQUEST_PATH'] %>
+  <%= f.hidden_field :referral_path, :value => request.env['REQUEST_URI'] %>
   <%= f.hidden_field :ip_address, :value => request.env['REMOTE_ADDR'] %>
-  <%= f.hidden_field :campaign_description, :value => 'CS Join' %>
+  <%= f.hidden_field :campaign_description, :value => EnrollmentInfo::CS_CAMPAIGN_DESCRIPTION %>
 <% end %>
 

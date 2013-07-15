@@ -451,8 +451,14 @@ class Member < ActiveRecord::Base
   end
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
-  def recover(new_tom, agent = nil)
-    enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, self.current_membership.enrollment_info, true, false)
+  def recover(new_tom, agent = nil, options = {})
+    enrollment_info_params = options.merge({ 
+      product_sku: self.current_membership.enrollment_info.product_sku, 
+      mega_channel: EnrollmentInfo::CS_MEGA_CHANNEL,
+      campaign_medium: EnrollmentInfo::CS_CAMPAIGN_MEDIUM,
+      campaign_description: EnrollmentInfo::CS_CAMPAIGN_DESCRIPTION
+    })
+    enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, enrollment_info_params, true, false)
   end
 
   def bill_membership

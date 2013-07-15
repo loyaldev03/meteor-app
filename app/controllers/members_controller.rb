@@ -96,7 +96,8 @@ class MembersController < ApplicationController
       if tom.nil?
         flash[:error] = "Terms of membership not found"
       else
-        answer = @current_member.recover(tom, current_agent)
+        answer = @current_member.recover(tom, current_agent, 
+          { landing_url: request.env['HTTP_HOST'], referral_path: request.env['REQUEST_URI'], ip_address: request.env['REMOTE_ADDR'] })
         if answer[:code] == Settings.error_codes.success
           flash[:notice] = answer[:message]
         else
