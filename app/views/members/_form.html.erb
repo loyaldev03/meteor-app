@@ -5,22 +5,23 @@
 </div>
 
 
-<table class="table table-condensed"> 
-  <% if !@member.new_record? %>
-  <tr class="control-group"> 
-    <td colspan="4">
-    <%= t('activerecord.attributes.member.member_classification_type') %>:
-    <% if !@member_group_types.nil? %>
-      <%= f.select :member_group_type_id, 
-                  options_from_collection_for_select(@member_group_types, "id","name", 
-                  {:selected => @member.member_group_type_id }), :include_blank => '' %>
-    <% else %>
-      <%= t('activerecord.attributes.member.does_not_have_member_groups')  %>
-    <% end %>
-    </td>
-  </tr> 
-  <% end %>
-  
+<% unless @member.new_record? %>
+  <table class="table table-condensed"> 
+   <tr class="control-group"> 
+      <td colspan="4">
+      <%= t('activerecord.attributes.member.member_classification_type') %>:
+      <% if !@member_group_types.nil? %>
+        <%= f.select :member_group_type_id, 
+                    options_from_collection_for_select(@member_group_types, "id","name", 
+                    {:selected => @member.member_group_type_id }), :include_blank => '' %>
+      <% else %>
+        <%= t('activerecord.attributes.member.does_not_have_member_groups')  %>
+      <% end %>
+      </td>
+    </tr> 
+  </table>
+<% end %>
+
 <table id="table_demographic_information" class="table table-bordered table-condensed table-nohover">
   <thead>
     <tr class="box_title"><th colspan="2"><h4>Demographic information</h4></th></tr>
@@ -262,8 +263,16 @@ Please, have in mind that fields with ' * ' are required.
   <% end %>
 </div>
 
+<%= request.env.inspect %>
+
 <% if @member.new_record? %>
   <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
   <%= f.hidden_field :product_sku, :value => Club::DEFAULT_PRODUCT.join(',') %>
+  <%= f.hidden_field :mega_channel, :value => 'other' %>
+  <%= f.hidden_field :campaign_medium, :value => 'phone' %>
+  <%= f.hidden_field :landing_url, :value => request.env['HTTP_HOST'] %>
+  <%= f.hidden_field :referral_path, :value => request.env['REQUEST_PATH'] %>
+  <%= f.hidden_field :ip_address, :value => request.env['REMOTE_ADDR'] %>
+  <%= f.hidden_field :campaign_description, :value => 'CS Join' %>
 <% end %>
 
