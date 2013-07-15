@@ -72,6 +72,7 @@ class Member < ActiveRecord::Base
     length:                      { is: 2, allow_nil: true },
     inclusion:                   { within: self.supported_countries }
   country_specific_validations!
+  validate :validate_birth_date
 
   scope :synced, lambda { |bool=true|
     bool ?
@@ -1511,6 +1512,12 @@ class Member < ActiveRecord::Base
 
     def after_marketing_tool_sync
       marketing_tool_sync
+    end
+    
+    def validate_birth_date
+      if !self.birth_date.nil? and birth_date < '1900-01-01'.to_date
+        errors.add(:birth_date, "is invalid, it must be null or greater than '1900-01-01'") 
+      end
     end
 
 end
