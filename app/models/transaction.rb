@@ -200,11 +200,11 @@ class Transaction < ActiveRecord::Base
 
   def is_response_code_cc_expired?
     expired_codes = []
-    if self.gateway == "mes"
+    if self.mes?
       expired_codes = ['054']
-    elsif self.gateway == "authorize_net"
+    elsif self.authorize_net?
       expired_codes = ['8','316']
-    elsif self.gateway == "litle"
+    elsif self.litle?
       expired_codes = ['305']
     end
     expired_codes.include? self.response_code 
