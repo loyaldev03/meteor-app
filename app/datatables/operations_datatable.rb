@@ -16,8 +16,7 @@ private
         operation.id,
         I18n.l(operation.operation_date,:format => :dashed),
         #I couldnt make it work in another way. TODO: fix operation#show url.
-        operation.description.truncate(150).html_safe, 
-        operation.notes.to_s.truncate(42),
+        operation.description.to_s.truncate(150) + note_icon(operation),
         operation.created_by.username,
         link_to("<i class='icon-zoom-in'>".html_safe, ((!@current_agent.can? :edit, Operation, @current_club.id) ? '#' : @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_member.id,:id => operation.id)), :class => "btn btn-small", :disabled=>(!@current_agent.can? :edit, Operation, @current_club.id)),
       ]
@@ -55,5 +54,20 @@ private
   def sort_column
     Operation.datatable_columns[params[:iSortCol_0].to_i]
   end
-
+  
+  def note_icon(operation)
+    (operation.notes.to_s.length > 0 ? " <i class ='icon-comment help' rel= 'popover' data-toggle='modal' href='#myModal" + operation.id.to_s + "' style='cursor: pointer'></i>" + modal(operation) : '')
+  end
+  
+  def modal(operation)
+    "<div id='myModal" + operation.id.to_s + "' class='well modal hide' style='border: none;'>
+      <div class='modal-header'>
+        <a href='#' class='close'>&times;</a>
+        <h3>Note</h3>
+      </div>
+      <div class='modal-body'>" + operation.notes.to_s + "</div>
+      <div class='modal-footer'><a href='#' class='btn' data-dismiss='modal' >Close</a></div>
+    </div>"
+  end
+  
 end    
