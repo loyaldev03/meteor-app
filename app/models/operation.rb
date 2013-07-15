@@ -9,7 +9,7 @@ class Operation < ActiveRecord::Base
   validates :description, :presence => true
 
   def self.datatable_columns
-    ['id', 'operation_date', 'description', 'notes']
+    ['id', 'operation_date', 'description']
   end
 
   private
