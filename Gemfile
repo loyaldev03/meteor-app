@@ -68,6 +68,7 @@ gem "zendesk_api"
 # gem 'unicorn'
 
 gem 'newrelic_rpm'
+gem 'oboe'
 
 # To use debugger
 group :development do
