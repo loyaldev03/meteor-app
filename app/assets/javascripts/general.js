@@ -804,23 +804,4 @@ function admin_form_functions(){
       club_list = clubs.split(";");
     }
   });
-
-  // $("*[id$='_club_id']").live("change", function(){
-  //   if($(this).attr('id') != "agent_club_roles_attributes_"+count+"_club_id"){
-  //     if (confirm("Are you sure you want to change this club? All others club rol set will be deleted.")) {
-  //       for(i=1;i<=count;i++){
-  //         $("#club_role_table tr[id='tr_club_rol_["+i+"]']").remove();
-  //         club_list = clubs.split(";");
-  //       }
-  //       count=0;
-  //     }
-  // }
-  // });
-
-  // $("#div_agent_roles").find("input:checkbox").click( function(){
-  //   var at_least_one_is_checked = $('#div_agent_roles :checkbox:checked').length > 0;
-  //   if(at_least_one_is_checked){
-      
-  //   }
-  // });
 }

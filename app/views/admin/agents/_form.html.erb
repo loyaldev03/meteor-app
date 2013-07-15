@@ -24,17 +24,19 @@
     </div>
   </div>
 
-  <div class="control-group" id="div_agent_roles">
-    <%= f.label :roles, 'Global Roles', :class => 'control-label' %>
-    <div class="controls">
-      <% Agent::ROLES.each do |role| %>
-        <%= label_tag nil, role, class: 'checkbox' do %>
-          <%= check_box_tag "agent[roles][]", role, @agent.has_role?(role), id: "agent_roles_#{role}" %>
-          <%= role -%>
+  <% if @agent.club_roles.empty? %>
+    <div class="control-group" id="div_agent_roles">
+      <%= f.label :roles, 'Global Roles', :class => 'control-label' %>
+      <div class="controls">
+        <% Agent::ROLES.each do |role| %>
+          <%= label_tag nil, role, class: 'checkbox' do %>
+            <%= check_box_tag "agent[roles][]", role, @agent.has_role?(role), id: "agent_roles_#{role}"%>
+            <%= role -%>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
     </div>
-  </div>
+  <% end %>
 
   <div class="control-group">
     <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
@@ -42,6 +44,14 @@
       <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;" id="club_role_table">
         <tr><td colspan="3"> <%= link_to 'Add', '#', :class => 'btn', :id=> "add_new_club_role" %> </td></tr>
         <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
+        <% unless @agent.new_record? %>
+          <% @agent.club_roles.each do |club_role| %>
+          <tr>
+            <td> <%= club_role.role %> </td>
+            <td> <%= club_role.club.name %> </td>
+            <td> Delete <%= check_box_tag "club_roles[delete][]", club_role.id %> </td>
+          <% end %>
+        <% end %>
       </table>
     </div>
   </div>
@@ -56,6 +66,6 @@
 
 <script>
   roles = "<%= Agent::ROLES.join(',') %>"
-  clubs = "<%= Club.all.collect{|club| club.name+","+club.id.to_s}.join(";") %>"
+  clubs = "<%= @clubs.collect{|club| club.name+","+club.id.to_s}.join(";") %>"
   $(document).ready(admin_form_functions());
 </script>

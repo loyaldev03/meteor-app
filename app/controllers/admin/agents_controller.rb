@@ -24,23 +24,22 @@ class Admin::AgentsController < ApplicationController
     @agent.clubs.each {|c| @clubs.delete(c)}
   end
 
+
   # POST /agents
   def create
     @clubs = Club.all
-    
-    # cleanup_for_update!(params[:agent])
-    # if params[:agent][:club_roles_attributes].present? and not params[:agent][:roles].blank?
-      # flash.now[:error] = 'Cannot set both global and club roles at the same time'
-      # render :action => "new"
-    # elsif @agent.save
-    if @agent.save
-      params[:club_roles_attributes].each do |club_role|
-        @agent.club_roles << ClubRole.new(club_role.last)
+    if params[:agent][:roles].present? and params[:club_roles_attributes].present?
+      flash.now[:error] = 'Cannot set both global and club roles at the same time'
+      render :action => "new"
+    elsif @agent.save
+      if params[:club_roles_attributes]
+        params[:club_roles_attributes].each do |club_role|
+          @agent.club_roles << ClubRole.new(club_role.last)
+        end
       end
       @agent.save
       redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
     else
-      flash.now[:error] = 
       render :action => "new"
     end
   end
@@ -49,10 +48,21 @@ class Admin::AgentsController < ApplicationController
   def update
     @clubs = Club.all
     cleanup_for_update!(params[:agent])
-    if params[:agent][:club_roles_attributes].present? and not params[:agent][:roles].blank?
+    if params[:agent][:roles].present? and params[:agent][:club_roles_attributes].present?
       flash.now[:error] = 'Cannot set both global and club roles at the same time'
       render :action => "edit" 
     elsif @agent.update_attributes(params[:agent])
+      if params[:club_roles].present?
+        params[:club_roles][:delete].each do |club_role_id|
+          ClubRole.find(club_role_id).delete
+        end
+      end
+      if params[:club_roles_attributes]
+        params[:club_roles_attributes].each do |club_role|
+          @agent.club_roles << ClubRole.new(club_role.last)
+        end
+      end
+      @agent.save
       redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') 
     else
       render :action => "edit" 
