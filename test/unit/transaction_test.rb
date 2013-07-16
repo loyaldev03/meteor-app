@@ -861,7 +861,7 @@ class TransactionTest < ActiveSupport::TestCase
     old_year = active_member.active_credit_card.expire_year
     old_month = active_member.active_credit_card.expire_month
 
-    sleep 1
+    sleep 2
     active_member.next_retry_bill_date = Time.zone.now
     active_member.bill_membership
     active_member.reload
@@ -883,6 +883,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_member.bill_membership
     active_member.change_terms_of_membership(@litle_terms_of_membership_the_second.id, "changing tom", 100)
 
+    sleep 2
     active_member.next_retry_bill_date = Time.zone.now
     active_merchant_stubs_litle
 
@@ -911,7 +912,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     active_member.bill_membership
 
-    sleep 1
+    sleep 2
     active_member.next_retry_bill_date = Time.zone.now
     active_merchant_stubs_auth_net
 
@@ -930,7 +931,7 @@ class TransactionTest < ActiveSupport::TestCase
     old_year = active_member.active_credit_card.expire_year
     old_month = active_member.active_credit_card.expire_month
 
-    sleep 1
+    sleep 2
     active_member.next_retry_bill_date = Time.zone.now
     active_member.bill_membership
     active_member.reload
@@ -952,6 +953,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_member.bill_membership
     active_member.change_terms_of_membership(@authorize_net_terms_of_membership_second.id, "changing tom", 100)
 
+    sleep 2
     active_member.next_retry_bill_date = Time.zone.now
     active_merchant_stubs_auth_net
 
@@ -967,5 +969,5 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal active_member.active_credit_card.expire_year, old_year
     assert_equal active_member.active_credit_card.expire_month, old_month
   end
-  
+
 end
