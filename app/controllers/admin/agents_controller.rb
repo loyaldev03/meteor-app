@@ -33,15 +33,15 @@ class Admin::AgentsController < ApplicationController
       begin
         if params[:agent][:roles].present? and params[:club_roles_attributes].present?
           flash.now[:error] = 'Cannot set both global and club roles at the same time'
-        elsif @agent.save
+        else
+          @agent.save!
           if params[:club_roles_attributes]
             @agent.set_club_roles(params[:club_roles_attributes])
           end
           success = true
         end
-      rescue ActiveRecord::RecordNotUnique
+      rescue ActiveRecord::RecordInvalid
         @agent.errors.add(:email, "has already been taken")
-        success = false
       rescue Exception => e
         Auditory.report_issue("Agent:Create", e, { :agent => @agent.inspect, :club_roles_attributes => params[:club_roles_attributes] })
         flash.now[:error] = I18n.t('error_messages.airbrake_error_message')
@@ -58,8 +58,7 @@ class Admin::AgentsController < ApplicationController
   # PUT /agents/1
   def update
     success = false
-    @clubs = Club.all
-    @agent.clubs.each {|c| @clubs.delete(c)}
+    @clubs = Club.where(["id not in (?)", @agent.club_roles.each.collect(&:club_id)])
     ClubRole.transaction do
       begin
         cleanup_for_update!(params[:agent])

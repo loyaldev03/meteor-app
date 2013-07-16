@@ -780,7 +780,7 @@ function admin_form_functions(){
         club_list.splice(index,1);
     });
 
-    if(club_list.length == 0){
+    if(club_list.length == 0 || club_list == ""){
       alert("Cannot add more club roles. No more clubs available.")
     }else{
       count++;

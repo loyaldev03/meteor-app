@@ -94,8 +94,7 @@ class Agent < ActiveRecord::Base
 
   def delete_club_roles(club_roles_id)
     club_roles_id.each do |club_role_id|
-      club_role = ClubRole.find(club_role_id)
-      club_role.delete
+      ClubRole.delete(club_role_id)
     end
   end
 
