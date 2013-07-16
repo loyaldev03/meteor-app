@@ -27,14 +27,28 @@ class Admin::AgentsController < ApplicationController
 
   # POST /agents
   def create
+    success = false
     @clubs = Club.all
-    if params[:agent][:roles].present? and params[:club_roles_attributes].present?
-      flash.now[:error] = 'Cannot set both global and club roles at the same time'
-      render :action => "new"
-    elsif @agent.save
-      if params[:club_roles_attributes]
-        @agent.set_club_roles(params[:club_roles_attributes])
+    ClubRole.transaction do
+      begin
+        if params[:agent][:roles].present? and params[:club_roles_attributes].present?
+          flash.now[:error] = 'Cannot set both global and club roles at the same time'
+        elsif @agent.save
+          if params[:club_roles_attributes]
+            @agent.set_club_roles(params[:club_roles_attributes])
+          end
+          success = true
+        end
+      rescue ActiveRecord::RecordNotUnique
+        @agent.errors.add(:email, "has already been taken")
+        success = false
+      rescue Exception => e
+        Auditory.report_issue("Agent:Create", e, { :agent => @agent.inspect, :club_roles_attributes => params[:club_roles_attributes] })
+        flash.now[:error] = I18n.t('error_messages.airbrake_error_message')
+        raise ActiveRecord::Rollback
       end
+    end
+    if success 
       redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
     else
       render :action => "new"
@@ -43,21 +57,36 @@ class Admin::AgentsController < ApplicationController
 
   # PUT /agents/1
   def update
+    success = false
     @clubs = Club.all
-    cleanup_for_update!(params[:agent])
-    if params[:agent][:roles].present? and params[:club_roles_attributes].present?
-      flash.now[:error] = 'Cannot set both global and club roles at the same time'
-      render :action => "edit" 
-    elsif @agent.update_attributes(params[:agent])
-      if params[:club_roles].present?
-        @agent.delete_club_roles(params[:club_roles][:delete])
+    @agent.clubs.each {|c| @clubs.delete(c)}
+    ClubRole.transaction do
+      begin
+        cleanup_for_update!(params[:agent])
+        if params[:agent][:roles].present? and params[:club_roles_attributes].present?
+          flash.now[:error] = 'Cannot set both global and club roles at the same time'
+        elsif @agent.update_attributes(params[:agent])
+          if params[:club_roles].present?
+            @agent.delete_club_roles(params[:club_roles][:delete])
+          end
+          if params[:club_roles_attributes]
+            @agent.set_club_roles(params[:club_roles_attributes])
+          end
+          success = true
+        end
+      rescue ActiveRecord::RecordNotUnique
+        @agent.errors.add(:email, "has already been taken")
+        success = false
+      rescue Exception => e
+        Auditory.report_issue("Agent:Update", e, { :agent => @agent.inspect, :club_roles_attributes => params[:club_roles_attributes] })
+        flash.now[:error] = I18n.t('error_messages.airbrake_error_message')
+        raise ActiveRecord::Rollback
       end
-      if params[:club_roles_attributes]
-        @agent.set_club_roles(params[:club_roles_attributes])
-      end
-      redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') 
+    end
+    if success 
+      redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
     else
-      render :action => "edit" 
+      render :action => "edit"
     end
   end
 

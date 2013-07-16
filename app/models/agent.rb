@@ -88,18 +88,14 @@ class Agent < ActiveRecord::Base
 
   def set_club_roles(club_roles_info)
     club_roles_info.each do |club_role|
-      ClubRole.transaction do
-        self.club_roles << ClubRole.create(club_role.last)
-      end
+      self.club_roles << ClubRole.create(club_role.last)
     end
   end
 
   def delete_club_roles(club_roles_id)
     club_roles_id.each do |club_role_id|
       club_role = ClubRole.find(club_role_id)
-      ClubRole.transaction do
-        club_role.delete
-      end
+      club_role.delete
     end
   end
 
