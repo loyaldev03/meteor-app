@@ -790,3 +790,43 @@ function recover_member_functions(){
     startAjaxLoader();
   }); 
 }
+
+function admin_form_functions(){
+  var count = 0;
+  var club_list = clubs.split(";");
+  var role_list = roles.split(",");
+
+  $('#add_new_club_role').live("click", function(event){
+    event.preventDefault();
+    
+    $("*[id$='_club_id'] option:selected").each( function(){
+      index = club_list.indexOf($(this).text()+","+$(this).val());
+      if(index >= 0)
+        club_list.splice(index,1);
+    });
+
+    if(club_list.length == 0 || club_list == ""){
+      alert("Cannot add more club roles. No more clubs available.")
+    }else{
+      count++;
+      var options_for_role = "<option value=''> </option>"
+      for (var i in role_list){
+        options_for_role = options_for_role+"<option value='"+role_list[i]+"'>"+role_list[i]+"</option>" 
+      };
+      var options_for_club_id = ""
+      for (var i in club_list){  
+        club = club_list[i].split(',');
+        options_for_club_id = options_for_club_id+"<option value='"+club[1]+"'>"+club[0]+"</option>"
+      };
+      $('#club_role_table').append("<tr id='tr_club_rol_["+count+"]'><td><select id='club_roles_attributes_"+count+"_role' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select></td><td><select id='club_roles_attributes_"+count+"_club_id' name='[club_roles_attributes]["+count+"][club_id]'>"+options_for_club_id+"</select></td><td><input type='button' id='club_role_delete' name='"+count+"' class='btn btn-mini' value='Delete'></td></tr>")
+    }
+  });
+
+
+  $("#club_role_delete").live("click", function(){
+    if (confirm("Are you sure you want to delete this club role?")) {
+      $("#club_role_table tr[id='tr_club_rol_["+$(this).attr('name')+"]']").remove();
+      club_list = clubs.split(";");
+    }
+  });
+}

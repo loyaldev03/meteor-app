@@ -80,10 +80,9 @@ class RolesTest < ActionController::IntegrationTest
    end
 
 
-
-  ##############################################################
-  #ADMIN
-  ##############################################################
+#   ##############################################################
+#   #ADMIN
+#   ##############################################################
 
   test "select all clubs for admin agent."do
     setup_admin
@@ -101,7 +100,7 @@ class RolesTest < ActionController::IntegrationTest
   test "Agent admin can assign role_clubs, when there are no global roles" do
     setup_admin
     setup_member false
-      @agent_no_role = FactoryGirl.create :confirmed_agent
+    @agent_no_role = FactoryGirl.create :confirmed_agent
     7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     club1 = Club.first
@@ -110,22 +109,25 @@ class RolesTest < ActionController::IntegrationTest
     club_last = Club.last
     visit edit_admin_agent_path(@agent_no_role.id)
     within(".table-condensed")do
-      select('admin', :from => 'agent[club_roles_attributes][0][role]')
-      select(club1.name, :from => 'agent[club_roles_attributes][0][club_id]')
       click_link_or_button 'Add'
+      select('admin', :from => '[club_roles_attributes][1][role]')
+      select(club1.name, :from => '[club_roles_attributes][1][club_id]')
     end
+    click_link_or_button 'Update Agent'
     click_link_or_button 'Edit'
     within(".table-condensed")do
-      select('supervisor', :from => 'agent[club_roles_attributes][1][role]')
-      select(club2.name, :from => 'agent[club_roles_attributes][1][club_id]')
       click_link_or_button 'Add'
+      select('supervisor', :from => '[club_roles_attributes][1][role]')
+      select(club2.name, :from => '[club_roles_attributes][1][club_id]')
     end
+    click_link_or_button 'Update Agent'
     click_link_or_button 'Edit'
     within(".table-condensed")do
-      select('representative', :from => 'agent[club_roles_attributes][2][role]')
-      select(club3.name, :from => 'agent[club_roles_attributes][2][club_id]')
       click_link_or_button 'Add'
+      select('representative', :from => '[club_roles_attributes][1][role]')
+      select(club3.name, :from => '[club_roles_attributes][1][club_id]')
     end
+    click_link_or_button 'Update Agent'
     assert page.has_content?("admin for")
     assert page.has_content?("supervisor for")
     assert page.has_content?("representative for")
