@@ -43,6 +43,30 @@ class ActiveSupport::TestCase
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:credit).returns(answer)
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:store).returns(answer)
   end
+
+  def active_merchant_stubs_litle(code = "000", message = "This transaction has been approved with stub", success = true)
+    answer = ActiveMerchant::Billing::Response.new(success, message, 
+      { "litleOnlineResponse"=>{"message"=>"Valid Format", "saleResponse"=>{"response" => code} ,"response"=>code, "version"=>"8.16", 
+       "xmlns"=>"http://www.litle.com/schema", "registerTokenResponse"=>{"customerId"=>"", "id"=>"", 
+       "reportGroup"=>"Default Report Group", "litleTxnId"=>"630745122415368266", 
+       "litleToken"=>"1111222233334444", "response"=>"000", "responseTime"=>"2013-04-08T16:54:24", 
+       "message"=>"Approved"}}})
+    ActiveMerchant::Billing::LitleGateway.any_instance.stubs(:purchase).returns(answer)
+    ActiveMerchant::Billing::LitleGateway.any_instance.stubs(:refund).returns(answer)
+    ActiveMerchant::Billing::LitleGateway.any_instance.stubs(:credit).returns(answer)
+    ActiveMerchant::Billing::LitleGateway.any_instance.stubs(:store).returns(answer)
+  end 
+
+  def active_merchant_stubs_auth_net(code = "000", message = "This transaction has been approved with stub", success = true)
+    answer = ActiveMerchant::Billing::Response.new(success, message, 
+      {"response_code"=>code, "response_reason_code"=>"6", "response_reason_text"=> message, 
+       "avs_result_code"=>"P", "transaction_id"=>"0", "card_code"=>"", "action"=>"AUTH_CAPTURE"})
+    ActiveMerchant::Billing::AuthorizeNetGateway.any_instance.stubs(:purchase).returns(answer)
+    ActiveMerchant::Billing::AuthorizeNetGateway.any_instance.stubs(:refund).returns(answer)
+    ActiveMerchant::Billing::AuthorizeNetGateway.any_instance.stubs(:credit).returns(answer)
+    ActiveMerchant::Billing::AuthorizeNetGateway.any_instance.stubs(:store).returns(answer)
+  end 
+
   def active_merchant_stubs_store(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
     answer = ActiveMerchant::Billing::Response.new(success, message, { "transaction_id"=>CREDIT_CARD_TOKEN[number], "error_code"=> code, "auth_response_text"=>"No Match" })
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:store).returns(answer)

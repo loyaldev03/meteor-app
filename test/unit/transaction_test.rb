@@ -9,6 +9,9 @@ class TransactionTest < ActiveSupport::TestCase
     @member = FactoryGirl.build(:member)
     @credit_card = FactoryGirl.build(:credit_card)
     @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+    @sd_mes_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "054")
+    @sd_litle_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "305", :gateway => "litle")
+    @sd_auth_net_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "316", :gateway => "authorize_net")
     @hd_strategy = FactoryGirl.create(:hard_decline_strategy)
     FactoryGirl.create(:without_grace_period_decline_strategy_monthly)
     FactoryGirl.create(:without_grace_period_decline_strategy_yearly)
@@ -772,4 +775,197 @@ class TransactionTest < ActiveSupport::TestCase
     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first
     assert_equal trans.response_result, I18n.t('error_messages.airbrake_error_message')
   end
+
+  # Try billing a member's membership when he was previously SD for credit_card_expired before last billing for MeS
+  test "Try billing a member's membership when he was previously SD for credit_card_expired for MeS" do 
+    active_member = create_active_member(@terms_of_membership)
+    active_merchant_stubs(@sd_mes_expired_strategy.response_code, "decline stubbed", false)
+    active_member.bill_membership
+
+    active_member.next_retry_bill_date = Time.zone.now
+    active_merchant_stubs
+
+    old_year = active_member.active_credit_card.expire_year
+    old_month = active_member.active_credit_card.expire_month
+    
+    assert_difference('Operation.count', 3) do
+      assert_difference('Transaction.count') do
+        active_member.bill_membership
+      end
+    end
+    active_member.reload
+    assert_equal active_member.active_credit_card.expire_year, old_year+2
+    assert_equal active_member.active_credit_card.expire_month, old_month
+
+    old_year = active_member.active_credit_card.expire_year
+    old_month = active_member.active_credit_card.expire_month
+
+    sleep 1
+    active_member.next_retry_bill_date = Time.zone.now
+    active_member.bill_membership
+    active_member.reload
+
+    assert_equal active_member.active_credit_card.expire_year, old_year
+    assert_equal active_member.active_credit_card.expire_month, old_month
+  end
+
+  test "Try billing a member's membership when he was previously SD for credit_card_expired on different membership for MeS" do 
+    active_member = create_active_member(@terms_of_membership)
+    active_merchant_stubs(@sd_mes_expired_strategy, "decline stubbed", false)
+    active_member.bill_membership
+    active_member.change_terms_of_membership(@terms_of_membership_with_gateway_yearly.id, "changing tom", 100)
+
+    active_member.next_retry_bill_date = Time.zone.now
+    active_merchant_stubs
+
+    old_year = active_member.active_credit_card.expire_year
+    old_month = active_member.active_credit_card.expire_month
+    
+    assert_difference('Operation.count', 3) do
+      assert_difference('Transaction.count') do
+        active_member.bill_membership
+      end
+    end
+    active_member.reload
+    assert_equal active_member.active_credit_card.expire_year, old_year
+    assert_equal active_member.active_credit_card.expire_month, old_month
+  end
+
+  # Try billing a member's membership when he was previously SD for credit_card_expired before last billing for Litle
+  test "Try billing a member's membership when he was previously SD for credit_card_expired for Litle" do 
+    @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
+    @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
+    @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)    
+
+    active_member = create_active_member(@litle_terms_of_membership)
+    active_merchant_stubs_litle(@sd_litle_expired_strategy.response_code, "decline stubbed", false)
+    active_member.active_credit_card.update_attribute :token, @credit_card_litle.token
+
+    active_member.bill_membership
+
+    active_member.next_retry_bill_date = Time.zone.now
+    active_merchant_stubs_litle
+
+    old_year = active_member.active_credit_card.expire_year
+    old_month = active_member.active_credit_card.expire_month
+    
+    assert_difference('Operation.count', 3) do
+      assert_difference('Transaction.count') do
+        active_member.bill_membership
+      end
+    end
+    active_member.reload
+    assert_equal active_member.active_credit_card.expire_year, old_year+2
+    assert_equal active_member.active_credit_card.expire_month, old_month
+
+    old_year = active_member.active_credit_card.expire_year
+    old_month = active_member.active_credit_card.expire_month
+
+    sleep 1
+    active_member.next_retry_bill_date = Time.zone.now
+    active_member.bill_membership
+    active_member.reload
+
+    assert_equal active_member.active_credit_card.expire_year, old_year
+    assert_equal active_member.active_credit_card.expire_month, old_month
+  end
+
+  test "Try billing a member's membership when he was previously SD for credit_card_expired on different membership for Litle" do 
+    @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
+    @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
+    @litle_terms_of_membership_the_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id, :name =>"second_one")
+    @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)
+
+    active_member = create_active_member(@litle_terms_of_membership)
+    active_member.active_credit_card.update_attribute :token, @credit_card_litle.token
+
+    active_merchant_stubs_litle(@sd_litle_expired_strategy.response_code, "decline stubbed", false)
+    active_member.bill_membership
+    active_member.change_terms_of_membership(@litle_terms_of_membership_the_second.id, "changing tom", 100)
+
+    active_member.next_retry_bill_date = Time.zone.now
+    active_merchant_stubs_litle
+
+    old_year = active_member.active_credit_card.expire_year
+    old_month = active_member.active_credit_card.expire_month
+    
+    assert_difference('Operation.count', 3) do
+      assert_difference('Transaction.count') do
+        active_member.bill_membership
+      end
+    end
+    active_member.reload
+    assert_equal active_member.active_credit_card.expire_year, old_year
+    assert_equal active_member.active_credit_card.expire_month, old_month
+  end
+
+  # Try billing a member's membership when he was previously SD for credit_card_expired before last billing for Auth.net
+  test "Try billing a member's membership when he was previously SD for credit_card_expired for Auth.net" do 
+    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
+    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
+    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net, :token => "tzNduuh2DRQT7FXUILDl3Q==")
+
+    active_member = create_active_member(@authorize_net_terms_of_membership)
+    active_merchant_stubs_auth_net(@sd_auth_net_expired_strategy.response_code, "decline stubbed", false)
+    active_member.active_credit_card.update_attribute :token, @credit_card_authorize_net.token
+
+    active_member.bill_membership
+
+    sleep 1
+    active_member.next_retry_bill_date = Time.zone.now
+    active_merchant_stubs_auth_net
+
+    old_year = active_member.active_credit_card.expire_year
+    old_month = active_member.active_credit_card.expire_month
+    
+    assert_difference('Operation.count', 3) do
+      assert_difference('Transaction.count') do
+        active_member.bill_membership
+      end
+    end
+    active_member.reload
+    assert_equal active_member.active_credit_card.expire_year, old_year+2
+    assert_equal active_member.active_credit_card.expire_month, old_month
+
+    old_year = active_member.active_credit_card.expire_year
+    old_month = active_member.active_credit_card.expire_month
+
+    sleep 1
+    active_member.next_retry_bill_date = Time.zone.now
+    active_member.bill_membership
+    active_member.reload
+
+    assert_equal active_member.active_credit_card.expire_year, old_year
+    assert_equal active_member.active_credit_card.expire_month, old_month
+  end
+
+  test "Try billing a member's membership when he was previously SD for credit_card_expired on different membership for Auth.net" do 
+    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
+    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
+    @authorize_net_terms_of_membership_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id, :name =>"second_one")
+    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)
+    
+    active_member = enroll_member(@authorize_net_terms_of_membership, 0, false, @credit_card_authorize_net)
+    active_member.next_retry_bill_date = Time.zone.now
+
+    active_merchant_stubs_auth_net(@sd_auth_net_expired_strategy.response_code, "decline stubbed", false)
+    active_member.bill_membership
+    active_member.change_terms_of_membership(@authorize_net_terms_of_membership_second.id, "changing tom", 100)
+
+    active_member.next_retry_bill_date = Time.zone.now
+    active_merchant_stubs_auth_net
+
+    old_year = active_member.active_credit_card.expire_year
+    old_month = active_member.active_credit_card.expire_month
+    
+    assert_difference('Operation.count', 3) do
+      assert_difference('Transaction.count') do
+        active_member.bill_membership
+      end
+    end
+    active_member.reload
+    assert_equal active_member.active_credit_card.expire_year, old_year
+    assert_equal active_member.active_credit_card.expire_month, old_month
+  end
+  
 end
