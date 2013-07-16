@@ -40,7 +40,7 @@ private
   end
 
   def transaction_description(transaction)
-    detail = case transaction.operation_type
+    description = case transaction.operation_type
     when 100
       I18n.t('activerecord.attributes.transaction.transaction_types_messages.enrollment_billing')
     when 101
@@ -81,7 +81,7 @@ private
       I18n.t('activerecord.attributes.transaction.transaction_types_messages.enrollment_needs_approval')
     else ''
     end
-    detail = (detail.length > 0 ? detail + ' - ' + transaction.response_result : detail = transaction.response_result)
+    description = (description.length > 0 ? description + ' - ' + transaction.response_result : transaction.response_result)
   end
 
   def sort_column
