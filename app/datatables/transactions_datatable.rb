@@ -40,7 +40,8 @@ private
   end
 
   def transaction_description(transaction)
-    description = case transaction.operation_type
+    if @current_agent.has_role? 'representative'
+      description = case transaction.operation_type
       when 100
         I18n.t('activerecord.attributes.transaction.transaction_types_messages.enrollment_billing')
       when 101
@@ -80,8 +81,11 @@ private
       when 206
         I18n.t('activerecord.attributes.transaction.transaction_types_messages.enrollment_needs_approval')
       else ''
+      end
+      description = (description.length > 0 ? description + ' - ' + transaction.response_result : transaction.response_result)
+    else
+      transaction.full_label
     end
-    description = (description.length > 0 ? description + ' - ' + transaction.response_result : transaction.response_result)
   end
 
   def sort_column
