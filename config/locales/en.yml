@@ -154,6 +154,26 @@ en:
           void: Credit
           authorization_capture: 'Authorization-Capture'
           chargeback: Chargeback
+        transaction_types_messages:
+          enrollment_billing: 'Billing: Enrollment Fee'
+          membership_billing: 'Billing: Membership Fee'
+          credit: 'Billing: Refund'
+          membership_billing_without_decline_strategy: 'Billing Error: No Decline Strategy'
+          membership_billing_hard_decline: 'Billing Error: Hard Decline'
+          membership_billing_soft_decline: 'Billing Error: Soft Decline'
+          credit_error: 'Billing Error: Refund Failed'
+          chargeback: 'Billing: Member Chargeback'
+          error_on_enrollment_billing: 'Billing Error: Enrollment Failed'
+          no_recurrent_billing: 'Billing: One Time Transaction'
+          no_recurrent_billing_with_error: 'Billing Error: One Time Transaction'
+          membership_billing_hard_decline_by_limit: 'Membership: Cancellation due to Soft Decline Limit'
+          downgraded_because_of_hard_decline: 'Downgrade: Hard Decline'
+          downgraded_because_of_hard_decline_by_limit: 'Membership: Downgrade due to Soft Decline Limit'
+          membership_billing_without_decline_strategy_limit: 'Membership: Soft Decline Limit Reach (No Strategy)'
+          membership_manual_cash_billing: 'Billing: Manual Cash Transaction'
+          membership_manual_check_billing: 'Billing: Manual Check Transaction'
+          recovery: 'Membership: Recovery'
+          enrollment_needs_approval: 'Membership: Requires Approval'
         amount_available_to_refund: Max
         date: 'Date'
         description: 'Description'
