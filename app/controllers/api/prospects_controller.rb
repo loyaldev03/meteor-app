@@ -58,17 +58,21 @@ class Api::ProspectsController < ApplicationController
   # @example_response_description Example response to valid request.
   #
   def create
-    tom = TermsOfMembership.find(params[:prospect][:terms_of_membership_id])
-    my_authorize! :manage_prospects_api, Prospect, tom.club_id
-  	response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
-  	prospect = Prospect.new(params[:prospect])
-    prospect.club_id = tom.club_id
-  	if prospect.save
-  	  response[:message] = "Prospect was successfuly saved."
-      response[:code] = Settings.error_codes.success
-      response[:prospect_id] = prospect.id
-    end   
-    render json: response
+    if params[:prospect].nil?
+      render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
+    else
+      tom = TermsOfMembership.find(params[:prospect][:terms_of_membership_id])
+      my_authorize! :manage_prospects_api, Prospect, tom.club_id
+    	response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
+    	prospect = Prospect.new(params[:prospect])
+      prospect.club_id = tom.club_id
+    	if prospect.save
+    	  response[:message] = "Prospect was successfuly saved."
+        response[:code] = Settings.error_codes.success
+        response[:prospect_id] = prospect.id
+      end   
+      render json: response
+    end
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
   end
