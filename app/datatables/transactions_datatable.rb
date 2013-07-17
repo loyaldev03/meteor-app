@@ -41,48 +41,11 @@ private
 
   def transaction_description(transaction)
     if @current_agent.has_role? 'representative'
-      description = case transaction.operation_type
-      when 100
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.enrollment_billing')
-      when 101
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.membership_billing')
-      when 104
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.credit')
-      when 105
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.membership_billing_without_decline_strategy')
-      when 106
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.membership_billing_hard_decline')
-      when 107
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.membership_billing_soft_decline')
-      when 108
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.credit_error')
-      when 110
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.chargeback')
-      when 111
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.error_on_enrollment_billing')
-      when 112
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.no_recurrent_billing')
-      when 113
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.no_recurrent_billing_with_error')
-      when 114
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.membership_billing_hard_decline_by_limit')
-      when 115
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.downgraded_because_of_hard_decline')
-      when 116
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.downgraded_because_of_hard_decline_by_limit')
-      when 117
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.membership_billing_without_decline_strategy_limit')
-      when 118
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.membership_manual_cash_billing')
-      when 119
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.membership_manual_check_billing')
-      when 203
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.recovery')
-      when 206
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.enrollment_needs_approval')
-      else ''
+      begin
+        I18n.t('activerecord.attributes.transaction.transaction_types_messages.type_' + transaction.operation_type.to_s) + ' - ' + transaction.response_result
+      rescue
+        transaction.response_result
       end
-      description = (description.length > 0 ? description + ' - ' + transaction.response_result : transaction.response_result)
     else
       transaction.full_label
     end
