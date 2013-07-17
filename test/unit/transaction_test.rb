@@ -782,31 +782,30 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs(@sd_mes_expired_strategy.response_code, "decline stubbed", false)
     active_member.bill_membership
 
-    active_member.next_retry_bill_date = Time.zone.now
     active_merchant_stubs
-
-    old_year = active_member.active_credit_card.expire_year
-    old_month = active_member.active_credit_card.expire_month
-    
-    assert_difference('Operation.count', 3) do
-      assert_difference('Transaction.count') do
-        active_member.bill_membership
+    Timecop.travel(active_member.next_retry_bill_date) do
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      
+      assert_difference('Operation.count', 3) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
       end
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, old_year+2
+      assert_equal active_member.active_credit_card.expire_month, old_month
     end
-    active_member.reload
-    assert_equal active_member.active_credit_card.expire_year, old_year+2
-    assert_equal active_member.active_credit_card.expire_month, old_month
 
-    old_year = active_member.active_credit_card.expire_year
-    old_month = active_member.active_credit_card.expire_month
+    Timecop.travel(active_member.next_retry_bill_date) do
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      active_member.bill_membership
+      active_member.reload
 
-    sleep 1
-    active_member.next_retry_bill_date = Time.zone.now
-    active_member.bill_membership
-    active_member.reload
-
-    assert_equal active_member.active_credit_card.expire_year, old_year
-    assert_equal active_member.active_credit_card.expire_month, old_month
+      assert_equal active_member.active_credit_card.expire_year, old_year
+      assert_equal active_member.active_credit_card.expire_month, old_month
+    end
   end
 
   test "Try billing a member's membership when he was previously SD for credit_card_expired on different membership for MeS" do 
@@ -815,20 +814,20 @@ class TransactionTest < ActiveSupport::TestCase
     active_member.bill_membership
     active_member.change_terms_of_membership(@terms_of_membership_with_gateway_yearly.id, "changing tom", 100)
 
-    active_member.next_retry_bill_date = Time.zone.now
     active_merchant_stubs
-
-    old_year = active_member.active_credit_card.expire_year
-    old_month = active_member.active_credit_card.expire_month
-    
-    assert_difference('Operation.count', 3) do
-      assert_difference('Transaction.count') do
-        active_member.bill_membership
+    Timecop.travel(active_member.next_retry_bill_date) do
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      
+      assert_difference('Operation.count', 3) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
       end
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, old_year
+      assert_equal active_member.active_credit_card.expire_month, old_month
     end
-    active_member.reload
-    assert_equal active_member.active_credit_card.expire_year, old_year
-    assert_equal active_member.active_credit_card.expire_month, old_month
   end
 
   # Try billing a member's membership when he was previously SD for credit_card_expired before last billing for Litle
@@ -843,31 +842,30 @@ class TransactionTest < ActiveSupport::TestCase
 
     active_member.bill_membership
 
-    active_member.next_retry_bill_date = Time.zone.now
     active_merchant_stubs_litle
-
-    old_year = active_member.active_credit_card.expire_year
-    old_month = active_member.active_credit_card.expire_month
-    
-    assert_difference('Operation.count', 3) do
-      assert_difference('Transaction.count') do
-        active_member.bill_membership
+    Timecop.travel(active_member.next_retry_bill_date) do
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      
+      assert_difference('Operation.count', 3) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
       end
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, old_year+2
+      assert_equal active_member.active_credit_card.expire_month, old_month
     end
-    active_member.reload
-    assert_equal active_member.active_credit_card.expire_year, old_year+2
-    assert_equal active_member.active_credit_card.expire_month, old_month
 
-    old_year = active_member.active_credit_card.expire_year
-    old_month = active_member.active_credit_card.expire_month
+    Timecop.travel(active_member.next_retry_bill_date) do
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      active_member.bill_membership
+      active_member.reload
 
-    sleep 2
-    active_member.next_retry_bill_date = Time.zone.now
-    active_member.bill_membership
-    active_member.reload
-
-    assert_equal active_member.active_credit_card.expire_year, old_year
-    assert_equal active_member.active_credit_card.expire_month, old_month
+      assert_equal active_member.active_credit_card.expire_year, old_year
+      assert_equal active_member.active_credit_card.expire_month, old_month
+    end
   end
 
   test "Try billing a member's membership when he was previously SD for credit_card_expired on different membership for Litle" do 
@@ -883,21 +881,21 @@ class TransactionTest < ActiveSupport::TestCase
     active_member.bill_membership
     active_member.change_terms_of_membership(@litle_terms_of_membership_the_second.id, "changing tom", 100)
 
-    sleep 2
-    active_member.next_retry_bill_date = Time.zone.now
-    active_merchant_stubs_litle
+    Timecop.travel(active_member.next_retry_bill_date) do
+      active_merchant_stubs_litle
 
-    old_year = active_member.active_credit_card.expire_year
-    old_month = active_member.active_credit_card.expire_month
-    
-    assert_difference('Operation.count', 3) do
-      assert_difference('Transaction.count') do
-        active_member.bill_membership
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      
+      assert_difference('Operation.count', 3) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
       end
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, old_year
+      assert_equal active_member.active_credit_card.expire_month, old_month
     end
-    active_member.reload
-    assert_equal active_member.active_credit_card.expire_year, old_year
-    assert_equal active_member.active_credit_card.expire_month, old_month
   end
 
   # Try billing a member's membership when he was previously SD for credit_card_expired before last billing for Auth.net
@@ -912,32 +910,28 @@ class TransactionTest < ActiveSupport::TestCase
 
     active_member.bill_membership
 
-    sleep 2
-    active_member.next_retry_bill_date = Time.zone.now
-    active_merchant_stubs_auth_net
-
-    old_year = active_member.active_credit_card.expire_year
-    old_month = active_member.active_credit_card.expire_month
-    
-    assert_difference('Operation.count', 3) do
-      assert_difference('Transaction.count') do
-        active_member.bill_membership
+    Timecop.travel(active_member.next_retry_bill_date) do
+      active_merchant_stubs_auth_net
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      assert_difference('Operation.count', 3) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
       end
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, old_year+2
+      assert_equal active_member.active_credit_card.expire_month, old_month
     end
-    active_member.reload
-    assert_equal active_member.active_credit_card.expire_year, old_year+2
-    assert_equal active_member.active_credit_card.expire_month, old_month
 
-    old_year = active_member.active_credit_card.expire_year
-    old_month = active_member.active_credit_card.expire_month
-
-    sleep 2
-    active_member.next_retry_bill_date = Time.zone.now
-    active_member.bill_membership
-    active_member.reload
-
-    assert_equal active_member.active_credit_card.expire_year, old_year
-    assert_equal active_member.active_credit_card.expire_month, old_month
+    Timecop.travel(active_member.next_retry_bill_date) do
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, old_year
+      assert_equal active_member.active_credit_card.expire_month, old_month
+    end
   end
 
   test "Try billing a member's membership when he was previously SD for credit_card_expired on different membership for Auth.net" do 
@@ -953,21 +947,21 @@ class TransactionTest < ActiveSupport::TestCase
     active_member.bill_membership
     active_member.change_terms_of_membership(@authorize_net_terms_of_membership_second.id, "changing tom", 100)
 
-    sleep 2
-    active_member.next_retry_bill_date = Time.zone.now
-    active_merchant_stubs_auth_net
+    Timecop.travel(active_member.next_retry_bill_date) do
+      active_merchant_stubs_auth_net
 
-    old_year = active_member.active_credit_card.expire_year
-    old_month = active_member.active_credit_card.expire_month
-    
-    assert_difference('Operation.count', 3) do
-      assert_difference('Transaction.count') do
-        active_member.bill_membership
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      
+      assert_difference('Operation.count', 3) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
       end
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, old_year
+      assert_equal active_member.active_credit_card.expire_month, old_month
     end
-    active_member.reload
-    assert_equal active_member.active_credit_card.expire_year, old_year
-    assert_equal active_member.active_credit_card.expire_month, old_month
   end
 
 end
