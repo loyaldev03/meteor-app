@@ -804,7 +804,6 @@ function admin_form_functions(){
       if(index >= 0)
         club_list.splice(index,1);
     });
-
     if(club_list.length == 0 || club_list == ""){
       alert("Cannot add more club roles. No more clubs available.")
     }else{
@@ -819,9 +818,12 @@ function admin_form_functions(){
         options_for_club_id = options_for_club_id+"<option value='"+club[1]+"'>"+club[0]+"</option>"
       };
       $('#club_role_table').append("<tr id='tr_club_rol_["+count+"]'><td><select id='club_roles_attributes_"+count+"_role' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select></td><td><select id='club_roles_attributes_"+count+"_club_id' name='[club_roles_attributes]["+count+"][club_id]'>"+options_for_club_id+"</select></td><td><input type='button' id='club_role_delete' name='"+count+"' class='btn btn-mini' value='Delete'></td></tr>")
-    }
-  });
+    };
 
+    $("*[id$='_club_id']").each(function() {
+      $(this).data('lastValue', $(this).val());
+    });
+  });
 
   $("#club_role_delete").live("click", function(){
     if (confirm("Are you sure you want to delete this club role?")) {
@@ -829,4 +831,24 @@ function admin_form_functions(){
       club_list = clubs.split(";");
     }
   });
-}
+
+  $("*[id$='_club_id']:not[:last]").live("change", function() {
+    var name = $(this).attr("name");
+    var lastRole = $(this).data('lastValue');
+    var newRole = $(this).val();
+    var success = true;
+
+    $("*[id$='_club_id']").each( function(){
+      if(newRole == $(this).val() && name != $(this).attr("name")){ 
+        success = false;
+      };
+    });
+
+    if(success){
+      $(this).data('lastValue',newRole);
+    }else{
+      $(this).val(lastRole);
+      alert("It has already been taken.")
+    }
+  });
+};
