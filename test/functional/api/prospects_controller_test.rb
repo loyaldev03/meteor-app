@@ -90,5 +90,19 @@ class Api::ProspectsControllerTest < ActionController::TestCase
       assert_response :unauthorized 
     end
   end
+
+  test "try to create a prospect without sending params" do
+    sign_in @admin_user
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    post( :create, {:format => :json})
+    assert @response.body.include? "There are some params missing. Please check them."
+    assert_response :success
+
+    post( :create, {:first_name => @member.first_name, :format => :json})
+    assert @response.body.include? "There are some params missing. Please check them."
+    assert_response :success
+  end
 end
 
