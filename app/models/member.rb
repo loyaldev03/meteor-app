@@ -1,7 +1,7 @@
 # encoding: utf-8
 class Member < ActiveRecord::Base
   extend Extensions::Member::CountrySpecificValidations
-  extend Extensions::Member::DateSpecificValidations
+#  extend Extensions::Member::DateSpecificValidations
 
   belongs_to :club
   belongs_to :member_group_type
@@ -73,9 +73,9 @@ class Member < ActiveRecord::Base
     length:                      { is: 2, allow_nil: true },
     inclusion:                   { within: self.supported_countries }
   country_specific_validations!
-  birth_date_specific_validations!
+  validates :birth_date, :birth_date => true
 
-  scope :synced, lambda { |bool=true|
+  scope :synced, lambda { |bool=true|bien
     bool ?
       where('sync_status = "synced"') :
       where('sync_status = "not_synced"')
