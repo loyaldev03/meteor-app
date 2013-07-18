@@ -75,7 +75,7 @@ class Member < ActiveRecord::Base
   country_specific_validations!
   validates :birth_date, :birth_date => true
 
-  scope :synced, lambda { |bool=true|bien
+  scope :synced, lambda { |bool=true|
     bool ?
       where('sync_status = "synced"') :
       where('sync_status = "not_synced"')
