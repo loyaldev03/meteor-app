@@ -1,6 +1,7 @@
 # encoding: utf-8
 class Member < ActiveRecord::Base
   extend Extensions::Member::CountrySpecificValidations
+#  extend Extensions::Member::DateSpecificValidations
 
   belongs_to :club
   belongs_to :member_group_type
@@ -72,6 +73,7 @@ class Member < ActiveRecord::Base
     length:                      { is: 2, allow_nil: true },
     inclusion:                   { within: self.supported_countries }
   country_specific_validations!
+  validates :birth_date, :birth_date => true
 
   scope :synced, lambda { |bool=true|
     bool ?
@@ -1525,5 +1527,4 @@ class Member < ActiveRecord::Base
     def after_marketing_tool_sync
       marketing_tool_sync
     end
-
 end
