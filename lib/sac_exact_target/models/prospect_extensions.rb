@@ -49,7 +49,6 @@ module SacExactTarget
         Auditory.report_issue("Prospect:sync", e, { :prospect => self.inspect })
         raise e
       end
-
     end
   end
 end

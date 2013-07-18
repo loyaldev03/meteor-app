@@ -5,11 +5,19 @@ module SacExactTarget
       # Find by email . I didnt have luck looking for a subscriber by email and List.
       subscriber = SacExactTarget::ProspectModel.find_by_email self.prospect.email, club_id
       res = if subscriber.nil?
-        options = { :subscribe_to_list => true }
-        client.Create(subscriber(subscriber_key, options))
+        begin 
+          options = { :subscribe_to_list => true }
+          client.Create(subscriber(subscriber_key, options))
+        rescue Timeout::Error 
+          Auditory.audit(nil, self, "ExactTarget crate took too long.", self.member, Settings.operation_types.et_timeout_create) 
+        end
       elsif SacExactTarget::ProspectModel.email_belongs_to_prospect?(subscriber.subscriber_key)
-        options = { :subscribe_to_list => false }
-        client.Update(subscriber(subscriber.subscriber_key, options))
+        begin
+          options = { :subscribe_to_list => false }
+          client.Update(subscriber(subscriber.subscriber_key, options))
+        rescue Timeout::Error 
+          Auditory.audit(nil, self, "ExactTarget update took too long.", self.member, Settings.operation_types.et_timeout_update) 
+        end
       end
       update_prospect(res) unless res.nil?
     end
@@ -29,6 +37,8 @@ module SacExactTarget
         'EmailAddress' => self.prospect.email, 'ObjectID' => true)
       res = client.Delete(subscriber)
       SacExactTarget::report_error("SacExactTarget:Prospect:destroy", res) if res.OverallStatus != "OK"
+    rescue Timeout::Error 
+      Auditory.audit(nil, self, "ExactTarget destroy took too long.", self.member, Settings.operation_types.et_timeout_destroy) 
     end
 
     def self.find_all_by_email(email, club_id)

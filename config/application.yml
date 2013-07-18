@@ -167,6 +167,7 @@ defaults: &defaults
     #not_visible
     et_timeout_create: 5000
     et_timeout_update: 5001
+    et_timeout_retrieve: 5002
   error_codes:
     success: '000'
     wrong_data: '100'

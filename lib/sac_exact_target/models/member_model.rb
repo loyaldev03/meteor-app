@@ -10,6 +10,8 @@ module SacExactTarget
       res = ExactTargetSDK::Subscriber.find [ ["SubscriberKey", ExactTargetSDK::SimpleOperator::EQUALS, subscriber_key ] ]
       @subscriber = res.Results.first
       @subscriber.nil?
+    rescue Timeout::Error 
+      Auditory.audit(nil, self, "ExactTarget subscriber find took too long.", self, Settings.operation_types.et_timeout_retrieve)
     end
 
     def unsubscribe!
