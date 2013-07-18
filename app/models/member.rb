@@ -1,6 +1,7 @@
 # encoding: utf-8
 class Member < ActiveRecord::Base
   extend Extensions::Member::CountrySpecificValidations
+#  extend Extensions::Member::DateSpecificValidations
 
   belongs_to :club
   belongs_to :member_group_type
@@ -72,6 +73,7 @@ class Member < ActiveRecord::Base
     length:                      { is: 2, allow_nil: true },
     inclusion:                   { within: self.supported_countries }
   country_specific_validations!
+  validates :birth_date, :birth_date => true
 
   scope :synced, lambda { |bool=true|
     bool ?
@@ -109,7 +111,7 @@ class Member < ActiveRecord::Base
   scope :with_credit_card_last_digits, lambda{ |value| joins(:credit_cards).where('credit_cards.last_digits = ?', value.strip) unless value.blank? }
   scope :with_credit_card_token, lambda{ |value| joins(:credit_cards).where('credit_cards.token = ?', value) unless value.blank? }
   scope :with_member_notes, lambda{ |value| joins(:member_notes).where('member_notes.description like ?', '%'+value.strip+'%') unless value.blank? }
-  scope :with_external_id, lambda{ |value| where("members.external_id = ?",value) unless value.blank? }
+  scope :with_external_id, lambda{ |value| where("members.external_id like ?",'%'+value.strip+'%') unless value.blank? }
   scope :needs_approval, lambda{ |value| where('members.status = ?', 'applied') unless value == '0' }
   scope :with_billed_date_from, lambda{ |value| joins(:transactions).where('date(transactions.created_at) >= ?', value) unless value.blank? }
   scope :with_billed_date_to, lambda{ |value| joins(:transactions).where('date(transactions.created_at) <= ?', value) unless value.blank? }
@@ -1525,5 +1527,4 @@ class Member < ActiveRecord::Base
     def after_marketing_tool_sync
       marketing_tool_sync
     end
-
 end
