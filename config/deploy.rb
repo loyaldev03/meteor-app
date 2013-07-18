@@ -1,3 +1,8 @@
+# Do you want to put in mantainance mode the site during deployment?
+# Use :
+# cap -S put_in_maintenance_mode="true" prototype deploy
+# default value is false
+
 set :stages, %w(production prototype staging demo)
 set :default_stage, "prototype"
 default_run_options[:pty] = true
@@ -27,6 +32,7 @@ task :link_config_files do
   puts "  * Creating shared symlinks... "
   run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
   run "ln -nfs #{release_path}/doc #{release_path}/public/doc"
+  run "ln -nfs #{shared_path}/mes_account_updater_files #{release_path}/mes_account_updater_files"
   run "ln -nfs #{shared_path}/assets #{release_path}/public/assets"
   run "if [ -e #{release_path}/rake_task_runner ]; then chmod +x #{release_path}/rake_task_runner; fi"
 end
@@ -39,7 +45,7 @@ end
 task :bundle_install do
   puts "  **** bundle_install"
   run "id"
-  run "cd #{release_path}; bundle install"
+  run "cd #{release_path}; #{sudo} bundle install"
 end
 
 desc "Restart delayed jobs"
@@ -94,7 +100,7 @@ namespace :deploy do
 
   task :migrate, :roles => :web, :except => { :no_release => true } do
     run <<-EOF
-      cd #{release_path} &&
+      cd #{release_path} && 
       RAILS_ENV=#{stage} bundle exec rake db:migrate --trace
     EOF
   end
@@ -176,13 +182,30 @@ task :assets, :roles => :web do
   EOF
 end
 
+# mantainance_mode
+namespace :maintenance_mode do
+  desc "Start"
+  task :start, :roles => :web do
+    run "cd #{release_path} && RAILS_ENV=#{rails_env} bundle exec rake maintenance:start"
+  end
+  
+  desc "Stop"
+  task :stop, :roles => :web do
+    run "cd #{release_path} && RAILS_ENV=#{rails_env} bundle exec rake maintenance:end"
+  end
+end
 
-after "deploy:setup", "deploy:db:setup"   unless fetch(:skip_db_setup, false)
+# after "deploy:setup", "deploy:db:setup" unless fetch(:skip_db_setup, false)
 after "deploy:update_code", "link_config_files"
 after "deploy:update_code", "bundle_install"
 after "deploy:update_code", "assets"
+after "deploy:update", "maintenance_mode:start" if fetch(:put_in_maintenance_mode, false)
 after "deploy:update", "deploy:migrate"
-after "deploy:update", "newrelic:notice_deployment"
-after 'deploy', 'restart_delayed_jobs'
+after "deploy:update", "maintenance_mode:stop" if fetch(:put_in_maintenance_mode, false)
+after 'deploy:update', 'restart_delayed_jobs'
+after "deploy", "newrelic:notice_deployment"
 after 'deploy', 'notify_campfire'
 after "deploy", "deploy:tag"
+
+
+

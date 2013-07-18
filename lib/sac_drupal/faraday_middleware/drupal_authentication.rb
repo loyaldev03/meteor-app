@@ -4,6 +4,7 @@ module Drupal
       class AuthError < StandardError; end
       SESSION_PATH = '/api/system/connect'.freeze
       LOGIN_PATH = '/api/user/login'.freeze
+      TOKEN_PATH = '/services/session/token'.freeze
 
       def initialize(app, options)
         super(app)
@@ -11,7 +12,7 @@ module Drupal
       end
 
       def call(env)
-        cookie = false
+        cookie, res = false, nil
         if self.cookie
           Drupal.logger.debug " ** using existing cookie for #{@options[:url]}: #{self.cookie}"
           cookie = true
@@ -20,18 +21,26 @@ module Drupal
         end
 
         env[:request_headers]['Cookie'] = self.cookie
+        env[:request_headers]['X-CSRF-Token'] = self.generate_token
         old_body = env[:body] # lets store the first body. because it will be overwritten after call/token regeneration
 
-        res = @app.call(env)
-
+        time_elapsed = Benchmark.ms do
+          res = @app.call(env)
+        end
+        Drupal.logger.info "Drupal::#{env[:url]} took #{time_elapsed}ms"
+  
         if res.status == 401 && cookie # retry if cookie is invalid
           Drupal.logger.debug(" ** invalidating %.2f seconds-old cookie. old body #{old_body.inspect}" % self.cookie_age)
           self.invalidate_cookie!
           self.regenerate_cookie!
 
           env[:request_headers]['Cookie'] = self.cookie
+          env[:request_headers]['X-CSRF-Token'] = self.generate_token
           env[:body] = old_body
-          res = @app.call(env)
+          time_elapsed = Benchmark.ms do
+            res = @app.call(env)
+          end
+          Drupal.logger.info "Drupal::#{env[:url]} took #{time_elapsed}ms"
         end
         res
       end
@@ -52,6 +61,18 @@ module Drupal
 
       def cookie
         store && store[@options[:url]] && store[@options[:url]][:body]
+      end
+
+      def generate_token
+        conn = simple_connection
+        conn.headers['Cookie'] = self.cookie
+        res = conn.get TOKEN_PATH
+        if res.status == 200
+          res.body.strip
+        else
+          Drupal.logger.error AuthError.new("HTTP #{res.status} when getting token") 
+          nil
+        end
       end
 
       def cookie_age
@@ -94,10 +115,9 @@ module Drupal
       end
 
       def simple_connection
-        @simple_connection ||= Faraday.new(url: @options[:url]) do |http| 
+        Faraday.new(url: @options[:url]) do |http| 
           http.headers = auth_headers
           http.use Drupal::FaradayMiddleware::FullLogger, Drupal.logger
-
           http.adapter :net_http 
         end
       end

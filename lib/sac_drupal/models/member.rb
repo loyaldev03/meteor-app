@@ -58,8 +58,8 @@ module Drupal
       uri = @token && @token.url && URI.parse(@token.url)
       self.member.update_column :autologin_url, uri.path if uri
       @token
-    rescue
-      Airbrake.notify(:error_class => 'Drupal:Member:login_token', :parameters => { :member => self.member.inspect })
+    rescue Exception => e
+      Auditory.report_issue('Drupal:Member:login_token', e, { :member => self.member.inspect })
       nil
     end
 
@@ -94,7 +94,7 @@ module Drupal
           }
         else
           {
-            last_sync_error: res.body.class == Hash ? res.body[:message] : res.body,
+            last_sync_error: res.body.class == Hash ? res.body["form_errors"].inspect : res.body,
             last_sync_error_at: Time.now,
             sync_status: "with_error"
           }
@@ -106,6 +106,11 @@ module Drupal
 
     def fieldmap
       m = self.member
+
+      role_list = {}
+      m.current_membership.terms_of_membership.api_role.to_s.split(',').each do |role|
+        role_list = role_list.merge!({role => role})
+      end
 
       map = { 
         mail: m.email,
@@ -175,6 +180,7 @@ module Drupal
             } 
           ]
         },
+        roles: role_list,
       }
 
       if self.new_record?
@@ -224,6 +230,3 @@ module Drupal
     end
   end
 end
-
-
-

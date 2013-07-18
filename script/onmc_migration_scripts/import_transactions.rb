@@ -26,6 +26,7 @@ def process_chargeback(refund, terms_of_membership_id = nil)
       transaction.amount = refund.phoenix_amount
       transaction.response = refund.result
       transaction.response_code = (refund.result == "Success" ? "000" : "999")
+      transaction.success = (transaction.response_code == '000')
       transaction.response_result = refund.result
       transaction.response_transaction_id = refund.litle_txn_id
       transaction.membership_id = @member.current_membership_id
@@ -201,8 +202,9 @@ def load_enrollment_transactions
             if response.code.to_i == 0
               transaction.response_transaction_id = authorization.litleTxnId
             end
+            transaction.success = (transaction.response_code == '000')
             transaction.response_auth_code = authorization.auth_code
-	    transaction.membership_id = @member.current_membership_id
+	         transaction.membership_id = @member.current_membership_id
             transaction.created_at = response.created_at
             transaction.updated_at = response.updated_at
             transaction.refunded_amount = 0
@@ -277,7 +279,8 @@ def load_membership_transactions
               transaction.response_transaction_id = authorization.litleTxnId
             end
             transaction.response_auth_code = authorization.auth_code
-	    transaction.membership_id = @member.current_membership_id
+            transaction.success = (transaction.response_code == '000')
+	           transaction.membership_id = @member.current_membership_id
             transaction.created_at = response.created_at
             transaction.updated_at = response.updated_at
             transaction.refunded_amount = 0

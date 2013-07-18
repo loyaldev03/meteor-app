@@ -26,7 +26,7 @@ class Api::ProspectsController < ApplicationController
   #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others).[optional]</li>
   #     <li><strong>terms_of_membership_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at prospect level. </li> 
   #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd"[optional]</li>
-  #     <li><strong>product_sku</strong> Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet")[optional]</li>
+  #     <li><strong>product_sku</strong> Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet") [optional]</li>
   #     <li><strong>mega_channel</strong>[optional]</li>
   #     <li><strong>marketing_code</strong> multi-team[optional]</li>
   #     <li><strong>fulfillment_code</strong> Id of the fulfillment we are sending to our member. (car-flag).[optional]</li>
@@ -36,7 +36,7 @@ class Api::ProspectsController < ApplicationController
   #     <li><strong>referral_parameters</strong> [optional]</li>
   #     <li><strong>referral_path</strong> [optional]</li>
   #     <li><strong>user_id</strong> User ID alias UID is an md5 hash of the user's IP address and user-agent information.[optional]</li>
-  #     <li><strong>landing_url</strong> Url from where te submit comes from.[optional]</li>
+  #     <li><strong>landing_url</strong> Url from where the submit comes from.[optional]</li>
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. This information is selected by the member. This information is stored with format as hash encoded with json. [optional]</li>
   #     <li><strong>cookie_value</strong> Cookie from where the enrollment is being submitted.[optional]</li>
   #     <li><strong>cookie_set</strong> If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.[optional]</li>
@@ -50,24 +50,29 @@ class Api::ProspectsController < ApplicationController
   # @response_field [String] prospect_id Prospect's id. This ID is unique for each prospect. (36 characters string)
   #
   # @example_request 
-  #   curl -v -k -X POST --data-ascii "{\"prospect\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"}}}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/prospects?api_key=G6qq3KzWQVi9zgfFVXud
-  # @example_request_description Requesting enroll of a valid member.
+  #   curl -v -k -X POST --data-ascii "{\"prospect\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"terms_of_membership_id\":\"1\"},\"api_key\":\"JWPGnS7bsfB7yizwxJ6F\"}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/prospects
+  # @example_request_description Example of request.
   #
   # @example_response 
   #   {"message":"Prospect was successfuly saved.","code":"000","prospect_id":"55e8f945-9d24-4d10-95cd-b0dcfcdb7f5c"}
-  # @example_response_description Example response to the previos example request.
+  # @example_response_description Example response to valid request.
   #
   def create
-    tom = TermsOfMembership.find(params[:prospect][:terms_of_membership_id])
-    my_authorize! :manage_prospects_api, Prospect, tom.club_id
-  	response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
-  	prospect = Prospect.new(params[:prospect])
-  	if prospect.save
-  	  response[:message] = "Prospect was successfuly saved."
-      response[:code] = Settings.error_codes.success
-      response[:prospect_id] = prospect.id
-    end   
-    render json: response
+    if params[:prospect].nil?
+      render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
+    else
+      tom = TermsOfMembership.find(params[:prospect][:terms_of_membership_id])
+      my_authorize! :manage_prospects_api, Prospect, tom.club_id
+    	response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
+    	prospect = Prospect.new(params[:prospect])
+      prospect.club_id = tom.club_id
+    	if prospect.save
+    	  response[:message] = "Prospect was successfuly saved."
+        response[:code] = Settings.error_codes.success
+        response[:prospect_id] = prospect.id
+      end   
+      render json: response
+    end
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
   end

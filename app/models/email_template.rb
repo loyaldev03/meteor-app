@@ -6,7 +6,9 @@ class EmailTemplate < ActiveRecord::Base
 
   TEMPLATE_TYPES =  [ :active, # sent when member changes its status to active
     :cancellation, # sent when member changes its status to lapsed
+    :rejection, # sent when member is in applied status, and it is rejected by one of our agents
     :prebill, # sent 7 days before we bill member
+    :manual_payment_prebill, # sent 14 days before next billing day.
     :refund, # sent when CS does a refund.
     :birthday, # sent if birthday is on enrollment_info
     :pillar, # emails sent after join date and active/prov status. they use days_after_join_date attribute
@@ -16,7 +18,7 @@ class EmailTemplate < ActiveRecord::Base
 
   validates :name, :template_type, :terms_of_membership_id, :presence => :true
 
-  CLIENTS = [ :amazon, :action_mailer, :lyris ]
+  CLIENTS = [ :exact_target, :action_mailer, :lyris ]
 
   def lyris?
     self.client == 'lyris'
@@ -24,6 +26,10 @@ class EmailTemplate < ActiveRecord::Base
 
   def action_mailer?
     self.client == 'action_mailer'
+  end
+
+  def exact_target?
+    self.client == 'exact_target'
   end
 
 end

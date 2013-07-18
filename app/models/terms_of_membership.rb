@@ -7,10 +7,11 @@ class TermsOfMembership < ActiveRecord::Base
   has_many :memberships
   has_many :prospects
   has_many :email_templates
+  belongs_to :downgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'downgrade_tom_id'
 
   acts_as_paranoid
 
-  after_create :setup_defaul_email_templates
+  after_create :setup_default_email_templates
 
   validates :name, :presence => true
   validates :mode, :presence => true
@@ -49,6 +50,10 @@ class TermsOfMembership < ActiveRecord::Base
   def payment_gateway_configuration
     club.payment_gateway_configurations.find_by_mode(mode)
   end
+  
+  def downgradable?
+    self.downgrade_tom_id.to_i > 0
+  end
 
   private
 
@@ -56,17 +61,18 @@ class TermsOfMembership < ActiveRecord::Base
       errors.add :base, :club_payment_gateway_configuration unless self.payment_gateway_configuration
     end
 
-    def setup_defaul_email_templates
+    def setup_default_email_templates
       if development?
         EmailTemplate::TEMPLATE_TYPES.each do |type|
-          et = EmailTemplate.new 
-          et.name = "Test #{type}"
-          et.client = :action_mailer
-          et.template_type = type
-          et.terms_of_membership_id = self.id
-          et.save
+          if type!=:rejection or (type==:rejection and self.needs_enrollment_approval)
+            et = EmailTemplate.new 
+            et.name = "Test #{type}"
+            et.client = :action_mailer
+            et.template_type = type
+            et.terms_of_membership_id = self.id
+            et.save
+          end
         end
       end
     end
-
 end

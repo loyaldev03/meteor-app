@@ -1,13 +1,16 @@
 defaults: &defaults
-  cc_encryption_key: reibel3y5estrada8
+  exact_target:
+    username: martin@xagax.com
+    password: charly-martin2013
+    business_unit_for_test: '6177869'
   max_reactivations: 3
+  days_to_wait_to_cancel_fulfillments: 2
   next_retry_on_missing_decline: 20.days
   number_of_retries_on_missing_decline: 4
   club_cash_for_members_who_belongs_to_group: 200
   call_these_members_recipients: platformadmins@xagax.com
   email_to_send_product_list: 'platformadmins@xagax.com'
   email_to_use_on_action_mailer_as_recipient: platformadmins@xagax.com
-  email_to_use_on_duplicated_email_sync_error: platformadmins@xagax.com
   others_product: "SLOOPS"
   kit_card_product: 'KIT-CARD'
   lyris_service:
@@ -36,6 +39,14 @@ defaults: &defaults
     membership_billing_without_pgc: 109
     chargeback: 110
     error_on_enrollment_billing: 111
+    no_recurrent_billing: 112
+    no_recurrent_billing_with_error: 113
+    membership_billing_hard_decline_by_limit: 114
+    downgraded_because_of_hard_decline: 115
+    downgraded_because_of_hard_decline_by_limit: 116
+    membership_billing_without_decline_strategy_limit: 117
+    membership_manual_cash_billing: 118
+    membership_manual_check_billing: 119
     #profile
     cancel: 200 
     future_cancel: 201
@@ -76,6 +87,9 @@ defaults: &defaults
     operation_updated: 237
     note_added: 238
     remote_club_cash_transaction: 239
+    downgrade_member: 240
+    unblacklisted: 241
+    member_manually_synced_to_exact_target: 242
     #communication
     active_email: 300     
     prebill_email: 301    
@@ -84,6 +98,9 @@ defaults: &defaults
     pillar_email: 304
     hard_decline_email: 305
     soft_decline_email: 306
+    rejection_email: 307
+    birthday_email: 308
+    no_email_error: 309
     #fulfillments
     from_not_processed_to_in_process: 400
     from_not_processed_to_on_hold: 401
@@ -141,6 +158,7 @@ defaults: &defaults
     from_bad_address_to_out_of_stock: 453
     from_bad_address_to_returned: 454
     from_bad_address_to_canceled: 455
+    automatic_recycle_credit_card: 456
     #vip
     vip_event_registration: 900
     vip_event_cancelation: 901 
@@ -160,6 +178,7 @@ defaults: &defaults
     club_is_not_enable_for_new_enrollments: '410'
     unrecoverable_error: '411'
     club_cash_cant_be_fixed: '412'
+    club_does_not_support_club_cash: '413'
     duplicate_transaction: '900'
     not_supported: '902'
     product_empty: '903'
@@ -170,6 +189,10 @@ defaults: &defaults
     credit_card_blacklisted: '9508'
     credit_card_blank: '9509'
     refund_invalid: '9788'
+    manual_billing_with_less_amount_than_permitted: '9880'
+    manual_billing_error: '9881'
+    membership_billing_error: '9882' 
+    no_reccurent_billing_error: '9883'
     member_club_dont_allow: '9884'
     nothing_to_change_tom: '9885'
     member_status_dont_allow: '9886'
@@ -187,6 +210,7 @@ defaults: &defaults
     member_email_blacklisted: '9996'
     member_could_no_be_blacklisted: '9998'
     tom_wihtout_gateway_configured: '9789'
+    tom_to_downgrade_belongs_to_different_club: '9790'
     club_cash_transaction_not_successful: '9791'
     fulfillment_error: '9801'
     fulfillment_reason_blank: '9802'
@@ -213,9 +237,6 @@ defaults: &defaults
     - us
     defaults:
       email:
-        presence: true
-        uniqueness:
-          :scope: :club_id
         format: !ruby/regexp /^([0-9a-zA-Z\-_]([-_\.]?[+?]?[0-9a-zA-Z\-_])*@([0-9a-zA-Z]+[-_\.]?[0-9a-zA-Z]*\.)+[a-zA-Z]{2,9})$/
       club_id:
         presence: true
@@ -251,14 +272,6 @@ defaults: &defaults
         length: 
           :minimum: 1
           :maximum: 8
-      api_id:
-        uniqueness:
-          :allow_blank: true
-          :scope: :club_id
-        numericality:
-          :only_integer: true
-          :allow_nil: true
-          :allow_blank: true
     sets:
       western:
         first_name:
@@ -307,13 +320,17 @@ defaults: &defaults
 
 development:
   <<: *defaults
+  xxxyyyzzz: reibel3y5estrada8
+
 
 test:
   <<: *defaults
+  xxxyyyzzz: reibel3y5estrada8
+
 
 production:
   <<: *defaults
-  call_these_members_recipients: 'rmosher@stoneacreinc.com,wbryant@stoneacreinc.com,mfulginiti@stoneacreinc.com,kflynn@stoneacreinc.com,jsmith@stoneacreinc.com'
+  call_these_members_recipients: 'rmosher@stoneacreinc.com,wbryant@stoneacreinc.com,mfulginiti@stoneacreinc.com,kflynn@stoneacreinc.com'
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   email_to_send_product_list: 'ddanch@stoneacreinc.com,tbrady@stoneacreinc.com'
   mes_report_service:
@@ -324,15 +341,18 @@ production:
   mes_aus_service:
     folder: <%= "#{Rails.root}/mes_account_updater_files" %>
     url: https://www.merchante-solutions.com/
+  xxxyyyzzz: 7faf4f991bc44841a00423b8db9602bb
 
 
 prototype:
   <<: *defaults
+  xxxyyyzzz: reibel3y5estrada8
 
 staging:
   <<: *defaults
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
-  email_to_send_product_list: 'ddanch@stoneacreinc.com,tbrady@stoneacreinc.com'
+  xxxyyyzzz: reibel3y5estrada8
 
 demo:
   <<: *defaults
+  xxxyyyzzz: reibel3y5estrada82012

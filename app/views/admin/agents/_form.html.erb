@@ -24,13 +24,13 @@
     </div>
   </div>
 
-  <% unless @agent.has_club_roles? %>
-    <div class="control-group">
+  <% if @agent.club_roles.empty? %>
+    <div class="control-group" id="div_agent_roles">
       <%= f.label :roles, 'Global Roles', :class => 'control-label' %>
       <div class="controls">
         <% Agent::ROLES.each do |role| %>
           <%= label_tag nil, role, class: 'checkbox' do %>
-            <%= check_box_tag "agent[roles][]", role, @agent.has_role?(role), id: "agent_roles_#{role}" %>
+            <%= check_box_tag "agent[roles][]", role, @agent.has_role?(role), id: "agent_roles_#{role}"%>
             <%= role -%>
           <% end %>
         <% end %>
@@ -38,30 +38,24 @@
     </div>
   <% end %>
 
-  <% if not f.object.new_record? and not @agent.has_global_role? %>
-    <div class="control-group">
-      <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
-      <div class="controls">
-        <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;">
-          <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
-          <%= f.fields_for :club_roles, @agent.club_roles do |role| %>
-            <tr>
-              <td><%= role.object.role %></td>
-              <td><%= role.object.club_id %> <%= role.object.club.name %></td>
-              <td>Delete &nbsp;<%= role.check_box '_destroy' %></td>
-            </tr>
+  <div class="control-group">
+    <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
+    <div class="controls">
+      <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;" id="club_role_table">
+        <tr><td colspan="3"> <%= link_to 'Add', '#', :class => 'btn', :id=> "add_new_club_role" %> </td></tr>
+        <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
+        <% unless @agent.new_record? %>
+          <% @agent.club_roles.each do |club_role| %>
+          <tr>
+            <td> <%= club_role.role %> </td>
+            <td> <%= club_role.club.name %> </td>
+            <td> Delete <%= check_box_tag "club_roles[delete][]", club_role.id %> </td>
+          </tr>
           <% end %>
-          <%= f.fields_for :club_roles, @agent.club_roles.build do |role| %>
-            <tr>
-              <td><%= role.select :role, Agent::ROLES, include_blank: true %></td>
-              <td><%= role.select :club_id, options_from_collection_for_select(@clubs, "id", "name") %></td>
-              <td><%= role.submit 'Add', :class => 'btn' %></td>
-            </tr>
-          <% end %>
-        </table>
-      </div>
+        <% end %>
+      </table>
     </div>
-  <% end %>
+  </div>
 
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
@@ -69,3 +63,10 @@
                 admin_agents_path, :class => 'btn' %>
   </div>
 <% end %>
+
+
+<script>
+  roles = "<%= Agent::ROLES.join(',') %>"
+  clubs = "<%= @clubs.collect{|club| club.name+","+club.id.to_s}.join(";") %>"
+  $(document).ready(admin_form_functions());
+</script>

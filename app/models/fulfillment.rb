@@ -45,22 +45,21 @@ class Fulfillment < ActiveRecord::Base
     event :set_as_on_hold do
       transition all => :on_hold
     end
-    event :set_as_sent do
-      transition all => :sent
-    end
     event :set_as_out_of_stock do
       transition all => :out_of_stock
     end
     event :set_as_returned do
       transition all => :returned
     end
-    event :set_as_canceled do
-      transition all => :canceled
+    event :set_as_sent do
+      transition all => :sent
     end
     event :set_as_bad_address do
       transition all => :bad_address
     end
-  
+    event :set_as_canceled do
+      transition all => :canceled
+    end
     #First status. fulfillment is waiting to be processed.
     state :not_processed
     #This status will be automatically set after the new fulfillment list is downloaded. Only if magento 
@@ -189,7 +188,7 @@ class Fulfillment < ActiveRecord::Base
           Rails.logger.info "  *[#{index}] processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
           fulfillment.renew!
         rescue Exception => e
-          Airbrake.notify(:error_class => "Member::Fulfillment", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :fulfillment => fulfillment.inspect })
+          Auditory.report_issue("Member::Fulfillment", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :fulfillment => fulfillment.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end

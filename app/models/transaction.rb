@@ -14,6 +14,8 @@ class Transaction < ActiveRecord::Base
 
   attr_accessor :refund_response_transaction_id
 
+  scope :refunds, lambda { where('transaction_type IN (?, ?)', 'credit', 'refund') }
+
   def full_label
     I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
       ( response_result.nil? ? '' : ' : ' + response_result)
@@ -61,24 +63,37 @@ class Transaction < ActiveRecord::Base
     ActiveMerchant::Billing::Base.mode = ( pgc.production? ? :production : :test )
   end
 
-  def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil)
+  def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, operation_type_to_set = nil)
     self.terms_of_membership_id = terms_of_membership_id || member.terms_of_membership.id
     self.member = member
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
+    self.membership_id = membership.nil? ? member.current_membership_id : membership.id 
+    self.operation_type = operation_type_to_set
     self.save
     @options = {
       :order_id => invoice_number,
       :billing_address => {
         :name     => "#{first_name} #{last_name}",
-        :address1 => address,
+        :address1 => address[0..34], # Litle has this restriction of characters.
         :city     => city,
         :state    => state,
-        :zip      => zip.gsub(/[a-zA-Z-]/, ''),
+        :zip      => zip.to_s.gsub(/[a-zA-Z-]/, ''),
         :phone    => phone_number
-      }
+      },
+      :expiration_date => "%02d%s" % [ self.expire_month.to_i, self.expire_year.to_s.last(2) ]
     }    
+  end
+
+  def prepare_for_manual(member, amount, operation_type_to_set)
+    self.terms_of_membership_id = member.terms_of_membership.id
+    self.member = member
+    self.amount = amount
+    self.membership_id = member.current_membership_id 
+    self.operation_type = operation_type_to_set
+    self.gateway = :manual
+    self.save    
   end
 
   def can_be_refunded?
@@ -89,6 +104,8 @@ class Transaction < ActiveRecord::Base
     case transaction_type
       when "sale"
         sale
+      when "sale_manual_cash", "sale_manual_check"
+        sale_manual
       #when "authorization"
       #  authorization
       #when "capture"
@@ -118,21 +135,33 @@ class Transaction < ActiveRecord::Base
     gateway == "litle"
   end
 
+  def authorize_net?
+    gateway == "authorize_net"
+  end
+
   # answer credit card token
   def self.store!(am_credit_card, pgc)
     if pgc.mes?
       MerchantESolutionsTransaction.store!(am_credit_card, pgc)
     elsif pgc.litle?
       LitleTransaction.store!(am_credit_card, pgc)
+    elsif pgc.authorize_net?
+      AuthorizeNetTransaction.store!(am_credit_card, pgc)
+    else
+      raise "No payment gateway configuration set for gateway \"#{pgc.gateway}\""
     end
   end
 
-  def self.obtain_transaction_by_gateway(gateway)
+  def self.obtain_transaction_by_gateway!(gateway)
     case gateway
     when 'mes'
       MerchantESolutionsTransaction.new
     when 'litle'
       LitleTransaction.new
+    when 'authorize_net'
+      AuthorizeNetTransaction.new
+    else
+      raise "No payment gateway configuration set for gateway \"#{gateway}\""
     end
   end
 
@@ -142,23 +171,24 @@ class Transaction < ActiveRecord::Base
       amount = amount.to_f
       # Lock transaction, so no one can use this record while we refund this member.
       sale_transaction = Transaction.find sale_transaction_id, :lock => true
-      trans = Transaction.new
       if amount <= 0.0
         return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
       elsif sale_transaction.amount_available_to_refund < amount
         return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
       end
-      trans = Transaction.obtain_transaction_by_gateway(sale_transaction.gateway)
+      trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
+      trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership, Settings.operation_types.credit)
       trans.fill_transaction_type_for_credit(sale_transaction)
-      trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
       answer = trans.process
       if trans.success?
         sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
         sale_transaction.save
-        Auditory.audit(agent, trans, "Refund success $#{amount}", sale_transaction.member, Settings.operation_types.credit)
+        Auditory.audit(agent, trans, "Refund success $#{amount} on transaction #{sale_transaction.id}", sale_transaction.member, Settings.operation_types.credit)
         Communication.deliver!(:refund, sale_transaction.member)
+        sale_transaction.member.marketing_tool_sync
       else
         Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
+        trans.update_attribute :operation_type, Settings.operation_types.credit_error
       end
       answer
     end
@@ -168,11 +198,22 @@ class Transaction < ActiveRecord::Base
     amount - refunded_amount
   end
 
+  def is_response_code_cc_expired?
+    expired_codes = []
+    if self.mes?
+      expired_codes = ['054']
+    elsif self.authorize_net?
+      expired_codes = ['8','316']
+    elsif self.litle?
+      expired_codes = ['305']
+    end
+    expired_codes.include? self.response_code 
+  end
 
   private
 
     def amount_to_send
-      (amount.to_f * 100).to_i
+      (amount.to_f * 100).round
     end
 
     def credit
@@ -191,7 +232,7 @@ class Transaction < ActiveRecord::Base
       if payment_gateway_configuration.nil?
         save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
       else
-        load_gateway
+        load_gateway        
         refund_response=@gateway.refund(amount_to_send, refund_response_transaction_id, @options)
         save_response(refund_response)
       end
@@ -201,10 +242,10 @@ class Transaction < ActiveRecord::Base
     def sale
       if payment_gateway_configuration.nil?
         save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
+      elsif amount.to_f == 0.0
+        save_custom_response({ :message => "Transaction success. Amount $0.0", :code => Settings.error_codes.success }, true)
       elsif self.token.nil? or self.token == CreditCard::BLANK_CREDIT_CARD_TOKEN
         save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
-      elsif amount.to_f == 0.0
-        save_custom_response({ :message => "Transaction success. Amount $0.0", :code => Settings.error_codes.success })
       else
         load_gateway
         purchase_response = @gateway.purchase(amount_to_send, credit_card_token, @options)
@@ -212,8 +253,13 @@ class Transaction < ActiveRecord::Base
       end
     end
 
-    def save_custom_response(answer)
-      self.success=false
+    def sale_manual
+      purchase_response = { :message => "Manual transaction success. Amount $#{self.amount}", :code => Settings.error_codes.success }
+      save_custom_response(purchase_response, true)
+    end
+
+    def save_custom_response(answer, trans_success=false)
+      self.success=trans_success
       self.response=answer
       self.response_code=answer[:code]
       self.response_result=answer[:message]
@@ -235,5 +281,4 @@ class Transaction < ActiveRecord::Base
         { :message=>"Error: " + answer.message, :code=>self.response_code }
       end      
     end  
-
 end

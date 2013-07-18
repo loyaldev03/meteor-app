@@ -32,14 +32,16 @@ end
 namespace :members do
   desc "Refresh autologin_url for ALL members"
   task :Members => :environment do
-    Rails.logger = Logger.new("#{Rails.root}/log/members_members.log")
-    Rails.logger.level = Logger::DEBUG
-    ActiveRecord::Base.logger = Rails.logger
-    tall = Time.zone.now
     begin
+      Rails.logger = Logger.new("#{Rails.root}/log/members_members.log")
+      Rails.logger.level = Logger::DEBUG
+      ActiveRecord::Base.logger = Rails.logger
+      tall = Time.zone.now
       Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
       Member.refresh_autologin
-    rescue
+    rescue Exception => e
+      Auditory.report_issue("Billing::Today", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+      Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"})"
     end    
   end
 
@@ -54,21 +56,6 @@ namespace :members do
       Member.cancel_all_member_up_today
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:cancel task"
-    end
-  end
-
-
-  desc "Sync members to pardot"
-  # This task should be run each day at 3 am ?
-  task :sync_members_to_pardot => :environment do
-    Rails.logger = Logger.new("#{Rails.root}/log/members_sync_members_to_pardot.log")
-    Rails.logger.level = Logger::DEBUG
-    ActiveRecord::Base.logger = Rails.logger
-    tall = Time.zone.now
-    begin
-      Member.sync_members_to_pardot
-    ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:sync_members_to_pardot task"
     end
   end
 

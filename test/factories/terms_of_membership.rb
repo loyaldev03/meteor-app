@@ -143,4 +143,37 @@ FactoryGirl.define do
     provisional_days 30
     # association :club, factory: :simple_club_with_gateway
   end
+
+  factory :terms_of_membership_monthly_without_provisional_day_and_amount, class: TermsOfMembership do
+    name "test"
+    installment_amount 0
+    installment_type '1.month'
+    quota 1
+    needs_enrollment_approval false
+    club_cash_amount 150
+    provisional_days 0
+    # association :club, factory: :simple_club_with_gateway
+  end
+
+  factory :terms_of_membership_yearly_without_provisional_day_and_amount, class: TermsOfMembership do
+    name "test"
+    installment_amount 0
+    installment_type '1.year'
+    quota 1
+    needs_enrollment_approval false
+    club_cash_amount 150
+    provisional_days 0
+    # association :club, factory: :simple_club_with_gateway
+  end
+
+  factory :terms_of_membership_for_downgrade, class: TermsOfMembership do
+    name "downgrade_free_membership"
+    installment_amount 0
+    installment_type '1.year'
+    quota 1
+    needs_enrollment_approval false
+    club_cash_amount 0
+    provisional_days 0
+    # association :club, factory: :simple_club_with_gateway
+  end
 end

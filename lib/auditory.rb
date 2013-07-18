@@ -17,7 +17,31 @@ class Auditory
       Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
     end
   end
-  def self.add_redmine_ticket(error = "Special Error", message = '', params = {})
-    Airbrake.notify(:error_class   => error, :error_message => "#{error}: #{message}", :parameters    => params)    
+  
+  def self.report_issue(error = "Special Error", message = '', params = {}, add_backtrace = true)
+    unless ["test","development"].include? Rails.env  
+    # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)
+      comment = message.to_s
+      comment = comment + "\n\n\n Parameters:\n" + params.collect{|k,v| "#{k}: #{v}" }.join("\n")
+      comment = comment + "\nBacktrace:\n " + caller.join("\n").to_s if add_backtrace
+
+      file_url = "/tmp/error_description_#{Time.zone.now.to_i}.txt"
+      temp = File.open(file_url, 'w+')
+      temp.write comment
+      temp.close
+
+      ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT,
+        :subject => "[#{Rails.env}] #{error}",
+        :comment => { :value => comment.truncate(10000) },
+        :submitter_id => ZENDESK_API_CLIENT.current_user.id,
+        :assignee_id => ZENDESK_API_CLIENT.current_user.id,
+        :type => "incident",
+        :tags => (Rails.env == 'production' ? "support-ruby-production" : "support-ruby" ),
+        :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
+
+      ticket.comment.uploads << file_url
+      ticket.save
+      File.delete(file_url)
+    end
   end
 end

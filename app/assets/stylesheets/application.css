@@ -14,6 +14,7 @@
  *= require jquery.ui.core
  *= require jquery.ui.theme
  *= require jquery.ui.datepicker
+ *= require table_sorter_style
  *= require dataTables/jquery.dataTables.bootstrap
  *= require dataTables/src/demo_table_jui
  */
@@ -114,8 +115,12 @@ div.dataTables_filter input {
   background-color: #B0D3E6;
 }
 
-.datepicker_for_search {
-  width: 120px;
+.datepicker_for_search_nbd {
+  width: 80px;
+}
+
+.datepicker_for_search_billed_date{
+  width: 80px;
 }
 
 .btn-large-w {
@@ -135,3 +140,68 @@ div.dataTables_filter input {
 }
 
 .required_asterick:after { content:" *"; }
+
+#ajax_loader {
+  position: fixed;
+  background-color: #EBE9EA;
+  text-align: left;
+  border-radius: 6px 6px 6px 6px;
+  width: 120px;
+  height: 35px;
+  border: 2px solid #D2D2D2;
+  overflow: hidden; 
+  left: 45%;
+  top: 0px;
+  display: none;
+  z-index: 200000;
+}
+
+#ajax_loader p{
+  position:absolute;
+  float:left;
+  font-size: 20px;
+  font-weight: bold;
+  top: 25%;
+  left: 5px;
+}
+
+.spinner{
+  float:right;
+  top: 18px;
+  right: 18px;
+}
+
+.dataTables_wrapper .top, .dataTables_wrapper .bottom {
+	padding: 0;
+	background-color: transparent;
+	border: none;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+	float: right;
+	text-align: center;
+}
+
+#partners_table_wrapper.dataTables_wrapper .dataTables_paginate,
+#agents_table_wrapper.dataTables_wrapper .dataTables_paginate,
+#my_clubs_table_wrapper.dataTables_wrapper .dataTables_paginate {
+	float: left;
+}
+
+#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_filter.dataTables_filter,
+#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_length,
+#club_cash_transactions_table_wrapper.dataTables_wrapper .dataTables_paginate {
+	width: 32%;
+}
+
+#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_filter label {
+	width: 290px;
+}
+
+div.dataTables_length label {
+	width: 170px;
+}
+
+#members.tab-pane .pagination {
+	margin: 0em 0;
+}

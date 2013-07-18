@@ -23,7 +23,8 @@ private
         (link_to(I18n.t('activerecord.model.members'), @url_helpers.members_path(club.partner.prefix, club.name), :class => 'btn btn-mini', :id =>'members') if @current_agent.can? :read, Member, club.id).to_s+
         (link_to(I18n.t('activerecord.model.products'), @url_helpers.products_path(club.partner.prefix, club.name), :class => 'btn btn-mini', :id =>'products') if @current_agent.can? :read, Product, club.id).to_s+
         (link_to(I18n.t('activerecord.model.fulfillments'), @url_helpers.fulfillments_index_path(club.partner.prefix, club.name), :class => 'btn btn-mini', :id =>'fulfillments') if @current_agent.can? :read, Fulfillment, club.id).to_s+
-        (link_to(I18n.t('activerecord.model.fulfillment_files'), @url_helpers.list_fulfillment_files_path(club.partner.prefix, club.name), :class => 'btn btn-mini', :id =>'fulfillment_files') if @current_agent.can? :report, Fulfillment, club.id).to_s
+        (link_to(I18n.t('activerecord.model.fulfillment_files'), @url_helpers.list_fulfillment_files_path(club.partner.prefix, club.name), :class => 'btn btn-mini', :id =>'fulfillment_files') if @current_agent.can? :report, Fulfillment, club.id).to_s+
+        (link_to(I18n.t('activerecord.model.disposition_types'), @url_helpers.disposition_types_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :read, DispositionType, club.id).to_s
       ]
     end
   end
@@ -40,7 +41,7 @@ private
     end
     clubs = clubs.page(page).per_page(per_page)
     if params[:sSearch].present?
-      clubs = clubs.where("id like :search or name like :search", search: "%#{params[:sSearch]}%")
+      clubs = clubs.where("clubs.id like :search or name like :search", search: "%#{params[:sSearch]}%")
     end
     clubs
   end

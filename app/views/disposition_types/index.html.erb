@@ -1,0 +1,26 @@
+<section>
+  <div class="page-header">
+    <h1>DispositionType</h1>
+    <% if can? :create, DispositionType %>
+      <%= link_to(new_disposition_type_path, :class => "btn btn-primary btn_on_header", :id => "new_product") do %> 
+        <i class="icon-plus"></i> New Disposition Type
+      <% end %>
+    <% end %>
+  </div>
+
+  <table id="disposition_types_table" class="table table-bordered table-condensed dataTable" data-source="<%= disposition_types_url(format: "json") %>">
+    <thead>
+      <tr>
+        <th> <%= t('activerecord.attributes.disposition_type.id') %> </th>
+        <th> <%= t('activerecord.attributes.disposition_type.name') %> </th>
+        <th> <%= t '.actions', :default => t("helpers.actions") %> </th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</section>
+
+<script>
+  $(document).ready(disposition_types_index_functions(<%= DispositionType.datatable_columns.size %>));
+</script>

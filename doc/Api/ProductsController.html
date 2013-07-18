@@ -301,7 +301,7 @@
     
 		<div class="method">
 			<p class="method_desc">Returns the stock available for a product.</p>
-			<h3 class="resource_url"><strong>/api/v1/products/get_stock</strong> [GET]</h3>
+			<h3 class="resource_url"><strong>/api/v1/products/get_stock</strong> [POST]</h3>
 
 			<div class="parameters">	
 				
@@ -346,7 +346,7 @@
 							<li>
 								<span class="name">stock</span>
 								<span class="type">Integer</span>
-								<span class="text">Actual stock of the product. This value is an integer type. This value is returned if there was no error.</span>
+								<span class="text">Actual stock of the product. This value is an integer type. This will returned only when the method run without finding any kind of error.</span>
 							</li>
 						</ul>
 					
@@ -354,7 +354,7 @@
 							<li>
 								<span class="name">allow_backorder</span>
 								<span class="type">Integer</span>
-								<span class="text">Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag is returned if there was no error.</span>
+								<span class="text">Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. This flag will returned only when there was no error.</span>
 							</li>
 						</ul>
 					
@@ -388,7 +388,7 @@
 							<span class="description">
 								
 									
-										Example with curl.
+										Example of valid request.
 									
 								
 							</span>
@@ -396,7 +396,7 @@
 								<strong class="type">Request</strong>
 								
 									
-										curl -v -k -X GET -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD" https://dev.stoneacrehq.com:3000/api/v1/products/get_stock
+										curl -v -k -X POST -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD" https://dev.stoneacrehq.com:3000/api/v1/products/get_stock
 									
 								
 							</span>
@@ -411,7 +411,7 @@
 							<span class="description">
 								
 									
-										Example response to the previos example request.
+										Example response to valid request.
 									
 								
 							</span>
@@ -429,7 +429,7 @@
   <li><strong>stock</strong> Actual stock of the product. This value is an integer type </li>
   <li><strong>allow_backorder</strong> Flag to inform that product allow negative stocks. It returns 1 for true value, and 0 for false value. </li>
 </ul></p>
-			<h3 class="resource_url"><strong>/api/v1/products/get_list_of_stock</strong> [GET]</h3>
+			<h3 class="resource_url"><strong>/api/v1/products/get_list_of_stock</strong> [POST]</h3>
 
 			<div class="parameters">	
 				
@@ -516,7 +516,7 @@
 							<span class="description">
 								
 									
-										Example with curl.
+										Example of valid request.
 									
 								
 							</span>
@@ -524,7 +524,7 @@
 								<strong class="type">Request</strong>
 								
 									
-										curl -v -k -X GET -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD,AnoterOne,NCARFLAGTONYSTEWART" https://dev.stoneacrehq.com:3000/api/v1/products/get_list_of_stock
+										curl -v -k -X POST -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD,AnoterOne,carflag" https://dev.stoneacrehq.com:3000/api/v1/products/get_list_of_stock
 									
 								
 							</span>
@@ -532,14 +532,14 @@
 								<strong class="type">Response</strong>
 								
 									
-										{"code":"000","product_list":[{"sku":"KIT-CARD","stock":9746,"allow_backorder":true}],"skus_could_not_found":["AnoterOne","NCARFLAGTONYSTEWART"]}
+										{"code":"000","product_list":[{"sku":"KIT-CARD","stock":9746,"allow_backorder":true}],"skus_could_not_found":["AnoterOne","carflag"]}
 									
 								
 							</span>
 							<span class="description">
 								
 									
-										Example response to the previos example request.
+										Example response to valid request.
 									
 								
 							</span>
@@ -568,7 +568,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Fri Apr 19 12:11:06 2013 with ruby-1.9.3
+  Generated on Tue May 21 15:41:24 2013 with ruby-1.9.3
 </div>
 
   </body>

@@ -1,11 +1,5 @@
 module Pardot
   class Member < Struct.new(:member)
-
-    # We dont check if a field changed, because we do this sync after drupal sync. Drupal sync saves object making changes hash to be empty.
-    MEMBER_OBSERVED_FIELDS = %w(first_name last_name address city email phone_country_code phone_area_code phone_local_number state zip id birth_date blacklisted preferences status member_since_date wrong_address wrong_phone_number bill_date gender external_id autologin_url country member_group_type_id club_cash_amount).to_set.freeze
-    MEMBERSHIP_OBSERVED_FIELDS = %w(terms_of_membership join_date cancel_date quota).to_set.freeze
-    ENROLLMENT_INFO_OBSERVED_FIELDS = %w(joint marketing_code mega_channel fulfillment_code campaign_medium_version campaign_medium product_sku landing_url enrollment_amount).to_set.freeze
-
     def save!(options = {})
       unless self.member.email.include?('@noemail.com') # do not sync @noemail.com
         begin

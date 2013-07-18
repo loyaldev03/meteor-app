@@ -6,6 +6,7 @@ class Club < ActiveRecord::Base
   has_many :domains
   has_many :terms_of_memberships
   has_many :members
+  has_many :prospects
   has_many :payment_gateway_configurations
   has_many :member_group_types
   has_many :products
@@ -14,6 +15,7 @@ class Club < ActiveRecord::Base
     through: :club_roles,
     uniq: true
   has_many :fulfillment_files
+  has_many :disposition_types
 
   belongs_to :api_domain,
     class_name:  'Domain',
@@ -21,7 +23,7 @@ class Club < ActiveRecord::Base
 
   attr_accessible :description, :name, :logo, :drupal_domain_id, :theme, :requires_external_id,
     :api_type, :api_username, :api_password, :time_zone, :pardot_email, :pardot_password, :pardot_user_key,
-    :cs_phone_number, :family_memberships_allowed
+    :cs_phone_number, :family_memberships_allowed, :club_cash_enable
 
   acts_as_paranoid
 
@@ -36,6 +38,11 @@ class Club < ActiveRecord::Base
 
   DEFAULT_PRODUCT = ['KIT-CARD']
 
+  # marketing_tool_attributes possible keys:
+  # Pardot : pardot_email, pardot_user_key, pardot_password
+  # Exact Target : et_bussines_unit, et_prospect_list, et_members_list
+  serialize :marketing_tool_attributes, JSON
+
   def full_name
     [ partner.name, name ].join(' ')
   end
@@ -49,12 +56,35 @@ class Club < ActiveRecord::Base
   end
 
   def pardot_sync?
-    [self.pardot_email, self.pardot_password, self.pardot_user_key].none?(&:blank?)
+    self.marketing_tool_attributes and 
+    [ 
+      self.marketing_tool_attributes['pardot_email'], 
+      self.marketing_tool_attributes['pardot_password'], 
+      self.marketing_tool_attributes['pardot_user_key']
+    ].none?(&:blank?)
+  end
+
+  def exact_target_sync?
+    self.marketing_tool_attributes and 
+    [ 
+      self.marketing_tool_attributes['et_business_unit'], 
+      self.marketing_tool_attributes['et_prospect_list'], 
+      self.marketing_tool_attributes['et_members_list']
+    ].none?(&:blank?)
   end
 
   # Improvements #25771 - Club cash transactions will be managed by Drupal User Points plugin. 
-  def club_cash_transactions_enabled
+  def is_not_drupal?
     api_type != 'Drupal::Member'
+  end
+
+  def allow_club_cash_transaction?
+    club_cash_enable
+  end
+
+  def use_pgc_authorize_net?
+    pgc = self.payment_gateway_configurations.first
+    not pgc.nil? and pgc.authorize_net?
   end
 
   private

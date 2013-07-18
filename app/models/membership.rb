@@ -14,7 +14,7 @@ class Membership < ActiveRecord::Base
     ['id', 'status', 'tom', 'join_date', 'cancel_date', 'quota' ]
   end
 
-  def cancel_because_of_save_the_sale
+  def cancel_because_of_membership_change
     self.update_attributes :cancel_date => Time.zone.now, :status => 'lapsed'
   end
 end

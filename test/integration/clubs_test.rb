@@ -9,7 +9,11 @@ class ClubTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-  # Club Creation
+
+  ###########################################################
+  # TESTS
+  ###########################################################
+
   test "create club" do
     unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
@@ -22,10 +26,22 @@ class ClubTest < ActionController::IntegrationTest
     attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
     check('club[requires_external_id]')
     select('application', :from => 'club[theme]')
-    assert_difference('Club.count') do
+    assert_difference('Club.count', 1) do
       click_link_or_button 'Create Club'
+      assert page.has_content?("The club #{unsaved_club.name} was successfully created")
     end
-    assert page.has_content?("The club #{unsaved_club.name} was successfully created")
+  end
+
+
+  test "Search option in My Clubs should not affect front end perfomance" do
+    saved_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    visit my_clubs_path
+    within("#my_clubs_table_filter") do
+      find(:css, "input").set(saved_club.name)
+    end
+    within("#my_clubs_table") do
+      page.has_content?(saved_club.name)
+    end
   end
 
   test "create blank club" do
@@ -188,4 +204,15 @@ class ClubTest < ActionController::IntegrationTest
     assert page.has_content?("number: Credit card is blacklisted")
   end
 
+  test "Display a club without PGC" do
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @partner = @club.partner
+    Time.zone = @club.time_zone
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    @club.payment_gateway_configurations.first.update_attribute(:club_id,nil)
+    visit my_clubs_path
+    click_link_or_button 'members'
+    assert page.has_no_content?("We're sorry, but something went wrong.")
+  end
 end

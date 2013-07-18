@@ -27,12 +27,15 @@ class MembersController < ApplicationController
                        .with_email_like(params[:member][:email])
                        .with_next_retry_bill_date(params[:member][:next_retry_bill_date])
                        .with_credit_card_last_digits(params[:member][:last_digits])
+                       .with_credit_card_token(params[:member][:cc_token])
                        .with_member_notes(params[:member][:notes])
                        .with_phone_country_code(params[:member][:phone_country_code])
                        .with_phone_area_code(params[:member][:phone_area_code])
                        .with_phone_local_number(params[:member][:phone_local_number])
                        .with_sync_status(params[:member][:sync_status])
                        .with_external_id(params[:member][:external_id])
+                       .with_billed_date_from(params[:member][:billing_date_start])
+                       .with_billed_date_to(params[:member][:billing_date_end])
                        .where(:club_id => @current_club)
                        .needs_approval(params[:member][:needs_approval])
                        .order('members.id')
@@ -93,7 +96,8 @@ class MembersController < ApplicationController
       if tom.nil?
         flash[:error] = "Terms of membership not found"
       else
-        answer = @current_member.recover(tom, current_agent)
+        answer = @current_member.recover(tom, current_agent, 
+          { landing_url: request.env['HTTP_HOST'], referral_path: request.env['REQUEST_URI'], ip_address: request.env['REMOTE_ADDR'] })
         if answer[:code] == Settings.error_codes.success
           flash[:notice] = answer[:message]
         else
@@ -142,9 +146,9 @@ class MembersController < ApplicationController
         end
       rescue Exception => e
         flash.now[:error] = t('error_messages.airbrake_error_message')
-        Airbrake.notify(:error_class => "Member:cancel", :error_message => e, :parameters => { :member => @current_member.inspect })
+        Auditory.report_issue("Member:cancel", e, { :member => @current_member.inspect })
       end
-    end    
+    end
   end
 
   def blacklist
@@ -186,7 +190,6 @@ class MembersController < ApplicationController
         format.json { render json: { :message => answer[:message], :code => answer[:code] }} 
       end
     end
-
   end
 
   def set_unreachable
@@ -245,33 +248,30 @@ class MembersController < ApplicationController
   def update_sync
     old_id = @current_member.api_id
     if params[:member]
-      @current_member.api_id = params[:member][:api_id] 
-      if @current_member.save
-        message = "Member's api_id changed from #{old_id.inspect} to #{@current_member.api_id.inspect}"
-        Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_drupal_remote_id_set)
-        redirect_to show_member_path, notice: 'Sync data updated'
+      if params[:member][:api_id].blank?
+        @current_member.skip_api_sync!
+        @current_member.api_id = nil
+        @current_member.last_sync_error = nil
+        @current_member.last_sync_error_at = nil
+        @current_member.last_synced_at = nil
+        @current_member.sync_status = "not_synced"
       else
-        redirect_to show_member_path, notice: "Sync data cannot be updated #{@current_member.errors.to_hash}"
+        @current_member.api_id = params[:member][:api_id]
+      end
+      begin
+        if @current_member.save
+          message = "Member's api_id changed from #{old_id.inspect} to #{@current_member.api_id.inspect}"
+          Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_drupal_remote_id_set)
+          redirect_to show_member_path, notice: 'Sync data updated'
+        else
+          flash[:error] = "Sync data cannot be updated #{@current_member.errors.to_hash}"
+          redirect_to show_member_path
+        end
+      rescue ActiveRecord::RecordNotUnique
+        flash[:error] = "Sync data cannot be updated. Api id already exists"
+        redirect_to show_member_path
       end
     end
-  end
-
-  def pardot_sync
-    am = @current_member.pardot_member
-    if am
-      am.save!
-      if @current_member.pardot_last_sync_error_at
-        message = "Synchronization to pardot failed: #{@current_member.pardot_last_sync_error_at}"
-      else
-        message = "Member synchronized to pardot"
-      end
-      Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_manually_synced_to_pardot)
-      redirect_to show_member_path, notice: message    
-    end
-  rescue
-    flash[:error] = t('error_messages.airbrake_error_message')
-    Airbrake.notify(:error_class => "Member:pardot_sync", :error_message => "Error on members#pardot_sync: #{$!}", :parameters => { :member => @current_member.inspect })
-    redirect_to show_member_path
   end
 
   def sync
@@ -279,7 +279,7 @@ class MembersController < ApplicationController
     if am
       am.save!(force: true)
       if @current_member.last_sync_error_at
-        message = "Synchronization failed: #{@current_member.last_sync_error.html_safe}"
+        message = "Synchronization failed: #{@current_member.last_sync_error ? @current_member.last_sync_error.html_safe : ''}"
       else
         message = "Member synchronized"
       end
@@ -288,8 +288,8 @@ class MembersController < ApplicationController
     end
   rescue
     flash[:error] = t('error_messages.airbrake_error_message')
-    Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.member_manually_synced_to_drupal_error)
-    Airbrake.notify(:error_class => "Member:sync", :error_message => message, :parameters => { :member => @current_member.inspect })
+    message = "Error on members#sync: #{$!}" 
+    Auditory.report_issue("Member:sync", message, { :member => @current_member.inspect })
     redirect_to show_member_path
   end
 
@@ -313,8 +313,7 @@ class MembersController < ApplicationController
   rescue
     flash[:error] = t('error_messages.airbrake_error_message')
     message = "Error on members#reset_password: #{$!}"
-    Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.reset_password_error)
-    Airbrake.notify(:error_class => "Member:reset_password", :error_message => message, :parameters => { :member => @current_member.inspect })
+    Auditory.report_issue("Member:reset_password", message, { :member => @current_member.inspect })
     redirect_to show_member_path
   end
 
@@ -330,15 +329,38 @@ class MembersController < ApplicationController
   rescue
     flash[:error] = t('error_messages.airbrake_error_message')
     message = "Error on members#resend_welcome: #{$!}"
-    Auditory.audit(@current_agent, @current_member, message, @current_member, Settings.operation_types.resend_welcome_error)
-    Airbrake.notify(:error_class => "Member:resend_welcome", :error_message => message, :parameters => { :member => @current_member.inspect })
+    Auditory.report_issue("Member:resend_welcome", message, { :member => @current_member.inspect })
     redirect_to show_member_path
+  end
+
+  def no_recurrent_billing
+    if request.post?
+      answer = @current_member.no_recurrent_billing(params[:amount], params[:description])
+      if answer[:code] == Settings.error_codes.success
+        flash[:notice] = answer[:message]
+        redirect_to show_member_path
+      else
+        flash.now[:error] = answer[:message]
+      end
+    end
+  end
+
+  def manual_billing
+    @tom = @current_member.current_membership.terms_of_membership
+    if request.post?
+      answer = @current_member.manual_billing(params[:amount], params[:payment_type])
+      if answer[:code] == Settings.error_codes.success
+        flash[:notice] = answer[:message]
+        redirect_to show_member_path
+      else
+        flash.now[:error] = answer[:message]
+      end
+    end
   end
 
   private 
     def check_permissions
       my_authorize! params[:action].to_sym, Member, @current_club.id
     end
-
 end
 

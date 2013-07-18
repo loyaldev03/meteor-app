@@ -36,6 +36,8 @@ en:
   all_times: 'All times'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
+  loading: 'Loading'
+  index: '#'
   menu: 
     logout: 'Logout'
     agents: 'Agents'
@@ -77,6 +79,10 @@ en:
     create_csv_file: 'Create CSV File'
     create_xls_file: 'Create XLS File'
     export_all_to_xls: 'Export all to XLS'
+    no_recurrent_billing: 'Bill 1-Time Transaction'
+    manual_billing: 'Check/Cash Payment'
+    manual_billing_help: 'This Payment is a membership payment that will be applied to the membership and is received offline (not via credit card). Payments of this type will act as if they were credit card transactions adjusting next bill date accordingly.'
+    reschedule: 'Reschedule'
   admin:
     agents:
       index:
@@ -94,7 +100,7 @@ en:
     member_set_wrong_address_error: "Could not set member's address as undeliverable. %{errors}"
     member_already_set_wrong_address: "Member's address already set as wrong address."
     member_set_as_blacklisted: "Operation cannot be done. Member is set as blacklisted."
-    member_data_invalid: "Member iformation is invalid."
+    member_data_invalid: "Member information is invalid."
     credit_card_in_use: "We're sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: %{cs_phone_number}."
     credit_card_blacklisted: "There was an error with your credit card information. Please call member services at: %{cs_phone_number}."
     expired_credit_card: "Credit card to activate is expired."
@@ -118,14 +124,17 @@ en:
     fulfillment_is_renwed: "Fulfillment is renewed. No operation can be done."
     fulfillment_file_cant_be_empty: "No fulfillments selected. Please, select fulfillments in order to crate XLS file."
     drupal_error_sync: "Unable to add club cash. There was a synchronization error, while requesting this." 
+    club_cash_not_supported: "Club cash is not supported for this club."
     unable_to_perform_due_member_status: "Unable to perfom this action. The member is not in the right status to perform this."
     airbrake_error_message: "Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience."
+    birth_date_is_invalid: "is invalid, it must be null or greater than '1900-01-01'"
   activerecord:
     model:
       members: 'Members'
       products: 'Products'
       fulfillments: 'Fulfillments'
       fulfillment_files: 'Fulfillment Files'
+      disposition_types: 'Disposition Types'
     member: 'Member'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
@@ -135,17 +144,42 @@ en:
       transaction:
         refundable: 'Refundable'
         refund_amount_help: 'Amount to refund'
+        payment_type: 'Payment type'
+        transaction_type: 'Transaction type'
         transaction_types: 
           sale: Sale
+          sale_manual_check: 'Sale Manual Check'
+          sale_manual_cash: 'Sale Manual Cash'
           refund: Credit
           credit: Credit
           void: Credit
           authorization_capture: 'Authorization-Capture'
           chargeback: Chargeback
+        transaction_types_messages:
+          type_100: 'Billing: Enrollment Fee' # enrollment_billing
+          type_101: 'Billing: Membership Fee' # membership_billing
+          type_104: 'Billing: Refund' # credit
+          tyoe_105: 'Billing Error: No Decline Strategy' # membership_billing_without_decline_strategy
+          type_106: 'Billing Error: Hard Decline' # membership_billing_hard_decline
+          type_107: 'Billing Error: Soft Decline' # membership_billing_soft_decline
+          type_108: 'Billing Error: Refund Failed' # membership_billing_soft_decline
+          type_110: 'Billing: Member Chargeback' # chargeback
+          type_111: 'Billing Error: Enrollment Failed' # error_on_enrollment_billing
+          type_112: 'Billing: One Time Transaction' # no_recurrent_billing
+          type_113: 'Billing Error: One Time Transaction' # no_recurrent_billing_with_error
+          type_114: 'Membership: Cancellation due to Soft Decline Limit' # membership_billing_hard_decline_by_limit
+          type_115: 'Downgrade: Hard Decline' # downgraded_because_of_hard_decline
+          type_116: 'Membership: Downgrade due to Soft Decline Limit' # downgraded_because_of_hard_decline_by_limit
+          type_117: 'Membership: Soft Decline Limit Reach (No Strategy)' # membership_billing_without_decline_strategy_limit
+          type_118: 'Billing: Manual Cash Transaction' # membership_manual_cash_billing
+          type_119: 'Billing: Manual Check Transaction' # membership_manual_check_billing
+          type_203: 'Membership: Recovery' # recovery
+          type_206: 'Membership: Requires Approval' # enrollment_needs_approval
         amount_available_to_refund: Max
         date: 'Date'
         description: 'Description'
         amount: 'Amount'
+        amount_help: "(Min %{minimun_amount})"
         gw_trans: 'Gw trans'
         cc_related: 'CC Last 4 Digits'
         not_found: 'No transactions were found.'
@@ -225,6 +259,11 @@ en:
         last_synced_at: 'Last successful sync'
         last_sync_error: 'Last failed sync'
         status_blacklisted: '- Blisted'
+        billed_date: 'Billed date'
+        billed_date_from: 'From:'
+        billed_date_to: 'To:'
+        manual_payment: 'Set to cash/check payments only'
+        manual_payment_help: 'Setting this flag will require Check/Cash payments transactions to remain active. Check/Cash payments should be made before the NBD or the member will be cancelled'
         sync_status_priorities:
           synced: success
           unsynced: warning
@@ -241,6 +280,9 @@ en:
         cancel_date: 'Cancel date'
         tom: 'TOM'
         quota: 'Quota'
+      disposition_type:
+        id: 'ID'
+        name: 'Name'
       club:
         id: 'ID'
         name: 'Name'
@@ -256,6 +298,7 @@ en:
         expire_year: 'Expire year'
         blacklisted: 'Blacklisted'
         last_digits: 'Last 4 digits'
+        token: 'Token'
         active: 'active'
         type_unknown: 'unknown'
       operation:
@@ -324,6 +367,14 @@ en:
         package: Package
         package_help: 'This value is part of the Packageid on the fulfillment file. e.g: set as package NCARFLAG and platform will add the member id. The packageid obtained will be NCARFLAG20243911111'
         sku_help: 'Members get fulfills according to the list of SKUs stored while enrollment.'
+      delayed_job:
+        id: 'ID'
+        attempts: 'Attempts'
+        handler: 'Handler'
+        last_error: 'Last error'
+        run_at: 'Run at'
+        created_at: 'created_at'
+        rescheduled_job: "re-scheduled Job: %{job}"
   date:
     formats:
       default: "%m/%d/%Y"

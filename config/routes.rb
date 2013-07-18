@@ -3,19 +3,21 @@ SacPlatform::Application.routes.draw do
 
   namespace :api do
     scope 'v1' do
-      resources :tokens,:only => [:create, :destroy]
+      resources :tokens,:only => [:create]
+      match 'tokens/:id' => 'tokens#destroy', as: 'destroy', :via => [:put]
       resources :members, :only => [:create, :show, :update] do
         resources :club_cash_transaction, only: [:create]
         resources :operation, only: [:create]
       end
+      match 'members/:id/profile' => 'members#show', as: 'show', :via => [:post]
       match 'members/:id/next_bill_date' => 'members#next_bill_date', as: 'next_bill_date', :via => [:put]
+      match 'members/find_all_by_updated/:club_id/:start_date/:end_date' => 'members#find_all_by_updated', as: 'find_all_by_updated', :via => [:post]
+      match 'members/find_all_by_created/:club_id/:start_date/:end_date' => 'members#find_all_by_created', as: 'find_all_by_created', :via => [:post]
       match 'members/:id/club_cash' => 'members#club_cash', as: 'club_cash', :via => [:put]
       match 'members/:id/cancel' => 'members#cancel', as: 'cancel', :via => [:put]
-      match 'members/find_all_by_updated/:club_id/:start_date/:end_date' => 'members#find_all_by_updated', as: 'find_all_by_updated', :via => [:get]
-      match 'members/find_all_by_created/:club_id/:start_date/:end_date' => 'members#find_all_by_created', as: 'find_all_by_created', :via => [:get]
-      match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get]
-      match '/products/get_list_of_stock' => 'products#get_list_of_stock', as: 'get_list_of_stock', :via => [:get]
-      resources :prospects, :only => [:create]      
+      match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get, :post]
+      match '/products/get_list_of_stock' => 'products#get_list_of_stock', as: 'get_list_of_stock', :via => [:get, :post]
+      resources :prospects, :only => [:create]
     end
   end
 
@@ -27,7 +29,10 @@ SacPlatform::Application.routes.draw do
       get :lock
       get :unlock
     end
+    resources :delayed_jobs, :only => [ :index ]
+    match '/delayed_jobs/:id/reschedule' => 'delayed_jobs#reschedule', as: 'delayed_job_reschedule', :via => [:post]
   end
+  
 
   scope '/partner/:partner_prefix' do
     resources :clubs
@@ -36,13 +41,13 @@ SacPlatform::Application.routes.draw do
       match '/members/new' => 'members#new', as: 'new_member'
       match '/members' => 'members#index', as: 'members', :via => [:get, :post]
       match '/members/search_result' => 'members#search_result', as: 'members_search_result', :via => [:get]
+      match '/terms_of_memberships/:id' => 'terms_of_memberships#show', as: 'terms_of_membership', :via => [:get]
 
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
         match '/operations' => 'operations#index', as: 'operations', :via => [:post, :get]
         resources :operations, :only => [:show, :update]
         resources :member_notes, :only => [ :new, :create ]
-        resources :terms_of_memberships, :only => [ :show ]
         resources :transactions, :only => [ :index ]
         resources :memberships, :only => [ :index ]
         resources :club_cash_transactions, :only => [:index]
@@ -62,18 +67,22 @@ SacPlatform::Application.routes.draw do
         match '/add_club_cash' => 'members#add_club_cash', as: 'member_add_club_cash'
         match '/approve' => 'members#approve', as: 'member_approve', :via => [:post]
         match '/reject' => 'members#reject', as: 'member_reject', :via => [:post]  
+        match '/no_recurrent_billing' => 'members#no_recurrent_billing', as: 'member_no_recurrent_billing', :via => [:get, :post]  
+        match '/manual_billing' => 'members#manual_billing', as: 'member_manual_billing', :via => [:get, :post]
         match '/' => 'members#show', as: 'show_member', :via => [:get, :post]
 
         post '/sync' => 'members#sync', as: 'member_sync'
         put  '/sync' => 'members#update_sync', as: 'member_update_sync'
         get  '/sync' => 'members#sync_data', as: 'member_sync_data'
-        post  '/pardot_sync' => 'members#pardot_sync', as: 'member_pardot_sync'
+        post '/pardot_sync' => 'members#pardot_sync', as: 'member_pardot_sync'
+        post '/exact_target_sync' => 'members#exact_target_sync', as: 'member_exact_target_sync'
         post '/reset_password' => 'members#reset_password', as: 'member_reset_password'
         post '/resend_welcome' => 'members#resend_welcome', as: 'member_resend_welcome'
         get  '/login_as_member' => 'members#login_as_member', as: 'login_as_member'
       end
 
       resources :products
+      resources :disposition_types, :except => [ :show, :destroy ]
 
       match '/fulfillments' => 'fulfillments#index', as: 'fulfillments_index', :via => [:post, :get]
       scope '/fulfillments' do
@@ -92,8 +101,6 @@ SacPlatform::Application.routes.draw do
     resources :domains
     match 'dashboard' => 'admin/partners#dashboard', as: 'admin_partner_dashboard'
   end
-
-
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

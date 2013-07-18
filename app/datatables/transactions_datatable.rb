@@ -13,9 +13,8 @@ private
     transactions.map do |transaction|
       [
         I18n.l(transaction.created_at, :format => :dashed),
-        transaction.full_label.truncate(50)+
-        " <i class ='icon-eye-open help' rel= 'popover' data-toggle='modal' href='#myModal"+transaction.id+"' 
-             style='cursor: pointer'></i>"+modal(transaction), 
+        transaction_description(transaction).truncate(75) + 
+          (transaction_description(transaction).length > 75 ? " <i class ='icon-eye-open help' rel= 'popover' data-toggle='modal' href='#myModal" + transaction.id + "' style='cursor: pointer'></i>" + modal(transaction) : ''), 
         number_to_currency(transaction.amount) ,
         transaction.can_be_refunded? ? number_to_currency(transaction.amount_available_to_refund) : '',
         transaction.gateway + " " + transaction.response_transaction_id.to_s,
@@ -40,17 +39,29 @@ private
     transactions
   end
 
+  def transaction_description(transaction)
+    if @current_agent.has_role? 'representative'
+      begin
+        I18n.t('activerecord.attributes.transaction.transaction_types_messages.type_' + transaction.operation_type.to_s) + ' - ' + transaction.response_result
+      rescue
+        transaction.response_result
+      end
+    else
+      transaction.full_label
+    end
+  end
+
   def sort_column
     Transaction.datatable_columns[params[:iSortCol_0].to_i]
   end
 
   def modal(transaction)
-    "<div id='myModal"+transaction.id+"' class='well modal hide' style='border: none;'>
+    "<div id='myModal" + transaction.id + "' class='well modal hide' style='border: none;'>
       <div class='modal-header'>
         <a href='#' class='close'>&times;</a>
         <h3> "+I18n.t('activerecord.attributes.transaction.description')+"</h3>
       </div>
-      <div class='modal-body'>"+transaction.full_label+" </div>
+      <div class='modal-body'>" + transaction_description(transaction) + " </div>
       <div class='modal-footer'> <a href='#' class='btn' data-dismiss='modal' >Close</a> </div>
     </div>"
   end

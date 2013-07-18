@@ -10,7 +10,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     init_test_setup
   end
 
-  def setup_member(cancel = true)
+  def setup_member(cancel = true, create_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @club = FactoryGirl.create(:simple_club_with_gateway)
     @partner = @club.partner
@@ -20,28 +20,31 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
     FactoryGirl.create(:batch_agent)
     
-    unsaved_member = FactoryGirl.build(:member_with_api)
-    create_member_by_sloop(@admin_agent, unsaved_member, nil, nil, @terms_of_membership_with_gateway)
-    
-    @saved_member = Member.find_by_email(unsaved_member.email)
 
-    if cancel    
-      cancel_date = Time.zone.now + 1.days
-      message = "Member cancellation scheduled to #{cancel_date} - Reason: #{@member_cancel_reason.name}"
-      @saved_member.cancel! cancel_date, message, @admin_agent
-      @saved_member.set_as_canceled!
-	  end
+    if create_member
+      unsaved_member = FactoryGirl.build(:member_with_api)
+      create_member_by_sloop(@admin_agent, unsaved_member, nil, nil, @terms_of_membership_with_gateway)
+      
+      @saved_member = Member.find_by_email(unsaved_member.email)
+
+      if cancel    
+        cancel_date = Time.zone.now + 1.days
+        message = "Member cancellation scheduled to #{cancel_date} - Reason: #{@member_cancel_reason.name}"
+        @saved_member.cancel! cancel_date, message, @admin_agent
+        @saved_member.set_as_canceled!
+  	  end
+    end
     sign_in_as(@admin_agent)
   end
 
   def recover_member(member, tom)
     visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
     
     click_on 'Recover'
 
     if tom.name != @terms_of_membership_with_gateway.name
-      wait_until{ select(tom.name, :from => 'terms_of_membership_id') }
+      select(tom.name, :from => 'terms_of_membership_id')
     end
     confirm_ok_js
     click_on 'Recover'
@@ -50,7 +53,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
 
   def cancel_member(member,date_time)
     visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     click_on 'Cancel'
     page.execute_script("window.jQuery('#cancel_date').next().click()")
@@ -65,7 +68,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
 
   def validate_member_recovery(member, tom)
     visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
+    assert find_field('input_first_name').value == @saved_member.first_name
 
     within("#td_mi_status") do
       assert page.has_content?('provisional') if member.status == 'provisional'
@@ -82,9 +85,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       click_on("Operations")
     end
     within("#operations_table")do
-      wait_until{
-        assert page.has_content?("Member recovered successfully $0.0 on TOM(#{tom.id}) -#{tom.name}-")
-      }
+      assert page.has_content?("Member recovered successfully $0.0 on TOM(#{tom.id}) -#{tom.name}-")
     end
 
     membership = member.current_membership
@@ -92,29 +93,36 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       click_on("Memberships")
     end
     within("#memberships_table")do
-      wait_until{
-        assert page.has_content?(membership.id.to_s)
-        assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-        assert page.has_content?(membership.quota.to_s)
-        assert page.has_content?('lapsed')
-      }
+      assert page.has_content?(membership.id.to_s)
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+      assert page.has_content?(membership.quota.to_s)
+      assert page.has_content?('lapsed')
     end    
     if member.status == 'provisional'
-      within("#memberships_table"){wait_until{ assert page.has_content?('provisional') if member.status == 'provisional' }}
+      within("#memberships_table"){ assert page.has_content?('provisional') if member.status == 'provisional' }
     elsif member.status == 'applied'
-      within("#memberships_table"){wait_until{ assert page.has_content?('applied') if member.status == 'applied' }}
+      within("#memberships_table"){ assert page.has_content?('applied') if member.status == 'applied' }
     end
   end
 
   ###########################################################
   # TESTS
   ###########################################################
+  
+  # TO FIX(pablo)
+  # test "Recover a member using CS which was enrolled with a product sku that does not have stock" do
+  #   setup_member(true, true)
+  #   prods = Product.find_all_by_sku @saved_member.enrollment_infos.first.product_sku.split(',')
+  #   prods.each {|p| p.update_attributes :stock =>  0, :allow_backorder => false }
+  #   recover_member(@saved_member,:terms_of_membership_with_gateway)
+  # end
+
 
   test "recovery a member with provisional TOM" do
     setup_member
     recover_member(@saved_member,@new_terms_of_membership_with_gateway)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    wait_until{ page.has_content? "Member recovered successfully $0.0 on TOM(2) -#{@saved_member.current_membership.terms_of_membership.name}-"}
+    assert find_field('input_first_name').value == @saved_member.first_name
+    page.has_content? "Member recovered successfully $0.0 on TOM(2) -#{@saved_member.current_membership.terms_of_membership.name}-"
 
     validate_member_recovery(@saved_member, @new_terms_of_membership_with_gateway)
   end
@@ -134,7 +142,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
         cancel_member(@saved_member,Time.zone.now + 1.day)        
       end
     }
-    wait_until { assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
+    assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
     within("#td_mi_reactivation_times") do
       assert page.has_content?("3")
     end
@@ -146,8 +154,8 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     @new_terms_of_membership_with_gateway.save
 
     recover_member(@saved_member,@new_terms_of_membership_with_gateway)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    wait_until{ page.has_content? "Member recovered successfully $0.0 on TOM(2) -#{@saved_member.current_membership.terms_of_membership.name}-"}
+    assert find_field('input_first_name').value == @saved_member.first_name
+    page.has_content? "Member recovered successfully $0.0 on TOM(2) -#{@saved_member.current_membership.terms_of_membership.name}-"
    
     validate_member_recovery(@saved_member,@new_terms_of_membership_with_gateway)
   end 
@@ -157,8 +165,8 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway.update_attribute(:installment_type, "1.year")
     recover_member(@saved_member, @terms_of_membership_with_gateway)
 
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    wait_until{ page.has_content? "Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-"}
+    assert find_field('input_first_name').value == @saved_member.first_name 
+    page.has_content? "Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-"
     validate_member_recovery(@saved_member, @terms_of_membership_with_gateway)
   end
 
@@ -167,10 +175,10 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     actual_tom = @saved_member.current_membership
 
     recover_member(@saved_member,@terms_of_membership_with_gateway)
-    wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
-    wait_until{ assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@saved_member.current_membership.terms_of_membership.name}-") }
+    assert find_field('input_first_name').value == @saved_member.first_name
+    assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@saved_member.current_membership.terms_of_membership.name}-")
 
-    wait_until{ assert_equal(@saved_member.current_membership.terms_of_membership_id, actual_tom.terms_of_membership_id) }
+    assert_equal(@saved_member.current_membership.terms_of_membership_id, actual_tom.terms_of_membership_id)
     validate_member_recovery(@saved_member, @terms_of_membership_with_gateway)
   end
 
@@ -179,7 +187,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     @saved_member.update_attribute(:blacklisted,true)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    wait_until { find(:xpath, "//a[@id='recovery' and @disabled='disabled']") }
+    find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
   end
 
   test "Recover a member with CC blacklisted" do
@@ -290,4 +298,38 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@new_terms_of_membership_with_gateway.id}) -#{@new_terms_of_membership_with_gateway.name}-")
     end
   end
+
+  # Complimentary members should be active (Recover)
+  test "Complimentary members should be active (Enroll)" do
+    setup_member false, false
+    @terms_of_membership_with_gateway.provisional_days = 0
+    @terms_of_membership_with_gateway.installment_amount = 0.0
+    @terms_of_membership_with_gateway.save
+    enrollment_info = FactoryGirl.build :complete_enrollment_info_with_cero_amount, :product_sku => 'KIT-CARD'
+    unsaved_member = FactoryGirl.build(:member_with_api)
+    
+    assert_difference('Member.count') do
+      create_member_by_sloop(@admin_agent, unsaved_member, nil, enrollment_info, @terms_of_membership_with_gateway, true, true)
+      @saved_member = Member.last
+    end
+    assert_difference('Transaction.count')do
+      @saved_member.bill_membership
+    end
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within('#table_membership_information')do
+      within('#td_mi_status'){ assert page.has_content?("active") }
+    end  
+    assert_equal @saved_member.status, 'active'
+
+    @saved_member.set_as_canceled
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within('#table_membership_information')do
+      within('#td_mi_status'){ assert page.has_content?("lapsed") }
+    end  
+    assert_equal @saved_member.status, 'lapsed'
+
+    recover_member( @saved_member, @terms_of_membership_with_gateway )
+    validate_member_recovery( @saved_member, @terms_of_membership_with_gateway )
+  end
+
 end

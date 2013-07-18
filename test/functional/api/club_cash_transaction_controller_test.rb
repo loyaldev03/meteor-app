@@ -89,4 +89,17 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
     end
     assert_response :unauthorized
   end
+
+  test "Should not let add club cash when club does not allow to" do
+    sign_in @admin_user
+    @club.update_attribute :club_cash_enable, false
+    @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    post(:create, { :member_id => @saved_member.id, 
+                              club_cash_transaction: {
+                                :amount => 100, 
+                                :description => "adding club cash"
+                              }, :format => :json })
+    assert @response.body.include?(I18n.t('error_messages.club_cash_not_supported'))
+    assert @response.body.include?(Settings.error_codes.club_does_not_support_club_cash)
+  end
 end

@@ -46,11 +46,13 @@ class Agent < ActiveRecord::Base
   has_many :clubs, 
     through: :club_roles,
     uniq: true
-  accepts_nested_attributes_for :club_roles,
-    allow_destroy: true
+
+  def which_is_the_role_for_this_club?(club_id)
+    self.club_roles.where(club_id: club_id).first
+  end
 
   def has_role_with_club?(role, club_id = nil)
-    logger.debug "role: #{role} club_id: #{club_id}        #{self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?}"
+    # logger.debug "role: #{role} club_id: #{club_id}        #{self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?}"
     club_id = club_id.to_param
     self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?
   end
@@ -88,6 +90,19 @@ class Agent < ActiveRecord::Base
     self.club_roles.select(:club_id).where("role != 'api'").collect &:club_id
   end
 
+  def set_club_roles(club_roles_info)
+    club_roles_info.each do |club_role|
+      self.club_roles << ClubRole.create(club_role.last)
+    end
+  end
+
+  def delete_club_roles(club_roles_id)
+    club_roles_id.each do |club_role_id|
+      ClubRole.delete(club_role_id)
+    end
+  end
+
+    
   protected
 
    # Attempt to find a user by it's email. If a record is found, send new

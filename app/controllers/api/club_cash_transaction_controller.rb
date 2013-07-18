@@ -1,7 +1,7 @@
 class Api::ClubCashTransactionController < ApplicationController
 
   ##
-  # This method adds or deducts an specific amount of club cash on a member. In case you want to add club cash, the amount value has to be a positive number, while if you want to remove club cash, the amount value has to be negative.  
+  # This method adds or deducts an specific amount of club cash on a member. In case you want to add club cash, the amount value has to be a positive number, while if you want to remove club cash, the amount value has to be negative. Have in mind that in order to use this feature, member's club must allow club cash transaction within it.  
   #
   # @resource /api/v1/members/:member_id/club_cash_transaction
   # @action POST
@@ -23,7 +23,7 @@ class Api::ClubCashTransactionController < ApplicationController
     render json: member.add_club_cash(current_agent,params[:club_cash_transaction][:amount],params[:club_cash_transaction][:description])
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
-  rescue Exception =>   e
-    render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
+  rescue NoMethodError => e
+    render json: { :message => "There are some params missing. Please check them. #{e}", :code => Settings.error_codes.wrong_data }
   end
 end

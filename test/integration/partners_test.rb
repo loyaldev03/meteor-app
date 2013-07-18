@@ -17,6 +17,23 @@ class PartnersTest < ActionController::IntegrationTest
     assert page.has_content?(I18n.t('errors.messages.blank')) #page.has_content?("errors")
   end
 
+
+  test "Required fields marks in New Partner page" do
+    visit admin_partners_path
+    assert page.has_content?('Partners')
+    click_link_or_button 'New Partner'
+    within("#div_prefix") do
+      assert page.has_css?('.required_asterick')
+    end
+    within("#div_name") do
+      assert page.has_css?('.required_asterick')
+    end
+    within("#div_domain_url") do
+      assert page.has_css?('.required_asterick')
+    end
+  end
+  
+
   test "create partner" do
     unsaved_partner = FactoryGirl.build(:partner)
     unsaved_domain = FactoryGirl.build(:simple_domain)
@@ -65,9 +82,7 @@ class PartnersTest < ActionController::IntegrationTest
     saved_partner = FactoryGirl.create(:partner)
     visit admin_partners_path
     within("#partners_table") do
-      wait_until{
         click_link_or_button 'Dashboard'
-      }
     end
     assert page.has_content?(saved_partner.prefix)
     assert page.has_content?(saved_partner.name)
@@ -80,9 +95,7 @@ class PartnersTest < ActionController::IntegrationTest
     saved_partner = FactoryGirl.create(:partner)
     visit admin_partners_path
     within("#partners_table") do
-      wait_until{
         click_link_or_button 'Edit'
-      }
     end
     fill_in 'partner[name]', :with => 'My new name'
     click_link_or_button 'Update Partner'
@@ -95,14 +108,10 @@ class PartnersTest < ActionController::IntegrationTest
     visit admin_partners_path
     confirm_ok_js
     within("#partners_table") do
-      wait_until{
         click_link_or_button 'Destroy'
-      }
     end
     saved_partner.reload
-    wait_until{
       assert page.has_content?('Partner WIEGANDTOY was successfully destroyed')
       assert Partner.with_deleted.where(:id => saved_partner.id).first
-    }
   end
 end

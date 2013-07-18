@@ -32,7 +32,6 @@ class ActiveSupport::TestCase
     "340504323632976" => "c25ccfecae10384698a44360444dead6", "123456" => "anytransactioniditsvalid.forinvalidccnumber", 
     "123456789" => "c25ccfecae10384698asddd60444dead6" }
 
-
   def active_merchant_stubs(code = "000", message = "This transaction has been approved with stub", success = true)
     answer = ActiveMerchant::Billing::Response.new(success, message, 
       { "transaction_id"=>"c25ccfecae10384698a44360444dead8", "error_code"=> code, 
@@ -44,14 +43,43 @@ class ActiveSupport::TestCase
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:credit).returns(answer)
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:store).returns(answer)
   end
+
+  def active_merchant_stubs_litle(code = "000", message = "This transaction has been approved with stub", success = true)
+    answer = ActiveMerchant::Billing::Response.new(success, message, 
+      { "litleOnlineResponse"=>{"message"=>"Valid Format", "saleResponse"=>{"response" => code} ,"response"=>code, "version"=>"8.16", 
+       "xmlns"=>"http://www.litle.com/schema", "registerTokenResponse"=>{"customerId"=>"", "id"=>"", 
+       "reportGroup"=>"Default Report Group", "litleTxnId"=>"630745122415368266", 
+       "litleToken"=>"1111222233334444", "response"=>"000", "responseTime"=>"2013-04-08T16:54:24", 
+       "message"=>"Approved"}}})
+    ActiveMerchant::Billing::LitleGateway.any_instance.stubs(:purchase).returns(answer)
+    ActiveMerchant::Billing::LitleGateway.any_instance.stubs(:refund).returns(answer)
+    ActiveMerchant::Billing::LitleGateway.any_instance.stubs(:credit).returns(answer)
+    ActiveMerchant::Billing::LitleGateway.any_instance.stubs(:store).returns(answer)
+  end 
+
+  def active_merchant_stubs_auth_net(code = "000", message = "This transaction has been approved with stub", success = true)
+    answer = ActiveMerchant::Billing::Response.new(success, message, 
+      {"response_code"=>code, "response_reason_code"=>"6", "response_reason_text"=> message, 
+       "avs_result_code"=>"P", "transaction_id"=>"0", "card_code"=>"", "action"=>"AUTH_CAPTURE"})
+    ActiveMerchant::Billing::AuthorizeNetGateway.any_instance.stubs(:purchase).returns(answer)
+    ActiveMerchant::Billing::AuthorizeNetGateway.any_instance.stubs(:refund).returns(answer)
+    ActiveMerchant::Billing::AuthorizeNetGateway.any_instance.stubs(:credit).returns(answer)
+    ActiveMerchant::Billing::AuthorizeNetGateway.any_instance.stubs(:store).returns(answer)
+  end 
+
   def active_merchant_stubs_store(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
     answer = ActiveMerchant::Billing::Response.new(success, message, { "transaction_id"=>CREDIT_CARD_TOKEN[number], "error_code"=> code, "auth_response_text"=>"No Match" })
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:store).returns(answer)
   end  
 
-  def active_merchant_stubs_purchace(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
+  def active_merchant_stubs_purchase(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
     answer = ActiveMerchant::Billing::Response.new(success, message, { "transaction_id"=>CREDIT_CARD_TOKEN[number], "error_code"=> code, "auth_response_text"=>"No Match" })
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns(answer)
+  end
+
+  def active_merchant_stubs_process(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
+     answer = ActiveMerchant::Billing::Response.new(success, message, { "transaction_id"=>CREDIT_CARD_TOKEN[number], "error_code"=> code, "auth_response_text"=>"No Match" })
+     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:process).returns(answer)
   end
 
   def create_active_member(tom, member_type = :active_member, enrollment_type = :enrollment_info, member_args = {}, membership_args = {}, use_default_active_merchant_stub = true)
@@ -142,7 +170,6 @@ module ActionController
     def search_member(field_selector, value, validate_obj)
       fill_in field_selector, :with => value unless value.nil?
       click_on 'Search'
-      sleep 5
       within("#members") do
         assert page.has_content?(validate_obj.status)
         assert page.has_content?("#{validate_obj.id}")
@@ -155,10 +182,16 @@ module ActionController
       end
     end
         
-    def create_member_by_sloop(agent, member, credit_card, enrollment_info, terms_of_membership, validate = true)
-      
-      credit_card = FactoryGirl.build(:credit_card) if credit_card.nil?
+    def create_member_by_sloop(agent, member, credit_card, enrollment_info, terms_of_membership, validate = true, cc_blank = false)
       enrollment_info = FactoryGirl.build(:enrollment_info) if enrollment_info.nil?
+
+      if cc_blank
+        credit_card_to_load = FactoryGirl.build(:blank_credit_card)
+      elsif credit_card.nil?
+        credit_card_to_load = FactoryGirl.build(:credit_card)
+      else
+        credit_card_to_load = credit_card
+      end
 
       ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns( 
         Hashie::Mash.new( :params => { :transaction_id => '1234', :error_code => '000', 
@@ -166,7 +199,8 @@ module ActionController
                                         :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
             )
       )
-      active_merchant_stubs_store(credit_card.number)
+
+      active_merchant_stubs_store(credit_card_to_load.number)
       post( api_members_url , { member: {:first_name => member.first_name, 
                                 :last_name => member.last_name,
                                 :address => member.address,
@@ -183,22 +217,37 @@ module ActionController
                                 :enrollment_amount => enrollment_info.enrollment_amount,
                                 :terms_of_membership_id => terms_of_membership.id,
                                 :birth_date => member.birth_date,
-                                :credit_card => {:number => credit_card.number,
-                                                 :expire_month => credit_card.expire_month,
-                                                 :expire_year => credit_card.expire_year },
+                                :credit_card => {:number => credit_card_to_load.number,
+                                                 :expire_month => credit_card_to_load.expire_month,
+                                                 :expire_year => credit_card_to_load.expire_year },
                                 :product_sku => enrollment_info.product_sku,
                                 :product_description => enrollment_info.product_description,
                                 :mega_channel => enrollment_info.mega_channel,
                                 :marketing_code => enrollment_info.marketing_code,
                                 :fulfillment_code => enrollment_info.fulfillment_code,
                                 :ip_address => enrollment_info.ip_address
-                                },
+                                }, :setter => { :cc_blank => cc_blank },
                                 :api_key => agent.authentication_token, :format => :json})
       if validate
         assert_response :success
       end
     end
 
+
+  def select_from_datepicker(name, date)
+    page.execute_script("window.jQuery('#"+name+"').next().click()")
+    within("#ui-datepicker-div") do
+      if date.month != Time.zone.now.month
+        if (date.month > Time.zone.now.month)
+          (date.month-Time.zone.now.month).times{ find(".ui-icon-circle-triangle-e").click }
+        end
+        if (date.month < Time.zone.now.month)
+          (Time.zone.now.month-date.month).times{ find(".ui-icon-circle-triangle-w").click }
+        end
+      end
+      first(:link, date.day.to_s).click
+    end
+  end
 
   def fill_in_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
     visit members_path( :partner_prefix => unsaved_member.club.partner.prefix, :club_prefix => unsaved_member.club.name )
@@ -222,12 +271,15 @@ module ActionController
       fill_in 'member[zip]', :with => unsaved_member.zip
     end
 
-    # TODO : FIX THIS.
-    # page.execute_script("window.jQuery('#member_birth_date').next().click()")
-    # within(".ui-datepicker-calendar") do
-    #   click_on("1")
+    # page.execute_script("window.jQuery('#birt_date').next().click()")
+    # within("#ui-datepicker-div") do
+    #     if ((Time.zone.now+2.day).month != Time.zone.now.month)
+    #       find(".ui-icon-circle-triangle-e").click
+    #     end
+    #     first(:link, "#{(Time.zone.now+1.day).day}").click
+    #   end
     # end
-    
+
     within("#table_contact_information")do
       fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
       fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
@@ -271,7 +323,7 @@ module ActionController
 
   def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
     fill_in_member(unsaved_member, credit_card, tom_type, cc_blank)
-    wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+    assert find_field('input_first_name').value == unsaved_member.first_name
     Member.find_by_email(unsaved_member.email)
   end
 
@@ -284,48 +336,45 @@ module ActionController
 
     answer = member.bill_membership
     assert (answer[:code] == Settings.error_codes.success), answer[:message]
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id)
+    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix =>member.club.name, :member_prefix => member.id)
     
+    # if current_membership.quota%12==0 and current_membership.quota!=12
+    #   within("#table_membership_information")do
+    #     within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
+    #   end
+    # end
     within("#table_membership_information")do
-      within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
-    end
-    within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
-
-
-    within("#table_membership_information")do
-      wait_until{ assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date ) } 
+      within("#td_mi_next_retry_bill_date")do
+        assert page.has_content?(I18n.l(next_bill_date, :format => :only_date))
+      end
+      assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date )
     end
 
-    #sleep(5)
-
+    within(".nav-tabs"){ click_on 'Operations' }
     within("#operations") do
-      wait_until {
-        assert page.has_selector?("#operations_table")
-        assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
-      }
+      assert page.has_selector?("#operations_table")
+      assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
     end
 
     within(".nav-tabs"){ click_on 'Transactions' }
     within("#transactions") do 
-      wait_until {
-        assert page.has_selector?("#transactions_table")
-        Transaction.all.each do |transaction|
-          assert page.has_content?(transaction.full_label.truncate(50))
-        end
-        # assert page.has_content?("Sale : This transaction has been approved")
-        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
-      }
+      assert page.has_selector?("#transactions_table")
+      Transaction.all.each do |transaction|
+        assert page.has_content?(transaction.full_label.truncate(50))
+      end
+      # assert page.has_content?("Sale : This transaction has been approved")
+      assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
     end
 
     within("#transactions_table") do
-     wait_until{ assert page.has_selector?('#refund') }
+      assert page.has_selector?('#refund')
     end
     
     if do_refund
       transaction = Transaction.last
       visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id, :transaction_id => transaction.id)
 
-      wait_until{ assert page.has_content?(transaction.amount_available_to_refund.to_s) }
+      assert page.has_content?(transaction.amount_available_to_refund.to_s)
 
       # final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
       final_amount = Transaction.first.amount_available_to_refund
@@ -338,24 +387,18 @@ module ActionController
       end
       
       within("#operations_table") do 
-        wait_until {
-          assert page.has_content?("Communication 'Test refund' sent")
-          assert page.has_content?("Refund success $#{final_amount}")
-        }
+        assert page.has_content?("Communication 'Test refund' sent")
+        assert page.has_content?("Refund success $#{final_amount}")
       end
       within(".nav-tabs"){ click_on 'Transactions' }
       within("#transactions_table") do 
-        wait_until {
-          assert page.has_content?("Credit : This transaction has been approved")
-          assert page.has_content?(final_amount)
-        }
+        assert page.has_content?("Credit : This transaction has been approved")
+        assert page.has_content?(final_amount)
       end
       within(".nav-tabs"){ click_on 'Communications' }
       within("#communication") do 
-        wait_until {
-          assert page.has_content?("Test refund")
-          assert page.has_content?("refund")
-        }
+        assert page.has_content?("Test refund")
+        assert page.has_content?("refund")
       end
     end
   end
@@ -382,7 +425,6 @@ module ActionController
     fill_in 'club_cash_transaction[amount]', :with => amount
     fill_in 'club_cash_transaction[description]', :with => description
     click_on 'Save club cash transaction'
-
     if validate
       within('.nav-tabs'){ click_on 'Operations' }
       within("#operations_table"){assert page.has_content?("#{amount.to_f.abs} club cash was successfully #{amount>0 ? 'added' : 'deducted'}. Concept: #{description}")}
@@ -392,21 +434,25 @@ module ActionController
   end
 
   def save_the_sale(member, new_terms_of_membership, validate = true)
-    old_membership = member.current_membership  
-    visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
+    assert_difference('Fulfillment.count',0) do 
+      old_membership = member.current_membership
+      next_retry_bill_date_old = member.next_retry_bill_date
+      visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
 
-    click_on 'Save the sale'    
-    select(new_terms_of_membership.name, :from => 'terms_of_membership_id')
-    confirm_ok_js
-    click_on 'Save the sale'
-    if validate
-      assert page.has_content?("Save the sale succesfully applied")
-      member.reload
-      old_membership.reload
-      assert_equal old_membership.status, "lapsed"
-      assert_equal member.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
-      assert_equal member.status, member.current_membership.status
-      within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
+      click_on 'Save the sale'    
+      select(new_terms_of_membership.name, :from => 'terms_of_membership_id')
+      confirm_ok_js
+      click_on 'Save the sale'
+      if validate
+        assert page.has_content?("Save the sale succesfully applied")
+        member.reload
+        old_membership.reload
+        assert_equal old_membership.status, "lapsed"
+        assert_equal next_retry_bill_date_old, member.next_retry_bill_date
+        assert_equal member.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
+        assert_equal member.status, member.current_membership.status
+        within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
+      end
     end
   end
 
@@ -417,7 +463,6 @@ module ActionController
     select(new_tom.name, :from => 'terms_of_membership_id')
     confirm_ok_js
     click_on "Recover"
-    sleep 1
     if validate
       wait_until{ assert find_field('input_first_name').value == member.first_name }
       within("#td_mi_reactivation_times")do

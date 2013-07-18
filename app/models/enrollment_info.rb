@@ -13,6 +13,10 @@ class EnrollmentInfo < ActiveRecord::Base
 
   scope :current, :order => ("created_at DESC"), :limit => 1
 
+  CS_MEGA_CHANNEL = 'other'
+  CS_CAMPAIGN_MEDIUM = 'phone'
+  CS_CAMPAIGN_DESCRIPTION = 'CS Join'
+
   # Method to update every enrollment_info field with the hash of information we recieve when enrolling a member.
   #
   def update_enrollment_info_by_hash(params)

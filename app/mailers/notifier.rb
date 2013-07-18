@@ -7,11 +7,20 @@ class Notifier < ActionMailer::Base
     mail :to => to, :subject => "Pre bill email to #{email}"
   end
 
+  def manual_payment_pre_bill(email)
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "Manual Payment Pre bill email to #{email}"
+  end
+
   def cancellation(email)
     to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
     mail :to => to, :subject => "cancellation to #{email}"
   end
 
+  def rejection(email)
+    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
+    mail :to => to, :subject => "rejection to #{email}"
+  end
   def active(email)
     to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
     mail :to => to, :subject => "active to #{email}"
@@ -32,16 +41,14 @@ class Notifier < ActionMailer::Base
     mail :to => to, :subject => "pillar to #{email}"
   end
 
-  def active_with_approval(agent,member)
-    @agent = agent
+  def active_with_approval(emails,member)
     @member = member
-    mail :to => agent.email, :subject => "Member activation needs approval"
+    mail :to => emails, :subject => "Member activation needs approval"
   end
 
-  def recover_with_approval(agent,member)
-    @agent = agent
+  def recover_with_approval(emails,member)
     @member = member
-    mail :to => agent.email, :subject => "Member recovering needs approval"
+    mail :to => emails, :subject => "Member recovering needs approval"
   end
 
   def call_these_members(csv)
@@ -49,12 +56,6 @@ class Notifier < ActionMailer::Base
     mail :to => Settings.call_these_members_recipients, 
          :subject => "AUS answered CALL to these members #{Date.today}",
          :bcc => 'platformadmins@xagax.com'
-  end
-
-  def members_with_duplicated_email_sync_error(member_list)
-    @members = member_list
-    mail :to => Settings.email_to_use_on_duplicated_email_sync_error,
-         :subject => "[#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )} - Duplicated email sync error."
   end
 
   def hard_decline(member)
@@ -71,6 +72,20 @@ class Notifier < ActionMailer::Base
     attachments["product_list_#{Date.today}.xlsx"] = File.read(product_xls_file)
     mail :to => Settings.email_to_send_product_list, 
          :subject => "[#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )} - Product list"
+  end
+
+  def fulfillment_naamma_report(fulfillment_xls_file, quantity)
+    @quantity = quantity
+    attachments["fulfillments_xls_file#{Date.today}.xlsx"] = File.read(fulfillment_xls_file)
+    mail :to => Rails.env=='production' ? 'bmiller@naamma.com,clawler@stoneacreinc.com,ddanch@stoneacreinc.com' : 'clawler@stoneacreinc.com,sonia@xagax.com',
+         :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NAAMMA fulfillments report"
+  end
+
+  def fulfillment_nfla_report(fulfillment_xls_file, quantity)
+    @quantity = quantity
+    attachments["fulfillments_xls_file#{Date.today}.xlsx"] = File.read(fulfillment_xls_file)
+    mail :to => Rails.env=='production' ? 'clawler@stoneacreinc.com,cball@stoneacreinc.com' : 'sonia@xagax.com',
+         :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NFLA kit-card fulfillments report"
   end
 
 end

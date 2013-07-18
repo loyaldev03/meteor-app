@@ -10,17 +10,13 @@ gem 'uuidtools'
 
 gem "paperclip", "~> 3.0"
 
-gem 'attr_encrypted'
-
 gem 'acts_as_list'
 gem 'delayed_job_active_record'
-gem 'daemons'
-gem 'foreman'
-gem 'god'
-gem 'rvm-capistrano'
-gem 'capistrano-campfire', '0.2.0'
-gem 'tinder', '1.9.2'
-gem "ruby-pardot"
+# uncomment if pardot is enabled again
+# gem "ruby-pardot"
+
+gem 'turnout'
+gem 'exact_target_sdk', github: 'stoneacre/exact_target_sdk'
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -58,7 +54,8 @@ gem 'jquery-rails', '2.0.3'
 
 gem 'acts_as_paranoid'
 
-gem "airbrake"
+#gem "airbrake"
+gem "zendesk_api"
 
 
 # To use ActiveModel has_secure_password
@@ -71,25 +68,30 @@ gem "airbrake"
 # gem 'unicorn'
 
 gem 'newrelic_rpm'
+gem 'oboe'
 
 # To use debugger
 group :development do
-  # gem 'ruby-debug19', :require => 'ruby-debug'
-  gem 'linecache19', :git => 'git://github.com/mark-moseley/linecache'
-  gem 'ruby-debug-base19x', '~> 0.11.30.pre4'
-  gem 'ruby-debug19'
+  gem 'debugger'
   gem "rails-erd"
   gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
   gem "yard", "~> 0.8.2.1"
   gem 'yard-rest'
   gem 'redcarpet'
   gem "bullet"
+  gem 'ruby-prof'
+  # -> deploy
+  gem 'rvm-capistrano'
+  gem 'capistrano-campfire', '0.2.0'
+  gem 'tinder', '1.9.2'
+  #####
+  gem 'daemons'
+  gem 'foreman'
 end
 
 group :prototype do
   gem "bullet"
 end
-
 
 group :test do
   gem 'factory_girl_rails'
@@ -104,5 +106,10 @@ group :test do
 end
 
 gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant"
-
 gem 'LitleOnline'
+
+# TODO => remove the following requires after tokenization is implemented
+### only for Auth.Net  without tokenization.
+gem 'encryptor'
+###################
+

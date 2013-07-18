@@ -1,3 +1,4 @@
+<div id="ajax_loader"><p><%=t('loading')%></p></div>
 <div class="navbar">
   <div class="navbar-inner">
     <div class="container">
@@ -51,6 +52,9 @@
                   <% if @current_agent.can? :read, Fulfillment, @current_club.id %>
                     <li><%= link_to t('activerecord.model.fulfillment_files'), list_fulfillment_files_path(@current_club.partner.prefix, @current_club.name) %></li>
                   <% end %>
+                  <% if @current_agent.can? :read, DispositionType, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.disposition_types'), disposition_types_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
                 </ul>
               </li>
             </ul>
@@ -62,6 +66,7 @@
             <li><%= link_to t('menu.agents'), admin_agents_path if can? :read, Agent %></li>
             <li><%= link_to t('menu.partners'), admin_partners_path if can? :read, Agent %></li>
             <li><%= link_to "My Clubs", root_path %></li>
+            <li><%= link_to "DelayedJobs", admin_delayed_jobs_path if can? :read, DelayedJob %></li>
             <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
             <li>
               <% selected = @current_club ? [ members_path(@current_partner.prefix, @current_club.name) ] : nil %>

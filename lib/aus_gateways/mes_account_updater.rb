@@ -1,24 +1,25 @@
 module MesAccountUpdater
+  CHARGEBACKS_TO_NOT_PROCESS = [ 'Duplicate Processing' ]
 
   def self.process_chargebacks(mode)
     PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
-      MesAccountUpdater.process_chargebacks gateway
+      MesAccountUpdater.process_chargebacks_for_gateway gateway
     end
   end
 
   def self.account_updater_process_answers(mode)
     PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
-      MesAccountUpdater.account_updater_process_answers gateway unless gateway.aus_login.blank?
+      MesAccountUpdater.account_updater_process_answers_for_gateway gateway unless gateway.aus_login.blank?
     end
   end
   
   def self.account_updater_send_file_to_process(mode)
     PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
-      MesAccountUpdater.account_updater_send_file_to_process gateway unless gateway.aus_login.blank?
+      MesAccountUpdater.account_updater_send_file_to_process_for_gateway gateway unless gateway.aus_login.blank?
     end
   end
 
-  def self.process_chargebacks(gateway)
+  def self.process_chargebacks_for_gateway(gateway)
     conn = Faraday.new(:url => Settings.mes_report_service.url, :ssl => {:verify => false})
     initial_date, end_date = (Date.today - 1).strftime('%m/%d/%Y'), (Date.today - 1).strftime('%m/%d/%Y')
     result = conn.get Settings.mes_report_service.path, { 
@@ -40,19 +41,19 @@ module MesAccountUpdater
   ################################################
   ########## AUS new file! #######################
   ################################################
-  def self.account_updater_process_answers(gateway)
+  def self.account_updater_process_answers_for_gateway(gateway)
     return if gateway.aus_login.nil? or gateway.aus_password.nil?
     answer = prepare_connection '/srv/api/ausStatus?', { :statusFilter => 'NEW' }, gateway
     quantity = answer['statusCount'].to_i-1
     if quantity >= 0
       0.upto(quantity) do |i|
-        request_file_by_id answer["rspfId_#{i}"], "rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
+        request_file_by_id answer["rspfId_#{i}"], "#{gateway.club_id}-rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
       end
       send_email_with_call_members
     end
   end
 
-  def self.account_updater_send_file_to_process(gateway)
+  def self.account_updater_send_file_to_process_for_gateway(gateway)
     return if gateway.aus_login.nil? or gateway.aus_password.nil?
     local_filename = "#{Settings.mes_aus_service.folder}/#{gateway.club_id}_account_updater_#{Time.zone.now}.txt"
     send_file_to_mes(local_filename, gateway) if store_file(local_filename, gateway)
@@ -63,7 +64,7 @@ module MesAccountUpdater
       ccs = CreditCard.where([" aus_status = 'CALL' AND date(aus_answered_at) = ? ", Time.zone.now.to_date ])
       if ccs.size > 0
         csv = "id,first_name,last_name,email,phone,status,cs_next_bill_date\n"
-        csv += ccs.collect {|cc| [ cc.member_id, cc.member.first_name, cc.member.last_name, cc.email, cc.full_phone_number,
+        csv += ccs.collect {|cc| [ cc.member_id, cc.member.first_name, cc.member.last_name, cc.member.email, cc.member.full_phone_number,
             cc.member.status, cc.member.next_retry_bill_date ].join(',') }.join("\n")
         Notifier.call_these_members(csv).deliver
       end
@@ -163,7 +164,15 @@ module MesAccountUpdater
         old_account_token = line[6..37].strip
         old_expiration_date = line[38..41]
         new_account_type = line[42..45]
-        new_account_token = line[46..77].strip
+        new_account_type_am = case new_account_type
+        when 'VISA'
+          'visa'
+        when 'MC'
+          'master'
+        else
+          'unknown'
+        end
+        new_account_number= line[46..77].strip
         new_expiration_date = line[78..81]
         response_code = line[82..89].strip
         response_source = line[90..91]
@@ -175,7 +184,7 @@ module MesAccountUpdater
         else
           new_expire_year = new_expiration_date[0..1].to_i+2000
           new_expire_month = new_expiration_date[2..3]
-          credit_cards = CreditCard.find_all_by_token credit_card.old_account_token
+          credit_cards = CreditCard.find_all_by_token old_account_token
           credit_cards.each do |cc|
             if cc.active 
               if cc.aus_status.nil?
@@ -185,14 +194,16 @@ module MesAccountUpdater
               end
               case response_code
               when 'NEWACCT'
-                # TODO: Asking Sean if token changes after NEWACCT 
-                answer = cc.member.update_credit_card_from_drupal({number: new_account_number, :expire_year => new_expire_year, :expire_month => new_expire_month})
+                new_credit_card = CreditCard.new(number: new_account_number, expire_year: new_expire_year, expire_month: new_expire_month)
+                new_credit_card.token = old_account_token
+                new_credit_card.cc_type = new_account_type_am
+                answer = cc.member.add_new_credit_card(new_credit_card)
                 unless answer[:code] == Settings.error_codes.success
-                  Airbrake.notify(:error_class => "MES::aus_update_process", :parameters => { :credit_card => cc.inspect, :answer => answer, :line => line })
+                  Auditory.report_issue("MES::aus_update_process", response_code, { :credit_card => cc.inspect, :answer => answer, :line => line })
                 end
               when 'NEWEXP'
-                cc.update_attributes :expire_year => new_expire_year, :expire_month => new_expire_month
                 Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.member, Settings.operation_types.aus_recycle_credit_card)
+                cc.update_attributes :expire_year => new_expire_year, :expire_month => new_expire_month
               when 'CLOSED', 'CALL'
                 member = cc.member
                 unless member.lapsed?
@@ -208,33 +219,37 @@ module MesAccountUpdater
       end
     end    
 
+
     def self.process_chargebacks_result(body, gateway)
       return if body.include?('Export Failed')
-      body.split("\n").each do |line|
+      lines = body.split("\n")
+      lines.each do |line|
         columns = line.split(',')
         next if columns[0].include?('Merchant Id')
         columns.each { |x| x.gsub!('"', '') }
         args = { :control_number => columns[2], :incomming_date => columns[3],
-          :reference_number => columns[5], :transaction_date => columns[6], :transaction_amount => columns[7],
+          :reference_number => columns[5].gsub("'", ''), :transaction_date => columns[6], :transaction_amount => columns[7],
           :trident_transaction_id => columns[8], :purchase_transaction_id => columns[9],
           :client_reference_number => columns[10], :auth_code => columns[11],
           :adjudication_date => columns[12], :adjudication_number => columns[13],
           :reason => columns[14], :first_time => columns[15],
           :reason_code => columns[16], :cb_ref_number => columns[17]
         }
+        next if MesAccountUpdater::CHARGEBACKS_TO_NOT_PROCESS.include?(args[:reason])
         transaction_chargebacked = Transaction.find_by_payment_gateway_configuration_id_and_response_transaction_id gateway.id, args[:trident_transaction_id]
         member = Member.find_by_id_and_club_id(args[:client_reference_number], gateway.club_id)
         begin
-          if transaction_chargebacked.nil? || member.nil?
+          if transaction_chargebacked.nil?
             raise "Chargeback ##{args[:control_number]} could not be processed. member or transaction_chargebacked are null! #{line}"
+          elsif member.nil?
+            transaction_chargebacked.member.chargeback! transaction_chargebacked, args
           elsif transaction_chargebacked.member_id == member.id
             member.chargeback! transaction_chargebacked, args
-            member.save
           else
             raise "Chargeback ##{args[:control_number]} could not be processed. member and transaction_chargebacked are different! #{line}"
           end
         rescue 
-          Airbrake.notify(:error_class => "MES::chargeback_report", :parameters => { :gateway => gateway, :member => member.inspect, :line => line, :transaction_chargebacked => transaction_chargebacked })
+          Auditory.report_issue("MES::chargeback_report", $!, { :gateway => gateway.inspect, :member => member.inspect, :line => line, :transaction_chargebacked => transaction_chargebacked.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end

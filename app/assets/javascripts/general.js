@@ -1,5 +1,4 @@
 $(document).ready( function() {
-
   $('.confirm').click( function(event){
     var answer = confirm('Are you sure?');
     return answer 
@@ -54,11 +53,41 @@ $(document).ready( function() {
   });
 });
 
+function startAjaxLoader(){
+  var opts = {
+    lines: 9, // The number of lines to draw
+    length: 4, // The length of each line
+    width: 3, // The line thickness
+    radius: 7, // The radius of the inner circle
+    corners: 1, // Corner roundness (0..1)
+    rotate: 0, // The rotation offset
+    direction: 1, // 1: clockwise, -1: counterclockwise
+    color: '#000', // #rgb or #rrggbb
+    speed: 1, // Rounds per second
+    trail: 35, // Afterglow percentage
+    shadow: false, // Whether to render a shadow
+    hwaccel: false, // Whether to use hardware acceleration
+    className: 'spinner', // The CSS class to assign to the spinner
+    zIndex: 2e9, // The z-index (defaults to 2000000000)
+    top: 'auto', // Top position relative to parent in px
+    left: 'auto' // Left position relative to parent in px
+  };
+  var spinner = new Spinner(opts).spin();
+  $("#ajax_loader").append(spinner.el);
+  $("#ajax_loader").slideDown("slow");
+};
+
+function endAjaxLoader(){
+  $("#ajax_loader").slideUp();
+  $('.spinner').remove();
+};
+
 function agent_index_functions(column_count){
   $('#agents_table').dataTable({
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
@@ -71,6 +100,7 @@ function agent_index_functions(column_count){
 function partner_index_functions(column_count){
   $('#partners_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -85,6 +115,7 @@ function partner_index_functions(column_count){
 function club_index_functions(column_count){
   $('#clubs_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -97,9 +128,41 @@ function club_index_functions(column_count){
   });
 }
 
+function delay_jobs_index_functions(column_count){
+  $('#delayed_jobs_table').dataTable({
+    "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aaSorting": [[ 0, "asc" ]],
+    "aoColumnDefs": [ { "sWidth": "100px", "aTargets": [ 1 ] },
+                      { "sWidth": "130px", "aTargets": [ 4,5,column_count ] },
+                      { "bSortable": false, "aTargets": [ column_count ] }],
+    "sAjaxSource": $('#delayed_jobs_table').data('source'),
+  });
+}
+
+function disposition_types_index_functions(column_count){
+  $('#disposition_types_table').dataTable({
+    "sPaginationType": "bootstrap",
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aaSorting": [[ 0, "asc" ]],
+    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ column_count ] }],
+    "sAjaxSource": $('#disposition_types_table').data('source'),
+  });
+}
+
 function my_club_index_functions(column_count){
   $('#my_clubs_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -112,6 +175,7 @@ function my_club_index_functions(column_count){
 function domain_index_functions(column_count){
   $('#domains_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -127,6 +191,7 @@ function domain_index_functions(column_count){
 function product_index_functions(column_count){
   $('#products_table').dataTable({
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -152,12 +217,20 @@ function new_product_functions(){
 
 function member_index_functions(){
   $('#index_search_form').submit(function (){
+    startAjaxLoader();
+    $('#submit_button').attr('disabled', 'disabled')
     update_select_only = false;
-    $.get(this.action, $(this).serialize(), null, 'script'); 
+    $.get(this.action, $(this).serialize(), null, 'script').done(function(data) {
+      endAjaxLoader();
+      $('#submit_button').removeAttr('disabled');
+    });
     return false;
   });
 
-  $(".datepicker_for_search").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
+  $(".datepicker_for_search_nbd").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
+                                           showOn: "both", buttonImage: "/icon-calendar.png", 
+                                           buttonImageOnly: true});
+  $(".datepicker_for_search_billed_date").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd", 
                                            showOn: "both", buttonImage: "/icon-calendar.png", 
                                            buttonImageOnly: true});
   $('#members .pagination a').on('click', function () {  
@@ -190,6 +263,7 @@ function new_member_functions(){
                                 yearRange: '1900',
                                 buttonImageOnly: true});
   $('#new_member').submit( function(event) {
+    startAjaxLoader();
     $('#error_explanation').hide();
     $('#submit_button').attr('disabled', 'disabled');
     event.preventDefault();
@@ -198,6 +272,7 @@ function new_member_functions(){
       url: "/api/v1/members",
       data: $("#new_member").serialize(),
       success: function(data) {
+        endAjaxLoader();
         $('input').parent().parent().removeClass("error");
         if (data.code == 000) {
           alert (data.message);
@@ -269,6 +344,7 @@ function edit_member_functions(){
                                 yearRange: '1900',
                                 buttonImageOnly: true});
   $('form').submit( function(event) {
+    startAjaxLoader();
     $('#submit_button').attr('disabled', 'disabled');
     event.preventDefault();
     $.ajax({
@@ -276,6 +352,7 @@ function edit_member_functions(){
       url: "/api/v1/members/"+id,
       data: $('form').serialize(),
       success: function(data) {
+        endAjaxLoader();
         alert(data.message);
         $('input').parent().parent().removeClass("error");
         if (data.code == 000)
@@ -314,6 +391,7 @@ function club_cash_functions(){
 
   $('#error_explanation').hide();
   $('form').submit( function(event) {
+    startAjaxLoader();
     $('#submit_button').attr('disabled', 'disabled');
     event.preventDefault(); 
     $.ajax({
@@ -321,9 +399,11 @@ function club_cash_functions(){
       url: "/api/v1/members/"+id+"/club_cash_transaction",
       data: $("form").serialize(),
       success: function(data) {
-        if (data.code == 000)
+        endAjaxLoader();
+        if (data.code == 000){
+          alert(data.message);
           window.location.replace('../'+id);
-        else{
+        }else{
           $('#submit_button').removeAttr("disabled");
           $('#error_explanation').show();
           $("#error_explanation ul").empty();
@@ -373,6 +453,7 @@ function operation_member_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "aaSorting": [[ 1, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ] }],
@@ -393,6 +474,7 @@ function transactions_member_functions(column_count){
     "bProcessing": true,
     "bFilter": false,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5,6 ] }],
@@ -406,6 +488,7 @@ function memberships_member_functions(column_count){
     "bProcessing": true,
     "bFilter": false,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "bLengthChange": false,
     "aaSorting": [[ 0, "desc" ]],
@@ -420,6 +503,7 @@ function fulfillment_files_functions() {
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "bSort": false,
     "bFilter": false,
@@ -438,6 +522,7 @@ function club_cash_transactions_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
+	"sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
@@ -551,6 +636,14 @@ function set_product_type_at_fulfillments_index(settings_kit_card_product, setti
 }
 
 function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message, settings_kit_card_product, settings_others_product){
+  $("#report_results").tablesorter({
+    headers: { 
+      0: { sorter: false }, 
+      7: { sorter: false }, 
+      8: { sorter: false } 
+    } 
+  }); 
+
   $(".datepicker").datepicker({ constrainInput: true, 
                                 dateFormat: "yy-mm-dd", 
                                 showOn: "both", 
@@ -676,3 +769,86 @@ function resend_fulfillment(url){
     });
   });
 }
+
+function show_terms_of_membership_functions(){
+  $('#return_btn').click( function(event){
+    event.preventDefault();
+    window.history.back();
+  });
+}
+
+function save_the_sale_functions(){
+  $('form').submit( function(event) {
+  $('#save_the_sale_button').attr('disabled', 'disabled');
+    startAjaxLoader();
+  });
+}
+
+function recover_member_functions(){
+  $('form').submit( function(event) {
+  $('#recover_button').attr('disabled', 'disabled');
+    startAjaxLoader();
+  }); 
+}
+
+function admin_form_functions(){
+  var count = 0;
+  var club_list = clubs.split(";");
+  var role_list = roles.split(",");
+
+  $('#add_new_club_role').live("click", function(event){
+    event.preventDefault();
+    
+    $("*[id$='_club_id'] option:selected").each( function(){
+      index = club_list.indexOf($(this).text()+","+$(this).val());
+      if(index >= 0)
+        club_list.splice(index,1);
+    });
+    if(club_list.length == 0 || club_list == ""){
+      alert("Cannot add more club roles. No more clubs available.")
+    }else{
+      count++;
+      var options_for_role = "<option value=''> </option>"
+      for (var i in role_list){
+        options_for_role = options_for_role+"<option value='"+role_list[i]+"'>"+role_list[i]+"</option>" 
+      };
+      var options_for_club_id = ""
+      for (var i in club_list){  
+        club = club_list[i].split(',');
+        options_for_club_id = options_for_club_id+"<option value='"+club[1]+"'>"+club[0]+"</option>"
+      };
+      $('#club_role_table').append("<tr id='tr_club_rol_["+count+"]'><td><select id='club_roles_attributes_"+count+"_role' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select></td><td><select id='club_roles_attributes_"+count+"_club_id' name='[club_roles_attributes]["+count+"][club_id]'>"+options_for_club_id+"</select></td><td><input type='button' id='club_role_delete' name='"+count+"' class='btn btn-mini' value='Delete'></td></tr>")
+    };
+
+    $("*[id$='_club_id']").each(function() {
+      $(this).data('lastValue', $(this).val());
+    });
+  });
+
+  $("#club_role_delete").live("click", function(){
+    if (confirm("Are you sure you want to delete this club role?")) {
+      $("#club_role_table tr[id='tr_club_rol_["+$(this).attr('name')+"]']").remove();
+      club_list = clubs.split(";");
+    }
+  });
+
+  $("*[id$='_club_id']:not[:last]").live("change", function() {
+    var name = $(this).attr("name");
+    var lastRole = $(this).data('lastValue');
+    var newRole = $(this).val();
+    var success = true;
+
+    $("*[id$='_club_id']").each( function(){
+      if(newRole == $(this).val() && name != $(this).attr("name")){ 
+        success = false;
+      };
+    });
+
+    if(success){
+      $(this).data('lastValue',newRole);
+    }else{
+      $(this).val(lastRole);
+      alert("It has already been taken.")
+    }
+  });
+};

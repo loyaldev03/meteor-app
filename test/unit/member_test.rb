@@ -16,9 +16,9 @@ class MemberTest < ActiveSupport::TestCase
   test "Should create a member" do
     member = FactoryGirl.build(:member)
     assert !member.save, member.errors.inspect
-    member.club =  @terms_of_membership_with_gateway.club
+    member.club = @terms_of_membership_with_gateway.club
     Delayed::Worker.delay_jobs = true
-    assert_difference('Delayed::Job.count', 1, 'should ceate job for #desnormalize_preferences') do
+    assert_difference('Delayed::Job.count', 2, 'should ceate job for #desnormalize_preferences and mkt tool sync') do
       assert member.save, "member cant be save #{member.errors.inspect}"
     end
     Delayed::Worker.delay_jobs = false
@@ -63,7 +63,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Monthly member should be billed if it is active or provisional" do
-    assert_difference('Operation.count', 4) do
+    assert_difference('Operation.count', 3) do
       member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
@@ -94,11 +94,12 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Should let save two members with the same email in differents clubs" do
+    @second_club = FactoryGirl.create(:simple_club_with_gateway)
+
     member = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @terms_of_membership_with_gateway.club)
     member.club_id = 1
     member.save
-    member_two = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @terms_of_membership_with_gateway.club)
-    member_two.club_id = 14
+    member_two = FactoryGirl.build(:member, email: 'testing@xagax.com', club: @second_club)
     assert member_two.save, "member cant be save #{member_two.errors.inspect}"
   end
 
@@ -241,6 +242,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "show dates according to club timezones" do
+    Time.zone = "UTC"
     saved_member = create_active_member(@terms_of_membership_with_gateway)
     saved_member.member_since_date = "Wed, 02 May 2012 19:10:51 UTC 00:00"
     saved_member.current_membership.join_date = "Wed, 03 May 2012 13:10:51 UTC 00:00"
@@ -262,17 +264,18 @@ class MemberTest < ActiveSupport::TestCase
     original_year = (Time.zone.now - 2.years).year
     member.credit_cards.each { |s| s.update_attribute :expire_year , original_year } # force to be expired!
     member.reload
+
     assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 4) do
+      assert_difference('Operation.count', 4) do  #renewal, recycle, bill, set as active
         assert_difference('Transaction.count') do
           assert_equal member.recycled_times, 0
           answer = member.bill_membership
           member.reload
           assert_equal answer[:code], Settings.error_codes.success
-          assert_equal original_year, member.transactions.last.expire_year
+          assert_equal original_year+3, Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first.expire_year
           assert_equal member.recycled_times, 0
           assert_equal member.credit_cards.count, 1 # only one credit card
-          assert_equal member.credit_cards.first.expire_year, original_year # expire_year should not be changed.
+          assert_equal member.active_credit_card.expire_year, original_year+3 # expire_year should be +3 years. 
         end
       end
     end
@@ -281,7 +284,7 @@ class MemberTest < ActiveSupport::TestCase
   test "Billing for renewal amount" do
     @club = @wordpress_terms_of_membership.club
     member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)    
-    assert_difference('Operation.count', 4) do
+    assert_difference('Operation.count', 3) do
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
      
@@ -341,7 +344,7 @@ class MemberTest < ActiveSupport::TestCase
     bill_date_before = @member.bill_date
 
     Timecop.freeze( @member.next_retry_bill_date ) do
-      assert_difference('Operation.count', 4) do
+      assert_difference('Operation.count', 3) do
         assert_difference('Transaction.count', 1) do
           Member.bill_all_members_up_today
         end
@@ -378,5 +381,19 @@ class MemberTest < ActiveSupport::TestCase
     member = FactoryGirl.create(:member_with_api, :club_id => @club.id)
 
     answer = member.add_club_cash(agent, 12385243.2)
+  end
+
+  test "save the sale should not update membership if it failed" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @saved_member = create_active_member(@terms_of_membership, :provisional_member_with_cc)
+    answer = {:code => 500, message => "Error on sts"}
+    Member.any_instance.stubs(:enroll).returns(answer)
+
+    @saved_member.save_the_sale @terms_of_membership2.id
+    @saved_member.reload
+      
+    assert_equal @saved_member.current_membership.status, @saved_member.status
+    assert_equal @saved_member.current_membership.cancel_date, nil
   end
 end
