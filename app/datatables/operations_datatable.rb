@@ -44,7 +44,7 @@ private
       elsif params[:sSearch] == 'others'
         operations = Operation.where('member_id' => @current_member.id,'operation_type' => Settings.operation_types.others).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'all'
-        operations = Operation.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member)
+        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 1000 and 4999",@current_member.id]).order("#{sort_column} #{sort_direction}")            
       end
     end
     operations = operations.page(page).per_page(per_page)

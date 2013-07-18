@@ -46,6 +46,8 @@ module SacExactTarget
         'Attributes' => attributes
       })
       client.Update(s)
+    rescue Timeout::Error 
+      Auditory.audit(nil, self, "ExactTarget update took too long.", self, Settings.operation_types.et_timeout_update)    
     end
 
     def create!
@@ -54,6 +56,9 @@ module SacExactTarget
       SacExactTarget::ProspectModel.destroy_by_email self.member.email, club_id
       # Add customer under member list
       client.Create(subscriber(subscriber_key, options))
+    rescue Timeout::Error 
+      Auditory.audit(nil, self, "ExactTarget create took too long.", self, Settings.operation_types.et_timeout_create)
+      nil
     end
 
     def update!
@@ -61,10 +66,19 @@ module SacExactTarget
       # We assume that everyone in a Club has a list
       options = { :subscribe_to_list => !@subscriber.attributes.select { |s| s[:name] == 'Club' and s[:value].nil? }.empty? }
       client.Update(subscriber(subscriber_key, options))
+    rescue Timeout::Error 
+      Auditory.audit(nil, self, "ExactTarget update took too long.", self, Settings.operation_types.et_timeout_update)    
+      nil
     end
 
     def update_member(res)
-      data = if res.OverallStatus != "OK"
+      data = if res.nil?
+        { 
+          exact_target_synced_status: 'error',
+          exact_target_last_sync_error: "Time out error.",
+          exact_target_last_sync_error_at: Time.zone.now
+        }        
+      elsif res.OverallStatus != "OK"
         SacExactTarget::report_error("SacExactTarget:Member:save", res)
         { 
           exact_target_synced_status: 'error',
