@@ -219,6 +219,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
      
     assert page.has_content?("Full save done")
     
+    within(".nav-tabs"){ click_on 'Operations' }
     within("#operations_table") do 
         assert page.has_content?("Full save done")
     end
