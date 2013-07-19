@@ -162,7 +162,7 @@ function disposition_types_index_functions(column_count){
 function my_club_index_functions(column_count){
   $('#my_clubs_table').dataTable({
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"fp>rt<"bottom"il>',
+  	"sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -499,22 +499,24 @@ function memberships_member_functions(column_count){
 
 function fulfillment_files_functions() {
   $('#fulfillment_files_table').dataTable({
-    "oLanguage": {"sSearch": "Filtered by:"},
+    "sPaginationType": "bootstrap",
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
-    "sPaginationType": "bootstrap",
-	"sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "bSort": false,
-    "bFilter": false,
     "bLengthChange": false,
     "iDisplayLength": 25,
     "sAjaxSource": $('#fulfillment_files_table').data('source')
   });
-  $('.dataTables_filter').hide();
-
-}
-
+  $('#fulfillment_files_table_filter').find('input').bind('input', function(event){
+    if ( $(this).val() != $(this).val().replace(/[^\d]/,'')){
+      $(this).val( $(this).val().replace(/[^\d]/,'') );
+      event.preventDefault();
+    }
+  });
+  $(".dataTables_paginate").css({ float: "left" });
+}  
 
 function club_cash_transactions_functions(column_count){
   $('#club_cash_transactions_table').dataTable({
@@ -522,7 +524,7 @@ function club_cash_transactions_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"flp>rt<"bottom"i>',
+	  "sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
