@@ -48,7 +48,8 @@ class Communication < ActiveRecord::Base
     self.response = result
     self.save!
     Auditory.audit(nil, self, "Communication '#{template_name}' scheduled", member, Settings.operation_types["#{template_type}_email"])
-  rescue Timeout::Error 
+  rescue Timeout::Error => e 
+    logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => "ExactTarget took to long.", :processed_at => Time.zone.now
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'. ExactTarget send_email took too long.", self, Settings.operation_types.et_timeout_create)    
   rescue Exception => e

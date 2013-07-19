@@ -168,6 +168,7 @@ defaults: &defaults
     et_timeout_create: 5000
     et_timeout_update: 5001
     et_timeout_retrieve: 5002
+    et_timeout_destroy: 5003
   error_codes:
     success: '000'
     wrong_data: '100'

@@ -9,7 +9,7 @@ module SacExactTarget
           options = { :subscribe_to_list => true }
           client.Create(subscriber(subscriber_key, options))
         rescue Timeout::Error 
-          Auditory.audit(nil, self, "ExactTarget crate took too long.", self.member, Settings.operation_types.et_timeout_create) 
+          Auditory.audit(nil, self, "ExactTarget create took too long.", self.member, Settings.operation_types.et_timeout_create) 
         end
       elsif SacExactTarget::ProspectModel.email_belongs_to_prospect?(subscriber.subscriber_key)
         begin
