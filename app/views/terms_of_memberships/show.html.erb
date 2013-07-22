@@ -1,10 +1,10 @@
 <table class="table table-bordered table-condensed" id="table_information">
   <thead>
-  <tr> <th> <%= t('activerecord.term_of_membership') %> </th> </tr>
+    <tr><th colspan="4"><%= t('activerecord.term_of_membership') %></th></tr>
   </thead>
   <tr>
     <td> <%= t('activerecord.attributes.terms_of_membership.name') %>: <%= @tom.name %> </td>
-    <td colspan="4"> <%= t('activerecord.attributes.terms_of_membership.mode') %>: <%= @tom.mode %> </td>
+    <td colspan="3"> <%= t('activerecord.attributes.terms_of_membership.mode') %>: <%= @tom.mode %> </td>
   </tr>
   <tr>
     <td> <%= t('activerecord.attributes.terms_of_membership.installment_amount') %>: 
@@ -14,30 +14,22 @@
     <td> <%= t('activerecord.attributes.terms_of_membership.provisional_days') %>: 
          <%= @tom.provisional_days %> </td>    
     <% if @current_club.allow_club_cash_transaction? %>
-      <td> <%= t('activerecord.attributes.terms_of_membership.club_cash_amount') %>: 
-        <%= @tom.club_cash_amount %> </td>
+      <td> <%= t('activerecord.attributes.terms_of_membership.club_cash_amount') %>: <%= @tom.club_cash_amount %></td>
+    <% else %>
+      <td>&nbsp;</td>
     <% end %>
   </tr>
   <tr>
-    <td colspan="5" class="comment"> <%= t('activerecord.attributes.terms_of_membership.description') %>: 
-                                     <%= @tom.description %> </td>
+    <td colspan="4" class="comment"> <%= t('activerecord.attributes.terms_of_membership.description') %>: <%= @tom.description %> </td>
   </tr>
 </table>
 
 <table class="table table-bordered table-condensed" id="table_payment_gateway_configuration">
   <thead>
-  <tr
-    <% if @payment_gateway_configuration_development.nil? %>
-      class="red"
-    <% end %>
-  >
+  <tr<% if @payment_gateway_configuration_development.nil? %> class="red"<% end %>>
     <th> <%= @payment_gateway_configuration_development.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_development') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_development') %> </th>
   </tr>
-  <tr
-    <% if @payment_gateway_configuration_production.nil? %>
-      class="red"
-    <% end %>
-  >
+  <tr<% if @payment_gateway_configuration_production.nil? %> class="red"<% end %>>
     <th> <%= @payment_gateway_configuration_production.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_production') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_production') %>  </th>
   </tr>
   </thead>
@@ -45,7 +37,7 @@
 
 <table class="table table-bordered table-condensed" id="table_email_template">
   <thead>
-    <tr> <th colspan="3"> <%= t('activerecord.email_template') %> </th> </tr>
+    <tr> <th colspan="4"> <%= t('activerecord.email_template') %> </th> </tr>
     <tr>
   	  <th> <%= t('activerecord.attributes.email_template.name') %> </th>
   	  <th> <%= t('activerecord.attributes.email_template.type') %> </th>
