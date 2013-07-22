@@ -40,7 +40,7 @@ private
   end
 
   def transaction_description(transaction)
-    if @current_agent.has_role? 'representative'
+    if @current_agent.has_role? 'representative' or @current_agent.has_role? 'supervisor'
       begin
         I18n.t('activerecord.attributes.transaction.transaction_types_messages.type_' + transaction.operation_type.to_s) + ' - ' + transaction.response_result
       rescue

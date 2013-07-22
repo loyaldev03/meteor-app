@@ -2,7 +2,6 @@
 class Member < ActiveRecord::Base
   extend Extensions::Member::CountrySpecificValidations
 #  extend Extensions::Member::DateSpecificValidations
-
   belongs_to :club
   belongs_to :member_group_type
   has_many :member_notes

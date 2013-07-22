@@ -31,6 +31,10 @@ private
 
   def fetch_files
     files = @current_club.fulfillment_files.order("status ASC, created_at DESC").where('agent_id' => @current_agent)
+    if params[:sSearch].present?
+      files = files.where("id = :search", search: "#{params[:sSearch].gsub(/\D/,'')}")
+    end
+
     files.page(page).per_page(per_page)
   end
-end    
+end     
