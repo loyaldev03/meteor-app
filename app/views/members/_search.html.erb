@@ -19,7 +19,7 @@
   <tbody>
     <% if @members %>
       <% if @members.count == 0 %>
-        <tr> <td colspan="<%= @columns_of_the_search_results_table %>"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
+        <tr> <td colspan="<%= @current_club.requires_external_id ? 9 : 8 %>"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
       <% else %>
         <% @members.each do |member| %>
         <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
