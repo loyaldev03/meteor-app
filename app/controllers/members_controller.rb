@@ -54,6 +54,11 @@ class MembersController < ApplicationController
     @active_credit_card = @current_member.active_credit_card
     @fulfillments = @current_member.fulfillments.all
     @communications = @current_member.communications.all
+
+    @columns_of_the_search_results_table = 8
+    if @current_club.requires_external_id
+      @columns_of_the_search_results_table += 1 # Because it adds the external id column in the view
+    end
   end
 
   def new
