@@ -15,42 +15,45 @@
       <th style="width: 20px;">Edit</th>
       <th style="width: 80px;">&nbsp;</th>
   	</tr>
+  </thead>
+  <tbody>
     <% if @members %>
       <% if @members.count == 0 %>
-        <tr> <td colspan="8"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
+        <tr> <td colspan="<%= @columns_of_the_search_results_table %>"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
+      <% else %>
+        <% @members.each do |member| %>
+        <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
+          <td class="<%= menber_status_class(member) %>"> 
+          <% if member.blacklisted? %>
+          <%= member.status %>
+          <%= t('activerecord.attributes.member.status_blacklisted') %>
+          <% else %>
+          <%= member.status %>
+          <% end %>
+          </td>
+          <td> <%= member.id %> </td>
+          <% if @current_club.requires_external_id %>
+            <td> <%= member.external_id if !member.external_id.nil? %> </td>
+          <% end %>
+          <td> <%= member.full_name %> </td>
+          <td> <%= member.full_address %> </td>
+          <td> <%= member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : member.member_group_type.name %> </td>
+          <td><a href="<%= show_member_path(:member_prefix => member.id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
+          <td>
+            <% if can? :edit, Member %>
+              <a href="<%= edit_member_path(:member_prefix => member.id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a>
+            <% end %>
+          </td>
+          <td>
+            <% if can? :edit, Member %> 
+              <%= member_action_drop_menu(member) %>
+            <% end %>
+          </td>
+        </tr>
       <% end %> 
-      <% @members.each do |member| %>
-      <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
-        <td class="<%= menber_status_class(member) %>"> 
-        <% if member.blacklisted? %>
-        <%= member.status %>
-        <%= t('activerecord.attributes.member.status_blacklisted') %>
-        <% else %>
-        <%= member.status %>
-        <% end %>
-        </td>
-        <td> <%= member.id %> </td>
-        <% if @current_club.requires_external_id %>
-          <td> <%= member.external_id if !member.external_id.nil? %> </td>
-        <% end %>
-        <td> <%= member.full_name %> </td>
-        <td> <%= member.full_address %> </td>
-        <td> <%= member.member_group_type.nil? ? t('activerecord.attributes.member.not_group_associated') : member.member_group_type.name %> </td>
-        <td><a href="<%= show_member_path(:member_prefix => member.id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
-        <td>
-          <% if can? :edit, Member %>
-            <a href="<%= edit_member_path(:member_prefix => member.id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a>
-          <% end %>
-        </td>
-        <td>
-          <% if can? :edit, Member %> 
-            <%= member_action_drop_menu(member) %>
-          <% end %>
-        </td>
-      </tr>
     <% end %>
   <% end %>
-  </thead>  
+  </tbody>
 </table>
 
 <script type="text/javascript">
