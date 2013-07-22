@@ -52,6 +52,7 @@ class Communication < ActiveRecord::Base
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => "ExactTarget took to long.", :processed_at => Time.zone.now
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'. ExactTarget send_email took too long.", self, Settings.operation_types.et_timeout_trigger_create)    
+    raise e
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
