@@ -10,7 +10,9 @@ module SacExactTarget
     require 'sac_exact_target/models/member_model'
     require 'sac_exact_target/models/prospect_model'
     require 'sac_exact_target/controllers/members_controller_extensions'
-    
+    require 'sac_exact_target/exceptions/prospect_timeout_exception'
+
+
     Club.send :include, SacExactTarget::ClubExtensions
     Member.send :include, SacExactTarget::MemberExtensions
     Prospect.send :include, SacExactTarget::ProspectExtensions

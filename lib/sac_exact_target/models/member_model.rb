@@ -40,9 +40,9 @@ module SacExactTarget
 
     def change_status!(status)
       attributes = [ 
-        ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id), 
-        ExactTargetSDK::Attributes.new(Name: 'Status', Value: status) 
-      ]Attributes
+       ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id), 
+       ExactTargetSDK::Attributes.new(Name: 'Status', Value: status) 
+      ]
       s = ExactTargetSDK::Subscriber.new({
         'SubscriberKey' => subscriber_key, 'Status' => status,
         'EmailAddress' => self.member.email, 'Client' => client_id, 'ObjectID' => true,
@@ -54,7 +54,11 @@ module SacExactTarget
     def create!
       options = { :subscribe_to_list => true }
       # Remove email from prospect list
-      SacExactTarget::ProspectModel.destroy_by_email self.member.email, club_id
+      begin
+        SacExactTarget::ProspectModel.destroy_by_email self.member.email, club_id
+      rescue Timeout::Error => e
+        raise ProspectTimeoutException.new(message: "Prospect delete expired.")
+      end
       # Add customer under member list
       client.Create(subscriber(subscriber_key, options))
     rescue Timeout::Error => e

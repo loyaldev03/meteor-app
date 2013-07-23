@@ -37,8 +37,9 @@ module SacExactTarget
         'EmailAddress' => self.prospect.email, 'ObjectID' => true)
       res = client.Delete(subscriber)
       SacExactTarget::report_error("SacExactTarget:Prospect:destroy", res) if res.OverallStatus != "OK"
-    rescue Timeout::Error 
+    rescue Timeout::Error => e 
       Auditory.audit(nil, self, "ExactTarget destroy took too long.", self.member, Settings.operation_types.et_timeout_destroy) 
+      raise e
     end
 
     def self.find_all_by_email(email, club_id)
