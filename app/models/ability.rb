@@ -56,6 +56,7 @@ class Ability
       can :manage, MemberNote
       can :manage, TermsOfMembership
       can :manage, Transaction
+      cannot :see_nice, Transaction
       can :manage, ClubCashTransaction
       can :api_enroll, Member
       can :api_update, Member
