@@ -41,7 +41,7 @@ private
 
   def transaction_description(transaction)
     # if @current_agent.has_role_with_club? 'representative', @current_club.id or @current_agent.has_role_with_club? 'supervisor', @current_club.id
-    if @current_agent.can? :see_nice, Transaction
+    if @current_agent.can? :see_nice, Transaction, @current_club.id
       begin
         I18n.t('activerecord.attributes.transaction.transaction_types_messages.type_' + transaction.operation_type.to_s) + ' - ' + transaction.response_result
       rescue
