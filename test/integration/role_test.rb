@@ -11,7 +11,7 @@ class RolesTest < ActionController::IntegrationTest
   def setup_agent_no_rol
     init_test_setup
     @agent = FactoryGirl.create(:confirmed_agent)
-    @agent.update_attribute(:roles, [''])
+    @agent.update_attribute(:roles, [])
     sign_in_as(@agent)   
   end
 
@@ -80,9 +80,9 @@ class RolesTest < ActionController::IntegrationTest
    end
 
 
-#   ##############################################################
-#   #ADMIN
-#   ##############################################################
+  ##############################################################
+  #ADMIN
+  ##############################################################
 
   test "select all clubs for admin agent."do
     setup_admin
@@ -322,7 +322,7 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
- # Profile representative
+  # Profile representative
   test "Representative should only see credit card last digits" do
     setup_representative
     setup_member
@@ -347,7 +347,7 @@ class RolesTest < ActionController::IntegrationTest
     assert page.has_selector?("#new_member")
   end
 
-# Profile Representative - "Add a Credit Card" 
+  # Profile Representative - "Add a Credit Card" 
   test "Profile Representative - Add a Credit Card" do
     setup_representative
     setup_member
@@ -470,7 +470,7 @@ test "Agency role - Recover a member" do
     validate_view_member_base(saved_member)
   end
 
-    test "fulfillment_managment role - Fulfillment page" do
+  test "fulfillment_managment role - Fulfillment page" do
     setup_fulfillment_managment
     setup_member
 
@@ -1005,10 +1005,9 @@ test "Agency role - Recover a member" do
       within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:disabled] == nil}
     end
 
-    # test "fulfillment_managment role - Fulfillment File page" do
-    #   setup_fulfillment_managment
-    #   setup_member
-    #   visit fulfillments_index_path( :partner_prefix => @partner.prefix, :club_prefix => @club.name)
-
-    # end
+    test "fulfillment_managment role - Fulfillment File page" do
+      setup_fulfillment_managment
+      setup_member
+      visit fulfillments_index_path( :partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    end
 end

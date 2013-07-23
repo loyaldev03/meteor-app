@@ -555,14 +555,14 @@ class TransactionTest < ActiveSupport::TestCase
       answer = active_member.bill_membership
       active_member.reload
       assert_equal active_member.status, 'active'
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+      trans = Transaction.find(:all, :limit => 1, :conditions => ['member_id = ? and operation_type = ?', active_member.id, Settings.operation_types.membership_billing]).first
       refunded_amount = amount-0.34
       answer = Transaction.refund(refunded_amount, trans)
       assert_equal answer[:code], Settings.error_codes.success, answer[:message]
       trans.reload
       assert_equal trans.refunded_amount, refunded_amount
       assert_not_equal trans.amount_available_to_refund, 0.0
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+      trans = Transaction.find(:all, :limit => 1, :conditions => ['member_id = ? and operation_type = ?', active_member.id, Settings.operation_types.credit]).first
       assert_equal trans.operation_type, Settings.operation_types.credit
       assert_equal trans.transaction_type, 'credit'
     end
