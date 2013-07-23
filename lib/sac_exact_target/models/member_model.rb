@@ -10,8 +10,9 @@ module SacExactTarget
       res = ExactTargetSDK::Subscriber.find [ ["SubscriberKey", ExactTargetSDK::SimpleOperator::EQUALS, subscriber_key ] ]
       @subscriber = res.Results.first
       @subscriber.nil?
-    rescue Timeout::Error 
+    rescue Timeout::Error  => e
       Auditory.audit(nil, self, "ExactTarget subscriber find took too long.", self, Settings.operation_types.et_timeout_retrieve)
+      raise e
     end
 
     def unsubscribe!
@@ -41,15 +42,13 @@ module SacExactTarget
       attributes = [ 
         ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id), 
         ExactTargetSDK::Attributes.new(Name: 'Status', Value: status) 
-      ]
+      ]Attributes
       s = ExactTargetSDK::Subscriber.new({
         'SubscriberKey' => subscriber_key, 'Status' => status,
         'EmailAddress' => self.member.email, 'Client' => client_id, 'ObjectID' => true,
         'Attributes' => attributes
       })
       client.Update(s)
-    rescue Timeout::Error 
-      Auditory.audit(nil, self, "ExactTarget update took too long.", self, Settings.operation_types.et_timeout_update)    
     end
 
     def create!
@@ -58,9 +57,9 @@ module SacExactTarget
       SacExactTarget::ProspectModel.destroy_by_email self.member.email, club_id
       # Add customer under member list
       client.Create(subscriber(subscriber_key, options))
-    rescue Timeout::Error 
+    rescue Timeout::Error => e
       Auditory.audit(nil, self, "ExactTarget create took too long.", self, Settings.operation_types.et_timeout_create)
-      nil
+      raise e
     end
 
     def update!
@@ -68,9 +67,9 @@ module SacExactTarget
       # We assume that everyone in a Club has a list
       options = { :subscribe_to_list => !@subscriber.attributes.select { |s| s[:name] == 'Club' and s[:value].nil? }.empty? }
       client.Update(subscriber(subscriber_key, options))
-    rescue Timeout::Error 
+    rescue Timeout::Error => e
       Auditory.audit(nil, self, "ExactTarget update took too long.", self, Settings.operation_types.et_timeout_update)    
-      nil
+      raise e 
     end
 
     def update_member(res)
