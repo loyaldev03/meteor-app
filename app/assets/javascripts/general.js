@@ -203,6 +203,21 @@ function product_index_functions(column_count){
   });       
 }
 
+function terms_of_memberships_table_index_functions(column_count) {
+  $('#terms_of_memberships_table').dataTable({
+    "sPaginationType": "bootstrap",
+    "sDom": '<"top"fp>rt<"bottom"il>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aaSorting": [[ 0, "asc" ]],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+    "sAjaxSource": $('#terms_of_memberships_table').data('source'),
+  });
+}
+
 function new_partner_functions(){
   $('.help').popover({offset: 10});
 }
