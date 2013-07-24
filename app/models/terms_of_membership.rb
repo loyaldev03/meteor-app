@@ -1,6 +1,6 @@
 class TermsOfMembership < ActiveRecord::Base
   attr_accessible :mode, :needs_enrollment_approval, :provisional_days, 
-    :installment_amount, :description, :installment_type, :club, :name, :club_cash_amount
+    :installment_amount, :description, :installment_type, :club, :name, :club_cash_amount, :agent_id
 
   belongs_to :club
   has_many :transactions
@@ -8,6 +8,7 @@ class TermsOfMembership < ActiveRecord::Base
   has_many :prospects
   has_many :email_templates
   belongs_to :downgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'downgrade_tom_id'
+  belongs_to :agent
 
   acts_as_paranoid
 
@@ -53,6 +54,10 @@ class TermsOfMembership < ActiveRecord::Base
   
   def downgradable?
     self.downgrade_tom_id.to_i > 0
+  end
+
+  def self.datatable_columns
+    ['id', 'name', 'api_role', 'created_at', 'agent_id']
   end
 
   private
