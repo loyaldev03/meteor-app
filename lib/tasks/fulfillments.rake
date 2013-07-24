@@ -1,7 +1,12 @@
 namespace :fulfillments do  
   desc "Create fulfillment report for Brian Miller."
   task :generate_fulfillment_naamma_report => :environment do
-    begin      
+    begin
+      Rails.logger = Logger.new("#{Rails.root}/log/fulfillment_naamma_report.log")
+      Rails.logger.level = Logger::DEBUG
+      tall = Time.zone.now
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
+
       fulfillment_file = FulfillmentFile.new 
       fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
 
@@ -20,16 +25,18 @@ namespace :fulfillments do
         ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
           AND ? and fulfillments.status = 'not_processed' 
           AND fulfillments.product_sku like 'KIT-CARD'", fulfillment_file.club_id, 
-        Time.zone.now-7.days, Time.zone.now ])
-
+        Time.zone.now-7.days, Time.zone.now ])      
       fulfillment_file.save!
-
       package = Axlsx::Package.new                  
+
+      Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
       package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
         sheet.add_row [ 'First Name', 'Last Name', 'Member Number', 'Membership Type (fan/subscriber)', 
                        'Address', 'City', 'State', 'Zip','Phone number', 'Join date', 'Membership expiration date', 'email' ]
         unless fulfillments.empty?
           fulfillments.each do |fulfillment|
+            tz = Time.zone.now
+            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
             member = fulfillment.member
             membership = member.current_membership
             row = [ member.first_name, member.last_name, member.id, 
@@ -41,6 +48,7 @@ namespace :fulfillments do
                   ]
             sheet.add_row row 
             fulfillment_file.fulfillments << fulfillment
+            Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
           end
         end
       end
@@ -55,9 +63,12 @@ namespace :fulfillments do
 
       fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
       fulfillment_file.processed
+    
     rescue Exception => e
       Auditory.report_issue("Fulfillments::NaammaReport", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run task"
     end
   end
 
@@ -67,6 +78,11 @@ namespace :fulfillments do
     begin 
       require 'csv'
       require 'net/ftp'
+
+      Rails.logger = Logger.new("#{Rails.root}/log/sloop_naamma_report.log")
+      Rails.logger.level = Logger::DEBUG
+      tall = Time.zone.now
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
 
       fulfillment_file = FulfillmentFile.new 
       fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
@@ -84,12 +100,15 @@ namespace :fulfillments do
           AND ? and fulfillments.status = 'not_processed' 
           AND fulfillments.product_sku != 'KIT-CARD'", fulfillment_file.club_id, 
         Time.zone.now-7.days, Time.zone.now ])
-
       temp_file = "#{I18n.l(Time.zone.now, :format => :only_date)}_sloop_naamma.csv"
+
+      Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
       CSV.open( temp_file, "w" ) do |csv|
         csv << [ 'First Name', 'Last Name', 'Product Choice', 'address', 'city', 'state', 'zip', 'join date', 'phone number' ]
         unless fulfillments.empty?
           fulfillments.each do |fulfillment|
+            tz = Time.zone.now
+            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"       
             member = fulfillment.member
             membership = member.current_membership
             csv << [member.first_name, member.last_name, fulfillment.product_sku, member.address, 
@@ -97,6 +116,7 @@ namespace :fulfillments do
                     I18n.l(member.join_date, :format => :only_date_short), 
                     member.full_phone_number]
             fulfillment_file.fulfillments << fulfillment
+            Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
           end
         end
       end
@@ -126,6 +146,8 @@ namespace :fulfillments do
     rescue Exception => e
       Auditory.report_issue("Fulfillments::NaammaSloopReport", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run task"    
     end
   end
 
@@ -134,6 +156,11 @@ namespace :fulfillments do
   task :generate_nfla_report => :environment do
     begin
       require 'csv'
+      Rails.logger = Logger.new("#{Rails.root}/log/nfla_report.log")
+      Rails.logger.level = Logger::DEBUG
+      tall = Time.zone.now
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
+
       fulfillment_file = FulfillmentFile.new 
       fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
 
@@ -150,16 +177,18 @@ namespace :fulfillments do
           AND ? and fulfillments.status = 'not_processed' 
           AND fulfillments.product_sku != 'KIT-CARD'", fulfillment_file.club_id, 
         Time.zone.now-7.days, Time.zone.now ])
-
       fulfillment_file.product = "SLOOPS"
       fulfillment_file.save!
-
       package = Axlsx::Package.new                  
+
+      Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
       package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
         sheet.add_row [ 'Code','First Name', 'Last Name', 'Member Valid Thru', 'Member Since', 
                        'Product Name', 'Product Sku' ]
         unless fulfillments.empty?
           fulfillments.each do |fulfillment|
+            tz = Time.zone.now
+            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"  
             member = fulfillment.member
             row = [ member.id.to_s, member.first_name, member.last_name,
                     I18n.l(member.next_retry_bill_date, :format => :only_date_short),
@@ -169,6 +198,7 @@ namespace :fulfillments do
                   ]
             sheet.add_row row 
             fulfillment_file.fulfillments << fulfillment
+            Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
           end
         end
       end
@@ -186,6 +216,8 @@ namespace :fulfillments do
     rescue Exception => e
       Auditory.report_issue("Fulfillments::NflaReport", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run task"        
     end  
   end
 end
