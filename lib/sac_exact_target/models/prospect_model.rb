@@ -52,7 +52,7 @@ module SacExactTarget
         result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
       end.flatten.compact
     rescue Timeout::Error => e
-      Auditory.audit(nil, self, "ExactTarget destroy took too long.", self.member, Settings.operation_types.et_timeout_destroy) 
+      Auditory.audit(nil, self, "ExactTarget find took too long.", self.member, Settings.operation_types.et_timeout_find) 
       raise e
     end
 
