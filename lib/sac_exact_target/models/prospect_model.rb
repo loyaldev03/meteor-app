@@ -1,5 +1,6 @@
 module SacExactTarget
   class ProspectModel < Struct.new(:prospect)
+		
     def save!
       return unless self.prospect.email
       # Find by email . I didnt have luck looking for a subscriber by email and List.
@@ -8,15 +9,17 @@ module SacExactTarget
         begin 
           options = { :subscribe_to_list => true }
           client.Create(subscriber(subscriber_key, options))
-        rescue Timeout::Error 
+        rescue Timeout::Error => e
           Auditory.audit(nil, self, "ExactTarget create took too long.", self.member, Settings.operation_types.et_timeout_create) 
+          raise e
         end
       elsif SacExactTarget::ProspectModel.email_belongs_to_prospect?(subscriber.subscriber_key)
         begin
           options = { :subscribe_to_list => false }
           client.Update(subscriber(subscriber.subscriber_key, options))
-        rescue Timeout::Error 
+        rescue Timeout::Error => e
           Auditory.audit(nil, self, "ExactTarget update took too long.", self.member, Settings.operation_types.et_timeout_update) 
+          raise e
         end
       end
       update_prospect(res) unless res.nil?
