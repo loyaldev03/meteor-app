@@ -45,7 +45,6 @@ class Member < ActiveRecord::Base
   after_update :asyn_desnormalize_preferences
   after_save :after_marketing_tool_sync
 
-
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
     api_member.destroy! unless api_member.nil? || api_id.nil?
