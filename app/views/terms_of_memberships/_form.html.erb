@@ -1,0 +1,35 @@
+
+<div class="control-group">
+  <%= f.label :name, :class => 'control-label' %>
+  <div class="controls">
+    <%= f.text_field :name, :class => 'text_field', :value => '' %>
+    <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.product.package_help')} %> 
+  </div>
+</div>
+
+<div class="control-group">
+  <%= f.label :api_role, :class => 'control-label' %>
+  <div class="controls">
+    <%= f.text_field :api_role, :class => 'text_field' %>
+    <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.product.package_help')} %> 
+  </div>
+</div>
+
+<div class="control-group">
+  <%= f.label :description, :class => 'control-label' %>
+  <div class="controls">
+    <%= f.text_area :description, :class => 'text_area' %>
+    <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.product.package_help')} %> 
+  </div>
+</div>
+
+
+
+<div class="form-actions">
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")), terms_of_memberships_path, :class => 'btn' %>
+</div>
+
+<script>
+  $(document).ready(new_product_functions())
+</script>
