@@ -6,6 +6,7 @@ class ClubTest < ActionController::IntegrationTest
     init_test_setup
     @partner = FactoryGirl.create(:partner)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    FactoryGirl.create(:batch_agent)
     sign_in_as(@admin_agent)
   end
 

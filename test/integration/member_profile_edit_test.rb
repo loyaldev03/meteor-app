@@ -9,6 +9,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
+    FactoryGirl.create(:batch_agent)
   end
 
   def setup_member(create_new_member = true, create_member_by_sloop = false)
@@ -20,8 +21,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     Time.zone = @club.time_zone
     @communication_type = FactoryGirl.create(:communication_type)
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
-    FactoryGirl.create(:batch_agent)
-    
+
     if create_new_member
       @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
     end

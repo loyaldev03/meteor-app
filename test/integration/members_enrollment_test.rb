@@ -12,6 +12,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
+    FactoryGirl.create(:batch_agent)
   end
 
   def setup_member(create_new_member = true)
@@ -24,7 +25,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     # @communication_type = FactoryGirl.create(:communication_type)
     # @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
-    FactoryGirl.create(:batch_agent)
     
     if create_new_member
       @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })

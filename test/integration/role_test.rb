@@ -2,6 +2,10 @@ require 'test_helper'
  
 class RolesTest < ActionController::IntegrationTest
  
+  setup do
+    FactoryGirl.create(:batch_agent)
+  end
+  
   def setup_admin
     init_test_setup
     @agent = FactoryGirl.create(:confirmed_admin_agent)
@@ -67,7 +71,6 @@ class RolesTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @communication_type = FactoryGirl.create(:communication_type)
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
-    FactoryGirl.create(:batch_agent)
     
     if create_new_member
       unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)

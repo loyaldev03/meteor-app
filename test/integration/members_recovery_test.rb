@@ -8,6 +8,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
+    FactoryGirl.create(:batch_agent)
   end
 
   def setup_member(cancel = true, create_member = true)
@@ -17,9 +18,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @new_terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => "another_tom")
-    @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
-    FactoryGirl.create(:batch_agent)
-    
+    @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)    
 
     if create_member
       unsaved_member = FactoryGirl.build(:member_with_api)
@@ -27,7 +26,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       
       @saved_member = Member.find_by_email(unsaved_member.email)
 
-      if cancel    
+      if cancel
         cancel_date = Time.zone.now + 1.days
         message = "Member cancellation scheduled to #{cancel_date} - Reason: #{@member_cancel_reason.name}"
         @saved_member.cancel! cancel_date, message, @admin_agent
