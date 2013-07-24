@@ -31,6 +31,9 @@ module SacExactTarget
         'Client' => client_id,
         'Subscribers' => [s] )
       client.Create(trigger_to_send)
+    rescue Timeout::Error => e
+      Auditory.audit(nil, self, "ExactTarget trigger creation took too long.", self, Settings.operation_types.et_timeout_trigger_create)
+      raise e
     end
 
   private
@@ -49,6 +52,9 @@ module SacExactTarget
         'Attributes' => attributes
       })
       client.Update(s)
+    rescue Timeout::Error => e
+      Auditory.audit(nil, self, "ExactTarget update took too long.", self, Settings.operation_types.et_timeout_update)
+      raise e
     end
 
     def create!

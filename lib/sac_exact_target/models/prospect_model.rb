@@ -48,9 +48,12 @@ module SacExactTarget
     def self.find_all_by_email(email, club_id)
       # Find by email . I didnt have luck looking for a subscriber by email and List.
       res = ExactTargetSDK::Subscriber.find [ ["EmailAddress", ExactTargetSDK::SimpleOperator::EQUALS, email] ]
-      res.Results.collect do |result|
+      res.Results.collect do |result|end.flatten.compact
         result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
       end.flatten.compact
+    rescue Timeout::Error => e
+      Auditory.audit(nil, self, "ExactTarget destroy took too long.", self.member, Settings.operation_types.et_timeout_destroy) 
+      raise e
     end
 
     def self.find_by_email(email, club_id)
