@@ -93,6 +93,7 @@ class ActiveSupport::TestCase
     active_member.save
     ei = FactoryGirl.create(enrollment_type, :member_id => active_member.id) unless enrollment_type.nil?
     membership.enrollment_info = ei
+    
     active_member.reload
     active_member
   end  
@@ -261,7 +262,7 @@ module ActionController
       fill_in 'member[first_name]', :with => unsaved_member.first_name
       if unsaved_member.gender == "Male" or unsaved_member.gender == "M"
         select("Male", :from => 'member[gender]')
-      else
+      elsif unsaved_member.gender == "Female" or unsaved_member.gender == "F"
         select("Female", :from => 'member[gender]')
       end
       fill_in 'member[address]', :with => unsaved_member.address
