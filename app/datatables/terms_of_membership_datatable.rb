@@ -16,10 +16,10 @@ private
         tom.name,
         tom.api_role,
         I18n.l(tom.created_at, :format => :dashed),
-        tom.agent.username,
+        get_agent_name(tom),
         (link_to(I18n.t(:show), @url_helpers.terms_of_membership_path(@current_partner.prefix, @current_club.name, tom.id), :class => 'btn btn-mini', :id => 'show') if @current_agent.can? :read, TermsOfMembership, @current_club.id)+
         (link_to(I18n.t(:edit), @url_helpers.edit_terms_of_membership_path(@current_partner.prefix, @current_club.name, tom.id), :class => 'btn btn-mini', :id => 'edit') if @current_agent.can? :edit, TermsOfMembership, @current_club.id)+
-        (link_to(I18n.t(:destroy), @url_helpers.terms_of_memberships_path(@current_partner.prefix, @current_club.name, tom.id), :method => :delete, :confirm => I18n.t("are_you_sure"), :id => 'destroy', :class => 'btn btn-mini btn-danger')if @current_agent.can? :delete, TermsOfMembership, @current_club.id)
+        (link_to(I18n.t(:destroy), @url_helpers.terms_of_membership_path(@current_partner.prefix, @current_club.name, tom.id), :method => :delete, :confirm => I18n.t("are_you_sure"), :id => 'destroy', :class => 'btn btn-mini btn-danger') if @current_agent.can? :delete, TermsOfMembership, @current_club.id)
       ]
     end
   end
@@ -40,4 +40,14 @@ private
   def sort_column
     TermsOfMembership.datatable_columns[params[:iSortCol_0].to_i]
   end
+
+  def get_agent_name(current_tom)
+    begin
+      username = tom.agent.username
+    rescue Exception => e
+      username = '--'
+    end
+    username
+  end
+
 end    
