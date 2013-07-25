@@ -25,6 +25,8 @@ class TermsOfMembership < ActiveRecord::Base
   validates :club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validate :validate_payment_gateway_configuration
 
+  before_destroy :verify_that_there_are_not_memberships_and_prospects
+
   ###########################################
   # Installment types:
   def monthly?
@@ -79,5 +81,9 @@ class TermsOfMembership < ActiveRecord::Base
           end
         end
       end
+    end
+
+    def verify_that_there_are_not_memberships_and_prospects
+      self.memberships.count == 0 && self.prospects.count == 0
     end
 end
