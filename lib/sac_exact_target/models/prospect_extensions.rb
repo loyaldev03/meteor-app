@@ -45,11 +45,12 @@ module SacExactTarget
           exact_target_prospect.save!
         end
         logger.info "SacExactTarget::sync took #{time_elapsed}ms"
+      rescue Timeout::error => e
+        raise e
       rescue Exception => e
         Auditory.report_issue("Prospect:sync", e, { :prospect => self.inspect })
         raise e
       end
-
     end
   end
 end
