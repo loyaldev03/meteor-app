@@ -1,6 +1,6 @@
 module SacExactTarget
   class ProspectModel < Struct.new(:prospect)
-		
+    
     def save!
       return unless self.prospect.email
       # Find by email . I didnt have luck looking for a subscriber by email and List.
@@ -25,8 +25,8 @@ module SacExactTarget
       update_prospect(res) unless res.nil?
     end
 
-    def self.destroy_by_email(email, club_id)
-      subscribers = find_all_by_email(email, club_id)
+    def self.destroy_by_email!(email, club_id)
+      subscribers = find_all_by_email!(email, club_id)
       unless subscribers.empty?
         subscribers.each do |subscriber|
           prospect = email_belongs_to_prospect?(subscriber.subscriber_key)
@@ -45,10 +45,10 @@ module SacExactTarget
       raise e
     end
 
-    def self.find_all_by_email(email, club_id)
+    def self.find_all_by_email!(email, club_id)
       # Find by email . I didnt have luck looking for a subscriber by email and List.
       res = ExactTargetSDK::Subscriber.find [ ["EmailAddress", ExactTargetSDK::SimpleOperator::EQUALS, email] ]
-      res.Results.collect do |result|end.flatten.compact
+      res.Results.collect do |result|
         result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
       end.flatten.compact
     rescue Timeout::Error => e
@@ -57,7 +57,7 @@ module SacExactTarget
     end
 
     def self.find_by_email(email, club_id)
-      find_all_by_email(email, club_id).first
+      find_all_by_email!(email, club_id).first
     end
  
     # easy way to know if a subscriber key is a prospect or member. This method can be improved, filtering by List id.

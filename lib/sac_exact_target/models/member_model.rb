@@ -65,7 +65,7 @@ module SacExactTarget
       begin
         client.Create(subscriber(subscriber_key, options))
       rescue Timeout::Error => e
-        Auditory.audit(nil, self, "ExactTarget create took too long.", self, Settings.ope ration_types.et_timeout_create)
+        Auditory.audit(nil, self, "ExactTarget create took too long.", self, Settings.operation_types.et_timeout_create)
         raise e
       end
     end
