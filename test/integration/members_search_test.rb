@@ -339,7 +339,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     within("#communication") { assert page.has_content?(communication_table_empty_text) }
   end
 
-  Search member with duplicated letters at Last Name
+  #Search member with duplicated letters at Last Name
   test "search by last name" do
     setup_search false
     2.times{ create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) }
