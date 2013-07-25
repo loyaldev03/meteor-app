@@ -25,8 +25,14 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def destroy
+    @tom = TermsOfMembership.find(params[:id])
+    if @tom.destroy
+      redirect_to terms_of_memberships_url, notice: "#{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
+    else
+      flash[:error] = "#{@tom.name} (ID: #{@tom.id}) was not destroyed."
+      redirect_to terms_of_memberships_url
+    end
   end
-
 
   def show
     @tom = TermsOfMembership.find(params[:id])
