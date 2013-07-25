@@ -8,6 +8,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
+    FactoryGirl.create(:batch_agent)
   end
 
   def setup_member(approval = false, active = false)
@@ -23,7 +24,6 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     @lifetime_terms_of_membership = FactoryGirl.create(:life_time_terms_of_membership, :club_id => @club.id)
     
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
-    FactoryGirl.create(:batch_agent)
     
     unsaved_member = FactoryGirl.build(:member_with_api)
     credit_card = FactoryGirl.build(:credit_card_master_card)

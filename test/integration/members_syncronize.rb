@@ -8,6 +8,7 @@ class MembersSyncronize < ActionController::IntegrationTest
 
   setup do
     init_test_setup
+    FactoryGirl.create(:batch_agent)
   end
 
  def setup_environment 
@@ -29,7 +30,6 @@ class MembersSyncronize < ActionController::IntegrationTest
     @partner = @club.partner
     @partner.update_attribute(:prefix,"partner_uno")
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
-    FactoryGirl.create(:batch_agent)
     sign_in_as(@admin_agent)
    end
 

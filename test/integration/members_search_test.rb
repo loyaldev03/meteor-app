@@ -13,6 +13,7 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
+    FactoryGirl.create(:batch_agent)
   end
 
   def setup_member(create_new_member = true)
@@ -24,7 +25,6 @@ class MembersSearchTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @communication_type = FactoryGirl.create(:communication_type)
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
-    FactoryGirl.create(:batch_agent)
     
     if create_new_member
       @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, :enrollment_info, {}, { :created_by => @admin_agent })
@@ -38,49 +38,15 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_member false
     if create_new_members
       20.times{ create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) }
-      20.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
-      20.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
+      30.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
+      30.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
     end
     @search_member = Member.first
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   end
 
- #  ############################################################
- #  # UTILS
- #  ############################################################
-
-  # borrar a futuro
-  # def fill_in_member(unsaved_member, credit_card)
-  #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-  #   click_link_or_button 'New Member'
-  #   within("#table_demographic_information")do
-  #       fill_in 'member[first_name]', :with => unsaved_member.first_name
-  #       select(unsaved_member.gender, :from => 'member[gender]')
-  #       fill_in 'member[address]', :with => unsaved_member.address
-  #       select_country_and_state(unsaved_member.country)
-  #       fill_in 'member[city]', :with => unsaved_member.city
-  #       fill_in 'member[last_name]', :with => unsaved_member.last_name
-  #       fill_in 'member[zip]', :with => unsaved_member.zip
-  #   end
-  #   within("#table_contact_information")do
-  #       fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-  #       fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-  #       fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-  #       select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]')
-  #       fill_in 'member[email]', :with => unsaved_member.email
-  #   end
-  #   within("#table_credit_card")do
-  #       fill_in 'member[credit_card][number]', :with => credit_card.number
-  #       select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
-  #       select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
-  #   end
-  #   alert_ok_js
-  #   click_link_or_button 'Create Member'    
-  # end
-
-
   ###########################################################
-  # TESTS
+  ## TESTS
   ###########################################################
 
   test "Do not display token field (club with auth.net) - Admin" do
@@ -95,13 +61,12 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_active_credit_card") do
       assert page.has_no_content?("#{saved_credit_card.token}")
-     end
+    end
     within(".nav-tabs"){ click_on("Credit Cards") }
     within("#credit_cards") do
      assert page.has_no_content?("#{saved_credit_card.token}")
     end
   end
-
 
   test "Do not display token field (club with auth.net) - Supervisor" do
     setup_member(false)
@@ -308,35 +273,35 @@ class MembersSearchTest < ActionController::IntegrationTest
         assert page.has_content?(Member.find_by_id(24).full_name)
     end
 
-      assert page.has_selector?(".pagination")
-      assert page.has_content?(Member.first.full_name)
-    within("#members")do
-        click_on("2")
-        if page.has_content?(Member.find_by_id(26).full_name)
-          assert true
-        else
-          assert false, "The last member was not found"
-        end
-    end
-
-      assert page.has_selector?(".pagination")
-    within("#members")do
-        click_on("3")
-        if page.has_content?(Member.find_by_id(51).full_name)
-          assert true
-        else
+  assert page.has_selector?(".pagination")
+  assert page.has_content?(Member.first.full_name)
+	within("#members")do
+		click_on("2")
+		if page.has_content?(Member.find_by_id(26).full_name)
+		  assert true
+		else
           assert false, "The last member was not found"
         end
     end
 
     assert page.has_selector?(".pagination")
     within("#members")do
-        click_on("4")
-        if page.has_content?(Member.find_by_id(76).full_name)
-          assert true
-        else
-          assert false, "The last member was not found"
-        end
+      click_on("3")
+      if page.has_content?(Member.find_by_id(51).full_name)
+        assert true
+      else
+        assert false, "The last member was not found"
+	  end
+    end
+
+    assert page.has_selector?(".pagination")
+    within("#members")do
+      click_on("4")
+      if page.has_content?(Member.find_by_id(79).full_name)
+        assert true
+      else
+        assert false, "The last member was not found"
+      end
     end
   end
 
@@ -346,7 +311,6 @@ class MembersSearchTest < ActionController::IntegrationTest
     assert page.evaluate_script("window.jQuery('.ui-datepicker-prev').is('.ui-state-disabled')")
   end
 
-  
   test "display member" do
     setup_search
     search_member("member[id]", "#{@search_member.id}", @search_member)
@@ -355,20 +319,23 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
     page.execute_script("window.jQuery('.odd:first a:first').find('.icon-zoom-in').click()")
 
-    validate_view_member_base(@search_member)
+    validate_view_member_base(@search_member, @search_member.status)
 
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table") { assert page.has_content?(operations_table_empty_text) }
 
     active_credit_card = @search_member.active_credit_card
+    within(".nav-tabs"){ click_on("Credit Cards") }
     within("#credit_cards") { 
       assert page.has_content?("#{active_credit_card.number}") 
       assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
     }
 
+    within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
-
+    within(".nav-tabs"){ click_on("Fulfillments") }
     within("#fulfillments") { assert page.has_content?(fulfillments_table_empty_text) }
-
+    within(".nav-tabs"){ click_on("Communications") }
     within("#communication") { assert page.has_content?(communication_table_empty_text) }
   end
 
@@ -624,15 +591,19 @@ class MembersSearchTest < ActionController::IntegrationTest
   end
 
   test "search by external_id" do
-    setup_member(false)
-    @terms_of_membership_with_gateway_and_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id)
+    setup_member(false)    
     @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
-    @member_with_external_id = create_active_member(@terms_of_membership_with_gateway_and_external_id, :active_member_with_external_id, 
-      nil, {}, { :created_by => @admin_agent })
-
+    @terms_of_membership_with_gateway_and_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id, :club_id => @club_external_id.id)
+    
+    unsaved_member = FactoryGirl.build(:member_with_api)
+    credit_card = FactoryGirl.build(:credit_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_and_external_id, false)
+    @member_with_external_id = Member.find_by_email unsaved_member.email     
+    
     visit members_path(:partner_prefix => @member_with_external_id.club.partner.prefix, :club_prefix => @member_with_external_id.club.name)
     assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
-    within("#payment_details")do
+    within("#personal_details")do
       fill_in "member[external_id]", :with => @member_with_external_id.external_id
     end
     click_link_or_button 'Search'
@@ -671,7 +642,6 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
   end
 
-
   test "search member that does not exist" do
     setup_member
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -703,7 +673,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
 
     member_to_seach = Member.first
-    within("#payment_details")do
+    within("#personal_details")do
       check('member[needs_approval]')
     end
     click_link_or_button 'Search'
@@ -718,21 +688,24 @@ class MembersSearchTest < ActionController::IntegrationTest
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     Time.zone = @club.time_zone 
-
-    @saved_member = create_active_member(@terms_of_membership_with_gateway_needs_approval, :applied_member, :enrollment_info, {}, { :created_by => @admin_agent })
-
+        
+    unsaved_member = FactoryGirl.build(:member_with_api)
+    credit_card = FactoryGirl.build(:credit_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
+    @saved_member = Member.find_by_email unsaved_member.email
+    
     sign_in_as(@admin_agent)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     confirm_ok_js
     click_link_or_button 'Approve'
-
     assert find_field('input_first_name').value == @saved_member.first_name
-
-    @saved_member.reload
+ 
     within("#table_membership_information") do  
       within("#td_mi_status") { assert page.has_content?('provisional') }
     end
+    
   end
 
   test "should reject applied member" do
@@ -741,12 +714,16 @@ class MembersSearchTest < ActionController::IntegrationTest
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     Time.zone = @club.time_zone 
-   
-    @saved_member = create_active_member(@terms_of_membership_with_gateway_needs_approval, :applied_member, :enrollment_info, {}, { :created_by => @admin_agent })
+    
+    unsaved_member = FactoryGirl.build(:member_with_api)
+    credit_card = FactoryGirl.build(:credit_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
+    @saved_member = Member.find_by_email unsaved_member.email
 
     sign_in_as(@admin_agent)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-
+	
     confirm_ok_js
     click_link_or_button 'Reject'
 
@@ -766,10 +743,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member,credit_card)
     @saved_member = Member.find_by_email(unsaved_member.email)
-      assert find_field('input_first_name').value == @saved_member.first_name
-      assert find_field('input_last_name').value == @saved_member.last_name
-      assert find_field('input_gender').value == I18n.t('activerecord.attributes.member.no_gender')
-      assert find_field('input_member_group_type').value == (@saved_member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : @saved_member.member_group_type.name)
+
+		assert find_field('input_gender').value == I18n.t('activerecord.attributes.member.no_gender')
   end
 
   test "create member without type of phone number" do
@@ -784,9 +759,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member.reload
     assert_equal(@saved_member.type_of_phone_number, '')
   end
- 
-  #TODO: Improve test... we should validate that the 'Cancel' button is being disabled.
-  test "canceled date will not be changed when it is set." do
+
+  test "canceled date will be abble to be cancelled once set." do
     setup_member
     cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -800,14 +774,21 @@ class MembersSearchTest < ActionController::IntegrationTest
     select(cancel_reason.name, :from => 'reason')
     confirm_ok_js
     click_link_or_button 'Cancel member'
-
+    
     @saved_member.reload
     assert find_field('input_first_name').value == @saved_member.first_name
     assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") 
-    # wait_until{ find(:xpath, "//a[@id='sync_cancel' and @disable='disable']") }
 
-    click_link_or_button 'Cancel' 
-    assert find_field('input_first_name').value == @saved_member.first_name
+    click_link_or_button 'Cancel'
+    page.execute_script("window.jQuery('#cancel_date').next().click()")
+    within("#ui-datepicker-div") do
+      click_on("#{Time.zone.now.day+2}")
+    end
+    select(cancel_reason.name, :from => 'reason')
+    confirm_ok_js
+    click_link_or_button 'Cancel member'
+		@saved_member.reload
+    assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") 
   end
 
   # See a member is blacklisted in the search results
@@ -818,11 +799,10 @@ class MembersSearchTest < ActionController::IntegrationTest
     @saved_member.update_attribute(:blacklisted,true)
 
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-
     click_link_or_button 'Search'
 
     within("#members")do
-      assert page.has_content?("Lapsed - Blisted")
+      assert page.has_content?("- Blisted")
     end
   end
 end

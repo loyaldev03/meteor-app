@@ -8,6 +8,7 @@ class MembersBlacklistTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
+    FactoryGirl.create(:batch_agent)
   end
 
   def setup_member(create_new_member = true)
@@ -17,7 +18,6 @@ class MembersBlacklistTest < ActionController::IntegrationTest
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @member_blacklist_reason =  FactoryGirl.create(:member_blacklist_reason)
-    FactoryGirl.create(:batch_agent)
 
     if create_new_member
       @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })

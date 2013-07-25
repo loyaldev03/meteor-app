@@ -5,6 +5,7 @@ class PartnersTest < ActionController::IntegrationTest
   setup do
     init_test_setup
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    FactoryGirl.create(:batch_agent)
     sign_in_as(@admin_agent)
   end
 

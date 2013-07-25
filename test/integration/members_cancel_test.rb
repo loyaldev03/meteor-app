@@ -8,6 +8,7 @@ class MembersCancelTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
+    FactoryGirl.create(:batch_agent)
   end
 
   def setup_member(create_new_member = true)
@@ -18,7 +19,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
-    FactoryGirl.create(:batch_agent)
+ 
     @hd_decline = FactoryGirl.create(:hard_decline_strategy_for_billing)
     @sd_decline = FactoryGirl.create(:soft_decline_strategy)
     if create_new_member

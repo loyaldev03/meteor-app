@@ -8,6 +8,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
+    FactoryGirl.create(:batch_agent)
   end
 
   def setup_member(create_new_member = true)
@@ -17,8 +18,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     
     @partner = @club.partner
     Time.zone = @club.time_zone
-    
-    FactoryGirl.create(:batch_agent)
 
     if create_new_member
       @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })

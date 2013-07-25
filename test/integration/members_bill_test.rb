@@ -17,7 +17,7 @@ class MembersBillTest < ActionController::IntegrationTest
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @club = FactoryGirl.create(:simple_club_with_gateway)
     @partner = @club.partner
-    
+
     Time.zone = @club.time_zone
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership_with_gateway.provisional_days = provisional_days unless provisional_days.nil?
@@ -57,7 +57,6 @@ class MembersBillTest < ActionController::IntegrationTest
     end
   end
   
-# TODO MEJORAR:
   def change_next_bill_date(date)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
@@ -287,7 +286,7 @@ class MembersBillTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_member.first_name
     next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_content?(I18n.l(@saved_member.current_membership.join_date+1.month, :format => :only_date))
+      assert page.has_content?(I18n.l(@saved_member.current_membership.join_date + 1.month, :format => :only_date))
     end
   end  
 
@@ -393,6 +392,7 @@ class MembersBillTest < ActionController::IntegrationTest
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
     end
     within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date_after_billing, :format => :only_date)) }
+    within('.nav-tabs'){ click_on 'Operations'}
     within("#operations") do
       assert page.has_selector?("#operations_table")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
@@ -410,7 +410,7 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.current_membership.join_date = Time.zone.now-3.day
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
     within(".nav-tabs") do
       click_on("Transactions")
@@ -426,11 +426,11 @@ class MembersBillTest < ActionController::IntegrationTest
       click_on("Operations")
     end
     within("#operations_table")do
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
       assert page.has_content?("Member enrolled successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
       assert page.has_content?("Refund success $#{final_amount.to_f}")
       assert page.has_content?("Full save done")
-      assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
     end
   end 
 
@@ -535,7 +535,7 @@ class MembersBillTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
 
-
+    within('.nav-tabs'){ click_on 'Operations'}
     within("#operations"){ assert page.has_content?("Communication 'Test hard_decline' sent") } 
     within("#operations"){ assert page.has_content?("Communication 'Test cancellation' sent") } 
     within("#operations"){ assert page.has_content?("Member canceled") } 
@@ -545,7 +545,7 @@ class MembersBillTest < ActionController::IntegrationTest
   end
 
 
-test "Try billing a member with credit card ok, and within a club that allows billing." do
+  test "Try billing a member with credit card ok, and within a club that allows billing." do
     setup_member
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)      
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
@@ -629,8 +629,8 @@ test "Try billing a member with credit card ok, and within a club that allows bi
     make_a_refund(transaction, transaction.amount_available_to_refund)
   end
 
-  # stubs isnt working correctly
   test "Litle payment gateway (Installment amount)" do
+    active_merchant_stubs_litle
     setup_member(false)
     @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
     @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
@@ -642,5 +642,5 @@ test "Try billing a member with credit card ok, and within a club that allows bi
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     Time.zone = @club.time_zone
     bill_member(@saved_member, true, nil, true)
-  end    
+  end
 end

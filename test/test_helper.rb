@@ -349,9 +349,10 @@ module ActionController
       end
       assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date )
     end
-  
+
     within(".nav-tabs"){ click_on 'Operations' }
-    within("#operations_table") do
+    within("#operations") do
+      assert page.has_selector?("#operations_table")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
     end
 
@@ -359,7 +360,7 @@ module ActionController
     within("#transactions") do 
       assert page.has_selector?("#transactions_table")
       Transaction.all.each do |transaction|
-        assert page.has_content?(transaction.response_result) 
+        assert (page.has_content?("Sale : This transaction has been approved") or page.has_content?("Billing:  Membership Fee - This transaction has been approved")  ) 
       end
       # assert page.has_content?("Sale : This transaction has been approved")
       assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
@@ -376,23 +377,22 @@ module ActionController
       assert page.has_content?(transaction.amount_available_to_refund.to_s)
 
       # final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
-      final_amount = Transaction.last.amount_available_to_refund
+      final_amount = Transaction.first.amount_available_to_refund
       final_amount = refund_amount.to_s if not refund_amount.nil?
-
 
       fill_in 'refund_amount', :with => final_amount   
       assert_difference ['Transaction.count'] do 
         click_on 'Refund'
       end
       
-      within(".nav-tabs"){ click_on 'Operations' }
+      within('.nav-tabs'){ click_on 'Operations'}
       within("#operations_table") do 
         assert page.has_content?("Communication 'Test refund' sent")
         assert page.has_content?("Refund success $#{final_amount}")
       end
       within(".nav-tabs"){ click_on 'Transactions' }
       within("#transactions_table") do 
-        assert (page.has_content?("Credit : This transaction has been approved") or page.has_content?("Billing: Refund - This transaction has been approved")  )
+        assert (page.has_content?("Credit : This transaction has been approved") or page.has_content?("Billing: Refund - This transaction has been approved")  ) 
         assert page.has_content?(final_amount)
       end
       within(".nav-tabs"){ click_on 'Communications' }
@@ -430,6 +430,8 @@ module ActionController
       within("#operations_table"){assert page.has_content?("#{amount.to_f.abs} club cash was successfully #{amount>0 ? 'added' : 'deducted'}. Concept: #{description}")}
       within('.nav-tabs'){ click_on 'Club Cash' }
       within("#td_mi_club_cash_amount") { assert page.has_content?((new_amount).to_s) }
+    else
+      confirm_ok_js
     end
   end
 
@@ -451,7 +453,6 @@ module ActionController
         assert_equal next_retry_bill_date_old, member.next_retry_bill_date
         assert_equal member.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
         assert_equal member.status, member.current_membership.status
-        within('.nav-tabs'){ click_on 'Operations' }
         within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
       end
     end
@@ -672,5 +673,3 @@ end
 
  # use_transactional_fixtures = false    # DOES NOT WORK!
    # … think this should be renamed and should definitely get some documentation love.
-    
- 
