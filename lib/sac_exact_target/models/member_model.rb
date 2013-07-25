@@ -60,16 +60,14 @@ module SacExactTarget
     def create!
       options = { :subscribe_to_list => true }
       # Remove email from prospect list
-      begin
-        SacExactTarget::ProspectModel.destroy_by_email self.member.email, club_id
-      rescue Timeout::Error => e
-        raise ProspectTimeoutException.new(message: "Prospect delete expired.")
-      end
+      SacExactTarget::ProspectModel.destroy_by_email! self.member.email, club_id
       # Add customer under member list
-      client.Create(subscriber(subscriber_key, options))
-    rescue Timeout::Error => e
-      Auditory.audit(nil, self, "ExactTarget create took too long.", self, Settings.operation_types.et_timeout_create)
-      raise e
+      begin
+        client.Create(subscriber(subscriber_key, options))
+      rescue Timeout::Error => e
+        Auditory.audit(nil, self, "ExactTarget create took too long.", self, Settings.ope ration_types.et_timeout_create)
+        raise e
+      end
     end
 
     def update!
