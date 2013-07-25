@@ -322,7 +322,7 @@ en:
         plan_name: 'Plan Name'
         external_code: 'External Code'
         created_at: 'Created At'
-        by_agent: 'By Agent'
+        by_agent: 'Created By'
       email_template:
         name: 'Name'
         type: 'Type'
