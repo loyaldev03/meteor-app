@@ -102,6 +102,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     click_on 'Save club cash transaction'
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#td_mi_club_cash_amount") { assert page.has_content?("0.99") }
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
       assert page.has_content?('0.99 club cash was successfully added.')
     end
@@ -114,6 +115,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @saved_member.bill_membership
     sleep(1) #To wait until billing is finished.
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
       assert page.has_no_content?('0 club cash was successfully added.')
     end

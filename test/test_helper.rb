@@ -430,6 +430,8 @@ module ActionController
       within("#operations_table"){assert page.has_content?("#{amount.to_f.abs} club cash was successfully #{amount>0 ? 'added' : 'deducted'}. Concept: #{description}")}
       within('.nav-tabs'){ click_on 'Club Cash' }
       within("#td_mi_club_cash_amount") { assert page.has_content?((new_amount).to_s) }
+    else
+      confirm_ok_js
     end
   end
 
