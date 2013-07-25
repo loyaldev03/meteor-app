@@ -42,7 +42,8 @@ SacPlatform::Application.routes.draw do
       match '/members' => 'members#index', as: 'members', :via => [:get, :post]
       match '/members/search_result' => 'members#search_result', as: 'members_search_result', :via => [:get]
       
-      resources :terms_of_memberships
+      resources :terms_of_memberships, :path => 'suscription_plans'
+
 
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
