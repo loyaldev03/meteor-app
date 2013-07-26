@@ -75,6 +75,7 @@ class AgentsTest < ActionController::IntegrationTest
     assert_difference('Agent.count', 0) do
       click_link_or_button 'Update Agent'
     end
+  
     assert page.has_content?("Agent was successfully updated")
   end
 

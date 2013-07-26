@@ -125,7 +125,7 @@ class ClubTest < ActionController::IntegrationTest
 
   test "should see all clubs as admin on my clubs section" do
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
-    click_link_or_button("My Clubs")
+    within(".navbar"){ click_link_or_button("My Clubs") }
     within("#my_clubs_table")do
       Club.all.each do |club|
         assert page.has_content?(club.name)
@@ -141,7 +141,7 @@ class ClubTest < ActionController::IntegrationTest
     @admin_agent.update_attribute(:roles,['agency'])
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
-    click_link_or_button("My Clubs")
+    within(".navbar"){ click_link_or_button("My Clubs") }
     within("#my_clubs_table")do
       Club.all.each do |club|
         assert page.has_content?(club.name)
@@ -157,7 +157,7 @@ class ClubTest < ActionController::IntegrationTest
     @admin_agent.update_attribute(:roles,['representative'])
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
-    click_link_or_button("My Clubs")
+    within(".navbar"){ click_link_or_button("My Clubs") }
     within("#my_clubs_table")do
       Club.all.each do |club|
         assert page.has_content?(club.name)
@@ -173,7 +173,7 @@ class ClubTest < ActionController::IntegrationTest
     @admin_agent.update_attribute(:roles,['supervisor'])
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
-    click_link_or_button("My Clubs")
+    within(".navbar"){ click_link_or_button("My Clubs") }
     within("#my_clubs_table")do
       Club.all.each do |club|
         assert page.has_content?(club.name)
