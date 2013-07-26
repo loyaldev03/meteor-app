@@ -1337,7 +1337,7 @@ class Member < ActiveRecord::Base
   handle_asynchronously :desnormalize_preferences
 
   def marketing_tool_sync
-    self.fenroll if defined?(SacExactTarget::MemberModel)
+    self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
   end
   handle_asynchronously :marketing_tool_sync
 
