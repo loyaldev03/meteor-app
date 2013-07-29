@@ -168,7 +168,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       assert page.has_content?(last_digits)
       assert page.has_content?("#{cc_saved.expire_month} / #{cc_saved.expire_year}")
     end
-
+    
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table"){ assert page.has_content?("Credit card #{cc_saved.last_digits} added and activated") }
 
     within('.nav-tabs'){ click_on 'Credit Cards'}
@@ -199,15 +200,16 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button 'Set undeliverable'
     confirm_ok_js
     click_link_or_button 'Set wrong address'
+
+    operation = @saved_member.operations.first
     
-    
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table") do
       assert page.has_content?("undeliverable")
       find('.icon-zoom-in').click
     end
     
     text_note = "text note 123456789"
-
     fill_in "operation_notes", :with => text_note
     
     assert_difference ['Operation.count'] do 
@@ -217,9 +219,10 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     assert page.has_content?("Edited operation note")
     click_on 'Cancel'
 
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table") do
       assert page.has_content?("Edited operation note")
-      assert page.has_content?(text_note) 
+      assert page.has_content?(operation.id.to_s)
     end
   end
 
@@ -232,6 +235,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     confirm_ok_js
     click_link_or_button 'Set wrong address'
     
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table") do
       assert page.has_content?("undeliverable")
       find('.icon-zoom-in').click
@@ -736,6 +740,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_on 'Full save'
      
     assert page.has_content?("Full save done")
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table"){ assert page.has_content?("Full save done") }
   end
  
@@ -784,6 +789,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       click_on 'Refund'
     end
     
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table") do 
       assert page.has_content?("Communication 'Test refund' sent")
       assert page.has_content?("Refund success $#{final_amount}")
@@ -1008,6 +1014,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date_after_billing, :format => :only_date)) }
 
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations") do
       assert page.has_selector?("#operations_table")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
@@ -1084,15 +1091,22 @@ class MemberProfileEditTest < ActionController::IntegrationTest
  test "Sorting transaction table" do
     setup_member
 
-    11.times{ @saved_member.bill_membership }
+    @saved_member.next_retry_bill_date = Time.zone.now
+    @saved_member.bill_membership
+    first_transaction = @saved_member.transactions.first
+    first_transaction.update_attribute :created_at, Time.zone.now-2.day
+    10.times do 
+      @saved_member.next_retry_bill_date = Time.zone.now
+      @saved_member.bill_membership
+    end
+    last_transaction = @saved_member.transactions.where("uuid != ?", first_transaction.id).first
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-
+  
     within(".nav-tabs"){ click_on("Transactions") }
-    within("#transactions_table")do
-      assert page.has_content?(Transaction.last.full_label.truncate(50))
+    within("#transactions_table")do 
+      assert page.has_content?(I18n.l(last_transaction.created_at, :format => :dashed))
       find("#th_date").click
-      find("#th_date").click
-      assert page.has_content?(Transaction.first.full_label.truncate(50))
+      assert page.has_content?(I18n.l(first_transaction.created_at, :format => :dashed))
     end
   end
 
