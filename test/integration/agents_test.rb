@@ -75,6 +75,7 @@ class AgentsTest < ActionController::IntegrationTest
     assert_difference('Agent.count', 0) do
       click_link_or_button 'Update Agent'
     end
+  
     assert page.has_content?("Agent was successfully updated")
   end
 
@@ -258,6 +259,7 @@ class AgentsTest < ActionController::IntegrationTest
     page.has_content?("Your password was changed successfully. You are now signed in.")
   end
 
+ 
   test "create agent with global role and them remove that role." do
     setup_environment
     visit new_admin_agent_path

@@ -358,7 +358,6 @@ module ActionController
 
     within(".nav-tabs"){ click_on 'Operations' }
     within("#operations") do
-      assert page.has_selector?("#operations_table")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
     end
 
@@ -459,6 +458,7 @@ module ActionController
         assert_equal next_retry_bill_date_old, member.next_retry_bill_date
         assert_equal member.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
         assert_equal member.status, member.current_membership.status
+        within(".nav-tabs"){ click_on 'Operations' }
         within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
       end
     end

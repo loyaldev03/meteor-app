@@ -83,7 +83,7 @@ class Admin::AgentsController < ApplicationController
       end
     end
     if success 
-      redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
+      redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') 
     else
       render :action => "edit"
     end
