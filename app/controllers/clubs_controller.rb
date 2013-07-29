@@ -2,6 +2,16 @@ class ClubsController < ApplicationController
   layout '2-cols'
   authorize_resource :club
 
+  def test_api_connection
+    club = Club.find(params[:club_id])
+    club.test_connection_to_api!
+    flash[:notice] = "Phoenix can connect to the remote API correctly."
+  rescue
+    flash[:error] = "There was an error while connecting to the remote API. " + $!.to_s
+  ensure
+    redirect_to club_path(id: club.id)
+  end
+
   # GET /clubs
   # GET /clubs.json
   def index
