@@ -869,3 +869,22 @@ function admin_form_functions(){
     }
   });
 };
+
+// TOM Wizard functions
+// Creates the wizard
+function tom_create_wizard() {
+  $("#tom_wizard_form").formwizard({ 
+    formPluginEnabled: true,
+    validationEnabled: true,
+    focusFirstInput : true,
+    disableUIStyles: true,
+    textNext: 'Membership Terms',
+    textSubmit: 'Create Plan',
+    formOptions :{
+      success: function(data){$("#status").fadeTo(500,1,function(){ $(this).html("You are now registered!").fadeTo(5000, 0); })},
+      beforeSubmit: function(data){$("#data").html("data sent to the server: " + $.param(data));},
+      dataType: 'json',
+      resetForm: true
+    } 
+  });
+}
