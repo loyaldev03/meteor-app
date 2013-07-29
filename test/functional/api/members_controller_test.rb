@@ -95,66 +95,116 @@ class Api::MembersControllerTest < ActionController::TestCase
     get( :find_all_by_created, { :club_id => club_id, :start_date => start_date, :end_date => end_date })
   end
 
-  # # Store the membership id at enrollment_infos table when enrolling a new member
-  # # Admin should enroll/create member with preferences
-  # # Billing membership by Provisional amount
-  # test "Admin should enroll/create member with preferences" do
-  #   sign_in @admin_user
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   @current_club = @terms_of_membership.club
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs
-  #   assert_difference('Membership.count')do
-  #     assert_difference('ClubCashTransaction.count')do
-  #       assert_difference('EnrollmentInfo.count')do
-  #         assert_difference('Transaction.count')do
-  #           assert_difference('MemberPreference.count',@preferences.size) do 
-  #             assert_difference('Member.count') do
-  #               generate_post_message
-  #               assert_response :success
-  #             end
-  #           end
-  #         end
-  #       end
-  #     end
-  #   end
-  #   saved_member = Member.find_by_email(@member.email)
-  #   membership = Membership.last
-  #   enrollment_info = EnrollmentInfo.last
-  #   assert_equal(enrollment_info.membership_id, membership.id)
-  #   assert_equal(saved_member.club_cash_amount, @terms_of_membership.club_cash_amount)
-  #   transaction = Transaction.last
-  #   assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
-  # end
+  # Store the membership id at enrollment_infos table when enrolling a new member
+  # Admin should enroll/create member with preferences
+  # Billing membership by Provisional amount
+  test "Admin should enroll/create member with preferences" do
+    sign_in @admin_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count')do
+      assert_difference('ClubCashTransaction.count')do
+        assert_difference('EnrollmentInfo.count')do
+          assert_difference('Transaction.count')do
+            assert_difference('MemberPreference.count',@preferences.size) do 
+              assert_difference('Member.count') do
+                generate_post_message
+                assert_response :success
+              end
+            end
+          end
+        end
+      end
+    end
+    saved_member = Member.find_by_email(@member.email)
+    membership = Membership.last
+    enrollment_info = EnrollmentInfo.last
+    assert_equal(enrollment_info.membership_id, membership.id)
+    assert_equal(saved_member.club_cash_amount, @terms_of_membership.club_cash_amount)
+    transaction = Transaction.last
+    assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
+  end
 
-  # test "Admin should enroll/create member within club related to drupal" do
-  #   sign_in @admin_user
-  #   @club = @club_with_api
-  #   @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   @current_club = @terms_of_membership.club
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs
-  #   assert_difference('Membership.count')do
-  #     assert_difference('EnrollmentInfo.count')do
-  #       assert_difference('Transaction.count')do
-  #         assert_difference('MemberPreference.count',@preferences.size) do 
-  #           assert_difference('Member.count') do
-  #             generate_post_message
-  #             assert_response :success
-  #           end
-  #         end
-  #       end
-  #     end
-  #   end
-  #   assert @response.body.include? '"api_role":["91284557"]'
-  # end
+  test "Admin should enroll/create member within club related to drupal" do
+    sign_in @admin_user
+    @club = @club_with_api
+    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count')do
+      assert_difference('EnrollmentInfo.count')do
+        assert_difference('Transaction.count')do
+          assert_difference('MemberPreference.count',@preferences.size) do 
+            assert_difference('Member.count') do
+              generate_post_message
+              assert_response :success
+            end
+          end
+        end
+      end
+    end
+    assert @response.body.include? '"api_role":["91284557"]'
+  end
 
-  # test "Member should not be enrolled if the email is already is used." do
+  test "Member should not be enrolled if the email is already is used." do
+    sign_in @admin_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count') do
+      assert_difference('EnrollmentInfo.count') do
+        assert_difference('Transaction.count') do
+          assert_difference('MemberPreference.count',@preferences.size) do 
+            assert_difference('Member.count') do
+              generate_post_message
+              assert_response :success
+            end
+          end
+        end
+      end
+    end
+    email_used = @member.email
+    @member = FactoryGirl.build :member_with_api, :email => email_used
+    assert_difference('Membership.count',0) do
+      assert_difference('EnrollmentInfo.count',0) do
+        assert_difference('Transaction.count',0) do
+          assert_difference('Member.count',0) do
+            generate_post_message
+            assert_response :success
+          end
+        end
+      end
+    end
+    assert_equal @response.body, '{"message":"Membership already exists for this email address. Contact Member Services if you would like more information at: 123 456 7891.","code":"409","errors":{"status":"Already active."}}'
+  end
+
+  test "When no param is provided on creation, it should tell us so" do
+    sign_in @admin_user
+    assert_difference('Membership.count',0) do
+      assert_difference('EnrollmentInfo.count',0) do
+        assert_difference('Transaction.count',0) do
+          assert_difference('Member.count',0) do
+            post( :create )
+            assert_response :success
+          end
+        end
+      end
+    end
+    assert @response.body.include?("There are some params missing. Please check them.")
+  end
+
+  # test "Member should not be enrolled if the email is already is used, even when mes throws error." do
   #   sign_in @admin_user
   #   @credit_card = FactoryGirl.build :credit_card
   #   @member = FactoryGirl.build :member_with_api
@@ -176,6 +226,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   #   end
   #   email_used = @member.email
   #   @member = FactoryGirl.build :member_with_api, :email => email_used
+  #   active_merchant_stubs_store(@credit_card, "900", "This transaction has been approved with stub", false)
   #   assert_difference('Membership.count',0) do
   #     assert_difference('EnrollmentInfo.count',0) do
   #       assert_difference('Transaction.count',0) do
@@ -186,964 +237,913 @@ class Api::MembersControllerTest < ActionController::TestCase
   #       end
   #     end
   #   end
-  #   assert_equal @response.body, '{"message":"Membership already exists for this email address. Contact Member Services if you would like more information at: 123 456 7891.","code":"409","errors":{"status":"Already active."}}'
+  #   puts @response.body
   # end
 
-  # test "When no param is provided on creation, it should tell us so" do
-  #   sign_in @admin_user
-  #   assert_difference('Membership.count',0) do
-  #     assert_difference('EnrollmentInfo.count',0) do
-  #       assert_difference('Transaction.count',0) do
-  #         assert_difference('Member.count',0) do
-  #           post( :create )
-  #           assert_response :success
-  #         end
-  #       end
-  #     end
-  #   end
-  #   assert @response.body.include?("There are some params missing. Please check them.")
-  # end
+  # Reject new enrollments if billing is disable
+  test "If billing is disabled member cant be enrolled." do
+    sign_in @admin_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_club.update_attribute :billing_enable, false
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count', 0)do
+      assert_difference('EnrollmentInfo.count', 0)do
+        assert_difference('Transaction.count', 0)do
+          assert_difference('MemberPreference.count', 0) do 
+            assert_difference('Member.count', 0) do
+              generate_post_message
+              assert_response :success
+            end
+          end
+        end
+      end
+    end
+    assert_equal @response.body, '{"message":"We are not accepting new enrollments at this time. Please call member services at: 123 456 7891","code":"410"}'
+  end
 
-  # # test "Member should not be enrolled if the email is already is used, even when mes throws error." do
-  # #   sign_in @admin_user
-  # #   @credit_card = FactoryGirl.build :credit_card
-  # #   @member = FactoryGirl.build :member_with_api
-  # #   @enrollment_info = FactoryGirl.build :enrollment_info
-  # #   @current_club = @terms_of_membership.club
-  # #   @current_agent = @admin_user
-  # #   active_merchant_stubs
-  # #   assert_difference('Membership.count') do
-  # #     assert_difference('EnrollmentInfo.count') do
-  # #       assert_difference('Transaction.count') do
-  # #         assert_difference('MemberPreference.count',@preferences.size) do 
-  # #           assert_difference('Member.count') do
-  # #             generate_post_message
-  # #             assert_response :success
-  # #           end
-  # #         end
-  # #       end
-  # #     end
-  # #   end
-  # #   email_used = @member.email
-  # #   @member = FactoryGirl.build :member_with_api, :email => email_used
-  # #   active_merchant_stubs_store(@credit_card, "900", "This transaction has been approved with stub", false)
-  # #   assert_difference('Membership.count',0) do
-  # #     assert_difference('EnrollmentInfo.count',0) do
-  # #       assert_difference('Transaction.count',0) do
-  # #         assert_difference('Member.count',0) do
-  # #           generate_post_message
-  # #           assert_response :success
-  # #         end
-  # #       end
-  # #     end
-  # #   end
-  # #   puts @response.body
-  # # end
+  test "Representative should enroll/create member" do
+    sign_in @representative_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    active_merchant_stubs_store(@credit_card.number)
+    assert_difference('Member.count') do
+      generate_post_message
+      assert_response :success
+    end
+  end
 
-  # # Reject new enrollments if billing is disable
-  # test "If billing is disabled member cant be enrolled." do
-  #   sign_in @admin_user
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   @current_club = @terms_of_membership.club
-  #   @current_club.update_attribute :billing_enable, false
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs
-  #   assert_difference('Membership.count', 0)do
-  #     assert_difference('EnrollmentInfo.count', 0)do
-  #       assert_difference('Transaction.count', 0)do
-  #         assert_difference('MemberPreference.count', 0) do 
-  #           assert_difference('Member.count', 0) do
-  #             generate_post_message
-  #             assert_response :success
-  #           end
-  #         end
-  #       end
-  #     end
-  #   end
-  #   assert_equal @response.body, '{"message":"We are not accepting new enrollments at this time. Please call member services at: 123 456 7891","code":"410"}'
-  # end
+  test "Fulfillment mamager should enroll/create member" do
+    sign_in @fulfillment_manager_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    active_merchant_stubs_store(@credit_card.number)
+    assert_difference('Member.count') do
+      generate_post_message
+      assert_response :success
+    end
+  end
 
-  # test "Representative should enroll/create member" do
-  #   sign_in @representative_user
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   @current_club = @terms_of_membership.club
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs
-  #   active_merchant_stubs_store(@credit_card.number)
-  #   assert_difference('Member.count') do
-  #     generate_post_message
-  #     assert_response :success
-  #   end
-  # end
+  test "Supervisor should enroll/create member" do
+    sign_in @supervisor_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Member.count') do
+      generate_post_message
+      assert_response :success
+    end
+  end
 
-  # test "Fulfillment mamager should enroll/create member" do
-  #   sign_in @fulfillment_manager_user
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   @current_club = @terms_of_membership.club
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs
-  #   active_merchant_stubs_store(@credit_card.number)
-  #   assert_difference('Member.count') do
-  #     generate_post_message
-  #     assert_response :success
-  #   end
-  # end
+  test "Api user should enroll/create member" do
+    sign_in @api_user
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    generate_post_message
+    assert_response :success
+  end
 
-  # test "Supervisor should enroll/create member" do
-  #   sign_in @supervisor_user
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   @current_club = @terms_of_membership.club
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs
-  #   assert_difference('Member.count') do
-  #     generate_post_message
-  #     assert_response :success
-  #   end
-  # end
-
-  # test "Api user should enroll/create member" do
-  #   sign_in @api_user
-  #   @credit_card = FactoryGirl.build :credit_card    
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   generate_post_message
-  #   assert_response :success
-  # end
-
-  # test "Agency should not enroll/create member" do
-  #   sign_in @agency_agent
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   @current_club = @terms_of_membership.club
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs
-  #   assert_difference('Member.count',0) do
-  #     generate_post_message
-  #     assert_response :unauthorized
-  #   end
-  # end
+  test "Agency should not enroll/create member" do
+    sign_in @agency_agent
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Member.count',0) do
+      generate_post_message
+      assert_response :unauthorized
+    end
+  end
  
-  # #Profile fulfillment_managment
-  # test "fulfillment_managment should enroll/create member" do
-  #   sign_in @fulfillment_managment_user
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   @current_club = @terms_of_membership.club
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs
-  #   assert_difference('Member.count') do
-  #     generate_post_message
-  #     assert_response :success
-  #   end
-  # end
+  #Profile fulfillment_managment
+  test "fulfillment_managment should enroll/create member" do
+    sign_in @fulfillment_managment_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Member.count') do
+      generate_post_message
+      assert_response :success
+    end
+  end
 
-  # test "When no param is provided on update, it should tell us so" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   assert_difference('Membership.count',0) do
-  #     assert_difference('EnrollmentInfo.count',0) do
-  #       assert_difference('Transaction.count',0) do
-  #         assert_difference('Member.count',0) do
-  #           put( :update, { id: @member.id } )
-  #           assert_response :success
-  #         end
-  #       end
-  #     end
-  #   end
-  #   assert @response.body.include?("There are some params missing. Please check them.")
-  # end
+  test "When no param is provided on update, it should tell us so" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    assert_difference('Membership.count',0) do
+      assert_difference('EnrollmentInfo.count',0) do
+        assert_difference('Transaction.count',0) do
+          assert_difference('Member.count',0) do
+            put( :update, { id: @member.id } )
+            assert_response :success
+          end
+        end
+      end
+    end
+    assert @response.body.include?("There are some params missing. Please check them.")
+  end
 
-  # test "admin user should update member" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+  test "admin user should update member" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     
-  #   @credit_card = FactoryGirl.create :credit_card_master_card, :active => false
-  #   @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
+    @credit_card = FactoryGirl.create :credit_card_master_card, :active => false
+    @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count') do
-  #     generate_put_message
-  #   end
-  #   assert_response :success
-  # end
+    assert_difference('Operation.count') do
+      generate_put_message
+    end
+    assert_response :success
+  end
 
-  # test "api_id should be updated if batch_update enabled" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+  test "api_id should be updated if batch_update enabled" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
    
-  #   @credit_card = FactoryGirl.create :credit_card_master_card, :active => false
-  #   @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
+    @credit_card = FactoryGirl.create :credit_card_master_card, :active => false
+    @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
 
-  #   new_api_id = @member.api_id.to_i + 10
+    new_api_id = @member.api_id.to_i + 10
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count') do
-  #     generate_put_message
-  #     assert_response :success
-  #     @member.reload
-  #     assert_not_equal new_api_id, @member.api_id
-  #   end
+    assert_difference('Operation.count') do
+      generate_put_message
+      assert_response :success
+      @member.reload
+      assert_not_equal new_api_id, @member.api_id
+    end
 
-  #   assert_difference('Operation.count') do
-  #     generate_put_message({:api_id => new_api_id, })
-  #     assert_response :success
-  #     @member.reload
-  #     assert_not_equal new_api_id, @member.api_id
-  #   end
-  # end
+    assert_difference('Operation.count') do
+      generate_put_message({:api_id => new_api_id, })
+      assert_response :success
+      @member.reload
+      assert_not_equal new_api_id, @member.api_id
+    end
+  end
 
-  # test "representative user should update member" do
-  #   sign_in @representative_user
-  #   @credit_card = FactoryGirl.build :credit_card    
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   @credit_card = active_credit_card
-  #   @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   generate_put_message
-  #   assert_response :success
-  # end
+  test "representative user should update member" do
+    sign_in @representative_user
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @credit_card = active_credit_card
+    @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    generate_put_message
+    assert_response :success
+  end
 
-  # test "supervisor user should update member" do
-  #   sign_in @supervisor_user
-  #   @credit_card = FactoryGirl.build :credit_card    
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   @credit_card = active_credit_card
-  #   @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   generate_put_message
-  #   assert_response :success
-  # end
+  test "supervisor user should update member" do
+    sign_in @supervisor_user
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @credit_card = active_credit_card
+    @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    generate_put_message
+    assert_response :success
+  end
 
-  # test "api user should update member" do
-  #   sign_in @api_user
-  #   @credit_card = FactoryGirl.build :credit_card    
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   @credit_card = active_credit_card
-  #   @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   generate_put_message
-  #   assert_response :success
-  # end
+  test "api user should update member" do
+    sign_in @api_user
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @credit_card = active_credit_card
+    @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    generate_put_message
+    assert_response :success
+  end
 
-  # test "agency user should not update member" do
-  #   sign_in @agency_agent
-  #   @credit_card = FactoryGirl.build :credit_card    
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   generate_put_message
-  #   assert_response :unauthorized
-  # end
+  test "agency user should not update member" do
+    sign_in @agency_agent
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    generate_put_message
+    assert_response :unauthorized
+  end
 
-  # #Profile fulfillment_managment
-  # test "fulfillment_managment user should update member" do
-  #   sign_in @fulfillment_managment_user
-  #   @credit_card = FactoryGirl.build :credit_card    
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   @credit_card = active_credit_card
-  #   @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   generate_put_message
-  #   assert_response :success
-  # end 
+  #Profile fulfillment_managment
+  test "fulfillment_managment user should update member" do
+    sign_in @fulfillment_managment_user
+    @credit_card = FactoryGirl.build :credit_card    
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @credit_card = active_credit_card
+    @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    generate_put_message
+    assert_response :success
+  end 
 
-  # # Credit card tests.
-  # test "Should update credit card" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+  # Credit card tests.
+  test "Should update credit card" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
     
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   active_merchant_stubs_store(@credit_card.number)
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',3) do
-  #     assert_difference('CreditCard.count') do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.number, nil)
-  #   assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])    
-  # end
+    assert_difference('Operation.count',3) do
+      assert_difference('CreditCard.count') do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, nil)
+    assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])    
+  end
 
-  # def validate_credit_card_updated_only_year(active_credit_card, token, number, amount_years)
-  #   @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
-  #   @credit_card.expire_month = active_credit_card.expire_month
-  #   @credit_card.expire_year = (Date.today + amount_years.year).year
-  #   assert_difference('Operation.count',2) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.token, token)
-  #   assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
-  # end
+  def validate_credit_card_updated_only_year(active_credit_card, token, number, amount_years)
+    @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
+    @credit_card.expire_month = active_credit_card.expire_month
+    @credit_card.expire_year = (Date.today + amount_years.year).year
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    assert_equal(@member.active_credit_card.token, token)
+    assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
+  end
 
 
-  # # Multiple same credit cards with different expiration date
-  # test "Should update credit card only year" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   token = active_credit_card.token
+  # Multiple same credit cards with different expiration date
+  test "Should update credit card only year" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    token = active_credit_card.token
     
-  #   active_merchant_stubs_store("5589548939080095")
+    active_merchant_stubs_store("5589548939080095")
 
-  #   validate_credit_card_updated_only_year(active_credit_card, token, "5589548939080095", 0)
-  #   validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 3)
-  #   validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 4)
-  #   validate_credit_card_updated_only_year(active_credit_card, token, "5589/5489/3908/0095", 5)
-  #   validate_credit_card_updated_only_year(active_credit_card, token, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}", 6)
-  # end
+    validate_credit_card_updated_only_year(active_credit_card, token, "5589548939080095", 0)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 3)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 4)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5589/5489/3908/0095", 5)
+    validate_credit_card_updated_only_year(active_credit_card, token, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}", 6)
+  end
 
-  # def validate_credit_card_updated_only_month(active_credit_card, token, number, amount_months)
-  #   @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
-  #   @credit_card.expire_month = (Time.zone.now + amount_months.months).month # January is the first month.
-  #   @credit_card.expire_year = active_credit_card.expire_year
-  #   assert_difference('Operation.count',2) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.token, token)
-  #   assert_equal(@member.active_credit_card.expire_year, @credit_card.expire_year)
-  # end
+  def validate_credit_card_updated_only_month(active_credit_card, token, number, amount_months)
+    @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
+    @credit_card.expire_month = (Time.zone.now + amount_months.months).month # January is the first month.
+    @credit_card.expire_year = active_credit_card.expire_year
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    assert_equal(@member.active_credit_card.token, token)
+    assert_equal(@member.active_credit_card.expire_year, @credit_card.expire_year)
+  end
 
-  # # Multiple same credit cards with different expiration date
-  # test "Should update credit card only month" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   token = active_credit_card.token
+  # Multiple same credit cards with different expiration date
+  test "Should update credit card only month" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    token = active_credit_card.token
 
-  #   active_merchant_stubs_store("5589548939080095")
+    active_merchant_stubs_store("5589548939080095")
 
-  #   validate_credit_card_updated_only_month(active_credit_card, token, "5589548939080095", 0)
-  #   validate_credit_card_updated_only_month(active_credit_card, token, "5589-5489-3908-0095", 1)
-  #   validate_credit_card_updated_only_month(active_credit_card, token, "5589-5489-3908-0095", 4)
-  #   validate_credit_card_updated_only_month(active_credit_card, token, "5589-5489-3908-0095", 2)
-  #   validate_credit_card_updated_only_month(active_credit_card, token, "5589/5489/3908/0095", 5)
-  #   validate_credit_card_updated_only_month(active_credit_card, token, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}", 6)
-  # end
+    validate_credit_card_updated_only_month(active_credit_card, token, "5589548939080095", 0)
+    validate_credit_card_updated_only_month(active_credit_card, token, "5589-5489-3908-0095", 1)
+    validate_credit_card_updated_only_month(active_credit_card, token, "5589-5489-3908-0095", 4)
+    validate_credit_card_updated_only_month(active_credit_card, token, "5589-5489-3908-0095", 2)
+    validate_credit_card_updated_only_month(active_credit_card, token, "5589/5489/3908/0095", 5)
+    validate_credit_card_updated_only_month(active_credit_card, token, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}", 6)
+  end
 
-  # test "Multiple same credit cards with different expiration date" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
+  test "Multiple same credit cards with different expiration date" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
 
-  #   @credit_card = FactoryGirl.build :credit_card_master_card
-  #   assert_difference('Operation.count',3) do
-  #     assert_difference('CreditCard.count') do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   @member.reload
-  #   cc_token = @member.active_credit_card.token
+    @credit_card = FactoryGirl.build :credit_card_master_card
+    assert_difference('Operation.count',3) do
+      assert_difference('CreditCard.count') do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    @member.reload
+    cc_token = @member.active_credit_card.token
     
-  #   @credit_card.expire_month = @credit_card.expire_month+1
-  #   @credit_card.expire_year = @credit_card.expire_year+1
-  #   @member.reload
-  #   assert_difference('Operation.count',2) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   @member.reload
+    @credit_card.expire_month = @credit_card.expire_month+1
+    @credit_card.expire_year = @credit_card.expire_year+1
+    @member.reload
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    @member.reload
 
-  #   assert_equal(@member.active_credit_card.token, cc_token)
-  #   assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
-  # end
+    assert_equal(@member.active_credit_card.token, cc_token)
+    assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
+  end
 
-  # test "Should not update credit card when dates are not changed and same number. (With 'X')" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   cc_token = active_credit_card.token
+  test "Should not update credit card when dates are not changed and same number. (With 'X')" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_token = active_credit_card.token
     
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-  #   @credit_card.expire_year = active_credit_card.expire_year
-  #   @credit_card.expire_month = active_credit_card.expire_month
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
+    @credit_card.expire_year = active_credit_card.expire_year
+    @credit_card.expire_month = active_credit_card.expire_month
 
-  #   assert_difference('Operation.count') do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.token, cc_token)
-  # end
+    assert_difference('Operation.count') do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    assert_equal(@member.active_credit_card.token, cc_token)
+  end
 
-  # # Multiple same credit cards with same expiration date
-  # test "Should not add new credit card with same data as the one active" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_year => (Time.zone.now+1.year).year, :expire_month => (Time.zone.now+1.month).month
+  # Multiple same credit cards with same expiration date
+  test "Should not add new credit card with same data as the one active" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_year => (Time.zone.now+1.year).year, :expire_month => (Time.zone.now+1.month).month
     
-  #   ["5589548939080095", "5589 5489 3908 0095", "5589-5489-3908-0095", "5589/5489/3908/0095"].each do |number|
-  #     @credit_card = FactoryGirl.build :credit_card_american_express
-  #     @credit_card.number = number
-  #     @credit_card.expire_year = @member.active_credit_card.expire_year
-  #     @credit_card.expire_month = @member.active_credit_card.expire_month
+    ["5589548939080095", "5589 5489 3908 0095", "5589-5489-3908-0095", "5589/5489/3908/0095"].each do |number|
+      @credit_card = FactoryGirl.build :credit_card_american_express
+      @credit_card.number = number
+      @credit_card.expire_year = @member.active_credit_card.expire_year
+      @credit_card.expire_month = @member.active_credit_card.expire_month
 
-  #     active_merchant_stubs_store(@credit_card.number)
+      active_merchant_stubs_store(@credit_card.number)
 
-  #     assert_difference('Operation.count',1) do
-  #       assert_difference('CreditCard.count',0) do
-  #         generate_put_message
-  #       end
-  #     end
+      assert_difference('Operation.count',1) do
+        assert_difference('CreditCard.count',0) do
+          generate_put_message
+        end
+      end
       
-  #     assert_response :success
-  #     @member.reload
-  #     assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
-  #     assert_equal(@member.active_credit_card.expire_year, @credit_card.expire_year)
-  #     assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
-  #   end
-  # end
+      assert_response :success
+      @member.reload
+      assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
+      assert_equal(@member.active_credit_card.expire_year, @credit_card.expire_year)
+      assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
+    end
+  end
 
-  # test "Should not update credit card when invalidid credit card number" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
+  test "Should not update credit card when invalidid credit card number" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
 
-  #   active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_month => (Time.zone.now+1.month).month
-  #   active_credit_card.update_attribute(:expire_year, (Time.zone.now+1.year).year)
-  #   cc_token = active_credit_card.token
+    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id, :expire_month => (Time.zone.now+1.month).month
+    active_credit_card.update_attribute(:expire_year, (Time.zone.now+1.year).year)
+    cc_token = active_credit_card.token
     
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   @credit_card.number = "123456789"
-  #   @credit_card.expire_year = @member.active_credit_card.expire_year
-  #   @credit_card.expire_month = @member.active_credit_card.expire_month
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = "123456789"
+    @credit_card.expire_year = @member.active_credit_card.expire_year
+    @credit_card.expire_month = @member.active_credit_card.expire_month
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',0) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   @member.reload
-  #   assert_equal(@member.active_credit_card.number, nil)
-  #   assert_not_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])    
-  #   assert_equal(@member.active_credit_card.token, cc_token)    
-  # end
+    assert_difference('Operation.count',0) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    @member.reload
+    assert_equal(@member.active_credit_card.number, nil)
+    assert_not_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])    
+    assert_equal(@member.active_credit_card.token, cc_token)    
+  end
 
-  # # Activate an inactive credit card record
-  # test "Should activate old credit when it is already created, if it is not expired" do
-  #   sign_in @admin_user
+  # Activate an inactive credit card record
+  test "Should activate old credit when it is already created, if it is not expired" do
+    sign_in @admin_user
     
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   cc_token = @active_credit_card.token
-  #   @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_token = @active_credit_card.token
+    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count', 2) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   @member.reload
-  #   assert_not_equal(@member.active_credit_card.token, cc_token)
-  #   assert_equal(@member.active_credit_card.token, @credit_card.token)
-  # end
+    assert_difference('Operation.count', 2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    @member.reload
+    assert_not_equal(@member.active_credit_card.token, cc_token)
+    assert_equal(@member.active_credit_card.token, @credit_card.token)
+  end
 
-  # test "Should activate old credit when it is already created, if it is not expired (with dashes)" do
-  #   sign_in @admin_user
-  #   number = "340-5043-2363-2976" 
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   cc_token = @active_credit_card.token
-  #   @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id, :number => number
+  test "Should activate old credit when it is already created, if it is not expired (with dashes)" do
+    sign_in @admin_user
+    number = "340-5043-2363-2976" 
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_token = @active_credit_card.token
+    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id, :number => number
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count', 2) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   @member.reload
-  #   assert_not_equal(@member.active_credit_card.token, cc_token)
-  #   assert_equal(@member.active_credit_card.token, @credit_card.token)
-  # end
+    assert_difference('Operation.count', 2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    @member.reload
+    assert_not_equal(@member.active_credit_card.token, cc_token)
+    assert_equal(@member.active_credit_card.token, @credit_card.token)
+  end
 
-  # test "Should activate old credit when it is already created, if it is not expired (with spaces)" do
-  #   sign_in @admin_user
-  #   number = "340 5043 2363 2976"   
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   cc_token = @active_credit_card.token
-  #   @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id, :number => number
+  test "Should activate old credit when it is already created, if it is not expired (with spaces)" do
+    sign_in @admin_user
+    number = "340 5043 2363 2976"   
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_token = @active_credit_card.token
+    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id, :number => number
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
     
-  #   assert_difference('Operation.count', 2) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   @member.reload
-  #   assert_not_equal(@member.active_credit_card.token, cc_token)
-  #   assert_equal(@member.active_credit_card.token, @credit_card.token)
-  # end
+    assert_difference('Operation.count', 2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    @member.reload
+    assert_not_equal(@member.active_credit_card.token, cc_token)
+    assert_equal(@member.active_credit_card.token, @credit_card.token)
+  end
 
-  # test "Should activate old credit when it is already created, if it is not expired (with slashes)" do
-  #   sign_in @admin_user
-  #   number = "340/5043/2363/2976"
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   cc_token = @active_credit_card.token
-  #   @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id, :number => number
+  test "Should activate old credit when it is already created, if it is not expired (with slashes)" do
+    sign_in @admin_user
+    number = "340/5043/2363/2976"
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_token = @active_credit_card.token
+    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id, :number => number
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count', 2) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   @member.reload
-  #   assert_not_equal(@member.active_credit_card.token, cc_token)
-  #   assert_equal(@member.active_credit_card.token, @credit_card.token)
-  # end
+    assert_difference('Operation.count', 2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    @member.reload
+    assert_not_equal(@member.active_credit_card.token, cc_token)
+    assert_equal(@member.active_credit_card.token, @credit_card.token)
+  end
 
-  # test "Should not activate old credit card when update only number, if old is expired" do
-  #   sign_in @admin_user
+  test "Should not activate old credit card when update only number, if old is expired" do
+    sign_in @admin_user
     
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   cc_number = @active_credit_card.number
-  #   @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id
-  #   @credit_card.expire_month = (Time.zone.now-1.month).month
-  #   @credit_card.expire_year = (Time.zone.now-1.year).year
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_number = @active_credit_card.number
+    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @member.id
+    @credit_card.expire_month = (Time.zone.now-1.month).month
+    @credit_card.expire_year = (Time.zone.now-1.year).year
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',0) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   @member.reload
-  #   assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[cc_number])
-  # end
+    assert_difference('Operation.count',0) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    @member.reload
+    assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[cc_number])
+  end
 
-  # test "Should not update active credit card with expired month" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   cc_expire_month = @active_credit_card.expire_month
+  test "Should not update active credit card with expired month" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_expire_month = @active_credit_card.expire_month
 
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   @credit_card.number = @active_credit_card.number
-  #   expired_month = Time.zone.now-1.month
-  #   @credit_card.expire_month = expired_month.month
-  #   @credit_card.expire_year = expired_month.year
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = @active_credit_card.number
+    expired_month = Time.zone.now-1.month
+    @credit_card.expire_month = expired_month.month
+    @credit_card.expire_year = expired_month.year
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',0) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   assert_response :success
-  #   @member.reload
-  #   assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
-  #   assert_equal(@member.active_credit_card.expire_month, cc_expire_month)
-  # end
+    assert_difference('Operation.count',0) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    @member.reload
+    assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
+    assert_equal(@member.active_credit_card.expire_month, cc_expire_month)
+  end
 
-  # test "Should not update active credit card with expired year" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   cc_expire_year = @active_credit_card.expire_year
+  test "Should not update active credit card with expired year" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    cc_expire_year = @active_credit_card.expire_year
 
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   @credit_card.number = @active_credit_card.number
-  #   @credit_card.expire_year = (Time.zone.now-1.year).year
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = @active_credit_card.number
+    @credit_card.expire_year = (Time.zone.now-1.year).year
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',0) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   @member.reload
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
-  #   assert_equal(@member.active_credit_card.expire_year, cc_expire_year)
-  # end
+    assert_difference('Operation.count',0) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
+    assert_equal(@member.active_credit_card.expire_year, cc_expire_year)
+  end
 
-  # test "Update a profile with CC blacklisted" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @member2 = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member.id
-  #   @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member2.id, :blacklisted => true
+  test "Update a profile with CC blacklisted" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member2 = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member.id
+    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member2.id, :blacklisted => true
 
-  #   @credit_card = FactoryGirl.build :credit_card_master_card
-  #   active_merchant_stubs_store(@credit_card.number)
+    @credit_card = FactoryGirl.build :credit_card_master_card
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',0) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   @member.reload
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@active_credit_card.number])
-  # end
+    assert_difference('Operation.count',0) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@active_credit_card.number])
+  end
 
-  # # New Member when CC is already used (Sloop) and Family memberships = true
-  # test "New Member when CC is already used (Drupal) and Family memberships = true" do
-  #   sign_in @admin_user
-  #   @terms_of_membership = @terms_of_membership_with_family
+  # New Member when CC is already used (Sloop) and Family memberships = true
+  test "New Member when CC is already used (Drupal) and Family memberships = true" do
+    sign_in @admin_user
+    @terms_of_membership = @terms_of_membership_with_family
 
-  #   @former_member = create_active_member(@terms_of_membership_with_family, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
-  #   @former_member_credit_card = @active_credit_card.token
+    @former_member = create_active_member(@terms_of_membership_with_family, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+    @former_member_credit_card = @active_credit_card.token
     
-  #   @member = FactoryGirl.build(:member_with_api)
-  #   @credit_card = FactoryGirl.build :credit_card_master_card
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
+    @member = FactoryGirl.build(:member_with_api)
+    @credit_card = FactoryGirl.build :credit_card_master_card
+    @enrollment_info = FactoryGirl.build :enrollment_info
 
-  #   active_merchant_stubs_store(@credit_card.number)
-  #   assert_difference('Operation.count',2) do
-  #     assert_difference('CreditCard.count',1) do
-  #       generate_post_message
-  #       assert_response :success
-  #     end
-  #   end
-  # end
+    active_merchant_stubs_store(@credit_card.number)
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',1) do
+        generate_post_message
+        assert_response :success
+      end
+    end
+  end
 
-  # # New Member when CC is already used (Sloop), Family memberships = true and email is duplicated
-  # test "Enroll error when CC is already used (Drupal), Family memberships = true and email is duplicated" do
-  #   sign_in @admin_user
-  #   @terms_of_membership.club.update_attribute(:family_memberships_allowed, true)
+  # New Member when CC is already used (Sloop), Family memberships = true and email is duplicated
+  test "Enroll error when CC is already used (Drupal), Family memberships = true and email is duplicated" do
+    sign_in @admin_user
+    @terms_of_membership.club.update_attribute(:family_memberships_allowed, true)
 
-  #   @former_member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
-  #   @former_member_credit_card_token = @active_credit_card.token
+    @former_member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+    @former_member_credit_card_token = @active_credit_card.token
 
-  #   @member = FactoryGirl.build(:member_with_api, :email => @former_member.email)
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
+    @member = FactoryGirl.build(:member_with_api, :email => @former_member.email)
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @enrollment_info = FactoryGirl.build :enrollment_info
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Member.count',0) do
-  #     assert_difference('Operation.count',0) do
-  #       assert_difference('CreditCard.count',0) do
-  #         generate_post_message
-  #       end
-  #     end
-  #   end
-  # end
+    assert_difference('Member.count',0) do
+      assert_difference('Operation.count',0) do
+        assert_difference('CreditCard.count',0) do
+          generate_post_message
+        end
+      end
+    end
+  end
 
-  # test "Update a profile with CC used by another member. club with family memberships" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership_with_family, :member_with_api)
-  #   @member2 = create_active_member(@terms_of_membership_with_family, :member_with_api)
+  test "Update a profile with CC used by another member. club with family memberships" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership_with_family, :member_with_api)
+    @member2 = create_active_member(@terms_of_membership_with_family, :member_with_api)
 
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   old_token = @active_credit_card.token
-  #   @active_credit_card2 = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member2.id
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    old_token = @active_credit_card.token
+    @active_credit_card2 = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member2.id
 
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   token = @credit_card.token
-  #   active_merchant_stubs_store(@credit_card.number)
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    token = @credit_card.token
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',3) do
-  #     assert_difference('CreditCard.count',1) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   @member.reload
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.number, nil)
-  #   assert_equal(@member.active_credit_card.token, token)
-  #   assert_not_equal(old_token, token)
-  # end
+    assert_difference('Operation.count',3) do
+      assert_difference('CreditCard.count',1) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, nil)
+    assert_equal(@member.active_credit_card.token, token)
+    assert_not_equal(old_token, token)
+  end
 
-  # # #Update a profile with CC used by another member and Family Membership = False
-  # test "Error Member when CC is already used (Sloop) and Family memberships = false" do
-  #   sign_in @admin_user
-  #   active_merchant_stubs
+  # #Update a profile with CC used by another member and Family Membership = False
+  test "Error Member when CC is already used (Sloop) and Family memberships = false" do
+    sign_in @admin_user
+    active_merchant_stubs
     
-  #   @current_agent = @admin_user
-  #   @former_member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @terms_of_membership.club = @former_member.club
-  #   @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
+    @current_agent = @admin_user
+    @former_member = create_active_member(@terms_of_membership, :member_with_api)
+    @terms_of_membership.club = @former_member.club
+    @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
     
-  #   @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
+    @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+    @enrollment_info = FactoryGirl.build :enrollment_info
 
-  #   @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
-  #   @credit_card = FactoryGirl.build :credit_card_master_card
-  #   active_merchant_stubs_store(@credit_card.number)
+    @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
+    @credit_card = FactoryGirl.build :credit_card_master_card
+    active_merchant_stubs_store(@credit_card.number)
   
-  #   assert_equal @terms_of_membership.club.family_memberships_allowed, false
-  #   assert_difference("Member.count",0) do
-  #     assert_difference("CreditCard.count",0) do
-  #       generate_post_message
-  #       assert_equal @response.body, '{"message":"We'+"'"+'re sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: 123 456 7891.","code":"9507","errors":{"number":"Credit card is already in use"}}'
-  #     end
-  #   end
-  # end
+    assert_equal @terms_of_membership.club.family_memberships_allowed, false
+    assert_difference("Member.count",0) do
+      assert_difference("CreditCard.count",0) do
+        generate_post_message
+        assert_equal @response.body, '{"message":"We'+"'"+'re sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: 123 456 7891.","code":"9507","errors":{"number":"Credit card is already in use"}}'
+      end
+    end
+  end
 
-  # # #Update a profile with CC used by another member and Family Membership = False
-  # test "Error Member when CC is already used (Sloop) and Family memberships = false with little gateway" do
-  #   sign_in @admin_user
-  #   active_merchant_stubs
-  #   @club = FactoryGirl.create(:simple_club_with_litle_gateway)
-  #   @current_agent = @admin_user
-  #   @former_member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @terms_of_membership.club = @former_member.club
-  #   @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
+  # #Update a profile with CC used by another member and Family Membership = False
+  test "Error Member when CC is already used (Sloop) and Family memberships = false with little gateway" do
+    sign_in @admin_user
+    active_merchant_stubs
+    @club = FactoryGirl.create(:simple_club_with_litle_gateway)
+    @current_agent = @admin_user
+    @former_member = create_active_member(@terms_of_membership, :member_with_api)
+    @terms_of_membership.club = @former_member.club
+    @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
     
-  #   @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
+    @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+    @enrollment_info = FactoryGirl.build :enrollment_info
 
-  #   @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
-  #   @credit_card = FactoryGirl.build :credit_card_master_card
-  #   active_merchant_stubs_store(@credit_card.number)
+    @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
+    @credit_card = FactoryGirl.build :credit_card_master_card
+    active_merchant_stubs_store(@credit_card.number)
   
-  #   assert_equal @terms_of_membership.club.family_memberships_allowed, false
-  #   assert_difference("Member.count",0) do
-  #     assert_difference("CreditCard.count",0) do
-  #       generate_post_message
-  #       assert_equal @response.body, '{"message":"We'+"'"+'re sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: 123 456 7891.","code":"9507","errors":{"number":"Credit card is already in use"}}'
-  #     end
-  #   end
-  # end
+    assert_equal @terms_of_membership.club.family_memberships_allowed, false
+    assert_difference("Member.count",0) do
+      assert_difference("CreditCard.count",0) do
+        generate_post_message
+        assert_equal @response.body, '{"message":"We'+"'"+'re sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: 123 456 7891.","code":"9507","errors":{"number":"Credit card is already in use"}}'
+      end
+    end
+  end
 
-  # # #Update a profile with CC used by another member and Family Membership = False
-  # test "Error Member when CC is already used (Sloop) and Family memberships = false with authorize_net gateway" do
-  #   sign_in @admin_user
-  #   active_merchant_stubs
-  #   @club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
-  #   @current_agent = @admin_user
-  #   @former_member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @terms_of_membership.club = @former_member.club
-  #   @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
+  # #Update a profile with CC used by another member and Family Membership = False
+  test "Error Member when CC is already used (Sloop) and Family memberships = false with authorize_net gateway" do
+    sign_in @admin_user
+    active_merchant_stubs
+    @club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
+    @current_agent = @admin_user
+    @former_member = create_active_member(@terms_of_membership, :member_with_api)
+    @terms_of_membership.club = @former_member.club
+    @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
     
-  #   @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
+    @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @former_member.id
+    @enrollment_info = FactoryGirl.build :enrollment_info
 
-  #   @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
-  #   @credit_card = FactoryGirl.build :credit_card_master_card
-  #   active_merchant_stubs_store(@credit_card.number)
+    @member = FactoryGirl.build(:member_with_api, :email => "new_email@email.com")
+    @credit_card = FactoryGirl.build :credit_card_master_card
+    active_merchant_stubs_store(@credit_card.number)
   
-  #   assert_equal @terms_of_membership.club.family_memberships_allowed, false
-  #   assert_difference("Member.count",0) do
-  #     assert_difference("CreditCard.count",0) do
-  #       generate_post_message
-  #       assert_equal @response.body, '{"message":"We'+"'"+'re sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: 123 456 7891.","code":"9507","errors":{"number":"Credit card is already in use"}}'
-  #     end
-  #   end
-  # end
+    assert_equal @terms_of_membership.club.family_memberships_allowed, false
+    assert_difference("Member.count",0) do
+      assert_difference("CreditCard.count",0) do
+        generate_post_message
+        assert_equal @response.body, '{"message":"We'+"'"+'re sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: 123 456 7891.","code":"9507","errors":{"number":"Credit card is already in use"}}'
+      end
+    end
+  end
 
-  # test "Update a profile with CC used by another member. club does not allow family memberships" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @member2 = create_active_member(@terms_of_membership, :member_with_api)
+  test "Update a profile with CC used by another member. club does not allow family memberships" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member2 = create_active_member(@terms_of_membership, :member_with_api)
 
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   token = @active_credit_card.token
-  #   @active_credit_card2 = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member2.id
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    token = @active_credit_card.token
+    @active_credit_card2 = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member2.id
 
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   active_merchant_stubs_store(@credit_card.number)
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',0) do
-  #     assert_difference('CreditCard.count',0) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   @member.reload
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.number, nil)
-  #   assert_equal(@member.active_credit_card.token, token)
-  # end
+    assert_difference('Operation.count',0) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, nil)
+    assert_equal(@member.active_credit_card.token, token)
+  end
 
-  # # Update a member with different CC 
-  # # Update same CC with dashes
-  # test "Update a profile with CC with dashes" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
-  #   cc_expire_year = @active_credit_card.expire_year
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   @credit_card.number = "340-5043-2363-2976"
-  #   @credit_card.expire_year = @blacklisted_credit_card.expire_year
-  #   @credit_card.expire_month = @blacklisted_credit_card.expire_month
+  # Update a member with different CC 
+  # Update same CC with dashes
+  test "Update a profile with CC with dashes" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
+    cc_expire_year = @active_credit_card.expire_year
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = "340-5043-2363-2976"
+    @credit_card.expire_year = @blacklisted_credit_card.expire_year
+    @credit_card.expire_month = @blacklisted_credit_card.expire_month
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',3) do
-  #     assert_difference('CreditCard.count',1) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   @member.reload
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.number, nil)
-  #   assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
-  # end
+    assert_difference('Operation.count',3) do
+      assert_difference('CreditCard.count',1) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, nil)
+    assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
+  end
 
-  # # Update a member with different CC 
-  # test "Update a profile with CC with slashes" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
-  #   cc_expire_year = @active_credit_card.expire_year
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   @credit_card.number = "340/5043/2363/2976"
-  #   @credit_card.expire_year = @blacklisted_credit_card.expire_year
-  #   @credit_card.expire_month = @blacklisted_credit_card.expire_month
+  # Update a member with different CC 
+  test "Update a profile with CC with slashes" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
+    cc_expire_year = @active_credit_card.expire_year
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = "340/5043/2363/2976"
+    @credit_card.expire_year = @blacklisted_credit_card.expire_year
+    @credit_card.expire_month = @blacklisted_credit_card.expire_month
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',3) do
-  #     assert_difference('CreditCard.count',1) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   @member.reload
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.number, nil)
-  #   assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
-  # end
+    assert_difference('Operation.count',3) do
+      assert_difference('CreditCard.count',1) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, nil)
+    assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
+  end
 
-  # # Update a member with different CC 
-  # # Update same CC with spaces 
-  # test "Update a profile with CC with white spaces" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
-  #   @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
-  #   cc_expire_year = @active_credit_card.expire_year
-  #   @credit_card = FactoryGirl.build :credit_card_american_express
-  #   @credit_card.number = "340 5043 2363 2976"
-  #   @credit_card.expire_year = @blacklisted_credit_card.expire_year
-  #   @credit_card.expire_month = @blacklisted_credit_card.expire_month
+  # Update a member with different CC 
+  # Update same CC with spaces 
+  test "Update a profile with CC with white spaces" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :member_id => @member.id
+    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :member_id => @member.id, :blacklisted => true
+    cc_expire_year = @active_credit_card.expire_year
+    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card.number = "340 5043 2363 2976"
+    @credit_card.expire_year = @blacklisted_credit_card.expire_year
+    @credit_card.expire_month = @blacklisted_credit_card.expire_month
 
-  #   active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stubs_store(@credit_card.number)
 
-  #   assert_difference('Operation.count',3) do
-  #     assert_difference('CreditCard.count',1) do
-  #       generate_put_message
-  #     end
-  #   end
-  #   @member.reload
-  #   assert_response :success
-  #   assert_equal(@member.active_credit_card.number, nil)
-  #   assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
-  # end
+    assert_difference('Operation.count',3) do
+      assert_difference('CreditCard.count',1) do
+        generate_put_message
+      end
+    end
+    @member.reload
+    assert_response :success
+    assert_equal(@member.active_credit_card.number, nil)
+    assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
+  end
   
-  # test "Should not create member's record when there is an error on transaction." do
-  #   active_merchant_stubs_store
-  #   sign_in @admin_user
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   @current_club = @terms_of_membership.club
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs_purchase(@credit_card.number, "34234", "decline stubbed", false) 
-  #   assert_difference('Membership.count', 0) do
-  #     assert_difference('EnrollmentInfo.count', 0)do
-  #       assert_difference('Transaction.count')do
-  #         assert_difference('MemberPreference.count', 0) do 
-  #           assert_difference('Member.count', 0) do
-  #             generate_post_message
-  #             assert_response :success
-  #           end
-  #         end
-  #       end
-  #     end
-  #   end
-  #   transaction = Transaction.last
-  #   assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
-  # end
+  test "Should not create member's record when there is an error on transaction." do
+    active_merchant_stubs_store
+    sign_in @admin_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs_purchase(@credit_card.number, "34234", "decline stubbed", false) 
+    assert_difference('Membership.count', 0) do
+      assert_difference('EnrollmentInfo.count', 0)do
+        assert_difference('Transaction.count')do
+          assert_difference('MemberPreference.count', 0) do 
+            assert_difference('Member.count', 0) do
+              generate_post_message
+              assert_response :success
+            end
+          end
+        end
+      end
+    end
+    transaction = Transaction.last
+    assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
+  end
 
-  # test "Should not create member's record when there is an error on MeS get token." do
-  #   active_merchant_stubs_store
-  #   sign_in @admin_user
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
-  #   @current_club = @terms_of_membership.club
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs_store(@credit_card.number, "117", "decline stubbed", false)
-  #   assert_difference('Membership.count', 0) do
-  #     assert_difference('EnrollmentInfo.count', 0)do
-  #       assert_difference('Transaction.count',0)do
-  #         assert_difference('MemberPreference.count',0) do 
-  #           assert_difference('Member.count',0) do
-  #             generate_post_message
-  #             assert_response :success
-  #           end
-  #         end
-  #       end
-  #     end
-  #   end
-  # end
+  test "Should not create member's record when there is an error on MeS get token." do
+    active_merchant_stubs_store
+    sign_in @admin_user
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs_store(@credit_card.number, "117", "decline stubbed", false)
+    assert_difference('Membership.count', 0) do
+      assert_difference('EnrollmentInfo.count', 0)do
+        assert_difference('Transaction.count',0)do
+          assert_difference('MemberPreference.count',0) do 
+            assert_difference('Member.count',0) do
+              generate_post_message
+              assert_response :success
+            end
+          end
+        end
+      end
+    end
+  end
 
-  # test "Update club cash if club is not Drupal" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@wordpress_terms_of_membership, :member_with_api)
-  #   new_amount, new_expire_date = 34, Date.today
-  #   old_amount, old_expire_date = @member.club_cash_amount, @member.club_cash_expire_date
-  #   put( :club_cash, { id: @member.id, amount: new_amount, expire_date: new_expire_date , :format => :json })
-  #   @member.reload
-  #   assert_response :success
-  #   assert_equal(@member.club_cash_amount, old_amount)
-  #   assert_equal(@member.club_cash_expire_date, old_expire_date)
-  # end
+  test "Update club cash if club is not Drupal" do
+    sign_in @admin_user
+    @member = create_active_member(@wordpress_terms_of_membership, :member_with_api)
+    new_amount, new_expire_date = 34, Date.today
+    old_amount, old_expire_date = @member.club_cash_amount, @member.club_cash_expire_date
+    put( :club_cash, { id: @member.id, amount: new_amount, expire_date: new_expire_date , :format => :json })
+    @member.reload
+    assert_response :success
+    assert_equal(@member.club_cash_amount, old_amount)
+    assert_equal(@member.club_cash_expire_date, old_expire_date)
+  end
 
-  # test "Update club cash if club is Drupal" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   new_amount, new_expire_date = 34, Date.today
-  #   old_amount, old_expire_date = @member.club_cash_amount, @member.club_cash_expire_date
-  #   put( :club_cash, id: @member.id, amount: new_amount, expire_date: new_expire_date, :format => :json )
-  #   @member.reload
-  #   assert_response :success
-  #   assert_equal(@member.club_cash_amount, old_amount)
-  #   assert_equal(@member.club_cash_expire_date, old_expire_date)
-  # end
+  test "Update club cash if club is Drupal" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    new_amount, new_expire_date = 34, Date.today
+    old_amount, old_expire_date = @member.club_cash_amount, @member.club_cash_expire_date
+    put( :club_cash, id: @member.id, amount: new_amount, expire_date: new_expire_date, :format => :json )
+    @member.reload
+    assert_response :success
+    assert_equal(@member.club_cash_amount, old_amount)
+    assert_equal(@member.club_cash_expire_date, old_expire_date)
+  end
 
   test "Update Credit Card with expire this current month" do
     sign_in @admin_user
@@ -1168,434 +1168,434 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.token, CREDIT_CARD_TOKEN[@active_credit_card.number])
   end
 
-  # test "Update member's next_bill_date provisional status" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
+  test "Update member's next_bill_date provisional status" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
     
-  #   @member.set_as_provisional
-  #   assert_difference('Operation.count') do
-  #     generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
-  #   end
-  #   @member.reload
-  #   assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
-  # end
+    @member.set_as_provisional
+    assert_difference('Operation.count') do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    @member.reload
+    assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
+  end
 
-  # test "Update member's next_bill_date active status" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
+  test "Update member's next_bill_date active status" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
     
-  #   @member.set_as_provisional
-  #   @member.set_as_active
+    @member.set_as_provisional
+    @member.set_as_active
 
-  #   assert_difference('Operation.count') do
-  #     generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
-  #   end
-  #   @member.reload
-  #   assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
-  # end
+    assert_difference('Operation.count') do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    @member.reload
+    assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
+  end
 
-  # test "Update member's next_bill_date applied status" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
+  test "Update member's next_bill_date applied status" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
     
-  #   @set_as_canceled
-  #   @member.set_as_applied   
-  #   assert_difference('Operation.count',0) do
-  #     generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
-  #   end
-  #   assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
-  # end
+    @set_as_canceled
+    @member.set_as_applied   
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
+  end
 
-  # test "Update member's next_bill_date lapsed status" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
+  test "Update member's next_bill_date lapsed status" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
 
-  #   @member.set_as_provisional
-  #   @member.set_as_canceled!
-  #   assert_difference('Operation.count',0) do
-  #     generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
-  #   end
-  #   assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
-  # end
+    @member.set_as_provisional
+    @member.set_as_canceled!
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
+  end
 
-  # test "Update member's next_bill_date with wrong date format" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
+  test "Update member's next_bill_date with wrong date format" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
     
-  #   @member.set_as_provisional
-  #   assert_difference('Operation.count',0) do
-  #     generate_put_next_bill_date( "25012015" )
-  #   end
-  #   assert @response.body.include? "Next bill date wrong format." 
-  # end
+    @member.set_as_provisional
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( "25012015" )
+    end
+    assert @response.body.include? "Next bill date wrong format." 
+  end
 
-  # test "Update member's next_bill_date with date prior to actual date" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
+  test "Update member's next_bill_date with date prior to actual date" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
     
-  #   @member.set_as_provisional
-  #   assert_difference('Operation.count',0) do
-  #     generate_put_next_bill_date( I18n.l(Time.zone.now - 3.days, :format => :only_date) )
-  #   end
-  #   assert @response.body.include? "Next bill date should be older that actual date" 
-  #   assert @response.body.include? "Is prior to actual date" 
-  # end
+    @member.set_as_provisional
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now - 3.days, :format => :only_date) )
+    end
+    assert @response.body.include? "Next bill date should be older that actual date" 
+    assert @response.body.include? "Is prior to actual date" 
+  end
 
-  # test "Update member's next_bill_date with blank date" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
+  test "Update member's next_bill_date with blank date" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
    
-  #   @member.set_as_provisional
-  #   assert_difference('Operation.count',0) do
-  #     generate_put_next_bill_date( "" )
-  #   end
-  #   assert @response.body.include? "Next bill date should not be blank" 
-  #   assert @response.body.include? "is blank" 
-  # end
+    @member.set_as_provisional
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( "" )
+    end
+    assert @response.body.include? "Next bill date should not be blank" 
+    assert @response.body.include? "is blank" 
+  end
 
-  # test "Supervisor should not updates member's next_bill_date" do
-  #   sign_in @supervisor_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   @member.set_as_provisional
-  #   assert_difference('Operation.count',0) do
-  #     generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
-  #     assert_response :unauthorized
-  #   end
-  # end
+  test "Supervisor should not updates member's next_bill_date" do
+    sign_in @supervisor_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    @member.set_as_provisional
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      assert_response :unauthorized
+    end
+  end
 
-  # test "Representative should not updates member's next_bill_date" do
-  #   sign_in @representative_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   @member.set_as_provisional
-  #   assert_difference('Operation.count',0) do
-  #     generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
-  #     assert_response :unauthorized
-  #   end
-  # end
+  test "Representative should not updates member's next_bill_date" do
+    sign_in @representative_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    @member.set_as_provisional
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      assert_response :unauthorized
+    end
+  end
 
-  # test "Agency should not updates member's next_bill_date" do
-  #   sign_in @agency_agent
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   @member.set_as_provisional
-  #   assert_difference('Operation.count',0) do
-  #     generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
-  #     assert_response :unauthorized
-  #   end
-  # end
+  test "Agency should not updates member's next_bill_date" do
+    sign_in @agency_agent
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    @member.set_as_provisional
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      assert_response :unauthorized
+    end
+  end
 
-  # test "Fulfillment manager should not updates member's next_bill_date" do
-  #   sign_in @fulfillment_managment_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   @member.set_as_provisional
-  #   assert_difference('Operation.count',0) do
-  #     generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
-  #     assert_response :unauthorized
-  #   end
-  # end
+  test "Fulfillment manager should not updates member's next_bill_date" do
+    sign_in @fulfillment_managment_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    @member.set_as_provisional
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      assert_response :unauthorized
+    end
+  end
 
-  #  test "Api agent should update member's next_bill_date" do
-  #    sign_in @admin_user
-  #    next_bill_date = Time.zone.now + 3.days
+   test "Api agent should update member's next_bill_date" do
+     sign_in @admin_user
+     next_bill_date = Time.zone.now + 3.days
  
-  #    @member = create_active_member(@terms_of_membership, :member_with_api)
-  #    FactoryGirl.create :credit_card, :member_id => @member.id
+     @member = create_active_member(@terms_of_membership, :member_with_api)
+     FactoryGirl.create :credit_card, :member_id => @member.id
  
-  #    @member.set_as_provisional
-  #    assert_difference('Operation.count') do
-  #     generate_put_next_bill_date( I18n.l(next_bill_date, :format => :only_date) )
-  #    end
-  #    @member.reload
-  #    assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(next_bill_date, :format => :only_date)
-  #  end
+     @member.set_as_provisional
+     assert_difference('Operation.count') do
+      generate_put_next_bill_date( I18n.l(next_bill_date, :format => :only_date) )
+     end
+     @member.reload
+     assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(next_bill_date, :format => :only_date)
+   end
 
-  # test "get members updated between given dates" do
-  #   sign_in @admin_user
+  test "get members updated between given dates" do
+    sign_in @admin_user
     
-  #   3.times{ create_active_member(@terms_of_membership, :member_with_api) }
-  #   first = Member.first
-  #   last = Member.last
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    first = Member.first
+    last = Member.last
 
-  #   first.update_attribute :updated_at, Time.zone.now - 10.days
-  #   last.update_attribute :updated_at, Time.zone.now - 8.days
+    first.update_attribute :updated_at, Time.zone.now - 10.days
+    last.update_attribute :updated_at, Time.zone.now - 8.days
 
-  #   generate_get_by_updated first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert @response.body.include? first.id.to_s
-  #   assert !(@response.body.include? last.id.to_s)
-  # end
+    generate_get_by_updated first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
+    assert @response.body.include? first.id.to_s
+    assert !(@response.body.include? last.id.to_s)
+  end
 
-  # test "get members updated between given dates with start date greater to end" do
-  #   sign_in @admin_user
-  #   generate_get_by_updated 5, Time.zone.now-9.day, Time.zone.now-11.day
-  #   assert @response.body.include? "Check both start and end date, please. Start date is greater than end date"
-  # end
+  test "get members updated between given dates with start date greater to end" do
+    sign_in @admin_user
+    generate_get_by_updated 5, Time.zone.now-9.day, Time.zone.now-11.day
+    assert @response.body.include? "Check both start and end date, please. Start date is greater than end date"
+  end
 
-  # test "get members updated between given dates with blank date" do
-  #   sign_in @admin_user
-  #   3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+  test "get members updated between given dates with blank date" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     
-  #   generate_get_by_updated 5, "",Time.zone.now-10.day
-  #   assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
-  #   generate_get_by_updated 5, Time.zone.now-10.day,""
-  #   assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
-  # end
+    generate_get_by_updated 5, "",Time.zone.now-10.day
+    assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
+    generate_get_by_updated 5, Time.zone.now-10.day,""
+    assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
+  end
 
-  # test "get members updated between given dates with wrong format date" do
-  #   sign_in @admin_user
-  #   3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+  test "get members updated between given dates with wrong format date" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     
-  #   generate_get_by_updated 5, "1234567", Time.zone.now-10.day
-  #   assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
-  #   generate_get_by_updated 5, Time.zone.now-10.day, "1234567"
-  #   assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
-  # end
+    generate_get_by_updated 5, "1234567", Time.zone.now-10.day
+    assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
+    generate_get_by_updated 5, Time.zone.now-10.day, "1234567"
+    assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
+  end
 
-  # test "Representative should not get members updated between given dates" do
-  #   sign_in @representative_user
-  #   generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert_response :unauthorized
-  # end
+  test "Representative should not get members updated between given dates" do
+    sign_in @representative_user
+    generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
 
-  # test "Supervisor should not get members updated between given dates" do
-  #   sign_in @supervisor_user
-  #   generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert_response :unauthorized
-  # end
+  test "Supervisor should not get members updated between given dates" do
+    sign_in @supervisor_user
+    generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
 
-  # test "Agency should not get members updated between given dates" do
-  #   sign_in @agency_agent
-  #   generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert_response :unauthorized
-  # end
+  test "Agency should not get members updated between given dates" do
+    sign_in @agency_agent
+    generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
 
-  # test "Fulfillment manager should not get members updated between given dates" do
-  #   sign_in @fulfillment_managment_user
-  #   generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert_response :unauthorized
-  # end
+  test "Fulfillment manager should not get members updated between given dates" do
+    sign_in @fulfillment_managment_user
+    generate_get_by_updated 5, Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
 
-  # test "Api should not get members updated between given dates" do
-  #   sign_in @api_user
-  #   3.times{ create_active_member(@terms_of_membership, :member_with_api) }
-  #   first = Member.first
-  #   last = Member.last
-  #   first.update_attribute :updated_at, Time.zone.now - 10.days
-  #   last.update_attribute :updated_at, Time.zone.now - 8.days
+  test "Api should not get members updated between given dates" do
+    sign_in @api_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    first = Member.first
+    last = Member.last
+    first.update_attribute :updated_at, Time.zone.now - 10.days
+    last.update_attribute :updated_at, Time.zone.now - 8.days
 
-  #   generate_get_by_updated first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert @response.body.include? first.id.to_s
-  #   assert !(@response.body.include? last.id.to_s)
-  # end
+    generate_get_by_updated first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
+    assert @response.body.include? first.id.to_s
+    assert !(@response.body.include? last.id.to_s)
+  end
 
-  # test "get members created between given dates" do
-  #   sign_in @admin_user
-  #   3.times{ create_active_member(@terms_of_membership, :member_with_api) }
-  #   first = Member.first
-  #   last = Member.last
-  #   first.update_attribute :created_at, Time.zone.now - 10.days
-  #   last.update_attribute :created_at, Time.zone.now - 8.days
+  test "get members created between given dates" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    first = Member.first
+    last = Member.last
+    first.update_attribute :created_at, Time.zone.now - 10.days
+    last.update_attribute :created_at, Time.zone.now - 8.days
 
-  #   generate_get_by_created first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert @response.body.include? first.id.to_s
-  #   assert !(@response.body.include? last.id.to_s)
-  # end
+    generate_get_by_created first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
+    assert @response.body.include? first.id.to_s
+    assert !(@response.body.include? last.id.to_s)
+  end
 
-  # test "get members created between given dates with blank date" do
-  #   sign_in @admin_user
-  #   3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+  test "get members created between given dates with blank date" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     
-  #   generate_get_by_created 5, "",Time.zone.now-10.day
-  #   assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
-  #   generate_get_by_created 5, Time.zone.now-10.day,""
-  #   assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
-  # end
+    generate_get_by_created 5, "",Time.zone.now-10.day
+    assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
+    generate_get_by_created 5, Time.zone.now-10.day,""
+    assert @response.body.include? "Make sure to send both start and end dates, please. There seems to be at least one as null or blank"
+  end
 
-  # test "get members created between given dates with wrong format date" do
-  #   sign_in @admin_user
-  #   3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+  test "get members created between given dates with wrong format date" do
+    sign_in @admin_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
     
-  #   generate_get_by_created 5, "1234567",Time.zone.now-10.day
-  #   assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
-  #   generate_get_by_created 5, Time.zone.now-10.day,"1234567"
-  #   assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
-  # end
+    generate_get_by_created 5, "1234567",Time.zone.now-10.day
+    assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
+    generate_get_by_created 5, Time.zone.now-10.day,"1234567"
+    assert @response.body.include? "Check both start and end date format, please. It seams one of them is in an invalid format"
+  end
 
-  # test "Supervisor should not get members created between given dates" do
-  #   sign_in @supervisor_user
-  #   generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert_response :unauthorized
-  # end
+  test "Supervisor should not get members created between given dates" do
+    sign_in @supervisor_user
+    generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
 
-  # test "Representative should not get members created between given dates" do
-  #   sign_in @representative_user
-  #   generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert_response :unauthorized
-  # end
+  test "Representative should not get members created between given dates" do
+    sign_in @representative_user
+    generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
 
-  # test "Agency agent should not get members created between given dates" do
-  #   sign_in @agency_agent
-  #   generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert_response :unauthorized
-  # end
+  test "Agency agent should not get members created between given dates" do
+    sign_in @agency_agent
+    generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
 
-  # test "Fulfillment manager should not get members created between given dates" do
-  #   sign_in @fulfillment_managment_user
-  #   generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
-  #   assert_response :unauthorized
-  # end
+  test "Fulfillment manager should not get members created between given dates" do
+    sign_in @fulfillment_managment_user
+    generate_get_by_created 5, Time.zone.now-11.day, Time.zone.now-9.day
+    assert_response :unauthorized
+  end
 
-  # test "Api agent should get members created between given dates" do
-  #   sign_in @api_user
-  #   3.times{ create_active_member(@terms_of_membership, :member_with_api) }
-  #   first = Member.first
-  #   last = Member.last
-  #   first.update_attribute :created_at, Time.zone.now - 10.days
-  #   last.update_attribute :created_at, Time.zone.now - 8.days
+  test "Api agent should get members created between given dates" do
+    sign_in @api_user
+    3.times{ create_active_member(@terms_of_membership, :member_with_api) }
+    first = Member.first
+    last = Member.last
+    first.update_attribute :created_at, Time.zone.now - 10.days
+    last.update_attribute :created_at, Time.zone.now - 8.days
 
-  #   generate_get_by_created first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
+    generate_get_by_created first.club_id, Time.zone.now-11.day, Time.zone.now-9.day
     
-  #   assert @response.body.include? first.id.to_s
-  #   assert !(@response.body.include? last.id.to_s)
-  # end
+    assert @response.body.include? first.id.to_s
+    assert !(@response.body.include? last.id.to_s)
+  end
 
   
-  # # StatzHub - Add an Api method to cancel a member
-  # # Cancel date using a Curl call
-  # test "Admin should cancel memeber" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+  # StatzHub - Add an Api method to cancel a member
+  # Cancel date using a Curl call
+  test "Admin should cancel memeber" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
-  #   assert_difference("Operation.count") do
-  #     generate_put_cancel( cancel_date, "Reason" )
-  #     assert_response :success
-  #   end
-  #   @member.reload
-  #   assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
-  # end
+    assert_difference("Operation.count") do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :success
+    end
+    @member.reload
+    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
+  end
 
-  # test "Should not cancel member when reason is blank" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+  test "Should not cancel member when reason is blank" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
-  #   assert_difference("Operation.count",0) do
-  #     generate_put_cancel( cancel_date, "" )
-  #     assert_response :success
-  #   end
-  #   assert @response.body.include?("Reason missing. Please, make sure to provide a reason for this cancelation.")
-  # end
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "" )
+      assert_response :success
+    end
+    assert @response.body.include?("Reason missing. Please, make sure to provide a reason for this cancelation.")
+  end
 
-  # test "Should cancel member even if the cancel date is the same as today" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   cancel_date = I18n.l(Time.zone.now, :format => :only_date)    
+  test "Should cancel member even if the cancel date is the same as today" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now, :format => :only_date)    
 
-  #   assert_difference("Operation.count",0) do
-  #     generate_put_cancel( cancel_date, "" )
-  #     assert_response :success
-  #   end
-  # end
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "" )
+      assert_response :success
+    end
+  end
 
-  # test "Should not cancel member when cancel date is in wrong format" do
-  #   sign_in @admin_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+  test "Should not cancel member when cancel date is in wrong format" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
-  #   assert_difference("Operation.count",0) do
-  #     generate_put_cancel( cancel_date, "" )
-  #     assert_response :success
-  #   end
-  #   assert @response.body.include?("Reason missing. Please, make sure to provide a reason for this cancelation.")
-  # end
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "" )
+      assert_response :success
+    end
+    assert @response.body.include?("Reason missing. Please, make sure to provide a reason for this cancelation.")
+  end
 
-  # test "Supervisor should not cancel memeber" do
-  #   sign_in @supervisor_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+  test "Supervisor should not cancel memeber" do
+    sign_in @supervisor_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
-  #   assert_difference("Operation.count",0) do
-  #     generate_put_cancel( cancel_date, "Reason" )
-  #     assert_response :unauthorized
-  #   end
-  # end
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :unauthorized
+    end
+  end
 
-  # test "Representative should not cancel memeber" do
-  #   sign_in @representative_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+  test "Representative should not cancel memeber" do
+    sign_in @representative_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
-  #   assert_difference("Operation.count",0) do
-  #     generate_put_cancel( cancel_date, "Reason" )
-  #     assert_response :unauthorized
-  #   end
-  # end
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :unauthorized
+    end
+  end
 
-  # test "Agency should not cancel memeber" do
-  #   sign_in @agency_agent
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+  test "Agency should not cancel memeber" do
+    sign_in @agency_agent
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
-  #   assert_difference("Operation.count",0) do
-  #     generate_put_cancel( cancel_date, "Reason" )
-  #     assert_response :unauthorized
-  #   end
-  # end
+    assert_difference("Operation.count",0) do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :unauthorized
+    end
+  end
 
-  # test "api should cancel memeber" do
-  #   sign_in @api_user
-  #   @member = create_active_member(@terms_of_membership, :member_with_api)
-  #   FactoryGirl.create :credit_card, :member_id => @member.id
-  #   cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
+  test "api should cancel memeber" do
+    sign_in @api_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
-  #   assert_difference("Operation.count") do
-  #     generate_put_cancel( cancel_date, "Reason" )
-  #     assert_response :success
-  #   end
-  #   @member.reload
-  #   assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
-  # end
+    assert_difference("Operation.count") do
+      generate_put_cancel( cancel_date, "Reason" )
+      assert_response :success
+    end
+    @member.reload
+    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
+  end
 
-  # test "Admin should enroll/create member with blank_cc as true even if not cc information provided." do
-  #   sign_in @admin_user
-  #   @club = @club_with_api
-  #   @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
-  #   @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info, :enrollment_amount => 0.0
-  #   @current_club = @terms_of_membership.club
-  #   @current_agent = @admin_user
-  #   active_merchant_stubs
-  #   assert_difference('Membership.count')do
-  #     assert_difference('EnrollmentInfo.count')do
-  #       assert_difference('MemberPreference.count',@preferences.size) do 
-  #         assert_difference('Member.count') do
-  #           generate_post_message({}, {setter: { cc_blank: true }})
-  #           assert_response :success
-  #         end
-  #       end
-  #     end
-  #   end
-  #   credit_card = Member.last.active_credit_card
-  #   assert_equal credit_card.token, "a"
-  #   assert_equal credit_card.expire_month, Time.zone.now.month
-  #   assert_equal credit_card.expire_year, Time.zone.now.year
-  # end
+  test "Admin should enroll/create member with blank_cc as true even if not cc information provided." do
+    sign_in @admin_user
+    @club = @club_with_api
+    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info, :enrollment_amount => 0.0
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count')do
+      assert_difference('EnrollmentInfo.count')do
+        assert_difference('MemberPreference.count',@preferences.size) do 
+          assert_difference('Member.count') do
+            generate_post_message({}, {setter: { cc_blank: true }})
+            assert_response :success
+          end
+        end
+      end
+    end
+    credit_card = Member.last.active_credit_card
+    assert_equal credit_card.token, "a"
+    assert_equal credit_card.expire_month, Time.zone.now.month
+    assert_equal credit_card.expire_year, Time.zone.now.year
+  end
 end
