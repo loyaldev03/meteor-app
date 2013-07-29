@@ -9,16 +9,16 @@ module SacExactTarget
         begin 
           options = { :subscribe_to_list => true }
           client.Create(subscriber(subscriber_key, options))
-        rescue Timeout::Error => e
-          Auditory.audit(nil, self, "ExactTarget create took too long.", self.member, Settings.operation_types.et_timeout_create) 
+        rescue Exception => e
+          Auditory.audit(nil, self, "ExactTarget create took too long.", self.prospect.member, Settings.operation_types.et_timeout_create) if e.to_s.include?("Timeout")
           raise e
         end
       elsif SacExactTarget::ProspectModel.email_belongs_to_prospect?(subscriber.subscriber_key)
         begin
           options = { :subscribe_to_list => false }
           client.Update(subscriber(subscriber.subscriber_key, options))
-        rescue Timeout::Error => e
-          Auditory.audit(nil, self, "ExactTarget update took too long.", self.member, Settings.operation_types.et_timeout_update) 
+        rescue Exception => e
+          Auditory.audit(nil, self, "ExactTarget update took too long.", self.prospect.member, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
           raise e
         end
       end
@@ -40,8 +40,8 @@ module SacExactTarget
         'EmailAddress' => self.prospect.email, 'ObjectID' => true)
       res = client.Delete(subscriber)
       SacExactTarget::report_error("SacExactTarget:Prospect:destroy", res) if res.OverallStatus != "OK"
-    rescue Timeout::Error => e 
-      Auditory.audit(nil, self, "ExactTarget destroy took too long.", self.member, Settings.operation_types.et_timeout_destroy) 
+    rescue Exception => e 
+      Auditory.audit(nil, self, "ExactTarget destroy took too long.", self.prospect.member, Settings.operation_types.et_timeout_destroy) if e.to_s.include?("Timeout")
       raise e
     end
 
@@ -51,8 +51,8 @@ module SacExactTarget
       res.Results.collect do |result|
         result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
       end.flatten.compact
-    rescue Timeout::Error => e
-      Auditory.audit(nil, self, "ExactTarget find took too long.", self.member, Settings.operation_types.et_timeout_find) 
+    rescue Exception => e
+      Auditory.audit(nil, self, "ExactTarget find took too long.", self.prospect.member, Settings.operation_types.et_timeout_find) if e.to_s.include?("Timeout")
       raise e
     end
 

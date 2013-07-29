@@ -38,10 +38,8 @@ module SacExactTarget
           exact_target_member.save!
         end
         logger.info "SacExactTarget::sync took #{time_elapsed}ms"
-      rescue Timeout::Error => e
-        raise e
       rescue Exception => e
-        Auditory.report_issue("Member:sync", e, { :member => self.inspect })
+        Auditory.report_issue("Member:ExactTargetsync", e, { :member => self.inspect }) unless e.to_s.include?("Timeout")
         raise e
       end
 
@@ -50,10 +48,8 @@ module SacExactTarget
           exact_target_member.unsubscribe_subscriber!
         end
         logger.info "SacExactTarget::unsubscribe_subscriber took #{time_elapsed}ms"
-      rescue Timeout::Error => e
-        raise e
       rescue Exception => e
-        Auditory.report_issue("Member:unsubscribe_subscriber", e, { :member => self.inspect })
+        Auditory.report_issue("Member:unsubscribe_subscriber", e, { :member => self.inspect }) unless e.to_s.include?("Timeout")
         raise e
       end
         

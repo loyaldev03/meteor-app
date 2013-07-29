@@ -1,0 +1,29 @@
+<section>
+  <div class="page-header">
+    <h1>Subscription Plans</h1>
+    <% if can? :create, Product %>
+      <%= link_to(new_terms_of_membership_path, :class => "btn btn-primary btn_on_header", :id => "new_tom") do %> 
+        <i class="icon-plus"></i> Add New Plan
+      <% end %>
+    <% end %>
+  </div>
+
+  <table id="terms_of_memberships_table" class="table table-bordered table-condensed dataTable" data-source="<%= terms_of_memberships_url(format: "json") %>">
+    <thead>
+      <tr>
+        <th><%= t('activerecord.attributes.terms_of_membership.id') %></th>
+        <th><%= t('activerecord.attributes.terms_of_membership.plan_name') %></th>
+        <th><%= t('activerecord.attributes.terms_of_membership.external_code') %></th>
+        <th><%= t('activerecord.attributes.terms_of_membership.created_at') %></th>
+        <th><%= t('activerecord.attributes.terms_of_membership.by_agent') %></th>
+        <th> <%=t '.actions', :default => t("helpers.actions") %> </th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</section>
+
+<script>
+  $(document).ready(terms_of_memberships_table_index_functions(<%= TermsOfMembership.datatable_columns.size %>));
+</script>

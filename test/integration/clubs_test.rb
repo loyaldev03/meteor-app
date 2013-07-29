@@ -5,8 +5,8 @@ class ClubTest < ActionController::IntegrationTest
   setup do
     init_test_setup
     @partner = FactoryGirl.create(:partner)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     FactoryGirl.create(:batch_agent)
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     sign_in_as(@admin_agent)
   end
 
@@ -125,7 +125,7 @@ class ClubTest < ActionController::IntegrationTest
 
   test "should see all clubs as admin on my clubs section" do
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
-    click_link_or_button("My Clubs")
+    within(".navbar"){ click_link_or_button("My Clubs") }
     within("#my_clubs_table")do
       Club.all.each do |club|
         assert page.has_content?(club.name)
@@ -134,54 +134,6 @@ class ClubTest < ActionController::IntegrationTest
       assert page.has_content?("Members")
       assert page.has_content?("Products")
       assert page.has_content?("Fulfillments")
-    end
-  end
-
-  test "Should see every club on my clubs table when has agency role." do
-    @admin_agent.update_attribute(:roles,['agency'])
-    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
-
-    click_link_or_button("My Clubs")
-    within("#my_clubs_table")do
-      Club.all.each do |club|
-        assert page.has_content?(club.name)
-        assert page.has_content?(club.id.to_s)
-      end
-      assert page.has_content?("Members")
-      assert page.has_content?("Products")
-      assert page.has_content?("Fulfillments")
-    end
-  end
-
-  test "Should see every club on my clubs table when has representative role." do
-    @admin_agent.update_attribute(:roles,['representative'])
-    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
-
-    click_link_or_button("My Clubs")
-    within("#my_clubs_table")do
-      Club.all.each do |club|
-        assert page.has_content?(club.name)
-        assert page.has_content?(club.id.to_s)
-      end
-      assert page.has_content?("Members")
-      assert page.has_no_content?("Products")
-      assert page.has_no_content?("Fulfillments")
-    end
-  end
-
-  test "Should see every club on my clubs table when has supervisor role." do
-    @admin_agent.update_attribute(:roles,['supervisor'])
-    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
-
-    click_link_or_button("My Clubs")
-    within("#my_clubs_table")do
-      Club.all.each do |club|
-        assert page.has_content?(club.name)
-        assert page.has_content?(club.id.to_s)
-      end
-      assert page.has_content?("Members")
-      assert page.has_no_content?("Products")
-      assert page.has_no_content?("Fulfillments")
     end
   end
 

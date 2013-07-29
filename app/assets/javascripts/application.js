@@ -26,3 +26,7 @@
 //= require bootstrap-modal
 //= require general
 
+//= require formwizard/jquery.form.js
+//= require formwizard/bbq.js
+//= require formwizard/jquery-ui-1.8.5.custom.min.js
+//= require formwizard/jquery.form.wizard.js

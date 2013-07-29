@@ -43,6 +43,15 @@ class Club < ActiveRecord::Base
   # Exact Target : et_bussines_unit, et_prospect_list, et_members_list
   serialize :marketing_tool_attributes, JSON
 
+  def test_connection_to_api!
+    if self.sync?
+      conn = drupal
+      res = conn.get('/api/user/').body
+    else
+      raise "Drupal configuration is not completed."
+    end
+  end
+
   def full_name
     [ partner.name, name ].join(' ')
   end

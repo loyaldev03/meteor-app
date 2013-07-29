@@ -116,9 +116,16 @@ module ActionController
 
     def init_test_setup
       DatabaseCleaner.start
+      ## do you use firefox??
       Capybara.current_driver = :selenium
-      #Capybara.current_driver = :webkit
-      #Capybara.javascript_driver = nil
+      ## end configuration for firefox
+      ## do you want chrome ? (chrome is for carla)
+      # Capybara.register_driver :chrome do |app|
+      #   Capybara::Selenium::Driver.new(app, :browser => :chrome)
+      # end
+      # Capybara.javascript_driver = :chrome
+      # Capybara.current_driver = :chrome
+      ## end chrome configuration
       Capybara.default_wait_time = 10
     end
 
@@ -261,7 +268,7 @@ module ActionController
       fill_in 'member[first_name]', :with => unsaved_member.first_name
       if unsaved_member.gender == "Male" or unsaved_member.gender == "M"
         select("Male", :from => 'member[gender]')
-      else
+      elsif unsaved_member.gender == "Female" or unsaved_member.gender == "F"
         select("Female", :from => 'member[gender]')
       end
       fill_in 'member[address]', :with => unsaved_member.address
@@ -352,7 +359,6 @@ module ActionController
 
     within(".nav-tabs"){ click_on 'Operations' }
     within("#operations") do
-      assert page.has_selector?("#operations_table")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
     end
 
@@ -453,6 +459,7 @@ module ActionController
         assert_equal next_retry_bill_date_old, member.next_retry_bill_date
         assert_equal member.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
         assert_equal member.status, member.current_membership.status
+        within(".nav-tabs"){ click_on 'Operations' }
         within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
       end
     end

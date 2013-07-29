@@ -116,7 +116,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   #   recover_member(@saved_member,:terms_of_membership_with_gateway)
   # end
 
-
   test "recovery a member with provisional TOM" do
     setup_member
     recover_member(@saved_member,@new_terms_of_membership_with_gateway)
@@ -272,7 +271,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@new_terms_of_membership_with_gateway.id}) -#{@new_terms_of_membership_with_gateway.name}-")
       assert page.has_content?("Member billed successfully $#{@new_terms_of_membership_with_gateway.installment_amount}")
       assert page.has_content?("Renewal scheduled. NBD set #{I18n.l(next_bill_date, :format => :only_date)}")
-      assert page.has_content?("#{@new_terms_of_membership_with_gateway.club_cash_amount} club cash was successfully added. Concept: Adding club cash after billing")
     end
   end
 
@@ -330,5 +328,4 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     recover_member( @saved_member, @terms_of_membership_with_gateway )
     validate_member_recovery( @saved_member, @terms_of_membership_with_gateway )
   end
-
 end

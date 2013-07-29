@@ -203,6 +203,21 @@ function product_index_functions(column_count){
   });       
 }
 
+function terms_of_memberships_table_index_functions(column_count) {
+  $('#terms_of_memberships_table').dataTable({
+    "sPaginationType": "bootstrap",
+    "sDom": '<"top"fp>rt<"bottom"il>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aaSorting": [[ 0, "asc" ]],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+    "sAjaxSource": $('#terms_of_memberships_table').data('source'),
+  });
+}
+
 function new_partner_functions(){
   $('.help').popover({offset: 10});
 }
@@ -854,3 +869,22 @@ function admin_form_functions(){
     }
   });
 };
+
+// TOM Wizard functions
+// Creates the wizard
+function tom_create_wizard() {
+  $("#tom_wizard_form").formwizard({ 
+    formPluginEnabled: true,
+    validationEnabled: true,
+    focusFirstInput : true,
+    disableUIStyles: true,
+    textNext: 'Membership Terms',
+    textSubmit: 'Create Plan',
+    formOptions :{
+      success: function(data){$("#status").fadeTo(500,1,function(){ $(this).html("You are now registered!").fadeTo(5000, 0); })},
+      beforeSubmit: function(data){$("#data").html("data sent to the server: " + $.param(data));},
+      dataType: 'json',
+      resetForm: true
+    } 
+  });
+}
