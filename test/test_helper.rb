@@ -116,9 +116,15 @@ module ActionController
 
     def init_test_setup
       DatabaseCleaner.start
+      # use firefox??
       Capybara.current_driver = :selenium
-      #Capybara.current_driver = :webkit
-      #Capybara.javascript_driver = nil
+      # do you want chrome ? (chrome is for carla)
+      # Capybara.register_driver :chrome do |app|
+      #   Capybara::Selenium::Driver.new(app, :browser => :chrome)
+      # end
+      # Capybara.javascript_driver = :chrome
+      # Capybara.current_driver = :chrome
+      # end chrome configuration
       Capybara.default_wait_time = 10
     end
 

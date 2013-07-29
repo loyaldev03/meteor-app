@@ -1013,4 +1013,57 @@ test "Agency role - Recover a member" do
       setup_member
       visit fulfillments_index_path( :partner_prefix => @partner.prefix, :club_prefix => @club.name)
     end
+
+
+
+  test "Should see every club on my clubs table when has agency role." do
+    setup_agency
+    @admin_agent.update_attribute(:roles,['agency'])
+    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+
+    within(".navbar"){ click_link_or_button("My Clubs") }
+    within("#my_clubs_table")do
+      Club.all.each do |club|
+        assert page.has_content?(club.name)
+        assert page.has_content?(club.id.to_s)
+      end
+      assert page.has_content?("Members")
+      assert page.has_content?("Products")
+      assert page.has_content?("Fulfillments")
+    end
+  end
+
+  test "Should see every club on my clubs table when has representative role." do
+    setup_representative
+    @admin_agent.update_attribute(:roles,['representative'])
+    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+
+    within(".navbar"){ click_link_or_button("My Clubs") }
+    within("#my_clubs_table")do
+      Club.all.each do |club|
+        assert page.has_content?(club.name)
+        assert page.has_content?(club.id.to_s)
+      end
+      assert page.has_content?("Members")
+      assert page.has_no_content?("Products")
+      assert page.has_no_content?("Fulfillments")
+    end
+  end
+
+  test "Should see every club on my clubs table when has supervisor role." do
+    setup_supervisor
+    @admin_agent.update_attribute(:roles,['supervisor'])
+    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+
+    within(".navbar"){ click_link_or_button("My Clubs") }
+    within("#my_clubs_table")do
+      Club.all.each do |club|
+        assert page.has_content?(club.name)
+        assert page.has_content?(club.id.to_s)
+      end
+      assert page.has_content?("Members")
+      assert page.has_no_content?("Products")
+      assert page.has_no_content?("Fulfillments")
+    end
+  end    
 end
