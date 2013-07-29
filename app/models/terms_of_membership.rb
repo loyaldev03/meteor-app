@@ -26,6 +26,7 @@ class TermsOfMembership < ActiveRecord::Base
   validate :validate_payment_gateway_configuration
 
   before_destroy :verify_that_there_are_not_memberships_and_prospects
+  before_update :verify_that_there_are_not_memberships_and_prospects
 
   ###########################################
   # Installment types:
