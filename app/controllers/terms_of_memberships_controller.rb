@@ -1,5 +1,38 @@
 class TermsOfMembershipsController < ApplicationController
   before_filter :validate_club_presence
+  # before_filter :check_permissions
+
+  def index
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: TermsOfMembershipDatatable.new(view_context,@current_partner,@current_club,nil,@current_agent) }
+    end
+  end
+
+  def new
+    @tom = TermsOfMembership.new
+  end
+
+  def create
+    @tom = TermsOfMembership.new(params[:tom])
+    @tom.club_id = @current_club.id
+    if @tom.save
+      redirect_to terms_of_membership_path(@current_partner.prefix,@current_club.name, @tom), 
+        notice: 'Your Suscription Plan ' + @tom.name +  'was created Succesfully'
+    else
+      render action: "new"
+    end
+  end
+
+  def destroy
+    @tom = TermsOfMembership.find(params[:id])
+    if @tom.destroy
+      redirect_to terms_of_memberships_url, notice: "#{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
+    else
+      flash[:error] = "#{@tom.name} (ID: #{@tom.id}) was not destroyed."
+      redirect_to terms_of_memberships_url
+    end
+  end
 
   def show
     @tom = TermsOfMembership.find(params[:id])

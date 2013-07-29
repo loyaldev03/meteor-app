@@ -1,0 +1,83 @@
+
+
+<div class="step" id="first">
+  <div class="control-group">
+    <h3 class="wizard_step">
+      <span>Step </span>
+      <span class="wizard_step_circle step_selected">1</span>
+      <span class="wizard_step_circle">2</span>
+      <span class="wizard_step_circle">3</span>
+    </h3>
+  </div>
+  <div class="control-group">
+    <%= f.label :name, 'Suscription Plan Name', :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'text_field', :value => '' %>
+      <%= render :partial => "shared/help", :locals => { :title => t('lorem'), :content => t('lorem')} %> 
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :api_role, 'External Code (optional)', :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :api_role, :class => 'text_field input-small' %>
+      <%= render :partial => "shared/help", :locals => { :title => t('lorem'), :content => t('lorem')} %> 
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :description, 'Description (optional)', :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_area :description, :class => 'text_area', :rows => 5 %>
+      <%= render :partial => "shared/help", :locals => { :title => t('lorem'), :content => t('lorem')} %> 
+    </div>
+  </div>
+</div>
+
+<div class="step" id="second">  
+  <div class="control-group">
+    <h3 class="wizard_step">
+      <span>Step </span>
+      <span class="wizard_step_circle">1</span>
+      <span class="wizard_step_circle step_selected">2</span>
+      <span class="wizard_step_circle">3</span>
+    </h3>
+  </div>
+</div>
+
+<div class="step" id="third">
+  <div class="control-group">
+    <h3 class="wizard_step">
+      <span>Step </span>
+      <span class="wizard_step_circle">1</span>
+      <span class="wizard_step_circle">2</span>
+      <span class="wizard_step_circle step_selected">3</span>
+    </h3>
+  </div>
+</div>
+
+<div id="" class="form-actions">
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")), terms_of_memberships_path, :class => 'btn' %>
+  <div style = "float: right;">
+    <%= f.submit "clear", :id => 'back', :class => 'btn', :type => "reset" %>
+    <%= f.submit nil, :id => 'next', :class => 'btn btn-primary' %>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(tom_create_wizard());
+  // Updates the text of the 'Next' button based on the current step
+  $(function() {
+    $("#tom_wizard_form").bind("before_step_shown", function(event, data) {
+      switch(data.currentStep) {
+        case "first":
+          $("#tom_wizard_form").formwizard("option", {textNext: 'Membership Terms'});
+          break;
+        case "second":
+          $("#tom_wizard_form").formwizard("option", {textNext: 'Define Upgrades / Downgrades'});
+          break;
+        case "third":
+          $("#tom_wizard_form").formwizard("option", {textNext: 'Create Plan'});
+          break;
+      }
+    });
+  });
+</script>

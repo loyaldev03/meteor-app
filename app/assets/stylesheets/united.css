@@ -32,7 +32,8 @@
 
 #partners_table_wrapper.dataTables_wrapper .dataTables_paginate,
 #agents_table_wrapper.dataTables_wrapper .dataTables_paginate,
-#my_clubs_table_wrapper.dataTables_wrapper .dataTables_paginate {
+#my_clubs_table_wrapper.dataTables_wrapper .dataTables_paginate,
+#terms_of_memberships_table_wrapper.dataTables_wrapper .dataTables_paginate {
 	float: left;
 }
 
