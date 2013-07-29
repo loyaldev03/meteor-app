@@ -35,7 +35,9 @@ SacPlatform::Application.routes.draw do
   
 
   scope '/partner/:partner_prefix' do
-    resources :clubs
+    resources :clubs do
+      match '/test_api_connection' => 'clubs#test_api_connection', :via => :get
+    end
 
     scope '/club/:club_prefix' do
       match '/members/new' => 'members#new', as: 'new_member'
