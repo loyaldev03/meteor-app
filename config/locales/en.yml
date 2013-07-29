@@ -38,6 +38,7 @@ en:
   text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
   loading: 'Loading'
   index: '#'
+  lorem: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
   menu: 
     logout: 'Logout'
     agents: 'Agents'
@@ -323,6 +324,11 @@ en:
         external_code: 'External Code'
         created_at: 'Created At'
         by_agent: 'Created By'
+        wizard:
+          title: 'New Suscription Plan'
+          plan_name: 'Suscription Plan Name'
+          external_code: 'External Code (optional)'
+          description: 'Description (optional)'
       email_template:
         name: 'Name'
         type: 'Type'
