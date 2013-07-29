@@ -267,7 +267,7 @@ module ActionController
       fill_in 'member[first_name]', :with => unsaved_member.first_name
       if unsaved_member.gender == "Male" or unsaved_member.gender == "M"
         select("Male", :from => 'member[gender]')
-      else
+      elsif unsaved_member.gender == "Female" or unsaved_member.gender == "F"
         select("Female", :from => 'member[gender]')
       end
       fill_in 'member[address]', :with => unsaved_member.address
