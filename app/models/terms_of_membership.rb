@@ -1,6 +1,6 @@
 class TermsOfMembership < ActiveRecord::Base
   attr_accessible :mode, :needs_enrollment_approval, :provisional_days, 
-    :installment_amount, :description, :installment_type, :club, :name, :club_cash_amount
+    :installment_amount, :description, :installment_type, :club, :name, :club_cash_amount, :agent_id
 
   belongs_to :club
   has_many :transactions
@@ -8,6 +8,7 @@ class TermsOfMembership < ActiveRecord::Base
   has_many :prospects
   has_many :email_templates
   belongs_to :downgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'downgrade_tom_id'
+  belongs_to :agent
 
   acts_as_paranoid
 
@@ -23,6 +24,9 @@ class TermsOfMembership < ActiveRecord::Base
   validates :quota, :presence => true
   validates :club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validate :validate_payment_gateway_configuration
+
+  before_destroy :verify_that_there_are_not_memberships_and_prospects
+  before_update :verify_that_there_are_not_memberships_and_prospects
 
   ###########################################
   # Installment types:
@@ -55,6 +59,10 @@ class TermsOfMembership < ActiveRecord::Base
     self.downgrade_tom_id.to_i > 0
   end
 
+  def self.datatable_columns
+    ['id', 'name', 'api_role', 'created_at', 'agent_id']
+  end
+
   private
 
     def validate_payment_gateway_configuration
@@ -74,5 +82,9 @@ class TermsOfMembership < ActiveRecord::Base
           end
         end
       end
+    end
+
+    def verify_that_there_are_not_memberships_and_prospects
+      self.memberships.count == 0 && self.prospects.count == 0
     end
 end

@@ -39,6 +39,7 @@ en:
   loading: 'Loading'
   test_api_connection: 'Test API Connection'
   index: '#'
+  lorem: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
   menu: 
     logout: 'Logout'
     agents: 'Agents'
@@ -136,6 +137,7 @@ en:
       fulfillments: 'Fulfillments'
       fulfillment_files: 'Fulfillment Files'
       disposition_types: 'Disposition Types'
+      suscription_plans: 'Suscription Plans'
     member: 'Member'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
@@ -318,6 +320,16 @@ en:
         not_have_payment_gateway_development: 'The club does not have payment gateway configuration for development mode'
         not_have_payment_gateway_production: 'The club does not have payment gateway configuration for production mode'
         club_cash_amount: 'Club cash amount'
+        id: 'ID'
+        plan_name: 'Plan Name'
+        external_code: 'External Code'
+        created_at: 'Created At'
+        by_agent: 'Created By'
+        wizard:
+          title: 'New Suscription Plan'
+          plan_name: 'Suscription Plan Name'
+          external_code: 'External Code (optional)'
+          description: 'Description (optional)'
       email_template:
         name: 'Name'
         type: 'Type'
@@ -376,6 +388,7 @@ en:
         run_at: 'Run at'
         created_at: 'created_at'
         rescheduled_job: "re-scheduled Job: %{job}"
+
   date:
     formats:
       default: "%m/%d/%Y"
