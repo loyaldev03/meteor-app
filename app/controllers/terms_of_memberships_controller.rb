@@ -16,6 +16,7 @@ class TermsOfMembershipsController < ApplicationController
   def create
     @tom = TermsOfMembership.new(params[:tom])
     @tom.club_id = @current_club.id
+    @tom.agent = @current_agent
     if @tom.save
       redirect_to terms_of_membership_path(@current_partner.prefix,@current_club.name, @tom), 
         notice: 'Your Suscription Plan ' + @tom.name +  'was created Succesfully'
