@@ -11,7 +11,7 @@ module SacExactTarget
       @subscriber = res.Results.first
       @subscriber.nil?
     rescue Exception  => e
-      Auditory.audit(nil, self, "ExactTarget subscriber find took too long.", self, Settings.operation_types.et_timeout_retrieve) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self, "ExactTarget subscriber find took too long.", self.member, Settings.operation_types.et_timeout_retrieve) if e.to_s.include?("Timeout")
       raise e
     end
 
@@ -32,7 +32,7 @@ module SacExactTarget
         'Subscribers' => [s] )
       client.Create(trigger_to_send)
     rescue Exception => e
-      Auditory.audit(nil, self, "ExactTarget trigger creation took too long.", self, Settings.operation_types.et_timeout_trigger_create) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self, "ExactTarget trigger creation took too long.", self.member, Settings.operation_types.et_timeout_trigger_create) if e.to_s.include?("Timeout")
       raise e
     end
 
@@ -53,7 +53,7 @@ module SacExactTarget
       })
       client.Update(s)
     rescue Exception => e
-      Auditory.audit(nil, self, "ExactTarget update took too long.", self, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self, "ExactTarget update took too long.", self.member, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
       raise e
     end
 
@@ -65,7 +65,7 @@ module SacExactTarget
       begin
         client.Create(subscriber(subscriber_key, options))
       rescue Exception => e
-        Auditory.audit(nil, self, "ExactTarget create took too long.", self, Settings.operation_types.et_timeout_create) if e.to_s.include?("Timeout")
+        Auditory.audit(nil, self, "ExactTarget create took too long.", self.member, Settings.operation_types.et_timeout_create) if e.to_s.include?("Timeout")
         raise e
       end
     end
@@ -76,7 +76,7 @@ module SacExactTarget
       options = { :subscribe_to_list => !@subscriber.attributes.select { |s| s[:name] == 'Club' and s[:value].nil? }.empty? }
       client.Update(subscriber(subscriber_key, options))
     rescue Exception => e 
-      Auditory.audit(nil, self, "ExactTarget update took too long.", self, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self, "ExactTarget update took too long.", self.member, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
       raise e 
     end
 
