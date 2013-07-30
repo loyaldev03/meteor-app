@@ -10,7 +10,7 @@ class ClubsController < ApplicationController
     flash[:error] = "There was an error while connecting to the remote API. " + $!.to_s
   ensure
     redirect_to club_path(id: club.id)
-  end
+  end  
 
   # GET /clubs
   # GET /clubs.json
