@@ -752,8 +752,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     unsaved_member.type_of_phone_number = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    fill_in_member(unsaved_member,credit_card)
-    @saved_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
+    create_member(unsaved_member,nil, nil, true)
+    @saved_member = Member.find_by_email(unsaved_member.email)
     assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload
     assert_equal(@saved_member.type_of_phone_number, '')
@@ -767,8 +767,12 @@ class MembersSearchTest < ActionController::IntegrationTest
 
     click_link_or_button 'Cancel'
     page.execute_script("window.jQuery('#cancel_date').next().click()")
+    date = Time.zone.now + 2.day
+    if (date.month > Time.zone.now.month)
+      (date.month-Time.zone.now.month).times{ find(".ui-icon-circle-triangle-e").click }
+    end
     within("#ui-datepicker-div") do
-      click_on("#{Time.zone.now.day+1}")
+      click_on("#{date.day}")
     end
     select(cancel_reason.name, :from => 'reason')
     confirm_ok_js
