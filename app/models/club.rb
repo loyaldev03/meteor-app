@@ -45,7 +45,7 @@ class Club < ActiveRecord::Base
 
   def test_connection_to_api!
     if self.sync?
-      conn = drupal
+      conn = drupal({ logout: true })
       res = conn.get('/api/user/').body
     else
       raise "Drupal configuration is not completed."

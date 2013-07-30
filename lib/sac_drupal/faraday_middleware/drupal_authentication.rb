@@ -13,7 +13,8 @@ module Drupal
 
       def call(env)
         cookie, res = false, nil
-        if self.cookie
+        Drupal.logger.info "logout var #{@options[:logout]} - #{self.cookie} - #{@options[:logout]}"
+        if self.cookie and not @options[:logout]
           Drupal.logger.debug " ** using existing cookie for #{@options[:url]}: #{self.cookie}"
           cookie = true
         else
