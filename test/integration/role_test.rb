@@ -3,7 +3,7 @@ require 'test_helper'
 class RolesTest < ActionController::IntegrationTest
  
   setup do
-    FactoryGirl.create(:batch_agent)
+    init_test_setup
   end
   
   def setup_admin

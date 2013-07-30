@@ -6,7 +6,7 @@ module Drupal
     end
 
     module InstanceMethods
-      def drupal
+      def drupal(options = {})
         unless @drupal_client
           unless [self.api_domain, self.api_username, self.api_password].all?
             raise 'no drupal_domain or drupal credentials'
@@ -17,10 +17,13 @@ module Drupal
             request: { open_timeout: 20, timeout: 20 }
           ) do |builder|
             builder.request :json
+            
             builder.request :drupal_auth,
               url: self.api_domain.url,
               username: self.api_username,
-              password: self.api_password
+              password: self.api_password,
+              logout: options[:logout] || false
+
             builder.headers.merge!({ 'Accept' => 'application/json' })
 
             builder.response :fix_non_json_body

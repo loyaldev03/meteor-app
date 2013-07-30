@@ -12,7 +12,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
-    FactoryGirl.create(:batch_agent)
   end
 
   def setup_member(create_new_member = true)
