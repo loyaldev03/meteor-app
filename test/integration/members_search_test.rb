@@ -754,7 +754,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     unsaved_member.type_of_phone_number = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_member(unsaved_member,credit_card)
-    @saved_member = Member.where(:first_name => unsaved_member.first_name, :last_name => unsaved_member.last_name).first
+    @saved_member = Member.find_by_email(unsaved_member.email)
     assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload
     assert_equal(@saved_member.type_of_phone_number, '')
