@@ -116,6 +116,7 @@ module ActionController
 
     def init_test_setup
       DatabaseCleaner.start
+      DatabaseCleaner.clean
       ## do you use firefox??
       Capybara.current_driver = :selenium
       ## end configuration for firefox
