@@ -94,6 +94,7 @@ group :prototype do
 end
 
 group :test do
+  gem 'turn'
   gem 'factory_girl_rails'
   gem 'faker'
   gem 'mocha', require: false

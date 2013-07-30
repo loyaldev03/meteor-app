@@ -13,6 +13,10 @@ require 'mocha/setup'
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
 
+require 'turn/autorun'
+
+Turn.config.format = :outline
+
 ## do you use firefox??
 Capybara.current_driver = :selenium
 ## end configuration for firefox
