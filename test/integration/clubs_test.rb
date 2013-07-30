@@ -124,6 +124,8 @@ class ClubTest < ActionController::IntegrationTest
 
   test "should see all clubs as admin on my clubs section" do
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+    require 'debugger'
+    debugger
     within(".navbar"){ click_link_or_button("My Clubs") }
     within("#my_clubs_table")do
       Club.all.each do |club|
