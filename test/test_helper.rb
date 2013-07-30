@@ -14,14 +14,14 @@ DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
 
 ## do you use firefox??
-# Capybara.current_driver = :selenium
+Capybara.current_driver = :selenium
 ## end configuration for firefox
 ## do you want chrome ? (chrome is for carla)
-Capybara.register_driver :chrome do |app|
-  Capybara::Selenium::Driver.new(app, :browser => :chrome)
-end
-Capybara.javascript_driver = :chrome
-Capybara.current_driver = :chrome
+# Capybara.register_driver :chrome do |app|
+#   Capybara::Selenium::Driver.new(app, :browser => :chrome)
+# end
+# Capybara.javascript_driver = :chrome
+# Capybara.current_driver = :chrome
 ## end chrome configuration
 # Capybara.default_wait_time = 10
 
