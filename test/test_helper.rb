@@ -128,6 +128,8 @@ module ActionController
       # Capybara.current_driver = :chrome
       ## end chrome configuration
       Capybara.default_wait_time = 10
+
+      FactoryGirl.create(:batch_agent)
     end
 
     def sign_in_as(user)

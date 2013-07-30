@@ -8,7 +8,6 @@ class SaveTheSaleTest < ActionController::IntegrationTest
 
   setup do
     init_test_setup
-    FactoryGirl.create(:batch_agent)
   end
 
   def setup_member(approval = false, active = false)
