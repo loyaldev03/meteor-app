@@ -892,9 +892,12 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_content?('Actual stock: 0.')
     end
     visit products_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    within("#products_table")do
-      click_link_or_button('Edit')
-    end
+    within("#products_table") do 
+      within("tr", :text => product.name) do 
+        click_link_or_button 'Edit'
+      end
+    end   
+
     page.has_content?('Edit Product')
     fill_in 'product[stock]', :with => '10'
     click_link_or_button('Update Product')
@@ -935,9 +938,13 @@ test "Enroll a member with recurrent product and it on the list" do
     product.save
 
     visit products_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    within("#products_table")do
-      click_link_or_button('Edit')
-    end
+
+    within("#products_table") do 
+      within("tr", :text => product.name) do 
+        click_link_or_button 'Edit'
+      end
+    end    
+
     page.has_content?('Edit Product')
     fill_in 'product[stock]', :with => '10'
     click_link_or_button('Update Product')

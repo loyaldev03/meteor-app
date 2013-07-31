@@ -110,10 +110,12 @@ class AgentsTest < ActionController::IntegrationTest
     confirmed_agent = FactoryGirl.create(:confirmed_agent)
     do_data_table_search("#agents_table_filter", confirmed_agent.email)
 
-    within("#agents_table") do
+    within("#agents_table") do 
       assert page.has_content?(confirmed_agent.email)
-      click_link_or_button 'Edit'
-    end
+      within("tr", :text => confirmed_agent.email) do 
+        click_link_or_button 'Edit'
+      end
+    end    
 
     assert find_field('agent[email]').value == confirmed_agent.email
   end
