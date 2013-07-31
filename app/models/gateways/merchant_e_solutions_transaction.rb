@@ -29,6 +29,7 @@ class MerchantESolutionsTransaction < Transaction
       self.response_result=args[:reason]
       self.response_code='000'
       self.response = args
+      self.success = true
       self.membership_id = sale_transaction.membership_id
       self.operation_type = Settings.operation_types.chargeback
       self.save
