@@ -375,9 +375,9 @@ class RolesTest < ActionController::IntegrationTest
   end
 
 
-   ##############################################################
-   # API
-   ##############################################################
+   ###############################################################
+   ## API
+   ###############################################################
 
   #should show every club when api global role.
   test "Should show agent's related club_roles, when agent has api global role."do
@@ -398,9 +398,9 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-   ##############################################################
-   # AGENCY
-   ##############################################################
+   ###############################################################
+   ## AGENCY
+   ###############################################################
 
   # Select only clubs related to agency agent.
   test "select every club when member has global role 'agency'" do
@@ -459,9 +459,9 @@ test "Agency role - Recover a member" do
     assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
   end
 
-   ##############################################################
-   # FULFILLLMENT MANAGMENT
-   ##############################################################
+   ###############################################################
+   ## FULFILLLMENT MANAGMENT
+   ###############################################################
 
   test "Profile fulfillment_managment" do
     setup_fulfillment_managment
@@ -519,9 +519,9 @@ test "Agency role - Recover a member" do
     recover_member(@saved_member,@new_tom)
   end
 
-   ##############################################################
-   # OTHERS
-   ##############################################################
+   ###############################################################
+   ## OTHERS
+   ###############################################################
 
   test "Profiles that not allow see products " do
     setup_supervisor
@@ -1018,7 +1018,9 @@ test "Agency role - Recover a member" do
 
   test "Should see every club on my clubs table when has agency role." do
     setup_agency
-    @admin_agent.update_attribute(:roles,['agency'])
+    setup_member false
+    
+    @agent.update_attribute(:roles,['agency'])
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     within(".navbar"){ click_link_or_button("My Clubs") }
@@ -1035,7 +1037,9 @@ test "Agency role - Recover a member" do
 
   test "Should see every club on my clubs table when has representative role." do
     setup_representative
-    @admin_agent.update_attribute(:roles,['representative'])
+    setup_member false
+
+    @agent.update_attribute(:roles,['representative'])
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     within(".navbar"){ click_link_or_button("My Clubs") }
@@ -1052,7 +1056,8 @@ test "Agency role - Recover a member" do
 
   test "Should see every club on my clubs table when has supervisor role." do
     setup_supervisor
-    @admin_agent.update_attribute(:roles,['supervisor'])
+    setup_member false
+    @agent.update_attribute(:roles,['supervisor'])
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     within(".navbar"){ click_link_or_button("My Clubs") }

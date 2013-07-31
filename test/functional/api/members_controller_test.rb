@@ -1156,10 +1156,9 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     active_merchant_stubs_store(@credit_card.number)
 
-    assert_difference('Operation.count',2, @response.body) do
+    assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
         generate_put_message
-        puts @response.body
       end
     end
 

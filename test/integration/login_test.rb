@@ -16,8 +16,11 @@ class LoginTest < ActionController::IntegrationTest
   	admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     sign_in_as(admin_agent)
     page.execute_script("window.jQuery('.dropdown').addClass('open')")
-#     page.find('#link_logout').click
-    click_link_or_button I18n.t('menu.logout')
+#     
+    within(".navbar")do
+      #click_link_or_button I18n.t('menu.logout')
+      page.find('#link_logout').click
+    end
     visit root_path
     assert page.has_content?("You need to sign in or sign up before continuing")
   end

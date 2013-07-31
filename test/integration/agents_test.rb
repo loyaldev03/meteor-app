@@ -52,9 +52,11 @@ class AgentsTest < ActionController::IntegrationTest
   test "view agent" do
     setup_environment
     visit admin_agents_path
-    within("#agents_table") do
-      click_link_or_button "Show" #change for view button
-    end
+    within("#agents_table") do 
+      within("tr", :text => @admin_agent.email) do 
+        click_link_or_button 'Show'
+      end
+    end    
 
     assert page.has_content?("Agent")
     assert page.has_content?(@admin_agent.email) 
@@ -65,9 +67,13 @@ class AgentsTest < ActionController::IntegrationTest
     setup_environment
     confirmed_agent = FactoryGirl.create(:confirmed_agent)
     visit admin_agents_path
-    within("#agents_table .even") do
-      click_link_or_button 'Edit'
-    end
+
+    within("#agents_table") do 
+      within("tr", :text => confirmed_agent.email) do 
+        click_link_or_button 'Edit'
+      end
+    end    
+
     fill_in 'agent[email]', :with => confirmed_agent.email
     fill_in 'agent[username]', :with => confirmed_agent.username
     fill_in 'agent[password]', :with => confirmed_agent.password
@@ -84,9 +90,13 @@ class AgentsTest < ActionController::IntegrationTest
     confirmed_agent = FactoryGirl.create(:confirmed_agent)
     visit admin_agents_path
     confirm_ok_js
-    within("#agents_table .even") do
-      click_link_or_button 'Destroy'
+
+    within("#agents_table") do 
+      within("tr", :text => confirmed_agent.email) do 
+        click_link_or_button 'Destroy'
+      end
     end
+
     assert page.has_content?("Agent was successfully deleted")
     assert Agent.with_deleted.where(:id => confirmed_agent.id).first
   end
@@ -100,10 +110,12 @@ class AgentsTest < ActionController::IntegrationTest
     confirmed_agent = FactoryGirl.create(:confirmed_agent)
     do_data_table_search("#agents_table_filter", confirmed_agent.email)
 
-    within("#agents_table") do
+    within("#agents_table") do 
       assert page.has_content?(confirmed_agent.email)
-      click_link_or_button 'Edit'
-    end
+      within("tr", :text => confirmed_agent.email) do 
+        click_link_or_button 'Edit'
+      end
+    end    
 
     assert find_field('agent[email]').value == confirmed_agent.email
   end
