@@ -125,7 +125,7 @@ module ActionController
 
     setup do
       DatabaseCleaner.start
-      FactoryGirl.create(:batch_agent)
+      FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")
     end
 
     teardown do
@@ -334,6 +334,7 @@ module ActionController
 
     def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
       fill_in_member(unsaved_member, credit_card, tom_type, cc_blank)
+      sleep 1
       assert find_field('input_first_name').value == unsaved_member.first_name
       Member.find_by_email(unsaved_member.email)
     end
@@ -387,7 +388,7 @@ module ActionController
         assert page.has_content?(transaction.amount_available_to_refund.to_s)
 
         # final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
-        final_amount = Transaction.first.amount_available_to_refund
+        final_amount = transaction.amount_available_to_refund
         final_amount = refund_amount.to_s if not refund_amount.nil?
 
         fill_in 'refund_amount', :with => final_amount   
