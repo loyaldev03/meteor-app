@@ -267,48 +267,35 @@ class MembersSearchTest < ActionController::IntegrationTest
   test "Organize Member results by Pagination" do
     setup_search
     click_on 'Search'
-      assert page.has_no_selector?(".pagination")
-    within("#members")do
-        assert page.has_content?(Member.find_by_id(24).full_name)
-    end
 
-  assert page.has_selector?(".pagination")
-  assert page.has_content?(Member.first.full_name)
-	within("#members")do
-		click_on("2")
-		if page.has_content?(Member.find_by_id(26).full_name)
-		  assert true
-		else
-          assert false, "The last member was not found"
-        end
+    member_list = Member.where("club_id = ?", @club.id)
+    assert page.has_no_selector?(".pagination")
+    within("#members")do
+      assert page.has_content?(member_list[24].full_name)
     end
 
     assert page.has_selector?(".pagination")
-    within("#members")do
-      click_on("3")
-      if page.has_content?(Member.find_by_id(51).full_name)
-        assert true
-      else
-        assert false, "The last member was not found"
-	  end
-    end
+	  within("#members")do
+		  within(".pagination"){ click_on("2") }
+		  assert page.has_content?(member_list[49].full_name)
+  	end
 
-    assert page.has_selector?(".pagination")
-    within("#members")do
-      click_on("4")
-      if page.has_content?(Member.find_by_id(79).full_name)
-        assert true
-      else
-        assert false, "The last member was not found"
-      end
-    end
+		within("#members")do
+		  within(".pagination"){ click_on("3") }
+	  	assert page.has_content?(member_list[74].full_name)
+  	end
+  	
+  	within("#members")do
+		  within(".pagination"){ click_on("4") }
+	  	assert page.has_content?(member_list[79].full_name)
+  	end
   end
 
-  test "search a member with next bill date in past" do
-    setup_search
-    page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
-    assert page.evaluate_script("window.jQuery('.ui-datepicker-prev').is('.ui-state-disabled')")
-  end
+  #test "search a member with next bill date in past" do
+    #setup_search
+    #page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
+    #assert page.evaluate_script("window.jQuery('.ui-datepicker-prev').is('.ui-state-disabled')")
+  #end
 
   test "display member" do
     setup_search
@@ -345,7 +332,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     2.times{ create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent }) }
     2.times{ create_active_member(@terms_of_membership_with_gateway, :lapsed_member, nil, {}, { :created_by => @admin_agent }) }
     create_active_member(@terms_of_membership_with_gateway, :provisional_member, nil, {}, { :created_by => @admin_agent })
-    
+  
     active_member = Member.find_by_status 'active'
     provisional_member = Member.find_by_status 'provisional'
     lapsed_member = Member.find_by_status 'lapsed'
