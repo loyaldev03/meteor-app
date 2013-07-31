@@ -82,10 +82,12 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     select_from_datepicker("member_billing_date_start", Time.zone.now+9.days)
     select_from_datepicker("member_billing_date_end", Time.zone.now+11.days)
-
+ 
     click_link_or_button('Search')
-    assert page.has_content?("#{c.first_name}")
-    assert page.has_no_content?("#{c2.first_name}")
+    within("#table_member_search_result") do
+      assert page.has_content?(c.first_name)
+      assert page.has_no_content?(c2.first_name)
+    end
   end
 
   test "edit member" do
@@ -883,6 +885,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       click_on("#{(Time.zone.now+1.day).day}")
     end
     click_link_or_button 'Change next bill date'
+    
     assert find_field('input_first_name').value == @saved_member.first_name
     next_bill_date = Time.zone.now + 1.day
     within("#td_mi_next_retry_bill_date"){ assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
