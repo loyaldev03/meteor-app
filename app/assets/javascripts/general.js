@@ -872,6 +872,11 @@ function admin_form_functions(){
 
 // TOM Wizard functions
 // Creates the wizard
+function new_tom_functions() {
+  $('.help').popover({offset: 10});
+  tom_create_wizard();
+}
+
 function tom_create_wizard() {
   $("#tom_wizard_form").formwizard({ 
     formPluginEnabled: true,
