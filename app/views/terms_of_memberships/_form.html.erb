@@ -63,21 +63,37 @@
 </div>
 
 <script type="text/javascript">
-  $(document).ready(tom_create_wizard());
-  // Updates the text of the 'Next' button based on the current step
+  $(document).ready(function() {
+    tom_create_wizard();
+    set_button_next_label($("#tom_wizard_form").formwizard("state").currentStep);
+  });
+
   $(function() {
     $("#tom_wizard_form").bind("before_step_shown", function(event, data) {
-      switch(data.currentStep) {
-        case "first":
-          $("#tom_wizard_form").formwizard("option", {textNext: 'Membership Terms'});
-          break;
-        case "second":
-          $("#tom_wizard_form").formwizard("option", {textNext: 'Define Upgrades / Downgrades'});
-          break;
-        case "third":
-          $("#tom_wizard_form").formwizard("option", {textNext: 'Create Plan'});
-          break;
-      }
+      set_button_next_label(data.currentStep);
     });
   });
+
+  function set_button_next_label(currentStep) {
+    var isSubmitButton = false;
+    var buttonText = '<NOT_SET>';
+    switch(currentStep) {
+      case "first":
+        buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_1_button_next') %>';
+        break;
+      case "second":
+        buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_2_button_next') %>';
+        break;
+      case "third":
+        isSubmitButton = true;
+        buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_3_button_next') %>';
+        break;
+    }
+    if(isSubmitButton) {
+      $("#tom_wizard_form").formwizard("option", {textSubmit: buttonText});
+    }
+    else {
+      $("#tom_wizard_form").formwizard("option", {textNext: buttonText});
+    }
+  }
 </script>
