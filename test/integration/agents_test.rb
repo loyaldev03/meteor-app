@@ -103,11 +103,12 @@ class AgentsTest < ActionController::IntegrationTest
 
   test "search agent" do
     setup_environment
-    visit admin_agents_path
-
-    10.times{ FactoryGirl.create(:confirmed_agent) }
 
     confirmed_agent = FactoryGirl.create(:confirmed_agent)
+    10.times{ FactoryGirl.create(:confirmed_agent) }
+
+    visit admin_agents_path
+
     do_data_table_search("#agents_table_filter", confirmed_agent.email)
 
     within("#agents_table") do 

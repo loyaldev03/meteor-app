@@ -86,6 +86,10 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button('Search')
     within("#table_member_search_result") do
       assert page.has_content?(c.first_name)
+      puts c.first_name
+      puts page.has_content?(c.first_name)
+      puts c2.first_name
+      puts page.has_content?(c2.first_name)
       assert page.has_no_content?(c2.first_name)
     end
   end
@@ -831,10 +835,12 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#td_mi_next_retry_bill_date"){ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
   end
 
-  test "Change member from Lapse status to Provisional statuss" do
+  test "Change member from Lapsed status to Provisional status" do
     setup_member false, true
     @saved_member.set_as_canceled
     @terms_of_membership_with_gateway.update_attribute :provisional_days,  5
+
+    @saved_member.reload
     @saved_member.recover(@terms_of_membership_with_gateway)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -844,6 +850,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     next_bill_date = @saved_member.current_membership.join_date + (@terms_of_membership_with_gateway.provisional_days).days
     within("#table_membership_information") do
       within("#td_mi_next_retry_bill_date") do
+        # TODO: I cant figure out why the nbd above is diff than the one set on the web site (same as member)
         assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) 
         assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) 
       end
@@ -1047,7 +1054,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       assert page.has_selector?('#refund')
       click_link_or_button("Refund")
     end
-    fill_in 'refund_amount', :with => final_amount
+    fill_in 'refunded_amount', :with => final_amount
     click_link_or_button 'Refund'
     page.has_content?("This transaction has been approved")
 
