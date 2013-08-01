@@ -1,6 +1,6 @@
 <p> <h1> <%= t('search_results') %> </h1> </p> 
 <%= will_paginate @members if @members %>
-<table class="table table-bordered table-condensed">
+<table class="table table-bordered table-condensed" id="table_member_search_result">
   <thead>
   	<tr>
       <th style="width: 110px;"> <%= t('activerecord.attributes.member.status') %> </th>
