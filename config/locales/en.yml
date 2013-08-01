@@ -330,8 +330,11 @@ en:
           # Step 1
           step_1_instructions: '<STEP_1_INSTRUCTIONS_HERE>'
           plan_name: 'Suscription Plan Name'
+          plan_name_help: 'help'
           external_code: 'External Code (optional)'
+          external_code_help: 'help'
           description: 'Description (optional)'
+          description_help: "help"
           step_1_button_next: 'Membership Terms'
           # Step 2
           step_2_instructions: '<STEP_2_INSTRUCTIONS_HERE>'
