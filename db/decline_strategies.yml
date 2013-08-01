@@ -15261,7 +15261,7 @@
   attributes:
     gateway: mes
     installment_type: 1.month
-    credit_card_type: visa
+    credit_card_type: all
     response_code: 097
     limit: 6
     days: 3
@@ -15277,7 +15277,7 @@
   attributes:
     gateway: mes
     installment_type: 1.year
-    credit_card_type: visa
+    credit_card_type: all
     response_code: 097
     limit: 6
     days: 3
