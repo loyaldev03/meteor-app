@@ -3,58 +3,49 @@ require 'test_helper'
 class RolesTest < ActionController::IntegrationTest
  
   setup do
-    init_test_setup
   end
   
   def setup_admin
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_admin_agent)
     sign_in_as(@agent)
   end
 
   def setup_agent_no_rol
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_agent)
     @agent.update_attribute(:roles, [])
     sign_in_as(@agent)   
   end
 
   def setup_supervisor
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_supervisor_agent)
     sign_in_as(@agent)
   end
 
   def setup_representative
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_representative_agent)
     @agent.update_attribute(:roles, ['representative'])
     sign_in_as(@agent)
   end
 
   def setup_agency
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_agency_agent)
     @agent.update_attribute(:roles, ['agency'])
     sign_in_as(@agent)
   end
 
   def setup_api
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_api_agent)
     @agent.update_attribute(:roles, ['api'])
     sign_in_as(@agent)
   end
 
   def setup_fulfillment_managment
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
     @agent.update_attribute(:roles, ['fulfillment_managment'])
     sign_in_as(@agent)
   end
 
   def setup_agent_with_club_role(club, role)
-    init_test_setup
     @agent = FactoryGirl.create(:agent)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id

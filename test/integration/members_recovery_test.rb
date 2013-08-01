@@ -7,7 +7,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   ############################################################
 
   setup do
-    init_test_setup
   end
 
   def setup_member(cancel = true, create_member = true)

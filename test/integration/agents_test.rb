@@ -4,7 +4,6 @@ class AgentsTest < ActionController::IntegrationTest
  
 
   def setup_environment
-    init_test_setup
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     sign_in_as(@admin_agent)
   end
@@ -250,7 +249,6 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "Reset Password at CS" do
-    init_test_setup
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
    
     visit '/'

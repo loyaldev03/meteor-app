@@ -8,7 +8,6 @@ class MembersBillTest < ActionController::IntegrationTest
   ############################################################
 
   setup do
-    init_test_setup
   end
 
   def setup_member(provisional_days = nil, create_member = true)
