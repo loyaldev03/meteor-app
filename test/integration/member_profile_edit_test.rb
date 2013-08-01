@@ -762,7 +762,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     bill_member(@saved_member, false)
     
     visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
-    fill_in 'refund_amount', :with => "99999999"   
+    fill_in 'refunded_amount', :with => "99999999"   
       
     click_on 'Refund'
     assert page.has_content?("Cant credit more $ than the original transaction amount")
@@ -795,7 +795,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     bill_member(@saved_member, true, final_amount)
     visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
-    fill_in 'refund_amount', :with => final_amount.to_s
+    fill_in 'refunded_amount', :with => final_amount.to_s
     assert_difference('Transaction.count') do 
       click_on 'Refund'
     end
