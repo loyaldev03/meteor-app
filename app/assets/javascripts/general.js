@@ -878,8 +878,8 @@ function tom_create_wizard() {
     validationEnabled: true,
     focusFirstInput : true,
     disableUIStyles: true,
-    textNext: 'Membership Terms',
-    textSubmit: 'Create Plan',
+    textNext: '',
+    textSubmit: '',
     formOptions :{
       success: function(data){$("#status").fadeTo(500,1,function(){ $(this).html("You are now registered!").fadeTo(5000, 0); })},
       beforeSubmit: function(data){$("#data").html("data sent to the server: " + $.param(data));},
