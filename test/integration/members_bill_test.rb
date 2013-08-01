@@ -179,7 +179,6 @@ class MembersBillTest < ActionController::IntegrationTest
     end
     assert page.has_content?("Cant credit more $ than the original transaction amount")
   end
- 
 
   test "two uncontrolled refund more than transaction amount" do
     active_merchant_stubs
@@ -264,7 +263,6 @@ class MembersBillTest < ActionController::IntegrationTest
     assert page.has_content?(I18n.t('error_messages.next_bill_date_blank'))
   end  
 
-
   test "Change Next Bill Date for tomorrow" do
     setup_member
     @saved_member.set_as_canceled
@@ -282,10 +280,20 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
-    next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
+    first_bill_date = @saved_member.join_date + @terms_of_membership_with_gateway.provisional_days.days
+
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_content?(I18n.l(@saved_member.current_membership.join_date + 1.month, :format => :only_date))
+      assert page.has_content?(I18n.l(first_bill_date, :format => :only_date))
     end
+    @saved_member.next_retry_bill_date = Time.zone.now
+    @saved_member.bill_membership
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
+    second_bill_date = first_bill_date + eval(@terms_of_membership_with_gateway.installment_type)
+
+    within("#td_mi_next_retry_bill_date")do
+      assert page.has_content?(I18n.l(second_bill_date, :format => :only_date))
+    end 
   end  
 
   test "Refund a transaction with error" do
@@ -456,8 +464,11 @@ class MembersBillTest < ActionController::IntegrationTest
   end
 
   test "Do not Send Prebill email (7 days before NBD) when member's installment_amount is 0" do
-    setup_member
+    setup_member(0,false)
     @terms_of_membership_with_gateway.update_attribute :installment_amount, 0.0
+    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
+    @saved_member = create_member(unsaved_member)
+
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
     @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
     Member.send_prebill
@@ -486,6 +497,7 @@ class MembersBillTest < ActionController::IntegrationTest
     
     Member.send_prebill
 
+    sleep 2 #waiting for the email to be sent. 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
 
