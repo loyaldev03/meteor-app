@@ -85,10 +85,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button('Search')
     within("#table_member_search_result") do
       assert page.has_content?(c.first_name)
-      puts c.first_name
-      puts page.has_content?(c.first_name)
-      puts c2.first_name
-      puts page.has_content?(c2.first_name)
       assert page.has_no_content?(c2.first_name)
     end
   end
@@ -497,8 +493,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Update Member'
-    @saved_member.reload
     within("#table_contact_information")do
+      @saved_member.reload
       assert page.has_content?(@saved_member.full_phone_number)
       assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
     end
