@@ -6,11 +6,6 @@ class MembersClubCashTest < ActionController::IntegrationTest
   # SETUP
   ############################################################
 
-  setup do
-    init_test_setup
-
-  end
-
   def setup_member(create_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
