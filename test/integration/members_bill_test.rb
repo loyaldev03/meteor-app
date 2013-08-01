@@ -23,7 +23,6 @@ class MembersBillTest < ActionController::IntegrationTest
     @terms_of_membership_with_gateway.provisional_days = provisional_days unless provisional_days.nil?
     @communication_type = FactoryGirl.create(:communication_type)
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
-    FactoryGirl.create(:batch_agent)
     
     sign_in_as(@admin_agent)
 

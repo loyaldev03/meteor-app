@@ -82,10 +82,16 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     select_from_datepicker("member_billing_date_start", Time.zone.now+9.days)
     select_from_datepicker("member_billing_date_end", Time.zone.now+11.days)
-
+ 
     click_link_or_button('Search')
-    assert page.has_content?("#{c.first_name}")
-    assert page.has_no_content?("#{c2.first_name}")
+    within("#table_member_search_result") do
+      assert page.has_content?(c.first_name)
+      puts c.first_name
+      puts page.has_content?(c.first_name)
+      puts c2.first_name
+      puts page.has_content?(c2.first_name)
+      assert page.has_no_content?(c2.first_name)
+    end
   end
 
   test "edit member" do
@@ -581,6 +587,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#external_id"){ fill_in 'member[external_id]', :with => '987654321' }
     alert_ok_js
     click_link_or_button 'Update Member'
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @member_with_external_id.id)
     assert find_field('input_first_name').value == @member_with_external_id.first_name
 
     @member_with_external_id.reload
@@ -599,6 +607,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#table_demographic_information"){ select('Female', :from => 'member[gender]') }
     alert_ok_js
     click_link_or_button 'Update Member'
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload
@@ -619,6 +629,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#table_demographic_information"){ select('Male', :from => 'member[gender]') }
     alert_ok_js
     click_link_or_button 'Update Member'
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+
     assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload
     assert find_field('input_gender').value == ('Male')
@@ -750,7 +762,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     bill_member(@saved_member, false)
     
     visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
-    fill_in 'refund_amount', :with => "99999999"   
+    fill_in 'refunded_amount', :with => "99999999"   
       
     click_on 'Refund'
     assert page.has_content?("Cant credit more $ than the original transaction amount")
@@ -783,7 +795,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     bill_member(@saved_member, true, final_amount)
     visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
-    fill_in 'refund_amount', :with => final_amount.to_s
+    fill_in 'refunded_amount', :with => final_amount.to_s
     assert_difference('Transaction.count') do 
       click_on 'Refund'
     end
@@ -829,10 +841,12 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#td_mi_next_retry_bill_date"){ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
   end
 
-  test "Change member from Lapse status to Provisional statuss" do
+  test "Change member from Lapsed status to Provisional status" do
     setup_member false, true
     @saved_member.set_as_canceled
     @terms_of_membership_with_gateway.update_attribute :provisional_days,  5
+
+    @saved_member.reload
     @saved_member.recover(@terms_of_membership_with_gateway)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -842,6 +856,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     next_bill_date = @saved_member.current_membership.join_date + (@terms_of_membership_with_gateway.provisional_days).days
     within("#table_membership_information") do
       within("#td_mi_next_retry_bill_date") do
+        # TODO: I cant figure out why the nbd above is diff than the one set on the web site (same as member)
         assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) 
         assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) 
       end
@@ -883,6 +898,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       click_on("#{(Time.zone.now+1.day).day}")
     end
     click_link_or_button 'Change next bill date'
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    
     assert find_field('input_first_name').value == @saved_member.first_name
     next_bill_date = Time.zone.now + 1.day
     within("#td_mi_next_retry_bill_date"){ assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
@@ -1044,7 +1061,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       assert page.has_selector?('#refund')
       click_link_or_button("Refund")
     end
-    fill_in 'refund_amount', :with => final_amount
+    fill_in 'refunded_amount', :with => final_amount
     click_link_or_button 'Refund'
     page.has_content?("This transaction has been approved")
 

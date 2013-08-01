@@ -149,6 +149,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     fill_in 'club_cash_transaction[amount]', :with => "99"
     alert_ok_js
     click_on 'Save club cash transaction'
+    sleep 0.5
     within("#table_membership_information"){
       within("#td_mi_club_cash_amount"){
           assert page.has_content?('99.0')

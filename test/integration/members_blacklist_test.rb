@@ -45,6 +45,10 @@ class MembersBlacklistTest < ActionController::IntegrationTest
       end
     end
 
+    within(".nav-tabs") do
+      click_on("Operations")
+    end
+
     within("#operations_table") do
       assert page.has_content?(text_reason)
     end
