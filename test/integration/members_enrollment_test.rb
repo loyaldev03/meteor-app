@@ -11,7 +11,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   ############################################################
 
   setup do
-    init_test_setup
   end
 
   def setup_member(create_new_member = true)
