@@ -471,7 +471,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.id)
     assert find_field('input_first_name').value == saved_member.first_name
 
-
+    within('.nav-tabs'){ click_on 'Operations' }
     within("#operations_table") do
     		assert page.has_content?('Member was enrolled')
     		assert page.has_content?('Blacklisted member. Reason: Too much spam')
@@ -757,6 +757,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     within("#td_mi_status"){ assert page.has_content?('lapsed') }
     within("#td_mi_join_date"){ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) } 
+    
+    within('.nav-tabs'){ click_on 'Operations' }
     within("#operations_table") { assert page.has_content?("Member was rejected and now its lapsed.") }
 
     within(".nav-tabs"){ click_on("Memberships") }

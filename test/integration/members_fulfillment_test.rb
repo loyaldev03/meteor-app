@@ -131,7 +131,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal @fulfillment.status, 'not_processed'
   end 
 
-  test "cancel member and check if processing fulfillments were updated to canceled" do
+  test "cancel member and check if in_process fulfillments were updated to canceled" do
     setup_member
     @fulfillment.set_as_in_process
 
@@ -140,7 +140,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
       click_on("Fulfillments")
     end
     within("#fulfillments")do
-      assert page.has_content?('processing')
+      assert page.has_content?('in_process')
     end
 
     @saved_member.set_as_canceled!
@@ -207,7 +207,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal @fulfillment.status, 'canceled'
   end 
 
-  test "display 'Mark as sent' and 'Set as wrong number' when fulfillment is processing on memebr's profile." do
+  test "display 'Mark as sent' and 'Set as wrong number' when fulfillment is in_process on memebr's profile." do
     setup_member
     @fulfillment.set_as_in_process    
 
@@ -485,7 +485,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
 
-  test "fulfillment record at processing + check stock" do
+  test "fulfillment record at in_process + check stock" do
     setup_member(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
@@ -515,7 +515,7 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.find_field('all_times')    
       assert page.find_field('product_type')
       check('all_times')
-      select('processing', :from => 'status')
+      select('in_process', :from => 'status')
       choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
@@ -527,7 +527,7 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
-      assert page.has_content?('processing')
+      assert page.has_content?('in_process')
     end
 
     @product.reload
@@ -707,7 +707,7 @@ test "Enroll a member with recurrent product and it on the list" do
     fulfillment = Fulfillment.find_by_product_sku('KIT')
     within("#fulfillments_table")do
       check('all_times')
-      select('processing', :from => 'status')
+      select('in_process', :from => 'status')
       select('Kit',:from => 'product_type')
     end
     click_link_or_button('Report')
@@ -718,7 +718,7 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
-      assert page.has_content?('processing') 
+      assert page.has_content?('in_process') 
       assert page.has_selector?('#mark_as_sent')
       assert page.has_selector?('#set_as_wrong_address')
 
@@ -731,7 +731,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
   
-  test "mark sent fulfillment at processing status" do
+  test "mark sent fulfillment at in_process status" do
     setup_member(false)
     product = FactoryGirl.create(:product, :club_id => @club.id, :recurrent => true)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
@@ -746,7 +746,7 @@ test "Enroll a member with recurrent product and it on the list" do
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
-      select('processing', :from => 'status')
+      select('in_process', :from => 'status')
       choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
@@ -757,7 +757,7 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
-      assert page.has_content?('processing') 
+      assert page.has_content?('in_process') 
       assert page.has_selector?('#mark_as_sent')
       assert page.has_selector?('#set_as_wrong_address')
 
@@ -776,7 +776,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
 
-  test "set as wrong address fulfillment at processing status" do
+  test "set as wrong address fulfillment at in_process status" do
     setup_member(false)
 
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT')
@@ -791,7 +791,7 @@ test "Enroll a member with recurrent product and it on the list" do
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
-      select('processing', :from => 'status')
+      select('in_process', :from => 'status')
       select('Kit',:from => 'product_type')
     end
     click_link_or_button('Report')
@@ -802,7 +802,7 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
-      assert page.has_content?('processing') 
+      assert page.has_content?('in_process') 
       assert page.has_selector?('#mark_as_sent')
       assert page.has_selector?('#set_as_wrong_address')
 
@@ -1243,7 +1243,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
 
-  test "fulfillment record from processing to cancel status" do
+  test "fulfillment record from in_process to cancel status" do
     setup_member
     @fulfillment.set_as_in_process
 
@@ -1409,42 +1409,6 @@ test "Enroll a member with recurrent product and it on the list" do
     assert_equal(@fulfillment_renewable.renewed, true )
   end
 
-  test "Fulfillments to be renewable with status undeliverable" do
-    setup_member
-    @product_recurrent = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true)
-    @fulfillment_renewable.update_attribute(:renewable_at, Time.zone.now)
-    @fulfillment_renewable.set_as_in_process
-    @fulfillment_renewable.set_as_undeliverable
-    
-    Fulfillment.process_fulfillments_up_today
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-
-    last_fulfillment = Fulfillment.last
-
-    within(".nav-tabs") do
-      click_on("Fulfillments")
-    end
-    within("#fulfillments")do
-      assert page.has_content?(last_fulfillment.product_sku)
-      assert page.has_content?('undeliverable')
-      assert page.has_content?((I18n.l(last_fulfillment.assigned_at, :format => :long)))
-      assert page.has_content?((I18n.l(last_fulfillment.renewable_at, :format => :long)))        
-      assert page.has_content?((I18n.l(@fulfillment_renewable.assigned_at, :format => :long)))
-      assert page.has_content?((I18n.l(@fulfillment_renewable.renewable_at, :format => :long)))
-    end
-    last_fulfillment.reload
-    @fulfillment_renewable.reload
-
-    assert_equal((I18n.l last_fulfillment.assigned_at, :format => :long), (I18n.l Time.zone.now, :format => :long))
-    assert_equal((I18n.l last_fulfillment.renewable_at, :format => :long), (I18n.l last_fulfillment.assigned_at + 1.year, :format => :long))
-    assert_equal(last_fulfillment.status, 'undeliverable')
-    assert_equal(last_fulfillment.recurrent, true )
-    assert_equal(last_fulfillment.renewed, false )
-    assert_equal(@fulfillment_renewable.renewed, true )
-  end
 
   test "Fulfillments to be renewable with status out_of_stock" do
     setup_member
@@ -1529,7 +1493,6 @@ test "Enroll a member with recurrent product and it on the list" do
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
-      select('undeliverable', :from => 'status')
       within("select#product_type")do
         assert page.has_content?('Kit')
         assert page.has_content?('Card')
@@ -1625,7 +1588,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#fulfillments_table")do
       check('all_times')
-      select('processing', :from => 'status')
+      select('in_process', :from => 'status')
       select('Kit',:from => 'product_type')
     end
 
@@ -1637,7 +1600,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?(fulfillment.product_sku)
         assert page.has_content?(fulfillment.tracking_code)
-        assert page.has_content?('processing') 
+        assert page.has_content?('in_process') 
         assert page.has_selector?('#mark_as_sent')
       click_link_or_button('Mark as sent')
     assert page.has_content?("Fulfillment #{product.sku} was set as sent.")
@@ -1674,7 +1637,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     within("#fulfillments_table")do
       check('all_times')
-      select('processing', :from => 'status')
+      select('in_process', :from => 'status')
       select('Card',:from => 'product_type')
     end
 
@@ -1685,7 +1648,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?(fulfillment.product_sku)
         assert page.has_content?(fulfillment.tracking_code)
-        assert page.has_content?('processing') 
+        assert page.has_content?('in_process') 
         assert page.has_selector?('#mark_as_sent')
       click_link_or_button('Mark as sent')
       assert page.has_content?("Fulfillment #{product.sku} was set as sent.")
@@ -1786,7 +1749,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
 
-  test "not_processed and processing fulfillments should be updated to undeliverable when set_wrong_address" do
+  test "not_processed and in_process fulfillments should be updated to undeliverable when set_wrong_address" do
     setup_member(false)
     product_card = Product.find_by_sku('CARD')
     product_kit = Product.find_by_sku('KIT')
@@ -1927,7 +1890,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
     within("#fulfillments")do
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?('processing')
+      assert page.has_content?('in_process')
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
       assert page.has_selector?("#mark_as_sent")
     end
@@ -1975,14 +1938,14 @@ test "Enroll a member with recurrent product and it on the list" do
     end
     within("#fulfillments")do
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?('processing')
+        assert page.has_content?('in_process')
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
         assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
         assert page.has_selector?("#mark_as_sent")
     end
   end
 
-  test "Generate CSV with fulfillment at processing status." do
+  test "Generate CSV with fulfillment at in_process status." do
     setup_member(false)
     product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
@@ -2000,13 +1963,13 @@ test "Enroll a member with recurrent product and it on the list" do
     end
     within("#fulfillments")do
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?('processing')
+      assert page.has_content?('in_process')
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
       assert page.has_selector?("#mark_as_sent")
     end
 
-    fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', 'processing', @club.id).type_others
+    fulfillments = Fulfillment.joins(:member).where('fulfillments.status = ? and club_id = ?', 'in_process', @club.id).type_others
     csv_string = Fulfillment.generateCSV(fulfillments, true, true) 
     assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},#{fulfillment.product_sku},#{@saved_member.full_name},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
   end
@@ -2045,13 +2008,13 @@ test "Enroll a member with recurrent product and it on the list" do
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
-      select('processing', :from => 'status')
+      select('in_process', :from => 'status')
       select('Kit',:from => 'product_type')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?('processing')
+      assert page.has_content?('in_process')
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
       assert page.has_selector?("#mark_as_sent")
@@ -2101,13 +2064,13 @@ test "Enroll a member with recurrent product and it on the list" do
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
-      select('processing', :from => 'status')
+      select('in_process', :from => 'status')
       select('Card',:from => 'product_type')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?('processing')
+      assert page.has_content?('in_process')
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
       assert page.has_selector?("#mark_as_sent")
@@ -2144,13 +2107,13 @@ test "Enroll a member with recurrent product and it on the list" do
     visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#fulfillments_table")do
       check('all_times')
-      select('processing', :from => 'status')
+      select('in_process', :from => 'status')
       select('Kit',:from => 'product_type')
     end
 
     click_link_or_button 'Report'
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
-            'processing', Date.today, Date.today, @club.id]).type_kit
+            'in_process', Date.today, Date.today, @club.id]).type_kit
     csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,ZIP,Product,Charter Member Status\n#{@saved_member.id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.zip},#{product.sku},C\n")    
   end
@@ -2182,7 +2145,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     click_link_or_button 'Report'
     fulfillments = Fulfillment.joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
-            'processing', Date.today, Date.today, @club.id]).type_card
+            'in_process', Date.today, Date.today, @club.id]).type_card
     csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
     puts csv_string
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,STATE,ZIP,Product,Charter Member Status\n#{@saved_member.id},#{@saved_member.first_name},#{@saved_member.last_name},#{(I18n.l @saved_member.member_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_member.address},#{@saved_member.city},#{@saved_member.state},#{@saved_member.zip},#{product.sku},C\n")    
