@@ -1,5 +1,3 @@
-
-
 <div class="step" id="first">
   <div class="control-group">
     <h3 class="wizard_step">
@@ -10,24 +8,30 @@
     </h3>
   </div>
   <div class="control-group">
-    <%= f.label :name, 'Suscription Plan Name', :class => 'control-label' %>
+    <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.plan_name'), :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :name, :class => 'text_field', :value => '' %>
-      <%= render :partial => "shared/help", :locals => { :title => t('lorem'), :content => t('lorem')} %> 
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.plan_name'), 
+        :content => t('lorem') } %> 
     </div>
   </div>
   <div class="control-group">
-    <%= f.label :api_role, 'External Code (optional)', :class => 'control-label' %>
+    <%= f.label :api_role, t('activerecord.attributes.terms_of_membership.wizard.external_code'), :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :api_role, :class => 'text_field input-small' %>
-      <%= render :partial => "shared/help", :locals => { :title => t('lorem'), :content => t('lorem')} %> 
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.external_code'), 
+        :content => t('lorem') } %> 
     </div>
   </div>
   <div class="control-group">
-    <%= f.label :description, 'Description (optional)', :class => 'control-label' %>
+    <%= f.label :description, t('activerecord.attributes.terms_of_membership.wizard.description'), :class => 'control-label' %>
     <div class="controls">
       <%= f.text_area :description, :class => 'text_area', :rows => 5 %>
-      <%= render :partial => "shared/help", :locals => { :title => t('lorem'), :content => t('lorem')} %> 
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.description'), 
+        :content => t('lorem') } %> 
     </div>
   </div>
 </div>
@@ -64,7 +68,7 @@
 
 <script type="text/javascript">
   $(document).ready(function() {
-    tom_create_wizard();
+    new_tom_functions();
     set_button_next_label($("#tom_wizard_form").formwizard("state").currentStep);
   });
 
