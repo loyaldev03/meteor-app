@@ -15256,3 +15256,35 @@
     updated_at: 2013-06-27 12:17:05.000000000 Z
     id: 1017
 
+
+- !ruby/object:DeclineStrategy
+  attributes:
+    gateway: mes
+    installment_type: 1.month
+    credit_card_type: visa
+    response_code: 097
+    limit: 6
+    days: 3
+    decline_type: soft
+    notes: 
+    deleted_at: 
+    created_at: 2013-08-01 18:59:21.000000000 Z
+    updated_at: 2013-08-01 18:59:21.000000000 Z
+    id: 1018
+
+
+- !ruby/object:DeclineStrategy
+  attributes:
+    gateway: mes
+    installment_type: 1.year
+    credit_card_type: visa
+    response_code: 097
+    limit: 6
+    days: 3
+    decline_type: soft
+    notes: 
+    deleted_at: 
+    created_at: 2013-08-01 18:59:22.000000000 Z
+    updated_at: 2013-08-01 18:59:22.000000000 Z
+    id: 1019
+
