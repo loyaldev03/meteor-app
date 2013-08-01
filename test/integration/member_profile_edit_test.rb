@@ -587,6 +587,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#external_id"){ fill_in 'member[external_id]', :with => '987654321' }
     alert_ok_js
     click_link_or_button 'Update Member'
+    
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @member_with_external_id.id)
     assert find_field('input_first_name').value == @member_with_external_id.first_name
 
     @member_with_external_id.reload
@@ -605,6 +607,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#table_demographic_information"){ select('Female', :from => 'member[gender]') }
     alert_ok_js
     click_link_or_button 'Update Member'
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
     assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload
@@ -625,6 +629,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#table_demographic_information"){ select('Male', :from => 'member[gender]') }
     alert_ok_js
     click_link_or_button 'Update Member'
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+
     assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload
     assert find_field('input_gender').value == ('Male')
@@ -892,6 +898,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       click_on("#{(Time.zone.now+1.day).day}")
     end
     click_link_or_button 'Change next bill date'
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
     assert find_field('input_first_name').value == @saved_member.first_name
     next_bill_date = Time.zone.now + 1.day
