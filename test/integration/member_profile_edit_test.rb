@@ -85,10 +85,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button('Search')
     within("#table_member_search_result") do
       assert page.has_content?(c.first_name)
-      puts c.first_name
-      puts page.has_content?(c.first_name)
-      puts c2.first_name
-      puts page.has_content?(c2.first_name)
       assert page.has_no_content?(c2.first_name)
     end
   end
@@ -497,8 +493,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Update Member'
-    @saved_member.reload
     within("#table_contact_information")do
+      @saved_member.reload
       assert page.has_content?(@saved_member.full_phone_number)
       assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
     end
@@ -1105,18 +1101,13 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
  test "Sorting transaction table" do
     setup_member
-
-    @saved_member.next_retry_bill_date = Time.zone.now
-    @saved_member.bill_membership
-    first_transaction = @saved_member.transactions.first
-    first_transaction.update_attribute :created_at, Time.zone.now-2.day
-    10.times do 
-      @saved_member.next_retry_bill_date = Time.zone.now
-      @saved_member.bill_membership
+    12.times do |index| 
+      FactoryGirl.create(:transaction, member_id: @saved_member.id, transaction_type: "sale", response_result: index, response_transaction_id: index, gateway: "mes")
+      sleep 0.25
     end
-    last_transaction = @saved_member.transactions.where("uuid != ?", first_transaction.id).first
+    first_transaction = Transaction.find_by_response_result 0
+    last_transaction = Transaction.find_by_response_result 11
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-  
     within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table")do 
       assert page.has_content?(I18n.l(last_transaction.created_at, :format => :dashed))

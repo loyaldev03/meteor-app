@@ -8,6 +8,9 @@ class Operation < ActiveRecord::Base
 
   validates :description, :presence => true
 
+  scope :is_visible, -> { where("operation_type < 5000") }
+
+
   def self.datatable_columns
     ['id', 'operation_date', 'description']
   end
