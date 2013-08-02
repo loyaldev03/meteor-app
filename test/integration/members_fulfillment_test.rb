@@ -423,7 +423,7 @@ test "Enroll a member with recurrent product and it on the list" do
     assert_equal(@product.stock,stock-1)
   end
 
-  test "dislpay default data on fulfillments index" do
+  test "display default data on fulfillments index" do
     setup_member(false)
 
     click_link_or_button("My Clubs")
@@ -435,7 +435,6 @@ test "Enroll a member with recurrent product and it on the list" do
       assert find_field('end_date').value == "#{Date.today}"
       assert page.find_field('status').value == 'not_processed'
       assert page.find_field('all_times')   
-      assert page.find_field('product_type')
     end
   end
 
@@ -1319,7 +1318,7 @@ test "Enroll a member with recurrent product and it on the list" do
     attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
     check('club[requires_external_id]')
     select('application', :from => 'club[theme]')
-    assert_difference('Product.count',2) do
+    assert_difference('Product.count',1) do
       click_link_or_button 'Create Club'
     end
     assert page.has_content?("The club #{unsaved_club.name} was successfully created")
@@ -1437,7 +1436,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "change status of fulfillment CARD from not_processed to sent" do
     setup_member(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_member_throught_sloop(enrollment_info)
     @saved_member = Member.find_by_email(@member.email)
@@ -1484,7 +1483,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "do not show fulfillment KIT with status = sent actions when member is lapsed." do
     setup_member(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_member_throught_sloop(enrollment_info)
     fulfillment = Fulfillment.last
@@ -1529,7 +1528,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "do not show fulfillment CARD with status = sent actions when member is lapsed." do
     setup_member(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_member_throught_sloop(enrollment_info)
     fulfillment = Fulfillment.last
