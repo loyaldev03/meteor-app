@@ -130,8 +130,9 @@ module ActionController
     end
 
     teardown do
-      DatabaseCleaner.clean
       Capybara.reset_sessions!  
+      sleep 5
+      DatabaseCleaner.clean
     end
 
     def sign_in_as(user)
