@@ -41,13 +41,12 @@ private
     TermsOfMembership.datatable_columns[params[:iSortCol_0].to_i]
   end
 
-  def get_agent_name(current_tom)
+  def get_agent_name(tom)
     begin
-      username = tom.agent.username
-    rescue Exception => e
-      username = '--'
+      tom.agent.username  
+    rescue
+      '(Not set)'
     end
-    username
   end
 
-end    
+end
