@@ -104,7 +104,7 @@ namespace :fulfillments do
 
       Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
       CSV.open( temp_file, "w" ) do |csv|
-        csv << [ 'First Name', 'Last Name', 'Product Choice', 'address', 'city', 'state', 'zip', 'join date', 'phone number' ]
+        csv << [ 'First Name', 'Last Name', 'Product Choice', 'address', 'city', 'state', 'zip', 'join date', 'phone number', 'Email' ]
         unless fulfillments.empty?
           fulfillments.each do |fulfillment|
             tz = Time.zone.now
@@ -114,7 +114,7 @@ namespace :fulfillments do
             csv << [member.first_name, member.last_name, fulfillment.product_sku, member.address, 
                     member.city, member.state, "#{member.zip}"  ,
                     I18n.l(member.join_date, :format => :only_date_short), 
-                    member.full_phone_number]
+                    member.full_phone_number, member.email]
             fulfillment_file.fulfillments << fulfillment
             Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
           end
