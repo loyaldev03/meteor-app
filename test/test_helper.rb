@@ -20,6 +20,7 @@ Turn.config.format = :outline
 
 ## do you use firefox??
 Capybara.current_driver = :selenium
+
 ## end configuration for firefox
 ## do you want chrome ? (chrome is for carla)
 # Capybara.register_driver :chrome do |app|
@@ -126,8 +127,9 @@ module ActionController
 
     setup do
       DatabaseCleaner.start
-      FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")  
-    end
+      FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")
+      page.driver.browser.manage.window.resize_to(1024,768)
+      end
 
     teardown do
       sleep 5
