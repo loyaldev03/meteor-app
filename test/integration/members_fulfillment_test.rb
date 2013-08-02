@@ -6,9 +6,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
   # SETUP
   ############################################################
 
-  setup do
-  end
-
   def setup_member(create_new_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @club = FactoryGirl.create(:simple_club_with_gateway)
@@ -17,13 +14,12 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     @partner = @club.partner
     Time.zone = @club.time_zone
 
-    @product = FactoryGirl.create(:product, :club_id => @club.id, :sku => 'KIT-CARD')
+    @product = Product.find_by_sku 'KIT-CARD'
 
     if create_new_member
       @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
       @fulfillment = FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'kit-card')
     end
-
 
     sign_in_as(@admin_agent)
   end
@@ -597,12 +593,12 @@ test "Enroll a member with recurrent product and it on the list" do
   test "mark sent fulfillment at in_process status" do
     setup_member(false)
     product = FactoryGirl.create(:product, :club_id => @club.id, :recurrent => true)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_member_throught_sloop(enrollment_info)
     @saved_member = Member.find_by_email(@member.email)
 
-    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+    fulfillment = Fulfillment.find_by_product_sku(@product.sku)
     fulfillment.set_as_in_process
     click_link_or_button("My Clubs")
     within("#my_clubs_table"){click_link_or_button("Fulfillments")}
@@ -625,7 +621,7 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_selector?('#set_as_wrong_address')
 
       click_link_or_button('Mark as sent')
-      assert page.has_content?("Fulfillment #{product.sku} was set as sent.")
+      assert page.has_content?("Fulfillment #{@product.sku} was set as sent.")
     end
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
@@ -634,7 +630,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
     within("#fulfillments")do
       assert page.has_content?(I18n.l @saved_member.join_date, :format => :long)
-      assert page.has_content?(product.sku)
+      assert page.has_content?(@product.sku)
       assert page.has_content?('sent')
     end
   end
@@ -1363,9 +1359,8 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "kit fulfillment without stock." do
     setup_member(false)
-    product = Product.find_by_sku('KIT-CARD')
-    product.update_attribute(:stock,0)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
+    @product.update_attribute(:stock,0)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_member_throught_sloop(enrollment_info)
     @saved_member = Member.find_by_email(@member.email)
@@ -1374,7 +1369,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){click_link_or_button("Fulfillments")}
     page.has_content?("Fulfillments")
 
-    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+    fulfillment = Fulfillment.find_by_product_sku(@product.sku)
 
     within("#fulfillments_table")do
       check('all_times')
@@ -1394,8 +1389,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "Create a report fulfillment selecting KIT at product type." do
     setup_member(false)
-    product = Product.find_by_sku('KIT-CARD')
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_member_throught_sloop(enrollment_info)
     @saved_member = Member.find_by_email(@member.email)
@@ -1443,7 +1437,6 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "change status of fulfillment CARD from not_processed to sent" do
     setup_member(false)
-    product = Product.find_by_sku('KIT-CARD')
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
@@ -1491,7 +1484,6 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "do not show fulfillment KIT with status = sent actions when member is lapsed." do
     setup_member(false)
-    product = Product.find_by_sku('KIT-CARD')
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
@@ -1537,7 +1529,6 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "do not show fulfillment CARD with status = sent actions when member is lapsed." do
     setup_member(false)
-    product = Product.find_by_sku('KIT-CARD')
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_member_throught_sloop(enrollment_info)
@@ -1583,8 +1574,6 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "not_processed and in_process fulfillments should be updated to undeliverable when set_wrong_address" do
     setup_member(false)
-    product_card = Product.find_by_sku('KIT-CARD')
-    product_kit = Product.find_by_sku('KIT-CARD')
     product_other = FactoryGirl.create(:product, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product_other.sku},CARD,KIT")
 
@@ -1638,8 +1627,6 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "kit and card renewed fulfillments should not set as undeliverable" do
     setup_member(false)
-    product_card = Product.find_by_sku('KIT-CARD')
-    product_kit = Product.find_by_sku('KIT-CARD')
     product_other = FactoryGirl.create(:product, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product_other.sku},CARD,KIT")
 
@@ -1796,8 +1783,7 @@ test "Enroll a member with recurrent product and it on the list" do
   
   test "Create a report fulfillment selecting CARD at product type - Chapter member status" do
     setup_member(false)
-    product = Product.find_by_sku('KIT-CARD')
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{@product.sku}")
 
     create_member_throught_sloop(enrollment_info)
     @saved_member = Member.find_by_email(@member.email)
@@ -1853,10 +1839,9 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "Pass product to Not Processed status without stock" do
     setup_member(false)
-    product = Product.find_by_sku('KIT-CARD')
     product.update_attribute :stock , 0
     product.update_attribute :allow_backorder , false
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{@product.sku}")
 
     assert_difference("Member.count",0)do
       create_member_throught_sloop(enrollment_info)
