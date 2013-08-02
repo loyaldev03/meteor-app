@@ -130,8 +130,8 @@ module ActionController
     end
 
     teardown do
-      Capybara.reset_sessions!  
       sleep 5
+      Capybara.reset_sessions!  
       DatabaseCleaner.clean
     end
 
