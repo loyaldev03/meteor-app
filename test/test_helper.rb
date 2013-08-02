@@ -9,6 +9,7 @@ require 'capybara/rails'
 require 'capybara/dsl'
 require 'database_cleaner'
 require 'mocha/setup'
+require "timeout"
 
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
@@ -22,7 +23,10 @@ Capybara.current_driver = :selenium
 ## end configuration for firefox
 ## do you want chrome ? (chrome is for carla)
 # Capybara.register_driver :chrome do |app|
-#   Capybara::Selenium::Driver.new(app, :browser => :chrome)
+#   client = Selenium::WebDriver::Remote::Http::Default.new
+#   client.timeout = 240 
+#   Capybara::Selenium::Driver.new(app, :browser => :chrome,
+#                                  :http_client => client)
 # end
 # Capybara.javascript_driver = :chrome
 # Capybara.current_driver = :chrome
@@ -120,12 +124,9 @@ module ActionController
 
     self.use_transactional_fixtures = false # DOES WORK! Damn it!
 
-    def init_test_setup
-    end
-
     setup do
       DatabaseCleaner.start
-      FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")
+      FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")  
     end
 
     teardown do
@@ -141,7 +142,6 @@ module ActionController
     end
 
     def wait_until
-      require "timeout"
       Timeout.timeout(Capybara.default_wait_time) do
         sleep(0.1) until value = yield
         value
@@ -267,8 +267,8 @@ module ActionController
       credit_card = FactoryGirl.build(:credit_card_master_card) if credit_card.nil?
 
       type_of_phone_number = (unsaved_member[:type_of_phone_number].blank? ? '' : unsaved_member.type_of_phone_number.capitalize)
-
-      within("#table_demographic_information")do
+      
+      within("#table_demographic_information") do
         fill_in 'member[first_name]', :with => unsaved_member.first_name
         if unsaved_member.gender == "Male" or unsaved_member.gender == "M"
           select("Male", :from => 'member[gender]')
@@ -334,8 +334,13 @@ module ActionController
 
     def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
       fill_in_member(unsaved_member, credit_card, tom_type, cc_blank)
-      sleep 1
-      assert find_field('input_first_name').value == unsaved_member.first_name
+      within('#table_contact_information') {}
+      begin
+        wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+      rescue
+        Rails.logger.error "Error - "
+        Rails.logger.error page.inspect
+      end
       Member.find_by_email(unsaved_member.email)
     end
 
@@ -436,6 +441,7 @@ module ActionController
       fill_in 'club_cash_transaction[amount]', :with => amount
       fill_in 'club_cash_transaction[description]', :with => description
       click_on 'Save club cash transaction'
+      sleep 1
       if validate
         within('.nav-tabs'){ click_on 'Operations' }
         within("#operations_table"){assert page.has_content?("#{amount.to_f.abs} club cash was successfully #{amount>0 ? 'added' : 'deducted'}. Concept: #{description}")}

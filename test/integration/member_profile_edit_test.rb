@@ -1084,6 +1084,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     sleep 2 #Wait untill script finish.
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+
     assert find_field('input_first_name').value == @saved_member.first_name
 
     within(".nav-tabs"){ click_on 'Communications' }
