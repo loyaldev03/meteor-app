@@ -176,17 +176,17 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal @fulfillment.status, 'canceled'
   end
 
-  test "cancel member and check if undeliverable fulfillments were updated to canceled" do
+  test "cancel member and check if bad_address fulfillments were updated to canceled" do
     setup_member
     @fulfillment.set_as_in_process
-    @fulfillment.set_as_undeliverable
+    @fulfillment.set_as_bad_address
     
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within(".nav-tabs") do
       click_on("Fulfillments")
     end
     within("#fulfillments")do
-      assert page.has_content?('undeliverable')
+      assert page.has_content?('bad_address')
     end
 
     @saved_member.set_as_canceled!
@@ -584,7 +584,7 @@ test "Enroll a member with recurrent product and it on the list" do
       fill_in 'reason', :with => 'spam'
       confirm_ok_js
       click_link_or_button('Set wrong address')
-      page.has_content?("#{fulfillment.member.full_address} is undeliverable. Reason: spam")
+      page.has_content?("#{fulfillment.member.full_address} is bad_address. Reason: spam")
     end
   end
   
@@ -668,7 +668,7 @@ test "Enroll a member with recurrent product and it on the list" do
       fill_in 'reason', :with => 'spam'
       confirm_ok_js
       click_link_or_button('Set wrong address')
-      page.has_content?("#{fulfillment.member.full_address} is undeliverable. Reason: spam")
+      page.has_content?("#{fulfillment.member.full_address} is bad_address. Reason: spam")
     end
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
@@ -678,7 +678,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments")do
       assert page.has_content?(I18n.l @saved_member.join_date, :format => :long)
       assert page.has_content?('KIT-CARD')
-      assert page.has_content?('undeliverable')
+      assert page.has_content?('bad_address')
     end
   end
 
@@ -883,7 +883,7 @@ test "Enroll a member with recurrent product and it on the list" do
     assert_equal(fulfillment.renewed, true)
   end
 
-  test "renewal as undeliverable and set renewed" do
+  test "renewal as bad_address and set renewed" do
     setup_member(false)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT-CARD')
 
@@ -909,14 +909,14 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_content?(I18n.l @saved_member.join_date + 1.year, :format => :long)
       assert page.has_content?(I18n.l @saved_member.join_date + 2.year, :format => :long)
       assert page.has_content?('KIT-CARD')
-      assert page.has_content?('undeliverable')
+      assert page.has_content?('bad_address')
     end
     fulfillment.reload
     fulfillment_new = Fulfillment.last
     assert_equal(fulfillment_new.product_sku, fulfillment.product_sku)
     assert_equal((I18n.l fulfillment_new.assigned_at, :format => :long), (I18n.l Time.zone.now, :format => :long))
     assert_equal((I18n.l fulfillment_new.renewable_at, :format => :long), (I18n.l fulfillment_new.assigned_at + 1.year, :format => :long))
-    assert_equal(fulfillment_new.status, 'undeliverable')
+    assert_equal(fulfillment_new.status, 'bad_address')
     assert_equal(fulfillment_new.renewed, false)
     assert_equal(fulfillment.renewed, true)
   end
@@ -961,7 +961,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
 
-  test "fulfillment status undeliverable" do
+  test "fulfillment status bad_address" do
     setup_member
 
     @fulfillment.set_as_in_process
@@ -972,7 +972,7 @@ test "Enroll a member with recurrent product and it on the list" do
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
-      select('undeliverable', :from => 'status')
+      select('bad_address', :from => 'status')
       choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
@@ -987,7 +987,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
 
-  test "Resend fulfillment with status undeliverable - Product with stock" do
+  test "Resend fulfillment with status bad_address - Product with stock" do
     setup_member
 
     @fulfillment.set_as_in_process
@@ -998,7 +998,7 @@ test "Enroll a member with recurrent product and it on the list" do
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
-      select('undeliverable', :from => 'status')
+      select('bad_address', :from => 'status')
       choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
@@ -1009,8 +1009,8 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
       assert page.has_content?(@fulfillment.product_sku)
       assert page.has_content?(@fulfillment.tracking_code)
-      assert page.has_content?('undeliverable')
-      click_link_or_button('This address is undeliverable.')
+      assert page.has_content?('bad_address')
+      click_link_or_button('This address is bad_address.')
     end
     click_link_or_button 'Edit'
 
@@ -1047,7 +1047,7 @@ test "Enroll a member with recurrent product and it on the list" do
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
-      select('undeliverable', :from => 'status')
+      select('bad_address', :from => 'status')
       choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
@@ -1059,7 +1059,7 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_content?(@fulfillment.product_sku)
       assert page.has_content?(@fulfillment.tracking_code)
       assert page.has_content?('bad_address')
-      click_link_or_button('This address is undeliverable.')
+      click_link_or_button('This address is bad_address.')
     end
     product.update_attribute(:stock,0)
 
@@ -1140,7 +1140,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
 
-  test "fulfillment record from undeliverable to cancel status" do
+  test "fulfillment record from bad_address to cancel status" do
     setup_member
     @fulfillment.set_as_in_process
     @saved_member.set_wrong_address(@admin_agent, 'admin')
@@ -1400,7 +1400,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){click_link_or_button("Fulfillments")}
     page.has_content?("Fulfillments")
 
-    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+    fulfillment = Fulfillment.find_by_product_sku(@product.sku)
 
     within("#fulfillments_table")do
       select('not_processed', :from => 'status')
@@ -1570,7 +1570,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
 
-  test "not_processed and in_process fulfillments should be updated to undeliverable when set_wrong_address" do
+  test "not_processed and in_process fulfillments should be updated to bad_address when set_wrong_address" do
     setup_member(false)
     product_other = FactoryGirl.create(:product, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product_other.sku},CARD,KIT")
@@ -1587,30 +1587,30 @@ test "Enroll a member with recurrent product and it on the list" do
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
-      select('undeliverable', :from => 'status')
+      select('bad_address', :from => 'status')
       choose('radio_product_type_KIT-CARD')
     end
     click_link_or_button('Report')
     within("#report_results")do
-      assert page.has_content?('undeliverable')
+      assert page.has_content?('bad_address')
       assert page.has_content?(product_card.sku)
-      assert page.has_content?((I18n.t('activerecord.attributes.member.undeliverable')))
+      assert page.has_content?((I18n.t('activerecord.attributes.member.bad_address')))
     end
     within("#fulfillments_table")do
       check('all_times')
-      select('undeliverable', :from => 'status')
+      select('bad_address', :from => 'status')
       choose('radio_product_type_SLOOPS')
     end
     click_link_or_button('Report')
     within("#report_results")do
-      assert page.has_content?('undeliverable')
+      assert page.has_content?('bad_address')
       assert page.has_content?(product_other.sku)
-      assert page.has_content?((I18n.t('activerecord.attributes.member.undeliverable')))
+      assert page.has_content?((I18n.t('activerecord.attributes.member.bad_address')))
       assert page.has_no_selector?('#resend')
     end
   end
 
-  test "kit and card renewed fulfillments should not set as undeliverable" do
+  test "kit and card renewed fulfillments should not set as bad_address" do
     setup_member(false)
     product_other = FactoryGirl.create(:product, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product_other.sku},CARD,KIT")
@@ -1822,8 +1822,8 @@ test "Enroll a member with recurrent product and it on the list" do
 
   test "Pass product to Not Processed status without stock" do
     setup_member(false)
-    product.update_attribute :stock , 0
-    product.update_attribute :allow_backorder , false
+    @product.update_attribute :stock , 0
+    @product.update_attribute :allow_backorder , false
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{@product.sku}")
 
     assert_difference("Member.count",0)do
