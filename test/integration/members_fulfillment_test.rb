@@ -466,7 +466,6 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.find_field('end_date')
       assert page.find_field('status')
       assert page.find_field('all_times')    
-      assert page.find_field('product_type')
       check('all_times')
       select('in_process', :from => 'status')
       choose('radio_product_type_SLOOPS')
@@ -1770,7 +1769,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     create_member_throught_sloop(enrollment_info)
     @saved_member = Member.find_by_email(@member.email)
-    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+    fulfillment = Fulfillment.find_by_product_sku(@product.sku)
     fulfillment.set_as_in_process
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
