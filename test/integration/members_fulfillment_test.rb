@@ -517,7 +517,6 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.find_field('end_date')
       assert page.find_field('status')
       assert page.find_field('all_times')    
-      assert page.find_field('product_type')
       check('all_times')
       select('sent', :from => 'status')
       choose('#radio_product_type_KIT-CARD')
@@ -984,7 +983,7 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
       assert page.has_content?(@fulfillment.product_sku)
       assert page.has_content?(@fulfillment.tracking_code)
-      assert page.has_content?('undeliverable')
+      assert page.has_content?('bad_address')
     end
   end
 
@@ -1030,7 +1029,7 @@ test "Enroll a member with recurrent product and it on the list" do
     end
   end
 
-  test "resend fulfillment with status undeliverable - Product without stock" do
+  test "resend fulfillment with status bad_address - Product without stock" do
     setup_member(false)
     product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
 
@@ -1059,7 +1058,7 @@ test "Enroll a member with recurrent product and it on the list" do
       assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :long)))
       assert page.has_content?(@fulfillment.product_sku)
       assert page.has_content?(@fulfillment.tracking_code)
-      assert page.has_content?('undeliverable')
+      assert page.has_content?('bad_address')
       click_link_or_button('This address is undeliverable.')
     end
     product.update_attribute(:stock,0)
@@ -1146,7 +1145,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @fulfillment.set_as_in_process
     @saved_member.set_wrong_address(@admin_agent, 'admin')
     @fulfillment.reload
-    assert_equal(@fulfillment.status, 'undeliverable')
+    assert_equal(@fulfillment.status, 'bad_address')
     @saved_member.set_as_canceled
     @saved_member.reload
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -1578,8 +1577,7 @@ test "Enroll a member with recurrent product and it on the list" do
 
     create_member_throught_sloop(enrollment_info)
     @saved_member = Member.find_by_email(@member.email)
-    fulfillment_card = Fulfillment.find_by_product_sku(product_card.sku)
-    fulfillment_kit = Fulfillment.find_by_product_sku(product_kit.sku)
+    fulfillment_card = Fulfillment.find_by_product_sku(@product.sku)
     fulfillment_other = Fulfillment.find_by_product_sku(product_other.sku)
     fulfillment_other.set_as_in_process
     @saved_member.set_wrong_address(@admin_agent, 'reason')
@@ -1590,25 +1588,13 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#fulfillments_table")do
       check('all_times')
       select('undeliverable', :from => 'status')
-      select('Card',:from => 'product_type')
+      choose('radio_product_type_KIT-CARD')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?('undeliverable')
       assert page.has_content?(product_card.sku)
       assert page.has_content?((I18n.t('activerecord.attributes.member.undeliverable')))
-    end
-    within("#fulfillments_table")do
-      check('all_times')
-      select('undeliverable', :from => 'status')
-      choose('radio_product_type_KIT-CARD')
-    end
-    click_link_or_button('Report')
-    within("#report_results")do
-      assert page.has_content?('undeliverable')
-      assert page.has_content?(product_kit.sku)
-      assert page.has_content?((I18n.t('activerecord.attributes.member.undeliverable')))
-      assert page.has_no_selector?('#resend')
     end
     within("#fulfillments_table")do
       check('all_times')
@@ -1631,10 +1617,8 @@ test "Enroll a member with recurrent product and it on the list" do
 
     create_member_throught_sloop(enrollment_info)
     @saved_member = Member.find_by_email(@member.email)
-    fulfillment_card = Fulfillment.find_by_product_sku(product_card.sku)
-    fulfillment_kit = Fulfillment.find_by_product_sku(product_kit.sku)
+    fulfillment_card = Fulfillment.find_by_product_sku(@product.sku)
     fulfillment_card.update_attribute(:renewed, true)
-    fulfillment_kit.update_attribute(:renewed, true)
 
     @saved_member.set_wrong_address(@admin_agent,'reason')
 
