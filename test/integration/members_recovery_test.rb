@@ -7,7 +7,6 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   ############################################################
 
   setup do
-    init_test_setup
   end
 
   def setup_member(cancel = true, create_member = true)
@@ -231,6 +230,9 @@ class MembersRecoveryTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Update Member'
+
+    page.has_content? "table_additional_data"
+
     @saved_member.reload
     assert_equal @saved_member.first_name, "New name"
     assert_equal @saved_member.status, "lapsed"

@@ -3,7 +3,6 @@ require 'test_helper'
 class LoginTest < ActionController::IntegrationTest
  
   setup do
-    init_test_setup
   end
 
   test "admin_agent_login" do

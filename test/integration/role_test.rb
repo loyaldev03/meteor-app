@@ -3,58 +3,50 @@ require 'test_helper'
 class RolesTest < ActionController::IntegrationTest
  
   setup do
-    init_test_setup
   end
   
   def setup_admin
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_admin_agent)
     sign_in_as(@agent)
+
   end
 
   def setup_agent_no_rol
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_agent)
     @agent.update_attribute(:roles, [])
     sign_in_as(@agent)   
   end
 
   def setup_supervisor
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_supervisor_agent)
     sign_in_as(@agent)
   end
 
   def setup_representative
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_representative_agent)
     @agent.update_attribute(:roles, ['representative'])
     sign_in_as(@agent)
   end
 
   def setup_agency
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_agency_agent)
     @agent.update_attribute(:roles, ['agency'])
     sign_in_as(@agent)
   end
 
   def setup_api
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_api_agent)
     @agent.update_attribute(:roles, ['api'])
     sign_in_as(@agent)
   end
 
   def setup_fulfillment_managment
-    init_test_setup
     @agent = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
     @agent.update_attribute(:roles, ['fulfillment_managment'])
     sign_in_as(@agent)
   end
 
   def setup_agent_with_club_role(club, role)
-    init_test_setup
     @agent = FactoryGirl.create(:agent)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
@@ -90,8 +82,8 @@ class RolesTest < ActionController::IntegrationTest
   test "select all clubs for admin agent."do
     setup_admin
     partner = FactoryGirl.create(:partner)
-    10.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
-    click_link_or_button("My Clubs")
+    10.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    find("#my_clubs").click
 
     within("#change_partner")do
       Club.all.each do |club|
@@ -105,7 +97,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_member false
     @agent_no_role = FactoryGirl.create :confirmed_agent
     7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
-
+    sleep 500
     club1 = Club.first
     club2 = Club.find(2)
     club3 = Club.find(3)
@@ -186,7 +178,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_supervisor
     partner = FactoryGirl.create(:partner)
     7.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
-    click_link_or_button("My Clubs")
+    find("#my_clubs").click
 
     within("#change_partner")do
       Club.all.each do |club|
@@ -284,7 +276,7 @@ class RolesTest < ActionController::IntegrationTest
     setup_representative
     partner = FactoryGirl.create(:partner)
     10.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
-    click_link_or_button("My Clubs")
+    find("#my_clubs").click
 
     within("#change_partner")do
       Club.all.each do |club|
@@ -385,7 +377,7 @@ class RolesTest < ActionController::IntegrationTest
     partner = FactoryGirl.create(:partner)
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
 
-    click_link_or_button("My Clubs")
+    find("#my_clubs").click
     within("#my_clubs_table")do
       Club.all.each do |club|
         assert page.has_content?("#{club.name}")
@@ -408,7 +400,7 @@ class RolesTest < ActionController::IntegrationTest
     partner = FactoryGirl.create(:partner)
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
 
-    click_link_or_button("My Clubs")
+    find("#my_clubs").click
     within("#my_clubs_table")do
       Club.all.each do |club|
         assert page.has_content?("#{club.name}")
@@ -514,7 +506,6 @@ test "Agency role - Recover a member" do
     setup_fulfillment_managment
     setup_member
     @new_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'new_tome')
-
     @saved_member.set_as_canceled!
     recover_member(@saved_member,@new_tom)
   end
@@ -551,7 +542,7 @@ test "Agency role - Recover a member" do
     @agent.add_role_with_club('representative', first_club)
     @agent.add_role_with_club('supervisor', second_club)
 
-    click_link_or_button("My Clubs")
+    find("#my_clubs").click
     within("#my_clubs_table")do
       assert page.has_content?("#{first_club.name}")
       assert page.has_content?("#{second_club.name}")
@@ -573,7 +564,7 @@ test "Agency role - Recover a member" do
     @agent.add_role_with_club('agency', fourth_club)
     @agent.add_role_with_club('admin', fifth_club)
 
-    click_link_or_button("My Clubs")
+    find("#my_clubs").click
     within("#my_clubs_table")do
       assert page.has_content?("#{first_club.name}")
       assert page.has_content?("#{second_club.name}")
@@ -615,7 +606,7 @@ test "Agency role - Recover a member" do
     @agent.add_role_with_club('agency', fourth_club)
     @agent.add_role_with_club('admin', fifth_club)
 
-    click_link_or_button("My Clubs")
+    find("#my_clubs").click
     within("#my_clubs_table")do
       assert page.has_content?("#{first_club.name}")
       assert page.has_content?("#{second_club.name}")
@@ -672,7 +663,7 @@ test "Agency role - Recover a member" do
     @agent.add_role_with_club('agency', fourth_club)
     @agent.add_role_with_club('admin', fifth_club)
 
-    click_link_or_button("My Clubs")
+    find("#my_clubs").click
     within("#my_clubs_table")do
       assert page.has_content?("#{first_club.name}")
       assert page.has_content?("#{second_club.name}")
@@ -1023,7 +1014,7 @@ test "Agency role - Recover a member" do
     @agent.update_attribute(:roles,['agency'])
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
-    within(".navbar"){ click_link_or_button("My Clubs") }
+    find("#my_clubs").click
     within("#my_clubs_table")do
       Club.all.each do |club|
         assert page.has_content?(club.name)
@@ -1042,7 +1033,7 @@ test "Agency role - Recover a member" do
     @agent.update_attribute(:roles,['representative'])
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
-    within(".navbar"){ click_link_or_button("My Clubs") }
+    find("#my_clubs").click
     within("#my_clubs_table")do
       Club.all.each do |club|
         assert page.has_content?(club.name)
@@ -1060,7 +1051,7 @@ test "Agency role - Recover a member" do
     @agent.update_attribute(:roles,['supervisor'])
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
-    within(".navbar"){ click_link_or_button("My Clubs") }
+    find("#my_clubs").click
     within("#my_clubs_table")do
       Club.all.each do |club|
         assert page.has_content?(club.name)

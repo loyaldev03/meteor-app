@@ -4,7 +4,6 @@ class AgentsTest < ActionController::IntegrationTest
  
 
   def setup_environment
-    init_test_setup
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     sign_in_as(@admin_agent)
   end
@@ -103,14 +102,14 @@ class AgentsTest < ActionController::IntegrationTest
 
   test "search agent" do
     setup_environment
-    visit admin_agents_path
-
-    10.times{ FactoryGirl.create(:confirmed_agent) }
 
     confirmed_agent = FactoryGirl.create(:confirmed_agent)
-    do_data_table_search("#agents_table_filter", confirmed_agent.email)
+    10.times{ FactoryGirl.create(:confirmed_agent) }
 
+    visit admin_agents_path
+    do_data_table_search("#agents_table_filter", confirmed_agent.email)
     within("#agents_table") do 
+      sleep 5      
       assert page.has_content?(confirmed_agent.email)
       within("tr", :text => confirmed_agent.email) do 
         click_link_or_button 'Edit'
@@ -250,7 +249,6 @@ class AgentsTest < ActionController::IntegrationTest
   end
 
   test "Reset Password at CS" do
-    init_test_setup
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
    
     visit '/'

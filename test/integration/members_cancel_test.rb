@@ -7,7 +7,6 @@ class MembersCancelTest < ActionController::IntegrationTest
   ############################################################
 
   setup do
-    init_test_setup
   end
 
   def setup_member(create_new_member = true)
@@ -58,14 +57,14 @@ class MembersCancelTest < ActionController::IntegrationTest
     assert_equal @saved_member.status, prior_status
   end
 
-  #test "See Additional Member Data" do
-    #@admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    #@club = FactoryGirl.create(:simple_club_with_gateway)
-    #@partner = @club.partner
-    #Time.zone = @club.time_zone
-    #@terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    #@terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
-  #end
+  test "See Additional Member Data" do
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @partner = @club.partner
+    Time.zone = @club.time_zone
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+  end
 
   ##TO FIX
   ## test "Downgrade a member - Different club" do
@@ -170,18 +169,18 @@ class MembersCancelTest < ActionController::IntegrationTest
     assert assert find_field('input_first_name').value == @saved_member.first_name
   end
 
-  #test "Rejecting a member should set cancel_date" do
-    #setup_member(false)
-    #unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-    #credit_card = FactoryGirl.build(:credit_card_master_card)
+  test "Rejecting a member should set cancel_date" do
+    setup_member(false)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
     
-    #@saved_member = create_member(unsaved_member, credit_card, @terms_of_membership_with_approval.name)
+    @saved_member = create_member(unsaved_member, credit_card, @terms_of_membership_with_approval.name)
 
-    #confirm_ok_js
-    #click_link_or_button 'Reject'
+    confirm_ok_js
+    click_link_or_button 'Reject'
 
-    #within("#td_mi_cancel_date")do
-      #assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-    #end
-  #end
+    within("#td_mi_cancel_date")do
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
+    end
+  end
 end

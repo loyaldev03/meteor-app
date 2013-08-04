@@ -7,7 +7,6 @@ class MembersBlacklistTest < ActionController::IntegrationTest
   ############################################################
 
   setup do
-    init_test_setup
   end
 
   def setup_member(create_new_member = true)
@@ -43,6 +42,10 @@ class MembersBlacklistTest < ActionController::IntegrationTest
       within("#td_mi_cancel_date") do
         assert page.has_content?(I18n.l(member.cancel_date, :format => :only_date))
       end
+    end
+
+    within(".nav-tabs") do
+      click_on("Operations")
     end
 
     within("#operations_table") do
