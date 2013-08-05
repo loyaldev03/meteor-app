@@ -28,7 +28,7 @@ private
   end
 
   def fetch_operations
-    operations = Operation.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member)
+    operations = Operation.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member.id).is_visible
     
     if params[:sSearch].present?
       if params[:sSearch] == 'billing'
@@ -44,7 +44,7 @@ private
       elsif params[:sSearch] == 'others'
         operations = Operation.where(["member_id = ? AND operation_type BETWEEN 1000 and 1099",@current_member.id]).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'all'
-        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 100 and 4999",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = Operation.where('member_id' => @current_member.id).order("#{sort_column} #{sort_direction}").is_visible
       end
     end
     operations = operations.page(page).per_page(per_page)

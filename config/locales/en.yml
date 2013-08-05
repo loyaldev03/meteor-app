@@ -41,6 +41,7 @@ en:
   index: '#'
   lorem: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
   menu: 
+    admin_menu: 'Admin Menu'
     logout: 'Logout'
     agents: 'Agents'
     partners: 'Partners'

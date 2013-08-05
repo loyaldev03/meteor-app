@@ -67,8 +67,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
  #  # UTILS
  #  ############################################################
 
-
-
   def validate_terms_of_membership_show_page(saved_member)
     within("#table_membership_information")do
       within("#td_mi_terms_of_membership_name"){ click_link_or_button("#{saved_member.terms_of_membership.name}") }
@@ -159,7 +157,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
-
   test "create member" do
   	setup_member(false)
 
@@ -194,7 +191,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)  
     created_member = create_member(unsaved_member, nil, nil, false)
   end
-
 
   test "Create a member with CC blank" do
     setup_member(false)
@@ -247,16 +243,16 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     alert_ok_js
     click_link_or_button 'Create Member'
     within("#error_explanation")do
-        assert page.has_content?("first_name: can't be blank,is invalid"), "Failure on first_name validation message"
-        assert page.has_content?("last_name: can't be blank,is invalid"), "Failure on last_name validation message"
-        assert page.has_content?("email: can't be blank,is invalid"), "Failure on email validation message"
-        assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_country_code validation message"
-        assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
-        assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_local_number validation message"
-        assert page.has_content?("address: is invalid"), "Failure on address validation message"
-        assert page.has_content?("state: can't be blank,is invalid"), "Failure on state validation message"
-        assert page.has_content?("city: can't be blank,is invalid"), "Failure on city validation message"
-        assert page.has_content?("zip: can't be blank,The zip code is not valid for the selected country."), "Failure on zip validation message"
+      assert page.has_content?("first_name: can't be blank,is invalid"), "Failure on first_name validation message"
+      assert page.has_content?("last_name: can't be blank,is invalid"), "Failure on last_name validation message"
+      assert page.has_content?("email: is invalid"), "Failure on email validation message"
+      assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_country_code validation message"
+      assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
+      assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_local_number validation message"
+      assert page.has_content?("address: is invalid"), "Failure on address validation message"
+      assert page.has_content?("state: can't be blank,is invalid"), "Failure on state validation message"
+      assert page.has_content?("city: can't be blank,is invalid"), "Failure on city validation message"
+      assert page.has_content?("zip: can't be blank,The zip code is not valid for the selected country."), "Failure on zip validation message"
     end
   end
 
@@ -503,22 +499,29 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   test "see operations grouped by billing from lastest to newest" do
     setup_member
     generate_operations(@saved_member)
-    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+    3.times{
+      FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 100,
                                 :description => 'Member enrolled - 100')
     }
-    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+    sleep 1
+    3.times{
+      FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 101,
                                 :description => 'Member enrolled - 101')
     }
-    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+    sleep 1
+    3.times{
+      FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 103,
                                 :description => 'Member enrolled - 102')
     }
-    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+    sleep 1
+    4.times{
+      FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 104,
                                 :description => 'Member enrolled - 103')
@@ -527,33 +530,40 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within('.nav-tabs'){ click_on 'Operations'}
     within("#dataTableSelect"){ select('billing', :from => 'operation[operation_type]') }
     within("#operations_table")do
-      assert page.has_content?('Member enrolled - 100')
       assert page.has_content?('Member enrolled - 101')
       assert page.has_content?('Member enrolled - 102')
       assert page.has_content?('Member enrolled - 103')
       assert page.has_content?('Member enrolled - 103')
+      assert page.has_no_content?('Member enrolled - 100')
     end
   end
 
   test "see operations grouped by profile from lastest to newest" do
     setup_member
     generate_operations(@saved_member)
-    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+    3.times{
+      FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 200,
                                 :description => 'Blacklisted member. Reason: Too much spam - 200')
     }
-    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+    sleep 1
+    3.times{
+      FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 201,
                                 :description => 'Blacklisted member. Reason: Too much spam - 201')
     }
-    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+    sleep 1
+    3.times{
+      FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 202,
                                 :description => 'Blacklisted member. Reason: Too much spam - 202')
     }
-    3.times{FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+    sleep 1
+    4.times{
+      FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 203,
                                 :description => 'Blacklisted member. Reason: Too much spam - 203')
@@ -562,32 +572,39 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within('.nav-tabs'){ click_on 'Operations'}
     within("#dataTableSelect"){ select('profile', :from => 'operation[operation_type]') }
     within("#operations_table")do
-      assert page.has_content?('Blacklisted member. Reason: Too much spam - 200')
       assert page.has_content?('Blacklisted member. Reason: Too much spam - 201')
       assert page.has_content?('Blacklisted member. Reason: Too much spam - 202')
       assert page.has_content?('Blacklisted member. Reason: Too much spam - 203')
+      assert page.has_no_content?('Blacklisted member. Reason: Too much spam - 200')
     end
   end
 
   test "see operations grouped by communication from lastest to newest" do
     setup_member
     generate_operations(@saved_member)
-    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+    3.times{
+      FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 300,
                                 :description => 'Communication sent - 300')
     }
-    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+    sleep 1
+    3.times{
+      FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 301,
                                 :description => 'Communication sent - 301')
     }
-    3.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+    sleep 1
+    3.times{
+      FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 302,
                                 :description => 'Communication sent - 302')
     }
-    4.times{FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+    sleep 1
+    4.times{
+      FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'Member', :member_id => @saved_member.id,
                                 :operation_type => 303,
                                 :description => 'Communication sent - 303')
@@ -964,8 +981,8 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => created_member.id)
     within('.nav-tabs'){ click_on 'Operations' }
+    within("#operations"){ select 'communications', :from => "operation[operation_type]" }
     within("#operations") do
-      select 'communications', :from => "operation[operation_type]"
       assert page.has_no_content?('enrollment_billing')
       assert page.has_no_content?('membership_billing')
       assert page.has_no_content?('full_save')
@@ -980,8 +997,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_no_content?('from_sent_to_bad_address')
       assert page.has_no_content?('vip_event_registration')
       assert page.has_no_content?('vip_event_cancelation')
-
-      select 'billing', :from => "operation[operation_type]"
+    end
+    within("#operations"){ select 'billing', :from => "operation[operation_type]" }
+    within("#operations") do
       assert page.has_content?('enrollment_billing')
       assert page.has_content?('membership_billing')
       assert page.has_content?('full_save')
@@ -996,8 +1014,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_no_content?('from_sent_to_bad_address')
       assert page.has_no_content?('vip_event_registration')
       assert page.has_no_content?('vip_event_cancelation')
-
-      select 'profile', :from => "operation[operation_type]"
+    end
+    within("#operations"){ select 'profile', :from => "operation[operation_type]" }
+    within("#operations") do
       assert page.has_no_content?('enrollment_billing')
       assert page.has_no_content?('membership_billing')
       assert page.has_no_content?('full_save')
@@ -1012,8 +1031,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_no_content?('from_sent_to_bad_address')
       assert page.has_no_content?('vip_event_registration')
       assert page.has_no_content?('vip_event_cancelation')
-
-      select 'fulfillments', :from => "operation[operation_type]"
+    end
+    within("#operations"){ select 'fulfillments', :from => "operation[operation_type]" }
+    within("#operations") do
       assert page.has_no_content?('enrollment_billing')
       assert page.has_no_content?('membership_billing')
       assert page.has_no_content?('full_save')
@@ -1028,8 +1048,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_content?('from_sent_to_bad_address')
       assert page.has_no_content?('vip_event_registration')
       assert page.has_no_content?('vip_event_cancelation')
-
-      select 'others', :from => "operation[operation_type]"
+    end
+    within("#operations"){ select 'others', :from => "operation[operation_type]" }
+    within("#operations") do
       assert page.has_no_content?('enrollment_billing')
       assert page.has_no_content?('membership_billing')
       assert page.has_no_content?('full_save')
@@ -1045,8 +1066,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_no_content?('vip_event_registration')
       assert page.has_no_content?('vip_event_cancelation')
       assert page.has_content?('others')
-
-      select 'vip', :from => "operation[operation_type]"
+    end
+    within("#operations"){ select 'vip', :from => "operation[operation_type]" }
+    within("#operations") do
       assert page.has_no_content?('enrollment_billing')
       assert page.has_no_content?('membership_billing')
       assert page.has_no_content?('full_save')

@@ -1,6 +1,6 @@
 class TermsOfMembership < ActiveRecord::Base
   attr_accessible :mode, :needs_enrollment_approval, :provisional_days, 
-    :installment_amount, :description, :installment_type, :club, :name, :club_cash_amount, :agent_id
+    :installment_amount, :description, :installment_type, :club, :name, :club_cash_amount
 
   belongs_to :club
   has_many :transactions

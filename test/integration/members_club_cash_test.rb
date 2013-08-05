@@ -6,11 +6,6 @@ class MembersClubCashTest < ActionController::IntegrationTest
   # SETUP
   ############################################################
 
-  setup do
-    init_test_setup
-
-  end
-
   def setup_member(create_member = true)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
@@ -133,6 +128,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
           assert page.has_content?('99.0')
       }
     }
+
     @saved_member.set_as_canceled
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_membership_information"){
@@ -173,6 +169,8 @@ class MembersClubCashTest < ActionController::IntegrationTest
     create_member_by_sloop(@admin_agent, @member, @credit_card, @enrollment_info, @terms_of_membership_with_gateway)
     @saved_member = Member.find_by_email(@member.email)
     @saved_member.bill_membership
+
+  
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload

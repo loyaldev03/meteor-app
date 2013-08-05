@@ -85,10 +85,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     click_link_or_button('Search')
     within("#table_member_search_result") do
       assert page.has_content?(c.first_name)
-      puts c.first_name
-      puts page.has_content?(c.first_name)
-      puts c2.first_name
-      puts page.has_content?(c2.first_name)
       assert page.has_no_content?(c2.first_name)
     end
   end
@@ -445,7 +441,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     alert_ok_js
     click_link_or_button 'Update Member'
-
+    sleep 1
     within("#table_contact_information"){ assert page.has_content?('Mobile') }
     assert_equal Member.last.type_of_phone_number, 'mobile'
   end
@@ -497,8 +493,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
     alert_ok_js
     click_link_or_button 'Update Member'
-    @saved_member.reload
     within("#table_contact_information")do
+      @saved_member.reload
       assert page.has_content?(@saved_member.full_phone_number)
       assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
     end
@@ -550,7 +546,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     assert find_field('input_member_group_type').value == 'VIP'
   end
-
+  
   test "go from member index to edit member's classification to celebrity" do
     setup_member
 
@@ -576,6 +572,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @terms_of_membership_with_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id, :club_id => @club_external_id.id)
     @member_with_external_id = create_active_member(@terms_of_membership_with_external_id, :active_member_with_external_id, nil, {}, { :created_by => @admin_agent })
 
+
     visit members_path(:partner_prefix => @terms_of_membership_with_external_id.club.partner.prefix, :club_prefix => @terms_of_membership_with_external_id.club.name)
     assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
     
@@ -587,7 +584,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     alert_ok_js
     click_link_or_button 'Update Member'
     
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @member_with_external_id.id)
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club_external_id.name, :member_prefix => @member_with_external_id.id)
     assert find_field('input_first_name').value == @member_with_external_id.first_name
 
     @member_with_external_id.reload
@@ -754,7 +751,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#operations_table"){ assert page.has_content?("Full save done") }
   end
  
- 
   test "uncontrolled refund more than transaction amount" do
     active_merchant_stubs
     setup_member
@@ -843,16 +839,16 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   test "Change member from Lapsed status to Provisional status" do
     setup_member false, true
     @saved_member.set_as_canceled
-    @terms_of_membership_with_gateway.update_attribute :provisional_days,  5
+    @tom_with_provisional_days = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :provisional_days => 5)
 
     @saved_member.reload
-    @saved_member.recover(@terms_of_membership_with_gateway)
+    @saved_member.recover(@tom_with_provisional_days)
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
     
     @saved_member.reload 
-    next_bill_date = @saved_member.current_membership.join_date + (@terms_of_membership_with_gateway.provisional_days).days
+    next_bill_date = @saved_member.current_membership.join_date + (@tom_with_provisional_days.provisional_days).days
     within("#table_membership_information") do
       within("#td_mi_next_retry_bill_date") do
         # TODO: I cant figure out why the nbd above is diff than the one set on the web site (same as member)
@@ -1088,6 +1084,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     sleep 2 #Wait untill script finish.
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+
     assert find_field('input_first_name').value == @saved_member.first_name
 
     within(".nav-tabs"){ click_on 'Communications' }
@@ -1105,18 +1102,13 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
  test "Sorting transaction table" do
     setup_member
-
-    @saved_member.next_retry_bill_date = Time.zone.now
-    @saved_member.bill_membership
-    first_transaction = @saved_member.transactions.first
-    first_transaction.update_attribute :created_at, Time.zone.now-2.day
-    10.times do 
-      @saved_member.next_retry_bill_date = Time.zone.now
-      @saved_member.bill_membership
+    12.times do |index| 
+      FactoryGirl.create(:transaction, member_id: @saved_member.id, transaction_type: "sale", response_result: index, response_transaction_id: index, gateway: "mes")
+      sleep 0.25
     end
-    last_transaction = @saved_member.transactions.where("uuid != ?", first_transaction.id).first
+    first_transaction = Transaction.find_by_response_result 0
+    last_transaction = Transaction.find_by_response_result 11
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-  
     within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table")do 
       assert page.has_content?(I18n.l(last_transaction.created_at, :format => :dashed))
