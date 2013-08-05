@@ -16,7 +16,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		within('#terms_of_memberships_table') do
 			click_link_or_button 'Destroy'
 		end
-		page.driver.browser.switch_to.alert.accept
+		alert_ok_js
 		assert page.has_content?("was successfully destroyed.")
 	end
 
@@ -29,7 +29,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		within('#terms_of_memberships_table') do
 			click_link_or_button 'Destroy'
 		end
-		page.driver.browser.switch_to.alert.accept
+		alert_ok_js
 		assert page.has_content?("was not destroyed.")
 	end
 
@@ -42,7 +42,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		within('#terms_of_memberships_table') do
 			click_link_or_button 'Destroy'
 		end
-		page.driver.browser.switch_to.alert.accept
+		alert_ok_js
 		assert page.has_content?("was not destroyed.")
 	end
 
