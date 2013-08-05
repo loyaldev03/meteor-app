@@ -425,6 +425,7 @@ class TransactionTest < ActiveSupport::TestCase
     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
     assert_equal trans.operation_type, Settings.operation_types.membership_billing_without_decline_strategy
     assert_equal trans.transaction_type, 'sale' 
+    assert_equal Operation.find_by_member_id_and_operation_type(active_member.id, Settings.operation_types.membership_billing_without_decline_strategy).description, "Billing error. No decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
   end
 
   test "Billing declined, but there is no decline rule and limit is reached. Send email" do 
@@ -438,6 +439,7 @@ class TransactionTest < ActiveSupport::TestCase
     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
     assert_equal trans.operation_type, Settings.operation_types.membership_billing_without_decline_strategy_limit
     assert_equal trans.transaction_type, 'sale' 
+    assert_equal Operation.find_by_member_id_and_operation_type(active_member.id, Settings.operation_types.membership_billing_without_decline_strategy_limit).description, "Billing error. No decline rule configured limit reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
   end
 
   # TODO: how do we stub faraday?
