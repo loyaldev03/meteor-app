@@ -45,6 +45,70 @@
       <span class="wizard_step_circle">3</span>
     </h3>
   </div>
+  <div class="control-group">
+    <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.installment_amount'), :class => 'control-label' %>
+    <div class="controls">
+      $&nbsp;<%= f.text_field :installment_amount, :class => 'text_field input-small', :value => '0.00' %>
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.installment_amount'), 
+        :content => t('lorem') } %> 
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.provisional_days'), :class => 'control-label' %>
+    <div class="controls">
+      $&nbsp;<%= f.text_field :provisional_days, :class => 'text_field input-small', :value => '0.00' %>
+      <%= t('activerecord.attributes.terms_of_membership.wizard.lasting') %>
+      <%= f.text_field :provisional_days, :class => 'text_field input-small', :value => '0' %>
+      <%= select_tag "provisional_days_time_span", options_for_select(@dates_span), :class => 'input-small' %>
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.provisional_days'), 
+        :content => t('lorem') } %> 
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), :class => 'control-label' %>
+    <div class="controls">
+      <%= radio_button_tag 'at_the_end_of_trial', 'payment', true %>
+      <%= t('activerecord.attributes.terms_of_membership.wizard.payment_is_expected') %>&nbsp;
+      <%= radio_button_tag 'at_the_end_of_trial', 'no_payment' %>
+      <%= t('activerecord.attributes.terms_of_membership.wizard.no_pay_is_expected') %>&nbsp;&nbsp;
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), 
+        :content => t('lorem') } %> 
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label' %>
+    <div class="controls">
+      $&nbsp;<%= f.text_field :recurring_amount, :class => 'text_field input-small', :value => '0.00' %>
+      <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
+      <%= f.text_field :recurring_amount_days, :class => 'text_field input-small', :value => '0' %>
+      <%= select_tag "recurring_amount_days_time_span", options_for_select(@dates_span), :class => 'input-small' %>
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), 
+        :content => t('lorem') } %> 
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.suscription_terms'), :class => 'control-label' %>
+    <div class="controls">
+      <%= radio_button_tag 'suscription_terms', 'until_cancelled', true %>
+      <span id="label_for_until_cancelled"><%= t('activerecord.attributes.terms_of_membership.wizard.bill_until_cancelled') %></span>
+      <br />
+      <%= radio_button_tag 'suscription_terms', 'stop_cancel_after' %>
+      <span id="label_for_stop_billing_after"><%= t('activerecord.attributes.terms_of_membership.wizard.stop_billing_after') %></span>
+      <%= f.text_field :suscription_terms_stop_billing_after_payment_days, :class => 'text_field input-small', :value => '0' %>
+      <%= select_tag "suscription_terms_stop_billing_after_payment_days_time_span", options_for_select(@dates_span), :class => 'input-small' %>
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.suscription_terms'), 
+        :content => t('lorem') } %> 
+    </div>
+  </div>
 </div>
 
 <div class="step" id="third">
@@ -56,6 +120,27 @@
       <span class="wizard_step_circle step_selected">3</span>
     </h3>
   </div>
+
+  <div class="control-group">
+    <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_member_then'), :class => 'control-label' %>
+    <div class="controls">
+      <%= radio_button_tag 'if_cannot_bill_member', 'cancel', true %>
+      <%= t('activerecord.attributes.terms_of_membership.wizard.cancel') %>
+      <br />
+      <%= radio_button_tag 'if_cannot_bill_member', 'suspend_for' %>
+      <%= t('activerecord.attributes.terms_of_membership.wizard.suspend_for') %>
+      <%= f.text_field :suscription_terms_stop_billing_after_payment_days, :class => 'text_field input-small', :value => '0' %>
+      <%= select_tag "suscription_terms_stop_billing_after_payment_days_time_span", options_for_select(@dates_span), :class => 'input-small' %>
+      <br />
+      <%= radio_button_tag 'if_cannot_bill_member', 'downgrade_to' %>
+      <%= t('activerecord.attributes.terms_of_membership.wizard.downgrade_to') %>
+
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_member_then'), 
+        :content => t('lorem') } %> 
+    </div>
+  </div>
+
 </div>
 
 <div id="" class="form-actions">
@@ -66,10 +151,12 @@
   </div>
 </div>
 
+
 <script type="text/javascript">
   $(document).ready(function() {
     new_tom_functions();
     set_button_next_label($("#tom_wizard_form").formwizard("state").currentStep);
+    window.at_the_end_of_trial = "payment";
   });
 
   $(function() {
@@ -77,6 +164,30 @@
       set_button_next_label(data.currentStep);
     });
   });
+
+  $('#at_the_end_of_trial_payment').click(function() {
+    window.at_the_end_of_trial = "payment";
+    update_labels();
+  });
+
+  $('#at_the_end_of_trial_no_payment').click(function() {
+    window.at_the_end_of_trial = "no payment";
+    update_labels();
+  });
+
+  function update_labels() {
+    var radio1_text, radio2_text;
+    if (window.at_the_end_of_trial == 'payment') {
+      radio1_text = '<%= t('activerecord.attributes.terms_of_membership.wizard.bill_until_cancelled') %>';
+      radio2_text = '<%= t('activerecord.attributes.terms_of_membership.wizard.stop_billing_after') %>';
+    }
+    else if (window.at_the_end_of_trial == 'no payment') {
+      radio1_text = '<%= t('activerecord.attributes.terms_of_membership.wizard.keep_active_until_manually_cancelled') %>';
+      radio2_text = '<%= t('activerecord.attributes.terms_of_membership.wizard.cancel_member_after') %>';
+    }
+    $('#label_for_until_cancelled').html(radio1_text);
+    $('#label_for_stop_billing_after').html(radio2_text);
+  }
 
   function set_button_next_label(currentStep) {
     var isSubmitButton = false;
