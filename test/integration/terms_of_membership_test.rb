@@ -10,39 +10,47 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sign_in_as(@admin_agent)
 	end
 
-	test "Delete unused tom" do
-		the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+	test "Delete unused TOM" do
+		13.times { the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id) }
+		the_tom = TermsOfMembership.last
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
-			click_link_or_button 'Destroy'
+			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
+			within("tr", :text => the_tom.id.to_s) do
+				confirm_ok_js
+				click_link_or_button "Destroy"
+			end
 		end
-		page.driver.browser.switch_to.alert.accept
 		assert page.has_content?("was successfully destroyed.")
 	end
 
 	test "Do not delete a TOM with inactive memberships" do
-		the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-		the_lapsed_member = FactoryGirl.create(:lapsed_member, :club_id => @club.id)
-		the_membership = FactoryGirl.create(:lapsed_member_membership, :member_id => the_lapsed_member.id, :terms_of_membership_id => the_tom.id)
-
+		27.times { the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id) }
+		the_tom = TermsOfMembership.last
+		the_lapsed_member = create_active_member(the_tom, :lapsed_member, nil, {}, { :created_by => @admin_agent })
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
-			click_link_or_button 'Destroy'
+			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
+			within("tr", :text => the_tom.id.to_s) do
+				confirm_ok_js
+				click_link_or_button "Destroy"
+			end
 		end
-		page.driver.browser.switch_to.alert.accept
 		assert page.has_content?("was not destroyed.")
 	end
 
 	test "Do not delete a TOM with active memberships" do
-		the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-		the_active_member = FactoryGirl.create(:active_member, :club_id => @club.id)
-		the_membership = FactoryGirl.create(:applied_member_membership, :member_id => the_active_member.id, :terms_of_membership_id => the_tom.id)
-
+		27.times { the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id) }
+		the_tom = TermsOfMembership.last
+		the_active_member = create_active_member(the_tom, :active_member, nil, {}, { :created_by => @admin_agent })
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
-			click_link_or_button 'Destroy'
+			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
+			within("tr", :text => the_tom.id.to_s) do
+				confirm_ok_js
+				click_link_or_button "Destroy"
+			end
 		end
-		page.driver.browser.switch_to.alert.accept
 		assert page.has_content?("was not destroyed.")
 	end
 
