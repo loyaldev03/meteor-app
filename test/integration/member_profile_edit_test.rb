@@ -8,6 +8,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   ############################################################
 
   setup do
+    @communication_type = FactoryGirl.create(:communication_type)
   end
 
   def setup_member(create_new_member = true, create_member_by_sloop = false)
@@ -17,7 +18,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
     @partner = @club.partner
     Time.zone = @club.time_zone
-    @communication_type = FactoryGirl.create(:communication_type)
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
 
     if create_new_member
