@@ -11,6 +11,7 @@ require 'database_cleaner'
 require 'mocha/setup'
 require "timeout"
 
+
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
 
@@ -19,6 +20,10 @@ require 'turn/autorun'
 Turn.config.format = :outline
 
 ## do you use firefox??
+Capybara.register_driver :selenium do |app|
+  http_client = Selenium::WebDriver::Remote::Http::Default.new
+  http_client.timeout = 180
+end
 Capybara.current_driver = :selenium
 
 ## end configuration for firefox
