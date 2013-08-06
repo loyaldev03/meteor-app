@@ -20,12 +20,7 @@ require 'turn/autorun'
 Turn.config.format = :outline
 
 ## do you use firefox??
-Capybara.register_driver :selenium do |app|
-  http_client = Selenium::WebDriver::Remote::Http::Default.new
-  http_client.timeout = 180
-end
 Capybara.current_driver = :selenium
-Capybara.current_session.driver.browser.manage.window.resize_to(1024,768)
 
 ## end configuration for firefox
 ## do you want chrome ? (chrome is for carla)
@@ -134,6 +129,7 @@ module ActionController
     setup do
       DatabaseCleaner.start
       FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")
+      page.driver.browser.manage.window.resize_to()
     end
 
     teardown do
