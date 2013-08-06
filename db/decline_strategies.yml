@@ -15288,3 +15288,19 @@
     updated_at: 2013-08-01 18:59:22.000000000 Z
     id: 1019
 
+
+- !ruby/object:DeclineStrategy
+  attributes:
+    gateway: mes
+    installment_type: 1.month
+    credit_card_type: all
+    response_code: '005'
+    limit: 6
+    days: 6
+    decline_type: soft
+    notes: 
+    deleted_at: 
+    created_at: 2013-08-06 13:18:55.000000000 Z
+    updated_at: 2013-08-06 13:18:55.000000000 Z
+    id: 1020
+
