@@ -110,6 +110,7 @@ class Api::MembersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
   rescue NoMethodError => e
+    Auditory.report_issue("API::Member::update", e, { :params => params.inspect })
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
 
@@ -206,6 +207,7 @@ class Api::MembersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   rescue NoMethodError => e
+    Auditory.report_issue("API::Member::update", e, { :params => params.inspect })
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   rescue ActiveRecord::RecordNotUnique => e
     errors = {}
@@ -388,7 +390,7 @@ class Api::MembersController < ApplicationController
     render json: member.change_next_bill_date(params[:next_bill_date], @current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
- end 
+  end 
 
   ##
   # Gets an array with all member's id that were updated between the dates given. 

@@ -28,13 +28,12 @@ class Api::OperationController < ApplicationController
   # @example_response_description Example response to valid request.
   #
 	def create
-    begin
-    	member = Member.find(params[:member_id])
-    	Auditory.audit(@current_agent, member, params[:description], member, params[:operation_type], params[:operation_date])
-			render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
-		rescue Exception => e
-			render json: { :message => "Operation was not created. Errors: #{e}", :code => Settings.error_codes.operation_not_saved}
-		end
+  	member = Member.find(params[:member_id])
+  	Auditory.audit(@current_agent, member, params[:description], member, params[:operation_type], params[:operation_date])
+		render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
+	rescue Exception => e
+    Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
+		render json: { :message => "Operation was not created. Errors: #{e}", :code => Settings.error_codes.operation_not_saved}
 	end
 
   # TODO: Add a list of operation types: 

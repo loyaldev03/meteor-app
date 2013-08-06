@@ -1464,6 +1464,7 @@ class Member < ActiveRecord::Base
           increment!(:recycled_times, 1)
           return message
         end
+        message = "Billing error. No decline rule configured limit reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
         operation_type = Settings.operation_types.membership_billing_without_decline_strategy_limit
         cancel_member = true
       else

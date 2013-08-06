@@ -17,7 +17,9 @@ namespace :fulfillments do
       elsif Rails.env=='staging'
         fulfillment_file.club = Club.find 17
       end
-
+      
+      Time.zone = fulfillment_file.club.time_zone
+      
       fulfillment_file.product = "KIT-CARD"
       fulfillment_file.save!
 
@@ -94,7 +96,9 @@ namespace :fulfillments do
       elsif Rails.env=='staging'
         fulfillment_file.club = Club.find 17
       end
-
+      
+      Time.zone = fulfillment_file.club.time_zone
+      
       fulfillments = Fulfillment.includes(:member).where( 
         ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
           AND ? and fulfillments.status = 'not_processed' 
@@ -171,7 +175,9 @@ namespace :fulfillments do
       elsif Rails.env=='staging'
         fulfillment_file.club = Club.find 19
       end
-
+      
+      Time.zone = fulfillment_file.club.time_zone
+      
       fulfillments = Fulfillment.includes(:member).where( 
         ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
           AND ? and fulfillments.status = 'not_processed' 
