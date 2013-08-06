@@ -20,8 +20,13 @@ require 'turn/autorun'
 Turn.config.format = :outline
 
 ## do you use firefox??
-Capybara.current_driver = :selenium
-
+# Capybara.current_driver = :selenium
+Capybara.register_driver :firefox do |app|
+  client = Selenium::WebDriver::Remote::Http::Default.new
+  client.timeout = 240 
+  Capybara::Selenium::Driver.new(app, :browser => :firefox,
+                                 :http_client => client)
+end
 ## end configuration for firefox
 ## do you want chrome ? (chrome is for carla)
 # Capybara.register_driver :chrome do |app|
