@@ -49,9 +49,6 @@
     <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.installment_amount'), :class => 'control-label' %>
     <div class="controls">
       $&nbsp;<%= f.text_field :installment_amount, :class => 'text_field input-small', :value => '0.00' %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.installment_amount'), 
-        :content => t('lorem') } %> 
     </div>
   </div>
 
@@ -61,7 +58,7 @@
       $&nbsp;<%= f.text_field :provisional_days, :class => 'text_field input-small', :value => '0.00' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.lasting') %>
       <%= f.text_field :provisional_days, :class => 'text_field input-small', :value => '0' %>
-      <%= select_date_span("provisional_days_time_span") %>
+      <%= select_for_date_span("provisional_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.provisional_days'), 
         :content => t('lorem') } %> 
@@ -87,7 +84,7 @@
       $&nbsp;<%= f.text_field :recurring_amount, :class => 'text_field input-small', :value => '0.00' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
       <%= f.text_field :recurring_amount_days, :class => 'text_field input-small', :value => '0' %>
-      <%= select_date_span("recurring_amount_days_time_span") %>
+      <%= select_for_date_span("recurring_amount_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), 
         :content => t('lorem') } %> 
@@ -103,7 +100,7 @@
       <%= radio_button_tag 'suscription_terms', 'stop_cancel_after' %>
       <span id="label_for_stop_billing_after"><%= t('activerecord.attributes.terms_of_membership.wizard.stop_billing_after') %></span>
       <%= f.text_field :suscription_terms_stop_billing_after_payment_days, :class => 'text_field input-small', :value => '0' %>
-      <%= select_date_span("suscription_terms_stop_billing_after_payment_days_time_span") %>
+      <%= select_for_date_span("suscription_terms_stop_billing_after_payment_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.suscription_terms'), 
         :content => t('lorem') } %> 
@@ -130,13 +127,27 @@
       <%= radio_button_tag 'if_cannot_bill_member', 'suspend_for' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.suspend_for') %>
       <%= f.text_field :suscription_terms_stop_billing_after_payment_days, :class => 'text_field input-small', :value => '0' %>
-      <%= select_date_span("suscription_terms_stop_billing_after_payment_days_time_span") %>
+      <%= select_for_date_span("suscription_terms_stop_billing_after_payment_days_time_span") %>
       <br />
       <%= radio_button_tag 'if_cannot_bill_member', 'downgrade_to' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.downgrade_to') %>
-
+      <%= select_for_toms('downgrade_to_tom') %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_member_then'), 
+        :content => t('lorem') } %> 
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
+    
+    <div class="controls">
+      <%= select_for_toms('upgrade_to_tom') %>
+      <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>
+      <%= f.text_field :upgrade_to_tom_days, :class => 'text_field input-small', :value => '0' %>
+      <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
         :content => t('lorem') } %> 
     </div>
   </div>
