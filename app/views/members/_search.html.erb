@@ -9,7 +9,7 @@
         <th> <%= t('activerecord.attributes.member.external_id') %> </th>
       <% end %>
       <th> <%= sortable "members.first_name, members.last_name", t('activerecord.attributes.member.full_name') %></th>
-      <th> <%= t('activerecord.attributes.member.full_address') %></th>
+      <th> <%= sortable "members.address, members.city", t('activerecord.attributes.member.full_address') %></th>
       <th> <%= t('activerecord.attributes.member.member_classification_type') %> </th>
       <th style="width: 20px;">View</th>
       <th style="width: 20px;">Edit</th>

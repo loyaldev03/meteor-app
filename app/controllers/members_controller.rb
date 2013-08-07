@@ -360,7 +360,7 @@ class MembersController < ApplicationController
 
   private 
     def sort_column
-      @sort_column ||= ['members.status', 'members.id', 'members.first_name, members.last_name'].include?(params[:sort]) ? params[:sort] : 'memberships.join_date'
+      @sort_column ||= ['members.status', 'members.id', 'members.first_name, members.last_name', 'members.address, members.city' ].include?(params[:sort]) ? params[:sort] : 'memberships.join_date'
     end
     
     def sort_direction
