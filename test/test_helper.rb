@@ -337,7 +337,7 @@ module ActionController
 
     def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
       fill_in_member(unsaved_member, credit_card, tom_type, cc_blank)
-      within('#table_contact_information') {}
+      
       begin
         wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
       rescue
@@ -438,6 +438,7 @@ module ActionController
       previous_amount = member.club_cash_amount
       new_amount = previous_amount + amount
       visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
+      wait_until{ assert find_field('input_first_name').value == member.first_name  }
       within("#table_membership_information"){ click_on 'Add club cash' }
       
       alert_ok_js
