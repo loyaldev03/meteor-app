@@ -492,6 +492,7 @@ def new_prospect(object, campaign, tom_id)
   phoenix.preferences = JSON.generate({ :old_id => object.id })
   phoenix.referral_parameters = JSON.generate({})
   phoenix.gender = object.gender
+  phoenix.club_id = CLUB
   phoenix.save!
   phoenix
 end
