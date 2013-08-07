@@ -38,7 +38,7 @@ class MembersController < ApplicationController
                        .with_billed_date_to(params[:member][:billing_date_end])
                        .where(:club_id => @current_club)
                        .needs_approval(params[:member][:needs_approval])
-                       .order('members.id')
+                       .order(sort_column + " " + sort_direction)
                        .uniq
     respond_to do |format|
       format.html {render 'index'}
@@ -359,6 +359,14 @@ class MembersController < ApplicationController
   end
 
   private 
+    def sort_column
+      @sort_column ||= ['members.status', 'members.id', 'members.first_name, members.last_name'].include?(params[:sort]) ? params[:sort] : 'memberships.join_date'
+    end
+    
+    def sort_direction
+      @sort_direction ||= %w[asc desc].include?(params[:direction]) ? params[:direction] : 'desc'
+    end
+
     def check_permissions
       my_authorize! params[:action].to_sym, Member, @current_club.id
     end
