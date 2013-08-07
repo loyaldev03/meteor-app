@@ -358,7 +358,7 @@ en:
           cancel: 'Cancel'
           suspend_for: 'Suspend for'
           downgrade_to: 'Downgrade to'
-          upgrade_to: 'Upgrade to'
+          upgrade_to: 'Upgrade to (optional)'
           after: 'after'
           step_3_button_next: 'Create Plan'
       email_template:
