@@ -11,7 +11,6 @@ class TermsOfMembershipsController < ApplicationController
 
   def new
     @tom = TermsOfMembership.new
-    @dates_span = [['Month(s)', 'months'], ['Day(s)', 'days']]
   end
 
   def create
