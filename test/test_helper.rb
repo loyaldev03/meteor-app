@@ -128,7 +128,7 @@ module ActionController
     setup do
       DatabaseCleaner.start
       FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")
-      page.driver.browser.manage.window.resize_to()
+      page.driver.browser.manage.window.resize_to(1024,720)
     end
 
     teardown do
