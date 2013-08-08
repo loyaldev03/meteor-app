@@ -27,6 +27,7 @@ class TermsOfMembership < ActiveRecord::Base
 
   before_destroy :verify_that_there_are_not_memberships_and_prospects
   before_update :verify_that_there_are_not_memberships_and_prospects
+  before_save :process_data
 
   ###########################################
   # Installment types:
