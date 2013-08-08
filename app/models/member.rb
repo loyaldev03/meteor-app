@@ -15,7 +15,7 @@ class Member < ActiveRecord::Base
   has_many :member_preferences
   has_many :memberships, :order => "created_at DESC"
   belongs_to :current_membership, :class_name => 'Membership'
-
+  
   # TODO: should we use delegate??
   delegate :terms_of_membership, :to => :current_membership
   # attr :terms_of_membership_id # is it necesarilly??? 
