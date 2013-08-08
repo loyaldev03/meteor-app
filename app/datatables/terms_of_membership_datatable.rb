@@ -43,9 +43,9 @@ private
 
   def get_agent_name(tom)
     begin
-      tom.agent.username  
-    rescue
-      '(Not set)'
+      current_tom.agent.username
+    rescue Exception => e
+      '--'
     end
   end
 
