@@ -879,7 +879,7 @@ function new_tom_functions() {
 
 function tom_create_wizard() {
   $("#tom_wizard_form").formwizard({ 
-    formPluginEnabled: true,
+    formPluginEnabled: false,
     validationEnabled: true,
     focusFirstInput : true,
     disableUIStyles: true,
