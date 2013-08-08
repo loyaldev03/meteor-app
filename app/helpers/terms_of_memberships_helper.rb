@@ -9,4 +9,16 @@ module TermsOfMembershipsHelper
 		select_tag select_name, options_from_collection_for_select(toms, "id", "name"), :include_blank => true
 	end
 
+	def wizard_steps_indicator(current_step)
+		class_for_selected = ' step_selected'
+		html = ''
+		html << '<h3 class="wizard_step">'
+		html << '<span>Step </span>'
+		(1..3).each do |s| 
+			html += '<span class="wizard_step_circle' + (s == current_step ? class_for_selected : '') + '">' + s.to_s + '</span>'
+		end 
+    html << '</h3>'
+    html.html_safe
+	end
+
 end
