@@ -371,13 +371,13 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => member_to_seach.full_name)
     end
   end
 
   test "search by phone number" do
     setup_search
-    member_to_seach = Member.first
+    member_to_seach = Member.last
     within("#personal_details")do
       fill_in "member[phone_country_code]", :with => member_to_seach.phone_country_code
       fill_in "member[phone_area_code]", :with => member_to_seach.phone_area_code
@@ -385,7 +385,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => member_to_seach.full_name)
     end
   end
 
@@ -397,7 +397,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => member_to_seach.full_name)
     end
   end
 
@@ -468,13 +468,13 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search by last digits" do
     setup_search
-    member_to_seach = Member.first
+    @search_member.active_credit_card.update_attribute :last_digits, 8965
     within("#payment_details")do
-      fill_in "member[last_digits]", :with => member_to_seach.active_credit_card.last_digits
+      fill_in "member[last_digits]", :with => @search_member.active_credit_card.last_digits
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => @search_member.full_name)
     end
   end
 
