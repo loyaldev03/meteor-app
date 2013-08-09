@@ -717,12 +717,8 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "create member without gender" do
     setup_member(false)
-
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    unsaved_member.gender = ''
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    fill_in_member(unsaved_member,credit_card)
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id, :gender => "")
+    @saved_member = create_member(unsaved_member)
 		assert find_field('input_gender').value == I18n.t('activerecord.attributes.member.no_gender')
   end
 
