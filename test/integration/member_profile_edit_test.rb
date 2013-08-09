@@ -83,9 +83,9 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     select_from_datepicker("member_billing_date_end", Time.zone.now+11.days)
  
     click_link_or_button('Search')
-    within("#table_member_search_result") do
-      assert page.has_content?(c.first_name)
-      assert page.has_no_content?(c2.first_name)
+      within("#members") do
+      assert find("tr", :text => c.full_name)
+      assert page.has_no_content? c2.full_name
     end
   end
 
@@ -93,7 +93,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     visit edit_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
-    within("#table_demographic_information") {
+    within("#table_demographic_information") do
       assert find_field('member[first_name]').value == @saved_member.first_name
       assert find_field('member[last_name]').value == @saved_member.last_name
       assert find_field('member[city]').value == @saved_member.city
@@ -103,15 +103,15 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       assert find_field('member[gender]').value == @saved_member.gender
       assert find_field('member[country]').value == @saved_member.country
       assert find_field('member[birth_date]').value == "#{@saved_member.birth_date}"
-    }
+    end
 
-    within("#table_contact_information") {
+    within("#table_contact_information") do
       assert find_field('member[email]').value == @saved_member.email
       assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
       assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
       assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
       assert find_field('member[type_of_phone_number]').value ==  @saved_member.type_of_phone_number.to_s
-    }
+    end
 
     alert_ok_js
 
