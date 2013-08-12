@@ -1,0 +1,19 @@
+class AddNewColumnsToToms < ActiveRecord::Migration
+	def up
+		add_column :terms_of_memberships, :initial_fee, :float
+		add_column :terms_of_memberships, :trial_period_amount, :float
+		add_column :terms_of_memberships, :is_payment_expected, :integer
+		add_column :terms_of_memberships, :installment_period, :integer
+		add_column :terms_of_memberships, :upgrade_tom, :integer
+		add_column :terms_of_memberships, :upgrade_tom_period, :integer
+	end
+
+	def down
+		remove_column :terms_of_memberships, :initial_fee
+		remove_column :terms_of_memberships, :trial_period_amount
+		remove_column :terms_of_memberships, :is_payment_expected
+		remove_column :terms_of_memberships, :installment_period
+		remove_column :terms_of_memberships, :upgrade_tom
+		remove_column :terms_of_memberships, :upgrade_tom_period
+	end
+end
