@@ -25,14 +25,14 @@
     <td> <%= t('activerecord.attributes.terms_of_membership.payment_is_expected') %>: 
          <%= @tom.is_payment_expected %> </td>
     <td> <%= t('activerecord.attributes.terms_of_membership.trial_period') %>: 
-         <%= @tom.trial_period_amount %> </td>
+         <%= number_to_currency(@tom.trial_period_amount) %> </td>
     <td> <%= t('activerecord.attributes.terms_of_membership.installment_period') %>: 
          <%= @tom.installment_period %> </td>
   </tr>
   <tr>
   <tr>
     <td> <%= t('activerecord.attributes.terms_of_membership.upgrade_to') %>: 
-         <%= @tom.upgrade_tom_id %> </td>
+         <%= @tom.upgrade_tom.name %> (ID: <%= @tom.upgrade_tom_id %>) </td>
     <td> <%= t('activerecord.attributes.terms_of_membership.upgrade_tom_period') %>: 
          <%= @tom.upgrade_tom_period %> </td>
     <td> <%= t('activerecord.attributes.terms_of_membership.suspension_period') %>: 
