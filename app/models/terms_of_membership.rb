@@ -21,9 +21,16 @@ class TermsOfMembership < ActiveRecord::Base
   validates :club, :presence => true
   validates :provisional_days, :presence => true
   validates :installment_amount, :presence => true
+  validates :installment_period, :presence => true
   validates :installment_type, :presence => true
   validates :quota, :presence => true
   validates :club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :initial_fee, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :trial_period_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :is_payment_expected, :presence => true
+  validates :suscription_limits, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :if_cannot_bill, :presence => true
+
   validate :validate_payment_gateway_configuration
 
   before_destroy :verify_that_there_are_not_memberships_and_prospects
