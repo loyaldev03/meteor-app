@@ -326,6 +326,15 @@ en:
         external_code: 'External Code'
         created_at: 'Created At'
         by_agent: 'Created By'
+        upgrade_to: 'Tom to upgrade'
+        upgrade_tom_period: 'Upgrade after'
+        suspension_period: 'Suspension period'
+        suscription_limits: 'Suscription limit'
+        if_cannot_bill: 'If cannot bill'
+        initial_fee: 'Initial fee'
+        payment_is_expected: 'Payment is Expected'
+        trial_period: 'Trial period'
+        installment_period: 'Installment period'
         wizard:
           title: 'New Suscription Plan'
           # Step 1
