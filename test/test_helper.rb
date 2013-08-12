@@ -11,6 +11,7 @@ require 'database_cleaner'
 require 'mocha/setup'
 require "timeout"
 
+
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
 
@@ -20,7 +21,6 @@ Turn.config.format = :outline
 
 ## do you use firefox??
 Capybara.current_driver = :selenium
-
 ## end configuration for firefox
 ## do you want chrome ? (chrome is for carla)
 # Capybara.register_driver :chrome do |app|
@@ -128,7 +128,7 @@ module ActionController
     setup do
       DatabaseCleaner.start
       FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")
-      page.driver.browser.manage.window.resize_to(1024,768)
+      page.driver.browser.manage.window.resize_to(1024,720)
     end
 
     teardown do
@@ -337,7 +337,7 @@ module ActionController
 
     def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
       fill_in_member(unsaved_member, credit_card, tom_type, cc_blank)
-      within('#table_contact_information') {}
+      
       begin
         wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
       rescue
@@ -438,6 +438,7 @@ module ActionController
       previous_amount = member.club_cash_amount
       new_amount = previous_amount + amount
       visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
+      wait_until{ assert find_field('input_first_name').value == member.first_name  }
       within("#table_membership_information"){ click_on 'Add club cash' }
       
       alert_ok_js

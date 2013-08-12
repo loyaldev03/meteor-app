@@ -157,3 +157,17 @@ div.dataTables_filter input {
   top: 18px;
   right: 18px;
 }
+
+.table .icon-arrow-down{
+  vertical-align:baseline;
+  padding-left: 14px;
+  width:4px;
+  white-space:nowrap
+}
+
+.table .icon-arrow-up{
+  vertical-align:baseline;
+  padding-left: 14px;
+  width:4px;
+  white-space:nowrap
+}

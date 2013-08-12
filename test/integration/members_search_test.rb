@@ -43,9 +43,9 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   end
 
-  ###########################################################
-  ## TESTS
-  ###########################################################
+  ##########################################################
+  # TESTS
+  ##########################################################
 
   test "Do not display token field (club with auth.net) - Admin" do
     setup_member(false)
@@ -196,9 +196,10 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search members by next bill date" do
     setup_search
+    @search_member.update_attribute :next_retry_bill_date, Time.zone.now.utc+7.days
     page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
     within("#ui-datepicker-div") do
-      click_on("#{Time.zone.now.day}")
+      click_on("#{@search_member.next_retry_bill_date.day}")
     end
     search_member("member[next_retry_bill_date]", nil, @search_member)
   end
@@ -219,18 +220,18 @@ class MembersSearchTest < ActionController::IntegrationTest
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_on 'Search'
     
-    within("#members") {
+    within("#members")do
       assert page.has_css?(".pagination")
-      assert page.has_content?(Member.first.full_name)
-    }
+      find("tr", :text => Member.last.full_name)
+    end
   end
 
   test "search member by pagination" do
     setup_search
     click_on 'Search'
     
-      assert page.has_selector?(".pagination")
-      assert page.has_content?(Member.first.full_name)
+    assert page.has_selector?(".pagination")
+    assert page.has_content?(Member.last.full_name)
 
     within(".pagination") do
       assert page.has_content?("1")
@@ -240,19 +241,19 @@ class MembersSearchTest < ActionController::IntegrationTest
       assert page.has_content?("Next")
     end
     within("#members")do
-        if page.has_content?(Member.last.full_name)
+        if page.has_content?(Member.first.full_name)
           assert true
         else
           click_on("2")
-          if page.has_content?(Member.last.full_name)
+          if page.has_content?(Member.first.full_name)
             assert true
           else
             click_on("3")
-            if page.has_content?(Member.last.full_name)
+            if page.has_content?(Member.first.full_name)
               assert true
             else
               click_on("4")
-              if page.has_content?(Member.last.full_name)
+              if page.has_content?(Member.first.full_name)
                 assert true
               else
                 assert false, "The last member was not found"
@@ -264,37 +265,37 @@ class MembersSearchTest < ActionController::IntegrationTest
   end
 
   test "Organize Member results by Pagination" do
-    setup_search
+    setup_member false
+    60.times do
+      create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
+      sleep 0.40
+    end
+    @search_member = Member.first
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_on 'Search'
 
-    member_list = Member.where("club_id = ?", @club.id)
-    assert page.has_no_selector?(".pagination")
+    member_list = Member.where("club_id = ?", @club.id).order("id DESC")
+    
     within("#members")do
-      assert page.has_content?(member_list[24].full_name)
+      find("tr", :text => member_list[20].full_name)
     end
 
-    assert page.has_selector?(".pagination")
 	  within("#members")do
 		  within(".pagination"){ click_on("2") }
-		  assert page.has_content?(member_list[49].full_name)
+      find("tr", :text => member_list[45].full_name)
   	end
 
 		within("#members")do
 		  within(".pagination"){ click_on("3") }
-	  	assert page.has_content?(member_list[74].full_name)
-  	end
-  	
-  	within("#members")do
-		  within(".pagination"){ click_on("4") }
-	  	assert page.has_content?(member_list[79].full_name)
+      find("tr", :text => member_list[65].full_name)
   	end
   end
 
-  #test "search a member with next bill date in past" do
-    #setup_search
-    #page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
-    #assert page.evaluate_script("window.jQuery('.ui-datepicker-prev').is('.ui-state-disabled')")
-  #end
+  test "search a member with next bill date in past" do
+    setup_search
+    page.execute_script("window.jQuery('#member_next_retry_bill_date').next().click()")
+    assert page.evaluate_script("window.jQuery('.ui-datepicker-prev').is('.ui-state-disabled')")
+  end
 
   test "display member" do
     setup_search
@@ -377,13 +378,13 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => member_to_seach.full_name)
     end
   end
 
   test "search by phone number" do
     setup_search
-    member_to_seach = Member.first
+    member_to_seach = Member.last
     within("#personal_details")do
       fill_in "member[phone_country_code]", :with => member_to_seach.phone_country_code
       fill_in "member[phone_area_code]", :with => member_to_seach.phone_area_code
@@ -391,7 +392,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => member_to_seach.full_name)
     end
   end
 
@@ -403,7 +404,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => member_to_seach.full_name)
     end
   end
 
@@ -415,19 +416,19 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => member_to_seach.full_name)
     end
   end
 
   test "search by state" do
     setup_search
-    member_to_seach = Member.first
+    member_to_seach = Member.last
     within("#contact_details")do
       select_country_and_state(member_to_seach.country)
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => member_to_seach.full_name)
     end
   end
 
@@ -439,7 +440,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => member_to_seach.full_name)
     end
   end
 
@@ -474,13 +475,13 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "search by last digits" do
     setup_search
-    member_to_seach = Member.first
+    @search_member.active_credit_card.update_attribute :last_digits, 8965
     within("#payment_details")do
-      fill_in "member[last_digits]", :with => member_to_seach.active_credit_card.last_digits
+      fill_in "member[last_digits]", :with => @search_member.active_credit_card.last_digits
     end
     click_link_or_button 'Search'
     within("#members")do
-      assert page.has_content?(member_to_seach.full_name)
+      find("tr", :text => @search_member.full_name)
     end
   end
 
@@ -723,12 +724,8 @@ class MembersSearchTest < ActionController::IntegrationTest
 
   test "create member without gender" do
     setup_member(false)
-
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    unsaved_member.gender = ''
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    fill_in_member(unsaved_member,credit_card)
-    @saved_member = Member.find_by_email(unsaved_member.email)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id, :gender => "")
+    @saved_member = create_member(unsaved_member)
 		assert find_field('input_gender').value == I18n.t('activerecord.attributes.member.no_gender')
   end
 
@@ -769,7 +766,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") 
 
     click_link_or_button 'Cancel'
-    date = Time.zone.now + 2.day
+    date = Time.zone.now + 3.day
     page.execute_script("window.jQuery('#cancel_date').next().click()")
     if (date.month > Time.zone.now.month)
       (date.month-Time.zone.now.month).times{ find(".ui-icon-circle-triangle-e").click }
@@ -781,7 +778,8 @@ class MembersSearchTest < ActionController::IntegrationTest
     confirm_ok_js
     click_link_or_button 'Cancel member'
 		@saved_member.reload
-    assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") 
+    find(".alert", :text => "Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}" )
+    assert page.has_content? "Member cancellation scheduled to #{I18n.l(@saved_member.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}"
   end
 
   # See a member is blacklisted in the search results
