@@ -5,6 +5,8 @@ class AddNewColumnsToToms < ActiveRecord::Migration
 		add_column :terms_of_memberships, :is_payment_expected, :integer
 		add_column :terms_of_memberships, :installment_period, :integer
 		add_column :terms_of_memberships, :suscription_limits, :integer
+		add_column :terms_of_memberships, :if_cannot_bill, :string
+		add_column :terms_of_memberships, :suspension_period, :integer
 		add_column :terms_of_memberships, :upgrade_tom_id, :integer
 		add_column :terms_of_memberships, :upgrade_tom_period, :integer
 	end
@@ -15,6 +17,8 @@ class AddNewColumnsToToms < ActiveRecord::Migration
 		remove_column :terms_of_memberships, :is_payment_expected
 		remove_column :terms_of_memberships, :installment_period
 		remove_column :terms_of_memberships, :suscription_limits
+		remove_column :terms_of_memberships, :if_cannot_bill
+		remove_column :terms_of_memberships, :suspension_period
 		remove_column :terms_of_memberships, :upgrade_tom_id
 		remove_column :terms_of_memberships, :upgrade_tom_period
 	end
