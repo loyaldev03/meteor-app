@@ -497,11 +497,13 @@ class Member < ActiveRecord::Base
       end
     end
   rescue Exception => e
+    trans.update_attribute :operation_type, Settings.operation_types.membership_billing_with_error if trans
     Auditory.report_issue( "Billing:membership", e, { :member => self.inspect, :exception => e.to_s, :transaction => trans.inspect } )
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
   def no_recurrent_billing(amount, description)
+    trans = nil
     if amount.blank? or description.blank?
       answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
     elsif amount.to_f <= 0.0
@@ -531,11 +533,13 @@ class Member < ActiveRecord::Base
     end
     answer
   rescue Exception => e
+    trans.update_attribute :operation_type, Settings.operation_types.no_recurrent_billing_with_error if trans
     Auditory.report_issue("Billing:no_recurrent_billing", e, { :member => self.inspect, :amount => amount, :description => description })
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.no_reccurent_billing_error }
   end
 
   def manual_billing(amount, payment_type)
+    trans = nil
     if amount.blank? or payment_type.blank?
       answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
     elsif amount.to_f < current_membership.terms_of_membership.installment_amount
@@ -555,6 +559,7 @@ class Member < ActiveRecord::Base
     end
   rescue Exception => e
     logger.error e.inspect
+    trans.update_attribute :operation_type, Settings.operation_types.manual_billing_with_error if trans
     Auditory.report_issue("Billing:manual_billing", e, { :member => self.inspect, :amount => amount, :payment_type => payment_type })
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
