@@ -59,7 +59,7 @@ class TermsOfMembershipsController < ApplicationController
       @tom.is_payment_expected = post_data[:is_payment_expected] == 'yes' ? 1 : 0
       @tom.installment_amount = post_data[:installment_amount]
       @tom.installment_period = post_data[:installment_amount_days_time_span] == 'months' ? months_to_days(post_data[:installment_amount_days]) : post_data[:installment_amount_days]
-      @tom.suscription_terms = 
+      @tom.suscription_limits = 
         if post_data[:suscription_terms] == 'until_cancelled'
           0
         else
