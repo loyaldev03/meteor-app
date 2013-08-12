@@ -36,31 +36,31 @@
   <div class="control-group"><%= wizard_steps_indicator(2) %></div>
   
   <div class="control-group">
-    <%= label_tag 'initial_fee_amount', t('activerecord.attributes.terms_of_membership.wizard.installment_amount'), :class => 'control-label' %>
+    <%= label_tag 'initial_fee_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_fee_amount'), :class => 'control-label' %>
     <div class="controls">
       <%= text_field_tag 'initial_fee_amount', nil, :class => 'text_field input-small required', :placeholder => '$0.00', :value => '4' %>
     </div>
   </div>
 
   <div class="control-group">
-    <%= label_tag 'trial_period_amount', t('activerecord.attributes.terms_of_membership.wizard.provisional_days'), :class => 'control-label' %>
+    <%= label_tag 'trial_period_amount', t('activerecord.attributes.terms_of_membership.wizard.trial_period'), :class => 'control-label' %>
     <div class="controls">
       <%= text_field_tag 'trial_period_amount', nil, :class => 'text_field input-small required', :placeholder => '$0.00', :value => '5' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.lasting') %>
       <%= text_field_tag 'trial_period_lasting', nil, :class => 'text_field input-small required', :placeholder => '0', :value => '6' %>
       <%= select_for_date_span("trial_period_lasting_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.provisional_days'), 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.trial_period'), 
         :content => t('lorem') } %> 
     </div>
   </div>
 
   <div class="control-group">
-    <%= label_tag 'at_the_end_of_trial', t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), :class => 'control-label' %>
+    <%= label_tag 'is_payment_expected', t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), :class => 'control-label' %>
     <div class="controls">
-      <%= radio_button_tag 'at_the_end_of_trial', 'payment', true %>
+      <%= radio_button_tag 'is_payment_expected', 'yes', true %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.payment_is_expected') %>&nbsp;
-      <%= radio_button_tag 'at_the_end_of_trial', 'no_payment' %>
+      <%= radio_button_tag 'is_payment_expected', 'no' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.no_pay_is_expected') %>&nbsp;&nbsp;
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), 
@@ -71,10 +71,10 @@
   <div class="control-group">
     <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label' %>
     <div class="controls">
-      <%= text_field_tag 'recurring_amount', nil, :class => 'text_field input-small required', :placeholder => '$0.00', :value => '7' %>
+      <%= text_field_tag 'installment_amount', nil, :class => 'text_field input-small required', :placeholder => '$0.00', :value => '7' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
-      <%= text_field_tag 'recurring_amount_days', nil, :class => 'text_field input-small required', :placeholder => '0', :value => '8' %>
-      <%= select_for_date_span("recurring_amount_days_time_span") %>
+      <%= text_field_tag 'installment_amount_days', nil, :class => 'text_field input-small required', :placeholder => '0', :value => '8' %>
+      <%= select_for_date_span("installment_amount_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), 
         :content => t('lorem') } %> 
