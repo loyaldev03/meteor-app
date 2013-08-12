@@ -339,8 +339,8 @@ en:
           step_1_button_next: 'Membership Terms'
           # Step 2
           step_2_instructions: '<STEP_2_INSTRUCTIONS_HERE>'
-          installment_amount: 'Initial Fee'
-          provisional_days: 'Trial Period'
+          initial_fee: 'Initial Fee'
+          trial_period: 'Trial Period'
           lasting: 'lasting'
           at_the_end_of_trial: 'At the end of the Trial Period'
           payment_is_expected: 'Payment is Expected'
