@@ -20,6 +20,34 @@
     <% end %>
   </tr>
   <tr>
+    <td> <%= t('activerecord.attributes.terms_of_membership.initial_fee') %>: 
+         <%= number_to_currency(@tom.initial_fee) %> </td>
+    <td> <%= t('activerecord.attributes.terms_of_membership.payment_is_expected') %>: 
+         <%= @tom.is_payment_expected %> </td>
+    <td> <%= t('activerecord.attributes.terms_of_membership.trial_period') %>: 
+         <%= @tom.trial_period_amount %> </td>
+    <td> <%= t('activerecord.attributes.terms_of_membership.installment_period') %>: 
+         <%= @tom.installment_period %> </td>
+  </tr>
+  <tr>
+  <tr>
+    <td> <%= t('activerecord.attributes.terms_of_membership.upgrade_to') %>: 
+         <%= @tom.upgrade_tom_id %> </td>
+    <td> <%= t('activerecord.attributes.terms_of_membership.upgrade_tom_period') %>: 
+         <%= @tom.upgrade_tom_period %> </td>
+    <td> <%= t('activerecord.attributes.terms_of_membership.suspension_period') %>: 
+         <%= @tom.suspension_period %> </td>
+    <td> <%= t('activerecord.attributes.terms_of_membership.suscription_limits') %>: 
+         <%= @tom.suscription_limits %> </td>
+  </tr>
+  <tr>
+    <td> <%= t('activerecord.attributes.terms_of_membership.if_cannot_bill') %>: 
+         <%= @tom.if_cannot_bill %> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+  </tr>
+  <tr>
     <td colspan="4" class="comment"> <%= t('activerecord.attributes.terms_of_membership.description') %>: <%= @tom.description %> </td>
   </tr>
 </table>
