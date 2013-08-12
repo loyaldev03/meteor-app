@@ -4,7 +4,7 @@
   <div class="control-group">
     <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.plan_name'), :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :name, :class => 'text_field required', :value => 'test' %>
+      <%= f.text_field :name, :class => 'text_field required', :minlength => 3 %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.plan_name'), 
         :content => t('lorem') } %> 
@@ -13,7 +13,7 @@
   <div class="control-group">
     <%= f.label :api_role, t('activerecord.attributes.terms_of_membership.wizard.external_code'), :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :api_role, :value => '', :class => 'text_field input-small', :value => '2' %>
+      <%= f.text_field :api_role, :value => '', :class => 'text_field input-small'%>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.external_code'), 
         :content => t('lorem') } %> 
@@ -22,14 +22,13 @@
   <div class="control-group">
     <%= f.label :description, t('activerecord.attributes.terms_of_membership.wizard.description'), :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_area :description, :class => 'text_area', :rows => 5, :value => '3' %>
+      <%= f.text_area :description, :class => 'text_area', :rows => 5 %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.description'), 
         :content => t('lorem') } %> 
     </div>
   </div>
 </div>
-
 
 <% # Second step %>
 <div class="step" id="second">  
@@ -38,16 +37,16 @@
   <div class="control-group">
     <%= label_tag 'initial_fee_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_fee_amount'), :class => 'control-label' %>
     <div class="controls">
-      <%= text_field_tag 'initial_fee_amount', nil, :class => 'text_field input-small required', :placeholder => '$0.00', :value => '4' %>
+      $&nbsp;<%= text_field_tag 'initial_fee_amount', nil, :class => 'text_field input-small required', :placeholder => '0.00', :type => 'number' %>
     </div>
   </div>
 
   <div class="control-group">
     <%= label_tag 'trial_period_amount', t('activerecord.attributes.terms_of_membership.wizard.trial_period'), :class => 'control-label' %>
     <div class="controls">
-      <%= text_field_tag 'trial_period_amount', nil, :class => 'text_field input-small required', :placeholder => '$0.00', :value => '5' %>
+      $&nbsp;<%= text_field_tag 'trial_period_amount', nil, :class => 'text_field input-small required', :placeholder => '0.00', :type => 'number' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.lasting') %>
-      <%= text_field_tag 'trial_period_lasting', nil, :class => 'text_field input-small required', :placeholder => '0', :value => '6' %>
+      <%= text_field_tag 'trial_period_lasting', nil, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("trial_period_lasting_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.trial_period'), 
@@ -61,7 +60,7 @@
       <%= radio_button_tag 'is_payment_expected', 'yes', true %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.payment_is_expected') %>&nbsp;
       <%= radio_button_tag 'is_payment_expected', 'no' %>
-      <%= t('activerecord.attributes.terms_of_membership.wizard.no_pay_is_expected') %>&nbsp;&nbsp;
+      <%= t('activerecord.attributes.terms_of_membership.wizard.no_pay_is_expected') %>&nbsp;
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), 
         :content => t('lorem') } %> 
@@ -71,9 +70,9 @@
   <div class="control-group">
     <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label' %>
     <div class="controls">
-      <%= text_field_tag 'installment_amount', nil, :class => 'text_field input-small required', :placeholder => '$0.00', :value => '7' %>
+      $&nbsp;<%= text_field_tag 'installment_amount', nil, :class => 'text_field input-small required', :placeholder => '0.00', :type => 'number' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
-      <%= text_field_tag 'installment_amount_days', nil, :class => 'text_field input-small required', :placeholder => '0', :value => '8' %>
+      <%= text_field_tag 'installment_amount_days', nil, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("installment_amount_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), 
@@ -84,10 +83,11 @@
     <%= label_tag 'suscription_terms', t('activerecord.attributes.terms_of_membership.wizard.suscription_terms'), :class => 'control-label' %>
     <div class="controls">
       <%= radio_button_tag 'suscription_terms', 'until_cancelled', true %>
-      <span id="label_for_until_cancelled"><%= t('activerecord.attributes.terms_of_membership.wizard.bill_until_cancelled') %></span><br />
+      <span id="label_for_until_cancelled"><%= t('activerecord.attributes.terms_of_membership.wizard.bill_until_cancelled') %></span>
+      <br /><br />
       <%= radio_button_tag 'suscription_terms', 'stop_cancel_after' %>
       <span id="label_for_stop_billing_after"><%= t('activerecord.attributes.terms_of_membership.wizard.stop_billing_after') %></span>
-      <%= text_field_tag 'suscription_terms_stop_billing_after', nil, :class => 'text_field input-small', :placeholder => '0', :value => '9' %>
+      <%= text_field_tag 'suscription_terms_stop_billing_after', nil, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("suscription_terms_stop_billing_after_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.suscription_terms'), 
@@ -96,21 +96,21 @@
   </div>
 </div>
 
-
 <% # Third step %>
 <div class="step" id="third">
   <div class="control-group"><%= wizard_steps_indicator(3) %></div>
   <div class="control-group">
     <%= label_tag 'if_cannot_bill_member', t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_member_then'), :class => 'control-label' %>
     <div class="controls">
-      <%= radio_button_tag 'if_cannot_bill_member', 'cancel', true %><%= t('activerecord.attributes.terms_of_membership.wizard.cancel') %>
-      <br />
-      <%= radio_button_tag 'if_cannot_bill_member', 'suspend_for' %>
+      <%= radio_button_tag 'if_cannot_bill_member', 'cancel', true %>&nbsp;
+      <%= t('activerecord.attributes.terms_of_membership.wizard.cancel') %>
+      <br /><br />
+      <%= radio_button_tag 'if_cannot_bill_member', 'suspend' %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.suspend_for') %>
-      <%= text_field_tag 'if_cannot_bill_member_suspend_for', nil, :class => 'text_field input-small', :placeholder => '0', :value => '10' %>
+      <%= text_field_tag 'if_cannot_bill_member_suspend_for', nil, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("if_cannot_bill_member_suspend_for_time_span") %>
-      <br />
-      <%= radio_button_tag 'if_cannot_bill_member', 'downgrade_to' %>
+      <br /><br />
+      <%= radio_button_tag 'if_cannot_bill_member', 'downgrade_to' %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.downgrade_to') %>
       <%= select_for_toms('downgrade_to_tom') %>
       <%= render :partial => "shared/help", :locals => { 
@@ -121,9 +121,9 @@
   <div class="control-group">
     <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
     <div class="controls">
-      <%= select_for_toms('upgrade_to_tom') %><br />
+      <%= select_for_toms('upgrade_to_tom') %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
-      <%= text_field_tag 'upgrade_to_tom_days', nil, :class => 'text_field input-small', :placeholder => '0', :value => '11' %>
+      <%= text_field_tag 'upgrade_to_tom_days', nil, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
@@ -132,16 +132,14 @@
   </div>
 </div>
 
-<div id="data"></div>
-
 <div id="" class="form-actions">
-  <%= link_to t('.cancel', :default => t("helpers.links.cancel")), terms_of_memberships_path, :class => 'btn', :confirm => "Do you really want to leave this page?\nAll your changes will be lost." %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")), terms_of_memberships_path, :class => 'btn', 
+    :confirm => "Do you really want to leave this page?\nAll your changes will be lost." %>
   <div style = "float: right;">
     <%= f.submit "clear", :id => 'back', :class => 'btn', :type => "reset" %>
     <%= f.submit nil, :id => 'next', :class => 'btn btn-primary' %>
   </div>
 </div>
-
 
 <script type="text/javascript">
   $(document).ready(function() {
@@ -156,14 +154,37 @@
     });
   });
 
-  $('#at_the_end_of_trial_payment').click(function() {
+  $('#is_payment_expected_yes').click(function() {
     window.at_the_end_of_trial = "payment";
     update_labels();
   });
 
-  $('#at_the_end_of_trial_no_payment').click(function() {
+  $('#is_payment_expected_no').click(function() {
     window.at_the_end_of_trial = "no payment";
     update_labels();
+  });
+
+  $('#suscription_terms_until_cancelled').click(function() {
+    $('#suscription_terms_stop_billing_after').removeAttr('required');
+  });
+
+  $('#suscription_terms_stop_cancel_after').click(function() {
+    $('#suscription_terms_stop_billing_after').prop('required', true);
+  });
+
+  $('#if_cannot_bill_member_cancel').click(function() {
+    $('#if_cannot_bill_member_suspend_for').removeAttr('required');
+    $('#downgrade_to_tom').removeAttr('required');
+  });
+
+  $('#if_cannot_bill_member_suspend').click(function() {
+    $('#if_cannot_bill_member_suspend_for').prop('required', true);
+    $('#downgrade_to_tom').removeAttr('required');
+  });
+
+  $('#if_cannot_bill_member_downgrade_to').click(function() {
+    $('#if_cannot_bill_member_suspend_for').removeAttr('required');
+    $('#downgrade_to_tom').prop('required', true);
   });
 
   function update_labels() {
