@@ -15,10 +15,9 @@ class TermsOfMembershipsController < ApplicationController
 
   def create
     @tom = TermsOfMembership.new(params[:tom])
-    # @tom.club_id = @current_club.id
     prepare_tom_data_to_save(params)
     if @tom.save
-      redirect_to terms_of_memberships_url, notice: "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was created Succesfully"
+      redirect_to terms_of_memberships_url, :notice => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was created Succesfully"
     else
       render action: "new"
     end
@@ -27,11 +26,11 @@ class TermsOfMembershipsController < ApplicationController
   def destroy
     @tom = TermsOfMembership.find(params[:id])
     if @tom.destroy
-      redirect_to terms_of_memberships_url, notice: "Suscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
+      flash[:notice] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
     else
       flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) was not destroyed."
-      redirect_to terms_of_memberships_url
     end
+    redirect_to terms_of_memberships_url
   end
 
   def show
@@ -53,10 +52,10 @@ class TermsOfMembershipsController < ApplicationController
       @tom.description = post_data[:terms_of_membership][:description]
 
       # Step 2
-      @tom.initial_fee = post_data[:initial_fee]
+      @tom.initial_fee = post_data[:initial_fee_amount]
       @tom.trial_period_amount = post_data[:trial_period_amount]
       @tom.provisional_days = post_data[:trial_period_lasting_time_span] == 'months' ? months_to_days(post_data[:trial_period_lasting]) : post_data[:trial_period_lasting]
-      @tom.is_payment_expected = post_data[:is_payment_expected] == 'yes' ? 1 : 0
+      @tom.is_payment_expected = post_data[:is_payment_expected] == 'yes'
       @tom.installment_amount = post_data[:installment_amount]
       @tom.installment_period = post_data[:installment_amount_days_time_span] == 'months' ? months_to_days(post_data[:installment_amount_days]) : post_data[:installment_amount_days]
       @tom.suscription_limits = 
@@ -67,10 +66,19 @@ class TermsOfMembershipsController < ApplicationController
         end
       
       # Step 3
+      case post_data[:if_cannot_bill_member]
+      when 'cancel'
+        @tom.if_cannot_bill = 'cancel'
+      when 'suspend_for'
+        @tom.if_cannot_bill = 'suspend'
+        @tom.suspend_period = post_data[:if_cannot_bill_member_suspend_for_time_span] == 'months' ? months_to_days(post_data[:if_cannot_bill_member_suspend_for]) : post_data[:if_cannot_bill_member_suspend_for]
+      when 'downgrade_to'
+        @tom.if_cannot_bill = 'downgrade_tom'
+        @tom.downgrade_tom_id = post_data[:downgrade_to_tom].to_i
+      end
       if post_data[:upgrade_to_tom] != '' and post_data[:upgrade_to_tom_days].to_i > 0
         @tom.upgrade_tom_id = post_data[:upgrade_to_tom]
-        @tom.upgrade_tom_period = 
-          post_data[:upgrade_to_tom_days_time_span] == 'months' ? months_to_days(post_data[:upgrade_to_tom_days]) : post_data[:upgrade_to_tom_days]
+        @tom.upgrade_tom_period = post_data[:upgrade_to_tom_days_time_span] == 'months' ? months_to_days(post_data[:upgrade_to_tom_days]) : post_data[:upgrade_to_tom_days]
       end
     end
 
