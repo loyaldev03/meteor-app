@@ -8,6 +8,7 @@ class TermsOfMembership < ActiveRecord::Base
   has_many :prospects
   has_many :email_templates
   belongs_to :downgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'downgrade_tom_id'
+  belongs_to :upgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'upgrade_tom_id'
   belongs_to :agent
 
   acts_as_paranoid
