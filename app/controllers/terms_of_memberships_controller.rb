@@ -63,13 +63,15 @@ class TermsOfMembershipsController < ApplicationController
         if post_data[:suscription_terms] == 'until_cancelled'
           0
         else
-          post_data[:suscription_terms_stop_billing_after_time_span] == 'months' ? 
-            months_to_days(post_data[:suscription_terms_stop_billing_after]) : post_data[:suscription_terms_stop_billing_after]
+          post_data[:suscription_terms_stop_billing_after_time_span] == 'months' ? months_to_days(post_data[:suscription_terms_stop_billing_after]) : post_data[:suscription_terms_stop_billing_after]
         end
       
       # Step 3
-
-      
+      if post_data[:upgrade_to_tom] != '' and post_data[:upgrade_to_tom_days].to_i > 0
+        @tom.upgrade_tom_id = post_data[:upgrade_to_tom]
+        @tom.upgrade_tom_period = 
+          post_data[:upgrade_to_tom_days_time_span] == 'months' ? months_to_days(post_data[:upgrade_to_tom_days]) : post_data[:upgrade_to_tom_days]
+      end
     end
 
     def months_to_days(months)
