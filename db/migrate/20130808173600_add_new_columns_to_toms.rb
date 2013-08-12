@@ -2,7 +2,7 @@ class AddNewColumnsToToms < ActiveRecord::Migration
 	def up
 		add_column :terms_of_memberships, :initial_fee, :float
 		add_column :terms_of_memberships, :trial_period_amount, :float
-		add_column :terms_of_memberships, :is_payment_expected, :integer
+		add_column :terms_of_memberships, :is_payment_expected, :boolean
 		add_column :terms_of_memberships, :installment_period, :integer
 		add_column :terms_of_memberships, :suscription_limits, :integer
 		add_column :terms_of_memberships, :if_cannot_bill, :string
