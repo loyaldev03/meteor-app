@@ -42,11 +42,9 @@ private
   end
 
   def get_agent_name(current_tom)
-    begin
-      current_tom.agent.username
+    current_tom.agent.username
     rescue Exception => e
       '--'
-    end
   end
 
 end    
