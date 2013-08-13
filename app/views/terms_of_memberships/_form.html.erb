@@ -187,6 +187,14 @@
     $('#downgrade_to_tom').prop('required', true);
   });
 
+  $('#upgrade_to_tom').on('change', function() {
+    if($('#upgrade_to_tom').val() != '') {
+      $('#upgrade_to_tom_days').prop('required', true);
+    } else {
+      $('#upgrade_to_tom_days').removeAttr('required');   
+    }
+  });
+
   function update_labels() {
     var radio1_text = 'NOT_SET';
     var radio2_text = 'NOT_SET';
