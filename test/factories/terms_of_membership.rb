@@ -5,6 +5,10 @@ FactoryGirl.define do
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -16,6 +20,11 @@ FactoryGirl.define do
     name "test Hold card 004"
     installment_amount 0.04 
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -28,6 +37,10 @@ FactoryGirl.define do
     installment_amount 0.05 
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -40,6 +53,10 @@ FactoryGirl.define do
     installment_amount 0.51 
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -52,6 +69,10 @@ FactoryGirl.define do
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -64,6 +85,10 @@ FactoryGirl.define do
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -76,6 +101,10 @@ FactoryGirl.define do
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -88,6 +117,10 @@ FactoryGirl.define do
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -100,6 +133,10 @@ FactoryGirl.define do
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -113,6 +150,10 @@ FactoryGirl.define do
     installment_amount 100
     installment_period 365 # installment_type '1.year'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 12
     needs_enrollment_approval false
     club_cash_amount 150
@@ -125,6 +166,10 @@ FactoryGirl.define do
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval true
     club_cash_amount 150
@@ -137,6 +182,10 @@ FactoryGirl.define do
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 0
@@ -149,6 +198,10 @@ FactoryGirl.define do
     installment_amount 100
     installment_period 365000 # installment_type '1000.years'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -161,6 +214,10 @@ FactoryGirl.define do
     installment_amount 0
     installment_period 30 # installment_type '1.month'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -171,8 +228,12 @@ FactoryGirl.define do
   factory :terms_of_membership_yearly_without_provisional_day_and_amount, class: TermsOfMembership do
     name "test"
     installment_amount 0
-    installment_period 365000 # installment_type '1.year'
+    installment_period 365 # installment_type '1.year'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -185,6 +246,10 @@ FactoryGirl.define do
     installment_amount 0
     installment_period 365 # installment_type '1.year'
     initial_fee 0
+    trial_period_amount 0
+    is_payment_expected false
+    suscription_limits 0
+    if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
     club_cash_amount 0
