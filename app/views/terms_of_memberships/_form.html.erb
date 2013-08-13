@@ -134,7 +134,7 @@
 
 <div id="" class="form-actions">
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")), terms_of_memberships_path, :class => 'btn', 
-    :confirm => "Do you really want to leave this page?\nAll your changes will be lost." %>
+    :confirm => t('activerecord.attributes.terms_of_membership.wizard.cancel_button_caption') %>
   <div style = "float: right;">
     <%= f.submit "clear", :id => 'back', :class => 'btn', :type => "reset" %>
     <%= f.submit nil, :id => 'next', :class => 'btn btn-primary' %>
