@@ -1,6 +1,6 @@
 class AddNewColumnsToToms < ActiveRecord::Migration
 	def up
-		add_column :terms_of_memberships, :initial_fee:decimal, :precision => 11, :scale => 2
+		add_column :terms_of_memberships, :initial_fee, :decimal, :precision => 11, :scale => 2
 		add_column :terms_of_memberships, :trial_period_amount, :decimal, :precision => 11, :scale => 2
 		add_column :terms_of_memberships, :is_payment_expected, :boolean
 		add_column :terms_of_memberships, :installment_period, :integer
