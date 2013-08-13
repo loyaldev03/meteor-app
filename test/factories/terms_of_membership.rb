@@ -6,7 +6,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -22,7 +22,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -38,7 +38,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -54,7 +54,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -70,7 +70,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -86,7 +86,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -102,7 +102,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -118,7 +118,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -134,7 +134,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -151,7 +151,7 @@ FactoryGirl.define do
     installment_period 365 # installment_type '1.year'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 12
@@ -167,7 +167,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -183,7 +183,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -199,7 +199,7 @@ FactoryGirl.define do
     installment_period 365000 # installment_type '1000.years'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -215,7 +215,7 @@ FactoryGirl.define do
     installment_period 30 # installment_type '1.month'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -231,7 +231,7 @@ FactoryGirl.define do
     installment_period 365 # installment_type '1.year'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
@@ -247,7 +247,7 @@ FactoryGirl.define do
     installment_period 365 # installment_type '1.year'
     initial_fee 0
     trial_period_amount 0
-    is_payment_expected false
+    is_payment_expected 1
     suscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
