@@ -277,17 +277,17 @@ class MembersSearchTest < ActionController::IntegrationTest
     member_list = Member.where("club_id = ?", @club.id).order("id DESC")
     
     within("#members")do
-      find("tr", :text => member_list[20].full_name)
+      find("tr", :text => member_list[24].full_name)
     end
 
 	  within("#members")do
 		  within(".pagination"){ click_on("2") }
-      find("tr", :text => member_list[45].full_name)
+      find("tr", :text => member_list[49].full_name)
   	end
 
 		within("#members")do
 		  within(".pagination"){ click_on("3") }
-      find("tr", :text => member_list[65].full_name)
+      find("tr", :text => member_list[59].full_name)
   	end
   end
 
