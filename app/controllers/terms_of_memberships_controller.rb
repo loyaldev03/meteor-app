@@ -74,7 +74,7 @@ class TermsOfMembershipsController < ApplicationController
       case post_data[:if_cannot_bill_member]
       when 'cancel'
         @tom.if_cannot_bill = 'cancel'
-      when 'suspend_for'
+      when 'suspend'
         @tom.if_cannot_bill = 'suspend'
         @tom.suspension_period = post_data[:if_cannot_bill_member_suspend_for_time_span] == 'months' ? months_to_days(post_data[:if_cannot_bill_member_suspend_for].to_i) : post_data[:if_cannot_bill_member_suspend_for]
       when 'downgrade_to'
