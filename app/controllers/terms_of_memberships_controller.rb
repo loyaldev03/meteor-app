@@ -56,8 +56,13 @@ class TermsOfMembershipsController < ApplicationController
       @tom.trial_period_amount = post_data[:trial_period_amount]
       @tom.provisional_days = post_data[:trial_period_lasting_time_span] == 'months' ? months_to_days(post_data[:trial_period_lasting].to_i) : post_data[:trial_period_lasting]
       @tom.is_payment_expected = post_data[:is_payment_expected] == 'yes'
-      @tom.installment_amount = post_data[:installment_amount]
-      @tom.installment_period = post_data[:installment_amount_days_time_span] == 'months' ? months_to_days(post_data[:installment_amount_days].to_i) : post_data[:installment_amount_days]
+      if @tom.is_payment_expected
+        @tom.installment_amount = post_data[:installment_amount]
+        @tom.installment_period = post_data[:installment_amount_days_time_span] == 'months' ? months_to_days(post_data[:installment_amount_days].to_i) : post_data[:installment_amount_days]
+      else
+        @tom.installment_amount = nil
+        @tom.installment_period = nil
+      end
       @tom.suscription_limits = 
         if post_data[:suscription_terms] == 'until_cancelled'
           0
