@@ -67,7 +67,7 @@
     </div>
   </div>
 
-  <div class="control-group">
+  <div class="control-group" id="recurring_amount_group">
     <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label' %>
     <div class="controls">
       $&nbsp;<%= text_field_tag 'installment_amount', nil, :class => 'text_field input-small required', :placeholder => '0.00', :type => 'number' %>
@@ -79,6 +79,7 @@
         :content => t('lorem') } %> 
     </div>
   </div>
+
   <div class="control-group">
     <%= label_tag 'suscription_terms', t('activerecord.attributes.terms_of_membership.wizard.suscription_terms'), :class => 'control-label' %>
     <div class="controls">
@@ -156,11 +157,16 @@
 
   $('#is_payment_expected_yes').click(function() {
     window.atTheEndOfTheTrial = "payment";
+    $('#recurring_amount_group').show('fast');
+    $('#installment_amount').prop('required', true);
+    $('#installment_amount_days').prop('required', true);
     update_labels();
   });
 
   $('#is_payment_expected_no').click(function() {
     window.atTheEndOfTheTrial = "no payment";
+    $('#recurring_amount_group').hide('fast');
+    $('#installment_amount_days').removeAttr('required');
     update_labels();
   });
 
