@@ -4,6 +4,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -26,6 +27,7 @@ FactoryGirl.define do
     name "test do not honor 0045"
     installment_amount 0.05 
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -37,6 +39,7 @@ FactoryGirl.define do
     name "test insuf funds"
     installment_amount 0.51 
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -48,6 +51,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -59,6 +63,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -70,6 +75,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -81,6 +87,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -92,6 +99,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -104,6 +112,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_period 365 # installment_type '1.year'
+    initial_fee 0
     quota 12
     needs_enrollment_approval false
     club_cash_amount 150
@@ -115,6 +124,7 @@ FactoryGirl.define do
     name "test-approval"
     installment_amount 100
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval true
     club_cash_amount 150
@@ -126,6 +136,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 100
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 0
@@ -137,6 +148,7 @@ FactoryGirl.define do
     name "test-lifetime"
     installment_amount 100
     installment_period 365000 # installment_type '1000.years'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -148,6 +160,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 0
     installment_period 30 # installment_type '1.month'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -159,6 +172,7 @@ FactoryGirl.define do
     name "test"
     installment_amount 0
     installment_period 365000 # installment_type '1.year'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 150
@@ -170,6 +184,7 @@ FactoryGirl.define do
     name "downgrade_free_membership"
     installment_amount 0
     installment_period 365 # installment_type '1.year'
+    initial_fee 0
     quota 1
     needs_enrollment_approval false
     club_cash_amount 0
