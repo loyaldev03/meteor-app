@@ -145,7 +145,7 @@
   $(document).ready(function() {
     new_tom_functions();
     set_button_next_label($("#tom_wizard_form").formwizard("state").currentStep);
-    window.at_the_end_of_trial = "payment";
+    window.atTheEndOfTheTrial = "payment";
   });
 
   $(function() {
@@ -155,12 +155,12 @@
   });
 
   $('#is_payment_expected_yes').click(function() {
-    window.at_the_end_of_trial = "payment";
+    window.atTheEndOfTheTrial = "payment";
     update_labels();
   });
 
   $('#is_payment_expected_no').click(function() {
-    window.at_the_end_of_trial = "no payment";
+    window.atTheEndOfTheTrial = "no payment";
     update_labels();
   });
 
@@ -196,18 +196,18 @@
   });
 
   function update_labels() {
-    var radio1_text = 'NOT_SET';
-    var radio2_text = 'NOT_SET';
-    if (window.at_the_end_of_trial == 'payment') {
-      radio1_text = '<%= t('activerecord.attributes.terms_of_membership.wizard.bill_until_cancelled') %>';
-      radio2_text = '<%= t('activerecord.attributes.terms_of_membership.wizard.stop_billing_after') %>';
+    var radio1Text = 'NOT_SET';
+    var radio2Text = 'NOT_SET';
+    if (window.atTheEndOfTheTrial == 'payment') {
+      radio1Text = '<%= t('activerecord.attributes.terms_of_membership.wizard.bill_until_cancelled') %>';
+      radio2Text = '<%= t('activerecord.attributes.terms_of_membership.wizard.stop_billing_after') %>';
     }
-    else if (window.at_the_end_of_trial == 'no payment') {
-      radio1_text = '<%= t('activerecord.attributes.terms_of_membership.wizard.keep_active_until_manually_cancelled') %>';
-      radio2_text = '<%= t('activerecord.attributes.terms_of_membership.wizard.cancel_member_after') %>';
+    else if (window.atTheEndOfTheTrial == 'no payment') {
+      radio1Text = '<%= t('activerecord.attributes.terms_of_membership.wizard.keep_active_until_manually_cancelled') %>';
+      radio2Text = '<%= t('activerecord.attributes.terms_of_membership.wizard.cancel_member_after') %>';
     }
-    $('#label_for_until_cancelled').html(radio1_text);
-    $('#label_for_stop_billing_after').html(radio2_text);
+    $('#label_for_until_cancelled').html(radio1Text);
+    $('#label_for_stop_billing_after').html(radio2Text);
   }
 
   function set_button_next_label(currentStep) {
