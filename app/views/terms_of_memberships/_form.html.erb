@@ -143,18 +143,7 @@
 </div>
 
 <script type="text/javascript">
-  $(document).ready(function() {
-    new_tom_functions();
-    set_button_next_label($("#tom_wizard_form").formwizard("state").currentStep);
-    window.atTheEndOfTheTrial = "payment";
-  });
-
-  $(function() {
-    $("#tom_wizard_form").bind("before_step_shown", function(event, data) {
-      set_button_next_label(data.currentStep);
-    });
-  });
-
+  // Second Step
   $('#is_payment_expected_yes').click(function() {
     window.atTheEndOfTheTrial = "payment";
     $('#recurring_amount_group').show('fast');
@@ -166,6 +155,7 @@
   $('#is_payment_expected_no').click(function() {
     window.atTheEndOfTheTrial = "no payment";
     $('#recurring_amount_group').hide('fast');
+    $('#installment_amount').removeAttr('required');
     $('#installment_amount_days').removeAttr('required');
     update_labels();
   });
@@ -178,19 +168,29 @@
     $('#suscription_terms_stop_billing_after').prop('required', true);
   });
 
+  // Third Step
   $('#if_cannot_bill_member_cancel').click(function() {
     $('#if_cannot_bill_member_suspend_for').removeAttr('required');
     $('#downgrade_to_tom').removeAttr('required');
+    $('#if_cannot_bill_member_suspend_for').prop('disabled', true);
+    $('#if_cannot_bill_member_suspend_for_time_span').prop('disabled', true);
+    $('#downgrade_to_tom').prop('disabled', true);
   });
 
   $('#if_cannot_bill_member_suspend').click(function() {
     $('#if_cannot_bill_member_suspend_for').prop('required', true);
     $('#downgrade_to_tom').removeAttr('required');
+    $('#if_cannot_bill_member_suspend_for').prop('disabled', false);
+    $('#if_cannot_bill_member_suspend_for_time_span').prop('disabled', false);
+    $('#downgrade_to_tom').prop('disabled', true);
   });
 
   $('#if_cannot_bill_member_downgrade_to').click(function() {
     $('#if_cannot_bill_member_suspend_for').removeAttr('required');
     $('#downgrade_to_tom').prop('required', true);
+    $('#if_cannot_bill_member_suspend_for').prop('disabled', true);
+    $('#if_cannot_bill_member_suspend_for_time_span').prop('disabled', true);
+    $('#downgrade_to_tom').prop('disabled', false);
   });
 
   $('#upgrade_to_tom').on('change', function() {
@@ -238,4 +238,16 @@
       $("#tom_wizard_form").formwizard("option", {textNext: buttonText});
     }
   }
+
+  $(function() {
+    $("#tom_wizard_form").bind("before_step_shown", function(event, data) {
+      set_button_next_label(data.currentStep);
+    });
+  });
+
+  $(document).ready(function() {
+    new_tom_functions();
+    set_button_next_label($("#tom_wizard_form").formwizard("state").currentStep);
+    window.atTheEndOfTheTrial = "payment";
+  });
 </script>
