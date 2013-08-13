@@ -15,7 +15,7 @@ module TermsOfMembershipsHelper
 		html << '<h3 class="wizard_step">'
 		html << '<span>Step </span>'
 		(1..3).each do |s| 
-			html += '<span class="wizard_step_circle' + (s == current_step ? class_for_selected : '') + '">' + s.to_s + '</span>'
+			html << '<span class="wizard_step_circle' + (s == current_step ? class_for_selected : '') + '">' + s.to_s + '</span>'
 		end 
     html << '</h3>'
     html.html_safe
