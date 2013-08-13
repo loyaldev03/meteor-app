@@ -161,4 +161,105 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
+	test "Create subcription plan with Recurring Amount in Months" do
+		tom_name = 'TOM with Recurring Amount in Months'
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		click_link_or_button 'Add New Plan'
+		fill_in 'terms_of_membership_name', :with => tom_name
+		click_link_or_button 'Membership Terms'
+		fill_in 'initial_fee_amount', :with => '0'
+		fill_in 'trial_period_amount', :with => '0'
+		fill_in 'trial_period_lasting', :with => '0'
+		fill_in 'installment_amount', :with => '10'
+		fill_in 'installment_amount_days', :with => '1'
+		select('Month(s)', :from => 'installment_amount_days_time_span')
+		click_link_or_button 'Define Upgrades / Downgrades'
+		click_link_or_button 'Create Plan'
+		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	end
+
+	test "Create subcription plan with Recurring Amount in Years" do
+		tom_name = 'TOM with Recurring Amount in Years'
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		click_link_or_button 'Add New Plan'
+		fill_in 'terms_of_membership_name', :with => tom_name
+		click_link_or_button 'Membership Terms'
+		fill_in 'initial_fee_amount', :with => '0'
+		fill_in 'trial_period_amount', :with => '0'
+		fill_in 'trial_period_lasting', :with => '0'
+		fill_in 'installment_amount', :with => '10'
+		fill_in 'installment_amount_days', :with => '12'
+		select('Month(s)', :from => 'installment_amount_days_time_span')
+		click_link_or_button 'Define Upgrades / Downgrades'
+		click_link_or_button 'Create Plan'
+		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	end
+
+
+
+
+
+
+
+
+
+
+
+
+	test "Create subcription plan with No payment is expected" do
+		tom_name = 'TOM with with No payment is expected'
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		click_link_or_button 'Add New Plan'
+		fill_in 'terms_of_membership_name', :with => tom_name
+		click_link_or_button 'Membership Terms'
+		fill_in 'initial_fee_amount', :with => '0'
+		fill_in 'trial_period_amount', :with => '1'
+		fill_in 'trial_period_lasting', :with => '0'
+		fill_in 'installment_amount', :with => '0'
+		fill_in 'installment_amount_days', :with => '0'
+		choose('is_payment_expected_no')
+		click_link_or_button 'Define Upgrades / Downgrades'
+		click_link_or_button 'Create Plan'
+		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 end
