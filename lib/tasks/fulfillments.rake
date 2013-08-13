@@ -44,8 +44,8 @@ namespace :fulfillments do
             row = [ member.first_name, member.last_name, member.id, 
                     membership.terms_of_membership.name, member.address, 
                     member.city, member.state, "=\"#{member.zip}\"", member.full_phone_number,
-                    I18n.l(member.join_date, :format => :only_date_short), 
-                    (I18n.l membership.cancel_date, :format => :only_date_short if membership.cancel_date ).to_s,
+                    sanitize_date(member.join_date, :only_date_short), 
+                    (sanitize_date(membership.cancel_date, :only_date_short) if membership.cancel_date ).to_s,
                     member.email
                   ]
             sheet.add_row row 
@@ -117,7 +117,7 @@ namespace :fulfillments do
             membership = member.current_membership
             csv << [member.first_name, member.last_name, fulfillment.product_sku, member.address, 
                     member.city, member.state, "#{member.zip}"  ,
-                    I18n.l(member.join_date, :format => :only_date_short), 
+                    sanitize_date(member.join_date, :only_date_short), 
                     member.full_phone_number, member.email]
             fulfillment_file.fulfillments << fulfillment
             Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
@@ -197,8 +197,8 @@ namespace :fulfillments do
             Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"  
             member = fulfillment.member
             row = [ member.id.to_s, member.first_name, member.last_name,
-                    I18n.l(member.next_retry_bill_date, :format => :only_date_short),
-                    I18n.l(member.member_since_date, :format => :only_date_short), 
+                    sanitize_date(member.next_retry_bill_date, :only_date_short),
+                    sanitize_date(member.member_since_date, :only_date_short), 
                     fulfillment.product.name,
                     fulfillment.product_sku                  
                   ]
@@ -225,5 +225,15 @@ namespace :fulfillments do
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run task"        
     end  
+  end
+  
+  def sanitize_date(date, format)
+    allowed_dt_formats = ["ActiveSupport::TimeWithZone", "Date", "DateTime"]
+
+    if allowed_dt_formats.include? date.class.to_s
+      return I18n.l(date, :format => format)
+    else
+      return ""
+    end
   end
 end
