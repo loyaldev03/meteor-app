@@ -59,7 +59,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
 	# 	click_link_or_button 'Add New Plan'
 	# 	fill_in 'terms_of_membership_name', :with => tom_name
-	# 	click_link_or_button 'Membership Terms'
+	# 	click_link_or_button 'Define Membership Terms'
 	# 	fill_in 'initial_fee_amount', :with => '1'
 	# 	fill_in 'trial_period_amount', :with => '0'
 	# 	fill_in 'trial_period_lasting', :with => '0'
@@ -76,7 +76,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
 	# 	click_link_or_button 'Add New Plan'
 	# 	fill_in 'terms_of_membership_name', :with => tom_name
-	# 	click_link_or_button 'Membership Terms'
+	# 	click_link_or_button 'Define Membership Terms'
 	# 	fill_in 'initial_fee_amount', :with => '0'
 	# 	fill_in 'trial_period_amount', :with => '0'
 	# 	fill_in 'trial_period_lasting', :with => '0'
@@ -94,7 +94,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
-		click_link_or_button 'Membership Terms'
+		click_link_or_button 'Define Membership Terms'
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
 		fill_in 'trial_period_lasting', :with => '5'
@@ -112,7 +112,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
-		click_link_or_button 'Membership Terms'
+		click_link_or_button 'Define Membership Terms'
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
 		fill_in 'trial_period_lasting', :with => '5'
@@ -130,7 +130,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
-		click_link_or_button 'Membership Terms'
+		click_link_or_button 'Define Membership Terms'
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '100'
 		fill_in 'trial_period_lasting', :with => '5'
@@ -148,7 +148,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
-		click_link_or_button 'Membership Terms'
+		click_link_or_button 'Define Membership Terms'
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '100'
 		fill_in 'trial_period_lasting', :with => '5'
@@ -166,7 +166,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
-		click_link_or_button 'Membership Terms'
+		click_link_or_button 'Define Membership Terms'
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
 		fill_in 'trial_period_lasting', :with => '0'
@@ -184,7 +184,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
-		click_link_or_button 'Membership Terms'
+		click_link_or_button 'Define Membership Terms'
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
 		fill_in 'trial_period_lasting', :with => '0'
@@ -213,7 +213,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
-		click_link_or_button 'Membership Terms'
+		click_link_or_button 'Define Membership Terms'
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '1'
 		fill_in 'trial_period_lasting', :with => '0'

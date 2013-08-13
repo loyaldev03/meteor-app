@@ -346,7 +346,7 @@ en:
           external_code_help: 'help'
           description: 'Description (optional)'
           description_help: "help"
-          step_1_button_next: 'Membership Terms'
+          step_1_button_next: 'Define Membership Terms'
           # Step 2
           step_2_instructions: '<STEP_2_INSTRUCTIONS_HERE>'
           initial_fee: 'Initial Fee'
