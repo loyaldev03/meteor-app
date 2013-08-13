@@ -85,7 +85,7 @@ class TermsOfMembershipsController < ApplicationController
     def months_to_days(months)
       months = months.to_i
       if months > 0
-        months % 12 == 0 ? months / 12 * 365 : (months * 30.4166667).to_i
+        (months * 30.4166667).to_i
       else
         0
       end
