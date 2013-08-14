@@ -45,7 +45,7 @@ namespace :fulfillments do
                     membership.terms_of_membership.name, member.address, 
                     member.city, member.state, "=\"#{member.zip}\"", member.full_phone_number,
                     sanitize_date(member.join_date, :only_date_short), 
-                    (sanitize_date(membership.cancel_date, :only_date_short) if membership.cancel_date ).to_s,
+                    sanitize_date(membership.cancel_date, :only_date_short),
                     member.email
                   ]
             sheet.add_row row 
