@@ -64,7 +64,15 @@ class TermsOfMembership < ActiveRecord::Base
   end
   
   def downgradable?
-    self.downgrade_tom_id.to_i > 0
+    self.if_cannot_bill == 'downgrade_to' and self.downgrade_tom_id.to_i > 0
+  end
+
+  def suspendable?
+    self.if_cannot_bill == 'suspend'
+  end
+
+  def cancelable?
+    self.if_cannot_bill == 'cancel'
   end
 
   def self.datatable_columns

@@ -1,114 +1,134 @@
-<table class="table table-bordered table-condensed" id="table_information">
-  <thead>
-    <tr><th colspan="4"><%= t('activerecord.term_of_membership') %></th></tr>
-  </thead>
-  <tr>
-    <td> <%= t('activerecord.attributes.terms_of_membership.name') %>: <%= @tom.name %> </td>
-    <td colspan="3"> <%= t('activerecord.attributes.terms_of_membership.mode') %>: <%= @tom.mode %> </td>
-  </tr>
-  <tr>
-    <td> <%= t('activerecord.attributes.terms_of_membership.installment_amount') %>: 
-         <%= number_to_currency(@tom.installment_amount) %> </td>
-    <td> <%= t('activerecord.attributes.terms_of_membership.installment_type') %>: 
-         <%= @tom.installment_type %> </td>
-    <td> <%= t('activerecord.attributes.terms_of_membership.provisional_days') %>: 
-         <%= @tom.provisional_days %> </td>    
-    <% if @current_club.allow_club_cash_transaction? %>
-      <td> <%= t('activerecord.attributes.terms_of_membership.club_cash_amount') %>: <%= @tom.club_cash_amount %></td>
-    <% else %>
-      <td>&nbsp;</td>
-    <% end %>
-  </tr>
-  
-  <tr>
-    <td> <%= t('activerecord.attributes.terms_of_membership.initial_fee') %>: 
-         <%= number_to_currency(@tom.initial_fee) %> </td>
-    <td> <%= t('activerecord.attributes.terms_of_membership.payment_is_expected') %>: 
-         <%= @tom.is_payment_expected ? 'Yes' : 'No' %> </td>
-    <td> <%= t('activerecord.attributes.terms_of_membership.trial_period') %>: 
-         <%= number_to_currency(@tom.trial_period_amount) %> </td>
-    <td> <%= t('activerecord.attributes.terms_of_membership.installment_period') %>: 
-         <%= @tom.installment_period.nil? ? 0 : @tom.installment_period  %>  <%= t('days') %> </td>
-  </tr>
-  <tr>
-    <td> <%= t('activerecord.attributes.terms_of_membership.suscription_limits') %>: 
-         <%= @tom.suscription_limits %> </td>
-    <td> 
-      <% unless @current_club.is_not_drupal?  %>
-        <%= t('activerecord.attributes.terms_of_membership.external_code') %>: <%= @tom.api_role %> 
-      <% end %>
-    </td>
-    <td></td>
-    <td></td>
-  </tr>
-
-  <tr><th colspan='4'> Cancelation Feature </th></tr>
-  <tr>
-    <td> <%= t('activerecord.attributes.terms_of_membership.if_cannot_bill') %>: 
-         <%= @tom.if_cannot_bill %> </td>
-    <td> <%= t('activerecord.attributes.terms_of_membership.downgrade_to') %>: 
-      <% if @tom.downgrade_tom %>
-         <%= @tom.downgrade_tom.name %> (ID: <%= @tom.downgrade_tom_id %>) 
-      <% else %>(Not set)
-      <% end %>
-    </td>
-    <td> <%= t('activerecord.attributes.terms_of_membership.suspension_period') %>: 
-      <%= @tom.suspension_period.nil? ? 0 : @tom.suspension_period  %>  <%= t('days') %> </td>
-    <td> </td>
-  </tr>
-
-  <tr><th colspan='4'> Upgrade Feature </th></tr>
-  <tr>
-    <td> <%= t('activerecord.attributes.terms_of_membership.upgrade_to') %>: 
-      <% if @tom.upgrade_tom %>
-         <%= @tom.upgrade_tom.name %> (ID: <%= @tom.upgrade_tom_id %>) 
-      <% else %>(Not set)
-      <% end %>
-    </td>
-    <td> <%= t('activerecord.attributes.terms_of_membership.upgrade_tom_period') %>: 
-      <%= @tom.upgrade_tom_period.nil? ? 0 : @tom.upgrade_tom_period  %>  <%= t('days') %> </td>
-    <td></td>
-    <td></td>
-  </tr>
-
-  <tr><th colspan='4'> <%= t('activerecord.attributes.terms_of_membership.description') %> </th></tr>
-  <tr>
-    <td colspan="4" class="comment"> <%= @tom.description %> </td>
-  </tr>
-</table>
-
-<table class="table table-bordered table-condensed" id="table_payment_gateway_configuration">
-  <thead>
-  <tr<% if @payment_gateway_configuration_development.nil? %> class="red"<% end %>>
-    <th> <%= @payment_gateway_configuration_development.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_development') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_development') %> </th>
-  </tr>
-  <tr<% if @payment_gateway_configuration_production.nil? %> class="red"<% end %>>
-    <th> <%= @payment_gateway_configuration_production.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_production') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_production') %>  </th>
-  </tr>
-  </thead>
-</table>
-
-<table class="table table-bordered table-condensed" id="table_email_template">
-  <thead>
-    <tr> <th colspan="4"> <%= t('activerecord.email_template') %> </th> </tr>
+<div>
+  <table class="table table-bordered table-condensed" id="table_information">
+    <thead>
+      <tr><th colspan="4"><%= t('activerecord.term_of_membership') %></th></tr>
+    </thead>
     <tr>
-  	  <th> <%= t('activerecord.attributes.email_template.name') %> </th>
-  	  <th> <%= t('activerecord.attributes.email_template.type') %> </th>
-     	<th> <%= t('activerecord.attributes.email_template.client') %> </th>
-      <th> <%= t('activerecord.attributes.email_template.external_attributes')%>
+      <td> <%= t('activerecord.attributes.terms_of_membership.name') %>: <%= @tom.name %> </td>
+      <td colspan="3"> <%= t('activerecord.attributes.terms_of_membership.mode') %>: <%= @tom.mode %> </td>
     </tr>
-  </thead>
-  <tbody>
-  	<% @email_templates.each do |et| %>
-  	<tr>
-  	  <td> <%= et.name %> </td>
-  	  <td> <%= et.template_type%> </td>
-  	  <td> <%= et.client %> </td>
-      <td> <%= et.external_attributes.to_s %> </td>
-  	</tr>
-  	<% end %>
-  </tbody>
-</table>
+    <tr>
+      <td> <%= t('activerecord.attributes.terms_of_membership.installment_amount') %>: 
+           <%= number_to_currency(@tom.installment_amount) %> </td>
+      <td> <%= t('activerecord.attributes.terms_of_membership.installment_type') %>: 
+           <%= @tom.installment_type %> </td>
+      <td> <%= t('activerecord.attributes.terms_of_membership.provisional_days') %>: 
+           <%= @tom.provisional_days %> </td>    
+      <% if @current_club.allow_club_cash_transaction? %>
+        <td> <%= t('activerecord.attributes.terms_of_membership.club_cash_amount') %>: <%= @tom.club_cash_amount %></td>
+      <% else %>
+        <td>&nbsp;</td>
+      <% end %>
+    </tr>
+    
+    <tr>
+      <td> <%= t('activerecord.attributes.terms_of_membership.initial_fee') %>: 
+           <%= number_to_currency(@tom.initial_fee) %> </td>
+      <td> <%= t('activerecord.attributes.terms_of_membership.payment_is_expected') %>: 
+           <%= @tom.is_payment_expected ? 'Yes' : 'No' %> </td>
+      <td> <%= t('activerecord.attributes.terms_of_membership.trial_period') %>: 
+           <%= number_to_currency(@tom.trial_period_amount) %> </td>
+      <td> <%= t('activerecord.attributes.terms_of_membership.installment_period') %>: 
+           <%= @tom.installment_period.nil? ? 0 : @tom.installment_period  %>  <%= t('days') %> </td>
+    </tr>
+    <tr>
+      <td> <%= t('activerecord.attributes.terms_of_membership.suscription_limits') %>: 
+           <%= @tom.suscription_limits %> </td>
+      <td> 
+        <% unless @current_club.is_not_drupal?  %>
+          <%= t('activerecord.attributes.terms_of_membership.external_code') %>: <%= @tom.api_role %> 
+        <% end %>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+  </table>
+</div>
+
+<div>
+  <table class="table table-bordered table-condensed" id="table_cancelation_feature">
+    <tr><th colspan='4'> Cancelation Feature </th></tr>
+    <tr>
+      <td colspan="<%= @tom.cancelable? ? 4 : 2 %>"> <%= t('activerecord.attributes.terms_of_membership.if_cannot_bill') %>: 
+        <%= @tom.if_cannot_bill %> </td>
+      <% if @tom.downgradable? %>
+        <td> <%= t('activerecord.model.suscription_plans').singularize %>: 
+          <% if @tom.downgrade_tom %>
+             <%= @tom.downgrade_tom.name %> (ID: <%= @tom.downgrade_tom_id %>) 
+          <% else %>(Not set)
+          <% end %>
+        </td>
+      <% elsif @tom.suspendable? %>
+        <td colspan="2"> <%= t('activerecord.attributes.terms_of_membership.suspension_period') %>: 
+          <%= @tom.suspension_period.nil? ? 0 : @tom.suspension_period  %>  <%= t('days') %> </td>
+      <% end %>
+    </tr>
+  </table>
+</div>
+
+<% if @tom.upgrade_tom %>
+  <div>
+    <table>
+      <table class="table table-bordered table-condensed" id="table_upgrade_feature">
+      <tr><th colspan='4'> Upgrade Feature </th></tr>
+      <tr>
+        <td colspan='2'> <%= t('activerecord.attributes.terms_of_membership.upgrade_to') %>: 
+          <%= @tom.upgrade_tom.name %> (ID: <%= @tom.upgrade_tom_id %>) 
+        </td>
+        <td colspan='2'> <%= t('activerecord.attributes.terms_of_membership.upgrade_tom_period') %>: 
+          <%= @tom.upgrade_tom_period.nil? ? 0 : @tom.upgrade_tom_period  %>  <%= t('days') %> </td>
+      </tr>
+    </table>
+  </div>
+<% end %>
+
+<% unless @tom.description.blank? %>
+  <div> 
+    <table class="table table-bordered table-condensed" id="table_upgrade_feature">
+      <tr><th colspan='4'> <%= t('activerecord.attributes.terms_of_membership.description') %> </th></tr>
+      <tr>
+        <td colspan="4" class="comment"> <%= @tom.description %> </td>
+      </tr>
+    </table>
+  </div>
+<% end %>
+
+<div>
+  <table class="table table-bordered table-condensed" id="table_payment_gateway_configuration">
+    <thead>
+    <tr<% if @payment_gateway_configuration_development.nil? %> class="red"<% end %>>
+      <th> <%= @payment_gateway_configuration_development.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_development') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_development') %> </th>
+    </tr>
+    <tr<% if @payment_gateway_configuration_production.nil? %> class="red"<% end %>>
+      <th> <%= @payment_gateway_configuration_production.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_production') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_production') %>  </th>
+    </tr>
+    </thead>
+  </table>
+</div>
+
+<div>
+  <table class="table table-bordered table-condensed" id="table_email_template">
+    <thead>
+      <tr> <th colspan="4"> <%= t('activerecord.email_template') %> </th> </tr>
+      <tr>
+    	  <th> <%= t('activerecord.attributes.email_template.name') %> </th>
+    	  <th> <%= t('activerecord.attributes.email_template.type') %> </th>
+       	<th> <%= t('activerecord.attributes.email_template.client') %> </th>
+        <th> <%= t('activerecord.attributes.email_template.external_attributes')%>
+      </tr>
+    </thead>
+    <tbody>
+    	<% @email_templates.each do |et| %>
+    	<tr>
+    	  <td> <%= et.name %> </td>
+    	  <td> <%= et.template_type%> </td>
+    	  <td> <%= et.client %> </td>
+        <td> <%= et.external_attributes.to_s %> </td>
+    	</tr>
+    	<% end %>
+    </tbody>
+  </table>
+</div>
 
 <%= link_to t('buttons.return'), '#', :class => "btn", :id => 'return_btn' %>
 
