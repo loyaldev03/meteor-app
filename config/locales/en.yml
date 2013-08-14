@@ -86,6 +86,7 @@ en:
     manual_billing: 'Check/Cash Payment'
     manual_billing_help: 'This Payment is a membership payment that will be applied to the membership and is received offline (not via credit card). Payments of this type will act as if they were credit card transactions adjusting next bill date accordingly.'
     reschedule: 'Reschedule'
+    return: 'Return'
   admin:
     agents:
       index:
