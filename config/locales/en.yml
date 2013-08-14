@@ -40,6 +40,7 @@ en:
   test_api_connection: 'Test API Connection'
   index: '#'
   lorem: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+  days: "days"
   menu: 
     logout: 'Logout'
     agents: 'Agents'
