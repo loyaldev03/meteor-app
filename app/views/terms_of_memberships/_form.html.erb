@@ -13,7 +13,7 @@
   <div class="control-group">
     <%= f.label :api_role, t('activerecord.attributes.terms_of_membership.wizard.external_code'), :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :api_role, :value => @current_club.is_not_drupal? ? @tom.api_role : '', :class => 'text_field input-small' %>
+      <%= f.text_field :api_role, :value => @current_club.is_not_drupal? ? '' : @tom.api_role, :class => 'text_field input-small' %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.external_code'), 
         :content => t('lorem') } %> 
