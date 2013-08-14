@@ -33,8 +33,11 @@
   <tr>
     <td> <%= t('activerecord.attributes.terms_of_membership.suscription_limits') %>: 
          <%= @tom.suscription_limits %> </td>
-    <td> <%= t('activerecord.attributes.terms_of_membership.external_code') %>: 
-         <%= @tom.api_role %> </td>
+    <td> 
+      <% unless @current_club.is_not_drupal?  %>
+        <%= t('activerecord.attributes.terms_of_membership.external_code') %>: <%= @tom.api_role %> 
+      <% end %>
+    </td>
     <td></td>
     <td></td>
   </tr>
@@ -107,7 +110,7 @@
   </tbody>
 </table>
 
-<%= link_to t('buttons.return_to_member_show'), '#', :class => "btn", :id => 'return_btn' %>
+<%= link_to t('buttons.return'), '#', :class => "btn", :id => 'return_btn' %>
 
 
 
