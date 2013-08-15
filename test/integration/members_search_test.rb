@@ -268,14 +268,18 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_member false
     60.times do
       create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
-      sleep 0.40
     end
     @search_member = Member.first
     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     click_on 'Search'
 
     member_list = Member.where("club_id = ?", @club.id).order("id DESC")
-    
+
+    within("#members") do
+      within("#th_member_id"){ click_on "Member ID" }
+      within("#th_member_id"){ click_on "Member ID" }
+    end
+        
     within("#members")do
       find("tr", :text => member_list[24].full_name)
     end
