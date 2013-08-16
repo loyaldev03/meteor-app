@@ -17,9 +17,23 @@ class TermsOfMembershipsController < ApplicationController
     @tom = TermsOfMembership.new(params[:tom])
     prepare_tom_data_to_save(params)
     if @tom.save
-      redirect_to terms_of_memberships_url, :notice => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was created Succesfully"
+      redirect_to terms_of_memberships_url, :notice => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was created succesfully"
     else
       render action: "new"
+    end
+  end
+
+  def edit
+    @tom = TermsOfMembership.find(params[:id])
+  end
+
+  def update
+    @tom = TermsOfMembership.find(params[:id])
+    prepare_tom_data_to_save(params)
+    if @tom.save
+      redirect_to terms_of_memberships_url, :notice => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
+    else
+      render action: "edit"
     end
   end
 
