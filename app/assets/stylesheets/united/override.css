@@ -193,7 +193,14 @@ form#tom_wizard_form .text_field.error {
 form#tom_wizard_form .controls label.error {
   display:none !important;
 }
-.table .icon-arrow-down{
+
+.div-table{
+  margin-top:25px;
+}
+
+.div-table .span2{
+  width: 20%;
+}.table .icon-arrow-down{
   vertical-align:baseline;
   padding-left: 14px;
   width:4px;
