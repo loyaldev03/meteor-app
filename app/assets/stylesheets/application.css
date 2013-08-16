@@ -206,3 +206,12 @@ div.dataTables_length label {
 #members.tab-pane .pagination {
 	margin: 0em 0;
 }
+
+.div-table{
+  margin-top:25px;
+}
+
+.div-table .title{
+  border-bottom: solid;
+}
+

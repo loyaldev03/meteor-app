@@ -199,3 +199,11 @@ form#tom_wizard_form .text_field.error {
 form#tom_wizard_form .controls label.error {
   display:none !important;
 }
+
+.div-table{
+  margin-top:25px;
+}
+
+.div-table .span2{
+  width: 20%;
+}
