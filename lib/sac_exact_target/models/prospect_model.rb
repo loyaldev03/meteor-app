@@ -52,7 +52,7 @@ module SacExactTarget
         result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
       end.flatten.compact
     rescue Exception => e
-      Auditory.audit(nil, self.prospect, e, EnrollmentInfo.find_by_prospect_id(self.prospect.id).member, Settings.operation_types.et_timeout_find) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, nil, e, Member.find_by_email_and_club_id(email,club_id), Settings.operation_types.et_timeout_find) if e.to_s.include?("Timeout")
       raise e
     end
 
