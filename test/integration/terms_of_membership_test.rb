@@ -60,14 +60,17 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		fill_in 'initial_fee_amount', :with => '1'
 		fill_in 'trial_period_amount', :with => '0'
 		fill_in 'trial_period_lasting', :with => '0'
 		fill_in 'installment_amount', :with => '0'
 		fill_in 'installment_amount_days', :with => '0'
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 	  choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
+		sleep 3
 		assert page.has_content?('was created Succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
@@ -78,12 +81,14 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
 		fill_in 'trial_period_lasting', :with => '0'
 		fill_in 'installment_amount', :with => '0'
 		fill_in 'installment_amount_days', :with => '0'
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 	  choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
@@ -96,6 +101,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
 		fill_in 'trial_period_lasting', :with => '5'
@@ -104,6 +110,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'installment_amount', :with => '0'
 		fill_in 'installment_amount_days', :with => '0'
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
@@ -116,6 +123,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
 		fill_in 'trial_period_lasting', :with => '5'
@@ -123,6 +131,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'installment_amount', :with => '0'
 		fill_in 'installment_amount_days', :with => '0'
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		sleep 1
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
@@ -136,6 +145,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '100'
 		fill_in 'trial_period_lasting', :with => '5'
@@ -143,6 +153,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'installment_amount', :with => '0'
 		fill_in 'installment_amount_days', :with => '0'
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
@@ -155,6 +166,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '100'
 		fill_in 'trial_period_lasting', :with => '5'
@@ -162,6 +174,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'installment_amount', :with => '0'
 		fill_in 'installment_amount_days', :with => '0'
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
@@ -174,6 +187,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		choose('is_payment_expected_yes')
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
@@ -182,6 +196,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'installment_amount_days', :with => '1'
 		select('Month(s)', :from => 'installment_amount_days_time_span')
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
@@ -194,6 +209,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		choose('is_payment_expected_yes')
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
@@ -202,6 +218,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'installment_amount_days', :with => '12'
 		select('Month(s)', :from => 'installment_amount_days_time_span')
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
@@ -214,11 +231,13 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '1'
 		fill_in 'trial_period_lasting', :with => '0'
 		choose('is_payment_expected_no')
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
@@ -231,6 +250,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		choose('is_payment_expected_yes')
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
@@ -241,6 +261,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'suscription_terms_stop_billing_after', :with => '1'
 		select('Month(s)', :from => 'suscription_terms_stop_billing_after_time_span')
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
@@ -253,6 +274,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		choose('is_payment_expected_yes')
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
@@ -263,6 +285,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'suscription_terms_stop_billing_after', :with => '1'
 		select('Day(s)', :from => 'suscription_terms_stop_billing_after_time_span')
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
@@ -277,12 +300,14 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		fill_in 'initial_fee_amount', :with => '1'
 		fill_in 'trial_period_amount', :with => '0'
 		fill_in 'trial_period_lasting', :with => '0'
 		fill_in 'installment_amount', :with => '0'
 		fill_in 'installment_amount_days', :with => '0'
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 	  choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
@@ -300,6 +325,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		choose('is_payment_expected_yes')
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
@@ -308,6 +334,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'installment_amount_days', :with => '1'
 		select('Month(s)', :from => 'installment_amount_days_time_span')
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_suspend')
 		fill_in 'if_cannot_bill_member_suspend_for', :with => '30'
 		select('Day(s)', :from => 'if_cannot_bill_member_suspend_for_time_span')
@@ -323,6 +350,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		choose('is_payment_expected_yes')
+		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
 		fill_in 'trial_period_lasting', :with => '0'
@@ -330,6 +358,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'installment_amount_days', :with => '1'
 		select('Month(s)', :from => 'installment_amount_days_time_span')
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_suspend')
 		fill_in 'if_cannot_bill_member_suspend_for', :with => '1'
 		select('Month(s)', :from => 'if_cannot_bill_member_suspend_for_time_span')
@@ -345,6 +374,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Add New Plan'
 		fill_in 'terms_of_membership_name', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
+		sleep 3
 		choose('is_payment_expected_yes')
 		fill_in 'initial_fee_amount', :with => '0'
 		fill_in 'trial_period_amount', :with => '0'
@@ -353,40 +383,12 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'installment_amount_days', :with => '1'
 		select('Month(s)', :from => 'installment_amount_days_time_span')
 		click_link_or_button 'Define Upgrades / Downgrades'
+		sleep 3
 		choose('if_cannot_bill_member_downgrade_to')
 		select(tom_to_downgrade.name, :from => 'downgrade_to_tom')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created Succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 end
