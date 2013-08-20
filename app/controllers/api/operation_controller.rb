@@ -31,7 +31,6 @@ class Api::OperationController < ApplicationController
     raise "Description can not be blank" if !params[:description].present?
     
   	member = Member.find(params[:member_id])
-		current_agent = Agent.find_by_email('batch@xagax.com') if @current_agent.nil?
     
     o = Operation.new( 
       :operation_date => params[:operation_date], 
@@ -44,6 +43,9 @@ class Api::OperationController < ApplicationController
     o.save!
       
     render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
+  rescue ActiveRecord::RecordNotFound => e
+    Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
+		render json: { :message => "Operation was not created. Errors: Member not found.", :code => Settings.error_codes.operation_not_saved}
   rescue Exception => e
     Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
 		render json: { :message => "Operation was not created. Errors: #{e}", :code => Settings.error_codes.operation_not_saved}
