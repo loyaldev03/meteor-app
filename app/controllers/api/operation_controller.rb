@@ -28,10 +28,23 @@ class Api::OperationController < ApplicationController
   # @example_response_description Example response to valid request.
   #
 	def create
+    raise "Description can not be blank" if !params[:description].present?
+    
   	member = Member.find(params[:member_id])
-  	Auditory.audit(@current_agent, member, params[:description], member, params[:operation_type], params[:operation_date])
-		render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
-	rescue Exception => e
+		current_agent = Agent.find_by_email('batch@xagax.com') if @current_agent.nil?
+    
+    o = Operation.new( 
+      :operation_date => params[:operation_date], 
+      :resource => member, 
+      :description => params[:description], 
+      :operation_type => params[:operation_type]
+    )
+    o.created_by_id = (@current_agent.nil? ? nil : @current_agent.id)
+    o.member = member
+    o.save!
+      
+    render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
+  rescue Exception => e
     Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
 		render json: { :message => "Operation was not created. Errors: #{e}", :code => Settings.error_codes.operation_not_saved}
 	end
