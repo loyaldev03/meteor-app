@@ -435,10 +435,9 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def save_the_sale(new_tom_id, agent = nil, api_required = false)
+  def save_the_sale(new_tom_id, agent = nil)
     message = "Save the sale from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
-    operation_type = api_required ? Settings.operation_types.save_the_sale_through_api : Settings.operation_types.save_the_sale
-    change_terms_of_membership(new_tom_id, message, operation_type, agent, api_required)
+    change_terms_of_membership(new_tom_id, message, Settings.operation_types.save_the_sale, agent)
   end
 
   def downgrade_member
