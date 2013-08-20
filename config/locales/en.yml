@@ -348,6 +348,7 @@ en:
           description: 'Description (optional)'
           description_help: "help"
           step_1_button_next: 'Define Membership Terms'
+          step_1_edit_button_next: 'Edit Membership Terms'
           # Step 2
           step_2_instructions: '<STEP_2_INSTRUCTIONS_HERE>'
           initial_fee: 'Initial Fee'
@@ -364,6 +365,7 @@ en:
           keep_active_until_manually_cancelled: 'Keep active until manually cancelled'
           cancel_member_after: 'Cancel member after'
           step_2_button_next: 'Define Upgrades / Downgrades'
+          step_2_edit_button_next: 'Edit Upgrades / Downgrades'
           # Step 3
           step_3_instructions: 'Configure whether you want to automatically upgrade or downgrade the memberships through this plan. These steps are optional'
           if_cannot_bill_member_then: 'If we cannot bill a member then'
@@ -373,6 +375,7 @@ en:
           upgrade_to: 'Upgrade to (optional)'
           after: 'after'
           step_3_button_next: 'Create Plan'
+          step_3_edit_button_next: 'Update Plan'
       email_template:
         name: 'Name'
         type: 'Type'
