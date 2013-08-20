@@ -25,6 +25,13 @@ class TermsOfMembershipsController < ApplicationController
 
   def edit
     @tom = TermsOfMembership.find(params[:id])
+    memberships_with_this_tom = Membership.where(:terms_of_membership_id => @tom.id).count
+    prospects_with_this_tom = Prospect.where(:terms_of_membership_id => @tom.id).count
+    Rails.logger.info memberships_with_this_tom + prospects_with_this_tom
+    if memberships_with_this_tom + prospects_with_this_tom > 0
+      flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
+      redirect_to terms_of_memberships_url
+    end
   end
 
   def update
@@ -33,7 +40,7 @@ class TermsOfMembershipsController < ApplicationController
     if @tom.save
       redirect_to terms_of_memberships_url, :notice => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
     else
-      render action: "edit"
+      redirect_to terms_of_memberships_url, :error => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was not updated"
     end
   end
 
