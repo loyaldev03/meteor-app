@@ -8,7 +8,6 @@ SacPlatform::Application.routes.draw do
       resources :members, :only => [:create, :show, :update] do
         resources :club_cash_transaction, only: [:create]
         resources :operation, only: [:create]
-        match 'terms_of_membership_change' => 'terms_of_memberships#change', as: 'change', :via => [:post]
       end
       match 'members/:id/profile' => 'members#show', as: 'show', :via => [:post]
       match 'members/:id/next_bill_date' => 'members#next_bill_date', as: 'next_bill_date', :via => [:put]
@@ -16,6 +15,7 @@ SacPlatform::Application.routes.draw do
       match 'members/find_all_by_created/:club_id/:start_date/:end_date' => 'members#find_all_by_created', as: 'find_all_by_created', :via => [:post]
       match 'members/:id/club_cash' => 'members#club_cash', as: 'club_cash', :via => [:put]
       match 'members/:id/cancel' => 'members#cancel', as: 'cancel', :via => [:put]
+      match 'members/:id/change_terms_of_membership' => 'members#change_terms_of_membership', as: 'change_terms_of_membership', :via => [:post]
       match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get, :post]
       match '/products/get_list_of_stock' => 'products#get_list_of_stock', as: 'get_list_of_stock', :via => [:get, :post]
       resources :prospects, :only => [:create]
