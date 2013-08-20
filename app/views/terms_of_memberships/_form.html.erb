@@ -221,14 +221,26 @@
     var buttonText = 'NOT_SET';
     switch(currentStep) {
       case "first":
-        buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_1_button_next') %>';
+        <% if controller.action_name == 'new' %>
+          buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_1_button_next') %>';
+        <% else %>
+          buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_1_edit_button_next') %>';
+        <% end %>
         break;
       case "second":
-        buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_2_button_next') %>';
+        <% if controller.action_name == 'new' %>
+          buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_2_button_next') %>';
+        <% else %>
+          buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_2_edit_button_next') %>';
+        <% end %>
         break;
       case "third":
         isSubmitButton = true;
-        buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_3_button_next') %>';
+        <% if controller.action_name == 'new' %>
+          buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_3_button_next') %>';
+        <% else %>
+          buttonText = '<%= t('activerecord.attributes.terms_of_membership.wizard.step_3_edit_button_next') %>';
+        <% end %>
         break;
     }
     if(isSubmitButton) {
