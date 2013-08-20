@@ -410,7 +410,7 @@ class Member < ActiveRecord::Base
 
   ###############################################
 
-  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil, api_required = false)
+  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil)
     if can_change_tom?
       new_tom = TermsOfMembership.find new_tom_id
       if new_tom.club_id == self.club_id
