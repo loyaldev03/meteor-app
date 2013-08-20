@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>
-  Class: Api::TokensController
+  Class: Api::TermsOfMembershipsController
   
     &mdash; Api Documentation
   
@@ -295,13 +295,13 @@
 		<div class="service">
   <h1 class="noborder title">Api Documentation</h1>
     <a class="back" href="../index.html" title="back to the overview">&laquo; back to overview</a>
-    <h2>Tokens</h2>
+    <h2>TermsOfMemberships</h2>
     
   <div id="Services" class="method_details_list">
     
 		<div class="method">
-			<p class="method_desc">Generate token.</p>
-			<h3 class="resource_url"><strong>/api/v1/tokens</strong> [POST]</h3>
+			<p class="method_desc">Change actual terms of membership related to a member.</p>
+			<h3 class="resource_url"><strong>/api/v1/members/:member_id/terms_of_membership_change</strong> [POST]</h3>
 
 			<div class="parameters">	
 				
@@ -310,17 +310,17 @@
 						
 							<ul>
 								<li>
-									<span class="name">email</span>
-									<span class="type">String</span>
-									<span class="text"></span>
+									<span class="name">member_id</span>
+									<span class="type">Integer</span>
+									<span class="text">Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
 								</li>
 							</ul>
 						
 							<ul>
 								<li>
-									<span class="name">password</span>
-									<span class="type">String</span>
-									<span class="text"></span>
+									<span class="name">terms_of_membership_id</span>
+									<span class="type">Integer</span>
+									<span class="text">New Terms of membership's ID to set on members.</span>
 								</li>
 							</ul>
 						
@@ -336,14 +336,6 @@
 					
 						<ul>
 							<li>
-								<span class="name">status</span>
-								<span class="type">Integer</span>
-								<span class="text">Code related to the method result.</span>
-							</li>
-						</ul>
-					
-						<ul>
-							<li>
 								<span class="name">message</span>
 								<span class="type">String</span>
 								<span class="text">Shows the method results and also informs the errors.</span>
@@ -352,162 +344,55 @@
 					
 						<ul>
 							<li>
-								<span class="name">token</span>
+								<span class="name">code</span>
 								<span class="type">String</span>
-								<span class="text">authentication token.</span>
-							</li>
-						</ul>
-					
-						<ul>
-							<li>
-								<span class="name">location</span>
-								<span class="type">String</span>
-								<span class="text"></span>
-							</li>
-						</ul>
-					
-				</div>
-			
-			
-			
-				<div class="examples">
-					<h4>Examples</h4>
-					
-						<div class="example">
-							
-							
-							
-							<span class="description">
-								
-									
-										Example with curl.
-									
-								
-							</span>
-							<span class="hash request">
-								<strong class="type">Request</strong>
-								
-									
-										curl -v -k -X POST -d "email=testmail@gmail.com&password=testpassword" https://dev.stoneacrehq.com:3000/api/v1/tokens
-									
-								
-							</span>
-							<span class="hash response">
-								<strong class="type">Response</strong>
-								
-									
-										{"token":"G6qq3KzWQVi9zgfFVXud"}
-									
-								
-							</span>
-							<span class="description">
-								
-									
-										Example response to valid request
-									
-								
-							</span>
-						</div>
-					
-				</div>
-			
-		</div>	
-    
-		<div class="method">
-			<p class="method_desc">Destroy token</p>
-			<h3 class="resource_url"><strong>/api/v1/tokens/:id</strong> [PUT]</h3>
-
-			<div class="parameters">	
-				
-					<div class="required">
-						<h4>Required Parameters</h4>
-						
-							<ul>
-								<li>
-									<span class="name">id</span>
-									<span class="type">String</span>
-									<span class="text">Token to destroy. Have in mind this is part of the url.</span>
-								</li>
-							</ul>
-						
-					</div>
-				
-
-				
-			</div><!-- parameters -->
-			
-			
-				<div class="response_fields">
-					<h4>Response Fields</h4>
-					
-						<ul>
-							<li>
-								<span class="name">status</span>
-								<span class="type">Integer</span>
 								<span class="text">Code related to the method result.</span>
 							</li>
 						</ul>
 					
 						<ul>
 							<li>
-								<span class="name">message</span>
-								<span class="type">String</span>
-								<span class="text">Shows the method results and also informs the errors.</span>
+								<span class="name">member_id</span>
+								<span class="type">Integer</span>
+								<span class="text">Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.</span>
 							</li>
 						</ul>
 					
 						<ul>
 							<li>
-								<span class="name">token</span>
+								<span class="name">errors</span>
+								<span class="type">Hash</span>
+								<span class="text">A hash with members and credit card errors.
+<ul>
+  <li> <strong>key</strong> member's field name with error. (Eg: first_name, last_name, etc.). In the particular case that one or more of credit_card's field are wrong, the key will be "credit_card", and the value will be a hash that follows the same logic as this error hash. (Eg: "credit_card":{"number":["is required"],"expire_month":["is required"],"expire_year":["is required"]})  </li>
+  <li> <strong>value</strong> Array of strings with errors. (Eg: ["can't be blank","is invalid"]). </li>
+</ul></span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">autologin_url</span>
 								<span class="type">String</span>
-								<span class="text">authentication token.</span>
+								<span class="text">Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account. This value wll be returned as blank in case the club is not related to drupal.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">status</span>
+								<span class="type">String</span>
+								<span class="text">Member's membership status after enrolling. There are two possibles status when the member is enrolled:
+<ul>
+  <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
+  <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
+</ul></span>
 							</li>
 						</ul>
 					
 				</div>
 			
 			
-			
-				<div class="examples">
-					<h4>Examples</h4>
-					
-						<div class="example">
-							
-							
-							
-							<span class="description">
-								
-									
-										Example with curl. We are passing in this example an empty body, just to make it work. (-d "")
-									
-								
-							</span>
-							<span class="hash request">
-								<strong class="type">Request</strong>
-								
-									
-										curl -X PUT -d "" https://dev.stoneacrehq.com:3000/api/v1/tokens/dodzJDdoaYZ1XNrn7axF
-									
-								
-							</span>
-							<span class="hash response">
-								<strong class="type">Response</strong>
-								
-									
-										{"token":"G6qq3KzWQVi9zgfFVXud"}
-									
-								
-							</span>
-							<span class="description">
-								
-									
-										Example response to a valid request.
-									
-								
-							</span>
-						</div>
-					
-				</div>
 			
 		</div>	
     

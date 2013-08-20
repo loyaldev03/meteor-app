@@ -8,6 +8,7 @@ SacPlatform::Application.routes.draw do
       resources :members, :only => [:create, :show, :update] do
         resources :club_cash_transaction, only: [:create]
         resources :operation, only: [:create]
+        match 'terms_of_membership_change' => 'terms_of_memberships#change', as: 'change', :via => [:post]
       end
       match 'members/:id/profile' => 'members#show', as: 'show', :via => [:post]
       match 'members/:id/next_bill_date' => 'members#next_bill_date', as: 'next_bill_date', :via => [:put]

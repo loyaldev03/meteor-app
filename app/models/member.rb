@@ -410,7 +410,7 @@ class Member < ActiveRecord::Base
 
   ###############################################
 
-  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil)
+  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil, api_required = false)
     if can_change_tom?
       new_tom = TermsOfMembership.find new_tom_id
       if new_tom.club_id == self.club_id
@@ -435,9 +435,10 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def save_the_sale(new_tom_id, agent = nil)
+  def save_the_sale(new_tom_id, agent = nil, api_required = false)
     message = "Save the sale from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
-    change_terms_of_membership(new_tom_id, message, Settings.operation_types.save_the_sale, agent)
+    operation_type = api_required ? Settings.operation_types.save_the_sale_through_api : Settings.operation_types.save_the_sale
+    change_terms_of_membership(new_tom_id, message, operation_type, agent, api_required)
   end
 
   def downgrade_member
