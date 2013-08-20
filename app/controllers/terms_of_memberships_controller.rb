@@ -63,17 +63,16 @@ class TermsOfMembershipsController < ApplicationController
       @tom.name = post_data[:terms_of_membership][:name]
       @tom.api_role = post_data[:terms_of_membership][:api_role]
       @tom.description = post_data[:terms_of_membership][:description]
-      # Step 2
+      # Step 2      
       @tom.initial_fee = post_data[:initial_fee_amount]
       @tom.trial_period_amount = post_data[:trial_period_amount]
       @tom.provisional_days = post_data[:trial_period_lasting_time_span] == 'months' ? months_to_days(post_data[:trial_period_lasting].to_i) : post_data[:trial_period_lasting].to_i
+      @tom.installment_amount = nil
+      @tom.installment_period = nil
       @tom.is_payment_expected = post_data[:is_payment_expected] == 'yes' ? 1 : 0
       if @tom.is_payment_expected == 1
         @tom.installment_amount = post_data[:installment_amount]
         @tom.installment_period = post_data[:installment_amount_days_time_span] == 'months' ? months_to_days(post_data[:installment_amount_days].to_i) : post_data[:installment_amount_days].to_i
-      else
-        @tom.installment_amount = nil
-        @tom.installment_period = nil
       end
       @tom.suscription_limits = 
         if post_data[:suscription_terms] == 'until_cancelled'
@@ -82,6 +81,9 @@ class TermsOfMembershipsController < ApplicationController
           post_data[:suscription_terms_stop_billing_after_time_span] == 'months' ? months_to_days(post_data[:suscription_terms_stop_billing_after].to_i) : post_data[:suscription_terms_stop_billing_after].to_i
         end
       # Step 3
+      @tom.downgrade_tom_id = nil
+      @tom.upgrade_tom_id = nil
+      @tom.upgrade_tom_period = nil
       case post_data[:if_cannot_bill_member]
       when 'cancel'
         @tom.if_cannot_bill = 'cancel'
