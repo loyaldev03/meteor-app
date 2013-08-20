@@ -38,14 +38,14 @@ class Api::OperationController < ApplicationController
       :description => params[:description], 
       :operation_type => params[:operation_type]
     )
-    o.created_by_id = (@current_agent.nil? ? nil : @current_agent.id)
+    o.created_by_id = @current_agent.id
     o.member = member
     o.save!
       
     render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
   rescue ActiveRecord::RecordNotFound => e
     Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
-		render json: { :message => "Operation was not created. Errors: Member not found.", :code => Settings.error_codes.operation_not_saved}
+		render json: { :message => "Operation was not created. Errors: Member not found", :code => Settings.error_codes.not_found}
   rescue Exception => e
     Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
 		render json: { :message => "Operation was not created. Errors: #{e}", :code => Settings.error_codes.operation_not_saved}
