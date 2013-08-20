@@ -58,7 +58,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM Initial Fee greater than 0'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		fill_in 'initial_fee_amount', :with => '1'
@@ -69,9 +69,9 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Define Upgrades / Downgrades'
 		sleep 3
 	  choose('if_cannot_bill_member_cancel')
+	  sleep 3
 		click_link_or_button 'Create Plan'
-		sleep 3
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -79,7 +79,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM Initial Fee equal to 0'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
@@ -90,8 +90,9 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Define Upgrades / Downgrades'
 		sleep 3
 	  choose('if_cannot_bill_member_cancel')
+	  sleep 3
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -99,7 +100,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM Trial Period in Days'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
@@ -113,15 +114,14 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
-		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+		assert page.has_content?('was created succesfully') # TOM was created
 	end
 
 	test "Create subcription plan with Free Trial Period in Months" do
 		tom_name = 'TOM Trial Period in Months'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
@@ -132,10 +132,9 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'installment_amount_days', :with => '0'
 		click_link_or_button 'Define Upgrades / Downgrades'
 		sleep 3
-		sleep 1
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -143,7 +142,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM with Paid Trial Period in Days'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
@@ -156,7 +155,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -164,7 +163,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM with Paid Trial Period in Months'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
@@ -177,7 +176,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -185,7 +184,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM with Recurring Amount in Months'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		choose('is_payment_expected_yes')
@@ -199,7 +198,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -207,7 +206,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM with Recurring Amount in Years'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		choose('is_payment_expected_yes')
@@ -221,7 +220,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -229,7 +228,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM with No payment expected'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		fill_in 'initial_fee_amount', :with => '0'
@@ -240,7 +239,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -248,7 +247,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM with with Stop billing after Months'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		choose('is_payment_expected_yes')
@@ -264,7 +263,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -272,7 +271,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM with with Stop billing after Days'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		choose('is_payment_expected_yes')
@@ -288,7 +287,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sleep 3
 		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -298,7 +297,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM To Create the Member'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		fill_in 'initial_fee_amount', :with => '1'
@@ -310,7 +309,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sleep 3
 	  choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 		# Then, create the member
 		the_tom = TermsOfMembership.last
@@ -323,7 +322,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM with Suspend Days'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		choose('is_payment_expected_yes')
@@ -339,7 +338,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'if_cannot_bill_member_suspend_for', :with => '30'
 		select('Day(s)', :from => 'if_cannot_bill_member_suspend_for_time_span')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -347,7 +346,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM with Suspend Months'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		choose('is_payment_expected_yes')
 		sleep 3
@@ -363,7 +362,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in 'if_cannot_bill_member_suspend_for', :with => '1'
 		select('Month(s)', :from => 'if_cannot_bill_member_suspend_for_time_span')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
@@ -372,7 +371,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM with Downgrade To'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
-		fill_in 'terms_of_membership_name', :with => tom_name
+		fill_in 'terms_of_membership[name]', :with => tom_name
 		click_link_or_button 'Define Membership Terms'
 		sleep 3
 		choose('is_payment_expected_yes')
@@ -387,7 +386,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		choose('if_cannot_bill_member_downgrade_to')
 		select(tom_to_downgrade.name, :from => 'downgrade_to_tom')
 		click_link_or_button 'Create Plan'
-		assert page.has_content?('was created Succesfully') # TOM was created
+		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
