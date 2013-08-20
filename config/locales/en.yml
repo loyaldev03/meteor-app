@@ -338,7 +338,8 @@ en:
         trial_period: 'Trial period'
         installment_period: 'Installment period'
         wizard:
-          title: 'New Suscription Plan'
+          title_new: 'New Suscription Plan'
+          title_edit: 'Edit Suscription Plan'
           cancel_button_caption: 'Do you really want to leave this page? All your changes will be lost.'
           # Step 1
           step_1_instructions: '<STEP_1_INSTRUCTIONS_HERE>'
