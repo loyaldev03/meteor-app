@@ -1,12 +1,12 @@
 module TermsOfMembershipsHelper
-	def select_for_date_span(select_name, selected_iten = nil)
-		dates_span = [['Day(s)', 'days'], ['Month(s)', 'months']]
-		select_tag select_name, options_for_select(dates_span), :class => 'input-small'
+	def select_for_date_span(select_name, selected_item = nil)
+		dates_span = options_for_select([['Day(s)', 'days'], ['Month(s)', 'months']], selected_item)
+		select_tag select_name, dates_span, :class => 'input-small', :selected => selected_item
 	end
 
-	def select_for_toms(select_name, selected_iten = nil)
+	def select_for_toms(select_name, selected_item = nil)
 		toms = TermsOfMembership.where(:club_id => @current_club.id)
-		select_tag select_name, options_from_collection_for_select(toms, "id", "name"), :include_blank => true
+		select_tag select_name, options_from_collection_for_select(toms, "id", "name", selected_item), :include_blank => true
 	end
 
 	def wizard_steps_indicator(current_step)
