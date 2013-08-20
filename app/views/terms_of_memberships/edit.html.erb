@@ -1,5 +1,5 @@
 <%- model_class = @tom.class -%>
-<h1><%=t '.title', :default => t('activerecord.attributes.terms_of_membership.wizard.title') %></h1>
+<h1><%=t '.title', :default => t('activerecord.attributes.terms_of_membership.wizard.title_edit') %></h1>
 <%= form_for @tom, :html => { :id => 'tom_wizard_form', :class => 'form-horizontal bbq' } do |f| %>
 	<%= render :partial => 'form', :locals => { :f => f } %>
 <% end %>
