@@ -1605,7 +1605,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
-    assert_equal @saved_member.operations.where(description: "Save the sale from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.save_the_sale_through_api
+    assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.save_the_sale_through_api
+    require "ruby-debug"
+    debugger
   end
 
   test "Do not allow change TOM throught API to same TOM - active member" do
@@ -1623,7 +1625,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
-    assert_equal @saved_member.operations.where(description: "Save the sale from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.save_the_sale_through_api
+    assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.save_the_sale_through_api
   end
 
   test "Do not allow change TOM throught API to same TOM - provisional member" do

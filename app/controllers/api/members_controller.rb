@@ -526,7 +526,7 @@ class Api::MembersController < ApplicationController
     tom = TermsOfMembership.find(params[:terms_of_membership_id])
     member = Member.find(params[:id])
     my_authorize! :api_change, TermsOfMembership, tom.club_id
-    render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Save the sale from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.save_the_sale_through_api, @current_agent)
+    render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.save_the_sale_through_api, @current_agent)
   rescue ActiveRecord::RecordNotFound => e 
     if e.to_s.include? "TermsOfMembership"
       message = "Terms of membership not found"
