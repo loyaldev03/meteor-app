@@ -763,7 +763,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		select('Month(s)', :from => 'installment_amount_days_time_span')
 		choose('suscription_terms_stop_cancel_after')
 		fill_in 'suscription_terms_stop_billing_after', :with => '1'
-		select('Months(s)', :from => 'suscription_terms_stop_billing_after_time_span')
+		select('Month(s)', :from => 'suscription_terms_stop_billing_after_time_span')
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		sleep 3
 		choose('if_cannot_bill_member_suspend')
