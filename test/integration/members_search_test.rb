@@ -230,13 +230,11 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_search
     click_on 'Search'
     
-    assert page.has_selector?(".pagination")
-    assert page.has_content?(Member.last.full_name)
-
     within("#members") do
       within("#th_member_id"){ click_on "Member ID" }
-      sleep 2
+      find("tr", :text => Member.first.full_name)
       within("#th_member_id"){ click_on "Member ID" }
+      find("tr", :text => Member.last.full_name)
     end
 
     within(".pagination") do
@@ -248,25 +246,32 @@ class MembersSearchTest < ActionController::IntegrationTest
     end
 
     within("#members")do
-      if page.has_content?(Member.where("club_id = ?", @club.id).order("id DESC").last.full_name)
+      begin 
+        find("tr", :text => Member.where("club_id = ?", @club.id).order("id DESC").last.full_name).nil?
+        assert false
+      rescue Capybara::ElementNotFound
         assert true
-      else
-        click_on("2")
-        if page.has_content?(Member.where("club_id = ?", @club.id).order("id DESC").last.full_name)
-          assert true
-        else
-          click_on("3")
-          if page.has_content?(Member.where("club_id = ?", @club.id).order("id DESC").last.full_name)
-            assert true
-          else
-            click_on("4")
-            if page.has_content?(Member.where("club_id = ?", @club.id).order("id DESC").last.full_name)
-              assert true
-            else
-              assert false, "The last member was not found"
-            end
-          end
-        end
+      end
+      click_on("2")
+      begin 
+        find("tr", :text => Member.where("club_id = ?", @club.id).order("id DESC").last.full_name).nil?
+        assert false
+      rescue Capybara::ElementNotFound
+        assert true
+      end
+      click_on("3")
+      begin 
+        find("tr", :text => Member.where("club_id = ?", @club.id).order("id DESC").last.full_name).nil?
+        assert false
+      rescue Capybara::ElementNotFound
+        assert true
+      end
+      click_on("4")
+      begin 
+        find("tr", :text => Member.where("club_id = ?", @club.id).order("id DESC").last.full_name).nil?
+        assert true
+      rescue Capybara::ElementNotFound
+        assert false, "The last member was not found"
       end
     end
   end
@@ -278,8 +283,9 @@ class MembersSearchTest < ActionController::IntegrationTest
     click_on 'Search'
 
     within("#members") do
+      find("tr", :text => Member.last.full_name)
       within("#th_member_id"){ click_on "Member ID" }
-      sleep 2
+      find("tr", :text => Member.first.full_name)
       within("#th_member_id"){ click_on "Member ID" }
     end
     
