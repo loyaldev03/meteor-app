@@ -233,6 +233,12 @@ class MembersSearchTest < ActionController::IntegrationTest
     assert page.has_selector?(".pagination")
     assert page.has_content?(Member.last.full_name)
 
+    within("#members") do
+      within("#th_member_id"){ click_on "Member ID" }
+      sleep 2
+      within("#th_member_id"){ click_on "Member ID" }
+    end
+
     within(".pagination") do
       assert page.has_content?("1")
       assert page.has_content?("2")
@@ -240,41 +246,42 @@ class MembersSearchTest < ActionController::IntegrationTest
       assert page.has_content?("4")      
       assert page.has_content?("Next")
     end
+
     within("#members")do
-        if page.has_content?(Member.first.full_name)
+      if page.has_content?(Member.where("club_id = ?", @club.id).order("id DESC").last.full_name)
+        assert true
+      else
+        click_on("2")
+        if page.has_content?(Member.where("club_id = ?", @club.id).order("id DESC").last.full_name)
           assert true
         else
-          click_on("2")
-          if page.has_content?(Member.first.full_name)
+          click_on("3")
+          if page.has_content?(Member.where("club_id = ?", @club.id).order("id DESC").last.full_name)
             assert true
           else
-            click_on("3")
-            if page.has_content?(Member.first.full_name)
+            click_on("4")
+            if page.has_content?(Member.where("club_id = ?", @club.id).order("id DESC").last.full_name)
               assert true
             else
-              click_on("4")
-              if page.has_content?(Member.first.full_name)
-                assert true
-              else
-                assert false, "The last member was not found"
-              end
+              assert false, "The last member was not found"
             end
           end
         end
+      end
     end
   end
 
   test "Organize Member results by Pagination" do
-    setup_member false
-    60.times do
-      create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
-      sleep 0.40
-    end
-    @search_member = Member.first
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_on 'Search'
+    setup_search
 
     member_list = Member.where("club_id = ?", @club.id).order("id DESC")
+    click_on 'Search'
+
+    within("#members") do
+      within("#th_member_id"){ click_on "Member ID" }
+      sleep 2
+      within("#th_member_id"){ click_on "Member ID" }
+    end
     
     within("#members")do
       find("tr", :text => member_list[24].full_name)
