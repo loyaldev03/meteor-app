@@ -95,6 +95,13 @@
         :content => t('lorem') } %> 
     </div>
   </div>
+
+  <div class="control-group">
+    <%= label_tag 'club_cash_amount', t('activerecord.attributes.terms_of_membership.wizard.club_cash_amount'), :class => 'control-label' %>
+    <div class="controls">
+      <%= text_field_tag 'club_cash_amount', @tom.club_cash_amount, :class => 'text_field input_medium', :type => 'number' %>
+    </div>
+  </div>
 </div>
 
 <% # Third step %>

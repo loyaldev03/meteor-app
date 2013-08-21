@@ -354,6 +354,7 @@ en:
           # Step 2
           step_2_instructions: '<STEP_2_INSTRUCTIONS_HERE>'
           initial_fee: 'Initial Fee'
+          initial_fee_amount: 'Initial Fee Amount'
           trial_period: 'Trial Period'
           lasting: 'lasting'
           at_the_end_of_trial: 'At the end of the Trial Period'
@@ -368,6 +369,7 @@ en:
           cancel_member_after: 'Cancel member after'
           step_2_button_next: 'Define Upgrades / Downgrades'
           step_2_edit_button_next: 'Edit Upgrades / Downgrades'
+          club_cash_amount: 'Club Cash Amount'
           # Step 3
           step_3_instructions: 'Configure whether you want to automatically upgrade or downgrade the memberships through this plan. These steps are optional'
           if_cannot_bill_member_then: 'If we cannot bill a member then'
