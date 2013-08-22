@@ -33,7 +33,7 @@ class TermsOfMembershipsController < ApplicationController
 
   def update
     @tom = TermsOfMembership.find(params[:id])
-    if !@tom.can_update_or_delete
+    if @tom.can_update_or_delete
       prepare_tom_data_to_save(params)
       if @tom.save
         flash[:notice] = "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
