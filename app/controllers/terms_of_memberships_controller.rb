@@ -25,10 +25,7 @@ class TermsOfMembershipsController < ApplicationController
 
   def edit
     @tom = TermsOfMembership.find(params[:id])
-    memberships_with_this_tom = Membership.where(:terms_of_membership_id => @tom.id).count
-    prospects_with_this_tom = Prospect.where(:terms_of_membership_id => @tom.id).count
-    Rails.logger.info memberships_with_this_tom + prospects_with_this_tom
-    if memberships_with_this_tom + prospects_with_this_tom > 0
+    if !@tom.can_update_or_delete
       flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
       redirect_to terms_of_memberships_url
     end
@@ -36,12 +33,17 @@ class TermsOfMembershipsController < ApplicationController
 
   def update
     @tom = TermsOfMembership.find(params[:id])
-    prepare_tom_data_to_save(params)
-    if @tom.save
-      redirect_to terms_of_memberships_url, :notice => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
+    if !@tom.can_update_or_delete
+      prepare_tom_data_to_save(params)
+      if @tom.save
+        flash[:notice] = "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
+      else
+        flash[:error] = "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was not updated"
+      end
     else
-      redirect_to terms_of_memberships_url, :error => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was not updated"
+      flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"      
     end
+    redirect_to terms_of_memberships_url
   end
 
   def destroy
@@ -82,7 +84,6 @@ class TermsOfMembershipsController < ApplicationController
         @tom.installment_period = post_data[:installment_amount_days_time_span] == 'months' ? months_to_days(post_data[:installment_amount_days].to_i) : post_data[:installment_amount_days].to_i
       end
       @tom.suscription_limits = post_data[:suscription_terms] == 'until_cancelled' ? 0 : (post_data[:suscription_terms_stop_billing_after_time_span] == 'months' ? months_to_days(post_data[:suscription_terms_stop_billing_after].to_i) : post_data[:suscription_terms_stop_billing_after].to_i)
-      @tom.club_cash_amount = post_data[:club_cash_amount]
       # Step 3
       @tom.downgrade_tom_id = nil
       @tom.upgrade_tom_id = nil

@@ -33,8 +33,8 @@ class TermsOfMembership < ActiveRecord::Base
 
   validate :validate_payment_gateway_configuration
 
-  before_destroy :verify_that_there_are_not_memberships_and_prospects
-  before_update :verify_that_there_are_not_memberships_and_prospects
+  before_destroy :can_update_or_delete
+  before_update :can_update_or_delete
 
   ###########################################
   # Installment types:
@@ -79,6 +79,10 @@ class TermsOfMembership < ActiveRecord::Base
     ['id', 'name', 'api_role', 'created_at', 'agent_id']
   end
 
+  def can_update_or_delete
+    self.memberships.count == 0 && self.prospects.count == 0
+  end
+
   private
 
     def validate_payment_gateway_configuration
@@ -99,9 +103,5 @@ class TermsOfMembership < ActiveRecord::Base
         end
       end
     end
-
-    def verify_that_there_are_not_memberships_and_prospects
-      self.memberships.count == 0 && self.prospects.count == 0
-    end
-
+    
 end
