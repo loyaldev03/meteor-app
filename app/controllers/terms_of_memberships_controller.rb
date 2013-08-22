@@ -25,7 +25,7 @@ class TermsOfMembershipsController < ApplicationController
 
   def edit
     @tom = TermsOfMembership.find(params[:id])
-    if !@tom.verify_that_there_are_not_memberships_and_prospects
+    if !@tom.can_update_or_delete
       flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
       redirect_to terms_of_memberships_url
     end
@@ -33,7 +33,7 @@ class TermsOfMembershipsController < ApplicationController
 
   def update
     @tom = TermsOfMembership.find(params[:id])
-    if !@tom.verify_that_there_are_not_memberships_and_prospects
+    if !@tom.can_update_or_delete
       prepare_tom_data_to_save(params)
       if @tom.save
         redirect_to terms_of_memberships_url, :notice => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
@@ -48,7 +48,7 @@ class TermsOfMembershipsController < ApplicationController
 
   def destroy
     @tom = TermsOfMembership.find(params[:id])
-    if !@tom.verify_that_there_are_not_memberships_and_prospects
+    if !@tom.can_update_or_delete
       if @tom.destroy
         flash[:notice] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
       else
