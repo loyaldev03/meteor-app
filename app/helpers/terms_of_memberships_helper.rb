@@ -20,8 +20,4 @@ module TermsOfMembershipsHelper
     html << '</h3>'
     html.html_safe
 	end
-
-	def get_api_role()
-		@current_club.is_not_drupal? ? '' + @tom.api_role : @tom.api_role
-	end
 end
