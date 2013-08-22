@@ -36,26 +36,22 @@ class TermsOfMembershipsController < ApplicationController
     if !@tom.can_update_or_delete
       prepare_tom_data_to_save(params)
       if @tom.save
-        redirect_to terms_of_memberships_url, :notice => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
+        flash[:notice] = "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
       else
-        redirect_to terms_of_memberships_url, :error => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was not updated"
+        flash[:error] = "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was not updated"
       end
     else
-      flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
-      redirect_to terms_of_memberships_url
+      flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"      
     end
+    redirect_to terms_of_memberships_url
   end
 
   def destroy
     @tom = TermsOfMembership.find(params[:id])
-    if !@tom.can_update_or_delete
-      if @tom.destroy
-        flash[:notice] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
-      else
-        flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) was not destroyed."
-      end
+    if @tom.destroy
+      flash[:notice] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
     else
-      flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) can not be deleted. It is being used"
+      flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) was not destroyed."
     end
     redirect_to terms_of_memberships_url
   end
