@@ -621,7 +621,7 @@ class Member < ActiveRecord::Base
     club = tom.club
 
     unless skip_product_validation
-      member_params[:product_sku].split(',').each do |sku|
+      member_params[:product_sku].to_s.split(',').each do |sku|
         product = Product.find_by_club_id_and_sku(club.id,sku)
         if product.nil?
           return { :message => I18n.t('error_messages.product_does_not_exists'), :code => Settings.error_codes.product_does_not_exists }
