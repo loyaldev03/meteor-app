@@ -189,16 +189,31 @@ namespace :fulfillments do
 
       Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
       package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
-        sheet.add_row [ 'Code','First Name', 'Last Name', 'Member Valid Thru', 'Member Since', 
+        sheet.add_row [ 'Code', 'First Name', 'Last Name', 
+                        'Member Valid Thru', 'Member Since', 
+
+                        'Membership Category', 'Type of Membership', 'Account',
+                        'Street1', 'Street2', 'City', 'State', 'Zip',
+
                        'Product Name', 'Product Sku' ]
         unless fulfillments.empty?
           fulfillments.each do |fulfillment|
             tz = Time.zone.now
             Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"  
             member = fulfillment.member
-            row = [ member.id.to_s, member.first_name, member.last_name,
+            row = [ member.id.to_s, 
+                    member.first_name, 
+                    member.last_name,
                     sanitize_date(member.next_retry_bill_date, :only_date_short),
                     sanitize_date(member.member_since_date, :only_date_short), 
+                    nfla_tom_mapping(membership.terms_of_membership.name),
+                    membership.terms_of_membership.name,
+                    'account',
+                    member.address,
+                    '',
+                    member.city,
+                    member.state,
+                    member.zip,
                     fulfillment.product.name,
                     fulfillment.product_sku                  
                   ]
@@ -234,6 +249,25 @@ namespace :fulfillments do
       return I18n.l(date, :format => format)
     else
       return ""
+    end
+  end
+
+  def nfla_tom_mapping(tom_name)
+    case tom_name
+    when 'Annual Player $100'
+      'Player'
+    when 'Annual Spouse $50'
+      'Spouse'
+    when 'Lifetime $3500'
+      'Lifetime'
+    when 'Complimentary Account'
+      'Complimentary'
+    when 'Annual Associate $150'
+      'Associate'
+    when 'Annual Professional $100'
+      'Professional'
+    when 'HOF Complimentary Account'
+      'HOF'
     end
   end
 end
