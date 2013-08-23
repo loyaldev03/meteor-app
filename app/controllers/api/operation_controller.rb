@@ -29,12 +29,28 @@ class Api::OperationController < ApplicationController
   #
 	def create
   	member = Member.find(params[:member_id])
-  	Auditory.audit(@current_agent, member, params[:description], member, params[:operation_type], params[:operation_date])
-		render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
-	rescue Exception => e
-    Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
-		render json: { :message => "Operation was not created. Errors: #{e}", :code => Settings.error_codes.operation_not_saved}
-	end
+    
+    o = Operation.new( 
+      :operation_date => params[:operation_date], 
+      :resource => member, 
+      :description => params[:description], 
+      :operation_type => params[:operation_type]
+    )
+    o.created_by_id = @current_agent.id
+    o.member = member
+
+    o.save!
+    render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
+    rescue ActiveRecord::RecordInvalid => e
+      Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
+      render json: { :message => "Operation was not created. Errors: #{e.message}", :code => Settings.error_codes.wrong_data}
+    rescue ActiveRecord::RecordNotFound => e
+      Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
+      render json: { :message => "Operation was not created. Errors: Member not found", :code => Settings.error_codes.not_found}
+    rescue Exception => e
+      Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
+      render json: { :message => "Operation was not created. Errors: #{e}", :code => Settings.error_codes.operation_not_saved}
+  end
 
   # TODO: Add a list of operation types: 
   # {include:file:config/application.yml}
