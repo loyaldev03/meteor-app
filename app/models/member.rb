@@ -934,7 +934,7 @@ class Member < ActiveRecord::Base
     self.blacklist nil, "Chargeback - "+args[:reason]
   end
 
-  def cancel!(cancel_date, message, current_agent = nil)
+  def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
     if not message.blank?
       if cancel_date.to_date >= Time.zone.now.to_date
         if self.cancel_date == cancel_date
@@ -944,7 +944,7 @@ class Member < ActiveRecord::Base
             cancel_date = cancel_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(self.club.time_zone).utc_offset)/(60*60)}")
             self.current_membership.update_attribute :cancel_date, cancel_date
             answer = { :message => "Member cancellation scheduled to #{cancel_date.to_date} - Reason: #{message}", :code => Settings.error_codes.success }
-            Auditory.audit(current_agent, self, answer[:message], self, Settings.operation_types.future_cancel)
+            Auditory.audit(current_agent, self, answer[:message], self, operation_type)
           else
             answer = { :message => "Member is not in cancelable status.", :code => Settings.error_codes.cancel_date_blank }
           end
@@ -1072,6 +1072,7 @@ class Member < ActiveRecord::Base
         tz = Time.zone.now
         begin
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
+          member.cancel!(Time.zone.now, "Billing date is overdue.", nil, Settings.operation_types.bill_overdue_cancel) if member.manual_payment and not member.cancel_date
           member.set_as_canceled!
         rescue Exception => e
           Auditory.report_issue("Members::Cancel", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })

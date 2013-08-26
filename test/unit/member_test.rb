@@ -396,4 +396,20 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal @saved_member.current_membership.status, @saved_member.status
     assert_equal @saved_member.current_membership.cancel_date, nil
   end
+
+  test "manual payment member should be canceled when its billing date is overdue" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @saved_member = create_active_member(@terms_of_membership, :provisional_member_with_cc)
+    @saved_member.manual_payment =true
+    @saved_member.bill_date = Time.zone.now-1.day
+    @saved_member.save
+
+    assert_difference("Operation.count",3) do
+      Member.cancel_all_member_up_today
+    end
+    @saved_member.reload
+    assert_equal @saved_member.status, "lapsed"
+    assert_equal I18n.l(@saved_member.cancel_date.utc, :format => :only_date), I18n.l(Time.zone.now.utc, :format => :only_date)
+    assert Operation.find_by_operation_type(Settings.operation_types.bill_overdue_cancel)
+  end 
 end
