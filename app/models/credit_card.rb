@@ -110,9 +110,12 @@ class CreditCard < ActiveRecord::Base
       self.cc_type = 'unknown'
       self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards
     else
+      # uncomment this line ONLY If #55804192 is approved
+      # self.errors[:number] << "is not a valid credit card number" if am.errors["number"].empty? and not am.errors["brand"].empty?
       self.errors[:number] << am.errors["number"].join(", ") unless am.errors["number"].empty?
       self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
       self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
+      self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards. #54934966
     end
     self.token
   end
@@ -147,11 +150,14 @@ class CreditCard < ActiveRecord::Base
     end
   end 
 
+  def get_offset_related
+    ((Time.zone.now.gmt_offset/3600)>=0 ? "+" : "-")+"%02d:00" % (Time.zone.now.gmt_offset/3600).abs
+  end
+
   def update_expire(year, month, current_agent = nil)
-    offset = ((Time.zone.now.gmt_offset/3600)>=0 ? "+" : "-")+"%02d:00" % (Time.zone.now.gmt_offset/3600)
     if year.to_i == expire_year.to_i and month.to_i == expire_month.to_i
       { :code => Settings.error_codes.success, :message => "New expiration date its identically than the one we have in database." }
-    elsif Time.new(year, month, nil, nil, nil, nil, offset) >= Time.zone.now.beginning_of_month
+    elsif Time.new(year, month, nil, nil, nil, nil, get_offset_related) >= Time.zone.now.beginning_of_month
       message = "Changed credit card XXXX-XXXX-XXXX-#{last_digits} from #{expire_month}/#{expire_year} to #{month}/#{year}"
       update_attributes(:expire_month => month, :expire_year => year)
       Auditory.audit(current_agent, self, message, self.member, Settings.operation_types.credit_card_updated)
