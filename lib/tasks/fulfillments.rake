@@ -98,7 +98,7 @@ namespace :fulfillments do
       end
       
       Time.zone = fulfillment_file.club.time_zone
-      
+
       fulfillments = Fulfillment.includes(:member).where( 
         ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
           AND ? and fulfillments.status = 'not_processed' 
@@ -108,17 +108,19 @@ namespace :fulfillments do
 
       Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
       CSV.open( temp_file, "w" ) do |csv|
-        csv << [ 'First Name', 'Last Name', 'Product Choice', 'address', 'city', 'state', 'zip', 'join date', 'phone number', 'Email' ]
+        csv << [ 'First Name', 'Last Name', 'Product Choice', 'address', 'city', 'state', 'zip', 'join date', 'phone number', 'Email', 'TOM' ]
         unless fulfillments.empty?
           fulfillments.each do |fulfillment|
             tz = Time.zone.now
             Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"       
             member = fulfillment.member
             membership = member.current_membership
+            tom = TermsOfMembership.find(membership.terms_of_membership_id)            
             csv << [member.first_name, member.last_name, fulfillment.product_sku, member.address, 
                     member.city, member.state, "#{member.zip}"  ,
                     sanitize_date(member.join_date, :only_date_short), 
-                    member.full_phone_number, member.email]
+                    member.full_phone_number, member.email,
+                    tom.name]
             fulfillment_file.fulfillments << fulfillment
             Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
           end
