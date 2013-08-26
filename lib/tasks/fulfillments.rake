@@ -182,9 +182,9 @@ namespace :fulfillments do
       toms = TermsOfMembership.where(:club_id => fulfillment_file.club)
       toms.each do |tom|
       
-        fulfillments = Fulfillment.includes(:member).where( 
+        fulfillments = Fulfillment.includes(:member => :memberships).where( 
           ["members.club_id = ? 
-            AND terms_of_membership_id = ? 
+            AND memberships.terms_of_membership_id = ?
             AND fulfillments.assigned_at BETWEEN ? 
             AND ? and fulfillments.status = 'not_processed' 
             AND fulfillments.product_sku != 'KIT-CARD'", 
@@ -192,21 +192,28 @@ namespace :fulfillments do
             tom.id,
             Time.zone.now-7.days, 
             Time.zone.now ])
+
         fulfillment_file.product = "SLOOPS"
         fulfillment_file.save!
 
         Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
-        package.workbook.add_worksheet(:name => nfla_tom_mapping(tom.name)) do |sheet|
-          sheet.add_row [ 'Code', 'First Name', 'Last Name', 
-                          'Member Valid Thru', 'Member Since', 
-                          'Membership Category', 'Type of Membership', 'Account',
+        package.workbook.add_worksheet(:name => tom.name) do |sheet|
+          sheet.add_row [ 'Code', 
+                          'First Name', 
+                          'Last Name', 
+                          'Member Valid Thru', 
+                          'Member Since', 
+                          'Membership Category', 
+                          'Type of Membership', 
+                          'Account',
                           'Street1', 'Street2', 'City', 'State', 'Zip',
-                         'Product Name', 'Product Sku' ]
+                          'Product Name', 'Product Sku' ]
           unless fulfillments.empty?
             fulfillments.each do |fulfillment|
               tz = Time.zone.now
               Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"  
               member = fulfillment.member
+              membership = member.current_membership
               row = [ member.id.to_s, 
                       member.first_name, 
                       member.last_name,
@@ -214,12 +221,8 @@ namespace :fulfillments do
                       sanitize_date(member.member_since_date, :only_date_short), 
                       nfla_tom_mapping(membership.terms_of_membership.name),
                       membership.terms_of_membership.name,
-                      '',
-                      member.address,
-                      '',
-                      member.city,
-                      member.state,
-                      member.zip,
+                      member.last_name + ' ' + member.first_name,
+                      member.address, '', member.city, member.state, member.zip,
                       fulfillment.product.name,
                       fulfillment.product_sku                  
                     ]
@@ -229,7 +232,6 @@ namespace :fulfillments do
             end
           end
         end
-
       end
 
       temp = Tempfile.new("nfla_kit-card_report.xlsx") 
@@ -257,25 +259,6 @@ namespace :fulfillments do
       return I18n.l(date, :format => format)
     else
       return ""
-    end
-  end
-
-  def nfla_tom_mapping(tom_name)
-    case tom_name
-    when 'Annual Player $100'
-      'Player'
-    when 'Annual Spouse $50'
-      'Spouse'
-    when 'Lifetime $3500'
-      'Lifetime'
-    when 'Complimentary Account'
-      'Complimentary'
-    when 'Annual Associate $150'
-      'Associate'
-    when 'Annual Professional $100'
-      'Professional'
-    when 'HOF Complimentary Account'
-      'HOF'
     end
   end
 end
