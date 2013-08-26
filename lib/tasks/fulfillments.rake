@@ -175,53 +175,61 @@ namespace :fulfillments do
       elsif Rails.env=='staging'
         fulfillment_file.club = Club.find 19
       end
-      
+
       Time.zone = fulfillment_file.club.time_zone
+
+      package = Axlsx::Package.new
+      toms = TermsOfMembership.where(:club_id => fulfillment_file.club)
+      toms.each do |tom|
       
-      fulfillments = Fulfillment.includes(:member).where( 
-        ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
-          AND ? and fulfillments.status = 'not_processed' 
-          AND fulfillments.product_sku != 'KIT-CARD'", fulfillment_file.club_id, 
-        Time.zone.now-7.days, Time.zone.now ])
-      fulfillment_file.product = "SLOOPS"
-      fulfillment_file.save!
-      package = Axlsx::Package.new                  
+        fulfillments = Fulfillment.includes(:member).where( 
+          ["members.club_id = ? 
+            AND terms_of_membership_id = ? 
+            AND fulfillments.assigned_at BETWEEN ? 
+            AND ? and fulfillments.status = 'not_processed' 
+            AND fulfillments.product_sku != 'KIT-CARD'", 
+            fulfillment_file.club_id, 
+            tom.id,
+            Time.zone.now-7.days, 
+            Time.zone.now ])
+        fulfillment_file.product = "SLOOPS"
+        fulfillment_file.save!
 
-      Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
-      package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
-        sheet.add_row [ 'Code', 'First Name', 'Last Name', 
-                        'Member Valid Thru', 'Member Since', 
-
-                        'Membership Category', 'Type of Membership', 'Account',
-                        'Street1', 'Street2', 'City', 'State', 'Zip',
-
-                       'Product Name', 'Product Sku' ]
-        unless fulfillments.empty?
-          fulfillments.each do |fulfillment|
-            tz = Time.zone.now
-            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"  
-            member = fulfillment.member
-            row = [ member.id.to_s, 
-                    member.first_name, 
-                    member.last_name,
-                    sanitize_date(member.next_retry_bill_date, :only_date_short),
-                    sanitize_date(member.member_since_date, :only_date_short), 
-                    nfla_tom_mapping(membership.terms_of_membership.name),
-                    membership.terms_of_membership.name,
-                    'account',
-                    member.address,
-                    '',
-                    member.city,
-                    member.state,
-                    member.zip,
-                    fulfillment.product.name,
-                    fulfillment.product_sku                  
-                  ]
-            sheet.add_row row 
-            fulfillment_file.fulfillments << fulfillment
-            Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
+        Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
+        package.workbook.add_worksheet(:name => nfla_tom_mapping(tom.name)) do |sheet|
+          sheet.add_row [ 'Code', 'First Name', 'Last Name', 
+                          'Member Valid Thru', 'Member Since', 
+                          'Membership Category', 'Type of Membership', 'Account',
+                          'Street1', 'Street2', 'City', 'State', 'Zip',
+                         'Product Name', 'Product Sku' ]
+          unless fulfillments.empty?
+            fulfillments.each do |fulfillment|
+              tz = Time.zone.now
+              Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"  
+              member = fulfillment.member
+              row = [ member.id.to_s, 
+                      member.first_name, 
+                      member.last_name,
+                      sanitize_date(member.next_retry_bill_date, :only_date_short),
+                      sanitize_date(member.member_since_date, :only_date_short), 
+                      nfla_tom_mapping(membership.terms_of_membership.name),
+                      membership.terms_of_membership.name,
+                      '',
+                      member.address,
+                      '',
+                      member.city,
+                      member.state,
+                      member.zip,
+                      fulfillment.product.name,
+                      fulfillment.product_sku                  
+                    ]
+              sheet.add_row row 
+              fulfillment_file.fulfillments << fulfillment
+              Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
+            end
           end
         end
+
       end
 
       temp = Tempfile.new("nfla_kit-card_report.xlsx") 
