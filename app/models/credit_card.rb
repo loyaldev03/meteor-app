@@ -110,9 +110,12 @@ class CreditCard < ActiveRecord::Base
       self.cc_type = 'unknown'
       self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards
     else
+      # uncomment this line ONLY If #55804192 is approved
+      # self.errors[:number] << "is not a valid credit card number" if am.errors["number"].empty? and not am.errors["brand"].empty?
       self.errors[:number] << am.errors["number"].join(", ") unless am.errors["number"].empty?
       self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
       self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
+      self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards. #54934966
     end
     self.token
   end
