@@ -219,7 +219,7 @@ namespace :fulfillments do
                       member.last_name,
                       sanitize_date(member.next_retry_bill_date, :only_date_short),
                       sanitize_date(member.member_since_date, :only_date_short), 
-                      nfla_tom_mapping(membership.terms_of_membership.name),
+                      'Professional',
                       membership.terms_of_membership.name,
                       member.last_name + ' ' + member.first_name,
                       member.address, '', member.city, member.state, member.zip,
