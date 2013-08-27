@@ -27,10 +27,14 @@ class Prospect < ActiveRecord::Base
   end
   handle_asynchronously :marketing_tool_sync
 
+  def skip_sync!
+    @skip_sync = true
+  end
+
   private 
 
     def after_marketing_tool_sync
-      marketing_tool_sync if self.allow_sync
+      marketing_tool_sync unless @skip_sync
     end
 
 
