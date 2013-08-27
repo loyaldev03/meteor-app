@@ -13,7 +13,8 @@ class Prospect < ActiveRecord::Base
    				  :ip_address, :referral_host, :referral_parameters, :cookie_value,:marketing_code, 
             :product_sku, :user_id, :landing_url, :mega_channel, :user_agent, :joint,
             :campaign_medium, :campaign_description, :campaign_medium_version , :terms_of_membership_id, 
-            :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description
+            :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description,
+            :allow_sync
 
   after_create :after_marketing_tool_sync
 
@@ -30,7 +31,7 @@ class Prospect < ActiveRecord::Base
   private 
 
     def after_marketing_tool_sync
-      marketing_tool_sync
+      marketing_tool_sync if allow_sync
     end
 
 
