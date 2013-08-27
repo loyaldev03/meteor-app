@@ -300,7 +300,9 @@ class MembersSearchTest < ActionController::IntegrationTest
 
 		within("#members")do
 		  within(".pagination"){ click_on("3") }
+      sleep 10
       find("tr", :text => member_list[59].full_name)
+      sleep 10
   	end
   end
 
