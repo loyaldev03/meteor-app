@@ -185,8 +185,9 @@ namespace :fulfillments do
         fulfillments = Fulfillment.includes(:member => :memberships).where( 
           ["members.club_id = ? 
             AND memberships.terms_of_membership_id = ?
-            AND fulfillments.assigned_at BETWEEN ? 
-            AND ? and fulfillments.status = 'not_processed' 
+            AND memberships.status = 'provisional' 
+            AND fulfillments.assigned_at BETWEEN ? AND ?
+            AND fulfillments.status = 'not_processed' 
             AND fulfillments.product_sku != 'KIT-CARD'", 
             fulfillment_file.club_id, 
             tom.id,
