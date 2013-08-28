@@ -67,7 +67,7 @@
     </div>
   </div>
 
-  <div class="control-group" id="recurring_amount_group">
+  <div class="control-group" style="<%= @tom.is_payment_expected == 0 ? 'display:none' : ''%>" id="recurring_amount_group">
     <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label' %>
     <div class="controls">
       $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>

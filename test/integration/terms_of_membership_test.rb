@@ -10,7 +10,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sign_in_as(@admin_agent)
 	end
 
-	def fill_in_form(options = {}, options_for_select = [], options_for_check = {})		
+	def fill_in_form(options = {}, options_for_select = {}, options_for_check = [])		
 		options_for_check.each do |value|
 			choose(value)
 		end
@@ -28,7 +28,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		find("label", :text => "Suscription Plan Name")
 		fill_in 'terms_of_membership[name]', :with => name if name
 		fill_in 'terms_of_membership[api_role]', :with => external_code if external_code
-		fill_in 'terms_of_membership[description]', :with => external_code if description
+		fill_in 'terms_of_membership[description]', :with => description if description
 	end
 
 	def fill_in_step_2(options = {}, options_for_select = [], options_for_check = {})
@@ -833,7 +833,8 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom.reload
 		assert_equal tom.club_cash_amount.to_i, club_cash_amount.to_i
 	end
-	# # DELETE
+
+	# # # DELETE
 
 	test "Delete unused TOM" do
 		27.times { the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id) }
