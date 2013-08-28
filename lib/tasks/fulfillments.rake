@@ -177,35 +177,58 @@ namespace :fulfillments do
       elsif Rails.env=='staging'
         fulfillment_file.club = Club.find 19
       end
-      
-      Time.zone = fulfillment_file.club.time_zone
-      
-      fulfillments = Fulfillment.includes(:member).where( 
-        ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
-          AND ? and fulfillments.status = 'not_processed' 
-          AND fulfillments.product_sku != 'KIT-CARD'", fulfillment_file.club_id, 
-        Time.zone.now-7.days, Time.zone.now ])
+
       fulfillment_file.product = "SLOOPS"
       fulfillment_file.save!
-      package = Axlsx::Package.new                  
 
-      Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
-      package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
-        sheet.add_row [ 'Code','First Name', 'Last Name', 'Member Valid Thru', 'Member Since', 
-                       'Product Name', 'Product Sku' ]
-        unless fulfillments.empty?
+      Time.zone = fulfillment_file.club.time_zone
+
+      package = Axlsx::Package.new
+
+      fulfillments = Fulfillment.includes(:member => :memberships).where( 
+          ["members.club_id = ? 
+            AND memberships.status != 'lapsed' 
+            AND fulfillments.assigned_at BETWEEN ? AND ? 
+            AND fulfillments.status = 'not_processed' 
+            AND fulfillments.product_sku != 'KIT-CARD'", 
+            fulfillment_file.club_id, 
+            Time.zone.now - 7.days, 
+            Time.zone.now]
+      )
+
+      toms = TermsOfMembership.where(:club_id => fulfillment_file.club)
+      toms.each do |tom|
+        Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
+        package.workbook.add_worksheet(:name => tom.name) do |sheet|
+          sheet.add_row [ 'Code', 
+                          'First Name', 
+                          'Last Name', 
+                          'Member Valid Thru', 
+                          'Member Since', 
+                          'Membership Category', 
+                          'Type of Membership', 
+                          'Account',
+                          'Street1', 'Street2', 'City', 'State', 'Zip',
+                          'Product Name', 'Product SKU' ]
           fulfillments.each do |fulfillment|
             tz = Time.zone.now
-            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"  
+            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
             member = fulfillment.member
-            row = [ member.id.to_s, member.first_name, member.last_name,
-                    sanitize_date(member.next_retry_bill_date, :only_date_short),
-                    sanitize_date(member.member_since_date, :only_date_short), 
-                    fulfillment.product.name,
-                    fulfillment.product_sku                  
-                  ]
-            sheet.add_row row 
-            fulfillment_file.fulfillments << fulfillment
+            membership = member.current_membership
+            if membership.terms_of_membership_id == tom.id 
+              row = [ member.id.to_s, 
+                      member.first_name, 
+                      member.last_name,
+                      sanitize_date(member.next_retry_bill_date, :only_date_short),
+                      sanitize_date(member.member_since_date, :only_date_short), 
+                      nfla_get_tom_category(membership.terms_of_membership.id),
+                      membership.terms_of_membership.name,
+                      member.last_name + ' ' + member.first_name,
+                      member.address, '', member.city, member.state, member.zip,
+                      fulfillment.product.name, fulfillment.product_sku ]
+              sheet.add_row row 
+              fulfillment_file.fulfillments << fulfillment
+            end
             Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
           end
         end
@@ -221,12 +244,32 @@ namespace :fulfillments do
 
       fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
       fulfillment_file.processed
+
     rescue Exception => e
       Auditory.report_issue("Fulfillments::NflaReport", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run task"        
     end  
+  end
+
+  def nfla_get_tom_category(tom_id)
+    # NFLA TOM Ids
+    # Annual Player $100 = 47
+    # Annual Spouse $50 = 48
+    # Lifetime $3500 = 49
+    # Complimentary Account = 50
+    # Annual Associate $150 = 51
+    # Annual Professional $100 = 52
+    # HOF Complimentary Account = 53
+    category = 
+      if [47, 49, 53].include? tom_id.to_i
+        'Professional'
+      elsif [48, 50, 51, 52].include? tom_id.to_i
+        'Associate'
+      else
+        ''
+      end
   end
   
   def sanitize_date(date, format)
