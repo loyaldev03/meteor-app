@@ -176,27 +176,26 @@ namespace :fulfillments do
         fulfillment_file.club = Club.find 19
       end
 
+      fulfillment_file.product = "SLOOPS"
+      fulfillment_file.save!
+
       Time.zone = fulfillment_file.club.time_zone
 
       package = Axlsx::Package.new
-      
-      toms = TermsOfMembership.where(:club_id => fulfillment_file.club)
-      toms.each do |tom|
-        fulfillments = Fulfillment.includes(:member => :memberships).where( 
+
+      fulfillments = Fulfillment.includes(:member => :memberships).where( 
           ["members.club_id = ? 
-            AND memberships.terms_of_membership_id = ?
-            AND memberships.status = 'provisional' 
-            AND fulfillments.assigned_at BETWEEN ? AND ?
+            AND memberships.status != 'lapsed' 
+            AND fulfillments.assigned_at BETWEEN ? AND ? 
             AND fulfillments.status = 'not_processed' 
             AND fulfillments.product_sku != 'KIT-CARD'", 
             fulfillment_file.club_id, 
-            tom.id,
-            Time.zone.now-7.days, 
-            Time.zone.now ])
+            Time.zone.now - 7.days, 
+            Time.zone.now]
+      )
 
-        fulfillment_file.product = "SLOOPS"
-        fulfillment_file.save!
-
+      toms = TermsOfMembership.where(:club_id => fulfillment_file.club)
+      toms.each do |tom|
         Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
         package.workbook.add_worksheet(:name => tom.name) do |sheet|
           sheet.add_row [ 'Code', 
@@ -211,21 +210,23 @@ namespace :fulfillments do
                           'Product Name', 'Product SKU' ]
           fulfillments.each do |fulfillment|
             tz = Time.zone.now
-            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"  
+            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
             member = fulfillment.member
             membership = member.current_membership
-            row = [ member.id.to_s, 
-                    member.first_name, 
-                    member.last_name,
-                    sanitize_date(member.next_retry_bill_date, :only_date_short),
-                    sanitize_date(member.member_since_date, :only_date_short), 
-                    nfla_get_tom_category(membership.terms_of_membership.id),
-                    membership.terms_of_membership.name,
-                    member.last_name + ' ' + member.first_name,
-                    member.address, '', member.city, member.state, member.zip,
-                    fulfillment.product.name, fulfillment.product_sku ]
-            sheet.add_row row 
-            fulfillment_file.fulfillments << fulfillment
+            if membership.terms_of_membership_id == tom.id 
+              row = [ member.id.to_s, 
+                      member.first_name, 
+                      member.last_name,
+                      sanitize_date(member.next_retry_bill_date, :only_date_short),
+                      sanitize_date(member.member_since_date, :only_date_short), 
+                      nfla_get_tom_category(membership.terms_of_membership.id),
+                      membership.terms_of_membership.name,
+                      member.last_name + ' ' + member.first_name,
+                      member.address, '', member.city, member.state, member.zip,
+                      fulfillment.product.name, fulfillment.product_sku ]
+              sheet.add_row row 
+              fulfillment_file.fulfillments << fulfillment
+            end
             Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
           end
         end
