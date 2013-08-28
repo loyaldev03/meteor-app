@@ -253,7 +253,6 @@ namespace :fulfillments do
 
   def nfla_get_tom_category(tom_id)
     if Rails.env == 'prototype'
-      category = 
       if [111, 113, 115].include? tom_id.to_i
         'Professional'
       elsif [116, 117, 112].include? tom_id.to_i
@@ -270,7 +269,6 @@ namespace :fulfillments do
       # Annual Associate $150 = 51
       # Annual Professional $100 = 52
       # HOF Complimentary Account = 53
-      category = 
       if [47, 49, 53].include? tom_id.to_i
         'Professional'
       elsif [48, 50, 51, 52].include? tom_id.to_i
@@ -278,6 +276,8 @@ namespace :fulfillments do
       else
         ''
       end
+    else
+      ''
     end
   end
   
