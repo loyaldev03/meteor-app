@@ -57,7 +57,7 @@ class Communication < ActiveRecord::Base
       Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
     end
   end  
-  handle_asynchronously :deliver_exact_target
+  handle_asynchronously :deliver_exact_target, :queue => :generic_queue
 
   def deliver_lyris
     lyris = LyrisService.new
@@ -82,7 +82,7 @@ class Communication < ActiveRecord::Base
       :current_membership => member.current_membership.inspect, :communication => self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
-  handle_asynchronously :deliver_lyris
+  handle_asynchronously :deliver_lyris, :queue => :generic_queue
 
 
   def deliver_action_mailer
@@ -120,6 +120,6 @@ class Communication < ActiveRecord::Base
     Auditory.report_issue("Communication deliver_action_mailer", e, { :member => member.inspect, :communication => self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
-  handle_asynchronously :deliver_action_mailer
+  handle_asynchronously :deliver_action_mailer, :queue => :generic_queue
 
 end

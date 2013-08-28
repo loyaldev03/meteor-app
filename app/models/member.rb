@@ -196,7 +196,7 @@ class Member < ActiveRecord::Base
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
     Notifier.active_with_approval(emails,self).deliver!
   end
-  handle_asynchronously :send_active_needs_approval_email_dj
+  handle_asynchronously :send_active_needs_approval_email_dj, :queue => :generic_queue
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_recover_needs_approval_email
@@ -207,7 +207,7 @@ class Member < ActiveRecord::Base
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
     Notifier.recover_with_approval(emails,self).deliver!
   end
-  handle_asynchronously :send_recover_needs_approval_email_dj
+  handle_asynchronously :send_recover_needs_approval_email_dj, :queue => :generic_queue
 
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
   def increment_reactivations
@@ -1340,24 +1340,24 @@ class Member < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :desnormalize_preferences
+  handle_asynchronously :desnormalize_preferences, :queue => :generic_queue
 
   def marketing_tool_sync
     self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
   end
-  handle_asynchronously :marketing_tool_sync
+  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync
 
   # used for member blacklist
   def marketing_tool_sync_unsubscription
     exact_target_member.unsubscribe! if defined?(SacExactTarget::MemberModel)
   end
-  handle_asynchronously :marketing_tool_sync_unsubscription
+  handle_asynchronously :marketing_tool_sync_unsubscription, :queue => :exact_target_sync
 
   # used for member unblacklist
   def marketing_tool_sync_subscription
     exact_target_member.subscribe! if defined?(SacExactTarget::MemberModel)
   end
-  handle_asynchronously :marketing_tool_sync_subscription
+  handle_asynchronously :marketing_tool_sync_subscription, :queue => :exact_target_sync
 
   private
     def schedule_renewal(manual = false)
