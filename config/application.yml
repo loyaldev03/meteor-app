@@ -89,6 +89,8 @@ defaults: &defaults
     operation_updated: 237
     note_added: 238
     remote_club_cash_transaction: 239
+    remote_club_cash_transaction_successful: 2391
+    remote_club_cash_transaction_failed: 2392
     downgrade_member: 240
     unblacklisted: 241
     member_manually_synced_to_exact_target: 242
