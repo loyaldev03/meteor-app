@@ -855,13 +855,15 @@ class Member < ActiveRecord::Base
         elsif not api_id.nil?
           Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
           message = last_sync_error || "Club cash processed at drupal correctly."
+          auditory_code = Settings.operation_types.remote_club_cash_transaction_failed
           if self.last_sync_error.nil?
+            auditory_code = Settings.operation_types.remote_club_cash_transaction
             answer = { :message => message, :code => Settings.error_codes.success }
           else
             answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
           end
           answer[:message] = I18n.t('error_messages.drupal_error_sync') if message.blank?
-          Auditory.audit(agent, self, answer[:message], self, Settings.operation_types.remote_club_cash_transaction)
+          Auditory.audit(agent, self, answer[:message], self, auditory_code)
         end
       rescue Exception => e
         answer[:errors] = cct.errors_merged(self) unless cct.nil?
