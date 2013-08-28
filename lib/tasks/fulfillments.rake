@@ -252,15 +252,25 @@ namespace :fulfillments do
   end
 
   def nfla_get_tom_category(tom_id)
-    # NFLA TOM Ids
-    # Annual Player $100 = 47
-    # Annual Spouse $50 = 48
-    # Lifetime $3500 = 49
-    # Complimentary Account = 50
-    # Annual Associate $150 = 51
-    # Annual Professional $100 = 52
-    # HOF Complimentary Account = 53
-    category = 
+    if Rails.env == 'prototype'
+      category = 
+      if [111, 113, 115].include? tom_id.to_i
+        'Professional'
+      elsif [116, 117, 112].include? tom_id.to_i
+        'Associate'
+      else
+        ''
+      end
+    elsif Rails.env == 'production'
+      # NFLA TOM Ids
+      # Annual Player $100 = 47
+      # Annual Spouse $50 = 48
+      # Lifetime $3500 = 49
+      # Complimentary Account = 50
+      # Annual Associate $150 = 51
+      # Annual Professional $100 = 52
+      # HOF Complimentary Account = 53
+      category = 
       if [47, 49, 53].include? tom_id.to_i
         'Professional'
       elsif [48, 50, 51, 52].include? tom_id.to_i
@@ -268,6 +278,7 @@ namespace :fulfillments do
       else
         ''
       end
+    end
   end
   
   def sanitize_date(date, format)
