@@ -9,8 +9,7 @@ namespace :clubs do
     begin
       clubs = Club.all
       clubs.map do |club|
-        club.members_count = club.members.count + 0
-        club.save!
+        club.update_attribute(:members_count, club.members.count + 0)
       end
     ensure 
       Rails.logger.info "It all took #{Time.zone.now - tall} to run clubs:count_members_in_clubs task"
