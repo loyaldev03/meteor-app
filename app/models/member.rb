@@ -936,7 +936,7 @@ class Member < ActiveRecord::Base
     self.blacklist nil, "Chargeback - "+args[:reason]
   end
 
-  def cancel!(cancel_date, message, current_agent = nil)
+  def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
     if not message.blank?
       if cancel_date.to_date >= Time.zone.now.in_time_zone(self.club.time_zone).to_date
         if self.cancel_date == cancel_date
@@ -946,7 +946,7 @@ class Member < ActiveRecord::Base
             cancel_date = cancel_date.to_datetime.change(:offset => (( Time.zone.now.in_time_zone(self.club.time_zone).gmt_offset/3600 >= 0 ? "+" : "-")+"#{(Time.zone.now.in_time_zone(self.club.time_zone).gmt_offset)/(3600).abs}"))
             self.current_membership.update_attribute :cancel_date, cancel_date
             answer = { :message => "Member cancellation scheduled to #{cancel_date.to_date} - Reason: #{message}", :code => Settings.error_codes.success }
-            Auditory.audit(current_agent, self, answer[:message], self, Settings.operation_types.future_cancel)
+            Auditory.audit(current_agent, self, answer[:message], self, operation_type)
           else
             answer = { :message => "Member is not in cancelable status.", :code => Settings.error_codes.cancel_date_blank }
           end
