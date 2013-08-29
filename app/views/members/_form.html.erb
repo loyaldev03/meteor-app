@@ -257,9 +257,9 @@ Please, have in mind that fields with ' * ' are required.
 <div class="form-actions">
   <%= f.submit nil, :class => 'btn btn-primary', :id => 'submit_button' %>
   <% if @member.new_record? %>
-    <%= link_to t(:cancel), :back, :class => 'btn' %>  
+    <%= link_to t(:cancel), :back, :class => 'btn', :id => 'cancel_button' %>  
   <% else %>
-    <%= link_to t('buttons.cancel_update'), show_member_path, :class => 'btn' %> 
+    <%= link_to t('buttons.cancel_update'), show_member_path, :class => 'btn', :id => "cancel_button" %> 
   <% end %>
 </div>
 

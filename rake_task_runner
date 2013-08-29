@@ -46,7 +46,9 @@ cd /var/www/$2/current && rake members:process_club_cash  >> $LOGFILE 2>&1 &
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
 wait $WAIT_PIDS
 
-#enabled only for NAAMAA club
+# count members for each  club
+cd /var/www/$2/current && rake clubs:count_members_in_clubs >> $LOGFILE 2>&1
+
 DATE=`date +"%u"` # 1 monday
 if [ "$1" == "production" ]; then
   if [ "$DATE" == "1" ]; then
@@ -54,6 +56,5 @@ if [ "$1" == "production" ]; then
     cd /var/www/$2/current && rake fulfillments:generate_sloop_naamma_report >> $LOGFILE 2>&1 
     cd /var/www/$2/current && rake fulfillments:generate_nfla_report >> $LOGFILE 2>&1 
   fi
-
   ssh carla@50.116.28.74 -p 30003 '/var/sac-platform-reporting/generate_reporting_database >> /var/sac-platform-reporting/log/nightly.log'
 fi
