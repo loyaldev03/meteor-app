@@ -8,4 +8,3 @@ while {1} {
   }
 }
 wait
-close $spawn_id
