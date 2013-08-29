@@ -15,8 +15,8 @@
     </tr>
     <tr>
       <td> <%= submit_tag t('buttons.save_te_sale'), :class => 'btn btn-primary', :confirm => t('are_you_sure'), :id => "save_the_sale_button" %>
-        <%= link_to t('buttons.full_save'), member_full_save_path , :class=> 'btn btn-success' %> 
-        <%= link_to t('buttons.cancel'), show_member_path, :class => 'btn' %> </td>
+        <%= link_to t('buttons.full_save'), member_full_save_path , :class=> 'btn btn-success', :id => 'full_save_button' %> 
+        <%= link_to t('buttons.cancel'), show_member_path, :class => 'btn', :id => 'cancel_button' %> </td>
     </tr>
   </table>
 <% end%>
