@@ -3,7 +3,6 @@ require 'test_helper'
 class TermsOfMembershipTests < ActionController::IntegrationTest
 
 	setup do
-		init_test_setup
 		@admin_agent = FactoryGirl.create(:confirmed_admin_agent)
 		@partner = FactoryGirl.create(:partner)
 		@club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
