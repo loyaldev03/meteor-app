@@ -56,7 +56,7 @@
                     <li><%= link_to t('activerecord.model.disposition_types'), disposition_types_path(@current_club.partner.prefix, @current_club.name) %></li>
                   <% end %>                  
                   <% if @current_agent.can? :read, TermsOfMembership, @current_club.id %>
-                    <li><%= link_to t('activerecord.model.suscription_plans'), terms_of_memberships_path(@current_club.partner.prefix, @current_club.name) %></li>
+                    <li><%= link_to t('activerecord.model.subscriptions_plans'), terms_of_memberships_path(@current_club.partner.prefix, @current_club.name) %></li>
                   <% end %>
                 </ul>
               </li>

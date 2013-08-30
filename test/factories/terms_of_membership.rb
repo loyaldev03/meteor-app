@@ -7,7 +7,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -23,7 +23,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -39,7 +39,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -55,7 +55,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -71,7 +71,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -87,7 +87,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -103,7 +103,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -119,7 +119,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -135,7 +135,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -152,7 +152,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 12
     needs_enrollment_approval false
@@ -168,7 +168,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval true
@@ -184,7 +184,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -200,7 +200,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -216,7 +216,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -232,7 +232,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false
@@ -248,7 +248,7 @@ FactoryGirl.define do
     initial_fee 0
     trial_period_amount 0
     is_payment_expected 1
-    suscription_limits 0
+    subscription_limits 0
     if_cannot_bill 'cancel'
     quota 1
     needs_enrollment_approval false

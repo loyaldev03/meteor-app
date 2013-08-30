@@ -25,7 +25,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	def fill_in_step_1(name = nil, external_code = nil, description = nil)
-		find("label", :text => "Suscription Plan Name")
+		find("label", :text => "Subscription Plan Name")
 		fill_in 'terms_of_membership[name]', :with => name if name
 		fill_in 'terms_of_membership[api_role]', :with => external_code if external_code
 		fill_in 'terms_of_membership[description]', :with => description if description
@@ -198,7 +198,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name)
 		click_link_or_button 'Define Membership Terms'
-		fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, installment_amount:1, installment_amount_days:1,suscription_terms_stop_billing_after:0},{suscription_terms_stop_billing_after_time_span:"Month(s)"},["suscription_terms_stop_cancel_after"])
+		fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, installment_amount:1, installment_amount_days:1,subscription_terms_stop_billing_after:0},{subscription_terms_stop_billing_after_time_span:"Month(s)"},["subscription_terms_stop_cancel_after"])
 		click_link_or_button 'Define Upgrades / Downgrades'
 
 		find("label", :text => "If we cannot bill a member then")
@@ -215,7 +215,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name)
 		click_link_or_button 'Define Membership Terms'
-		fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, installment_amount:1, installment_amount_days:1,suscription_terms_stop_billing_after:0},{suscription_terms_stop_billing_after_time_span:"Day(s)"},["suscription_terms_stop_cancel_after"])
+		fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, installment_amount:1, installment_amount_days:1,subscription_terms_stop_billing_after:0},{subscription_terms_stop_billing_after_time_span:"Day(s)"},["subscription_terms_stop_cancel_after"])
 		click_link_or_button 'Define Upgrades / Downgrades'
 
 		find("label", :text => "If we cannot bill a member then")
@@ -347,7 +347,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:1},{},["is_payment_expected_yes","suscription_terms_until_cancelled"])
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:1},{},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -370,7 +370,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:0, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:1},{},["is_payment_expected_yes","suscription_terms_until_cancelled"])
+		fill_in_step_2({initial_fee_amount:0, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:1},{},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 
 		find("label", :text => "If we cannot bill a member then")
@@ -393,7 +393,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:0, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Day(s)"},["is_payment_expected_yes","suscription_terms_until_cancelled"])
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:0, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Day(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -416,7 +416,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:0, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_yes","suscription_terms_until_cancelled"])
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:0, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -440,7 +440,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Day(s)"},["is_payment_expected_yes","suscription_terms_until_cancelled"])
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Day(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -463,7 +463,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_yes","suscription_terms_until_cancelled"])
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -486,7 +486,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:6},{trial_period_lasting_time_span:"Month(s)",installment_amount_days_time_span:"Month(s)"},["is_payment_expected_yes","suscription_terms_until_cancelled"])
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:6},{trial_period_lasting_time_span:"Month(s)",installment_amount_days_time_span:"Month(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -509,7 +509,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:24},{trial_period_lasting_time_span:"Month(s)",installment_amount_days_time_span:"Month(s)"},["is_payment_expected_yes","suscription_terms_until_cancelled"])
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:24},{trial_period_lasting_time_span:"Month(s)",installment_amount_days_time_span:"Month(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -532,7 +532,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_no","suscription_terms_until_cancelled"])
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_no","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -555,7 +555,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:24},{suscription_terms_stop_billing_after_time_span:"Month(s)",installment_amount_days_time_span:"Month(s)"},["is_payment_expected_yes","suscription_terms_stop_cancel_after"])
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:24},{subscription_terms_stop_billing_after_time_span:"Month(s)",installment_amount_days_time_span:"Month(s)"},["is_payment_expected_yes","subscription_terms_stop_cancel_after"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -578,7 +578,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:24, suscription_terms_stop_billing_after:10},{installment_amount_days_time_span:"Month(s)",suscription_terms_stop_billing_after_time_span:"Day(s)"},["is_payment_expected_yes","suscription_terms_stop_cancel_after"])
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:24, subscription_terms_stop_billing_after:10},{installment_amount_days_time_span:"Month(s)",subscription_terms_stop_billing_after_time_span:"Day(s)"},["is_payment_expected_yes","subscription_terms_stop_cancel_after"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -603,9 +603,9 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, 
-			              installment_amount:10, installment_amount_days:24, suscription_terms_stop_billing_after:10},
-								   {installment_amount_days_time_span: 'Month(s)', suscription_terms_stop_billing_after_time_span: "Day(s)"},
-		               ["is_payment_expected_yes", "suscription_terms_stop_cancel_after"])
+			              installment_amount:10, installment_amount_days:24, subscription_terms_stop_billing_after:10},
+								   {installment_amount_days_time_span: 'Month(s)', subscription_terms_stop_billing_after_time_span: "Day(s)"},
+		               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -634,9 +634,9 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, 
-			              installment_amount:10, installment_amount_days:24, suscription_terms_stop_billing_after:10},
-								   {installment_amount_days_time_span: 'Month(s)', suscription_terms_stop_billing_after_time_span: "Day(s)"},
-		               ["is_payment_expected_yes", "suscription_terms_stop_cancel_after"])
+			              installment_amount:10, installment_amount_days:24, subscription_terms_stop_billing_after:10},
+								   {installment_amount_days_time_span: 'Month(s)', subscription_terms_stop_billing_after_time_span: "Day(s)"},
+		               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -662,9 +662,9 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, 
-			              installment_amount:10, installment_amount_days:24, suscription_terms_stop_billing_after:1},
-								   {installment_amount_days_time_span: 'Month(s)', suscription_terms_stop_billing_after_time_span: "Month(s)"},
-		               ["is_payment_expected_yes", "suscription_terms_stop_cancel_after"])
+			              installment_amount:10, installment_amount_days:24, subscription_terms_stop_billing_after:1},
+								   {installment_amount_days_time_span: 'Month(s)', subscription_terms_stop_billing_after_time_span: "Month(s)"},
+		               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -691,9 +691,9 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_1(tom_name + ' Updated')
 		click_link_or_button 'Edit Membership Terms'
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, 
-			              installment_amount:10, installment_amount_days:24, suscription_terms_stop_billing_after:10},
-								   {installment_amount_days_time_span: 'Month(s)', suscription_terms_stop_billing_after_time_span: "Day(s)"},
-		               ["is_payment_expected_yes", "suscription_terms_stop_cancel_after"])
+			              installment_amount:10, installment_amount_days:24, subscription_terms_stop_billing_after:10},
+								   {installment_amount_days_time_span: 'Month(s)', subscription_terms_stop_billing_after_time_span: "Day(s)"},
+		               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")
@@ -719,8 +719,8 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Edit Membership Terms'
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, 
 			              installment_amount:10, installment_amount_days:24},
-								   {installment_amount_days_time_span: 'Month(s)', suscription_terms_stop_billing_after_time_span: "Day(s)"},
-		               ["is_payment_expected_yes", "suscription_terms_until_cancelled"])
+								   {installment_amount_days_time_span: 'Month(s)', subscription_terms_stop_billing_after_time_span: "Day(s)"},
+		               ["is_payment_expected_yes", "subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
 		find("label", :text => "If we cannot bill a member then")

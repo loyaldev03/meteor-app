@@ -81,17 +81,17 @@
   </div>
 
   <div class="control-group">
-    <%= label_tag 'suscription_terms', t('activerecord.attributes.terms_of_membership.wizard.suscription_terms'), :class => 'control-label' %>
+    <%= label_tag 'subscription_terms', t('activerecord.attributes.terms_of_membership.wizard.subscription_terms'), :class => 'control-label' %>
     <div class="controls">
-      <%= radio_button_tag 'suscription_terms', 'until_cancelled', ((@tom.suscription_limits == 0 unless !@tom.suscription_limits) or true), :class => 'required' %>
+      <%= radio_button_tag 'subscription_terms', 'until_cancelled', ((@tom.subscription_limits == 0 unless !@tom.subscription_limits) or true), :class => 'required' %>
       <span id="label_for_until_cancelled"><%= t('activerecord.attributes.terms_of_membership.wizard.bill_until_cancelled') %></span>
       <br /><br />
-      <%= radio_button_tag 'suscription_terms', 'stop_cancel_after', (@tom.suscription_limits > 0 unless !@tom.suscription_limits) %>
+      <%= radio_button_tag 'subscription_terms', 'stop_cancel_after', (@tom.subscription_limits > 0 unless !@tom.subscription_limits) %>
       <span id="label_for_stop_billing_after"><%= t('activerecord.attributes.terms_of_membership.wizard.stop_billing_after') %></span>
-      <%= text_field_tag 'suscription_terms_stop_billing_after', @tom.suscription_limits, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
-      <%= select_for_date_span("suscription_terms_stop_billing_after_time_span") %>
+      <%= text_field_tag 'subscription_terms_stop_billing_after', @tom.subscription_limits, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
+      <%= select_for_date_span("subscription_terms_stop_billing_after_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.suscription_terms'), 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.subscription_terms'), 
         :content => t('lorem') } %> 
     </div>
   </div>
@@ -167,12 +167,12 @@
     update_labels();
   });
 
-  $('#suscription_terms_until_cancelled').click(function() {
-    $('#suscription_terms_stop_billing_after').removeAttr('required');
+  $('#subscription_terms_until_cancelled').click(function() {
+    $('#subscription_terms_stop_billing_after').removeAttr('required');
   });
 
-  $('#suscription_terms_stop_cancel_after').click(function() {
-    $('#suscription_terms_stop_billing_after').prop('required', true);
+  $('#subscription_terms_stop_cancel_after').click(function() {
+    $('#subscription_terms_stop_billing_after').prop('required', true);
   });
 
   // Third Step

@@ -17,9 +17,9 @@ class TermsOfMembershipsController < ApplicationController
     @tom = TermsOfMembership.new(params[:tom])
     prepare_tom_data_to_save(params)
     if @tom.save
-      redirect_to terms_of_memberships_url, :notice => "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was created succesfully"
+      redirect_to terms_of_memberships_url, :notice => "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was created succesfully"
     else
-      flash.now[:error] = "There was an error while trying to save this suscription plan. #{@tom.errors.to_hash}"
+      flash.now[:error] = "There was an error while trying to save this subscription plan. #{@tom.errors.to_hash}"
       render action: "new"
     end
   end
@@ -27,7 +27,7 @@ class TermsOfMembershipsController < ApplicationController
   def edit
     @tom = TermsOfMembership.find(params[:id])
     if !@tom.can_update_or_delete
-      flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
+      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
       redirect_to terms_of_memberships_url
     end
   end
@@ -37,12 +37,12 @@ class TermsOfMembershipsController < ApplicationController
     if @tom.can_update_or_delete
       prepare_tom_data_to_save(params)
       if @tom.save
-        flash[:notice] = "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
+        flash[:notice] = "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
       else
-        flash[:error] = "Your Suscription Plan #{@tom.name} (ID: #{@tom.id}) was not updated"
+        flash[:error] = "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was not updated"
       end
     else
-      flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"      
+      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"      
     end
     redirect_to terms_of_memberships_url
   end
@@ -50,9 +50,9 @@ class TermsOfMembershipsController < ApplicationController
   def destroy
     @tom = TermsOfMembership.find(params[:id])
     if @tom.destroy
-      flash[:notice] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
+      flash[:notice] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
     else
-      flash[:error] = "Suscription Plan #{@tom.name} (ID: #{@tom.id}) was not destroyed."
+      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was not destroyed."
     end
     redirect_to terms_of_memberships_url
   end
@@ -84,7 +84,7 @@ class TermsOfMembershipsController < ApplicationController
         @tom.installment_amount = post_data[:installment_amount]
         @tom.installment_period = post_data[:installment_amount_days_time_span] == 'months' ? months_to_days(post_data[:installment_amount_days].to_i) : post_data[:installment_amount_days].to_i
       end
-      @tom.suscription_limits = post_data[:suscription_terms] == 'until_cancelled' ? 0 : (post_data[:suscription_terms_stop_billing_after_time_span] == 'months' ? months_to_days(post_data[:suscription_terms_stop_billing_after].to_i) : post_data[:suscription_terms_stop_billing_after].to_i)
+      @tom.subscription_limits = post_data[:subscription_terms] == 'until_cancelled' ? 0 : (post_data[:subscription_terms_stop_billing_after_time_span] == 'months' ? months_to_days(post_data[:subscription_terms_stop_billing_after].to_i) : post_data[:subscription_terms_stop_billing_after].to_i)
       @tom.club_cash_amount = post_data[:club_cash_amount]
       # Step 3
       @tom.downgrade_tom_id = nil
