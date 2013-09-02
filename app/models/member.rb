@@ -267,7 +267,7 @@ class Member < ActiveRecord::Base
       errors = { :next_bill_date => 'Is prior to actual date' }
       answer = { :message => "Next bill date should be older that actual date.", :code => Settings.error_codes.next_bill_date_prior_actual_date, :errors => errors }
     elsif self.valid? and not self.active_credit_card.expired?
-      next_bill_date = next_bill_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(self.club.time_zone).utc_offset)/(60*60)}")
+      next_bill_date = next_bill_date.to_datetime.change(:offset => self.get_offset_related)
       self.next_retry_bill_date = next_bill_date
       self.bill_date = next_bill_date
       self.save(:validate => false)
@@ -943,7 +943,7 @@ class Member < ActiveRecord::Base
           answer = { :message => "Cancel date is already set to that date", :code => Settings.error_codes.wrong_data }
         else
           if can_be_canceled?
-            self.current_membership.update_attribute :cancel_date, cancel_date.to_datetime.change(:offset => Time.now.in_time_zone(self.club.time_zone).formatted_offset )
+            self.current_membership.update_attribute :cancel_date, cancel_date.to_datetime.change(:offset => self.get_offset_related )
             answer = { :message => "Member cancellation scheduled to #{cancel_date.to_date} - Reason: #{message}", :code => Settings.error_codes.success }
             Auditory.audit(current_agent, self, answer[:message], self, operation_type)
           else
@@ -1359,6 +1359,10 @@ class Member < ActiveRecord::Base
     exact_target_member.subscribe! if defined?(SacExactTarget::MemberModel)
   end
   handle_asynchronously :marketing_tool_sync_subscription, :queue => :exact_target_sync
+
+  def get_offset_related
+    Time.now.in_time_zone(self.club.time_zone).formatted_offset
+  end
 
   private
     def schedule_renewal(manual = false)
