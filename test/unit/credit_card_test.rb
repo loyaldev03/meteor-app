@@ -8,8 +8,9 @@ class CreditCardTest < ActiveSupport::TestCase
     assert !(credit_card_one.blacklist && credit_card_one.activate), "blacklisted credit card activated. #{credit_card_two.errors.inspect}"
 	end
 
-	test "CC dates validation within club with negative offset" do 
-	  credit_card = FactoryGirl.create(:credit_card)
+	test "CC dates validation within club with negative offset" do
+		club = FactoryGirl.create(:club) 
+	  credit_card = FactoryGirl.create(:member_with_cc, :club => club)
     Time.zone = "International Date Line West"
 	  # # testing internal logic
 	  offset = credit_card.get_offset_related
@@ -18,7 +19,7 @@ class CreditCardTest < ActiveSupport::TestCase
 	end
 
 	test "CC dates validation within club with positive offset" do 
-	  credit_card = FactoryGirl.create(:credit_card)
+	  credit_card = FactoryGirl.create(:member_with_cc)
     Time.zone = "Pacific/Kiritimati"
 	  # # testing internal logic
 	  offset = credit_card.get_offset_related
