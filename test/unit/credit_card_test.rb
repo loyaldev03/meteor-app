@@ -8,31 +8,28 @@ class CreditCardTest < ActiveSupport::TestCase
     assert !(credit_card_one.blacklist && credit_card_one.activate), "blacklisted credit card activated. #{credit_card_two.errors.inspect}"
 	end
 
+  
+  
+  def check_offset 
+    terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    member = create_active_member(terms_of_membership, :provisional_member_with_cc)
+    credit_card = member.active_credit_card
+    # # testing internal logic
+    assert_equal Time.now.in_time_zone(@club.time_zone).formatted_offset, credit_card.member.get_offset_related
+  end
+  
 	test "CC dates validation within club with negative offset" do
-		club = FactoryGirl.create(:club) 
-	  credit_card = FactoryGirl.create(:member_with_cc, :club => club)
-    Time.zone = "International Date Line West"
-	  # # testing internal logic
-	  offset = credit_card.get_offset_related
-	  date = Time.new(Time.zone.now.year+10, Time.zone.now.month, nil, nil, nil, nil, offset)
-	  assert_equal date.gmt_offset/3600, Time.zone.now.gmt_offset/3600
-	end
+		@club = FactoryGirl.create(:simple_club_with_gateway, :time_zone => "International Date Line West") 
+    check_offset
+  end
 
 	test "CC dates validation within club with positive offset" do 
-	  credit_card = FactoryGirl.create(:member_with_cc)
-    Time.zone = "Pacific/Kiritimati"
-	  # # testing internal logic
-	  offset = credit_card.get_offset_related
-	  date = Time.new(Time.zone.now.year+10, Time.zone.now.month, nil, nil, nil, nil, offset)
-	  assert_equal date.gmt_offset/3600, Time.zone.now.gmt_offset/3600
+    @club = FactoryGirl.create(:simple_club_with_gateway, :time_zone => "Pacific/Kiritimati") 
+    check_offset
 	end
 
 	test "CC dates validation within club with offset = +00:00" do 
-	  credit_card = FactoryGirl.create(:credit_card)
-		Time.zone = "UTC"
-	  # # testing internal logic
-	  offset = credit_card.get_offset_related
-	  date = Time.new(Time.zone.now.year+10, Time.zone.now.month, nil, nil, nil, nil, offset)
-	  assert_equal date.gmt_offset/3600, Time.zone.now.utc.gmt_offset/3600
-	end
+    @club = FactoryGirl.create(:simple_club_with_gateway, :time_zone => "UTC") 
+    check_offset
+  end
 end

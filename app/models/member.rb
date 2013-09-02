@@ -938,7 +938,7 @@ class Member < ActiveRecord::Base
 
   def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
     if not message.blank?
-      if cancel_date.to_date >= Time.zone.now.in_time_zone(self.club.time_zone).to_date
+      if cancel_date.to_datetime.change(:offset => self.get_offset_related) >= DateTime.now.change(:offset => self.get_offset_related)
         if self.cancel_date == cancel_date
           answer = { :message => "Cancel date is already set to that date", :code => Settings.error_codes.wrong_data }
         else

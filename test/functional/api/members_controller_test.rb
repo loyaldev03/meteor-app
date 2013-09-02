@@ -1490,7 +1490,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     @member.reload
     cancel_date_to_check = (cancel_date.to_s+" 23:59:59").to_datetime
-    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => Time.zone.now.in_time_zone(@club.time_zone).formatted_offset )
+    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => @member.get_offset_related )
 
     assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
@@ -1513,15 +1513,15 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
     cancel_date = I18n.l(Time.zone.now, :format => :only_date)    
-
+    
     assert_difference("Operation.count") do
       generate_put_cancel( cancel_date, "reason" )
       assert_response :success
     end
     @member.reload
     cancel_date_to_check = (cancel_date.to_s+" 23:59:59").to_datetime
-    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => Time.zone.now.in_time_zone(@club.time_zone).formatted_offset )
-
+    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => @member.get_offset_related)  
+    
     assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
 
@@ -1586,7 +1586,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     @member.reload
     cancel_date_to_check = (cancel_date.to_s+" 23:59:59").to_datetime
-    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => Time.zone.now.in_time_zone(@club.time_zone).formatted_offset )
+    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => @member.get_offset_related )
 
     assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
