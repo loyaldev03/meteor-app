@@ -1474,18 +1474,16 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
-    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
-    
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)
     assert_difference("Operation.count") do
       generate_put_cancel( cancel_date, "Reason" )
       assert_response :success
     end
     @member.reload
-
     cancel_date_to_check = (cancel_date.to_s+" 23:59:59").to_datetime
-    cancel_date_to_check = cancel_date.to_datetime.change(:offset => (( Time.zone.now.in_time_zone(@club.time_zone).gmt_offset/3600 >= 0 ? "+" : "-")+"#{(Time.zone.now.in_time_zone(@club.time_zone).utc_offset)/(3600).abs}"))
+    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => Time.zone.now.in_time_zone(@club.time_zone).formatted_offset )
 
-    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check, :format => :only_date)
+    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
 
   test "Should not cancel member when reason is blank" do
@@ -1513,9 +1511,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     @member.reload
     cancel_date_to_check = (cancel_date.to_s+" 23:59:59").to_datetime
-    cancel_date_to_check = cancel_date.to_datetime.change(:offset => (( Time.zone.now.in_time_zone(@club.time_zone).gmt_offset/3600 >= 0 ? "+" : "-")+"#{(Time.zone.now.in_time_zone(@club.time_zone).utc_offset)/(3600).abs}"))
+    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => Time.zone.now.in_time_zone(@club.time_zone).formatted_offset )
 
-    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check, :format => :only_date)
+    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
 
   test "Should not cancel member when cancel date is in wrong format" do
@@ -1578,7 +1576,10 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_response :success
     end
     @member.reload
-    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
+    cancel_date_to_check = (cancel_date.to_s+" 23:59:59").to_datetime
+    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => Time.zone.now.in_time_zone(@club.time_zone).formatted_offset )
+
+    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
 
   test "Admin should enroll/create member with blank_cc as true even if not cc information provided." do
