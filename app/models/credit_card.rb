@@ -151,7 +151,7 @@ class CreditCard < ActiveRecord::Base
   end 
 
   def get_offset_related
-    ((Time.zone.now.gmt_offset/3600)>=0 ? "+" : "-")+"%02d:00" % (Time.zone.now.gmt_offset/3600).abs
+    Time.zone.now.formatted_offset
   end
 
   def update_expire(year, month, current_agent = nil)

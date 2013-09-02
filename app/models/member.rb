@@ -943,8 +943,7 @@ class Member < ActiveRecord::Base
           answer = { :message => "Cancel date is already set to that date", :code => Settings.error_codes.wrong_data }
         else
           if can_be_canceled?
-            cancel_date = cancel_date.to_datetime.change(:offset => (( Time.zone.now.in_time_zone(self.club.time_zone).gmt_offset/3600 >= 0 ? "+" : "-")+"#{(Time.zone.now.in_time_zone(self.club.time_zone).gmt_offset)/(3600).abs}"))
-            self.current_membership.update_attribute :cancel_date, cancel_date
+            self.current_membership.update_attribute :cancel_date, cancel_date.to_datetime.change(:offset => Time.now.in_time_zone(self.club.time_zone).formatted_offset )
             answer = { :message => "Member cancellation scheduled to #{cancel_date.to_date} - Reason: #{message}", :code => Settings.error_codes.success }
             Auditory.audit(current_agent, self, answer[:message], self, operation_type)
           else
