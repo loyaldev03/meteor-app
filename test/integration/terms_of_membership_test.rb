@@ -1,9 +1,7 @@
 require 'test_helper'
 
 class TermsOfMembershipTests < ActionController::IntegrationTest
-
 	setup do
-		init_test_setup
 		@admin_agent = FactoryGirl.create(:confirmed_admin_agent)
 		@partner = FactoryGirl.create(:partner)
 		@club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
@@ -731,13 +729,13 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Do not edit TOM with active (active, applied and provisional) membership" do
-		27.times { the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id) }
+		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		the_member = create_active_member(the_tom, :active_member, nil, {}, { :created_by => @admin_agent })
-		visit terms_of_memberships_path(@partner.prefix, @club.name)
+			visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
 			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
-			within("tr", :text => the_tom.id.to_s) do
+			within("tr", :text => the_tom.name) do
 				confirm_ok_js
 				click_link_or_button "Edit"
 			end
@@ -746,13 +744,13 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Do not edit TOM with inactive (lapsed) membership" do
-		27.times { the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id) }
+		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		the_lapsed_member = create_active_member(the_tom, :lapsed_member, nil, {}, { :created_by => @admin_agent })
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
 			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
-			within("tr", :text => the_tom.id.to_s) do
+			within("tr", :text => the_tom.name) do
 				confirm_ok_js
 				click_link_or_button "Edit"
 			end
@@ -834,15 +832,15 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		assert_equal tom.club_cash_amount.to_i, club_cash_amount.to_i
 	end
 
-	# # # DELETE
+	# # # # DELETE
 
 	test "Delete unused TOM" do
-		27.times { the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id) }
+		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
 			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
-			within("tr", :text => the_tom.id.to_s) do
+			within("tr", :text => the_tom.name) do
 				confirm_ok_js
 				click_link_or_button "Destroy"
 			end
@@ -851,13 +849,13 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Do not delete a TOM with inactive memberships" do
-		27.times { the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id) }
+		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		the_lapsed_member = create_active_member(the_tom, :lapsed_member, nil, {}, { :created_by => @admin_agent })
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
 			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
-			within("tr", :text => the_tom.id.to_s) do
+			within("tr", :text => the_tom.name) do
 				confirm_ok_js
 				click_link_or_button "Destroy"
 			end
@@ -866,13 +864,13 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Do not delete a TOM with active memberships" do
-		27.times { the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id) }
+		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		the_active_member = create_active_member(the_tom, :active_member, nil, {}, { :created_by => @admin_agent })
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
 			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
-			within("tr", :text => the_tom.id.to_s) do
+			within("tr", :text => the_tom.name) do
 				confirm_ok_js
 				click_link_or_button "Destroy"
 			end
