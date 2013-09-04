@@ -293,10 +293,10 @@ class Api::MembersController < ApplicationController
         phone_local_number: member.phone_local_number, 
         type_of_phone_number: member.type_of_phone_number,
         gender: member.gender,
-        bill_date: member.next_retry_bill_date.nil? ? '' : member.next_retry_bill_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}").to_s,
+        bill_date: member.next_retry_bill_date.nil? ? '' : member.next_retry_bill_date.to_datetime.change(:offset => member.get_offset_related).to_s,
         wrong_address: member.wrong_address,
         wrong_phone_number: member.wrong_phone_number,
-        member_since_date: member.member_since_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}").to_s,
+        member_since_date: member.member_since_date.to_datetime.change(:offset => member.get_offset_related).to_s,
         reactivation_times: member.reactivation_times,
         external_id: member.external_id,
         blacklisted: member.blacklisted,
@@ -310,8 +310,8 @@ class Api::MembersController < ApplicationController
       },
       current_membership:{
         status: membership.status,
-        join_date: membership.join_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}").to_s,
-        cancel_date: membership.cancel_date.nil? ? '' : membership.cancel_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(club.time_zone).utc_offset)/(60*60)}").to_s
+        join_date: membership.join_date.to_datetime.change(:offset => member.get_offset_related).to_s,
+        cancel_date: membership.cancel_date.nil? ? '' : membership.cancel_date.to_datetime.change(:offset => member.get_offset_related).to_s
       }
     }
     response.merge!( external_id: member.external_id ) if member.club.requires_external_id
@@ -490,11 +490,15 @@ class Api::MembersController < ApplicationController
   def cancel
     member = Member.find params[:id]
     my_authorize! :api_cancel, Member, member.club_id
-    render json: member.cancel!(params[:cancel_date], params[:reason], @current_agent)
+
+    cancel_date = params[:cancel_date].to_date.to_s+(member.join_date.to_date == params[:cancel_date].to_date ? " 23:59:59" : "")
+    render json: member.cancel!(cancel_date, params[:reason], @current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   rescue ArgumentError => e
     render json: { :message => "Check cancel date, please. It seams that it is in the wrong format.", :code => Settings.error_codes.wrong_data }
+  rescue NoMethodError
+    render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
 
   ##
