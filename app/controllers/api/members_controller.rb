@@ -492,12 +492,13 @@ class Api::MembersController < ApplicationController
     my_authorize! :api_cancel, Member, member.club_id
 
     cancel_date = params[:cancel_date].to_date.to_s+(member.join_date.to_date == params[:cancel_date].to_date ? " 23:59:59" : "")
-
     render json: member.cancel!(cancel_date, params[:reason], @current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   rescue ArgumentError => e
     render json: { :message => "Check cancel date, please. It seams that it is in the wrong format.", :code => Settings.error_codes.wrong_data }
+  rescue NoMethodError
+    render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
 
   ##
