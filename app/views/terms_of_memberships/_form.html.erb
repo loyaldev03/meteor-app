@@ -212,6 +212,20 @@
     $('#downgrade_to_tom').prop('disabled', false);  
   }
 
+  function select_upgrade_logic_disable(){
+    $('#upgrade_to_tom_days').prop('disabled', true);          
+    $('#upgrade_to_tom_days').removeAttr('required');
+    $('#upgrade_to_tom_days_time_span').prop('disabled', true);          
+    $('#upgrade_to_tom_days_time_span').removeAttr('required');
+  }
+
+  function select_upgrade_logic_enable(){
+    $('#upgrade_to_tom_days').prop('disabled', false);          
+    $('#upgrade_to_tom_days').prop('required', true);
+    $('#upgrade_to_tom_days_time_span').prop('disabled', false);          
+    $('#upgrade_to_tom_days_time_span').prop('required', true);
+  }
+
   $('#if_cannot_bill_member_cancel').click(function() {
     cancel_radio_logic();
   });
@@ -226,9 +240,9 @@
 
   $('#upgrade_to_tom').on('change', function() {
     if($('#upgrade_to_tom').val() != '') {
-      $('#upgrade_to_tom_days').prop('required', true);
+      select_upgrade_logic_enable();
     } else {
-      $('#upgrade_to_tom_days').removeAttr('required');   
+      select_upgrade_logic_disable();  
     }
   });
 
@@ -274,7 +288,7 @@
         <% end %>
         break;
     }
-    if(isSubmitButton) {
+    if(isSubmitButton) {  
       $("#tom_wizard_form").formwizard("option", {textSubmit: buttonText});
     }
     else {
@@ -292,22 +306,15 @@
     currentStep = $("#tom_wizard_form").formwizard("state").currentStep;
     switch(currentStep) {
       case "second":
-        if ("<%= (@tom.subscription_limits.nil? or @tom.subscription_limits==0) %>" == "true"){
-          until_cancel_logic();
-        }
+        <% if @tom.subscription_limits.nil? or @tom.subscription_limits==0 %>
+          if ($("#subscription_terms_until_cancelled").is(":checked") ){ until_cancel_logic(); }
+        <% end %>
         break;
       case "third":
-          switch("<%= @tom.if_cannot_bill %>"){
-            case "cancel":
-              cancel_radio_logic();
-              break;
-            case "suspend":
-              suspend_radio_logic();
-              break;
-            case "downgrade_tom":
-              downgrade_radio_logic();
-              break;
-          }
+        if( $("#subscription_terms_until_cancelled").is(":checked") ){ cancel_radio_logic(); }
+        else if( $("#if_cannot_bill_member_suspend").is(":checked") ){ suspend_radio_logic(); }
+        else if( $("#if_cannot_bill_member_downgrade_to").is(":checked") ){ downgrade_radio_logic();}
+        if( $("#upgrade_to_tom").val() == "" ){ select_upgrade_logic_disable(); }
         break;
     }
   });
