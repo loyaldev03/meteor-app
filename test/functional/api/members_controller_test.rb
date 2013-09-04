@@ -1475,21 +1475,23 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @response.body.include? first.id.to_s
     assert !(@response.body.include? last.id.to_s)
   end
-
   
   # StatzHub - Add an Api method to cancel a member
   # Cancel date using a Curl call
   test "Admin should cancel memeber" do
     sign_in @admin_user
+    @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)
+
     assert_difference("Operation.count") do
       generate_put_cancel( cancel_date, "Reason" )
       assert_response :success
     end
     @member.reload
-    cancel_date_to_check = (cancel_date.to_s+" 23:59:59").to_datetime
+    cancel_date_to_check = cancel_date.to_datetime
     cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => @member.get_offset_related )
 
     assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
@@ -1497,7 +1499,9 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Should not cancel member when reason is blank" do
     sign_in @admin_user
+    @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
@@ -1510,7 +1514,9 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Should cancel member even if the cancel date is the same as today" do
     sign_in @admin_user
+    @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
     cancel_date = I18n.l(Time.zone.now, :format => :only_date)    
     
@@ -1527,7 +1533,9 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Should not cancel member when cancel date is in wrong format" do
     sign_in @admin_user
+    @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
@@ -1576,7 +1584,9 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "api should cancel memeber" do
     sign_in @api_user
+    @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
@@ -1585,7 +1595,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_response :success
     end
     @member.reload
-    cancel_date_to_check = (cancel_date.to_s+" 23:59:59").to_datetime
+    cancel_date_to_check = cancel_date.to_datetime
     cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => @member.get_offset_related )
 
     assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)

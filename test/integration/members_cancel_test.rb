@@ -101,29 +101,35 @@ class MembersCancelTest < ActionController::IntegrationTest
     answer = @saved_member.bill_membership
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
+    @saved_member.reload
     within('.nav-tabs'){ click_on "Operations"}
     within("#operations_table")do
-        assert page.has_content?("Downgraded member from TOM(#{@terms_of_membership_with_gateway.id}) to TOM(#{@terms_of_membership_with_gateway_to_downgrade.id})")
+      assert page.has_content?("Downgraded member from TOM(#{@terms_of_membership_with_gateway.id}) to TOM(#{@terms_of_membership_with_gateway_to_downgrade.id})")
     end
+    assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_with_gateway_to_downgrade.id
   end
 
   test "changing the cancel date" do
     setup_member
-
+    cancel_date = Time.zone.now+1.day
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_link_or_button 'cancel'
-    select_from_datepicker("cancel_date", Time.zone.now+1.day)
-
+    select_from_datepicker("cancel_date", cancel_date)
     select(@member_cancel_reason.name, :from => 'reason')
 
     confirm_ok_js
     click_link_or_button 'Cancel member'
+    @saved_member.reload
+    assert_equal I18n.l(@saved_member.cancel_date, :format => :only_date), I18n.l(cancel_date, :format => :only_date)
+    cancel_date = Time.zone.now+2.day
+
     click_link_or_button 'cancel'
-    select_from_datepicker("cancel_date", Time.zone.now+2.day)
-
+    select_from_datepicker("cancel_date", cancel_date)
     select(@member_cancel_reason.name, :from => 'reason')
     confirm_ok_js
     click_link_or_button 'Cancel member'
+    @saved_member.reload
+    assert_equal I18n.l(@saved_member.cancel_date, :format => :only_date), I18n.l(cancel_date, :format => :only_date)
   end
 
   #Check cancel email - It is send it by CS inmediate after member is lapsed
