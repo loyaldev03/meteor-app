@@ -306,9 +306,7 @@
     currentStep = $("#tom_wizard_form").formwizard("state").currentStep;
     switch(currentStep) {
       case "second":
-        <% if @tom.subscription_limits.nil? or @tom.subscription_limits==0 %>
-          if ($("#subscription_terms_until_cancelled").is(":checked") ){ until_cancel_logic(); }
-        <% end %>
+        if ($("#subscription_terms_until_cancelled").is(":checked") ){ until_cancel_logic(); }
         break;
       case "third":
         if( $("#subscription_terms_until_cancelled").is(":checked") ){ cancel_radio_logic(); }
