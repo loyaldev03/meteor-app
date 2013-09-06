@@ -151,6 +151,14 @@
 
 <script type="text/javascript">
   // Second Step
+
+  function until_cancel_logic(){
+    $('#subscription_terms_stop_billing_after').removeAttr('required');
+    $('#subscription_terms_stop_billing_after').prop('disabled',true);
+    $('#subscription_terms_stop_billing_after_time_span').removeAttr('required');
+    $('#subscription_terms_stop_billing_after_time_span').prop('disabled',true);    
+  }
+
   $('#is_payment_expected_yes').click(function() {
     window.atTheEndOfTheTrial = "payment";
     $('#recurring_amount_group').show('fast');
@@ -168,43 +176,73 @@
   });
 
   $('#subscription_terms_until_cancelled').click(function() {
-    $('#subscription_terms_stop_billing_after').removeAttr('required');
+    until_cancel_logic();
   });
 
   $('#subscription_terms_stop_cancel_after').click(function() {
     $('#subscription_terms_stop_billing_after').prop('required', true);
+    $('#subscription_terms_stop_billing_after').removeAttr('disabled');
+    $('#subscription_terms_stop_billing_after_time_span').prop('required', true);
+    $('#subscription_terms_stop_billing_after_time_span').removeAttr('disabled');
   });
 
   // Third Step
-  $('#if_cannot_bill_member_cancel').click(function() {
+
+  function cancel_radio_logic(){
     $('#if_cannot_bill_member_suspend_for').removeAttr('required');
     $('#downgrade_to_tom').removeAttr('required');
     $('#if_cannot_bill_member_suspend_for').prop('disabled', true);
     $('#if_cannot_bill_member_suspend_for_time_span').prop('disabled', true);
     $('#downgrade_to_tom').prop('disabled', true);
-  });
+  }
 
-  $('#if_cannot_bill_member_suspend').click(function() {
+  function suspend_radio_logic(){
     $('#if_cannot_bill_member_suspend_for').prop('required', true);
     $('#downgrade_to_tom').removeAttr('required');
     $('#if_cannot_bill_member_suspend_for').prop('disabled', false);
     $('#if_cannot_bill_member_suspend_for_time_span').prop('disabled', false);
-    $('#downgrade_to_tom').prop('disabled', true);
-  });
+    $('#downgrade_to_tom').prop('disabled', true);   
+  }
 
-  $('#if_cannot_bill_member_downgrade_to').click(function() {
+  function downgrade_radio_logic(){    
     $('#if_cannot_bill_member_suspend_for').removeAttr('required');
     $('#downgrade_to_tom').prop('required', true);
     $('#if_cannot_bill_member_suspend_for').prop('disabled', true);
     $('#if_cannot_bill_member_suspend_for_time_span').prop('disabled', true);
-    $('#downgrade_to_tom').prop('disabled', false);
+    $('#downgrade_to_tom').prop('disabled', false);  
+  }
+
+  function select_upgrade_logic_disable(){
+    $('#upgrade_to_tom_days').prop('disabled', true);          
+    $('#upgrade_to_tom_days').removeAttr('required');
+    $('#upgrade_to_tom_days_time_span').prop('disabled', true);          
+    $('#upgrade_to_tom_days_time_span').removeAttr('required');
+  }
+
+  function select_upgrade_logic_enable(){
+    $('#upgrade_to_tom_days').prop('disabled', false);          
+    $('#upgrade_to_tom_days').prop('required', true);
+    $('#upgrade_to_tom_days_time_span').prop('disabled', false);          
+    $('#upgrade_to_tom_days_time_span').prop('required', true);
+  }
+
+  $('#if_cannot_bill_member_cancel').click(function() {
+    cancel_radio_logic();
+  });
+
+  $('#if_cannot_bill_member_suspend').click(function() {
+    suspend_radio_logic();
+  });
+
+  $('#if_cannot_bill_member_downgrade_to').click(function() {
+    downgrade_radio_logic();
   });
 
   $('#upgrade_to_tom').on('change', function() {
     if($('#upgrade_to_tom').val() != '') {
-      $('#upgrade_to_tom_days').prop('required', true);
+      select_upgrade_logic_enable();
     } else {
-      $('#upgrade_to_tom_days').removeAttr('required');   
+      select_upgrade_logic_disable();  
     }
   });
 
@@ -250,7 +288,7 @@
         <% end %>
         break;
     }
-    if(isSubmitButton) {
+    if(isSubmitButton) {  
       $("#tom_wizard_form").formwizard("option", {textSubmit: buttonText});
     }
     else {
@@ -262,6 +300,21 @@
     $("#tom_wizard_form").bind("before_step_shown", function(event, data) {
       set_button_next_label(data.currentStep);
     });
+  });
+
+  $("#tom_wizard_form").bind("step_shown", function(event, data){
+    currentStep = $("#tom_wizard_form").formwizard("state").currentStep;
+    switch(currentStep) {
+      case "second":
+        if ($("#subscription_terms_until_cancelled").is(":checked") ){ until_cancel_logic(); }
+        break;
+      case "third":
+        if( $("#subscription_terms_until_cancelled").is(":checked") ){ cancel_radio_logic(); }
+        else if( $("#if_cannot_bill_member_suspend").is(":checked") ){ suspend_radio_logic(); }
+        else if( $("#if_cannot_bill_member_downgrade_to").is(":checked") ){ downgrade_radio_logic();}
+        if( $("#upgrade_to_tom").val() == "" ){ select_upgrade_logic_disable(); }
+        break;
+    }
   });
 
   $(document).ready(function() {
