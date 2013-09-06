@@ -4,6 +4,7 @@ FactoryGirl.define do
   end
 
   factory :member_with_api_membership, class: Membership do
+    join_date { DateTime.now }
     status "none"
   end
 
