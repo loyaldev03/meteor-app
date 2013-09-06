@@ -75,7 +75,7 @@ group :development do
   gem 'debugger'
   gem "rails-erd"
   gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
-  gem "yard", "~> 0.8.2.1"
+  gem "yard"  , :git => 'git@github.com:stoneacre/yard.git'
   gem 'yard-rest'
   gem 'redcarpet'
   gem "bullet"
