@@ -196,7 +196,7 @@ class Member < ActiveRecord::Base
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
     Notifier.active_with_approval(emails,self).deliver!
   end
-  handle_asynchronously :send_active_needs_approval_email_dj
+  handle_asynchronously :send_active_needs_approval_email_dj, :queue => :generic_queue
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_recover_needs_approval_email
@@ -207,7 +207,7 @@ class Member < ActiveRecord::Base
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
     Notifier.recover_with_approval(emails,self).deliver!
   end
-  handle_asynchronously :send_recover_needs_approval_email_dj
+  handle_asynchronously :send_recover_needs_approval_email_dj, :queue => :generic_queue
 
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
   def increment_reactivations
@@ -267,7 +267,7 @@ class Member < ActiveRecord::Base
       errors = { :next_bill_date => 'Is prior to actual date' }
       answer = { :message => "Next bill date should be older that actual date.", :code => Settings.error_codes.next_bill_date_prior_actual_date, :errors => errors }
     elsif self.valid? and not self.active_credit_card.expired?
-      next_bill_date = next_bill_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(self.club.time_zone).utc_offset)/(60*60)}")
+      next_bill_date = next_bill_date.to_datetime.change(:offset => self.get_offset_related)
       self.next_retry_bill_date = next_bill_date
       self.bill_date = next_bill_date
       self.save(:validate => false)
@@ -621,7 +621,7 @@ class Member < ActiveRecord::Base
     club = tom.club
 
     unless skip_product_validation
-      member_params[:product_sku].split(',').each do |sku|
+      member_params[:product_sku].to_s.split(',').each do |sku|
         product = Product.find_by_club_id_and_sku(club.id,sku)
         if product.nil?
           return { :message => I18n.t('error_messages.product_does_not_exists'), :code => Settings.error_codes.product_does_not_exists }
@@ -855,13 +855,15 @@ class Member < ActiveRecord::Base
         elsif not api_id.nil?
           Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
           message = last_sync_error || "Club cash processed at drupal correctly."
+          auditory_code = Settings.operation_types.remote_club_cash_transaction_failed
           if self.last_sync_error.nil?
+            auditory_code = Settings.operation_types.remote_club_cash_transaction
             answer = { :message => message, :code => Settings.error_codes.success }
           else
             answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
           end
           answer[:message] = I18n.t('error_messages.drupal_error_sync') if message.blank?
-          Auditory.audit(agent, self, answer[:message], self, Settings.operation_types.remote_club_cash_transaction)
+          Auditory.audit(agent, self, answer[:message], self, auditory_code)
         end
       rescue Exception => e
         answer[:errors] = cct.errors_merged(self) unless cct.nil?
@@ -934,17 +936,16 @@ class Member < ActiveRecord::Base
     self.blacklist nil, "Chargeback - "+args[:reason]
   end
 
-  def cancel!(cancel_date, message, current_agent = nil)
+  def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
     if not message.blank?
-      if cancel_date.to_date >= Time.zone.now.to_date
+      if cancel_date.to_datetime.change(:offset => self.get_offset_related) >= DateTime.now.change(:offset => self.get_offset_related)
         if self.cancel_date == cancel_date
           answer = { :message => "Cancel date is already set to that date", :code => Settings.error_codes.wrong_data }
         else
           if can_be_canceled?
-            cancel_date = cancel_date.to_datetime.change(:offset => "#{(Time.zone.now.in_time_zone(self.club.time_zone).utc_offset)/(60*60)}")
-            self.current_membership.update_attribute :cancel_date, cancel_date
+            self.current_membership.update_attribute :cancel_date, cancel_date.to_datetime.change(:offset => self.get_offset_related )
             answer = { :message => "Member cancellation scheduled to #{cancel_date.to_date} - Reason: #{message}", :code => Settings.error_codes.success }
-            Auditory.audit(current_agent, self, answer[:message], self, Settings.operation_types.future_cancel)
+            Auditory.audit(current_agent, self, answer[:message], self, operation_type)
           else
             answer = { :message => "Member is not in cancelable status.", :code => Settings.error_codes.cancel_date_blank }
           end
@@ -1072,6 +1073,7 @@ class Member < ActiveRecord::Base
         tz = Time.zone.now
         begin
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
+          member.cancel!(Time.zone.now, "Billing date is overdue.", nil, Settings.operation_types.bill_overdue_cancel) if member.manual_payment and not member.cancel_date
           member.set_as_canceled!
         rescue Exception => e
           Auditory.report_issue("Members::Cancel", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
@@ -1339,24 +1341,28 @@ class Member < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :desnormalize_preferences
+  handle_asynchronously :desnormalize_preferences, :queue => :generic_queue
 
   def marketing_tool_sync
     self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
   end
-  handle_asynchronously :marketing_tool_sync
+  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync
 
   # used for member blacklist
   def marketing_tool_sync_unsubscription
     exact_target_member.unsubscribe! if defined?(SacExactTarget::MemberModel)
   end
-  handle_asynchronously :marketing_tool_sync_unsubscription
+  handle_asynchronously :marketing_tool_sync_unsubscription, :queue => :exact_target_sync
 
   # used for member unblacklist
   def marketing_tool_sync_subscription
     exact_target_member.subscribe! if defined?(SacExactTarget::MemberModel)
   end
-  handle_asynchronously :marketing_tool_sync_subscription
+  handle_asynchronously :marketing_tool_sync_subscription, :queue => :exact_target_sync
+
+  def get_offset_related
+    Time.now.in_time_zone(self.club.time_zone).formatted_offset
+  end
 
   private
     def schedule_renewal(manual = false)

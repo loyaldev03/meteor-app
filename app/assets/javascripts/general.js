@@ -233,7 +233,7 @@ function new_product_functions(){
 function member_index_functions(){
   $('#index_search_form').submit(function (){
     startAjaxLoader();
-    $('#submit_button').attr('disabled', 'disabled')
+    $('#submit_button').attr('disabled', 'disabled');
     update_select_only = false;
     $.get(this.action, $(this).serialize(), null, 'script').done(function(data) {
       endAjaxLoader();
@@ -281,6 +281,7 @@ function new_member_functions(){
     startAjaxLoader();
     $('#error_explanation').hide();
     $('#submit_button').attr('disabled', 'disabled');
+    $('#cancel_button').hide();
     event.preventDefault();
     $.ajax({
       type: 'POST',
@@ -296,6 +297,7 @@ function new_member_functions(){
           $('#error_explanation').show();
           $('#error_explanation ul').empty();
           $('#submit_button').removeAttr('disabled');
+          $('#cancel_button').show();
           $('#error_explanation ul').append("<b>"+data.message+"</b>");
           for (var key in data.errors){
             if (data.errors.hasOwnProperty(key)) {
@@ -361,6 +363,7 @@ function edit_member_functions(){
   $('form').submit( function(event) {
     startAjaxLoader();
     $('#submit_button').attr('disabled', 'disabled');
+    $('#cancel_button').hide();
     event.preventDefault();
     $.ajax({
       type: 'PUT',
@@ -374,6 +377,7 @@ function edit_member_functions(){
           window.location.replace('../'+id);
         else{
           $('#submit_button').removeAttr('disabled');
+          $('#cancel_button').show();
           $('#error_explanation').show();
           $('#error_explanation ul').empty();
           $('#error_explanation ul').append("<b>"+data.message+"</b>");
@@ -408,6 +412,7 @@ function club_cash_functions(){
   $('form').submit( function(event) {
     startAjaxLoader();
     $('#submit_button').attr('disabled', 'disabled');
+    $('#cancel_button').hide();
     event.preventDefault(); 
     $.ajax({
       type: 'POST',
@@ -420,6 +425,7 @@ function club_cash_functions(){
           window.location.replace('../'+id);
         }else{
           $('#submit_button').removeAttr("disabled");
+          $('#cancel_button').show();
           $('#error_explanation').show();
           $("#error_explanation ul").empty();
           $('#error_explanation ul').append("<b>"+data.message+"</b>");
@@ -797,6 +803,8 @@ function show_terms_of_membership_functions(){
 function save_the_sale_functions(){
   $('form').submit( function(event) {
   $('#save_the_sale_button').attr('disabled', 'disabled');
+  $('#full_save_button').hide();
+  $('#cancel_button').hide();
     startAjaxLoader();
   });
 }
@@ -804,6 +812,7 @@ function save_the_sale_functions(){
 function recover_member_functions(){
   $('form').submit( function(event) {
   $('#recover_button').attr('disabled', 'disabled');
+  $('#cancel_button').hide();
     startAjaxLoader();
   }); 
 }
