@@ -1363,10 +1363,10 @@ class Member < ActiveRecord::Base
 
   private
     def schedule_renewal(manual = false)
-      if manual or (terms_of_membership.monthly? and self.recycled_times > 1) 
-        new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
+      if manual or (terms_of_membership.monthly? and self.recycled_times > 1)
+        new_bill_date = Time.zone.now + terms_of_membership.installment_period.days
       else
-        new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
+        new_bill_date = self.bill_date + terms_of_membership.installment_period.days
       end
       # refs #15935
       self.current_membership.increment!(:quota, terms_of_membership.quota)
