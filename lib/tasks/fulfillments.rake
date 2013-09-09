@@ -17,9 +17,10 @@ namespace :fulfillments do
       elsif Rails.env=='staging'
         fulfillment_file.club = Club.find 17
       end
-      
+
       Time.zone = fulfillment_file.club.time_zone
-      
+      fulfillment_file.initial_date = Time.zone.now-7.days
+      fulfillment_file.end_date = Time.zone.now
       fulfillment_file.product = "KIT-CARD"
       fulfillment_file.save!
 
@@ -27,7 +28,7 @@ namespace :fulfillments do
         ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
           AND ? and fulfillments.status = 'not_processed' 
           AND fulfillments.product_sku like 'KIT-CARD'", fulfillment_file.club_id, 
-        Time.zone.now-7.days, Time.zone.now ])      
+          fulfillment_file.initial_date, fulfillment_file.end_date ])
       fulfillment_file.save!
       package = Axlsx::Package.new                  
 
@@ -98,12 +99,14 @@ namespace :fulfillments do
       end
       
       Time.zone = fulfillment_file.club.time_zone
+      fulfillment_file.initial_date = Time.zone.now-7.days
+      fulfillment_file.end_date = Time.zone.now
 
       fulfillments = Fulfillment.includes(:member).where( 
         ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
           AND ? and fulfillments.status = 'not_processed' 
           AND fulfillments.product_sku != 'KIT-CARD'", fulfillment_file.club_id, 
-        Time.zone.now-7.days, Time.zone.now ])
+          fulfillment_file.initial_date, fulfillment_file.end_date ])
       temp_file = "#{I18n.l(Time.zone.now, :format => :only_date)}_sloop_naamma.csv"
 
       Rails.logger.info " *** Processing #{fulfillments.count} fulfillments for club #{fulfillment_file.club_id}"
@@ -182,6 +185,8 @@ namespace :fulfillments do
       fulfillment_file.save!
 
       Time.zone = fulfillment_file.club.time_zone
+      fulfillment_file.initial_date = Time.zone.now-7.days
+      fulfillment_file.end_date = Time.zone.now
 
       package = Axlsx::Package.new
 
@@ -192,8 +197,9 @@ namespace :fulfillments do
             AND fulfillments.status = 'not_processed' 
             AND fulfillments.product_sku != 'KIT-CARD'", 
             fulfillment_file.club_id, 
-            Time.zone.now - 7.days, 
-            Time.zone.now]
+            fulfillment_file.initial_date, 
+            fulfillment_file.end_date
+          ]
       )
 
       toms = TermsOfMembership.where(:club_id => fulfillment_file.club)
