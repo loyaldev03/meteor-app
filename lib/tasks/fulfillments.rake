@@ -101,6 +101,7 @@ namespace :fulfillments do
       Time.zone = fulfillment_file.club.time_zone
       fulfillment_file.initial_date = Time.zone.now-7.days
       fulfillment_file.end_date = Time.zone.now
+      fulfillment_file.product = "SLOOPS"
 
       fulfillments = Fulfillment.includes(:member).where( 
         ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
@@ -129,7 +130,6 @@ namespace :fulfillments do
           end
         end
       end
-      fulfillment_file.product = "SLOOPS"
       fulfillment_file.save!
       
       begin
@@ -181,12 +181,11 @@ namespace :fulfillments do
         fulfillment_file.club = Club.find 19
       end
 
-      fulfillment_file.product = "SLOOPS"
-      fulfillment_file.save!
-
       Time.zone = fulfillment_file.club.time_zone
       fulfillment_file.initial_date = Time.zone.now-7.days
       fulfillment_file.end_date = Time.zone.now
+      fulfillment_file.product = "SLOOPS"
+      fulfillment_file.save!
 
       package = Axlsx::Package.new
 
