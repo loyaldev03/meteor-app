@@ -126,7 +126,7 @@ class TransactionTest < ActiveSupport::TestCase
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
       Member.bill_all_members_up_today
       member.reload
-      nbd = nbd + eval(member.terms_of_membership.installment_type)
+      nbd = nbd + member.terms_of_membership.installment_period.days
       assert_equal nbd, member.next_retry_bill_date
       assert_equal member.bill_date, member.next_retry_bill_date
       assert_equal 1, member.quota
@@ -138,7 +138,7 @@ class TransactionTest < ActiveSupport::TestCase
       Timecop.travel(next_month + time.month) do
         Member.bill_all_members_up_today
         member.reload
-        nbd = nbd + eval(member.terms_of_membership.installment_type)
+        nbd = nbd + member.terms_of_membership.installment_period.days
         assert_equal nbd, member.next_retry_bill_date
         assert_equal member.bill_date, member.next_retry_bill_date
         assert_equal member.quota, time+1
@@ -172,7 +172,7 @@ class TransactionTest < ActiveSupport::TestCase
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
       Member.bill_all_members_up_today
       member.reload
-      nbd = nbd + eval(member.terms_of_membership.installment_type)
+      nbd = nbd + member.terms_of_membership.installment_period.days
       assert_equal nbd, member.next_retry_bill_date
       assert_equal member.bill_date, member.next_retry_bill_date
       assert_equal 12, member.quota
@@ -183,7 +183,7 @@ class TransactionTest < ActiveSupport::TestCase
       Timecop.travel(next_year + time.years) do
         Member.bill_all_members_up_today
         member.reload
-        nbd = nbd + eval(member.terms_of_membership.installment_type)
+        nbd = nbd + member.terms_of_membership.installment_period.days
         assert_equal nbd, member.next_retry_bill_date
         assert_equal member.bill_date, member.next_retry_bill_date
         assert_equal member.quota, time*12
@@ -646,7 +646,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal nbd_initial, member.next_retry_bill_date
     assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership2.provisional_days.days, :format => :only_date)
     assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd_initial, :format => :only_date)
-    nbd = member.bill_date + eval(@terms_of_membership2.installment_type)
+    nbd = member.bill_date + @terms_of_membership2.installment_period.days
 
     Timecop.freeze( member.next_retry_bill_date ) do
       Member.bill_all_members_up_today
@@ -670,7 +670,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal nbd_initial, member.next_retry_bill_date
     assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership2.provisional_days.days, :format => :only_date)
     assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd_initial, :format => :only_date)
-    nbd = member.bill_date + eval(@terms_of_membership2.installment_type)
+    nbd = member.bill_date + @terms_of_membership2.installment_period.days
 
     Timecop.freeze( member.next_retry_bill_date ) do
       Member.bill_all_members_up_today
@@ -693,7 +693,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now+@terms_of_membership2.provisional_days.days, :format => :only_date)
     assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd_initial, :format => :only_date)
-    nbd = member.bill_date + eval(@terms_of_membership2.installment_type)
+    nbd = member.bill_date + @terms_of_membership2.installment_period.days
 
     Timecop.freeze( member.next_retry_bill_date ) do
       Member.bill_all_members_up_today
@@ -715,7 +715,7 @@ class TransactionTest < ActiveSupport::TestCase
     member.reload
 
     assert_equal nbd, member.next_retry_bill_date
-    nbd = member.bill_date + eval(@terms_of_membership2.installment_type)
+    nbd = member.bill_date + @terms_of_membership2.installment_period.days
     assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(Time.zone.now, :format => :only_date)
     assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(member.bill_date+@terms_of_membership2.provisional_days.days, :format => :only_date)
 
