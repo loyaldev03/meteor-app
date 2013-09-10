@@ -39,15 +39,15 @@ class TermsOfMembership < ActiveRecord::Base
   ###########################################
   # Installment types:
   def monthly?
-    installment_type == "1.month"
+    installment_period == 30
   end
 
   def yearly?
-    installment_type == "1.year"
+    installment_period == 365
   end
 
   def lifetime?
-    installment_type == "1000.years"
+    installment_period == 365000
   end
   #################################
   

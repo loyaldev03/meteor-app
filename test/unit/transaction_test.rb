@@ -249,8 +249,10 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs_store
     active_merchant_stubs
     @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
-    @terms_of_membership.update_attribute :downgrade_tom_id, @terms_of_membership_for_downgrade.id
-
+    @terms_of_membership.downgrade_tom_id = @terms_of_membership_for_downgrade.id
+    @terms_of_membership.if_cannot_bill = "downgrade_to"
+    @terms_of_membership.save
+    
     member = enroll_member(@terms_of_membership)
     nbd = member.bill_date
     bill_date = member.bill_date
@@ -374,8 +376,10 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing with SD reaches the recycle limit, and HD downgrade the member." do 
     @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
-    @terms_of_membership.update_attribute :downgrade_tom_id, @terms_of_membership_for_downgrade.id
-        
+    @terms_of_membership.downgrade_tom_id = @terms_of_membership_for_downgrade.id
+    @terms_of_membership.if_cannot_bill = "downgrade_to"
+    @terms_of_membership.save
+
     active_merchant_stubs_store
     assert_difference('Operation.count', 3) do
       active_member = create_active_member(@terms_of_membership)
@@ -397,8 +401,10 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing with HD downgrade the member when configured to do so" do 
     @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
-    @terms_of_membership.update_attribute :downgrade_tom_id, @terms_of_membership_for_downgrade.id
-    
+    @terms_of_membership.downgrade_tom_id = @terms_of_membership_for_downgrade.id
+    @terms_of_membership.if_cannot_bill = "downgrade_to"
+    @terms_of_membership.save
+
     active_merchant_stubs_store
     assert_difference('Operation.count', 3) do
       active_member = create_active_member(@terms_of_membership)
