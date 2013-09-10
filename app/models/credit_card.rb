@@ -96,11 +96,12 @@ class CreditCard < ActiveRecord::Base
   end
 
   def get_token(pgc, pmember, allow_cc_blank = false)
+    pgc ||= member.terms_of_membership.payment_gateway_configuration
     am = CreditCard.am_card(number, expire_month, expire_year, pmember.first_name || member.first_name, pmember.last_name || member.last_name)
     if am.valid?
       self.cc_type = am.brand
       begin
-        self.token = Transaction.store!(am, pgc || member.terms_of_membership.payment_gateway_configuration)
+        self.token = Transaction.store!(am, pgc)
       rescue Exception => e
         Auditory.report_issue("CreditCard:GetToken", "Gateway response: " + e.to_s, { credit_card: self.inspect, member: pmember.inspect || self.member.inspect })
         logger.error e.inspect
@@ -117,6 +118,7 @@ class CreditCard < ActiveRecord::Base
       self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
       self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards. #54934966
     end
+    self.gateway = pgc.gateway
     self.token
   end
 
