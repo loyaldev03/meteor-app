@@ -1519,17 +1519,19 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member = create_active_member(@terms_of_membership, :member_with_api)
     @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
-    cancel_date = I18n.l(Time.zone.now, :format => :only_date)    
-    
-    assert_difference("Operation.count") do
-      generate_put_cancel( cancel_date, "reason" )
-      assert_response :success
+
+    Timecop.freeze(Time.zone.now + 1.month) do
+      cancel_date = I18n.l(Time.new.getlocal(@member.get_offset_related), :format => :only_date)    
+
+      assert_difference("Operation.count") do
+        generate_put_cancel( cancel_date, "reason" )
+        assert_response :success
+      end
+      @member.reload
+      cancel_date_to_check = cancel_date.to_datetime.change(:offset => @member.get_offset_related)  
+      assert @member.current_membership.cancel_date > @member.current_membership.join_date
+      assert_equal I18n.l(@member.current_membership.cancel_date, :format => :only_date), I18n.l(cancel_date_to_check, :format => :only_date)
     end
-    @member.reload
-    cancel_date_to_check = (cancel_date.to_s+" 23:59:59").to_datetime
-    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => @member.get_offset_related)  
-    assert @member.current_membership.cancel_date > @member.current_membership.join_date
-    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
 
   test "Should not cancel member when cancel date is in wrong format" do
