@@ -490,9 +490,7 @@ class Api::MembersController < ApplicationController
   def cancel
     member = Member.find params[:id]
     my_authorize! :api_cancel, Member, member.club_id
-
-    cancel_date = params[:cancel_date].to_date.to_s+(member.join_date.to_date == params[:cancel_date].to_date ? " 23:59:59" : "")
-    render json: member.cancel!(cancel_date, params[:reason], @current_agent)
+    render json: member.cancel!(params[:cancel_date], params[:reason], @current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   rescue ArgumentError => e

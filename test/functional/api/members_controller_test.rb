@@ -1478,7 +1478,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   # StatzHub - Add an Api method to cancel a member
   # Cancel date using a Curl call
-  test "Admin should cancel memeber" do
+  test "Admin should cancel member" do
     sign_in @admin_user
     @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -1494,6 +1494,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     cancel_date_to_check = cancel_date.to_datetime
     cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => @member.get_offset_related )
 
+    assert @member.current_membership.cancel_date > @member.current_membership.join_date
     assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
 
@@ -1527,7 +1528,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member.reload
     cancel_date_to_check = (cancel_date.to_s+" 23:59:59").to_datetime
     cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => @member.get_offset_related)  
-    
+    assert @member.current_membership.cancel_date > @member.current_membership.join_date
     assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
 

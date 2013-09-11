@@ -937,8 +937,11 @@ class Member < ActiveRecord::Base
   end
 
   def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
+    cancel_date = cancel_date.to_date
+    cancel_date = (self.join_date.to_date == cancel_date ? "#{cancel_date} 23:59:59" : cancel_date).to_datetime
+
     if not message.blank?
-      if cancel_date.to_datetime.change(:offset => self.get_offset_related) >= DateTime.now.change(:offset => self.get_offset_related)
+      if cancel_date.change(:offset => self.get_offset_related).to_date >= Time.new.getlocal(self.get_offset_related).to_date
         if self.cancel_date == cancel_date
           answer = { :message => "Cancel date is already set to that date", :code => Settings.error_codes.wrong_data }
         else
