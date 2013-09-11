@@ -37,19 +37,6 @@ class TermsOfMembership < ActiveRecord::Base
   before_update :can_update_or_delete
 
   ###########################################
-  # Installment types:
-  def monthly?
-    installment_period == 30
-  end
-
-  def yearly?
-    installment_period == 365
-  end
-
-  def lifetime?
-    installment_period == 365000
-  end
-  #################################
   
   def production?
     self.mode == 'production'
