@@ -72,7 +72,7 @@ class MemberTest < ActiveSupport::TestCase
       assert_equal member.quota, 1, "quota is #{member.quota} should be 1"
       assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
       assert_equal member.bill_date, member.next_retry_bill_date, "bill_date is #{member.bill_date} should be #{member.next_retry_bill_date}"
-      assert_equal member.next_retry_bill_date, (prev_bill_date + 1.month), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + 1.month)}"
+      assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l((prev_bill_date + member.terms_of_membership.installment_period.days), :format => :only_date), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + 1.month)}"
     end
   end
 
@@ -293,8 +293,8 @@ class MemberTest < ActiveSupport::TestCase
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
       assert_equal member.quota, 1, "quota is #{member.quota} should be 1"
       assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
-      assert_equal member.bill_date, member.next_retry_bill_date, "bill_date is #{member.bill_date} should be #{member.next_retry_bill_date}"
-      assert_equal member.next_retry_bill_date, (prev_bill_date + installment_period), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + installment_period)}"
+      assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(member.next_retry_bill_date, :format => :only_date), "bill_date is #{member.bill_date} should be #{member.next_retry_bill_date}"
+      assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(prev_bill_date + installment_period, :format => :only_date), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + installment_period)}"
     end
 
 
