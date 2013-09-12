@@ -197,7 +197,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
         assert page.has_content?('0.0')
       end
     end
-    @saved_member.current_membership.update_attribute :quota, 23
+    @saved_member.current_membership.update_attribute :join_date, Time.zone.now-23.months
     @saved_member.bill_membership 
     assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount )
     @saved_member.reload
@@ -221,7 +221,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
         assert page.has_content?('0.0')
       end
     end
-    @saved_member.current_membership.update_attribute :quota, 23
+    @saved_member.current_membership.update_attribute :join_date, Time.zone.now-23.months
     assert @saved_member.club_cash_expire_date == nil
     @saved_member.bill_membership 
     assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount )
@@ -248,7 +248,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
       end
     end
     assert @saved_member.club_cash_expire_date == nil
-    @saved_member.current_membership.update_attribute :quota, 12
+    @saved_member.current_membership.update_attribute :join_date, Time.zone.now-12.months
     @saved_member.bill_membership 
     assert_equal(@saved_member.club_cash_amount, @terms_of_membership_with_gateway.club_cash_amount )
     @saved_member.reload
@@ -276,7 +276,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
     click_link_or_button('Update Member')
     assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload
-    @saved_member.current_membership.update_attribute :quota, 12
+    @saved_member.current_membership.update_attribute :join_date, Time.zone.now-12.months
     @saved_member.bill_membership 
     assert_equal(@saved_member.club_cash_amount, 200 )
     @saved_member.reload

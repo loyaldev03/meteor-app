@@ -9,7 +9,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -25,7 +24,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -41,7 +39,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -57,7 +54,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -73,7 +69,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -89,7 +84,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -105,7 +99,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -121,7 +114,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -137,7 +129,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -154,7 +145,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 12
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -170,7 +160,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval true
     club_cash_amount 150
     provisional_days 30
@@ -186,7 +175,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 0
     provisional_days 30
@@ -202,7 +190,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 30
@@ -218,7 +205,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 0
@@ -234,7 +220,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 150
     provisional_days 0
@@ -250,7 +235,6 @@ FactoryGirl.define do
     is_payment_expected 1
     subscription_limits 0
     if_cannot_bill 'cancel'
-    quota 1
     needs_enrollment_approval false
     club_cash_amount 0
     provisional_days 0

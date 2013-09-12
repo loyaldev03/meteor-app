@@ -311,10 +311,6 @@
             <td id="td_mi_club_cash_expire_date"> <%= I18n.l(@current_member.club_cash_expire_date, :format => :only_date) unless @current_member.club_cash_expire_date.nil?  %> </td>
           </tr>
           <% end %>
-          <tr>
-            <th><%= t('activerecord.attributes.member.quota') %>: </th>
-            <td id="td_mi_quota"><%= @current_membership.quota %></td>  
-          </tr>
         </table>        
       </td>
     </tr>

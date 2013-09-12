@@ -22,7 +22,6 @@ class Member < ActiveRecord::Base
   delegate :terms_of_membership_id, :to => :current_membership
   delegate :join_date, :to => :current_membership
   delegate :cancel_date, :to => :current_membership
-  delegate :quota, :to => :current_membership
   delegate :time_zone, :to => :club
   ##### 
 
@@ -359,14 +358,7 @@ class Member < ActiveRecord::Base
 
   # refs #21919
   def can_renew_fulfillment?
-    self.active? and 
-    (self.recycled_times == 0 and 
-      (
-        ((self.current_membership.quota % 12)==0) or
-        # self.current_membership.quota > 12 .. yes we need it . because quota = 12 and 2012-2012=0 +1*12 => 12
-        (self.current_membership.quota > 12 and (self.current_membership.quota == (12 * (Time.zone.now.year - self.current_membership.join_date.year + 1))))
-      )
-    )
+    self.active? and self.recycled_times == 0 and ( self.get_estimated_quota % 12 == 0 )
   end
 
   def last_refunded_amount
@@ -397,6 +389,10 @@ class Member < ActiveRecord::Base
       return true if transaction.is_response_code_cc_expired?
     end
     false
+  end
+
+  def get_estimated_quota
+    ((Time.zone.now.year - self.join_date.year) * 12 + Time.zone.now.month - self.join_date.month)
   end
 
   ###############################################
@@ -797,7 +793,7 @@ class Member < ActiveRecord::Base
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing")
-    if current_membership.quota%12==0 and current_membership.quota!=12
+    # if self.get_estimated_quota != 12 and self.get_estimated_quota % 12 == 0
       amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
       self.add_club_cash(nil, amount, message)
       if is_not_drupal?
@@ -806,7 +802,7 @@ class Member < ActiveRecord::Base
         end
         self.save(:validate => false)
       end
-    end
+    # end
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop billing!! 
@@ -1356,7 +1352,6 @@ class Member < ActiveRecord::Base
     def schedule_renewal(manual = false)
       new_bill_date = Time.zone.now + terms_of_membership.installment_period.days
       # refs #15935
-      self.current_membership.increment!(:quota, terms_of_membership.quota)
       self.recycled_times = 0
       self.bill_date = new_bill_date
       self.next_retry_bill_date = new_bill_date

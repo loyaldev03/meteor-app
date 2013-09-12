@@ -696,7 +696,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#memberships_table")do
       assert page.has_content?(membership.id.to_s)
       assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-      assert page.has_content?(membership.quota.to_s)
       assert page.has_content?('provisional')
     end
 
@@ -762,7 +761,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#memberships_table")do
       assert page.has_content?(membership.id.to_s)
       assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-      assert page.has_content?(membership.quota.to_s)
       assert page.has_content?('applied')
     end
 
@@ -781,7 +779,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#memberships_table")do
       assert page.has_content?(membership.id.to_s)
       assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-      assert page.has_content?(membership.quota.to_s)
       assert page.has_content?('lapsed')
     end
   end
