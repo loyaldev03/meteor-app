@@ -1528,6 +1528,8 @@ class Api::MembersControllerTest < ActionController::TestCase
         assert_response :success
       end
       @member.reload
+     puts @member.get_offset_related
+     puts cancel_date
       cancel_date_to_check = cancel_date.to_datetime.change(:offset => @member.get_offset_related)  
       assert @member.current_membership.cancel_date > @member.current_membership.join_date
       assert_equal I18n.l(@member.current_membership.cancel_date.change(:offset => @member.get_offset_related), :format => :only_date), I18n.l(cancel_date_to_check, :format => :only_date)
