@@ -657,7 +657,6 @@ module ActionController
 
         assert page.has_selector?("#link_member_add_club_cash") if member.status == 'provisional' or member.status == 'active'
 
-        within("#td_mi_quota") { assert page.has_content?("#{member.quota}") }      
       end  
       if not member.current_membership.enrollment_info.nil?
         if not member.current_membership.enrollment_info.product_sku.blank? and not member.status == 'applied'
@@ -673,7 +672,6 @@ module ActionController
       within("#memberships_table")do
         assert page.has_content?(membership.id.to_s)
         assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-        assert page.has_content?(membership.quota.to_s)
         assert page.has_content?(status)
       end
     end

@@ -11,7 +11,7 @@ class Membership < ActiveRecord::Base
   # validates :member, :presence => true
 
   def self.datatable_columns
-    ['id', 'status', 'tom', 'join_date', 'cancel_date', 'quota' ]
+    ['id', 'status', 'tom', 'join_date', 'cancel_date']
   end
 
   def cancel_because_of_membership_change

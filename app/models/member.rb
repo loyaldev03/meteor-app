@@ -358,7 +358,7 @@ class Member < ActiveRecord::Base
 
   # refs #21919
   def can_renew_fulfillment?
-    self.active? and self.recycled_times == 0 and ( self.get_estimated_quota % 12 == 0 )
+    self.active? and self.recycled_times == 0
   end
 
   def last_refunded_amount
@@ -389,10 +389,6 @@ class Member < ActiveRecord::Base
       return true if transaction.is_response_code_cc_expired?
     end
     false
-  end
-
-  def get_estimated_quota
-    ((Time.zone.now.year - self.join_date.year) * 12 + Time.zone.now.month - self.join_date.month)
   end
 
   ###############################################
@@ -793,16 +789,14 @@ class Member < ActiveRecord::Base
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing")
-    # if self.get_estimated_quota != 12 and self.get_estimated_quota % 12 == 0
-      amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
-      self.add_club_cash(nil, amount, message)
-      if is_not_drupal?
-        if self.club_cash_expire_date.nil? # first club cash assignment
-          self.club_cash_expire_date = join_date + 1.year
-        end
-        self.save(:validate => false)
+    amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
+    self.add_club_cash(nil, amount, message)
+    if is_not_drupal?
+      if self.club_cash_expire_date.nil? # first club cash assignment
+        self.club_cash_expire_date = join_date + 1.year
       end
-    # end
+      self.save(:validate => false)
+    end
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop billing!! 

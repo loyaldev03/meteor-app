@@ -16,7 +16,7 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "active member can't renew fulfillments" do 
     [ 1, 5, 15, 25 ].each do |time|
-      [ 0, 3 ].each do |recycled_times|
+      [ 1, 3 ].each do |recycled_times|
         member = create_active_member(@terms_of_membership_with_gateway, :active_member, :enrollment_info, { recycled_times: recycled_times }, { join_date: Time.zone.now-time.month })
         assert !member.can_renew_fulfillment?, "monthly recycled_times: #{recycled_times} and join_date: #{I18n.l(member.join_date, :format => :only_date)} and actual date #{I18n.l(Time.zone.now, :format => :only_date)}"
       end
