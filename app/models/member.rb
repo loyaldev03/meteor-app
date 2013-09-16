@@ -122,10 +122,6 @@ class Member < ActiveRecord::Base
     after_transition [ :none, :provisional, :active ] => # none is new join. provisional and active are save the sale
                         :applied, :do => [:set_join_date, :send_active_needs_approval_email]
     ###### <<<<<<========
-    ###### member gets active =====>>>>
-    after_transition :provisional => 
-                        :active, :do => :send_active_email
-    ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
                         :provisional, :do => 'schedule_first_membership(true)'
@@ -180,11 +176,6 @@ class Member < ActiveRecord::Base
 
   def save_state
     save(:validate => false)
-  end
-
-  # Sends the activation mail.
-  def send_active_email
-    Communication.deliver!(:active, self)
   end
 
   # Sends the request mail to every representative to accept/reject the member.
