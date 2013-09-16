@@ -468,7 +468,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
     member = enroll_member(@tom, 0, true)
 
-    assert_difference("Operation.count",3) do  # communictaion | renewal schedule NBD | billing
+    assert_difference("Operation.count",2) do  # renewal schedule NBD | billing
       assert_difference("Transaction.count") do
         member.bill_membership
       end
@@ -482,7 +482,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
     member = enroll_member(@tom, 0, true)
     
-    assert_difference("Operation.count",3) do  #  communictaion | renewal schedule NBD | billing
+    assert_difference("Operation.count",2) do  #  renewal schedule NBD | billing
       assert_difference("Transaction.count") do
         member.bill_membership
       end
@@ -821,7 +821,7 @@ class TransactionTest < ActiveSupport::TestCase
       old_year = active_member.active_credit_card.expire_year
       old_month = active_member.active_credit_card.expire_month
       
-      assert_difference('Operation.count', 3) do
+      assert_difference('Operation.count', 2) do
         assert_difference('Transaction.count') do
           active_member.bill_membership
         end
@@ -889,7 +889,7 @@ class TransactionTest < ActiveSupport::TestCase
       old_year = active_member.active_credit_card.expire_year
       old_month = active_member.active_credit_card.expire_month
       
-      assert_difference('Operation.count', 3) do
+      assert_difference('Operation.count', 2) do
         assert_difference('Transaction.count') do
           active_member.bill_membership
         end
@@ -955,7 +955,7 @@ class TransactionTest < ActiveSupport::TestCase
       old_year = active_member.active_credit_card.expire_year
       old_month = active_member.active_credit_card.expire_month
       
-      assert_difference('Operation.count', 3) do
+      assert_difference('Operation.count', 2) do
         assert_difference('Transaction.count') do
           active_member.bill_membership
         end
