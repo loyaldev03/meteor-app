@@ -123,7 +123,9 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### member gets active =====>>>>
     after_transition :provisional => 
-                        :active, :do => :send_active_email
+                        :active, :do => [:send_active_email, :assign_first_club_cash]
+    after_transition :active => 
+                        :active, :do => :assign_club_cash
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
@@ -242,7 +244,7 @@ class Member < ActiveRecord::Base
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
     end
     self.save(:validate => false)
-    self.delay.assign_club_cash('club cash on enroll') unless skip_add_club_cash
+    self.delay.assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
   end
 
   # Changes next bill date.
@@ -787,9 +789,17 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def assign_first_club_cash 
+    assign_club_cash unless terms_of_membership.skip_first_club_cash
+  end
+
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
-  def assign_club_cash(message = "Adding club cash after billing")
-    amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
+  def assign_club_cash(message = "Adding club cash after billing", enroll = false)
+    amount = if enroll
+        terms_of_membership.initial_club_cash_amount
+      else
+        (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_installment_amount)
+    end
     self.add_club_cash(nil, amount, message)
     if is_not_drupal?
       if self.club_cash_expire_date.nil? # first club cash assignment
@@ -1387,7 +1397,6 @@ class Member < ActiveRecord::Base
         Auditory.report_issue("#{bill_type}::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
       end
       schedule_renewal(manual)
-      assign_club_cash
       message = (manual ? "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}" : "Member billed successfully $#{trans.amount} Transaction id: #{trans.id}" )
       Auditory.audit(nil, trans, message, self, operation_type)
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
