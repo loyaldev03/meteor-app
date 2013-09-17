@@ -85,7 +85,9 @@ class TermsOfMembershipsController < ApplicationController
         @tom.installment_period = post_data[:installment_amount_days_time_span] == 'months' ? months_to_days(post_data[:installment_amount_days].to_i) : post_data[:installment_amount_days].to_i
       end
       @tom.subscription_limits = post_data[:subscription_terms] == 'until_cancelled' ? 0 : (post_data[:subscription_terms_stop_billing_after_time_span] == 'months' ? months_to_days(post_data[:subscription_terms_stop_billing_after].to_i) : post_data[:subscription_terms_stop_billing_after].to_i)
-      @tom.club_cash_amount = post_data[:club_cash_amount]
+      @tom.initial_club_cash_amount = post_data[:initial_club_cash_amount]
+      @tom.club_cash_installment_amount = post_data[:club_cash_installment_amount]
+      @tom.skip_first_club_cash = post_data[:terms_of_membership][:skip_first_club_cash]
       # Step 3
       @tom.downgrade_tom_id = nil
       @tom.upgrade_tom_id = nil
