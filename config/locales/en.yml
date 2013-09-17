@@ -322,7 +322,6 @@ en:
         has_payment_gateway_production: 'The club has payment gateway configuration for production mode'
         not_have_payment_gateway_development: 'The club does not have payment gateway configuration for development mode'
         not_have_payment_gateway_production: 'The club does not have payment gateway configuration for production mode'
-        club_cash_amount: 'Club cash amount'
         id: 'ID'
         plan_name: 'Plan Name'
         external_code: 'External Code'
@@ -337,6 +336,9 @@ en:
         payment_is_expected: 'Payment is Expected'
         trial_period: 'Trial period'
         installment_period: 'Installment period'
+        initial_club_cash_amount: 'Initial Club Cash Amount'
+        club_cash_installment_amount: 'Club Cash Amount'
+        skip_first_club_cash: 'Skip first club cash'
         wizard:
           title_new: 'New Subscription Plan'
           title_edit: 'Edit Subscription Plan'
@@ -370,6 +372,9 @@ en:
           step_2_button_next: 'Define Upgrades / Downgrades'
           step_2_edit_button_next: 'Edit Upgrades / Downgrades'
           club_cash_amount: 'Club Cash Amount'
+          initial_club_cash_amount: 'Initial Club Cash Amount'
+          club_cash_installment_amount: 'Club Cash Amount'
+          skip_first_club_cash: 'Skip adding club cash on first membership billing'
           # Step 3
           step_3_instructions: 'Configure whether you want to automatically upgrade or downgrade the memberships through this plan. These steps are optional'
           if_cannot_bill_member_then: 'If we cannot bill a member then'
