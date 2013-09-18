@@ -124,7 +124,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     membership = Membership.last
     enrollment_info = EnrollmentInfo.last
     assert_equal(enrollment_info.membership_id, membership.id)
-    assert_equal(saved_member.club_cash_amount, @terms_of_membership.club_cash_amount)
+    assert_equal(saved_member.club_cash_amount, @terms_of_membership.initial_club_cash_amount)
     transaction = Transaction.last
     assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
   end

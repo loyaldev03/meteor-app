@@ -63,7 +63,7 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Monthly member should be billed if it is active or provisional" do
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
@@ -265,7 +265,7 @@ class MemberTest < ActiveSupport::TestCase
     member.reload
 
     assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 4) do  #renewal, recycle, bill, set as active
+      assert_difference('Operation.count', 5) do  # club cash, renewal, recycle, bill, set as active
         assert_difference('Transaction.count') do
           assert_equal member.recycled_times, 0
           answer = member.bill_membership
@@ -284,10 +284,9 @@ class MemberTest < ActiveSupport::TestCase
     @club = @wordpress_terms_of_membership.club
     member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)    
     installment_period = @wordpress_terms_of_membership.installment_period.days
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
-
       member.reload
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
       assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
@@ -339,7 +338,7 @@ class MemberTest < ActiveSupport::TestCase
     bill_date_before = @member.bill_date
 
     Timecop.freeze( @member.next_retry_bill_date ) do
-      assert_difference('Operation.count', 3) do
+      assert_difference('Operation.count', 4) do
         assert_difference('Transaction.count', 1) do
           Member.bill_all_members_up_today
         end

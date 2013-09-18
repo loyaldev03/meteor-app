@@ -10,7 +10,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club
   end
@@ -25,7 +27,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club
   end
@@ -40,7 +44,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club
   end
@@ -55,7 +61,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club
   end
@@ -70,7 +78,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club, factory: :simple_club_with_gateway
   end
@@ -85,7 +95,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club, factory: :club_with_wordpress_api
   end
@@ -100,7 +112,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club, factory: :simple_club_with_gateway_with_family
   end
@@ -115,7 +129,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club, factory: :simple_club_with_require_external_id
   end
@@ -130,7 +146,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club, factory: :club_with_api
   end
@@ -146,7 +164,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club, factory: :club_with_gateway
   end
@@ -161,7 +181,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval true
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club, factory: :simple_club_with_gateway
   end
@@ -176,7 +198,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 0
+    initial_club_cash_amount 0
+    club_cash_installment_amount 0
+    skip_first_club_cash 0
     provisional_days 30
     # association :club, factory: :club_with_gateway
   end  
@@ -191,7 +215,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 30
     # association :club, factory: :simple_club_with_gateway
   end
@@ -206,7 +232,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 0
     # association :club, factory: :simple_club_with_gateway
   end
@@ -221,7 +249,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 150
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 0
     # association :club, factory: :simple_club_with_gateway
   end
@@ -236,7 +266,9 @@ FactoryGirl.define do
     subscription_limits 0
     if_cannot_bill 'cancel'
     needs_enrollment_approval false
-    club_cash_amount 0
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
     provisional_days 0
     # association :club, factory: :simple_club_with_gateway
   end

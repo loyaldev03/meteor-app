@@ -305,13 +305,14 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 	test "Create a new TOM with club cash and enroll a member with it" do
 		tom_name = 'TOM Name with club cash'
-		amount_of_club_cash = 80
+		initial_amount_of_club_cash = 80
+		club_cash_installment_amount = 100
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
 
 		fill_in_step_1(tom_name)
 		click_link_or_button 'Define Membership Terms'
-		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, club_cash_amount:amount_of_club_cash})
+		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, initial_club_cash_amount:initial_amount_of_club_cash, club_cash_installment_amount:club_cash_installment_amount})
 		click_link_or_button 'Define Upgrades / Downgrades'
 
 		find_button("Create Plan")
@@ -327,7 +328,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership)
     @saved_member = Member.find_by_email(unsaved_member.email)  
     visit show_member_path(:partner_prefix => @terms_of_membership.club.partner.prefix, :club_prefix => @terms_of_membership.club.name, :member_prefix => @saved_member.id)
-    within("#td_mi_club_cash_amount") { assert page.has_content?(amount_of_club_cash) }
+    within("#td_mi_club_cash_amount") { assert page.has_content?(initial_amount_of_club_cash) }
 	end
 
 	# # EDIT
@@ -771,7 +772,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, club_cash_amount:100})
+		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, initial_club_cash_amount:100, club_cash_installment_amount:200})
 		click_link_or_button 'Edit Upgrades / Downgrades'
 
 		find_button("Update Plan")
@@ -794,7 +795,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, club_cash_amount:0})
+		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, initial_club_cash_amount:0, club_cash_installment_amount:0})
 		click_link_or_button 'Edit Upgrades / Downgrades'
 
 		find_button("Update Plan")
@@ -803,12 +804,14 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		assert page.has_content?('was updated succesfully') # TOM was updated
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 		tom.reload
-		assert_equal tom.club_cash_amount.to_i, 0
+		assert_equal tom.initial_club_cash_amount.to_i, 0
+		assert_equal tom.club_cash_installment_amount.to_i, 0
 	end
 
 	test "Edit TOM without members and add club cash " do
 		tom_name = 'TOM Name'
-		club_cash_amount = 50
+		initial_club_cash_amount = 50
+		club_cash_installment_amount = 150
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
@@ -820,7 +823,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, club_cash_amount:club_cash_amount})
+		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, initial_club_cash_amount:initial_club_cash_amount, club_cash_installment_amount:club_cash_installment_amount})
 		click_link_or_button 'Edit Upgrades / Downgrades'
 
 		find_button("Update Plan")
@@ -829,7 +832,8 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		assert page.has_content?('was updated succesfully') # TOM was updated
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 		tom.reload
-		assert_equal tom.club_cash_amount.to_i, club_cash_amount.to_i
+		assert_equal tom.initial_club_cash_amount.to_i, initial_club_cash_amount.to_i
+		assert_equal tom.club_cash_installment_amount.to_i, club_cash_installment_amount.to_i
 	end
 
 	# # # # DELETE
