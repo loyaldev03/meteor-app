@@ -312,7 +312,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1(tom_name)
 		click_link_or_button 'Define Membership Terms'
-		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, initial_club_cash_amount:initial_amount_of_club_cash, club_cash_installment_amount:club_cash_installment_amount})
+		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, terms_of_membership_initial_club_cash_amount:initial_amount_of_club_cash, terms_of_membership_club_cash_installment_amount:club_cash_installment_amount})
 		click_link_or_button 'Define Upgrades / Downgrades'
 
 		find_button("Create Plan")
@@ -718,7 +718,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		click_link_or_button 'Edit Membership Terms'
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, 
 			              installment_amount:10, installment_amount_days:24},
-								   {installment_amount_days_time_span: 'Month(s)', subscription_terms_stop_billing_after_time_span: "Day(s)"},
+								   {installment_amount_days_time_span: 'Month(s)'},
 		               ["is_payment_expected_yes", "subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
@@ -772,7 +772,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, initial_club_cash_amount:100, club_cash_installment_amount:200})
+		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, terms_of_membership_initial_club_cash_amount:100, terms_of_membership_club_cash_installment_amount:200})
 		click_link_or_button 'Edit Upgrades / Downgrades'
 
 		find_button("Update Plan")
@@ -795,7 +795,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, initial_club_cash_amount:0, club_cash_installment_amount:0})
+		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, terms_of_membership_initial_club_cash_amount:0, terms_of_membership_club_cash_installment_amount:0})
 		click_link_or_button 'Edit Upgrades / Downgrades'
 
 		find_button("Update Plan")
@@ -823,7 +823,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		fill_in_step_1
 		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, initial_club_cash_amount:initial_club_cash_amount, club_cash_installment_amount:club_cash_installment_amount})
+		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:0, terms_of_membership_initial_club_cash_amount:initial_club_cash_amount, terms_of_membership_club_cash_installment_amount:club_cash_installment_amount})
 		click_link_or_button 'Edit Upgrades / Downgrades'
 
 		find_button("Update Plan")
