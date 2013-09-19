@@ -125,7 +125,7 @@ class Member < ActiveRecord::Base
     after_transition :provisional => 
                         :active, :do => [:send_active_email, :assign_first_club_cash]
     after_transition :active => 
-                        :active, :do => :assign_club_cash
+                    :active, :do => 'assign_club_cash()'
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
@@ -826,7 +826,7 @@ class Member < ActiveRecord::Base
         elsif is_not_drupal?
           if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
             cct = ClubCashTransaction.new(:amount => amount, :description => description)
-            cct.member = self
+            self.club_cash_transactions << cct
             raise "Could not save club cash transaction" unless cct.valid? and self.valid?
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save(:validate => false)
