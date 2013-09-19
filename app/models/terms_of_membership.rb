@@ -1,6 +1,7 @@
 class TermsOfMembership < ActiveRecord::Base
   attr_accessible :mode, :needs_enrollment_approval, :provisional_days, 
-    :installment_amount, :description, :installment_type, :club, :name, :club_cash_amount
+    :installment_amount, :description, :installment_type, :club, :name, :initial_club_cash_amount, 
+    :club_cash_installment_amount, :skip_first_club_cash
 
   belongs_to :club
   has_many :transactions
@@ -23,8 +24,8 @@ class TermsOfMembership < ActiveRecord::Base
   # validates :installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
   # validates :installment_period, :numericality => { :greater_than_or_equal_to => 0 }
   validates :installment_type, :presence => true
-  validates :quota, :presence => true
-  validates :club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :initial_club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :club_cash_installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validates :initial_fee, :numericality => { :greater_than_or_equal_to => 0 }
   validates :trial_period_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validates :is_payment_expected, :presence => true
@@ -37,19 +38,6 @@ class TermsOfMembership < ActiveRecord::Base
   before_update :can_update_or_delete
 
   ###########################################
-  # Installment types:
-  def monthly?
-    installment_type == "1.month"
-  end
-
-  def yearly?
-    installment_type == "1.year"
-  end
-
-  def lifetime?
-    installment_type == "1000.years"
-  end
-  #################################
   
   def production?
     self.mode == 'production'

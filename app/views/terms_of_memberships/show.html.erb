@@ -41,8 +41,16 @@
     </div>
     <% if @current_club.allow_club_cash_transaction? %>
       <div class="span2"> 
-        <b> <%= t('activerecord.attributes.terms_of_membership.club_cash_amount') %>: </b> 
-        <%= @tom.club_cash_amount %> 
+        <b> <%= t('activerecord.attributes.terms_of_membership.initial_club_cash_amount') %>: </b> 
+        <%= @tom.initial_club_cash_amount %> 
+      </div>
+      <div class="span2"> 
+        <b> <%= t('activerecord.attributes.terms_of_membership.club_cash_installment_amount') %>: </b> 
+        <%= @tom.club_cash_installment_amount %> 
+      </div>
+      <div class="span2"> 
+        <b> <%= t('activerecord.attributes.terms_of_membership.skip_first_club_cash') %>: </b> 
+        <%= @tom.skip_first_club_cash ? 'Yes' : 'No' %> 
       </div>
     <% end %>
   </div>

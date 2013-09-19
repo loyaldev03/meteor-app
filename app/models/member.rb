@@ -22,7 +22,6 @@ class Member < ActiveRecord::Base
   delegate :terms_of_membership_id, :to => :current_membership
   delegate :join_date, :to => :current_membership
   delegate :cancel_date, :to => :current_membership
-  delegate :quota, :to => :current_membership
   delegate :time_zone, :to => :club
   ##### 
 
@@ -124,7 +123,9 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### member gets active =====>>>>
     after_transition :provisional => 
-                        :active, :do => :send_active_email
+                        :active, :do => [:send_active_email, :assign_first_club_cash]
+    after_transition :active => 
+                    :active, :do => 'assign_club_cash()'
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
@@ -238,21 +239,12 @@ class Member < ActiveRecord::Base
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
     end
-    if nbd_update_for_sts
-      if terms_of_membership.monthly? # we need this if to avoid Bug #27211
-        self.bill_date = self.next_retry_bill_date
-      end
-    else
-      if terms_of_membership.monthly?
-        self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
-        self.next_retry_bill_date = self.bill_date
-      else
-        self.bill_date = membership.join_date
-        self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
-      end
+    unless nbd_update_for_sts
+      self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
+      self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
     end
     self.save(:validate => false)
-    self.delay.assign_club_cash('club cash on enroll') unless skip_add_club_cash
+    self.delay.assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
   end
 
   # Changes next bill date.
@@ -368,14 +360,7 @@ class Member < ActiveRecord::Base
 
   # refs #21919
   def can_renew_fulfillment?
-    self.active? and 
-    (self.recycled_times == 0 and 
-      (
-        (terms_of_membership.monthly? and (self.current_membership.quota % 12)==0) or
-        # self.current_membership.quota > 12 .. yes we need it . because quota = 12 and 2012-2012=0 +1*12 => 12
-        (terms_of_membership.yearly? and self.current_membership.quota > 12 and (self.current_membership.quota == (12 * (Time.zone.now.year - self.current_membership.join_date.year + 1))))
-      )
-    )
+    self.active? and self.recycled_times == 0
   end
 
   def last_refunded_amount
@@ -402,7 +387,7 @@ class Member < ActiveRecord::Base
   end
   
   def has_been_sd_cc_expired?
-    self.transactions.where("membership_id = ? AND created_at >= ?", self.current_membership_id, self.bill_date).each do |transaction|
+    self.transactions.where('membership_id = ? AND transaction_type = "sale"', self.current_membership_id).order('created_at DESC').limit(self.recycled_times).each do |transaction|
       return true if transaction.is_response_code_cc_expired?
     end
     false
@@ -804,17 +789,23 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def assign_first_club_cash 
+    assign_club_cash unless terms_of_membership.skip_first_club_cash
+  end
+
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
-  def assign_club_cash(message = "Adding club cash after billing")
-    if current_membership.quota%12==0 and current_membership.quota!=12
-      amount = (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_amount)
-      self.add_club_cash(nil, amount, message)
-      if is_not_drupal?
-        if self.club_cash_expire_date.nil? # first club cash assignment
-          self.club_cash_expire_date = join_date + 1.year
-        end
-        self.save(:validate => false)
+  def assign_club_cash(message = "Adding club cash after billing", enroll = false)
+    amount = if enroll
+        terms_of_membership.initial_club_cash_amount
+      else
+        (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_installment_amount)
+    end
+    self.add_club_cash(nil, amount, message)
+    if is_not_drupal?
+      if self.club_cash_expire_date.nil? # first club cash assignment
+        self.club_cash_expire_date = join_date + 1.year
       end
+      self.save(:validate => false)
     end
   rescue Exception => e
     # refs #21133
@@ -835,7 +826,7 @@ class Member < ActiveRecord::Base
         elsif is_not_drupal?
           if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
             cct = ClubCashTransaction.new(:amount => amount, :description => description)
-            cct.member = self
+            self.club_cash_transactions << cct
             raise "Could not save club cash transaction" unless cct.valid? and self.valid?
             self.club_cash_amount = self.club_cash_amount + amount.to_f
             self.save(:validate => false)
@@ -1363,13 +1354,8 @@ class Member < ActiveRecord::Base
 
   private
     def schedule_renewal(manual = false)
-      if manual or (terms_of_membership.monthly? and self.recycled_times > 1) 
-        new_bill_date = Time.zone.now + eval(terms_of_membership.installment_type)
-      else
-        new_bill_date = self.bill_date + eval(terms_of_membership.installment_type)
-      end
+      new_bill_date = Time.zone.now + terms_of_membership.installment_period.days
       # refs #15935
-      self.current_membership.increment!(:quota, terms_of_membership.quota)
       self.recycled_times = 0
       self.bill_date = new_bill_date
       self.next_retry_bill_date = new_bill_date
@@ -1411,7 +1397,6 @@ class Member < ActiveRecord::Base
         Auditory.report_issue("#{bill_type}::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
       end
       schedule_renewal(manual)
-      assign_club_cash
       message = (manual ? "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}" : "Member billed successfully $#{trans.amount} Transaction id: #{trans.id}" )
       Auditory.audit(nil, trans, message, self, operation_type)
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
@@ -1449,11 +1434,10 @@ class Member < ActiveRecord::Base
     def set_decline_strategy(trans)
       # soft / hard decline
       tom = terms_of_membership
-      type = tom.installment_type
-      decline = DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
-                  trans.response_code, type, trans.cc_type) || 
-                DeclineStrategy.find_by_gateway_and_response_code_and_installment_type_and_credit_card_type(trans.gateway.downcase, 
-                  trans.response_code, type, "all")
+      decline = DeclineStrategy.find_by_gateway_and_response_code_and_credit_card_type(trans.gateway.downcase, 
+                  trans.response_code, trans.cc_type) || 
+                DeclineStrategy.find_by_gateway_and_response_code_and_credit_card_type(trans.gateway.downcase, 
+                  trans.response_code, "all")
       cancel_member = false
 
       if decline.nil?
@@ -1464,7 +1448,7 @@ class Member < ActiveRecord::Base
         self.save(:validate => false)
         Auditory.report_issue("Decline rule not found TOM ##{tom.id}", 
           "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.cc_type}. " + 
-            "Campaign type: #{type}. We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
+          "We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
           { :member => self.inspect })
         if self.recycled_times < Settings.number_of_retries_on_missing_decline
           Auditory.audit(nil, trans, message, self, operation_type)
