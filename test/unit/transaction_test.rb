@@ -983,4 +983,48 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal member.club_cash_amount, club_cash+@terms_of_membership.club_cash_installment_amount
   end
 
+  test "Create and bill a member with installment period = X days or months at TOM" do 
+    active_merchant_stubs
+
+    @club = FactoryGirl.create(:simple_club_with_gateway_with_family)
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+
+    [6, 15, 365].each do |days|
+      @club = FactoryGirl.create(:simple_club_with_gateway_with_family)
+      @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_period => days)
+      @member = FactoryGirl.build(:member)
+      member = enroll_member(@terms_of_membership)
+      Timecop.travel(member.next_retry_bill_date) do
+        Member.bill_all_members_up_today
+      end
+      Timecop.travel(member.next_retry_bill_date) do
+        Member.bill_all_members_up_today
+        member.reload
+        nbd = member.next_retry_bill_date + days
+        assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd, :format => :only_date)
+      end
+    end
+
+    [1, 6, 24].each do |months|
+      @club = FactoryGirl.create(:simple_club_with_gateway_with_family)
+      @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_period => (months*30.4166667).to_i )
+      @member = FactoryGirl.build(:member)
+      member = enroll_member(@terms_of_membership)
+
+      Timecop.travel(member.next_retry_bill_date) do
+        Member.bill_all_members_up_today
+      end
+      Timecop.travel(member.next_retry_bill_date) do
+        nbd = member.next_retry_bill_date + (months*30.4166667).to_i.days
+        Member.bill_all_members_up_today
+        member.reload
+        puts member.next_retry_bill_date
+        puts nbd
+        puts "*********"
+        assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd, :format => :only_date)
+      end      
+    end
+
+    @club.update_attribute :family_memberships_allowed, false
+  end
 end
