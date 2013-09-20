@@ -87,8 +87,6 @@ class Communication < ActiveRecord::Base
 
   def deliver_action_mailer
     response = case template_type.to_sym
-    when :active
-      Notifier.active(email).deliver!
     when :cancellation
       Notifier.cancellation(email).deliver!
     when :rejection

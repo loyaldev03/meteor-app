@@ -221,7 +221,7 @@ class Fulfillment < ActiveRecord::Base
         sheet.add_row Fulfillment::KIT_CARD_HEADER
       end
       fulfillments.each do |fulfillment|
-        row = fulfillment.get_file_line(true, type_others)
+        row = fulfillment.get_file_line(change_status, type_others)
         sheet.add_row row unless row.empty?
       end
     end

@@ -175,6 +175,7 @@ defaults: &defaults
     et_timeout_retrieve: 5002
     et_timeout_destroy: 5003
     et_timeout_trigger_create: 5004
+    et_timeout_find: 5005
   error_codes:
     success: '000'
     wrong_data: '100'
