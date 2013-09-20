@@ -161,7 +161,6 @@ module SacExactTarget
         'Terms_of_membership' => 'terms_of_membership_id',
         'Join_date' => 'join_date',
         'Cancel_date' => 'cancel_date',
-        'Quota' => 'quota'
       }
     end
 
