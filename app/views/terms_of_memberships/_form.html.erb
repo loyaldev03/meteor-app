@@ -116,7 +116,7 @@
 <% # Third step %>
 <div class="step" id="third">
   <div class="control-group"><%= wizard_steps_indicator(3) %></div>
-  <div class="control-group">
+  <div class="control-group" id="if_cannot_bill_member_options">
     <%= label_tag 'if_cannot_bill_member', t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_member_then'), :class => 'control-label' %>
     <div class="controls">
       <%= radio_button_tag 'if_cannot_bill_member', 'cancel', ((@tom.if_cannot_bill == 'cancel' unless !@tom.if_cannot_bill) or true), :class => 'required' %>&nbsp;
@@ -309,24 +309,37 @@
     $("#tom_wizard_form").bind("before_step_shown", function(event, data) {
       set_button_next_label(data.currentStep);
     });
-  });
 
-  $("#tom_wizard_form").bind("step_shown", function(event, data){
-    currentStep = $("#tom_wizard_form").formwizard("state").currentStep;
-    switch(currentStep) {
-      case "second":
-        if ($("#subscription_terms_until_cancelled").is(":checked") ){ until_cancel_logic(); }
-        break;
-      case "third":
-        if( $("#subscription_terms_until_cancelled").is(":checked") ){ cancel_radio_logic(); }
-        else if( $("#if_cannot_bill_member_suspend").is(":checked") ){ suspend_radio_logic(); }
-        else if( $("#if_cannot_bill_member_downgrade_to").is(":checked") ){ downgrade_radio_logic();}
-        if( $("#upgrade_to_tom").val() == "" ){ select_upgrade_logic_disable(); }
-        break;
-    }
-  });
+    $("#tom_wizard_form").bind("step_shown", function(event, data){
+      currentStep = $("#tom_wizard_form").formwizard("state").currentStep;
+      switch(currentStep) {
+        case "second":
+          if ($("#subscription_terms_until_cancelled").is(":checked") ){ 
+            until_cancel_logic(); 
+          }
+          break;
+        case "third":
+          if ($('#is_payment_expected_yes').is(':checked')) {
+            $('#if_cannot_bill_member_options').show();
+          } else {
+            $('#if_cannot_bill_member_options').hide('fast');
+          }
+          if( $("#subscription_terms_until_cancelled").is(":checked") ){ 
+            cancel_radio_logic(); 
+          }
+          else if( $("#if_cannot_bill_member_suspend").is(":checked") ){ 
+            suspend_radio_logic(); 
+          }
+          else if( $("#if_cannot_bill_member_downgrade_to").is(":checked") ){ downgrade_radio_logic();
+          }
 
-  $(document).ready(function() {
+          if( $("#upgrade_to_tom").val() == "" ){ 
+            select_upgrade_logic_disable(); 
+          }
+          break;
+      }
+    });
+
     new_tom_functions();
     set_button_next_label($("#tom_wizard_form").formwizard("state").currentStep);
     window.atTheEndOfTheTrial = "payment";
