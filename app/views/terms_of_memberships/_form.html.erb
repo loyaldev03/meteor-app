@@ -54,7 +54,7 @@
     </div>
   </div>
 
-<!--   <div class="control-group">
+  <div class="control-group">
     <%= label_tag 'is_payment_expected', t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), :class => 'control-label' %>
     <div class="controls">
       <%= radio_button_tag 'is_payment_expected', 'yes', ((@tom.is_payment_expected == 1 unless !@tom.is_payment_expected) or true), :class => 'required' %>
@@ -65,7 +65,7 @@
         :title => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), 
         :content => t('lorem') } %> 
     </div>
-  </div> -->
+  </div>
 
   <div class="control-group" style="<%= @tom.is_payment_expected == 0 ? 'display:none' : ''%>" id="recurring_amount_group">
     <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label' %>
