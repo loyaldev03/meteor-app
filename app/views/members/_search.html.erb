@@ -22,7 +22,7 @@
         <tr> <td colspan="<%= @current_club.requires_external_id ? 9 : 8 %>"> <%= t('activerecord.attributes.member.search_member_not_found') %> </td> </tr>
       <% else %>
         <% @members.each do |member| %>
-        <tr class= "<%= cycle("odd", "even", :name => "row_class") -%>" > 
+        <tr> 
           <td class="<%= menber_status_class(member) %>"> 
           <% if member.blacklisted? %>
           <%= member.status %>
