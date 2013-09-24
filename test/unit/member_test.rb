@@ -414,7 +414,7 @@ class MemberTest < ActiveSupport::TestCase
     assert Operation.find_by_operation_type(Settings.operation_types.bill_overdue_cancel)
   end 
 
-  test "Membr email validation" do
+  test "Member email validation" do
     member = create_active_member(@terms_of_membership_with_gateway, :provisional_member)
     300.times do
       member.update_attribute :email, Faker::Internet.email
