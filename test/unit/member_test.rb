@@ -424,7 +424,7 @@ class MemberTest < ActiveSupport::TestCase
       member.update_attribute :email, valid_email
       assert member.valid?, "Member with email #{member.email} is not valid"
     end
-    ['name@do--main..com', 'name@-do-ma-in.com.ar'].each do |wrong_email|
+    ['name@do--main..com', 'name@-do-ma-in.com.ar', '', nil, 'name@domain@domain.com', '..'].each do |wrong_email|
       member.update_attribute :email, wrong_email
       assert !member.valid?, "Member with email #{member.email} is valid when it should not be."
     end   
