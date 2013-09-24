@@ -214,8 +214,6 @@ class MemberTest < ActiveSupport::TestCase
     cancel_date = member.cancel_date
     # 2 operations : cancel and blacklist
     assert_difference('Operation.count', 4) do
-      require "ruby-debug"
-      debugger  
       member.blacklist(nil, "Test")
     end
     m = Member.find member.id
@@ -414,5 +412,21 @@ class MemberTest < ActiveSupport::TestCase
     assert_nil @saved_member.next_retry_bill_date
     assert @saved_member.cancel_date > @saved_member.join_date
     assert Operation.find_by_operation_type(Settings.operation_types.bill_overdue_cancel)
+  end 
+
+  test "Membr email validation" do
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member)
+    300.times do
+      member.update_attribute :email, Faker::Internet.email
+      assert member.valid?, "Member with email #{member.email} is not valid."
+    end
+    ['name@do--main.com', 'name@do-ma-in.com.ar', 'name2@do.ma-in.com', 'name3@d.com'].each do |valid_email|
+      member.update_attribute :email, valid_email
+      assert member.valid?, "Member with email #{member.email} is not valid"
+    end
+    ['name@do--main..com', 'name@-do-ma-in.com.ar'].each do |wrong_email|
+      member.update_attribute :email, wrong_email
+      assert !member.valid?, "Member with email #{member.email} is valid when it should not be."
+    end   
   end 
 end
