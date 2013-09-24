@@ -5,7 +5,6 @@ FactoryGirl.define do
     response_code 102
     decline_type 'soft'
     credit_card_type 'all'
-    installment_type "1.month"
     gateway 'mes'
     limit '4'
   end
@@ -15,7 +14,6 @@ FactoryGirl.define do
     response_code Settings.error_codes.credit_card_blank_without_grace
     decline_type 'hard'
     credit_card_type 'all'
-    installment_type "1.month"
     gateway 'mes'
     limit '1'
   end
@@ -25,7 +23,6 @@ FactoryGirl.define do
     response_code Settings.error_codes.credit_card_blank_without_grace
     decline_type 'hard'
     credit_card_type 'all'
-    installment_type "1.year"
     gateway 'mes'
     limit '1'
   end
@@ -35,7 +32,6 @@ FactoryGirl.define do
     response_code 104
     decline_type 'hard'
     credit_card_type 'all'
-    installment_type "1.month"
     gateway 'mes'
     limit '1'
   end
@@ -46,7 +42,6 @@ FactoryGirl.define do
     response_code 9997
     decline_type 'hard'
     credit_card_type 'all'
-    installment_type "1.month"
     gateway 'mes'
     limit '0'
   end

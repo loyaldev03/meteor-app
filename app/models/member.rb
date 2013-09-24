@@ -795,11 +795,7 @@ class Member < ActiveRecord::Base
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing", enroll = false)
-    amount = if enroll
-        terms_of_membership.initial_club_cash_amount
-      else
-        (self.member_group_type_id ? Settings.club_cash_for_members_who_belongs_to_group : terms_of_membership.club_cash_installment_amount)
-    end
+    amount = enroll ? terms_of_membership.initial_club_cash_amount : terms_of_membership.club_cash_installment_amount
     self.add_club_cash(nil, amount, message)
     if is_not_drupal?
       if self.club_cash_expire_date.nil? # first club cash assignment
