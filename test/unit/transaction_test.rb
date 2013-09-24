@@ -958,31 +958,6 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "should not add club cash on first enroll if configured so" do
-    member = enroll_member(@terms_of_membership, 0)
-    member.terms_of_membership.update_attribute :skip_first_club_cash, true
-    member.update_attribute :next_retry_bill_date, Time.zone.now
-    club_cash = member.club_cash_amount
-    assert_difference("Operation.count",3) do
-      assert_difference("Transaction.count")do
-        member.bill_membership
-      end
-    end
-    member.reload
-    assert_equal member.club_cash_amount, club_cash
-
-    member.update_attribute :next_retry_bill_date, Time.zone.now
-    club_cash = member.club_cash_amount
-
-    assert_difference("Operation.count",3) do
-      assert_difference("Transaction.count")do
-        member.bill_membership
-      end
-    end
-    member.reload
-    assert_equal member.club_cash_amount, club_cash+@terms_of_membership.club_cash_installment_amount
-  end
-
   test "Create and bill a member with installment period = X days or months at TOM" do 
     active_merchant_stubs
 
@@ -1026,5 +1001,282 @@ class TransactionTest < ActiveSupport::TestCase
     end
 
     @club.update_attribute :family_memberships_allowed, false
+  end
+
+  ############################################################################
+  ############ CLUB CASH ###############
+  ############################################################################
+
+
+  test "Create a member with initial_club_cash_amount and club_cash_installment_amount like 0 and skip_first_club_cash set as false" do
+    @terms_of_membership.update_attribute :skip_first_club_cash, false
+    @terms_of_membership.update_attribute :club_cash_installment_amount, 0
+    @terms_of_membership.update_attribute :initial_club_cash_amount, 0
+
+    member = enroll_member(@terms_of_membership, 0)
+    assert_equal member.club_cash_amount, 0
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 0
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+
+    assert_difference("Operation.count",2) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 0
+  end
+
+  test "Create a member with initial_club_cash_amount and club_cash_installment_amount like 0 and skip_first_club_cash set as true" do
+    @terms_of_membership.update_attribute :skip_first_club_cash, true
+    @terms_of_membership.update_attribute :club_cash_installment_amount, 0
+    @terms_of_membership.update_attribute :initial_club_cash_amount, 0
+
+    member = enroll_member(@terms_of_membership, 0)
+    assert_equal member.club_cash_amount, 0
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 0
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+
+    assert_difference("Operation.count",2) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 0
+  end
+
+  test "Create a member with initial_club_cash_amount = X, club_cash_installment_amount = 0 and skip_first_club_cash set = false" do
+    @terms_of_membership.update_attribute :skip_first_club_cash, false
+    @terms_of_membership.update_attribute :club_cash_installment_amount, 0
+    @terms_of_membership.update_attribute :initial_club_cash_amount, 100
+
+    member = enroll_member(@terms_of_membership, 0)
+    assert_equal member.club_cash_amount, 100 
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 100
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+
+    assert_difference("Operation.count",2) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 100  
+  end
+
+  test "Create a member with initial_club_cash_amount = X, club_cash_installment_amount = 0 and skip_first_club_cash set = true" do
+    @terms_of_membership.update_attribute :skip_first_club_cash, true
+    @terms_of_membership.update_attribute :club_cash_installment_amount, 0
+    @terms_of_membership.update_attribute :initial_club_cash_amount, 100
+
+    member = enroll_member(@terms_of_membership, 0)
+    assert_equal member.club_cash_amount, 100 
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 100
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+
+    assert_difference("Operation.count",2) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 100
+  end
+
+  test "Create a member with initial_club_cash_amount = X, club_cash_installment_amount = X and skip_first_club_cash set = false" do
+    @terms_of_membership.update_attribute :skip_first_club_cash, true
+    @terms_of_membership.update_attribute :club_cash_installment_amount, 50
+    @terms_of_membership.update_attribute :initial_club_cash_amount, 100
+
+    member = enroll_member(@terms_of_membership, 0)
+    assert_equal member.club_cash_amount, 100 
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 100
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",1) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 150
+  end
+
+  test "Create a member with initial_club_cash_amount = X, club_cash_installment_amount = X and skip_first_club_cash set = true" do
+    @terms_of_membership.update_attribute :skip_first_club_cash, true
+    @terms_of_membership.update_attribute :club_cash_installment_amount, 50
+    @terms_of_membership.update_attribute :initial_club_cash_amount, 100
+
+    member = enroll_member(@terms_of_membership, 0)
+    assert_equal member.club_cash_amount, 100 
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 100
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",1) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 150  
+  end
+
+  test "Create a member with initial_club_cash_amount = 0, club_cash_installment_amount = X and skip_first_club_cash set = false" do
+    @terms_of_membership.update_attribute :skip_first_club_cash, false
+    @terms_of_membership.update_attribute :club_cash_installment_amount, 50
+    @terms_of_membership.update_attribute :initial_club_cash_amount, 0
+
+    member = enroll_member(@terms_of_membership, 0) 
+    assert_equal member.club_cash_amount, 0 
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+    assert_difference("Operation.count",4) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",1) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 50
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",1) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 100
+  end
+
+  test "Create a member with initial_club_cash_amount = 0, club_cash_installment_amount = X and skip_first_club_cash set = true" do
+    @terms_of_membership.update_attribute :skip_first_club_cash, true
+    @terms_of_membership.update_attribute :club_cash_installment_amount, 50
+    @terms_of_membership.update_attribute :initial_club_cash_amount, 0
+
+    member = enroll_member(@terms_of_membership, 0) 
+    assert_equal member.club_cash_amount, 0 
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",0) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 0
+
+    member.update_attribute :next_retry_bill_date, Time.zone.now
+    club_cash = member.club_cash_amount
+
+    assert_difference("Operation.count",3) do
+      assert_difference("Transaction.count")do
+        assert_difference("ClubCashTransaction.count",1) do
+          member.bill_membership
+        end
+      end
+    end
+    member.reload
+    assert_equal member.club_cash_amount, 50
   end
 end
