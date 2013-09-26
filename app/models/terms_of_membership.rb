@@ -31,6 +31,7 @@ class TermsOfMembership < ActiveRecord::Base
   validates :is_payment_expected, :presence => true
   validates :subscription_limits, :numericality => { :greater_than_or_equal_to => 0 }
   validates :if_cannot_bill, :presence => true
+  validates :downgrade_tom_id, :presence => true, if: Proc.new { |tom| tom.downgradable? }
 
   validate :validate_payment_gateway_configuration
 
@@ -52,7 +53,7 @@ class TermsOfMembership < ActiveRecord::Base
   end
   
   def downgradable?
-    self.if_cannot_bill == 'downgrade_to' and self.downgrade_tom_id.to_i > 0
+    self.if_cannot_bill == 'downgrade_to'
   end
 
   def suspendable?
