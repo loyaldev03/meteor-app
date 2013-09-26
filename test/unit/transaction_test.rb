@@ -234,9 +234,9 @@ class TransactionTest < ActiveSupport::TestCase
           assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_hard_decline_by_limit).count
         else
           nbd = nbd + @sd_strategy.days.days
-          assert_equal nbd, member.next_retry_bill_date
+          assert_equal nbd.to_date, member.next_retry_bill_date.to_date
           assert_equal bill_date, member.bill_date
-          assert_not_equal member.bill_date, member.next_retry_bill_date
+          assert_not_equal member.bill_date.to_date, member.next_retry_bill_date.to_date
           assert_equal 0, member.quota
           assert_equal time, member.recycled_times
           assert_equal time, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_soft_decline).count
@@ -263,7 +263,7 @@ class TransactionTest < ActiveSupport::TestCase
       nbd = nbd + @sd_strategy.days.days
       assert_equal nbd.to_date, member.next_retry_bill_date.to_date
       assert_equal bill_date, member.bill_date
-      assert_not_equal member.bill_date, member.next_retry_bill_date
+      assert_not_equal member.bill_date.to_date, member.next_retry_bill_date.to_date
       assert_equal 0, member.quota
       assert_equal 1, member.recycled_times
     end
@@ -281,9 +281,9 @@ class TransactionTest < ActiveSupport::TestCase
           assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.downgraded_because_of_hard_decline_by_limit).count
         else
           nbd = nbd + @sd_strategy.days.days
-          assert_equal nbd, member.next_retry_bill_date
+          assert_equal nbd.to_date, member.next_retry_bill_date.to_date
           assert_equal bill_date, member.bill_date
-          assert_not_equal member.bill_date, member.next_retry_bill_date
+          assert_not_equal member.bill_date.to_date, member.next_retry_bill_date.to_date
           assert_equal 0, member.quota
           assert_equal time, member.recycled_times
           assert_equal time, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_soft_decline).count
@@ -646,7 +646,7 @@ class TransactionTest < ActiveSupport::TestCase
       Member.bill_all_members_up_today
       member.reload
       assert_equal member.bill_date, nbd 
-      assert_equal member.next_retry_bill_date, nbd 
+      assert_equal member.next_retry_bill_date.to_date, nbd.to_date
     end
   end
 

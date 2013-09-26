@@ -42,6 +42,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
                                 :preferences => @enrollment_info.preferences,
                                 :cookie_set => @enrollment_info.cookie_set,
                                 :cookie_value => @enrollment_info.cookie_value,
+                                :source => @enrollment_info.source,
                                 :joint => @enrollment_info.joint,
                               },:format => :json})
   end
@@ -64,8 +65,10 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
   	assert_difference('Prospect.count') do
-      do_post
+      response = do_post
+      prospect = Prospect.find JSON.parse(response.body)["prospect_id"]
       assert_response :success
+      assert_equal prospect.source, @enrollment_info.source
     end
   end
 
@@ -80,7 +83,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     end	
   end
 
-    test "representative should not create a prospect" do
+  test "representative should not create a prospect" do
   	sign_in @representative_user
   	@member = FactoryGirl.build :member_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info

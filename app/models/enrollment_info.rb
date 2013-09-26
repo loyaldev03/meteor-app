@@ -36,6 +36,7 @@ class EnrollmentInfo < ActiveRecord::Base
       self.preferences = params[:preferences]
       self.cookie_value = params[:cookie_value]
       self.cookie_set = params[:cookie_set]
+      self.source = params[:source]
       self.campaign_medium = params[:campaign_medium]
       self.campaign_description = params[:campaign_description]
       self.campaign_medium_version = params[:campaign_medium_version]
