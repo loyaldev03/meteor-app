@@ -72,6 +72,7 @@ class Member < ActiveRecord::Base
     inclusion:                   { within: self.supported_countries }
   country_specific_validations!
   validates :birth_date, :birth_date => true
+  validates :email, :email => true
 
   scope :synced, lambda { |bool=true|
     bool ?
