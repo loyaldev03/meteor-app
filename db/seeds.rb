@@ -20,14 +20,10 @@ MemberCancelReason.delete_all!
 MemberBlacklistReason.delete_all!
 
 
-File.open("#{Rails.root}/db/decline_strategies.yml", 'r') do |file|
-   YAML::load(file).each do |record|
-      ds = DeclineStrategy.new
-      record.attributes.each do |key, value|
-        ds.send("#{key}=", value)
-      end
-      ds.save!
-   end
+File.open("#{Rails.root}/db/decline_strategies.sql", 'r') do |file|
+  while statements = file.gets("") do
+    ActiveRecord::Base.connection.execute(statements)
+  end
 end
 
 data = 'batch@xagax.com'
