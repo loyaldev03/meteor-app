@@ -53,7 +53,7 @@ class TermsOfMembership < ActiveRecord::Base
   end
   
   def downgradable?
-    self.if_cannot_bill == 'downgrade_to'
+    self.if_cannot_bill == 'downgrade_tom'
   end
 
   def suspendable?
