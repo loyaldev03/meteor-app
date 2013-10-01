@@ -7,10 +7,12 @@ namespace :clubs do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      clubs = Club.all
-      clubs.map do |club|
+      Club.all.each do |club|
         club.update_attribute(:members_count, club.members.count + 0)
       end
+    rescue Exception => e
+      Auditory.report_issue("Clubs::count_members_in_clubs", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+      Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"      
     ensure 
       Rails.logger.info "It all took #{Time.zone.now - tall} to run clubs:count_members_in_clubs task"
     end 
