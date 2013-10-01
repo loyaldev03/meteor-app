@@ -5,17 +5,16 @@ class Auditory
   # member : member that must show this operation (only for operations that are related to members: e.g. CC management, Emails)
   # operation_type : operation type used by reporting/web to group operations
   # operation_date : date when the operation related was done. If this value is nil we save that operation with Time.zone.now
-  def self.audit(current_agent, object, description, member = nil, operation_type = Settings.operation_types.others, operation_date = Time.zone.now)
-    begin
-      current_agent = Agent.find_by_email('batch@xagax.com') if current_agent.nil?
-      o = Operation.new :operation_date => operation_date, 
-        :resource => object, :description => description, :operation_type => operation_type
-      o.created_by_id = (current_agent.nil? ? nil : current_agent.id)
-      o.member = member
-      o.save!
-    rescue Exception => e
-      Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
-    end
+  def self.audit(current_agent, object, description, member = nil, operation_type = Settings.operation_types.others, operation_date = Time.zone.now, notes = nil)
+    current_agent = Agent.find_by_email('batch@xagax.com') if current_agent.nil?
+    o = Operation.new :operation_date => operation_date, 
+      :resource => object, :description => description, :operation_type => operation_type
+    o.created_by_id = (current_agent.nil? ? nil : current_agent.id)
+    o.notes = notes
+    o.member = member
+    o.save!
+  rescue Exception => e
+    Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
   end
   
   def self.report_issue(error = "Special Error", message = '', params = {}, add_backtrace = true)
