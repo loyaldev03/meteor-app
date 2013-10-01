@@ -27,6 +27,16 @@ h2 small { font-weight: normal; font-size: 0.7em; display: block; float: right; 
 .rdoc-term { padding-right: 25px; font-weight: bold; }
 .rdoc-list p { margin: 0; padding: 0; margin-bottom: 4px; }
 
+/* style for <table> */
+#filecontents table, .docstring table { border-collapse: collapse; }
+#filecontents table th, #filecontents table td,
+.docstring table th, .docstring table td { border: 1px solid #ccc; padding: 8px; padding-right: 17px; }
+#filecontents table tr:nth-child(odd),
+.docstring table tr:nth-child(odd) { background: #eee; }
+#filecontents table tr:nth-child(even),
+.docstring table tr:nth-child(even) { background: #fff; }
+#filecontents table th, .docstring table th { background: #fff; }
+
 /* style for <ul> */
 #filecontents li > p, .docstring li > p { margin: 0px; }
 #filecontents ul, .docstring ul { padding-left: 20px; }
@@ -213,7 +223,7 @@ ul.fullTree li:last-child { padding-bottom: 0; }
 
 #search { position: absolute; right: 14px; top: 0px; }
 #search a:link, #search a:visited {
-  display: block; float: left; margin-right: 4px;
+  display: block; float: left; margin-right: 8px;
   padding: 8px 10px; text-decoration: none; color: #05a;
   border: 1px solid #d8d8e5;
   -moz-border-radius-bottomleft: 3px; -moz-border-radius-bottomright: 3px;
@@ -292,6 +302,7 @@ li.r2 { background: #fafafa; }
 #toc ol ol > ol { padding-left: 2.3em; }
 #toc ol + li { margin-top: 0.3em; }
 #toc.hidden { padding: 10px; background: #f6f6f6; -webkit-box-shadow: none; -moz-box-shadow: none; }
+#toc{ overflow : auto; }
 #filecontents h1 + #toc.nofloat { margin-top: 0; }
 
 /* syntax highlighting */

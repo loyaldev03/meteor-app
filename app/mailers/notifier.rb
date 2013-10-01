@@ -21,10 +21,6 @@ class Notifier < ActionMailer::Base
     to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
     mail :to => to, :subject => "rejection to #{email}"
   end
-  def active(email)
-    to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
-    mail :to => to, :subject => "active to #{email}"
-  end
 
   def refund(email)
     to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email

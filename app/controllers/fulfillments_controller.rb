@@ -51,7 +51,7 @@ class FulfillmentsController < ApplicationController
 
   def list_for_file
     @file = FulfillmentFile.find(params[:fulfillment_file_id])
-    @fulfillments = @file.fulfillments
+    @fulfillments = @file.fulfillments.includes(:member)
     render :index
   end
 
@@ -89,9 +89,9 @@ class FulfillmentsController < ApplicationController
     my_authorize! :report, Fulfillment, @current_club.id
     ff = FulfillmentFile.find(params[:fulfillment_file_id])
     if params[:only_in_progress]
-      fulfillments = ff.fulfillments.where_in_process
+      fulfillments = ff.fulfillments.where_in_process.includes(:member)
     else
-      fulfillments = ff.fulfillments
+      fulfillments = ff.fulfillments.includes(:member)
     end
     xls_package = Fulfillment.generateXLS(fulfillments, false, ff.product == Settings.others_product)
     send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",

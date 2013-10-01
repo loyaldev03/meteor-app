@@ -190,6 +190,7 @@ class MemberTest < ActiveSupport::TestCase
     m = Member.find member.id
     assert_not_nil m.cancel_date 
     assert_nil cancel_date
+    assert m.cancel_date > m.join_date
   end
 
   test "Member should be saved with first_name and last_name with numbers or acents." do
@@ -287,6 +288,7 @@ class MemberTest < ActiveSupport::TestCase
     assert_difference('Operation.count', 4) do
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
+
       member.reload
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
       assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
@@ -396,13 +398,29 @@ class MemberTest < ActiveSupport::TestCase
     @saved_member.manual_payment =true
     @saved_member.bill_date = Time.zone.now-1.day
     @saved_member.save
-
     assert_difference("Operation.count",3) do
       Member.cancel_all_member_up_today
     end
     @saved_member.reload
     assert_equal @saved_member.status, "lapsed"
-    assert_equal I18n.l(@saved_member.cancel_date.utc, :format => :only_date), I18n.l(Time.zone.now.utc, :format => :only_date)
+    assert_nil @saved_member.next_retry_bill_date
+    assert @saved_member.cancel_date > @saved_member.join_date
     assert Operation.find_by_operation_type(Settings.operation_types.bill_overdue_cancel)
+  end 
+
+  test "Member email validation" do
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member)
+    300.times do
+      member.update_attribute :email, Faker::Internet.email
+      assert member.valid?, "Member with email #{member.email} is not valid."
+    end
+    ['name@do--main.com', 'name@do-ma-in.com.ar', 'name2@do.ma-in.com', 'name3@d.com'].each do |valid_email|
+      member.update_attribute :email, valid_email
+      assert member.valid?, "Member with email #{member.email} is not valid"
+    end
+    ['name@do--main..com', 'name@-do-ma-in.com.ar', '', nil, 'name@domain@domain.com', '..'].each do |wrong_email|
+      member.update_attribute :email, wrong_email
+      assert !member.valid?, "Member with email #{member.email} is valid when it should not be."
+    end   
   end 
 end

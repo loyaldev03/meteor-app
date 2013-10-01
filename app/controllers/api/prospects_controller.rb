@@ -40,6 +40,7 @@ class Api::ProspectsController < ApplicationController
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. This information is selected by the member. This information is stored with format as hash encoded with json. [optional]</li>
   #     <li><strong>cookie_value</strong> Cookie from where the enrollment is being submitted.[optional]</li>
   #     <li><strong>cookie_set</strong> If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.[optional]</li>
+  #     <li><strong>source</strong> [optional]</li>
   #     <li><strong>campaign_medium</strong> [optional]</li>
   #     <li><strong>campaign_description</strong> The name of the campaign.[optional]</li>
   #     <li><strong>campaign_medium_version</strong> [optional]</li>

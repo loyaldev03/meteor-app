@@ -1171,14 +1171,19 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
     FactoryGirl.create :credit_card, :member_id => @member.id
-    
+      
     @member.set_as_provisional
+    
+    next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed)
     assert_difference('Operation.count') do
-      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      generate_put_next_bill_date(next_bill_date)
     end
     @member.reload
-    assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
+    date_to_check = next_bill_date.to_datetime.change(:offset => @member.get_offset_related)
+    
+    assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(date_to_check.utc, :format => :only_date)
   end
+
 
   test "Update member's next_bill_date active status" do
     sign_in @admin_user
@@ -1188,11 +1193,14 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member.set_as_provisional
     @member.set_as_active
 
+    next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed).to_datetime
     assert_difference('Operation.count') do
-      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+      generate_put_next_bill_date(next_bill_date)
+      puts @member.club.time_zone
     end
     @member.reload
-    assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(Time.zone.now + 3.days, :format => :only_date)
+    date_to_check = next_bill_date.to_datetime.change(:offset => @member.get_offset_related)
+    assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(date_to_check.utc, :format => :only_date)
   end
 
   test "Update member's next_bill_date applied status" do
@@ -1305,17 +1313,18 @@ class Api::MembersControllerTest < ActionController::TestCase
 
    test "Api agent should update member's next_bill_date" do
      sign_in @admin_user
-     next_bill_date = Time.zone.now + 3.days
+    next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed)
  
      @member = create_active_member(@terms_of_membership, :member_with_api)
      FactoryGirl.create :credit_card, :member_id => @member.id
  
      @member.set_as_provisional
      assert_difference('Operation.count') do
-      generate_put_next_bill_date( I18n.l(next_bill_date, :format => :only_date) )
+      generate_put_next_bill_date( next_bill_date )
      end
      @member.reload
-     assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(next_bill_date, :format => :only_date)
+     date_to_check = next_bill_date.to_datetime.change(:offset => @member.get_offset_related)
+     assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(date_to_check.utc, :format => :only_date)
    end
 
   test "get members updated between given dates" do
@@ -1466,27 +1475,34 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @response.body.include? first.id.to_s
     assert !(@response.body.include? last.id.to_s)
   end
-
   
   # StatzHub - Add an Api method to cancel a member
   # Cancel date using a Curl call
-  test "Admin should cancel memeber" do
+  test "Admin should cancel member" do
     sign_in @admin_user
+    @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
-    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
-    
+    cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)
+
     assert_difference("Operation.count") do
       generate_put_cancel( cancel_date, "Reason" )
       assert_response :success
     end
     @member.reload
-    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
+    cancel_date_to_check = cancel_date.to_datetime
+    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => @member.get_offset_related )
+
+    assert @member.current_membership.cancel_date > @member.current_membership.join_date
+    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
 
   test "Should not cancel member when reason is blank" do
     sign_in @admin_user
+    @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
@@ -1499,19 +1515,30 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "Should cancel member even if the cancel date is the same as today" do
     sign_in @admin_user
+    @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
-    cancel_date = I18n.l(Time.zone.now, :format => :only_date)    
 
-    assert_difference("Operation.count",0) do
-      generate_put_cancel( cancel_date, "" )
-      assert_response :success
+    Timecop.freeze(Time.zone.now + 1.month) do
+      cancel_date = I18n.l(Time.new.getlocal(@member.get_offset_related), :format => :only_date)    
+
+      assert_difference("Operation.count") do
+        generate_put_cancel( cancel_date, "reason" )
+        assert_response :success
+      end
+      @member.reload
+      cancel_date_to_check = cancel_date.to_datetime.change(:offset => @member.get_offset_related)  
+      assert @member.current_membership.cancel_date > @member.current_membership.join_date
+      assert_equal I18n.l(@member.current_membership.cancel_date.in_time_zone(@member.club.time_zone), :format => :only_date), I18n.l(cancel_date_to_check, :format => :only_date)
     end
   end
 
   test "Should not cancel member when cancel date is in wrong format" do
     sign_in @admin_user
+    @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
@@ -1560,7 +1587,9 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   test "api should cancel memeber" do
     sign_in @api_user
+    @membership = FactoryGirl.create(:member_with_api_membership)
     @member = create_active_member(@terms_of_membership, :member_with_api)
+    @member.update_attribute :current_membership_id, @membership.id
     FactoryGirl.create :credit_card, :member_id => @member.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
     
@@ -1569,7 +1598,10 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_response :success
     end
     @member.reload
-    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), cancel_date
+    cancel_date_to_check = cancel_date.to_datetime
+    cancel_date_to_check = cancel_date_to_check.to_datetime.change(:offset => @member.get_offset_related )
+
+    assert_equal I18n.l(@member.current_membership.cancel_date.utc, :format => :only_date), I18n.l(cancel_date_to_check.utc, :format => :only_date)
   end
 
   test "Admin should enroll/create member with blank_cc as true even if not cc information provided." do
@@ -1601,7 +1633,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Change TOM throught API - different TOM - active member" do
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
-    @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user }) 
+    @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
@@ -1611,7 +1643,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Do not allow change TOM throught API to same TOM - active member" do
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
-    @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user }) 
+    @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership.id, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
   end
@@ -1619,7 +1651,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Change TOM throught API - different TOM - provisional member" do
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
-    @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user }) 
+    @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
@@ -1629,7 +1661,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Do not allow change TOM throught API to same TOM - provisional member" do
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
-    @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user }) 
+    @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership.id, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
   end
@@ -1637,7 +1669,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Do not allow change TOM throught API - applied member" do
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
-    @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user }) 
+    @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the terms of membership."
   end
@@ -1645,7 +1677,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Do not allow change TOM throught API - lapsed member" do
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
-    @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user }) 
+    @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the terms of membership."
   end
