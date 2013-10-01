@@ -124,7 +124,7 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### member gets active =====>>>>
     after_transition :provisional => 
-                        :active, :do => [:send_active_email, :assign_first_club_cash]
+                        :active, :do => [:assign_first_club_cash]
     after_transition :active => 
                     :active, :do => 'assign_club_cash()'
     ###### <<<<<<========
