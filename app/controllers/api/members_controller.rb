@@ -189,9 +189,13 @@ class Api::MembersController < ApplicationController
 
     if response[:code] == Settings.error_codes.success
       member.update_member_data_by_params(params[:member])
+      changed_attributes = member.changed
       if member.save
         message = "Member updated successfully"
-        Auditory.audit(current_agent, member, message, member, Settings.operation_types.profile_updated) unless batch_update
+        notes = 'Modified: ' + changed_attributes.join(', ')
+        unless batch_update
+          Auditory.audit(current_agent, member, message, member, Settings.operation_types.profile_updated, Time.zone.now, notes)
+        end
         response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
       else
         message = "Member could not be updated, #{member.error_to_s}"

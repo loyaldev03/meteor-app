@@ -376,6 +376,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_difference('Operation.count') do
       generate_put_message
     end
+    assert_not_nil @member.operations.last.notes
+
     assert_response :success
   end
 
