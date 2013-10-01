@@ -9,6 +9,9 @@ class Product < ActiveRecord::Base
   validates :package, :format => /^[a-zA-Z\-_]+$/, :length => { :maximum => 19 }
   validates :stock, :numericality => { :only_integer => true, :less_than => 1999999 }, :allow_backorder => true
 
+  scope :with_stock, where('(allow_backorder = true) OR (allow_backorder = false and stock > 0)')
+  scope :not_kit_card, where('sku != "KIT-CARD" ')
+
   before_save :apply_upcase_to_sku
 
   def self.datatable_columns
