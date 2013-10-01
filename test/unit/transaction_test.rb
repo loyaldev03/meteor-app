@@ -465,7 +465,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
     member = enroll_member(@tom, 0, true)
 
-    assert_difference("Operation.count",4) do  # club cash | communictaion | renewal schedule NBD | billing
+    assert_difference("Operation.count",3) do  # club cash | renewal schedule NBD | billing
       assert_difference("Transaction.count") do
         member.bill_membership
       end
@@ -479,7 +479,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs
     member = enroll_member(@tom, 0, true)
     
-    assert_difference("Operation.count",4) do  # club_cash | communication | renewal schedule NBD | billing
+    assert_difference("Operation.count",3) do  # club_cash | renewal schedule NBD | billing
       assert_difference("Transaction.count") do
         member.bill_membership
       end
@@ -813,7 +813,7 @@ class TransactionTest < ActiveSupport::TestCase
       old_year = active_member.active_credit_card.expire_year
       old_month = active_member.active_credit_card.expire_month
       
-      assert_difference('Operation.count', 4) do
+      assert_difference('Operation.count', 3) do
         assert_difference('Transaction.count') do
           active_member.bill_membership
         end
@@ -881,7 +881,7 @@ class TransactionTest < ActiveSupport::TestCase
       old_year = active_member.active_credit_card.expire_year
       old_month = active_member.active_credit_card.expire_month
       
-      assert_difference('Operation.count', 4) do
+      assert_difference('Operation.count', 3) do
         assert_difference('Transaction.count') do
           active_member.bill_membership
         end
@@ -947,7 +947,7 @@ class TransactionTest < ActiveSupport::TestCase
       old_year = active_member.active_credit_card.expire_year
       old_month = active_member.active_credit_card.expire_month
       
-      assert_difference('Operation.count', 4) do
+      assert_difference('Operation.count', 3) do
         assert_difference('Transaction.count') do
           active_member.bill_membership
         end
@@ -993,9 +993,6 @@ class TransactionTest < ActiveSupport::TestCase
         nbd = member.next_retry_bill_date + (months*30.4166667).to_i.days
         Member.bill_all_members_up_today
         member.reload
-        puts member.next_retry_bill_date
-        puts nbd
-        puts "*********"
         assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd, :format => :only_date)
       end      
     end
@@ -1018,7 +1015,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     member.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = member.club_cash_amount
-    assert_difference("Operation.count",3) do
+    assert_difference("Operation.count",2) do
       assert_difference("Transaction.count")do
         assert_difference("ClubCashTransaction.count",0) do
           member.bill_membership
@@ -1052,7 +1049,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     member.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = member.club_cash_amount
-    assert_difference("Operation.count",3) do
+    assert_difference("Operation.count",2) do
       assert_difference("Transaction.count")do
         assert_difference("ClubCashTransaction.count",0) do
           member.bill_membership
@@ -1086,7 +1083,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     member.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = member.club_cash_amount
-    assert_difference("Operation.count",3) do
+    assert_difference("Operation.count",2) do
       assert_difference("Transaction.count")do
         assert_difference("ClubCashTransaction.count",0) do
           member.bill_membership
@@ -1120,7 +1117,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     member.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = member.club_cash_amount
-    assert_difference("Operation.count",3) do
+    assert_difference("Operation.count",2) do
       assert_difference("Transaction.count")do
         assert_difference("ClubCashTransaction.count",0) do
           member.bill_membership
@@ -1154,7 +1151,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     member.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = member.club_cash_amount
-    assert_difference("Operation.count",3) do
+    assert_difference("Operation.count",2) do
       assert_difference("Transaction.count")do
         assert_difference("ClubCashTransaction.count",0) do
           member.bill_membership
@@ -1188,7 +1185,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     member.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = member.club_cash_amount
-    assert_difference("Operation.count",3) do
+    assert_difference("Operation.count",2) do
       assert_difference("Transaction.count")do
         assert_difference("ClubCashTransaction.count",0) do
           member.bill_membership
@@ -1222,7 +1219,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     member.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = member.club_cash_amount
-    assert_difference("Operation.count",4) do
+    assert_difference("Operation.count",3) do
       assert_difference("Transaction.count")do
         assert_difference("ClubCashTransaction.count",1) do
           member.bill_membership
@@ -1256,7 +1253,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     member.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = member.club_cash_amount
-    assert_difference("Operation.count",3) do
+    assert_difference("Operation.count",2) do
       assert_difference("Transaction.count")do
         assert_difference("ClubCashTransaction.count",0) do
           member.bill_membership
