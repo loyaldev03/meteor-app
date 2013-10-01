@@ -284,17 +284,18 @@ class MembersBillTest < ActionController::IntegrationTest
     within("#td_mi_next_retry_bill_date")do
       assert page.has_content?(I18n.l(first_bill_date, :format => :only_date))
     end
-    @saved_member.next_retry_bill_date = Time.zone.now
-    @saved_member.bill_membership
+
+    bill_member(@saved_member, false)
+
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
-    second_bill_date = first_bill_date + eval(@terms_of_membership_with_gateway.installment_type)
+    second_bill_date = first_bill_date + @terms_of_membership_with_gateway.installment_period.days
 
     within("#td_mi_next_retry_bill_date")do
       assert page.has_content?(I18n.l(second_bill_date, :format => :only_date))
     end 
   end  
-
+  
   test "Refund a transaction with error" do
     setup_member
     @terms_of_membership_with_gateway.update_attribute(:installment_amount, 45.56)
@@ -388,23 +389,18 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Billing membership amount on the Next Bill Date" do
     active_merchant_stubs
     setup_member
-    @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
-    next_bill_date = @saved_member.current_membership.join_date + eval(@terms_of_membership_with_gateway.installment_type)
-    next_bill_date_after_billing = @saved_member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)
-    Member.bill_all_members_up_today
+    next_bill_date = @saved_member.current_membership.join_date + @terms_of_membership_with_gateway.provisional_days.days
+    next_bill_date_after_billing = @saved_member.next_retry_bill_date + @terms_of_membership_with_gateway.installment_period.days
+
+    bill_member(@saved_member, false)
+
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_membership_information") do
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
     end
-    within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date_after_billing, :format => :only_date)) }
-    within('.nav-tabs'){ click_on 'Operations'}
-    within("#operations") do
-      assert page.has_selector?("#operations_table")
-      assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
-    end
+
     within('.nav-tabs'){ click_on 'Transactions'}
     within("#transactions_table") do
-      assert page.has_selector?('#refund')
       assert page.has_content?("Sale : This transaction has been approved")
       assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
     end
