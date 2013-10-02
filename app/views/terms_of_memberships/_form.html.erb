@@ -59,11 +59,11 @@
     <div class="controls">
       <%= radio_button_tag 'is_payment_expected', 'yes', ((@tom.is_payment_expected == 1 unless !@tom.is_payment_expected) or true), :class => 'required' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.payment_is_expected') %>&nbsp;
-      <%= radio_button_tag 'is_payment_expected', 'no', @tom.is_payment_expected == 0 %>
+<!--       <%= radio_button_tag 'is_payment_expected', 'no', @tom.is_payment_expected == 0 %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.no_pay_is_expected') %>&nbsp;
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), 
-        :content => t('lorem') } %>
+        :content => t('lorem') } %>  -->
     </div>
   </div>
 
@@ -86,13 +86,13 @@
       <%= radio_button_tag 'subscription_terms', 'until_cancelled', ((@tom.subscription_limits == 0 unless !@tom.subscription_limits) or true), :class => 'required' %>
       <span id="label_for_until_cancelled"><%= t('activerecord.attributes.terms_of_membership.wizard.bill_until_cancelled') %></span>
       <br /><br />
-      <%= radio_button_tag 'subscription_terms', 'stop_cancel_after', (@tom.subscription_limits > 0 unless !@tom.subscription_limits) %>
+<!--       <%= radio_button_tag 'subscription_terms', 'stop_cancel_after', (@tom.subscription_limits > 0 unless !@tom.subscription_limits) %>
       <span id="label_for_stop_billing_after"><%= t('activerecord.attributes.terms_of_membership.wizard.stop_billing_after') %></span>
       <%= text_field_tag 'subscription_terms_stop_billing_after', @tom.subscription_limits, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("subscription_terms_stop_billing_after_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.subscription_terms'), 
-        :content => t('lorem') } %> 
+        :content => t('lorem') } %>  -->
     </div>
   </div>
 
@@ -135,7 +135,7 @@
         :content => t('lorem') } %> 
     </div>
   </div>
-   <div class="control-group">
+<!--   <div class="control-group">
     <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
     <div class="controls">
       <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id) %>&nbsp;
@@ -146,7 +146,7 @@
         :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
         :content => t('lorem') } %> 
     </div>
-  </div> 
+  </div> -->
 </div>
 
 <div id="" class="form-actions">
