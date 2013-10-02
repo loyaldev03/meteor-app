@@ -219,7 +219,7 @@ class Transaction < ActiveRecord::Base
     def credit
       if payment_gateway_configuration.nil?
         save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
-      elsif self.token.nil? or self.token == CreditCard::BLANK_CREDIT_CARD_TOKEN
+      elsif self.token.nil? or self.token.size < 4
         save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
       else
         load_gateway
