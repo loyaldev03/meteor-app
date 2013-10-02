@@ -1302,6 +1302,7 @@ class Member < ActiveRecord::Base
     CreditCard.transaction do 
       begin
         new_credit_card.member = self
+        new_credit_card.gateway = self.terms_of_membership.payment_gateway_configuration.gateway if new_credit_card.gateway.nil?
         if new_credit_card.errors.size == 0
           new_credit_card.save!
           message = "Credit card #{new_credit_card.last_digits} added and activated."
