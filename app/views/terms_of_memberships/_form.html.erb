@@ -34,12 +34,12 @@
 <div class="step" id="second">  
   <div class="control-group"><%= wizard_steps_indicator(2) %></div>
   
-  <div class="control-group">
+<!--   <div class="control-group">
     <%= label_tag 'initial_fee_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_fee_amount'), :class => 'control-label' %>
     <div class="controls">
       $&nbsp;<%= text_field_tag 'initial_fee_amount', @tom.initial_fee, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
     </div>
-  </div>
+  </div> -->
 
   <div class="control-group">
     <%= label_tag 'trial_period_amount', t('activerecord.attributes.terms_of_membership.wizard.trial_period'), :class => 'control-label' %>
@@ -122,12 +122,12 @@
       <%= radio_button_tag 'if_cannot_bill_member', 'cancel', ((@tom.if_cannot_bill == 'cancel' unless !@tom.if_cannot_bill) or true), :class => 'required' %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.cancel') %>
       <br /><br />
-      <%= radio_button_tag 'if_cannot_bill_member', 'suspend', @tom.if_cannot_bill == 'suspend' %>&nbsp;
+<!--       <%= radio_button_tag 'if_cannot_bill_member', 'suspend', @tom.if_cannot_bill == 'suspend' %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.suspend_for') %>
       <%= text_field_tag 'if_cannot_bill_member_suspend_for', @tom.suspension_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("if_cannot_bill_member_suspend_for_time_span") %>
       <br /><br />
-      <%= radio_button_tag 'if_cannot_bill_member', 'downgrade_to', @tom.if_cannot_bill == 'downgrade_tom' %>&nbsp;
+ -->      <%= radio_button_tag 'if_cannot_bill_member', 'downgrade_to', @tom.if_cannot_bill == 'downgrade_tom' %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.downgrade_to') %>
       <%= select_for_toms('downgrade_to_tom', @tom.downgrade_tom_id) %>
       <%= render :partial => "shared/help", :locals => { 

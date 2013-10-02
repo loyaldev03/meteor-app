@@ -26,7 +26,7 @@ class TermsOfMembership < ActiveRecord::Base
   validates :installment_type, :presence => true
   validates :initial_club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validates :club_cash_installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
-  validates :initial_fee, :numericality => { :greater_than_or_equal_to => 0 }
+  # validates :initial_fee, :numericality => { :greater_than_or_equal_to => 0 }
   validates :trial_period_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validates :is_payment_expected, :presence => true
   validates :subscription_limits, :numericality => { :greater_than_or_equal_to => 0 }
