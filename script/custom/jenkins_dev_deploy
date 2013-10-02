@@ -1,0 +1,10 @@
+#!/usr/bin/expect
+set timeout 60
+spawn cap prototype deploy
+while {1} {
+  expect {
+    eof                          {break}
+    "Password:"                  {send "xagax2012\r"}
+  }
+}
+wait

@@ -15,8 +15,7 @@ private
         membership.status, 
         membership.terms_of_membership.name, 
         (I18n.l(membership.join_date, :format => :only_date) if membership.join_date), 
-        (I18n.l(membership.cancel_date, :format => :only_date) if membership.cancel_date),
-        membership.quota
+        (I18n.l(membership.cancel_date, :format => :only_date) if membership.cancel_date)
       ]
     end
   end

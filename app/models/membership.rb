@@ -5,13 +5,13 @@ class Membership < ActiveRecord::Base
   has_one :enrollment_info
   has_many :transactions
 
-  attr_accessible :created_by, :join_date, :status, :cancel_date, :quota, :terms_of_membership_id
+  attr_accessible :created_by, :join_date, :status, :cancel_date, :terms_of_membership_id
 
   # validates :terms_of_membership, :presence => true
   # validates :member, :presence => true
 
   def self.datatable_columns
-    ['id', 'status', 'tom', 'join_date', 'cancel_date', 'quota' ]
+    ['id', 'status', 'tom', 'join_date', 'cancel_date']
   end
 
   def cancel_because_of_membership_change

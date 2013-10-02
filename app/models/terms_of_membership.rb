@@ -1,6 +1,7 @@
 class TermsOfMembership < ActiveRecord::Base
   attr_accessible :mode, :needs_enrollment_approval, :provisional_days, 
-    :installment_amount, :description, :installment_type, :club, :name, :club_cash_amount
+    :installment_amount, :description, :installment_type, :club, :name, :initial_club_cash_amount, 
+    :club_cash_installment_amount, :skip_first_club_cash
 
   belongs_to :club
   has_many :transactions
@@ -8,6 +9,7 @@ class TermsOfMembership < ActiveRecord::Base
   has_many :prospects
   has_many :email_templates
   belongs_to :downgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'downgrade_tom_id'
+  belongs_to :upgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'upgrade_tom_id'
   belongs_to :agent
 
   acts_as_paranoid
@@ -19,29 +21,24 @@ class TermsOfMembership < ActiveRecord::Base
   #validates :needs_enrollment_approval, :presence => true
   validates :club, :presence => true
   validates :provisional_days, :presence => true
-  validates :installment_amount, :presence => true
+  # validates :installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  # validates :installment_period, :numericality => { :greater_than_or_equal_to => 0 }
   validates :installment_type, :presence => true
-  validates :quota, :presence => true
-  validates :club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :initial_club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :club_cash_installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  # validates :initial_fee, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :trial_period_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :is_payment_expected, :presence => true
+  validates :subscription_limits, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :if_cannot_bill, :presence => true
+  validates :downgrade_tom_id, :presence => true, if: Proc.new { |tom| tom.downgradable? }
+
   validate :validate_payment_gateway_configuration
 
-  before_destroy :verify_that_there_are_not_memberships_and_prospects
-  before_update :verify_that_there_are_not_memberships_and_prospects
+  before_destroy :can_update_or_delete
+  before_update :can_update_or_delete
 
   ###########################################
-  # Installment types:
-  def monthly?
-    installment_type == "1.month"
-  end
-
-  def yearly?
-    installment_type == "1.year"
-  end
-
-  def lifetime?
-    installment_type == "1000.years"
-  end
-  #################################
   
   def production?
     self.mode == 'production'
@@ -56,11 +53,23 @@ class TermsOfMembership < ActiveRecord::Base
   end
   
   def downgradable?
-    self.downgrade_tom_id.to_i > 0
+    self.if_cannot_bill == 'downgrade_tom'
+  end
+
+  def suspendable?
+    self.if_cannot_bill == 'suspend'
+  end
+
+  def cancelable?
+    self.if_cannot_bill == 'cancel'
   end
 
   def self.datatable_columns
     ['id', 'name', 'api_role', 'created_at', 'agent_id']
+  end
+
+  def can_update_or_delete
+    self.memberships.count == 0 && self.prospects.count == 0
   end
 
   private
@@ -83,8 +92,5 @@ class TermsOfMembership < ActiveRecord::Base
         end
       end
     end
-
-    def verify_that_there_are_not_memberships_and_prospects
-      self.memberships.count == 0 && self.prospects.count == 0
-    end
+    
 end

@@ -848,7 +848,6 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member = Member.find_by_email(@member.email)
     @saved_member.set_as_active
     @saved_member.update_attribute(:recycled_times,0)
-    @saved_member.current_membership.update_attribute(:quota, 12)
     @saved_member.current_membership.update_attribute(:join_date,Time.zone.now-1.year)
 
 
@@ -890,7 +889,6 @@ test "Enroll a member with recurrent product and it on the list" do
     @saved_member = Member.find_by_email(@member.email)
     @saved_member.set_as_active
     @saved_member.update_attribute(:recycled_times,0)
-    @saved_member.current_membership.update_attribute(:quota, 12)
     @saved_member.current_membership.update_attribute(:join_date,Time.zone.now-1.year)
 
     fulfillment = Fulfillment.find_by_product_sku('KIT-CARD')
@@ -928,7 +926,6 @@ test "Enroll a member with recurrent product and it on the list" do
     create_member_throught_sloop(enrollment_info)
     @saved_member = Member.find_by_email(@member.email)
     @saved_member.set_as_active
-    @saved_member.current_membership.update_attribute(:quota, 12)
     @saved_member.current_membership.update_attribute(:join_date,Time.zone.now-1.year)  
 
     fulfillment = Fulfillment.find_by_product_sku(product.sku)

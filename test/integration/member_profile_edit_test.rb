@@ -905,7 +905,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name 
 
-    next_bill_date = @saved_member.join_date + eval(@terms_of_membership_with_gateway.installment_type)
+    next_bill_date = @saved_member.join_date + @terms_of_membership_with_gateway.installment_period.days
 
     within("#td_mi_next_retry_bill_date")do
       assert page.has_no_content?(I18n.l(@saved_member.current_membership.join_date+1.month, :format => :only_date)) 
@@ -1015,8 +1015,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     setup_member
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
 
-    next_bill_date = @saved_member.current_membership.join_date + eval(@terms_of_membership_with_gateway.installment_type)
-    next_bill_date_after_billing = @saved_member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)
+    next_bill_date = @saved_member.current_membership.join_date + @terms_of_membership_with_gateway.installment_period.days
+    next_bill_date_after_billing = @saved_member.bill_date + @terms_of_membership_with_gateway.installment_period.days
 
     Member.bill_all_members_up_today
 

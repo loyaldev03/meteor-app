@@ -15,27 +15,30 @@ class FulfillmentTest < ActiveSupport::TestCase
   end
 
   test "active member can't renew fulfillments" do 
-    [ 1, 5, 15, 25 ].each do |quota|
-      [ 0, 3 ].each do |recycled_times|
-        member = create_active_member(@terms_of_membership_with_gateway, :active_member, :enrollment_info, { recycled_times: recycled_times }, { quota: quota })
-        assert !member.can_renew_fulfillment?, "monthly recycled_times: #{recycled_times} and quota: #{quota}"
+    [ 1, 5, 15, 25 ].each do |time|
+      [ 1, 3 ].each do |recycled_times|
+        member = create_active_member(@terms_of_membership_with_gateway, :active_member, :enrollment_info, { recycled_times: recycled_times }, { join_date: Time.zone.now-time.month })
+        assert !member.can_renew_fulfillment?, "monthly recycled_times: #{recycled_times} and join_date: #{I18n.l(member.join_date, :format => :only_date)} and actual date #{I18n.l(Time.zone.now, :format => :only_date)}"
       end
     end
 
-    [ 1, 5, 15, 25, 12 ].each do |quota|
-      [ 0, 3 ].each do |recycled_times|
-        member = create_active_member(@terms_of_membership_with_gateway_yearly, :active_member, :enrollment_info, { recycled_times: recycled_times }, { quota: quota })
-        assert !member.can_renew_fulfillment?, "yearly recycled_times: #{recycled_times} and quota: #{quota}"
+    [ 1, 5, 15, 25, 12 ].each do |time|
+      [ 1, 3 ].each do |recycled_times|
+        member = create_active_member(@terms_of_membership_with_gateway_yearly, :active_member, :enrollment_info, { recycled_times: recycled_times }, { join_date: Time.zone.now-time.year })
+        assert !member.can_renew_fulfillment?, "yearly recycled_times: #{recycled_times} and join_date: #{I18n.l(member.join_date, :format => :only_date)} and actual date #{I18n.l(Time.zone.now, :format => :only_date)}"
       end
     end
   end
 
   test "active member can renew fulfillments" do 
-    member = create_active_member(@terms_of_membership_with_gateway, :active_member, :enrollment_info, { recycled_times: 0 }, { quota: 12, join_date: Time.zone.now-1.year })
-    assert member.can_renew_fulfillment?, "monthly with quota 12 paid"
-
-    member = create_active_member(@terms_of_membership_with_gateway_yearly, :active_member, :enrollment_info, { recycled_times: 0 }, { quota: 24, join_date: Time.zone.now-1.year })
-    assert member.can_renew_fulfillment?, "yearly with quota 24 paid"
+    [ 12, 24, 36 ].each do |time|
+      member = create_active_member(@terms_of_membership_with_gateway, :active_member, :enrollment_info, { recycled_times: 0 }, { join_date: Time.zone.now-time.month })
+      assert member.can_renew_fulfillment?, "monthly with quota 12 paid"
+    end
+    [ 1, 2, 3, 4 ].each do |time|
+      member = create_active_member(@terms_of_membership_with_gateway_yearly, :active_member, :enrollment_info, { recycled_times: 0 }, { join_date: Time.zone.now-time.year })
+      assert member.can_renew_fulfillment?, "yearly with quota 24 paid"
+    end
   end
 
   test "fulfillment not_processed renewal" do 

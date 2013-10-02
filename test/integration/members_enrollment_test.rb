@@ -696,7 +696,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#memberships_table")do
       assert page.has_content?(membership.id.to_s)
       assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-      assert page.has_content?(membership.quota.to_s)
       assert page.has_content?('provisional')
     end
 
@@ -762,7 +761,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#memberships_table")do
       assert page.has_content?(membership.id.to_s)
       assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-      assert page.has_content?(membership.quota.to_s)
       assert page.has_content?('applied')
     end
 
@@ -781,7 +779,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#memberships_table")do
       assert page.has_content?(membership.id.to_s)
       assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-      assert page.has_content?(membership.quota.to_s)
       assert page.has_content?('lapsed')
     end
   end
@@ -870,35 +867,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_content?(@saved_member.birth_date.to_s) 
     end
   end 
-
-  # Check active email - It is send it by CS inmediate
-  test "Check active email" do
-    setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
-    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_member = Member.find_by_email(unsaved_member.email)  
-    @saved_member.set_as_active
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-    within("#table_membership_information") do
-      assert page.has_content?("active")
-    end
-    within('.nav-tabs'){ click_on 'Communications'}
-    within("#communication") do
-      assert page.has_content?("Test active")
-      assert page.has_content?("active")
-      assert_equal(Communication.last.template_type, 'active')
-    end
-
-    within('.nav-tabs'){ click_on 'Operations'}
-    within("#operations_table") do
-      assert page.has_content?("Communication 'Test active' sent")
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    end
-  end
 
   test "Check Birthday email -  It is send it by CS at night" do
     setup_member(false)

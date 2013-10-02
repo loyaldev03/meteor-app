@@ -350,19 +350,22 @@ module ActionController
     # Check Refund email -  It is send it by CS inmediate
     def bill_member(member, do_refund = true, refund_amount = nil, update_next_bill_date_to_today = true)
       active_merchant_stubs
-      
-      member.update_attribute(:next_retry_bill_date, Time.zone.now)
-      next_bill_date = member.bill_date + eval(@terms_of_membership_with_gateway.installment_type)
+      diff_between_next_bill_date_and_today = member.next_retry_bill_date - Time.zone.now
+      next_bill_date = member.next_retry_bill_date + member.terms_of_membership.installment_period.days
 
+      member.update_attribute(:next_retry_bill_date, Time.zone.now)
       answer = member.bill_membership
+      member.update_attribute(:next_retry_bill_date, member.next_retry_bill_date + diff_between_next_bill_date_and_today)
+      
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
       visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix =>member.club.name, :member_prefix => member.id)
       
       # if current_membership.quota%12==0 and current_membership.quota!=12
       #   within("#table_membership_information")do
-      #     within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
+      #     within("#td_mi_club_cash_amount") { assert page.has_content?("#{member.terms_of_membership.club_cash_amount}") }
       #   end
       # end
+
       within("#table_membership_information")do
         within("#td_mi_next_retry_bill_date")do
           assert page.has_content?(I18n.l(next_bill_date, :format => :only_date))
@@ -372,7 +375,7 @@ module ActionController
 
       within(".nav-tabs"){ click_on 'Operations' }
       within("#operations") do
-        assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
+        assert page.has_content?("Member billed successfully $#{member.terms_of_membership.installment_amount}") 
       end
 
       within(".nav-tabs"){ click_on 'Transactions' }
@@ -382,7 +385,7 @@ module ActionController
           assert (page.has_content?("Sale : This transaction has been approved") or page.has_content?("Billing:  Membership Fee - This transaction has been approved")  ) 
         end
         # assert page.has_content?("Sale : This transaction has been approved")
-        assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
+        assert page.has_content?(member.terms_of_membership.installment_amount.to_s)
       end
 
       within("#transactions_table") do
@@ -395,7 +398,7 @@ module ActionController
 
         assert page.has_content?(transaction.amount_available_to_refund.to_s)
 
-        # final_amount = @terms_of_membership_with_gateway.installment_amount.to_s
+        # final_amount = member.terms_of_membership.installment_amount.to_s
         final_amount = transaction.amount_available_to_refund
         final_amount = refund_amount.to_s if not refund_amount.nil?
 
@@ -657,7 +660,6 @@ module ActionController
 
         assert page.has_selector?("#link_member_add_club_cash") if member.status == 'provisional' or member.status == 'active'
 
-        within("#td_mi_quota") { assert page.has_content?("#{member.quota}") }      
       end  
       if not member.current_membership.enrollment_info.nil?
         if not member.current_membership.enrollment_info.product_sku.blank? and not member.status == 'applied'
@@ -673,7 +675,6 @@ module ActionController
       within("#memberships_table")do
         assert page.has_content?(membership.id.to_s)
         assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-        assert page.has_content?(membership.quota.to_s)
         assert page.has_content?(status)
       end
     end

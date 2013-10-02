@@ -63,16 +63,15 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "Monthly member should be billed if it is active or provisional" do
-    assert_difference('Operation.count', 2) do
+    assert_difference('Operation.count', 3) do
       member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
       member.reload
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
-      assert_equal member.quota, 1, "quota is #{member.quota} should be 1"
       assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
       assert_equal member.bill_date, member.next_retry_bill_date, "bill_date is #{member.bill_date} should be #{member.next_retry_bill_date}"
-      assert_equal member.next_retry_bill_date, (prev_bill_date + 1.month), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + 1.month)}"
+      assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l((prev_bill_date + member.terms_of_membership.installment_period.days), :format => :only_date), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + 1.month)}"
     end
   end
 
@@ -267,7 +266,7 @@ class MemberTest < ActiveSupport::TestCase
     member.reload
 
     assert_difference('CreditCard.count', 0) do
-      assert_difference('Operation.count', 3) do  #renewal, recycle, bill
+      assert_difference('Operation.count', 4) do  # club cash, renewal, recycle, bill, set as active
         assert_difference('Transaction.count') do
           assert_equal member.recycled_times, 0
           answer = member.bill_membership
@@ -285,28 +284,26 @@ class MemberTest < ActiveSupport::TestCase
   test "Billing for renewal amount" do
     @club = @wordpress_terms_of_membership.club
     member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)    
-    assert_difference('Operation.count', 2) do
+    installment_period = @wordpress_terms_of_membership.installment_period.days
+    assert_difference('Operation.count', 3) do
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
-
       member.reload
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
-      assert_equal member.quota, 1, "quota is #{member.quota} should be 1"
       assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
-      assert_equal member.bill_date, member.next_retry_bill_date, "bill_date is #{member.bill_date} should be #{member.next_retry_bill_date}"
-      assert_equal member.next_retry_bill_date, (prev_bill_date + 1.month), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + 1.month)}"
+      assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(member.next_retry_bill_date, :format => :only_date), "bill_date is #{member.bill_date} should be #{member.next_retry_bill_date}"
+      assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(prev_bill_date + installment_period, :format => :only_date), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + installment_period)}"
     end
 
 
-    Timecop.freeze(Time.zone.now + 1.month) do
+    Timecop.freeze(Time.zone.now + installment_period) do
       prev_bill_date = member.next_retry_bill_date
       answer = member.bill_membership
       member.reload
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
-      assert_equal member.quota, 2, "quota is #{member.quota} should be 1"
       assert_equal member.recycled_times, 0, "recycled_times is #{member.recycled_times} should be 0"
-      assert_equal member.bill_date, member.next_retry_bill_date, "bill_date is #{member.bill_date} should be #{member.next_retry_bill_date}"
-      assert_equal member.next_retry_bill_date, (prev_bill_date + 1.month), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + 1.month)}"
+      assert_equal I18n.l(member.bill_date, :format => :only_date), I18n.l(member.next_retry_bill_date, :format => :only_date), "bill_date is #{member.bill_date} should be #{member.next_retry_bill_date}"
+      assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l((prev_bill_date + installment_period), :format => :only_date), "next_retry_bill_date is #{member.next_retry_bill_date} should be #{(prev_bill_date + 1.month)}"
     end
   end
 
@@ -316,8 +313,7 @@ class MemberTest < ActiveSupport::TestCase
     @club.update_attribute(:billing_enable, false)
     @member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
 
-    @member.current_membership.update_attribute(:quota, 2)
-    quota_before = @member.quota
+    @member.current_membership.update_attribute(:join_date, Time.zone.now-2.month)
     next_bill_date_before = @member.next_retry_bill_date
     bill_date_before = @member.bill_date
 
@@ -328,7 +324,6 @@ class MemberTest < ActiveSupport::TestCase
         end
       end
       @member.reload
-      assert_equal(quota_before,@member.quota)
       assert_equal(next_bill_date_before,@member.next_retry_bill_date)
       assert_equal(bill_date_before,@member.bill_date)
     end
@@ -339,20 +334,18 @@ class MemberTest < ActiveSupport::TestCase
     @club = @wordpress_terms_of_membership.club
     @member = create_active_member(@wordpress_terms_of_membership, :provisional_member_with_cc)
 
-    @member.current_membership.update_attribute(:quota, 2)
-    quota_before = @member.quota
+    @member.current_membership.update_attribute(:join_date, Time.zone.now-2.month)
     next_bill_date_before = @member.next_retry_bill_date
     bill_date_before = @member.bill_date
 
     Timecop.freeze( @member.next_retry_bill_date ) do
-      assert_difference('Operation.count', 2) do
+      assert_difference('Operation.count', 3) do
         assert_difference('Transaction.count', 1) do
           Member.bill_all_members_up_today
         end
       end
 
       @member.reload
-      assert_not_equal(quota_before, @member.quota)
       assert_not_equal(next_bill_date_before,@member.next_retry_bill_date)
       assert_not_equal(bill_date_before,@member.bill_date)
     end
@@ -365,7 +358,7 @@ class MemberTest < ActiveSupport::TestCase
     
     @saved_member.recover(@terms_of_membership_with_gateway)
 
-    next_bill_date = @saved_member.bill_date + 1.month
+    next_bill_date = @saved_member.bill_date + @terms_of_membership_with_gateway.installment_period.days
 
     Timecop.freeze( @saved_member.next_retry_bill_date ) do
       Member.bill_all_members_up_today
