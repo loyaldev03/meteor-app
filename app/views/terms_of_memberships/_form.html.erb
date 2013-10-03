@@ -44,7 +44,7 @@
   <div class="control-group">
     <%= label_tag 'trial_period_amount', t('activerecord.attributes.terms_of_membership.wizard.trial_period'), :class => 'control-label' %>
     <div class="controls">
-      $&nbsp;<%= text_field_tag 'trial_period_amount', @tom.trial_period_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
+<!--       $&nbsp;<%= text_field_tag 'trial_period_amount', @tom.trial_period_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %> -->
       <%= t('activerecord.attributes.terms_of_membership.wizard.lasting') %>
       <%= text_field_tag 'trial_period_lasting', @tom.provisional_days, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("trial_period_lasting_time_span") %>
