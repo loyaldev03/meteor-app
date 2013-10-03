@@ -188,7 +188,6 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-
   ######################################
   ############ DECLINE ###################
   test "Monthly member SD until gets HD" do 
@@ -347,10 +346,10 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing with HD cancels member" do 
     active_merchant_stubs_store
-    assert_difference('Operation.count', 5) do
+    active_member = create_active_member(@terms_of_membership)
+    active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
+    assert_difference('Operation.count', 5) do        
       assert_difference('Communication.count', 2) do
-        active_member = create_active_member(@terms_of_membership)
-        active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
         amount = @terms_of_membership.installment_amount
         answer = active_member.bill_membership
         active_member.reload
