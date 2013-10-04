@@ -14,6 +14,7 @@ class TermsOfMembership < ActiveRecord::Base
 
   acts_as_paranoid
 
+  before_create :set_mode
   after_create :setup_default_email_templates
 
   validates :name, :presence => true
@@ -76,6 +77,10 @@ class TermsOfMembership < ActiveRecord::Base
 
     def validate_payment_gateway_configuration
       errors.add :base, :club_payment_gateway_configuration unless self.payment_gateway_configuration
+    end
+
+    def set_mode
+      self.mode = "production" if Rails.env.production?
     end
 
     def setup_default_email_templates
