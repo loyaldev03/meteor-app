@@ -78,7 +78,6 @@ class TermsOfMembershipsController < ApplicationController
       @tom.trial_period_amount = post_data[:trial_period_amount]
       @tom.provisional_days = post_data[:trial_period_lasting_time_span] == 'months' ? months_to_days(post_data[:trial_period_lasting].to_i) : post_data[:trial_period_lasting].to_i
       @tom.installment_amount = nil
-      @tom.installment_period = nil
       @tom.is_payment_expected = post_data[:is_payment_expected] == 'yes' ? 1 : 0
       if @tom.is_payment_expected == 1
         @tom.installment_amount = post_data[:installment_amount]

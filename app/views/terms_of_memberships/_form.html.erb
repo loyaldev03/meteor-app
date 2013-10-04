@@ -159,8 +159,7 @@
 </div>
 
 <script type="text/javascript">
-  // Second Step
-
+  // Second Step  
   function until_cancel_logic(){
     $('#subscription_terms_stop_billing_after').removeAttr('required');
     $('#subscription_terms_stop_billing_after').prop('disabled',true);
@@ -173,6 +172,7 @@
     $('#recurring_amount_group').show('fast');
     $('#installment_amount').prop('required', true);
     $('#installment_amount_days').prop('required', true);
+    $('#installment_amount_days').prop('min', 1);
     update_labels();
   });
 
@@ -181,6 +181,7 @@
     $('#recurring_amount_group').hide('fast');
     $('#installment_amount').removeAttr('required');
     $('#installment_amount_days').removeAttr('required');
+    $('#installment_amount_days').removeAttr('min');
     update_labels();
   });
 
@@ -314,6 +315,9 @@
       currentStep = $("#tom_wizard_form").formwizard("state").currentStep;
       switch(currentStep) {
         case "second":
+          if ($('#is_payment_expected_yes').is(":checked") ){
+            $('#installment_amount_days').prop('min', 1);
+          }
           if ($("#subscription_terms_until_cancelled").is(":checked") ){ 
             until_cancel_logic(); 
           }
