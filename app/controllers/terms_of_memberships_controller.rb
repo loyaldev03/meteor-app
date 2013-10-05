@@ -39,10 +39,10 @@ class TermsOfMembershipsController < ApplicationController
       if @tom.save
         flash[:notice] = "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
       else
-        flash[:error] = "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was not updated"
+        flash[:error] = "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was not updated. #{@tom.errors.to_hash}"
       end
     else
-      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"      
+      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
     end
     redirect_to terms_of_memberships_url
   end

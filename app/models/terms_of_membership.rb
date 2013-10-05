@@ -17,7 +17,7 @@ class TermsOfMembership < ActiveRecord::Base
   before_create :set_mode
   after_create :setup_default_email_templates
 
-  validates :name, :presence => true
+  validates :name, :presence => true, :uniqueness => { :scope => :club_id }
   validates :mode, :presence => true
   #validates :needs_enrollment_approval, :presence => true
   validates :club, :presence => true
