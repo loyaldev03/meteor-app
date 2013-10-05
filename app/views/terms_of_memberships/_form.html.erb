@@ -314,6 +314,9 @@
       currentStep = $("#tom_wizard_form").formwizard("state").currentStep;
       switch(currentStep) {
         case "second":
+          $('#terms_of_membership_initial_club_cash_amount').prop('min',0);
+          $('#terms_of_membership_club_cash_installment_amount').prop('min',0);
+
           if ($("#subscription_terms_until_cancelled").is(":checked") ){ 
             until_cancel_logic(); 
           }
