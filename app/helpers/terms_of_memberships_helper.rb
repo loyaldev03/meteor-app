@@ -4,8 +4,9 @@ module TermsOfMembershipsHelper
 		select_tag select_name, dates_span, :class => 'input-small', :selected => selected_item
 	end
 
-	def select_for_toms(select_name, selected_item = nil)
+	def select_for_toms(select_name, selected_item = nil, current_tom = nil)
 		toms = TermsOfMembership.where(:club_id => @current_club.id)
+		toms = toms - [current_tom] unless current_tom.new_record?
 		select_tag select_name, options_from_collection_for_select(toms, "id", "name", selected_item), :include_blank => true
 	end
 
