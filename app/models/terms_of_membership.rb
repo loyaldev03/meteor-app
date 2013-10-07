@@ -7,7 +7,7 @@ class TermsOfMembership < ActiveRecord::Base
   has_many :transactions
   has_many :memberships
   has_many :prospects
-  has_many :email_templates
+  has_many :email_templates, :dependent => :destroy
   belongs_to :downgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'downgrade_tom_id'
   belongs_to :upgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'upgrade_tom_id'
   belongs_to :agent
