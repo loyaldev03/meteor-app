@@ -1,3 +1,15 @@
+<% if @tom.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= pluralize(@tom.errors.count, "error") %> founded:</h2>
+    <ul>
+      <% @tom.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+  <br>
+<% end %>
+
 <% # First step %>
 <div class="step" id="first">
   <div class="control-group"><%= wizard_steps_indicator(1) %></div>
@@ -46,7 +58,7 @@
     <div class="controls">
 <!--       $&nbsp;<%= text_field_tag 'trial_period_amount', @tom.trial_period_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %> -->
       <%= t('activerecord.attributes.terms_of_membership.wizard.lasting') %>
-      <%= text_field_tag 'trial_period_lasting', @tom.provisional_days, :class => 'text_field input-small required', :placeholder => '0', :type => 'number', :min => 0 %>
+      <%= text_field_tag 'trial_period_lasting', @tom.provisional_days, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("trial_period_lasting_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.trial_period'), 
@@ -70,7 +82,7 @@
   <div class="control-group" style="<%= @tom.is_payment_expected == 0 ? 'display:none' : ''%>" id="recurring_amount_group">
     <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label' %>
     <div class="controls">
-      $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number', :min => 0 %>
+      $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
       <%= text_field_tag 'installment_amount_days', @tom.installment_period, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("installment_amount_days_time_span") %>
@@ -99,14 +111,14 @@
   <div class="control-group">
     <%= label_tag 'initial_club_cash_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number', :min => 0 %>
+      <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number' %>
     </div>
   </div>
 
   <div class="control-group">
     <%= label_tag 'club_cash_installment_amount', t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number', :min => 0 %>
+      <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.skip_first_club_cash') %>
       <%= f.check_box 'skip_first_club_cash' %>
     </div>
