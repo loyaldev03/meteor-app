@@ -28,6 +28,15 @@
       <% if params[:controller] == 'fulfillments' %>
         <%= delimiter %><li class="active">Fulfillments</li>
       <% end %>
+      <% if params[:controller] == 'terms_of_memberships' %>
+        <%= delimiter %><a href="<%= terms_of_memberships_path %>">Subscription Plans</a>
+      <% end %>
+      <% if params[:controller] == 'terms_of_memberships' and ['show','edit'].include? params[:action]  %>
+        <%= delimiter %><li class="active"><%= @tom.name %></li>
+      <% end %>
+      <% if params[:controller] == 'terms_of_memberships' and params[:action] == 'new' %>
+        <%= delimiter %><li class="active">New Subscription Plan</li>
+      <% end %>
     <% end %>
 
     <% if @current_member %>
