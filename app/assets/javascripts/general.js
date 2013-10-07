@@ -282,6 +282,16 @@ function new_member_functions(){
     $('#error_explanation').hide();
     $('#submit_button').attr('disabled', 'disabled');
     $('#cancel_button').hide();
+
+    var skus = [];
+    if ($('#kit_card_product_sku').is(':checked')) {
+      skus.push("KIT-CARD");
+    }
+    if ($('#product_sku option:selected').text().length > 0) {
+      skus.push($('#product_sku option:selected').text());
+    }
+    $('#member_product_sku').val(skus.join(','));
+    
     event.preventDefault();
     $.ajax({
       type: 'POST',
