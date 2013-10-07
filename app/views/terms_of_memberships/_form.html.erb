@@ -70,7 +70,7 @@
   <div class="control-group" style="<%= @tom.is_payment_expected == 0 ? 'display:none' : ''%>" id="recurring_amount_group">
     <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label' %>
     <div class="controls">
-      $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
+      $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number', :min => 0 %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
       <%= text_field_tag 'installment_amount_days', @tom.installment_period, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("installment_amount_days_time_span") %>
