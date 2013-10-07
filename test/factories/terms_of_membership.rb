@@ -1,7 +1,7 @@
 FactoryGirl.define do
 
   factory :terms_of_membership do
-    name "test"
+    sequence(:name) {|n| "test_#{n}" }
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -18,7 +18,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_hold_card, class: TermsOfMembership do
-    name "test Hold card 004"
+    sequence(:name) {|n| "test Hold card 004_#{n}" }
     installment_amount 0.04 
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -35,7 +35,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_do_not_honor, class: TermsOfMembership do
-    name "test do not honor 0045"
+    sequence(:name) {|n| "test do not honor 0045_#{n}" }
     installment_amount 0.05 
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -52,7 +52,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_insuf_funds, class: TermsOfMembership do
-    name "test insuf funds"
+    sequence(:name) {|n| "test insuf funds_#{n}" }
     installment_amount 0.51 
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -69,7 +69,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_with_gateway, class: TermsOfMembership do
-    name "test"
+    sequence(:name) {|n| "test with gateway_#{n}" }
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -86,7 +86,7 @@ FactoryGirl.define do
   end
 
   factory :wordpress_terms_of_membership_with_gateway, class: TermsOfMembership do
-    name "test"
+    sequence(:name) {|n| "test wordpress with gateway_#{n}" }
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -103,7 +103,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_with_gateway_with_family, class: TermsOfMembership do
-    name "test"
+    sequence(:name) {|n| "test with gateway and family_#{n}" }
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -120,7 +120,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_with_gateway_and_external_id, class: TermsOfMembership do
-    name "test"
+    sequence(:name) {|n| "test with gateway and external id#{n}" }
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -137,7 +137,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_with_gateway_and_api, class: TermsOfMembership do
-    name "test"
+    sequence(:name) {|n| "test with gateway and api#{n}" }
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -155,7 +155,7 @@ FactoryGirl.define do
 
 
   factory :terms_of_membership_with_gateway_yearly, class: TermsOfMembership do
-    name "test"
+    sequence(:name) {|n| "test with gateway yearly#{n}" }
     installment_amount 100
     installment_period 365 # installment_type '1.year'
     initial_fee 0
@@ -172,7 +172,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_with_gateway_needs_approval, class: TermsOfMembership do
-    name "test-approval"
+    sequence(:name) {|n| "test-approval_#{n}" }
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -189,7 +189,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_with_gateway_without_club_cash, class: TermsOfMembership do
-    name "test"
+    sequence(:name) {|n| "test without club cash_#{n}" }
     installment_amount 100
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -206,7 +206,7 @@ FactoryGirl.define do
   end  
 
   factory :life_time_terms_of_membership, class: TermsOfMembership do
-    name "test-lifetime"
+    sequence(:name) {|n| "test-lifetime_#{n}" }
     installment_amount 100
     installment_period 365000 # installment_type '1000.years'
     initial_fee 0
@@ -223,7 +223,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_monthly_without_provisional_day_and_amount, class: TermsOfMembership do
-    name "test"
+    sequence(:name) {|n| "test monthly without provisional days and amount_#{n}" }
     installment_amount 0
     installment_period 30 # installment_type '1.month'
     initial_fee 0
@@ -240,7 +240,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_yearly_without_provisional_day_and_amount, class: TermsOfMembership do
-    name "test"
+    sequence(:name) {|n| "test yearly without provisional day and amount_#{n}" }
     installment_amount 0
     installment_period 365 # installment_type '1.year'
     initial_fee 0
@@ -257,7 +257,7 @@ FactoryGirl.define do
   end
 
   factory :terms_of_membership_for_downgrade, class: TermsOfMembership do
-    name "downgrade_free_membership"
+    sequence(:name) {|n| "downgrade_free_membership_#{n}" }
     installment_amount 0
     installment_period 365 # installment_type '1.year'
     initial_fee 0

@@ -1,3 +1,15 @@
+<% if @tom.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= pluralize(@tom.errors.count, "error") %> founded:</h2>
+    <ul>
+      <% @tom.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+  <br>
+<% end %>
+
 <% # First step %>
 <div class="step" id="first">
   <div class="control-group"><%= wizard_steps_indicator(1) %></div>

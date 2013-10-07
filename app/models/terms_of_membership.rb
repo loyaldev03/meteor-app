@@ -7,7 +7,7 @@ class TermsOfMembership < ActiveRecord::Base
   has_many :transactions
   has_many :memberships
   has_many :prospects
-  has_many :email_templates
+  has_many :email_templates, :dependent => :destroy
   belongs_to :downgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'downgrade_tom_id'
   belongs_to :upgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'upgrade_tom_id'
   belongs_to :agent
@@ -17,13 +17,13 @@ class TermsOfMembership < ActiveRecord::Base
   before_create :set_mode
   after_create :setup_default_email_templates
 
-  validates :name, :presence => true
+  validates :name, :presence => true, :uniqueness => { :scope => :club_id }
   validates :mode, :presence => true
   #validates :needs_enrollment_approval, :presence => true
   validates :club, :presence => true
-  validates :provisional_days, :presence => true
-  # validates :installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validates :installment_period, :numericality => { :greater_than_or_equal_to => 1 }
+  validates :provisional_days, :presence => true, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validates :installment_type, :presence => true
   validates :initial_club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validates :club_cash_installment_amount, :numericality => { :greater_than_or_equal_to => 0 }

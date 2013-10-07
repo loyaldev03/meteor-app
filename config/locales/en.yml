@@ -279,6 +279,9 @@ en:
           unsynced: Not Synced
           error: Sync Error
         is_lapsed: 'Member was canceled.'
+      enrollment_info:
+        kit_card_product_sku: KIT-CARD
+        product_sku: Product
       membership:
         id: 'ID'
         status: 'Status'
