@@ -21,9 +21,9 @@ class TermsOfMembership < ActiveRecord::Base
   validates :mode, :presence => true
   #validates :needs_enrollment_approval, :presence => true
   validates :club, :presence => true
+  validates :installment_period, :numericality => { :greater_than_or_equal_to => 1 }
   validates :provisional_days, :presence => true, :numericality => { :greater_than_or_equal_to => 0 }
   validates :installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
-  # validates :installment_period, :numericality => { :greater_than_or_equal_to => 0 }
   validates :installment_type, :presence => true
   validates :initial_club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validates :club_cash_installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
