@@ -335,13 +335,15 @@
           } else {
             $('#if_cannot_bill_member_options').hide('fast');
           }
-          if( $("#subscription_terms_until_cancelled").is(":checked") ){ 
+          
+          if( $("#if_cannot_bill_member_cancel").is(":checked") ){ 
             cancel_radio_logic(); 
           }
           else if( $("#if_cannot_bill_member_suspend").is(":checked") ){ 
             suspend_radio_logic(); 
           }
-          else if( $("#if_cannot_bill_member_downgrade_to").is(":checked") ){ downgrade_radio_logic();
+          else if( $("#if_cannot_bill_member_downgrade_to").is(":checked") ){ 
+            downgrade_radio_logic();
           }
 
           if( $("#upgrade_to_tom").val() == "" ){ 
