@@ -99,14 +99,14 @@
   <div class="control-group">
     <%= label_tag 'initial_club_cash_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number' %>
+      <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number', :min => 0 %>
     </div>
   </div>
 
   <div class="control-group">
     <%= label_tag 'club_cash_installment_amount', t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number' %>
+      <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number', :min => 0 %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.skip_first_club_cash') %>
       <%= f.check_box 'skip_first_club_cash' %>
     </div>
@@ -314,9 +314,6 @@
       currentStep = $("#tom_wizard_form").formwizard("state").currentStep;
       switch(currentStep) {
         case "second":
-          $('#terms_of_membership_initial_club_cash_amount').prop('min',0);
-          $('#terms_of_membership_club_cash_installment_amount').prop('min',0);
-
           if ($("#subscription_terms_until_cancelled").is(":checked") ){ 
             until_cancel_logic(); 
           }
