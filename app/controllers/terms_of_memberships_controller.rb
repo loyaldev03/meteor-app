@@ -38,13 +38,15 @@ class TermsOfMembershipsController < ApplicationController
       prepare_tom_data_to_save(params)
       if @tom.save
         flash[:notice] = "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
+        redirect_to terms_of_memberships_url
       else
-        flash[:error] = "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was not updated. #{@tom.errors.to_hash}"
+        flash.now[:error] = "Your Subscription Plan was not updated."
+        render action: "edit"
       end
     else
       flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
+      redirect_to terms_of_memberships_url
     end
-    redirect_to terms_of_memberships_url
   end
 
   def destroy
