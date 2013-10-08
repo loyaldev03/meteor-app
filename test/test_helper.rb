@@ -263,7 +263,7 @@ module ActionController
       end
     end
 
-    def fill_in_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
+    def fill_in_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false, product_skus = ['KIT-CARD'])
       visit members_path( :partner_prefix => unsaved_member.club.partner.prefix, :club_prefix => unsaved_member.club.name )
       click_link_or_button 'New Member'
 
@@ -311,9 +311,17 @@ module ActionController
 
       fill_in_credit_card_info(credit_card, cc_blank)
 
-      unless unsaved_member.external_id.nil?
+      if unsaved_member.club.requires_external_id and not unsaved_member.external_id.nil?
         fill_in 'member[external_id]', :with => unsaved_member.external_id
       end 
+
+      product_skus.each do |product|
+        if product == 'KIT-CARD'
+          check 'kit_card_product_sku' 
+        else
+          select(product, :from => "product_sku")
+        end
+      end
 
       alert_ok_js
       click_link_or_button 'Create Member'
@@ -335,8 +343,8 @@ module ActionController
       end
     end
 
-    def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false)
-      fill_in_member(unsaved_member, credit_card, tom_type, cc_blank)
+    def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false, product_skus = ['KIT-CARD'])
+      fill_in_member(unsaved_member, credit_card, tom_type, cc_blank, product_skus)
       
       begin
         wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
@@ -665,7 +673,9 @@ module ActionController
         if not member.current_membership.enrollment_info.product_sku.blank? and not member.status == 'applied'
           within(".nav-tabs"){ click_on 'Fulfillments' }
           within("#fulfillments") do
-            assert page.has_content?('KIT-CARD')
+            member.enrollment_infos.first.product_sku.to_s.split(',') do |product|
+              assert page.has_content?(product)
+            end
           end
         end
       end

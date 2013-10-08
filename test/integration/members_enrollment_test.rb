@@ -157,6 +157,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
+  #Create a member selecting only a kit-card
   test "create member" do
   	setup_member(false)
 
@@ -169,7 +170,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) }
     within(".nav-tabs"){ click_on 'Transactions' }
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
-    assert_equal(Fulfillment.count,Club::DEFAULT_PRODUCT.count)
+    within(".nav-tabs"){ click_on 'Fulfillments' }
+    within("#fulfillments") { assert page.has_content?('KIT-CARD') }
+    assert_equal(Fulfillment.count, 1)
+    assert_equal created_member.fulfillments.last.product_sku, 'KIT-CARD'
   end
 
   # Reject new enrollments if billing is disable
@@ -1171,5 +1175,56 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_content?("Member information is invalid.")
       assert page.has_content?("number: An error was encountered while processing your request.")
     end
+  end
+
+  test "Create a member selecting only a product" do
+    setup_member(false)
+    product = FactoryGirl.create(:product, :club_id => @club.id,)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    created_member = create_member(unsaved_member,nil,nil,false,[product.sku])
+
+    validate_view_member_base(created_member)
+    within(".nav-tabs"){ click_on 'Operations' }
+    within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
+    within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) }
+    within(".nav-tabs"){ click_on 'Transactions' }
+    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
+    within(".nav-tabs"){ click_on 'Fulfillments' }
+    within("#fulfillments") { assert page.has_content?(product.sku) }
+    assert_equal(Fulfillment.count, 1)
+    assert_equal created_member.fulfillments.last.product_sku, product.sku
+  end
+
+  test "Create a member without selecting any " do
+    setup_member(false)
+    product = FactoryGirl.create(:product, :club_id => @club.id, :name => 'PRODUCT_RANDOM')
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    created_member = create_member(unsaved_member,nil,nil,false,[''])
+
+    validate_view_member_base(created_member)
+    within(".nav-tabs"){ click_on 'Operations' }
+    within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
+    within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) }
+    within(".nav-tabs"){ click_on 'Transactions' }
+    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
+    assert_equal(Fulfillment.count, 0)
+  end
+
+  test "Create a member selecting kit-card and product" do
+    setup_member(false)
+    product = FactoryGirl.create(:product, :club_id => @club.id)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    created_member = create_member(unsaved_member,nil,nil,false,[product.sku,'KIT-CARD'])
+
+    validate_view_member_base(created_member)
+    within(".nav-tabs"){ click_on 'Operations' }
+    within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
+    within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) }
+    within(".nav-tabs"){ click_on 'Transactions' }
+    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
+    within(".nav-tabs"){ click_on 'Fulfillments' }
+    within("#fulfillments") { assert page.has_content?(product.sku) }
+    within("#fulfillments") { assert page.has_content?('KIT-CARD') }
+    assert_equal(Fulfillment.count, 2)
   end
 end
