@@ -229,12 +229,13 @@ class Member < ActiveRecord::Base
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
   def schedule_first_membership(set_join_date, skip_send_fulfillment = false, nbd_update_for_sts = false, skip_add_club_cash = false)
-    send_fulfillment unless skip_send_fulfillment
-
     membership = current_membership
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
-    end
+    end    
+
+    send_fulfillment unless skip_send_fulfillment
+    
     unless nbd_update_for_sts
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
