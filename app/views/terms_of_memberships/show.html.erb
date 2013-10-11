@@ -19,10 +19,10 @@
       <b> <%= t('activerecord.attributes.terms_of_membership.provisional_days') %>: </b> 
       <%= @tom.provisional_days %> 
     </div>
-    <div class="span2"> 
+<!--     <div class="span2"> 
       <b> <%= t('activerecord.attributes.terms_of_membership.initial_fee') %>: </b> 
       <%= number_to_currency(@tom.initial_fee) %>
-    </div>
+    </div> -->
     <div class="span2"> 
       <b> <%= t('activerecord.attributes.terms_of_membership.payment_is_expected') %>: </b> 
       <%= @tom.is_payment_expected ? 'Yes' : 'No' %>
@@ -31,10 +31,10 @@
       <b> <%= t('activerecord.attributes.terms_of_membership.installment_period') %>: </b> 
       <%= @tom.installment_period.nil? ? 0 : @tom.installment_period  %>  <%= t('days') %>
     </div>
-    <div class="span2"> 
+<!--     <div class="span2"> 
       <b> <%= t('activerecord.attributes.terms_of_membership.subscription_limits') %>: </b> 
       <%= @tom.subscription_limits %>
-    </div>
+    </div> -->
     <div class="span2"> 
       <b> <%= t('activerecord.attributes.terms_of_membership.external_code') %>: </b> 
       <%= @tom.api_role %> 
