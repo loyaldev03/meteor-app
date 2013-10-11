@@ -36,7 +36,6 @@ class Transaction < ActiveRecord::Base
     self.state = member.state
     self.country = member.country
     self.zip = member.zip
-    self.terms_of_membership_id = member.terms_of_membership.id
   end
 
   def credit_card=(credit_card)
@@ -64,12 +63,12 @@ class Transaction < ActiveRecord::Base
   end
 
   def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, operation_type_to_set = nil)
-    self.terms_of_membership_id = terms_of_membership_id || member.terms_of_membership.id
     self.member = member
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
     self.membership_id = membership.nil? ? member.current_membership_id : membership.id 
+    self.terms_of_membership_id = terms_of_membership_id || member.terms_of_membership.id
     self.operation_type = operation_type_to_set
     self.save
     @options = {
