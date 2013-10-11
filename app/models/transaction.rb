@@ -235,8 +235,12 @@ class Transaction < ActiveRecord::Base
         save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
       else
         load_gateway        
-        refund_response=@gateway.refund(amount_to_send, refund_response_transaction_id, @options)
-        save_response(refund_response)
+        begin
+          refund_response=@gateway.refund(amount_to_send, refund_response_transaction_id, @options)
+          save_response(refund_response)
+        rescue Exception => e
+          save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
+        end
       end
     end    
 

@@ -133,6 +133,7 @@ en:
     unable_to_perform_due_member_status: "Unable to perfom this action. The member is not in the right status to perform this."
     airbrake_error_message: "Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience."
     birth_date_is_invalid: "is invalid, it must be null or greater than '1900-01-01'"
+    payment_gateway_time_out: "Time out trying to connect with the payment gateway."
   activerecord:
     model:
       members: 'Members'
