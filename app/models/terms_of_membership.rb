@@ -14,7 +14,7 @@ class TermsOfMembership < ActiveRecord::Base
 
   acts_as_paranoid
 
-  before_create :set_mode
+  before_validation :set_mode
   after_create :setup_default_email_templates
 
   validates :name, :presence => true, :uniqueness => { :scope => :club_id }
@@ -80,7 +80,9 @@ class TermsOfMembership < ActiveRecord::Base
     end
 
     def set_mode
-      self.mode = "production" if Rails.env.production?
+      if self.new_record?
+        self.mode = "production" if Rails.env.production?
+      end
     end
 
     def setup_default_email_templates
