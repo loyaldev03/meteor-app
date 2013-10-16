@@ -1275,4 +1275,39 @@ class TransactionTest < ActiveSupport::TestCase
     member.reload
     assert_equal member.club_cash_amount, 50
   end
+
+  test "After successful billing it should upgrade member if upgrade_tom was set" do
+    active_merchant_stubs
+    @terms_of_membership_with_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, 
+                                                           :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
+                                                           :upgrade_tom_period => 65, :provisional_days => 30, :installment_period => 30 )
+
+    member = enroll_member(@terms_of_membership_with_upgrade)
+    nbd = member.next_retry_bill_date
+    next_month = Time.zone.now.to_date + member.terms_of_membership.installment_period.days
+    #first billing, it should not upgrade 
+    Timecop.travel(member.next_retry_bill_date) do
+      assert_difference("Operation.count", 3) do
+        Member.bill_all_members_up_today
+      end      
+      member.reload
+      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
+    end
+    #Second billing, it should not upgrade 
+    Timecop.travel(member.next_retry_bill_date) do
+      assert_difference("Operation.count", 3) do
+        Member.bill_all_members_up_today
+      end
+      member.reload
+      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
+    end
+    #Third billing, it should upgrade 
+    Timecop.travel(member.next_retry_bill_date) do
+      assert_difference("Operation.count", 5) do
+        Member.bill_all_members_up_today
+      end
+      member.reload
+      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership.id
+    end
+  end
 end

@@ -445,7 +445,7 @@ class Member < ActiveRecord::Base
 
   def bill_membership
     trans = nil
-    if can_bill_membership? and self.next_retry_bill_date <= Time.zone.now
+    if can_bill_membership? and self.next_retry_bill_date <= Time.zone.now and terms_of_membership.is_payment_expected
       amount = terms_of_membership.installment_amount
       if terms_of_membership.payment_gateway_configuration.nil?
         message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
@@ -973,9 +973,7 @@ class Member < ActiveRecord::Base
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
 
-    # base = Member.includes(:current_membership => :terms_of_membership).where("next_retry_bill_date <= ? AND members.club_id IN (select id from clubs where billing_enable = true) AND members.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now).limit(2000)
-   
-    base = Member.where("next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status NOT IN ('applied','lapsed') AND manual_payment = false", Time.zone.now).limit(2000) 
+    base = Member.includes(:current_membership => :terms_of_membership).where("next_retry_bill_date <= ? AND members.club_id IN (select id from clubs where billing_enable = true) AND members.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now).limit(2000)
 
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:billing rake task, processing #{base.count} members"
     base.to_enum.with_index.each do |member,index| 
@@ -1364,6 +1362,14 @@ class Member < ActiveRecord::Base
       Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date.to_date}", self, Settings.operation_types.renewal_scheduled)
     end
 
+    def manage_upgrade
+      unless terms_of_membership.upgrade_tom_id.nil?
+        if join_date.to_date + terms_of_membership.upgrade_tom_period.days < Time.new.getlocal(self.get_offset_related).to_date
+          change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade)
+        end
+      end
+    end
+
     def set_status_on_enrollment!(agent, trans, amount, info)
       operation_type = Settings.operation_types.enrollment_billing
       description = 'enrolled'
@@ -1398,6 +1404,7 @@ class Member < ActiveRecord::Base
         Auditory.report_issue("#{bill_type}::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
       end
       schedule_renewal(manual)
+      manage_upgrade
       message = (manual ? "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}" : "Member billed successfully $#{trans.amount} Transaction id: #{trans.id}" )
       Auditory.audit(nil, trans, message, self, operation_type)
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
