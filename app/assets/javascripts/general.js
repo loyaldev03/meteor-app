@@ -267,17 +267,15 @@ function member_index_functions(){
 };
 
 function retrieve_information(){
-  var product_skus = ""
-  var cc_blank_value;
-  if( $("#setter_cc_blank").length > 0 )
-    cc_blank_value = $("#setter_cc_blank").is(":checked") ? 1 : 0
+  var skus = [];
+  if ($('#kit_card_product_sku').is(':checked')) {
+    skus.push("KIT-CARD");
+  }
+  if ($('#product_sku option:selected').text().length > 0) {
+    skus.push($('#product_sku option:selected').text());
+  }
+  $('#member_product_sku').val(skus.join(','));
 
-  if( $("#kit_card_product_sku").is(":checked") )
-    product_skus = "KIT-CARD"
-  
-  if ($('#product_sku option:selected').text().length > 0)
-    product_skus = product_skus+","+$('#product_sku option:selected').text();
-  
   data = {
     member:{  
       first_name: $("#member_first_name").val(),
@@ -296,12 +294,7 @@ function retrieve_information(){
       manual_payment: $("#member_manual_payment").val(),
       email: $("#member_email").val(),
       external_id: $("#member_external_id").val()=="" ? null : $("#member_external_id").val(),
-      credit_card:{
-        number: $("#member_credit_card_number").val(),
-        expire_month: $("#member_credit_card_expire_month").val(),
-        expire_year: $("#member_credit_card_expire_year").val()
-      },
-      product_sku: product_skus,
+      product_sku: $('#member_product_sku').val(),
       enrollment_amount: $("#member_enrollment_amount").val(),
       mega_channel: $("#member_mega_channel").val(),
       campaign_medium: $("#member_campaign_medium").val(),
@@ -310,11 +303,18 @@ function retrieve_information(){
       ip_address: $("#member_ip_address").val(),
       campaign_description: $("#member_campaign_description").val(),
       member_group_type_id: $("#member_member_group_type_id").val()
-    },
-    setter:{
-      cc_blank: cc_blank_value,
-    },
+    }
   }
+  if( $("#member_credit_card_number").length > 0 ){
+    var credit_card_params = {}
+    credit_card_params["number"] = $("#member_credit_card_number").val(),
+    credit_card_params["expire_month"] = $("#member_credit_card_expire_month").val(),
+    credit_card_params["expire_year"] = $("#member_credit_card_expire_year").val(),
+    data["member"]["credit_card"] = credit_card_params;
+  }
+  if( $("#setter_cc_blank").length > 0 )
+    data["setter"] = { "cc_blank": $("#setter_cc_blank").is(":checked") ? 1 : 0 }
+
   return data
 }
 
