@@ -58,8 +58,8 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
   	assert !@terms_of_membership.valid?
   end
 
-  # Create a member with TOM before
-  test "After successful billing it should upgrade member if upgrade_tom was set" do
+  # Create a TOM with upgrate to >1
+  test "Create a member with TOM upgrate to >1" do
     active_merchant_stubs
     @terms_of_membership_with_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
@@ -88,6 +88,52 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     Timecop.travel(member.next_retry_bill_date) do
       assert_difference("Operation.count", 5) do
         Member.bill_all_members_up_today
+      end
+      member.reload
+      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership.id
+      assert_not_nil member.operations.where(operation_type: Settings.operation_types.tom_upgrade).first
+    end
+  end
+
+  #Create a TOM with upgrate to = 1
+  test "Create a member with TOM upgrate to = 1" do
+    active_merchant_stubs
+    @terms_of_membership_with_upgrade = FactoryGirl.build(:terms_of_membership_with_gateway, 
+                                                           :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
+                                                           :upgrade_tom_period => 1, :provisional_days => 30, :installment_period => 30 )
+    assert @terms_of_membership_with_upgrade.save
+    member = enroll_member(@terms_of_membership_with_upgrade)
+  end
+
+  test "Create a member with Manual Payment with TOM upgrate to >1" do
+    active_merchant_stubs
+    @terms_of_membership_with_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, 
+                                                           :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
+                                                           :upgrade_tom_period => 65, :provisional_days => 30, :installment_period => 30 )
+
+    member = enroll_member(@terms_of_membership_with_upgrade)
+    member.update_attribute :manual_payment, true
+
+    #first billing, it should not upgrade  
+    Timecop.travel(member.next_retry_bill_date) do
+      assert_difference("Operation.count", 3) do
+        member.manual_billing(@terms_of_membership_with_upgrade.installment_amount, 'cash')
+      end      
+      member.reload
+      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
+    end
+    #Second billing, it should not upgrade 
+    Timecop.travel(member.next_retry_bill_date) do
+      assert_difference("Operation.count", 3) do
+        member.manual_billing(@terms_of_membership_with_upgrade.installment_amount, 'cash')
+      end
+      member.reload
+      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
+    end
+    #Third billing, it should upgrade 
+    Timecop.travel(member.next_retry_bill_date) do
+      assert_difference("Operation.count", 5) do
+        member.manual_billing(@terms_of_membership_with_upgrade.installment_amount, 'cash')
       end
       member.reload
       assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership.id
