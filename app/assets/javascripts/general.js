@@ -266,6 +266,58 @@ function member_index_functions(){
 
 };
 
+function retrieve_information(){
+  var product_skus = ""
+  var cc_blank_value;
+  if( $("#setter_cc_blank").length > 0 )
+    cc_blank_value = $("#setter_cc_blank").is(":checked") ? 1 : 0
+
+  if( $("#kit_card_product_sku").is(":checked") )
+    product_skus = "KIT-CARD"
+  
+  if ($('#product_sku option:selected').text().length > 0)
+    product_skus = product_skus+","+$('#product_sku option:selected').text();
+  
+  data = {
+    member:{  
+      first_name: $("#member_first_name").val(),
+      gender: $("#member_gender").val()=="" ? null : $("#member_gender").val(),
+      address: $("#member_address").val(),
+      country: $("#member_country").val(),
+      state: $("#member_state").val(),
+      last_name: $("#member_last_name").val(),
+      city: $("#member_city").val(),
+      zip: $("#member_zip").val(),
+      phone_country_code: $("#member_phone_country_code").val(),
+      phone_area_code: $("#member_phone_area_code").val(),
+      phone_local_number: $("#member_phone_local_number").val(),
+      type_of_phone_number: $("#member_type_of_phone_number").val(),
+      terms_of_membership_id: $("#member_terms_of_membership_id").val(),
+      manual_payment: $("#member_manual_payment").val(),
+      email: $("#member_email").val(),
+      external_id: $("#member_external_id").val()=="" ? null : $("#member_external_id").val(),
+      credit_card:{
+        number: $("#member_credit_card_number").val(),
+        expire_month: $("#member_credit_card_expire_month").val(),
+        expire_year: $("#member_credit_card_expire_year").val()
+      },
+      product_sku: product_skus,
+      enrollment_amount: $("#member_enrollment_amount").val(),
+      mega_channel: $("#member_mega_channel").val(),
+      campaign_medium: $("#member_campaign_medium").val(),
+      landing_url: $("#member_landing_url").val(),
+      referral_path: $("#member_referral_path").val(),
+      ip_address: $("#member_ip_address").val(),
+      campaign_description: $("#member_campaign_description").val(),
+      member_group_type_id: $("#member_member_group_type_id").val()
+    },
+    setter:{
+      cc_blank: cc_blank_value,
+    },
+  }
+  return data
+}
+
 function new_member_functions(){
   $('#error_explanation').hide();
   $(".datepicker").datepicker({ constrainInput: true, 
@@ -282,21 +334,14 @@ function new_member_functions(){
     $('#error_explanation').hide();
     $('#submit_button').attr('disabled', 'disabled');
     $('#cancel_button').hide();
-
-    var skus = [];
-    if ($('#kit_card_product_sku').is(':checked')) {
-      skus.push("KIT-CARD");
-    }
-    if ($('#product_sku option:selected').text().length > 0) {
-      skus.push($('#product_sku option:selected').text());
-    }
-    $('#member_product_sku').val(skus.join(','));
-    
     event.preventDefault();
+
     $.ajax({
       type: 'POST',
+      dataType: 'json',
+      contentType: 'application/json',
       url: "/api/v1/members",
-      data: $("#new_member").serialize(),
+      data: JSON.stringify(retrieve_information()),
       success: function(data) {
         endAjaxLoader();
         $('input').parent().parent().removeClass("error");
@@ -369,16 +414,20 @@ function edit_member_functions(){
                                 changeMonth: true,
                                 changeYear: true,
                                 yearRange: '1900',
-                                buttonImageOnly: true});
+                                buttonImageOnly: true});    
+
   $('form').submit( function(event) {
     startAjaxLoader();
     $('#submit_button').attr('disabled', 'disabled');
     $('#cancel_button').hide();
     event.preventDefault();
+
     $.ajax({
       type: 'PUT',
+      dataType: 'json',
+      contentType: "application/json",
       url: "/api/v1/members/"+id,
-      data: $('form').serialize(),
+      data: JSON.stringify(retrieve_information()),
       success: function(data) {
         endAjaxLoader();
         alert(data.message);
