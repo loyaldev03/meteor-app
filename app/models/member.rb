@@ -236,7 +236,7 @@ class Member < ActiveRecord::Base
 
     send_fulfillment unless skip_send_fulfillment
     
-    unless nbd_update_for_sts
+    if not nbd_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
     end
@@ -323,6 +323,10 @@ class Member < ActiveRecord::Base
   # Returns true if member is active or provisional.
   def can_change_tom?
     self.active? or self.provisional?
+  end
+
+  def is_billing_expected?
+    terms_of_membership.is_payment_expected
   end
 
   def status_enable_to_bill?
@@ -445,7 +449,7 @@ class Member < ActiveRecord::Base
 
   def bill_membership
     trans = nil
-    if can_bill_membership? and self.next_retry_bill_date <= Time.zone.now and terms_of_membership.is_payment_expected
+    if can_bill_membership? and self.next_retry_bill_date <= Time.zone.now and is_billing_expected?
       amount = terms_of_membership.installment_amount
       if terms_of_membership.payment_gateway_configuration.nil?
         message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
@@ -463,7 +467,7 @@ class Member < ActiveRecord::Base
         answer = trans.process
         if trans.success?
           credit_card.save # lets update year if we recycle this member
-          proceed_with_billing_logic(trans, Settings.operation_types.membership_billing, false ,"Billing")
+          proceed_with_billing_logic(trans)
         else
           message = set_decline_strategy(trans)
           answer # TODO: should we answer set_decline_strategy message too?
@@ -474,6 +478,8 @@ class Member < ActiveRecord::Base
         { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
       elsif not status_enable_to_bill?
         { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+      elsif not is_billing_expected?
+        { :message => "Member is not expected to get billed.", :code => Settings.error_codes.member_not_expecting_billing }
       else
         { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
       end
@@ -532,7 +538,7 @@ class Member < ActiveRecord::Base
       operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
       trans.prepare_for_manual(self, amount, operation_type)
       trans.process
-      answer = proceed_with_billing_logic(trans, operation_type, true, "Billing:manual_billing")
+      answer = proceed_with_manual_billing_logic(trans, operation_type)
       unless self.manual_payment
         self.manual_payment = true 
         self.save(:validate => false)
@@ -1391,13 +1397,23 @@ class Member < ActiveRecord::Base
       message
     end
 
-    def proceed_with_billing_logic(trans, operation_type, manual, bill_type="Billing")
+    def proceed_with_manual_billing_logic(trans, operation_type)
       unless set_as_active
-        Auditory.report_issue("#{bill_type}::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+        Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
       end
-      schedule_renewal(manual)
-      message = (manual ? "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}" : "Member billed successfully $#{trans.amount} Transaction id: #{trans.id}" )
+      schedule_renewal(true) if is_billing_expected?
+      message = "Member billed successfully $#{trans.amount} Transaction id: #{trans.id}"
       Auditory.audit(nil, trans, message, self, operation_type)
+      { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
+    end
+
+    def proceed_with_billing_logic(trans)
+      unless set_as_active
+        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+      end
+      schedule_renewal
+      message = "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}"
+      Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
     end
 

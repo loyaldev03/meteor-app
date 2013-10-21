@@ -758,6 +758,29 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal trans.transaction_type, 'refund'
   end
 
+  test "Make no recurrent billing with member not expecting billing" do
+    @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
+    member = enroll_member(@terms_of_membership_not_expected_to_be_billed, 0, false)
+    amount = 200
+    assert_difference("Transaction.count") do
+      assert_difference("Operation.count") do
+        member.no_recurrent_billing(amount,"testing event")
+      end
+    end
+  end
+
+  test "Make check/cash payment with member not expecting billing" do
+    @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
+    member = enroll_member(@terms_of_membership_not_expected_to_be_billed, 0, false)
+    amount = 200
+    assert_difference("Transaction.count") do
+      assert_difference("Operation.count",2) do   #club_cash, manual_billing
+        member.manual_billing(amount,"cash")
+      end
+    end
+    assert_nil member.next_retry_bill_date
+  end
+
   test "Member with manual payment set should not be included on billing script" do
     member_manual_billing = enroll_member(@terms_of_membership)
     member_manual_billing.update_attribute :manual_payment, true
