@@ -131,6 +131,7 @@ en:
     drupal_error_sync: "Unable to add club cash. There was a synchronization error, while requesting this." 
     club_cash_not_supported: "Club cash is not supported for this club."
     unable_to_perform_due_member_status: "Unable to perfom this action. The member is not in the right status to perform this."
+    not_expecting_billing: "Unable to perfom this action. The member is not expected to get billed."
     airbrake_error_message: "Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience."
     birth_date_is_invalid: "is invalid, it must be null or greater than '1900-01-01'"
   activerecord:
