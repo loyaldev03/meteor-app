@@ -532,24 +532,32 @@ class Member < ActiveRecord::Base
 
   def manual_billing(amount, payment_type)
     trans = nil
-    if not is_billing_expected?
-      answer = { :message => "Member is not expected to get billed.", :code => Settings.error_codes.member_not_expecting_billing }
-    elsif amount.blank? or payment_type.blank?
-      answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
-    elsif amount.to_f < current_membership.terms_of_membership.installment_amount
-      answer = { :message => "Amount to bill cannot be less than terms of membership installment amount.", :code => Settings.error_codes.manual_billing_with_less_amount_than_permitted }
-    else
-      trans = Transaction.new
-      trans.transaction_type = "sale_manual_#{payment_type}"
-      operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
-      trans.prepare_for_manual(self, amount, operation_type)
-      trans.process
-      answer = proceed_with_manual_billing_logic(trans, operation_type)
-      unless self.manual_payment
-        self.manual_payment = true 
-        self.save(:validate => false)
+    if membership_billing_enabled? and self.next_retry_bill_date <= Time.zone.now
+      if amount.blank? or payment_type.blank?
+        answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
+      elsif amount.to_f < current_membership.terms_of_membership.installment_amount
+        answer = { :message => "Amount to bill cannot be less than terms of membership installment amount.", :code => Settings.error_codes.manual_billing_with_less_amount_than_permitted }
+      else
+        trans = Transaction.new
+        trans.transaction_type = "sale_manual_#{payment_type}"
+        operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
+        trans.prepare_for_manual(self, amount, operation_type)
+        trans.process
+        answer = proceed_with_manual_billing_logic(trans, operation_type)
+        unless self.manual_payment
+          self.manual_payment = true 
+          self.save(:validate => false)
+        end
+        answer
       end
-      answer
+    else
+      if not self.club.billing_enable
+        { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
+      elsif not status_enable_to_bill?
+        { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+      elsif not is_billing_expected?
+        { :message => "Member is not expected to get billed.", :code => Settings.error_codes.member_not_expecting_billing }
+      end
     end
   rescue Exception => e
     logger.error e.inspect
