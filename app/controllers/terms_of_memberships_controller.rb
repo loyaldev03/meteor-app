@@ -19,7 +19,7 @@ class TermsOfMembershipsController < ApplicationController
     if @tom.save
       redirect_to terms_of_memberships_url, :notice => "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was created succesfully"
     else
-      flash.now[:error] = "There was an error while trying to save this subscription plan. #{@tom.inspect}"
+      flash.now[:error] = "There was an error while trying to save this subscription plan."
       render action: "new"
     end
   end
