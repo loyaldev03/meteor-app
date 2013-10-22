@@ -173,7 +173,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	# Create a member with TOM before created
-	test "Create a TOM with 'no payment is expected' selected - with Trial Period and Initial Club Cash" do
+	test "Create a TOM with 'no payment is expected' selected - with Trial Period and Initial Club cash" do
 		tom_name = 'TOM with No payment expected'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -199,7 +199,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.id)
     within("#table_membership_information") do
       within("#td_mi_club_cash_amount") { assert page.has_content?(@terms_of_membership.initial_club_cash_amount) }
-    	assert page.has_no_content? I18n.t('activerecord.attributes.member.next_retry_bill_date')
+    	assert page.has_content? I18n.t('activerecord.attributes.member.billing_is_not_expected')
     end
     assert_nil saved_member.next_retry_bill_date
 	end
@@ -231,7 +231,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.id)
     within("#table_membership_information") do
       within("#td_mi_club_cash_amount") { assert page.has_content?("0") }
-    	assert page.has_no_content? I18n.t('activerecord.attributes.member.next_retry_bill_date')
+    	assert page.has_content? I18n.t('activerecord.attributes.member.billing_is_not_expected')
     end
     assert_nil saved_member.next_retry_bill_date
 	end
@@ -263,7 +263,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.id)
     within("#table_membership_information") do
       within("#td_mi_club_cash_amount") { assert page.has_content?(@terms_of_membership.initial_club_cash_amount) }
-    	assert page.has_no_content? I18n.t('activerecord.attributes.member.next_retry_bill_date')
+    	assert page.has_content? I18n.t('activerecord.attributes.member.billing_is_not_expected')
     end
     assert_nil saved_member.next_retry_bill_date
 	end
@@ -295,7 +295,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.id)
     within("#table_membership_information") do
       within("#td_mi_club_cash_amount") { assert page.has_content?("0") }
-    	assert page.has_no_content? I18n.t('activerecord.attributes.member.next_retry_bill_date')
+    	assert page.has_content? I18n.t('activerecord.attributes.member.billing_is_not_expected')
     end
     assert_nil saved_member.next_retry_bill_date
 	end

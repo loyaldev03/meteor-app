@@ -98,20 +98,22 @@
 
     <div class="row-fluid" style="margin-top: 8px;">
       <div class="span4">
-        <% if @current_member.can_bill_membership? and can? :no_recurrent_billing, Member %>
+        <% if @current_member.billing_enabled? and can? :no_recurrent_billing, Member %>
           <%= link_to I18n.t('buttons.no_recurrent_billing'), member_no_recurrent_billing_path, :class => "btn btn-large-w btn-info", :id => "no_recurrent_bill_btn" %>
         <% else %>
           <%= link_to I18n.t('buttons.no_recurrent_billing'), "#", :class => "btn btn-large-w btn-info", :disabled => 'disabled', :id => "no_recurrent_bill_btn" %>
         <% end %>
       </div>
-      <div class="span4">
-        <% if @current_member.can_bill_membership? and can? :manual_billing, Member %>
-          <%= link_to I18n.t('buttons.manual_billing'), member_manual_billing_path, :class => "btn btn-large-w btn-info", :id => "manual_billing_btn" %>
-        <% else %>
-          <%= link_to I18n.t('buttons.manual_billing'), "#", :class => "btn btn-large-w btn-info", :disabled => 'disabled', :id => "manual_billing_btn" %>
-        <% end %>
-        <%= render :partial => "shared/help", :locals => { :title => t('buttons.manual_billing'), :content => t('buttons.manual_billing_help')} %>
-      </div>
+      <% if @current_member.is_billing_expected? %>
+        <div class="span4">
+          <% if @current_member.billing_enabled? and can? :manual_billing, Member %>
+            <%= link_to I18n.t('buttons.manual_billing'), member_manual_billing_path, :class => "btn btn-large-w btn-info", :id => "manual_billing_btn" %>
+          <% else %>
+            <%= link_to I18n.t('buttons.manual_billing'), "#", :class => "btn btn-large-w btn-info", :disabled => 'disabled', :id => "manual_billing_btn" %>
+          <% end %>
+          <%= render :partial => "shared/help", :locals => { :title => t('buttons.manual_billing'), :content => t('buttons.manual_billing_help')} %>
+        </div>
+      <% end %>
       <div class="span4">
       </div>
     </div>
@@ -271,19 +273,21 @@
             <th><%= t('activerecord.attributes.member.join_date') %>:</th>
             <td id="td_mi_join_date"><%= I18n.l @current_membership.join_date, :format => :only_date %></td>
           </tr>
-          <% if @current_member.is_billing_expected? %>
-            <tr class="ligthgrey">
-              <th><%= t('activerecord.attributes.member.next_retry_bill_date') %>:</th>
-              <td id="td_mi_next_retry_bill_date">
+          <tr class="ligthgrey">
+            <th><%= t('activerecord.attributes.member.next_retry_bill_date') %>:</th>
+            <td id="td_mi_next_retry_bill_date">
+              <% if @current_member.is_billing_expected? %>
                 <%= I18n.l(@current_member.next_retry_bill_date, :format => :only_date) unless @current_member.next_retry_bill_date.nil? %>&nbsp;&nbsp;&nbsp;
                 <% if @current_member.can_change_next_bill_date? %>
                   <%= link_to(member_change_next_bill_date_path, :class => "btn btn-mini btn-info", :id => "link_member_change_next_bill_date", :disabled => (cannot? :change_next_bill_date, Member)) do %> 
                     <i class="icon-pencil"></i> Change
                   <% end %>
                 <% end %>
-              </td>
-            </tr>
-          <% end %>
+              <% else %>
+                <%= t('activerecord.attributes.member.billing_is_not_expected') %>
+              <% end %>
+            </td>
+          </tr>
           <tr>
             <th><%= t('activerecord.attributes.member.cancel_date') %>:</th>
             <td id="td_mi_cancel_date"><%= I18n.l(@current_membership.cancel_date, :format => :only_date) unless @current_membership.cancel_date.nil? %></td>  

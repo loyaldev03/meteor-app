@@ -773,8 +773,8 @@ class TransactionTest < ActiveSupport::TestCase
     @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
     member = enroll_member(@terms_of_membership_not_expected_to_be_billed, 0, false)
     amount = 200
-    assert_difference("Transaction.count") do
-      assert_difference("Operation.count",2) do   #club_cash, manual_billing
+    assert_difference("Transaction.count",0) do
+      assert_difference("Operation.count",0) do   #club_cash, manual_billing
         member.manual_billing(amount,"cash")
       end
     end

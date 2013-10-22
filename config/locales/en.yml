@@ -280,6 +280,7 @@ en:
           unsynced: Not Synced
           error: Sync Error
         is_lapsed: 'Member was canceled.'
+        billing_is_not_expected: 'Billing is not expected.'
       enrollment_info:
         kit_card_product_sku: KIT-CARD
         product_sku: Product
