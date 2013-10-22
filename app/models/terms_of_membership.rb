@@ -33,7 +33,7 @@ class TermsOfMembership < ActiveRecord::Base
   validates :subscription_limits, :numericality => { :greater_than_or_equal_to => 0 }
   validates :if_cannot_bill, :presence => true
   validates :downgrade_tom_id, :presence => true, if: Proc.new { |tom| tom.downgradable? }
-  validates :upgrade_tom_period, :presence => true, :numericality => { :greater_than_or_equal_to => 0 }, if: Proc.new{ |tom| tom.upgradable? }
+  validates :upgrade_tom_period, :presence => true, :numericality => { :greater_than_or_equal_to => 1 }, if: Proc.new{ |tom| tom.upgradable? }
 
   validate :validate_payment_gateway_configuration
 
