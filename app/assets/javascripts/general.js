@@ -291,7 +291,7 @@ function retrieve_information(){
       phone_local_number: $("#member_phone_local_number").val(),
       type_of_phone_number: $("#member_type_of_phone_number").val(),
       terms_of_membership_id: $("#member_terms_of_membership_id").val(),
-      manual_payment: $("#member_manual_payment").val(),
+      manual_payment: $("#member_manual_payment").is(":checked") ? 1 : 0,
       email: $("#member_email").val(),
       external_id: $("#member_external_id").val()=="" ? null : $("#member_external_id").val(),
       product_sku: $('#member_product_sku').val(),
