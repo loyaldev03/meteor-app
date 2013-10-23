@@ -1,7 +1,7 @@
 #
 # assigned_at => The day this fulfillment is assigned to our member.
 #     If fulfillment is resend it is because of a wrong address. 
-#     this value will be updated.
+#     this value will be 3d.
 # renewable_at => This day is assigned_at + 1.year (at first time). 
 #     Will be used by fulfillment script to check which members need a new fulfillment
 # status => open , archived
@@ -148,7 +148,7 @@ class Fulfillment < ActiveRecord::Base
     if file.nil?
       message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
     else
-      message = "Changed status on File ##{file} Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
+      message = "Changed status on File ##{file.id} Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
     end
     Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
     return { :message => message, :code => Settings.error_codes.success }
