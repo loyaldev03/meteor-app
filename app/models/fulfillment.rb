@@ -1,7 +1,7 @@
 #
 # assigned_at => The day this fulfillment is assigned to our member.
 #     If fulfillment is resend it is because of a wrong address. 
-#     this value will be 3d.
+#     this value will be updated.
 # renewable_at => This day is assigned_at + 1.year (at first time). 
 #     Will be used by fulfillment script to check which members need a new fulfillment
 # status => open , archived
