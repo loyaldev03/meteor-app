@@ -4,8 +4,10 @@ namespace :fulfillments do
     begin
       Rails.logger = Logger.new("#{Rails.root}/log/fulfillment_naamma_report.log")
       Rails.logger.level = Logger::DEBUG
-      tall = Time.zone.now
+      ActiveRecord::Base.logger = Rails.logger
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
+
+      tall = Time.zone.now
 
       fulfillment_file = FulfillmentFile.new 
       fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
@@ -84,6 +86,7 @@ namespace :fulfillments do
 
       Rails.logger = Logger.new("#{Rails.root}/log/sloop_naamma_report.log")
       Rails.logger.level = Logger::DEBUG
+      ActiveRecord::Base.logger = Rails.logger
       tall = Time.zone.now
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
 
@@ -167,6 +170,7 @@ namespace :fulfillments do
       require 'csv'
       Rails.logger = Logger.new("#{Rails.root}/log/nfla_report.log")
       Rails.logger.level = Logger::DEBUG
+      ActiveRecord::Base.logger = Rails.logger
       tall = Time.zone.now
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
 
