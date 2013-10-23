@@ -469,7 +469,7 @@ class Member < ActiveRecord::Base
   def bill_membership
     trans = nil
     validation = has_problems_to_bill?
-    if not validation and self.next_retry_bill_date <= Time.zone.now
+    if not validation and self.next_retry_bill_date.to_date <= Time.zone.now.to_date
       amount = terms_of_membership.installment_amount
       if terms_of_membership.payment_gateway_configuration.nil?
         message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
