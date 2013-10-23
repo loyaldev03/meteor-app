@@ -38,7 +38,7 @@ class FulfillmentsController < ApplicationController
     fulfillment = Fulfillment.find(params[:id])
     file = (params[:file].blank? ? nil : params[:file])
     render json: fulfillment.update_status(@current_agent, params[:new_status], params[:reason], file).merge(:id => params[:id])
-  rescue ActiveRecord::RecordNotFound
+  rescue ActiveRecord::RecordNotFound => e
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found, :id => params[:id] }
   end
 
@@ -72,11 +72,11 @@ class FulfillmentsController < ApplicationController
         params[:fulfillment_selected].each do |fs|
           fulfillment = Fulfillment.find(fs.first)
           ff.fulfillments << fulfillment
-          fulfillment.set_as_in_process
+          fulfillment.update_status(ff.agent, "in_process", "Fulfillment file generated", ff.id)
         end
         flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
       rescue Exception => e
-        flash.now[:error] = t('error_messages.airbrake_error_message')
+        flash.now[:error] = t('error_messages.airbrake_error_message')+e.to_s
         Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
       end
     else

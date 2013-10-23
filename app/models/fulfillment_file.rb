@@ -26,7 +26,7 @@ class FulfillmentFile < ActiveRecord::Base
   end
 
   def mark_fulfillments_as_sent
-    self.fulfillments.where_in_process.each { |x| x.update_status(agent, 'sent', 'fulfillment_file set as sent', self) }
+    self.fulfillments.where_in_process.each { |x| x.update_status(agent, 'sent', 'Fulfillment file set as sent', self.id) }
   end
 
 end

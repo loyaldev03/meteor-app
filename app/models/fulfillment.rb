@@ -148,11 +148,11 @@ class Fulfillment < ActiveRecord::Base
     if file.nil?
       message = "Changed status on Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
     else
-      message = "Changed status on File ##{file.id} Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
+      message = "Changed status on File ##{file} Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
     end
     Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
     return { :message => message, :code => Settings.error_codes.success }
-  rescue 
+  rescue Exception => e
     message = I18n.t('error_messages.fulfillment_error')
     Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_error )
     return { :message => message, :code => Settings.error_codes.fulfillment_error }
@@ -198,7 +198,8 @@ class Fulfillment < ActiveRecord::Base
   def get_file_line(change_status = false, type_others = true)
     return [] if product.nil?
     if change_status
-      Fulfillment.find(self.id).set_as_in_process unless self.in_process? or self.renewed?
+      ff = self.fulfillment_files.first
+      Fulfillment.find(self.id).update_status(ff.agent_id, "in_process", "Fulfillment file generated", ff.id) unless self.in_process? or self.renewed?
     end
     member = self.member
     if type_others
