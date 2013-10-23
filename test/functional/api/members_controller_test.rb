@@ -1231,6 +1231,20 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
   end
 
+  test "Update member's next_bill_date when payment is not expected" do
+    sign_in @admin_user
+    @terms_of_membership_no_payment_expected = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false
+    @member = create_active_member(@terms_of_membership_no_payment_expected, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+
+    @member.set_as_provisional
+    @member.set_as_canceled!
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    assert @response.body.include?(I18n.t('error_messages.not_expecting_billing'))
+  end
+
   test "Update member's next_bill_date with wrong date format" do
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)

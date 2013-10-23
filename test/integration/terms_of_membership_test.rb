@@ -172,22 +172,133 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
-	# test "Create subcription plan with No payment is expected" do
-	# 	tom_name = 'TOM with No payment expected'
-	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
-	# 	click_link_or_button 'Add New Plan'
+	# Create a member with TOM before created
+	test "Create a TOM with 'no payment is expected' selected - with Trial Period and Initial Club cash" do
+		tom_name = 'TOM with No payment expected'
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		click_link_or_button 'Add New Plan'
 
-	# 	fill_in_step_1(tom_name)
-	# 	click_link_or_button 'Define Membership Terms'
-	# 	fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0},{},["is_payment_expected_no"])
-	# 	click_link_or_button 'Define Upgrades / Downgrades'
+		fill_in_step_1(tom_name)
+		click_link_or_button 'Define Membership Terms'
+		fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:1, terms_of_membership_initial_club_cash_amount:20},{},["is_payment_expected_no"])
+		assert page.has_content? I18n.t('activerecord.attributes.terms_of_membership.wizard.keep_active_until_manually_cancelled')
 
-	# 	find("label", :text => "If we cannot bill a member then")
-	# 	choose('if_cannot_bill_member_cancel')
-	# 	click_link_or_button 'Create Plan'
-	# 	assert page.has_content?('was created succesfully') # TOM was created
-	# 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
-	# end
+		click_link_or_button 'Define Upgrades / Downgrades'
+		click_link_or_button 'Create Plan'
+		assert page.has_content?('was created succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+
+		@terms_of_membership = TermsOfMembership.find_by_name tom_name
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @terms_of_membership.club_id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership)
+
+    saved_member = Member.find_by_email unsaved_member.email
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.id)
+    within("#table_membership_information") do
+      within("#td_mi_club_cash_amount") { assert page.has_content?(@terms_of_membership.initial_club_cash_amount) }
+    	assert page.has_content? I18n.t('activerecord.attributes.member.billing_is_not_expected')
+    end
+    assert_nil saved_member.next_retry_bill_date
+	end
+
+	#Create a member with TOM before created
+	test "Create a TOM with 'no payment is expected' selected - with Trial Period and NOT Initial Club Cash" do
+		tom_name = 'TOM with No payment expected'
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		click_link_or_button 'Add New Plan'
+
+		fill_in_step_1(tom_name)
+		click_link_or_button 'Define Membership Terms'
+		fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:1},{},["is_payment_expected_no"])
+		assert page.has_content? I18n.t('activerecord.attributes.terms_of_membership.wizard.keep_active_until_manually_cancelled')
+
+		click_link_or_button 'Define Upgrades / Downgrades'
+		click_link_or_button 'Create Plan'
+		assert page.has_content?('was created succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+
+		@terms_of_membership = TermsOfMembership.find_by_name tom_name
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @terms_of_membership.club_id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership)
+
+    saved_member = Member.find_by_email unsaved_member.email
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.id)
+    within("#table_membership_information") do
+      within("#td_mi_club_cash_amount") { assert page.has_content?("0") }
+    	assert page.has_content? I18n.t('activerecord.attributes.member.billing_is_not_expected')
+    end
+    assert_nil saved_member.next_retry_bill_date
+	end
+
+	# Create a member with TOM before created
+	test "Create a TOM with 'no payment is expected' selected - without Trial Period and Initial Club Cash" do
+		tom_name = 'TOM with No payment expected'
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		click_link_or_button 'Add New Plan'
+
+		fill_in_step_1(tom_name)
+		click_link_or_button 'Define Membership Terms'
+		fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, terms_of_membership_initial_club_cash_amount:20},{},["is_payment_expected_no"])
+		assert page.has_content? I18n.t('activerecord.attributes.terms_of_membership.wizard.keep_active_until_manually_cancelled')
+
+		click_link_or_button 'Define Upgrades / Downgrades'
+		click_link_or_button 'Create Plan'
+		assert page.has_content?('was created succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+
+		@terms_of_membership = TermsOfMembership.find_by_name tom_name
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @terms_of_membership.club_id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership)
+
+    saved_member = Member.find_by_email unsaved_member.email
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.id)
+    within("#table_membership_information") do
+      within("#td_mi_club_cash_amount") { assert page.has_content?(@terms_of_membership.initial_club_cash_amount) }
+    	assert page.has_content? I18n.t('activerecord.attributes.member.billing_is_not_expected')
+    end
+    assert_nil saved_member.next_retry_bill_date
+	end
+
+	# Create a member with TOM before created
+	test "Create a TOM with 'no payment is expected' selected - without Trial Period and without Initial Club Cash" do
+		tom_name = 'TOM with No payment expected'
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		click_link_or_button 'Add New Plan'
+
+		fill_in_step_1(tom_name)
+		click_link_or_button 'Define Membership Terms'
+		fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0},{},["is_payment_expected_no"])
+		assert page.has_content? I18n.t('activerecord.attributes.terms_of_membership.wizard.keep_active_until_manually_cancelled')
+
+		click_link_or_button 'Define Upgrades / Downgrades'
+		click_link_or_button 'Create Plan'
+		assert page.has_content?('was created succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+
+		@terms_of_membership = TermsOfMembership.find_by_name tom_name
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @terms_of_membership.club_id)
+    credit_card = FactoryGirl.build(:credit_card_master_card)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership)
+
+    saved_member = Member.find_by_email unsaved_member.email
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => saved_member.id)
+    within("#table_membership_information") do
+      within("#td_mi_club_cash_amount") { assert page.has_content?("0") }
+    	assert page.has_content? I18n.t('activerecord.attributes.member.billing_is_not_expected')
+    end
+    assert_nil saved_member.next_retry_bill_date
+	end
 
 	# test "Create subcription plan with Stop billing after at Subscription Terms - month" do
 	# 	tom_name = 'TOM with with Stop billing after Months'
@@ -548,28 +659,28 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
-	# test "Update subcription plan with No payment is expected - No membership associated" do
-	# 	tom_name = 'TOM Name'
-	# 	tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
-	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
-	# 	within('#terms_of_memberships_table') do
-	# 		find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
-	# 		within("tr", :text => tom_name) do
-	# 			click_link_or_button "Edit"
-	# 		end
-	# 	end
+	test "Update subcription plan with No payment is expected - No membership associated" do
+		tom_name = 'TOM Name'
+		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		within('#terms_of_memberships_table') do
+			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
+			within("tr", :text => tom_name) do
+				click_link_or_button "Edit"
+			end
+		end
 
-	# 	fill_in_step_1(tom_name + ' Updated')
-	# 	click_link_or_button 'Edit Membership Terms'
-	# 	fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_no","subscription_terms_until_cancelled"])
-	# 	click_link_or_button 'Edit Upgrades / Downgrades'
+		fill_in_step_1(tom_name + ' Updated')
+		click_link_or_button 'Edit Membership Terms'
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_no","subscription_terms_until_cancelled"])
+		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-	# 	find("label", :text => "If we cannot bill a member then")
-	# 	choose('if_cannot_bill_member_cancel')
-	# 	click_link_or_button 'Update Plan'
-	# 	assert page.has_content?('was updated succesfully') # TOM was created
-	# 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
-	# end
+		find("label", :text => "If we cannot bill a member then")
+		choose('if_cannot_bill_member_cancel')
+		click_link_or_button 'Update Plan'
+		assert page.has_content?('was updated succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	end
 
 	# test "Update subcription plan with Stop billing after at Subscription Terms - month  - No membership associated" do
 	# 	tom_name = 'TOM Name'

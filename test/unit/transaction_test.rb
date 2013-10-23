@@ -321,6 +321,33 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
+  test "Should not bill member which is not being spected to be billed (is_payment_expected = false)" do
+    @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
+    active_member = create_active_member( @terms_of_membership_not_expected_to_be_billed )
+    blank_cc = FactoryGirl.create( :blank_credit_card, :member_id => active_member.id )
+
+    Timecop.travel(active_member.next_retry_bill_date+1.day) do
+      assert_difference('Operation.count', 0) do
+        assert_difference('Communication.count', 0) do
+          assert_difference('Transaction.count', 0) do
+            Member.bill_all_members_up_today
+          end
+        end
+      end
+    end
+    Timecop.travel(active_member.next_retry_bill_date+10.day) do
+      assert_difference('Operation.count', 0) do
+        assert_difference('Communication.count', 0) do
+          assert_difference('Transaction.count', 0) do
+            answer = active_member.bill_membership
+            assert_equal "Member is not expected to get billed.", answer[:message]
+            assert_equal Settings.error_codes.member_not_expecting_billing, answer[:code]
+          end
+        end
+      end
+    end
+  end
+
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 
     active_merchant_stubs_store
     assert_difference('Operation.count', 5) do
@@ -740,6 +767,29 @@ class TransactionTest < ActiveSupport::TestCase
     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first
     assert_equal trans.operation_type, Settings.operation_types.credit
     assert_equal trans.transaction_type, 'refund'
+  end
+
+  test "Make no recurrent billing with member not expecting billing" do
+    @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
+    member = enroll_member(@terms_of_membership_not_expected_to_be_billed, 0, false)
+    amount = 200
+    assert_difference("Transaction.count") do
+      assert_difference("Operation.count") do
+        member.no_recurrent_billing(amount,"testing event")
+      end
+    end
+  end
+
+  test "Make check/cash payment with member not expecting billing" do
+    @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
+    member = enroll_member(@terms_of_membership_not_expected_to_be_billed, 0, false)
+    amount = 200
+    assert_difference("Transaction.count",0) do
+      assert_difference("Operation.count",0) do   #club_cash, manual_billing
+        member.manual_billing(amount,"cash")
+      end
+    end
+    assert_nil member.next_retry_bill_date
   end
 
   test "Member with manual payment set should not be included on billing script" do

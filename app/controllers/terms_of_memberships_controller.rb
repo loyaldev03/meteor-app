@@ -79,33 +79,39 @@ class TermsOfMembershipsController < ApplicationController
       @tom.initial_fee = post_data[:initial_fee_amount]
       @tom.trial_period_amount = post_data[:trial_period_amount]
       @tom.provisional_days = post_data[:trial_period_lasting_time_span] == 'months' ? months_to_days(post_data[:trial_period_lasting].to_i) : post_data[:trial_period_lasting].to_i
-      @tom.installment_amount = nil
-      @tom.is_payment_expected = post_data[:is_payment_expected] == 'yes' ? 1 : 0
-      if @tom.is_payment_expected == 1
+      @tom.is_payment_expected = post_data[:is_payment_expected] == 'yes' ? true : false
+      if @tom.is_payment_expected
         @tom.installment_amount = post_data[:installment_amount]
         @tom.installment_period = post_data[:installment_amount_days_time_span] == 'months' ? months_to_days(post_data[:installment_amount_days].to_i) : post_data[:installment_amount_days].to_i
+      else
+        @tom.installment_period = nil
+        @tom.installment_amount = nil
       end
       @tom.subscription_limits = post_data[:subscription_terms] == 'until_cancelled' ? 0 : (post_data[:subscription_terms_stop_billing_after_time_span] == 'months' ? months_to_days(post_data[:subscription_terms_stop_billing_after].to_i) : post_data[:subscription_terms_stop_billing_after].to_i)
       @tom.initial_club_cash_amount = post_data[:terms_of_membership][:initial_club_cash_amount]
       @tom.club_cash_installment_amount = post_data[:terms_of_membership][:club_cash_installment_amount]
       @tom.skip_first_club_cash = post_data[:terms_of_membership][:skip_first_club_cash]
       # Step 3
-      @tom.downgrade_tom_id = nil
-      @tom.upgrade_tom_id = nil
-      @tom.upgrade_tom_period = nil
       case post_data[:if_cannot_bill_member]
       when 'cancel'
         @tom.if_cannot_bill = 'cancel'
+        @tom.downgrade_tom_id = nil
+        @tom.suspension_period = nil
       when 'suspend'
         @tom.if_cannot_bill = 'suspend'
         @tom.suspension_period = post_data[:if_cannot_bill_member_suspend_for_time_span] == 'months' ? months_to_days(post_data[:if_cannot_bill_member_suspend_for].to_i) : post_data[:if_cannot_bill_member_suspend_for].to_i
+        @tom.downgrade_tom_id = nil
       when 'downgrade_to'
         @tom.if_cannot_bill = 'downgrade_tom'
         @tom.downgrade_tom_id = post_data[:downgrade_to_tom]
+        @tom.suspension_period = nil
       end
       if post_data[:upgrade_to_tom] != ''
         @tom.upgrade_tom_id = post_data[:upgrade_to_tom]
         @tom.upgrade_tom_period = post_data[:upgrade_to_tom_days_time_span] == 'months' ? months_to_days(post_data[:upgrade_to_tom_days].to_i) : post_data[:upgrade_to_tom_days].to_i
+      else 
+        @tom.upgrade_tom_id = nil
+        @tom.upgrade_tom_period = nil
       end
     end
 
