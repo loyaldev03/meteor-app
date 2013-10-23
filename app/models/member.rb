@@ -451,9 +451,21 @@ class Member < ActiveRecord::Base
     enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, enrollment_info_params, true, false)
   end
 
+  def has_problems_to_bill?
+    if not self.club.billing_enable
+      { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
+    elsif not status_enable_to_bill?
+      { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+    elsif not is_billing_expected?
+      { :message => "Member is not expected to get billed.", :code => Settings.error_codes.member_not_expecting_billing }
+    else
+      false
+    end
+  end
+
   def bill_membership
     trans = nil
-    if membership_billing_enabled? and self.next_retry_bill_date <= Time.zone.now
+    if not has_problems_to_bill? and self.next_retry_bill_date <= Time.zone.now
       amount = terms_of_membership.installment_amount
       if terms_of_membership.payment_gateway_configuration.nil?
         message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
@@ -478,13 +490,7 @@ class Member < ActiveRecord::Base
         end
       end
     else
-      if not self.club.billing_enable
-        { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
-      elsif not status_enable_to_bill?
-        { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
-      elsif not is_billing_expected?
-        { :message => "Member is not expected to get billed.", :code => Settings.error_codes.member_not_expecting_billing }
-      else
+      if self.next_retry_bill_date <= Time.zone.now
         { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
       end
     end
@@ -532,7 +538,7 @@ class Member < ActiveRecord::Base
 
   def manual_billing(amount, payment_type)
     trans = nil
-    if membership_billing_enabled? and self.next_retry_bill_date <= Time.zone.now
+    if has_problems_to_bill?
       if amount.blank? or payment_type.blank?
         answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
       elsif amount.to_f < current_membership.terms_of_membership.installment_amount
@@ -549,14 +555,6 @@ class Member < ActiveRecord::Base
           self.save(:validate => false)
         end
         answer
-      end
-    else
-      if not self.club.billing_enable
-        { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
-      elsif not status_enable_to_bill?
-        { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
-      elsif not is_billing_expected?
-        { :message => "Member is not expected to get billed.", :code => Settings.error_codes.member_not_expecting_billing }
       end
     end
   rescue Exception => e
