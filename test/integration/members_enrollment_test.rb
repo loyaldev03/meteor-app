@@ -71,7 +71,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#table_membership_information")do
       within("#td_mi_terms_of_membership_name"){ click_link_or_button("#{saved_member.terms_of_membership.name}") }
     end
-    within("#table_information")do
+    within("#div_description_feature")do
       assert page.has_content?(@terms_of_membership_with_gateway.name) if @terms_of_membership_with_gateway.name
       assert page.has_content?(@terms_of_membership_with_gateway.description) if @terms_of_membership_with_gateway.description
       assert page.has_content?(@terms_of_membership_with_gateway.provisional_days.to_s) if @terms_of_membership_with_gateway.provisional_days
@@ -249,7 +249,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#error_explanation")do
       assert page.has_content?("first_name: can't be blank,is invalid"), "Failure on first_name validation message"
       assert page.has_content?("last_name: can't be blank,is invalid"), "Failure on last_name validation message"
-      assert page.has_content?("email: is invalid"), "Failure on email validation message"
+      assert page.has_content?("email: email address is invalid"), "Failure on email validation message"
       assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_country_code validation message"
       assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
       assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_local_number validation message"
@@ -323,7 +323,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#error_explanation") do
         assert page.has_content?("first_name: is invalid"), "Failure on first_name validation message"
         assert page.has_content?("last_name: is invalid"), "Failure on last_name validation message"
-        assert page.has_content?("email: is invalid"), "Failure on email validation message"
+        assert page.has_content?("email: email address is invalid"), "Failure on email validation message"
         assert page.has_content?("phone_country_code: is not a number"), "Failure on phone_country_code validation message"
         assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
         assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
@@ -367,7 +367,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     alert_ok_js
     click_link_or_button 'Create Member'
     within("#error_explanation") do
-        assert page.has_content?("email: is invalid"), "Failure on email validation message"
+        assert page.has_content?("email: email address is invalid"), "Failure on email validation message"
     end    
   end
   
@@ -376,8 +376,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     validate_terms_of_membership_show_page(@saved_member) 
-    click_link_or_button('Return to member show')
-    assert find_field('input_id').value == "#{@saved_member.id}"
+    click_link_or_button('Return')
   end
 
   test "create member with gender male" do

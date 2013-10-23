@@ -106,7 +106,7 @@ class TermsOfMembershipsController < ApplicationController
         @tom.downgrade_tom_id = post_data[:downgrade_to_tom]
         @tom.suspension_period = nil
       end
-      if post_data[:upgrade_to_tom] != '' and post_data[:upgrade_to_tom_days].to_i > 0
+      if post_data[:upgrade_to_tom] != ''
         @tom.upgrade_tom_id = post_data[:upgrade_to_tom]
         @tom.upgrade_tom_period = post_data[:upgrade_to_tom_days_time_span] == 'months' ? months_to_days(post_data[:upgrade_to_tom_days].to_i) : post_data[:upgrade_to_tom_days].to_i
       else 
