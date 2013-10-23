@@ -1329,7 +1329,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
    test "Api agent should update member's next_bill_date" do
      sign_in @admin_user
-    next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed)
+     next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed)
  
      @member = create_active_member(@terms_of_membership, :member_with_api)
      FactoryGirl.create :credit_card, :member_id => @member.id

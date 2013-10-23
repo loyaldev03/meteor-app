@@ -246,7 +246,10 @@ class Member < ActiveRecord::Base
 
   # Changes next bill date.
   def change_next_bill_date(next_bill_date, current_agent = nil)
-    if not self.can_change_next_bill_date?
+    if not is_billing_expected?
+      errors = { :member => 'is not expected to get billed.' }
+      answer = { :message => I18n.t('error_messages.not_expecting_billing'), :code => Settings.error_codes.member_not_expecting_billing, :errors => errors }
+    elsif not self.can_change_next_bill_date?
       errors = { :member => 'is not in billable status' }
       answer = { :message => I18n.t('error_messages.unable_to_perform_due_member_status'), :code => Settings.error_codes.next_bill_date_blank, :errors => errors }
     elsif next_bill_date.blank?
