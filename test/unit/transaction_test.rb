@@ -326,7 +326,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_member = create_active_member( @terms_of_membership_not_expected_to_be_billed )
     blank_cc = FactoryGirl.create( :blank_credit_card, :member_id => active_member.id )
 
-    Timecop.travel(active_member.next_retry_bill_date) do
+    Timecop.travel(active_member.next_retry_bill_date+1.day) do
       assert_difference('Operation.count', 0) do
         assert_difference('Communication.count', 0) do
           assert_difference('Transaction.count', 0) do
@@ -334,7 +334,18 @@ class TransactionTest < ActiveSupport::TestCase
           end
         end
       end
-    end   
+    end
+    Timecop.travel(active_member.next_retry_bill_date+10.day) do
+      assert_difference('Operation.count', 0) do
+        assert_difference('Communication.count', 0) do
+          assert_difference('Transaction.count', 0) do
+            answer = active_member.bill_membership
+            assert_equal "Member is not expected to get billed.", answer[:message]
+            assert_equal Settings.error_codes.member_not_expecting_billing, answer[:code]
+          end
+        end
+      end
+    end
   end
 
   test "Billing with SD reaches the recycle limit, and HD cancels member." do 

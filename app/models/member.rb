@@ -465,7 +465,8 @@ class Member < ActiveRecord::Base
 
   def bill_membership
     trans = nil
-    if not has_problems_to_bill? and self.next_retry_bill_date <= Time.zone.now
+    validation = has_problems_to_bill?
+    if not validation and self.next_retry_bill_date <= Time.zone.now
       amount = terms_of_membership.installment_amount
       if terms_of_membership.payment_gateway_configuration.nil?
         message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
@@ -489,10 +490,10 @@ class Member < ActiveRecord::Base
           answer # TODO: should we answer set_decline_strategy message too?
         end
       end
+    elsif not self.next_retry_bill_date.nil? and self.next_retry_bill_date > Time.zone.now
+      { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
     else
-      if self.next_retry_bill_date <= Time.zone.now
-        { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
-      end
+      validation
     end
   rescue Exception => e
     trans.update_attribute :operation_type, Settings.operation_types.membership_billing_with_error if trans
@@ -538,7 +539,8 @@ class Member < ActiveRecord::Base
 
   def manual_billing(amount, payment_type)
     trans = nil
-    if has_problems_to_bill?
+    validation = has_problems_to_bill?
+    if not validation
       if amount.blank? or payment_type.blank?
         answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
       elsif amount.to_f < current_membership.terms_of_membership.installment_amount
@@ -556,6 +558,8 @@ class Member < ActiveRecord::Base
         end
         answer
       end
+    else
+      validation
     end
   rescue Exception => e
     logger.error e.inspect
