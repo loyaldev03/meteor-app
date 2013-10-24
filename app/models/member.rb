@@ -469,7 +469,7 @@ class Member < ActiveRecord::Base
   def bill_membership
     trans = nil
     validation = has_problems_to_bill?
-    if not validation and self.next_retry_bill_date <= Time.zone.now
+    if not validation and self.next_retry_bill_date.to_date <= Time.zone.now.to_date
       amount = terms_of_membership.installment_amount
       if terms_of_membership.payment_gateway_configuration.nil?
         message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
@@ -998,7 +998,7 @@ class Member < ActiveRecord::Base
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
 
-    base = Member.includes(:current_membership => :terms_of_membership).where("next_retry_bill_date <= ? AND members.club_id IN (select id from clubs where billing_enable = true) AND members.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now).limit(2000)
+    base = Member.includes(:current_membership => :terms_of_membership).where("DATE(next_retry_bill_date) <= ? AND members.club_id IN (select id from clubs where billing_enable = true) AND members.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now.to_date).limit(2000)
 
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:billing rake task, processing #{base.count} members"
     base.to_enum.with_index.each do |member,index| 

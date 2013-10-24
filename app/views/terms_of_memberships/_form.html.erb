@@ -146,19 +146,19 @@
         :title => t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_member_then'), 
         :content => t('lorem') } %> 
     </div>
+    <div class="control-group">
+      <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
+      <div class="controls">
+        <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id, @tom) %>&nbsp;
+        <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
+        <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
+        <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
+        <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
+          :content => t('lorem') } %> 
+      </div>
+    </div> 
   </div>
-  <div class="control-group">
-    <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
-    <div class="controls">
-      <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id, @tom) %>&nbsp;
-      <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
-      <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
-      <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
-        :content => t('lorem') } %> 
-    </div>
-  </div> 
 </div>
 
 <div id="" class="form-actions">
