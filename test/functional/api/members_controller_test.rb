@@ -1153,8 +1153,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     @active_credit_card = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member.id
 
     @credit_card = FactoryGirl.build :credit_card_american_express
-    @credit_card.expire_year = (Time.zone.now.utc).year
-    @credit_card.expire_month = (Time.zone.now.utc).month 
+    @credit_card.expire_year = (Time.zone.now.in_time_zone(@member.club.time_zone)).year
+    @credit_card.expire_month = (Time.zone.now.in_time_zone(@member.club.time_zone)).month 
 
     active_merchant_stubs_store(@credit_card.number)
 
