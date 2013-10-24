@@ -1388,14 +1388,13 @@ class Member < ActiveRecord::Base
     end
 
     def check_upgradable
-      continue = true
       if terms_of_membership.upgradable?
         if join_date.to_date + terms_of_membership.upgrade_tom_period.days < Time.new.getlocal(self.get_offset_related).to_date
           change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade)
-          continue = false
+          return false
         end
       end
-      continue
+      true
     end
 
     def set_status_on_enrollment!(agent, trans, amount, info)
@@ -1431,11 +1430,10 @@ class Member < ActiveRecord::Base
       unless set_as_active
         Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
       end
-      schedule_renewal(true)
       message = "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}"
       Auditory.audit(nil, trans, message, self, operation_type)
       if check_upgradable 
-        schedule_renewal(manual)
+        schedule_renewal(true)
       end
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
     end
@@ -1444,7 +1442,9 @@ class Member < ActiveRecord::Base
       unless set_as_active
         Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
       end
-      schedule_renewal
+      if check_upgradable 
+        schedule_renewal
+      end
       message = "Member billed successfully $#{trans.amount} Transaction id: #{trans.id}"
       Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
