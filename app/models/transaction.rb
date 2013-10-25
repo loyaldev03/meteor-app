@@ -187,11 +187,15 @@ class Transaction < ActiveRecord::Base
         Communication.deliver!(:refund, sale_transaction.member)
         sale_transaction.member.marketing_tool_sync
       else
-        Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
+        Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]} #{trans.inspect}", sale_transaction.member, Settings.operation_types.credit_error)
         trans.update_attribute :operation_type, Settings.operation_types.credit_error
       end
       answer
     end
+  rescue Timeout::Error => e
+    save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
+  rescue Exception => e
+    save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
   end
 
   def amount_available_to_refund
@@ -226,6 +230,11 @@ class Transaction < ActiveRecord::Base
         credit_response=@gateway.credit(amount_to_send, credit_card_token, @options)
         save_response(credit_response)
       end
+    rescue Timeout::Error
+      save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
+    rescue Exception => e
+      save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
+      Auditory.report_issue("Transaction::Credit", e, {:member => self.member.inspect, :transaction => self.inspect })
     end
 
     def refund
@@ -238,10 +247,11 @@ class Transaction < ActiveRecord::Base
         refund_response=@gateway.refund(amount_to_send, refund_response_transaction_id, @options)
         save_response(refund_response)
       end
-    rescue Timeout::Error => e
+    rescue Timeout::Error
       save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
       save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
+      Auditory.report_issue("Transaction::Refund", e, {:member => self.member.inspect, :transaction => self.inspect })
     end    
 
     # Process only sale operations
