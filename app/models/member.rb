@@ -241,7 +241,8 @@ class Member < ActiveRecord::Base
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
     end
     self.save(:validate => false)
-    self.delay.assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
+    # self.delay.assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
+    self.assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
   end
 
   # Changes next bill date.
@@ -1392,7 +1393,7 @@ class Member < ActiveRecord::Base
 
     def check_upgradable
       if terms_of_membership.upgradable?
-        if join_date.to_date + terms_of_membership.upgrade_tom_period.days < Time.new.getlocal(self.get_offset_related).to_date
+        if join_date.to_date + terms_of_membership.upgrade_tom_period.days <=  Time.new.getlocal(self.get_offset_related).to_date
           change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade)
           return false
         end
