@@ -192,10 +192,6 @@ class Transaction < ActiveRecord::Base
       end
       answer
     end
-  rescue Timeout::Error => e
-    save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
-  rescue Exception => e
-    save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
   end
 
   def amount_available_to_refund
@@ -221,7 +217,7 @@ class Transaction < ActiveRecord::Base
     end
 
     def credit
-      if payment_gateway_configuration.nil?
+        if payment_gateway_configuration.nil?
         save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
       elsif self.token.nil? or self.token.size < 4
         save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
