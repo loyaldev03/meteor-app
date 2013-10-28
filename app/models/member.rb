@@ -948,7 +948,7 @@ class Member < ActiveRecord::Base
 
   def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
     cancel_date = cancel_date.to_date
-    cancel_date = (self.join_date.to_date == cancel_date ? "#{cancel_date} 23:59:59" : cancel_date).to_datetime
+    cancel_date = (self.join_date.in_time_zone(self.club.time_zone).to_date == cancel_date ? "#{cancel_date} 23:59:59" : cancel_date).to_datetime
     if not message.blank?
       if cancel_date.change(:offset => self.get_offset_related).to_date >= Time.new.getlocal(self.get_offset_related).to_date
         if self.cancel_date == cancel_date

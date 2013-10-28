@@ -397,15 +397,15 @@ class MemberTest < ActiveSupport::TestCase
     @saved_member.manual_payment =true
     @saved_member.bill_date = Time.zone.now-1.day
     @saved_member.save
+    Time.zone = 'UTC'
     assert_difference("Operation.count",3) do
-      Time.zone = 'UTC'
       Member.cancel_all_member_up_today
-      Time.zone = @club.time_zone
     end
+    Time.zone = @club.time_zone
     @saved_member.reload
     assert_equal @saved_member.status, "lapsed"
     assert_nil @saved_member.next_retry_bill_date
-    assert @saved_member.cancel_date > @saved_member.join_date
+    assert @saved_member.cancel_date.utc > @saved_member.join_date.utc, "#{@saved_member.cancel_date.utc} Not > #{@saved_member.join_date.utc}"
     assert Operation.find_by_operation_type(Settings.operation_types.bill_overdue_cancel)
   end 
 
