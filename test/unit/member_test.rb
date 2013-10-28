@@ -398,7 +398,9 @@ class MemberTest < ActiveSupport::TestCase
     @saved_member.bill_date = Time.zone.now-1.day
     @saved_member.save
     assert_difference("Operation.count",3) do
+      Time.zone = 'UTC'
       Member.cancel_all_member_up_today
+      Time.zone = @club.time_zone
     end
     @saved_member.reload
     assert_equal @saved_member.status, "lapsed"
