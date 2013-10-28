@@ -93,7 +93,7 @@ class FulfillmentsController < ApplicationController
     else
       fulfillments = ff.fulfillments.includes(:member)
     end
-    xls_package = Fulfillment.generateXLS(fulfillments, false, ff.product == Settings.others_product)
+    xls_package = Fulfillment.generateXLS(ff, false)
     send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
              :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
              :disposition => "attachment; filename=miworkingfile2.xlsx"

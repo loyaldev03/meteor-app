@@ -33,4 +33,7 @@ class FulfillmentFile < ActiveRecord::Base
     self.fulfillments.where_in_process.each { |x| x.update_status(agent, 'sent', 'Fulfillment file set as sent', self.id) }
   end
 
+  def other_type?
+    self.product == Settings.others_product
+  end
 end

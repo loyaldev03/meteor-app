@@ -195,14 +195,13 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def get_file_line(change_status = false, type_others = true)
+  def get_file_line(change_status = false, fulfillment_file)
     return [] if product.nil?
     if change_status
-      ff = current_file
-      Fulfillment.find(self.id).update_status(ff.agent_id, "in_process", "Fulfillment file generated", ff.id) unless self.in_process? or self.renewed?
+      Fulfillment.find(self.id).update_status(fulfillment_file.agent_id, "in_process", "Fulfillment file generated", fulfillment_file.id) unless self.in_process? or self.renewed?
     end
     member = self.member
-    if type_others
+    if fulfillment_file.other_type?
       [ self.tracking_code, self.product.cost_center, member.full_name, member.address, member.city,
             member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
             self.product.weight, 'MID']
@@ -213,16 +212,16 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def self.generateXLS(fulfillments, change_status = false, type_others = true)
+  def self.generateXLS(fulfillment_file, change_status = false)
     package = Axlsx::Package.new
     package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
-      if type_others
+      if fulfillment_file.other_type?
         sheet.add_row Fulfillment::SLOOPS_HEADER
       else
         sheet.add_row Fulfillment::KIT_CARD_HEADER
       end
-      fulfillments.each do |fulfillment|
-        row = fulfillment.get_file_line(change_status, type_others)
+      fulfillment_file.fulfillments.each do |fulfillment|
+        row = fulfillment.get_file_line(change_status, fulfillment_file)
         sheet.add_row row unless row.empty?
       end
     end
