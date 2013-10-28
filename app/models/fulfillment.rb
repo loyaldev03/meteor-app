@@ -198,7 +198,7 @@ class Fulfillment < ActiveRecord::Base
   def get_file_line(change_status = false, type_others = true)
     return [] if product.nil?
     if change_status
-      ff = self.fulfillment_files.first
+      ff = current_file
       Fulfillment.find(self.id).update_status(ff.agent_id, "in_process", "Fulfillment file generated", ff.id) unless self.in_process? or self.renewed?
     end
     member = self.member
@@ -233,6 +233,9 @@ class Fulfillment < ActiveRecord::Base
     @product ||= Product.find_by_sku_and_club_id(self.product_sku, self.member.club_id)
   end
 
+  def current_file
+    self.fulfillment_files.order("fulfillment_files.id DESC").first
+  end
 
   private
     def set_default_values
