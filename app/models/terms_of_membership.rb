@@ -14,7 +14,7 @@ class TermsOfMembership < ActiveRecord::Base
 
   acts_as_paranoid
 
-  before_create :set_mode
+  before_validation :set_mode, :on => :create
   after_create :setup_default_email_templates
 
   validates :name, :presence => true, :uniqueness => { :scope => :club_id }
