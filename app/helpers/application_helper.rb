@@ -27,4 +27,14 @@ module ApplicationHelper
     member_search = params[:member] ? { :member => params[:member] } : { }
     link_to title, {:sort => column, :direction => direction, :page => page}.merge(member_search), {:class => css_class}
   end 
+
+  def dynamic_form_error_messages(object)
+    return '' unless object.respond_to?(:errors) && object.errors.any?
+
+    errors_list = ""
+    errors_list << content_tag(:span, "There are errors!", :class => "title-error")
+    errors_list << object.errors.map { |field, message| content_tag(:li, field.to_s + ": " + message.first) }.join("\n")
+
+    '<div class="alert alert-danger"><ul>'+errors_list.html_safe+'</ul></div>'
+  end
 end

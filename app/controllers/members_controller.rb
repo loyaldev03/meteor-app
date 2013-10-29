@@ -13,6 +13,18 @@ class MembersController < ApplicationController
     end
   end
 
+  def additional_data
+    @form = MyForm.new params
+    if request.post?
+      if @form.valid?
+        @current_member.update_attribute :additional_data, @form.cleaned_data
+        redirect_to show_member_path, notice: 'Additional data updated with success'
+      else
+        flash.now[:error] = "There is an error on data you are trying to save. Review errors."
+      end
+    end
+  end
+
   def search_result
     @members = Member.paginate(:page => params[:page], :per_page => 25)
                        .joins([:current_membership])

@@ -59,6 +59,8 @@ SacPlatform::Application.routes.draw do
         resources :credit_cards, :only => [ :new, :create, :destroy ] do
           post :activate
         end
+        get 'additional_data' => 'members#additional_data'
+        post 'additional_data' => 'members#additional_data'
         match '/recover' => 'members#recover', as: 'member_recover', :via => [:get, :post]
         match '/refund/:transaction_id' => 'members#refund', as: 'member_refund', :via => [:get, :post]
         match '/full_save' => 'members#full_save', as: 'member_full_save', :via => [:get]
