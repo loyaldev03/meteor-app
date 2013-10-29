@@ -60,23 +60,25 @@ class Fulfillment < ActiveRecord::Base
     event :set_as_canceled do
       transition all => :canceled
     end
-    #First status. fulfillment is waiting to be processed.
+    #First status. fulfillment is waiting to be processed. Stock will be decreased by one.
     state :not_processed
-    #This status will be automatically set after the new fulfillment list is downloaded. Only if magento 
-    #has stock. Stock will be decreased in one.
+    #This status will be automatically set after the new fulfillment list is downloaded.
     state :in_process
     #Used due to some type of error
     state :on_hold
-    #Manually set through CS, by selecting all or some fulfillments in in_process status.
+    #Manually set through CS, by selecting all or some fulfillments in in_process status. Also, when we 
+    #mark as sent a fulfillment file, we set every fulfillment related to it as sent.
     state :sent 
     #Set automatically using Magento, when a representative or supervisor downloads the file with 
     #fulfillments in not_processed status
     state :out_of_stock 
     #Will be similar than Bad address
     state :returned
-    #when member gets lapsed status, all not_processed / in_process / Out of stock fulfillments gets this status.
+    #when member gets lapsed status, all not_processed / in_process / out_of_stock / bad_address fulfillments gets this status.
     state :canceled
-    #if delivery fail this status is set and wrong address on member file should be filled with the reason
+    #if delivery fail this status is set and wrong address on member file should be filled with the reason. If the member
+    #is set as undeliverable every fulfillment in 'not_processed','in_process','out_of_stock' and 'returned' will also be
+    #set as 'bad_address' 
     state :bad_address
   end
 
