@@ -1366,7 +1366,10 @@ class Member < ActiveRecord::Base
 
   # used for member blacklist
   def marketing_tool_sync_unsubscription
-    exact_target_member.unsubscribe! if defined?(SacExactTarget::MemberModel)
+    if defined?(SacExactTarget::MemberModel)
+      exact_target_after_create_sync_to_remote_domain
+      exact_target_member.unsubscribe!
+    end
   rescue Exception => e
     logger.error "* * * * * #{e}"
     Auditory.report_issue("Member::unsubscribe", e, { :member => self.inspect })
