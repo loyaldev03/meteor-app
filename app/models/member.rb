@@ -211,6 +211,10 @@ class Member < ActiveRecord::Base
     increment!(:reactivation_times, 1)
   end
 
+  def additional_data_form
+    "Form#{club_id}".constantize rescue nil
+  end
+
   # Sets join date. It is called multiple times.
   def set_join_date
     membership = current_membership

@@ -62,7 +62,9 @@
         <% disable_cancel = @current_member.can_be_canceled? == false %>
         <%= link_to("Cancel", (!disable_cancel ? member_cancel_path : "#"), :class => "btn  btn-large-w #{(disable_cancel ? "disabled" : "btn-danger")}", :disabled => (cannot? :cancel, Member or disable_cancel) , :id => 'cancel') %>
       </div>
-      <div class="span4">&nbsp;</div>
+      <div class="span4">
+        <%= link_to('Edit additional data', additional_data_path, :class => "btn btn-success btn-large-w", :id => 'edit_additional_attributes', :disabled => (cannot? :api_update, Member)) if @current_member.additional_data_form %>
+      </div>
     </div>  
 
     <div class="row-fluid" style="margin-top: 8px;">

@@ -14,7 +14,7 @@ class MembersController < ApplicationController
   end
 
   def additional_data
-    @form = MyForm.new params
+    @form = @current_member.additional_data_form.new params
     if request.post?
       if @form.valid?
         @current_member.update_attribute :additional_data, @form.cleaned_data
