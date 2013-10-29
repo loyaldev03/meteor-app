@@ -76,7 +76,9 @@ class Fulfillment < ActiveRecord::Base
     state :returned
     #when member gets lapsed status, all not_processed / in_process / out_of_stock / bad_address fulfillments gets this status.
     state :canceled
-    #if delivery fail this status is set and wrong address on member file should be filled with the reason
+    #if delivery fail this status is set and wrong address on member file should be filled with the reason. If the member
+    #is set as undeliverable every fulfillment in 'not_processed','in_process','out_of_stock' and 'returned' will also be
+    #set as 'bad_address' 
     state :bad_address
   end
 
