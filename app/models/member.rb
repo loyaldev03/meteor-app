@@ -1383,7 +1383,11 @@ class Member < ActiveRecord::Base
   handle_asynchronously :marketing_tool_sync_subscription, :queue => :exact_target_sync
 
   def get_offset_related
-    Time.now.in_time_zone(self.club.time_zone).formatted_offset
+    Time.now.in_time_zone(get_club_timezone).formatted_offset
+  end
+
+  def get_club_timezone
+    @club_timezone ||= self.club.time_zone
   end
 
   private
