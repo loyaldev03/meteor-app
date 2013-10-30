@@ -232,10 +232,6 @@ class Fulfillment < ActiveRecord::Base
     @product ||= Product.find_by_sku_and_club_id(self.product_sku, self.member.club_id)
   end
 
-  def current_file
-    self.fulfillment_files.order("fulfillment_files.id DESC").first
-  end
-
   private
     def set_default_values
       self.assigned_at = Time.zone.now
