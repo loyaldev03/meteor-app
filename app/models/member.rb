@@ -917,7 +917,7 @@ class Member < ActiveRecord::Base
             self.cancel! Time.zone.now.in_time_zone(self.club.time_zone), "Automatic cancellation"
             self.set_as_canceled!
           end
-          marketing_tool_sync_unsubscription
+          marketing_tool_sync_unsubscription unless exact_target_member.nil?
           answer = { :message => message, :code => Settings.error_codes.success }
         rescue Exception => e
           Auditory.report_issue("Member::blacklist", e, { :member => self.inspect })
