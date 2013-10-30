@@ -38,7 +38,7 @@ class FulfillmentsController < ApplicationController
     fulfillment = Fulfillment.find(params[:id])
     file = (params[:file].blank? ? nil : params[:file])
     render json: fulfillment.update_status(@current_agent, params[:new_status], params[:reason], file).merge(:id => params[:id])
-  rescue ActiveRecord::RecordNotFound
+  rescue ActiveRecord::RecordNotFound => e
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found, :id => params[:id] }
   end
 
@@ -72,7 +72,7 @@ class FulfillmentsController < ApplicationController
         params[:fulfillment_selected].each do |fs|
           fulfillment = Fulfillment.find(fs.first)
           ff.fulfillments << fulfillment
-          fulfillment.set_as_in_process
+          fulfillment.update_status(ff.agent, "in_process", "Fulfillment file generated", ff.id)
         end
         flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
       rescue Exception => e
@@ -93,7 +93,7 @@ class FulfillmentsController < ApplicationController
     else
       fulfillments = ff.fulfillments.includes(:member)
     end
-    xls_package = Fulfillment.generateXLS(fulfillments, false, ff.product == Settings.others_product)
+    xls_package = Fulfillment.generateXLS(ff, false)
     send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
              :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
              :disposition => "attachment; filename=miworkingfile2.xlsx"

@@ -66,7 +66,7 @@ namespace :fulfillments do
       temp.close 
       temp.unlink
 
-      fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
+      fulfillment_file.mark_fulfillments_as_in_process
       fulfillment_file.processed
     
     rescue Exception => e
@@ -146,7 +146,7 @@ namespace :fulfillments do
           ftp.chdir(folder)
         end
         ftp.putbinaryfile(temp_file, File.basename(temp_file))
-        fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
+        fulfillment_file.mark_fulfillments_as_in_process
         fulfillment_file.processed
       rescue Exception => e
         Auditory.report_issue('NaammaSloopReport:create', e, { :fulfillment_file => fulfillment_file.inspect })
@@ -251,7 +251,7 @@ namespace :fulfillments do
       temp.close 
       temp.unlink
 
-      fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
+      fulfillment_file.mark_fulfillments_as_in_process
       fulfillment_file.processed
 
     rescue Exception => e
