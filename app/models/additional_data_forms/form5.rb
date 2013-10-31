@@ -1,4 +1,5 @@
-class Form8 < Bureaucrat::Form
+# Club id 5 is AmerigoRV
+class Form5 < Bureaucrat::Form
   extend Bureaucrat::Quickfields
 
   string  :nickname, max_length: 50

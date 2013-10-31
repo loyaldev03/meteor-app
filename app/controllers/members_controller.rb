@@ -3,7 +3,7 @@ class MembersController < ApplicationController
 
   before_filter :validate_club_presence
   before_filter :validate_member_presence, :except => [ :index, :new, :search_result ]
-  before_filter :check_permissions
+  before_filter :check_permissions, :except => [ :additional_data ]
   
   def index
     @countries = Carmen::Country.coded('US').subregions + Carmen::Country.coded('CA').subregions
@@ -14,6 +14,7 @@ class MembersController < ApplicationController
   end
 
   def additional_data
+    my_authorize! :update, MemberAdditionalData, @current_club.id
     @form = @current_member.additional_data_form.new params
     if request.post?
       if @form.valid?

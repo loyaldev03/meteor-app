@@ -1,3 +1,4 @@
+# This class is for testing purpouses.
 class Form10 < Bureaucrat::Form
   extend Bureaucrat::Quickfields
 
