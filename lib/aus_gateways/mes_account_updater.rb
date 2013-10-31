@@ -97,11 +97,8 @@ module MesAccountUpdater
 
       count = 0
       # members with expired credit card and active
-      members = Member.joins(:credit_cards).billable.where([ ' date(members.bill_date) = ? AND credit_cards.active = 1 ' + 
-                    ' AND (credit_cards.aus_sent_at IS NULL OR (credit_cards.aus_sent_at < ? AND credit_cards.aus_status IS NULL) )' + 
-                    ' AND members.club_id = ? AND credit_cards.blacklisted = false ', 
-                    (Time.zone.now+7.days).to_date,
-                    (Time.zone.now-1.days).to_date, gateway.club_id ])
+      members = Member.billable.where([ 'date(bill_date) = ? AND recycled_times = 0 AND club_id = ?', 
+                    (Time.zone.now+7.days).to_date, gateway.club_id ])
       members.each do |member|
         cc = member.active_credit_card
         account_type = case cc.cc_type
