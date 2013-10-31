@@ -544,4 +544,27 @@ class Api::MembersController < ApplicationController
     Auditory.report_issue("API::TermsOfMembership::change", e, { :params => params.inspect })
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
+
+  ##
+  # Charge with a no recurrent amount a member. This could be either a donation or a on-time only amount.
+  #
+  # @resource /api/v1/members/:id/charge
+  # @action POST
+  #
+  # @required [Float] amount Amount to charge the member.
+  # @required [String] description Description of why the member is being charged.
+  # @optional [String] type Type of the operation. It could be either "donation" or "one-time". By default we set it as "one-time".
+  #
+  def sale
+    member = Member.find(params[:id])
+    my_authorize! :api_sale, Member, member.club_id
+    member.no_recurrent_billing(amount, description, type = "one-time")
+  rescue ActiveRecord::RecordNotFound => e 
+    if e.to_s.include? "TermsOfMembership"
+      message = "Terms of membership not found"
+    elsif e.to_s.include? "Member"
+      message = "Member not found"
+    end
+    render json: { :message => message, :code => Settings.error_codes.not_found }
+  end
 end

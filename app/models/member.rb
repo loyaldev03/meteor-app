@@ -505,7 +505,7 @@ class Member < ActiveRecord::Base
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
-  def no_recurrent_billing(amount, description)
+  def no_recurrent_billing(amount, description, type = "one-time")
     trans = nil
     if amount.blank? or description.blank?
       answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
@@ -521,10 +521,12 @@ class Member < ActiveRecord::Base
           message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
           trans.update_attribute :response_result, trans.response_result+". Reason: #{description}"
           answer = { :message => message, :code => Settings.error_codes.success }
-          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing)
+          operation_type = type=="one-time" ? Settings.operation_types.no_recurrent_billing : Settings.operation_types.no_reccurent_billing_donation
+          Auditory.audit(nil, trans, answer[:message], self, operation_type)
         else
           answer = { :message => trans.response_result, :code => Settings.error_codes.no_reccurent_billing_error }
-          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing_with_error)
+          operation_type = type=="one-time" ? Settings.operation_types.no_recurrent_billing_with_error : Settings.operation_types.no_recurrent_billing_donation_with_error
+          Auditory.audit(nil, trans, answer[:message], self, operation_type)
         end
       else
         if not self.club.billing_enable

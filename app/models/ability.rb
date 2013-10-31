@@ -32,6 +32,7 @@ class Ability
     cannot :api_find_all_by_updated, Member
     cannot :api_find_all_by_created, Member
     cannot :api_change, TermsOfMembership
+    cannot :api_sale, Member
     cannot :manage_product_api, Product
     cannot :manage_prospects_api, Prospect
     cannot :manage_token_api, Agent
@@ -69,6 +70,7 @@ class Ability
       can :api_find_all_by_created, Member
       can :manage_product_api, Product
       can :api_change, TermsOfMembership
+      can :api_sale, Member
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent
@@ -129,6 +131,7 @@ class Ability
       can :manage_token_api, Agent
       can :manage_operations_api, Operation
       can :api_change, TermsOfMembership
+      can :api_sale, Member
     # Agency role: Team de acquisicion 
     when 'agency' then
       can :manage, Product
