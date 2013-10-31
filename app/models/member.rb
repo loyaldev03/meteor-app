@@ -917,11 +917,11 @@ class Member < ActiveRecord::Base
             self.cancel! Time.zone.now.in_time_zone(self.club.time_zone), "Automatic cancellation"
             self.set_as_canceled!
           end
-          marketing_tool_sync_unsubscription unless exact_target_member.nil?
+          marketing_tool_sync_unsubscription  
           answer = { :message => message, :code => Settings.error_codes.success }
         rescue Exception => e
           Auditory.report_issue("Member::blacklist", e, { :member => self.inspect })
-          answer = { :message => I18n.t('error_messages.airbrake_error_message'), :success => Settings.error_codes.member_could_no_be_blacklisted }
+          answer = { :message => I18n.t('error_messages.airbrake_error_message')+e.to_s, :success => Settings.error_codes.member_could_no_be_blacklisted }
           raise ActiveRecord::Rollback
         end
       end
@@ -1366,7 +1366,7 @@ class Member < ActiveRecord::Base
 
   # used for member blacklist
   def marketing_tool_sync_unsubscription
-    if defined?(SacExactTarget::MemberModel)
+    if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
       exact_target_after_create_sync_to_remote_domain
       exact_target_member.unsubscribe!
     end
