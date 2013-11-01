@@ -560,12 +560,14 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :success
     @member.reload
     cc_token = @member.active_credit_card.token
-    
-    @credit_card.expire_month = @credit_card.expire_month+1
-    @credit_card.expire_year = @credit_card.expire_year+1
+
+
+    @credit_card.expire_year = @credit_card.expire_year + 1
     @member.reload
     assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
+        require "ruby-debug"
+        debugger
         generate_put_message
       end
     end
@@ -1153,8 +1155,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     @active_credit_card = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member.id
 
     @credit_card = FactoryGirl.build :credit_card_american_express
-    @credit_card.expire_year = (Time.zone.now.in_time_zone(@member.club.time_zone)).year
-    @credit_card.expire_month = (Time.zone.now.in_time_zone(@member.club.time_zone)).month 
+    @credit_card.expire_year = (Time.zone.now.in_time_zone(@member.get_club_timezone)).year
+    @credit_card.expire_month = (Time.zone.now.in_time_zone(@member.get_club_timezone)).month 
 
     active_merchant_stubs_store(@credit_card.number)
 
@@ -1198,7 +1200,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed).to_datetime
     assert_difference('Operation.count') do
       generate_put_next_bill_date(next_bill_date)
-      puts @member.club.time_zone
+      puts @member.get_club_timezone
     end
     @member.reload
     date_to_check = next_bill_date.to_datetime.change(:offset => @member.get_offset_related)
@@ -1546,7 +1548,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       @member.reload
       cancel_date_to_check = cancel_date.to_datetime.change(:offset => @member.get_offset_related)  
       assert @member.current_membership.cancel_date > @member.current_membership.join_date
-      assert_equal I18n.l(@member.current_membership.cancel_date.in_time_zone(@member.club.time_zone), :format => :only_date), I18n.l(cancel_date_to_check, :format => :only_date)
+      assert_equal I18n.l(@member.current_membership.cancel_date.in_time_zone(@member.get_club_timezone), :format => :only_date), I18n.l(cancel_date_to_check, :format => :only_date)
     end
   end
 

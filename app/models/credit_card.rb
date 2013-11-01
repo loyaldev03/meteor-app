@@ -155,7 +155,7 @@ class CreditCard < ActiveRecord::Base
   def update_expire(year, month, current_agent = nil)
     if year.to_i == expire_year.to_i and month.to_i == expire_month.to_i
       { :code => Settings.error_codes.success, :message => "New expiration date its identically than the one we have in database." }
-    elsif Time.new(year, month, nil, nil, nil, nil, self.member.get_offset_related) >= Time.now.in_time_zone(self.member.club.time_zone).beginning_of_month
+    elsif Time.new(year, month, nil, nil, nil, nil, self.member.get_club_timezone) >= Time.now.in_time_zone(self.member.get_club_timezone).beginning_of_month
       message = "Changed credit card XXXX-XXXX-XXXX-#{last_digits} from #{expire_month}/#{expire_year} to #{month}/#{year}"
       update_attributes(:expire_month => month, :expire_year => year)
       Auditory.audit(current_agent, self, message, self.member, Settings.operation_types.credit_card_updated)
