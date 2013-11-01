@@ -553,12 +553,12 @@ class Api::MembersController < ApplicationController
   #
   # @required [Float] amount Amount to charge the member.
   # @required [String] description Description of why the member is being charged.
-  # @optional [String] type Type of the operation. It could be either "donation" or "one-time". By default we set it as "one-time".
+  # @required [String] type Type of the operation. It could be either "donation" or "one-time". By default we set it as "one-time".
   #
   def sale
     member = Member.find(params[:id])
     my_authorize! :api_sale, Member, member.club_id
-    member.no_recurrent_billing(amount, description, type = "one-time")
+    render json: member.no_recurrent_billing(params[:amount], params[:description], params[:type])
   rescue ActiveRecord::RecordNotFound => e 
     if e.to_s.include? "TermsOfMembership"
       message = "Terms of membership not found"

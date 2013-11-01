@@ -505,10 +505,10 @@ class Member < ActiveRecord::Base
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
-  def no_recurrent_billing(amount, description, type = "one-time")
+  def no_recurrent_billing(amount, description, type)
     trans = nil
-    if amount.blank? or description.blank?
-      answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
+    if amount.blank? or description.blank? or type.blank?
+      answer = { :message =>"Amount, description and type cannot be blank.", :code => Settings.error_codes.wrong_data }
     elsif amount.to_f <= 0.0
       answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
     else
@@ -916,7 +916,7 @@ class Member < ActiveRecord::Base
           Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
           self.credit_cards.each { |cc| cc.blacklist }
           unless self.lapsed?
-            self.cancel! Time.zone.now.in_time_zone(self.club.time_zone), "Automatic cancellation"
+            self.cancel! Time.zone.now.in_time_zone(get_club_timezone), "Automatic cancellation"
             self.set_as_canceled!
           end
           marketing_tool_sync_unsubscription  
@@ -950,7 +950,7 @@ class Member < ActiveRecord::Base
 
   def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
     cancel_date = cancel_date.to_date
-    cancel_date = (self.join_date.in_time_zone(self.club.time_zone).to_date == cancel_date ? "#{cancel_date} 23:59:59" : cancel_date).to_datetime
+    cancel_date = (self.join_date.in_time_zone(get_club_timezone).to_date == cancel_date ? "#{cancel_date} 23:59:59" : cancel_date).to_datetime
     if not message.blank?
       if cancel_date.change(:offset => self.get_offset_related).to_date >= Time.new.getlocal(self.get_offset_related).to_date
         if self.cancel_date == cancel_date
@@ -1087,7 +1087,7 @@ class Member < ActiveRecord::Base
         tz = Time.zone.now
         begin
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-          member.cancel!(Time.zone.now.in_time_zone(member.club.time_zone), "Billing date is overdue.", nil, Settings.operation_types.bill_overdue_cancel) if member.manual_payment and not member.cancel_date
+          member.cancel!(Time.zone.now.in_time_zone(member.get_club_timezone), "Billing date is overdue.", nil, Settings.operation_types.bill_overdue_cancel) if member.manual_payment and not member.cancel_date
           member.set_as_canceled!
         rescue Exception => e
           Auditory.report_issue("Members::Cancel", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
@@ -1546,7 +1546,7 @@ class Member < ActiveRecord::Base
         if tom.downgradable?
           downgrade_member
         else
-          self.cancel! Time.zone.now.in_time_zone(self.club.time_zone), "HD cancellation"
+          self.cancel! Time.zone.now.in_time_zone(get_club_timezone), "HD cancellation"
           set_as_canceled!
           Communication.deliver!(:hard_decline, self)    
         end
