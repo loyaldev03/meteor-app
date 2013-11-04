@@ -548,7 +548,7 @@ class Api::MembersController < ApplicationController
   ##
   # Charge with a no recurrent amount a member. This could be either a donation or a on-time only amount.
   #
-  # @resource /api/v1/members/:id/charge
+  # @resource /api/v1/members/:id/sale
   # @action POST
   #
   # @required [Float] amount Amount to charge the member.

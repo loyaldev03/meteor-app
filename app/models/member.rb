@@ -509,6 +509,8 @@ class Member < ActiveRecord::Base
     trans = nil
     if amount.blank? or description.blank? or type.blank?
       answer = { :message =>"Amount, description and type cannot be blank.", :code => Settings.error_codes.wrong_data }
+    elsif not ["one-time", "donation"].include? type
+      answer = { :message =>"Type should be 'one-time' or 'donation'.", :code => Settings.error_codes.wrong_data }
     elsif amount.to_f <= 0.0
       answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
     else
