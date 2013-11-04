@@ -553,7 +553,15 @@ class Api::MembersController < ApplicationController
   #
   # @required [Float] amount Amount to charge the member.
   # @required [String] description Description of why the member is being charged.
-  # @required [String] type Type of the operation. It could be either "donation" or "one-time". By default we set it as "one-time".
+  # @required [String] type Type of the operation. It could be either "donation" or "one-time".
+  #
+  # @example_request
+  #   curl -v -k -X POST -d "api_key=YUiVENNdFbNpRiYFd83Q&amount=10&description=paid related to product&type=one-time" https://dev.stoneacrehq.com:3000/api/v1/members/3/sale
+  # @example_request_description Example of valid request. 
+  #
+  # @example_response
+  #   {"message":"Member billed successfully $10 Transaction id: 6043044a-1185-4323-aa46-64cd4941d511. Reason: paid related to product","code":"000"}
+  # @example_response_description Example response to a valid request.
   #
   def sale
     member = Member.find(params[:id])
