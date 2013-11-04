@@ -566,8 +566,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member.reload
     assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
-        require "ruby-debug"
-        debugger
         generate_put_message
       end
     end
