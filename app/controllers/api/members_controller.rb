@@ -555,6 +555,9 @@ class Api::MembersController < ApplicationController
   # @required [String] description Description of why the member is being charged.
   # @required [String] type Type of the operation. It could be either "donation" or "one-time".
   #
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [String] code Code related to the method result.
+  #
   # @example_request
   #   curl -v -k -X POST -d "api_key=YUiVENNdFbNpRiYFd83Q&amount=10&description=paid related to product&type=one-time" https://dev.stoneacrehq.com:3000/api/v1/members/3/sale
   # @example_request_description Example of valid request. 
