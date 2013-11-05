@@ -9,7 +9,7 @@
 			</th>
 			<th>
 				<%= label :type, "Type", :class => 'help-inline' %>
-				<%= select_tag :type, options_for_select([["One-Time","one-time"], ["Donation","donation"]]), :class => "select_field" %>
+				<%= select_tag :type, options_for_select(Transaction::ONE_TIME_BILLINGS), :class => "select_field" %>
 			</th>
 		</tr>
 		<tr>

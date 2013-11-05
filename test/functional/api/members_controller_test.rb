@@ -95,7 +95,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     get( :find_all_by_created, { :club_id => club_id, :start_date => start_date, :end_date => end_date })
   end
 
-  def generate_post_sale(amount, description, type_of_phone_number)
+  def generate_post_sale(amount, description, type)
     post( :sale, { :id => @member.id, :amount => amount, :description => description, :type => type } )
   end
 

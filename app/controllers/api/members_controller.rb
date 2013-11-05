@@ -546,7 +546,7 @@ class Api::MembersController < ApplicationController
   end
 
   ##
-  # Charge with a no recurrent amount a member. This could be either a donation or a on-time only amount.
+  # Charge a non-recurrent amount to a member. This could be either a "donation" or an "one-time" only amount.
   #
   # @resource /api/v1/members/:id/sale
   # @action POST
