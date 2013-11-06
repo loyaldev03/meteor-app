@@ -1,5 +1,5 @@
 class TermsOfMembership < ActiveRecord::Base
-  attr_accessible :mode, :needs_enrollment_approval, :provisional_days, 
+  attr_accessible :needs_enrollment_approval, :provisional_days, 
     :installment_amount, :description, :installment_type, :club, :name, :initial_club_cash_amount, 
     :club_cash_installment_amount, :skip_first_club_cash
 
@@ -14,11 +14,9 @@ class TermsOfMembership < ActiveRecord::Base
 
   acts_as_paranoid
 
-  before_validation :set_mode, :on => :create
   after_create :setup_default_email_templates
 
   validates :name, :presence => true, :uniqueness => { :scope => :club_id }
-  validates :mode, :presence => true
   #validates :needs_enrollment_approval, :presence => true
   validates :club, :presence => true
   validates :installment_period, :numericality => { :greater_than_or_equal_to => 1 }, if: Proc.new{ |tom| tom.is_payment_expected }
@@ -42,14 +40,6 @@ class TermsOfMembership < ActiveRecord::Base
 
   ###########################################
   
-  def production?
-    self.mode == 'production'
-  end
-
-  def development?
-    self.mode == 'development'
-  end
-
   def payment_gateway_configuration
     club.payment_gateway_configurations.find_by_mode(mode)
   end
@@ -84,12 +74,8 @@ class TermsOfMembership < ActiveRecord::Base
       errors.add :base, :club_payment_gateway_configuration unless self.payment_gateway_configuration
     end
 
-    def set_mode
-      self.mode = "production" if Rails.env.production?
-    end
-
     def setup_default_email_templates
-      if development?
+      unless Rails.env.production?
         EmailTemplate::TEMPLATE_TYPES.each do |type|
           if type!=:rejection or (type==:rejection and self.needs_enrollment_approval)
             et = EmailTemplate.new 

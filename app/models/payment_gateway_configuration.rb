@@ -1,5 +1,5 @@
 class PaymentGatewayConfiguration < ActiveRecord::Base
-  attr_accessible :login, :merchant_key, :password, :mode, :gateway, :report_group, :aus_login, :aus_password
+  attr_accessible :login, :merchant_key, :password, :gateway, :report_group, :aus_login, :aus_password
 
   belongs_to :club
   has_many :transactions
@@ -10,10 +10,8 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   validates :login, :presence => true
   validates :merchant_key, :presence => true
   validates :password, :presence => true
-  validates :mode, :presence => true
   validates :gateway, :presence => true
   validates :club, :presence => true
-  validates_uniqueness_of_without_deleted :mode, :scope => :club_id
 
   def mes?
     self.gateway == 'mes'
@@ -25,10 +23,4 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
     self.gateway == "authorize_net"
   end
 
-  def production?
-    self.mode == 'production'
-  end
-  def development?
-    self.mode == 'development'
-  end
 end

@@ -1325,4 +1325,27 @@ class TransactionTest < ActiveSupport::TestCase
     member.reload
     assert_equal member.club_cash_amount, 50
   end
+
+  test "Should not let refunds on transactions with different pgc" do
+    previous_pgc = @club.payment_gateway_configurations.first
+
+    active_member = create_active_member(@terms_of_membership)
+    amount = @terms_of_membership.installment_amount
+    active_member.update_attribute :next_retry_bill_date, Time.zone.now
+    answer = active_member.bill_membership
+
+    @club.payment_gateway_configurations.first.delete
+    old_pgc = FactoryGirl.create(:litle_payment_gateway_configuration, :club_id => @club.id)
+    active_member.reload
+    assert_equal active_member.status, 'active'
+
+    assert_difference('Operation.count', 0) do
+      assert_difference('Transaction.count', 0) do
+        assert_difference('Communication.count', 0) do
+          trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+          answer = Transaction.refund(amount, trans)
+        end 
+      end
+    end
+  end
 end

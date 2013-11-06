@@ -54,12 +54,11 @@ class Transaction < ActiveRecord::Base
     self.merchant_key = pgc.merchant_key
     self.login = pgc.login
     self.password = pgc.password
-    self.mode = pgc.mode
     self.descriptor_name = pgc.descriptor_name
     self.descriptor_phone = pgc.descriptor_phone
     self.order_mark = pgc.order_mark
     self.gateway = pgc.gateway
-    ActiveMerchant::Billing::Base.mode = ( pgc.production? ? :production : :test )
+    ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
   end
 
   def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, operation_type_to_set = nil)
@@ -96,7 +95,11 @@ class Transaction < ActiveRecord::Base
   end
 
   def can_be_refunded?
-    [ 'sale' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted? and self.success?
+    [ 'sale' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted? and self.success? and has_same_pgc_as_current?
+  end
+
+  def has_same_pgc_as_current?
+    gateway == member.club.payment_gateway_configurations.first.gateway
   end
 
   def process
@@ -166,30 +169,34 @@ class Transaction < ActiveRecord::Base
 
 
   def self.refund(amount, sale_transaction_id, agent=nil)
-    Transaction.transaction do 
-      amount = amount.to_f
-      # Lock transaction, so no one can use this record while we refund this member.
-      sale_transaction = Transaction.find sale_transaction_id, :lock => true
-      if amount <= 0.0
-        return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
-      elsif sale_transaction.amount_available_to_refund < amount
-        return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
+    # Lock transaction, so no one can use this record while we refund this member.
+    sale_transaction = Transaction.find sale_transaction_id, :lock => true
+    if not sale_transaction.has_same_pgc_as_current?
+      { :code => Settings.error_codes.transaction_gateway_differs_from_current, :message => I18n.t("error_messages.transaction_gateway_differs_from_current") }
+    else 
+      Transaction.transaction do 
+        amount = amount.to_f
+        if amount <= 0.0
+          return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
+        elsif sale_transaction.amount_available_to_refund < amount
+          return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
+        end
+        trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
+        trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership, Settings.operation_types.credit)
+        trans.fill_transaction_type_for_credit(sale_transaction)
+        answer = trans.process
+        if trans.success?
+          sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
+          sale_transaction.save
+          Auditory.audit(agent, trans, "Refund success $#{amount} on transaction #{sale_transaction.id}", sale_transaction.member, Settings.operation_types.credit)
+          Communication.deliver!(:refund, sale_transaction.member)
+          sale_transaction.member.marketing_tool_sync
+        else
+          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]} #{trans.inspect}", sale_transaction.member, Settings.operation_types.credit_error)
+          trans.update_attribute :operation_type, Settings.operation_types.credit_error
+        end
+        answer
       end
-      trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
-      trans.prepare(sale_transaction.member, sale_transaction.credit_card, amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership, Settings.operation_types.credit)
-      trans.fill_transaction_type_for_credit(sale_transaction)
-      answer = trans.process
-      if trans.success?
-        sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
-        sale_transaction.save
-        Auditory.audit(agent, trans, "Refund success $#{amount} on transaction #{sale_transaction.id}", sale_transaction.member, Settings.operation_types.credit)
-        Communication.deliver!(:refund, sale_transaction.member)
-        sale_transaction.member.marketing_tool_sync
-      else
-        Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]} #{trans.inspect}", sale_transaction.member, Settings.operation_types.credit_error)
-        trans.update_attribute :operation_type, Settings.operation_types.credit_error
-      end
-      answer
     end
   end
 
@@ -216,7 +223,7 @@ class Transaction < ActiveRecord::Base
     end
 
     def credit
-        if payment_gateway_configuration.nil?
+      if payment_gateway_configuration.nil?
         save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
       elsif self.token.nil? or self.token.size < 4
         save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
