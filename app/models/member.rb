@@ -43,6 +43,7 @@ class Member < ActiveRecord::Base
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
   after_save :after_marketing_tool_sync
+  
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
@@ -505,26 +506,29 @@ class Member < ActiveRecord::Base
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
-  def no_recurrent_billing(amount, description)
+  def no_recurrent_billing(amount, description, type)
     trans = nil
-    if amount.blank? or description.blank?
-      answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
+    if amount.blank? or description.blank? or type.blank?
+      answer = { :message =>"Amount, description and type cannot be blank.", :code => Settings.error_codes.wrong_data }
+    elsif not Transaction::ONE_TIME_BILLINGS.include? type
+      answer = { :message =>"Type should be 'one-time' or 'donation'.", :code => Settings.error_codes.wrong_data }
     elsif amount.to_f <= 0.0
       answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
     else
       if billing_enabled?
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
-        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.no_recurrent_billing)
+        trans.prepare_no_recurrent(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, type)
         answer = trans.process
         if trans.success?
           message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
           trans.update_attribute :response_result, trans.response_result+". Reason: #{description}"
           answer = { :message => message, :code => Settings.error_codes.success }
-          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing)
+          Auditory.audit(nil, trans, answer[:message], self, trans.operation_type)
         else
           answer = { :message => trans.response_result, :code => Settings.error_codes.no_reccurent_billing_error }
-          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing_with_error)
+          operation_type = trans.one_time_type? ? Settings.operation_types.no_recurrent_billing_with_error : Settings.operation_types.no_recurrent_billing_donation_with_error
+          Auditory.audit(nil, trans, answer[:message], self, operation_type)
         end
       else
         if not self.club.billing_enable
