@@ -360,7 +360,9 @@ class MemberTest < ActiveSupport::TestCase
     next_bill_date = @saved_member.bill_date + @terms_of_membership_with_gateway.installment_period.days
 
     Timecop.freeze( @saved_member.next_retry_bill_date ) do
+      Time.zone = "UTC"
       Member.bill_all_members_up_today
+      Time.zone = @club.time_zone
       @saved_member.reload
 
       assert_equal(@saved_member.current_membership.status, "active")
