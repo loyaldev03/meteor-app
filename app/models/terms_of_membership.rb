@@ -41,7 +41,7 @@ class TermsOfMembership < ActiveRecord::Base
   ###########################################
   
   def payment_gateway_configuration
-    club.payment_gateway_configurations.find_by_mode(mode)
+    club.payment_gateway_configurations.first
   end
   
   def downgradable?

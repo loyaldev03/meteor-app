@@ -135,7 +135,8 @@ en:
     airbrake_error_message: "Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience."
     birth_date_is_invalid: "is invalid, it must be null or greater than '1900-01-01'"
     payment_gateway_time_out: "Time out trying to connect with the payment gateway."
-    transaction_gateway_differs_from_current: "Transaction does not have the same gateway as current."
+    transaction_gateway_differs_from_current: "Transaction does not have the same active gateway."
+    credit_card_gateway_differs_from_current: "Credit card does not have the same active gateway."
   activerecord:
     errors:
       models:

@@ -71,7 +71,11 @@ class CreditCard < ActiveRecord::Base
   end
 
   def can_be_activated?
-    not self.active and not self.member.lapsed? and not self.blacklisted
+    not self.active and not self.member.lapsed? and not self.blacklisted and sis_same_gateway_as_current_tom?
+  end
+
+  def is_same_gateway_as_current_tom?
+    self.member.club.payment_gateway_configuration.gateway == self.gateway
   end
 
   def self.am_card(number, expire_month, expire_year, first_name, last_name)
@@ -90,9 +94,13 @@ class CreditCard < ActiveRecord::Base
   end
 
   def set_as_active!
-    self.member.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
-    self.update_attribute :active , true
-    Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member, Settings.operation_types.credit_card_activated)
+    if is_same_gateway_as_current_tom?
+      self.member.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
+      self.update_attribute :active , true
+      Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member, Settings.operation_types.credit_card_activated)
+    else
+      raise CreditCardDifferentGatewaysException.new(:message => "Different Gateway")
+    end
   end
 
   def get_token(pgc, pmember, allow_cc_blank = false)
