@@ -71,7 +71,7 @@ class CreditCard < ActiveRecord::Base
   end
 
   def can_be_activated?
-    not self.active and not self.member.lapsed? and not self.blacklisted and sis_same_gateway_as_current_tom?
+    not self.active and not self.member.lapsed? and not self.blacklisted and is_same_gateway_as_current_tom?
   end
 
   def is_same_gateway_as_current_tom?
