@@ -15,14 +15,16 @@ class MembersController < ApplicationController
 
   def additional_data
     my_authorize! :update, MemberAdditionalData, @current_club.id
-    @form = @current_member.additional_data_form.new params
     if request.post?
+      @form = @current_member.additional_data_form.new params
       if @form.valid?
         @current_member.update_attribute :additional_data, @form.cleaned_data
         redirect_to show_member_path, notice: 'Additional data updated with success'
       else
         flash.now[:error] = "There is an error on data you are trying to save. Review errors."
       end
+    else
+      @form = @current_member.additional_data_form.new @current_member.additional_data
     end
   end
 
