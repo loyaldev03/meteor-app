@@ -1220,7 +1220,7 @@ class Member < ActiveRecord::Base
                           ["((date(next_retry_bill_date) = ? AND recycled_times = 0) 
                            OR (date(next_retry_bill_date) = ? AND manual_payment = true)) 
                            AND terms_of_memberships.installment_amount != 0.0 
-                           AND terms_of_memberships.is_payment_expected = false", 
+                           AND terms_of_memberships.is_payment_expected = true", 
                            (Time.zone.now + 7.days).to_date, (Time.zone.now + 14.days).to_date 
                           ])
 
