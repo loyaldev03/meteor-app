@@ -114,3 +114,5 @@ gem 'LitleOnline'
 gem 'encryptor'
 ###################
 
+gem 'bureaucrat', :github => 'vsizov/bureaucrat'
+

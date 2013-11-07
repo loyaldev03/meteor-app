@@ -13,6 +13,7 @@ class Member < ActiveRecord::Base
   has_many :club_cash_transactions
   has_many :enrollment_infos, :order => "created_at DESC"
   has_many :member_preferences
+  has_many :member_additional_data
   has_many :memberships, :order => "created_at DESC"
   belongs_to :current_membership, :class_name => 'Membership'
   
@@ -210,6 +211,10 @@ class Member < ActiveRecord::Base
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
   def increment_reactivations
     increment!(:reactivation_times, 1)
+  end
+
+  def additional_data_form
+    "Form#{club_id}".constantize rescue nil
   end
 
   # Sets join date. It is called multiple times.
@@ -1352,6 +1357,17 @@ class Member < ActiveRecord::Base
     answer
   end
 
+  def desnormalize_additional_data
+    if self.additional_data.present?
+      self.additional_data.each do |key, value|
+        pref = MemberAdditionalData.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
+        pref.value = value
+        pref.save
+      end
+    end
+  end
+  handle_asynchronously :desnormalize_additional_data, :queue => :generic_queue
+
   def desnormalize_preferences
     if self.preferences.present?
       self.preferences.each do |key, value|
@@ -1563,6 +1579,7 @@ class Member < ActiveRecord::Base
 
     def asyn_desnormalize_preferences(opts = {})
       self.desnormalize_preferences if opts[:force] || self.changed.include?('preferences') 
+      self.desnormalize_additional_data if opts[:force] || self.changed.include?('additional_data') 
     end
 
     def wrong_address_logic

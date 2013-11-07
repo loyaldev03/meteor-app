@@ -35,6 +35,14 @@ GIT
     yard (0.8.7)
 
 GIT
+  remote: git://github.com/vsizov/bureaucrat.git
+  revision: 6131fe41649ed1e87f804eedca4a49aa71650d1f
+  specs:
+    bureaucrat (0.11.6)
+      activesupport (~> 3.2)
+      i18n (~> 0.6)
+
+GIT
   remote: https://github.com/brynary/rack-bug.git
   revision: 1e6d33664fb21a5f08836e5d8a9d7bfcc47c8d81
   branch: rails3
@@ -184,7 +192,7 @@ GEM
     faraday_middleware (0.9.0)
       faraday (>= 0.7.4, < 0.9)
     fastercsv (1.5.5)
-    ffi (1.8.1)
+    ffi (1.9.0)
     foreman (0.63.0)
       dotenv (>= 0.7)
       thor (>= 0.13.6)
@@ -308,10 +316,10 @@ GEM
       nokogiri (>= 1.4.0)
       nori (~> 1.0)
       wasabi (~> 2.0)
-    selenium-webdriver (2.33.0)
+    selenium-webdriver (2.35.1)
       childprocess (>= 0.2.5)
       multi_json (~> 1.0)
-      rubyzip
+      rubyzip (< 1.0.0)
       websocket (~> 1.0.4)
     settingslogic (2.0.8)
     sexp_processor (4.2.1)
@@ -403,6 +411,7 @@ DEPENDENCIES
   bootstrap-will_paginate
   brakeman
   bullet
+  bureaucrat!
   cancan
   capistrano-campfire (= 0.2.0)
   capybara
@@ -440,7 +449,7 @@ DEPENDENCIES
   ruby-prof
   rvm-capistrano
   sass-rails (~> 3.2.3)
-  selenium-webdriver
+  selenium-webdriver (~> 2.35.1)
   settingslogic (= 2.0.8)
   simplecov
   state_machine (= 1.1.2)

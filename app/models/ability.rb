@@ -40,6 +40,7 @@ class Ability
     cannot :manage, DelayedJob
     cannot :manage, DispositionType
     cannot :see_nice, Transaction
+    cannot :manage, MemberAdditionalData
 
     role = agent.roles.first || agent.which_is_the_role_for_this_club?(club_id).role rescue nil
 
@@ -77,6 +78,7 @@ class Ability
       can :manage_operations_api, Operation
       can :manage, DelayedJob
       can :manage, DispositionType
+      can :manage, MemberAdditionalData
     when 'representative' then
       can :manage, Member
       cannot :api_profile, Member
@@ -100,6 +102,7 @@ class Ability
       can :refund, Transaction
       can :list, ClubCashTransaction
       can :see_nice, Transaction
+      can :manage, MemberAdditionalData
     when 'supervisor' then
       can :manage, Member
       cannot :api_profile, Member
@@ -118,6 +121,7 @@ class Ability
       can :manage, Transaction
       can :manage, ClubCashTransaction
       can :see_nice, Transaction
+      can :manage, MemberAdditionalData
     when 'api' then
       can :api_enroll, Member
       can :api_update, Member
