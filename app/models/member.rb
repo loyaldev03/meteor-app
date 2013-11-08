@@ -13,6 +13,7 @@ class Member < ActiveRecord::Base
   has_many :club_cash_transactions
   has_many :enrollment_infos, :order => "created_at DESC"
   has_many :member_preferences
+  has_many :member_additional_data
   has_many :memberships, :order => "created_at DESC"
   belongs_to :current_membership, :class_name => 'Membership'
   
@@ -43,6 +44,7 @@ class Member < ActiveRecord::Base
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
   after_save :after_marketing_tool_sync
+  
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
@@ -209,6 +211,10 @@ class Member < ActiveRecord::Base
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
   def increment_reactivations
     increment!(:reactivation_times, 1)
+  end
+
+  def additional_data_form
+    "Form#{club_id}".constantize rescue nil
   end
 
   # Sets join date. It is called multiple times.
@@ -505,26 +511,29 @@ class Member < ActiveRecord::Base
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
-  def no_recurrent_billing(amount, description)
+  def no_recurrent_billing(amount, description, type)
     trans = nil
-    if amount.blank? or description.blank?
-      answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
+    if amount.blank? or description.blank? or type.blank?
+      answer = { :message =>"Amount, description and type cannot be blank.", :code => Settings.error_codes.wrong_data }
+    elsif not Transaction::ONE_TIME_BILLINGS.include? type
+      answer = { :message =>"Type should be 'one-time' or 'donation'.", :code => Settings.error_codes.wrong_data }
     elsif amount.to_f <= 0.0
       answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
     else
       if billing_enabled?
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
-        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.no_recurrent_billing)
+        trans.prepare_no_recurrent(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, type)
         answer = trans.process
         if trans.success?
           message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
           trans.update_attribute :response_result, trans.response_result+". Reason: #{description}"
           answer = { :message => message, :code => Settings.error_codes.success }
-          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing)
+          Auditory.audit(nil, trans, answer[:message], self, trans.operation_type)
         else
           answer = { :message => trans.response_result, :code => Settings.error_codes.no_reccurent_billing_error }
-          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing_with_error)
+          operation_type = trans.one_time_type? ? Settings.operation_types.no_recurrent_billing_with_error : Settings.operation_types.no_recurrent_billing_donation_with_error
+          Auditory.audit(nil, trans, answer[:message], self, operation_type)
         end
       else
         if not self.club.billing_enable
@@ -1348,6 +1357,17 @@ class Member < ActiveRecord::Base
     answer
   end
 
+  def desnormalize_additional_data
+    if self.additional_data.present?
+      self.additional_data.each do |key, value|
+        pref = MemberAdditionalData.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
+        pref.value = value
+        pref.save
+      end
+    end
+  end
+  handle_asynchronously :desnormalize_additional_data, :queue => :generic_queue
+
   def desnormalize_preferences
     if self.preferences.present?
       self.preferences.each do |key, value|
@@ -1559,6 +1579,7 @@ class Member < ActiveRecord::Base
 
     def asyn_desnormalize_preferences(opts = {})
       self.desnormalize_preferences if opts[:force] || self.changed.include?('preferences') 
+      self.desnormalize_additional_data if opts[:force] || self.changed.include?('additional_data') 
     end
 
     def wrong_address_logic

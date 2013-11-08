@@ -18,7 +18,7 @@ class MemberTest < ActiveSupport::TestCase
     assert !member.save, member.errors.inspect
     member.club = @terms_of_membership_with_gateway.club
     Delayed::Worker.delay_jobs = true
-    assert_difference('Delayed::Job.count', 2, 'should ceate job for #desnormalize_preferences and mkt tool sync') do
+    assert_difference('Delayed::Job.count', 3, 'should ceate job for #desnormalize_preferences and mkt tool sync') do
       assert member.save, "member cant be save #{member.errors.inspect}"
     end
     Delayed::Worker.delay_jobs = false

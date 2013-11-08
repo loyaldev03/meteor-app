@@ -1059,21 +1059,20 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   test "Update a profile with CC used by another member and Family Membership = True" do
     setup_member(false)
-    @club = FactoryGirl.create(:simple_club_with_gateway_with_family)
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @club_with_family = FactoryGirl.create(:simple_club_with_gateway_with_family)
+    @partner = @club_with_family.partner
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club_with_family.id)
 
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club_with_family.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     created_member = Member.find_by_email(unsaved_member.email)  
 
-    visit clubs_path(@partner.prefix)
-    within("#clubs_table"){ click_link_or_button 'Edit' }
+    visit edit_club_path(@club_with_family.partner.prefix, @club_with_family.id)
+    assert_nil find(:xpath, "//input[@id='club_family_memberships_allowed']").set(true)
 
-    assert find(:xpath, "//input[@id='club_family_memberships_allowed']").set(true)
-
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club_with_family.id)
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
   end
 
