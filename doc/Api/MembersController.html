@@ -1550,6 +1550,112 @@ It will also send a welcome email and charge the enrollment to the member's cred
 			
 		</div>	
     
+		<div class="method">
+			<p class="method_desc">Charge a non-recurrent amount to a member. This could be either a "donation" or an "one-time" only amount.</p>
+			<h3 class="resource_url"><strong>/api/v1/members/:id/sale</strong> [POST]</h3>
+
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">amount</span>
+									<span class="type">Float</span>
+									<span class="text">Amount to charge the member.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">description</span>
+									<span class="type">String</span>
+									<span class="text">Description of why the member is being charged.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">type</span>
+									<span class="type">String</span>
+									<span class="text">Type of the operation. It could be either "donation" or "one-time".</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method results and also informs the errors.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">String</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Example of valid request.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										curl -v -k -X POST -d "api_key=YUiVENNdFbNpRiYFd83Q&amount=10&description=paid related to product&type=one-time" https://dev.stoneacrehq.com:3000/api/v1/members/3/sale
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										{"message":"Member billed successfully $10 Transaction id: 6043044a-1185-4323-aa46-64cd4941d511. Reason: paid related to product","code":"000"}
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Example response to a valid request.
+									
+								
+							</span>
+						</div>
+					
+				</div>
+			
+		</div>	
+    
   </div>
 
 </div>
@@ -1569,7 +1675,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Mon Sep 23 11:21:15 2013 with ruby-1.9.3
+  Generated on Tue Nov  5 14:39:42 2013 with ruby-1.9.3
 </div>
 
   </body>
