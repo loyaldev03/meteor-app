@@ -424,5 +424,57 @@ class MemberTest < ActiveSupport::TestCase
       member.update_attribute :email, wrong_email
       assert !member.valid?, "Member with email #{member.email} is valid when it should not be."
     end   
-  end 
+  end
+
+  ##################################################
+  # => PREBILL
+  ##################################################
+
+  test "Send Prebill email (7 days before NBD)" do
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)    
+
+    excecute_like_server(@club.time_zone) do 
+      Timecop.travel(member.next_retry_bill_date-7.days) do
+        assert_difference("Operation.count") do
+         assert_difference("Communication.count") do
+            Member.send_prebill
+          end
+        end
+      end
+    end 
+    member.reload
+    assert_equal member.communications.last.template_name, "Test prebill"
+  end
+
+  test "Do not Send Prebill email (7 days before NBD) when member's installment_amount is 0" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_amount => 0)
+    member = create_active_member(@terms_of_membership, :provisional_member_with_cc)
+    
+    excecute_like_server(@club.time_zone) do 
+      Timecop.travel(member.next_retry_bill_date-7.days) do
+        assert_difference("Operation.count",0) do
+          assert_difference("Communication.count",0) do
+            Member.send_prebill
+          end
+        end
+      end
+    end
+    Time.zone = @club.time_zone
+  end
+
+  test "Do not Send Prebill email (7 days before NBD) when member's recycled_times is not 0" do
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)    
+    member.update_attribute :recycled_times, 1
+    
+    excecute_like_server(@club.time_zone) do 
+      Timecop.travel(member.next_retry_bill_date-7.days) do
+        assert_difference("Operation.count",0) do
+          assert_difference("Communication.count",0) do
+            Member.send_prebill
+          end
+        end
+      end
+    end
+  end
+
 end
