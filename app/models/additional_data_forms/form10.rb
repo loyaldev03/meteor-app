@@ -4,7 +4,7 @@ class Form10 < Bureaucrat::Form
 
   string  :nickname, max_length: 50
   string  :realname, required: false
-  date :first_grade
+  date :first_grade, min: '1900-01-01'.to_date
   choice :options, [ :test, :salida, :entrada ] 
 
 end
