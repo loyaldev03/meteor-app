@@ -1,5 +1,4 @@
 class CreditCardsController < ApplicationController
-  require "exceptions"
 	before_filter :validate_club_presence
 	before_filter :validate_member_presence
   before_filter :check_authentification

@@ -5,7 +5,7 @@ class RemoveModeFromTomAndPgc < ActiveRecord::Migration
   end
 
   def down
-   	add_column :terms_of_memberships, :mode
-  	add_column :payment_gateway_configurations, :mode
+   	add_column :terms_of_memberships, :mode, :string
+  	add_column :payment_gateway_configurations, :mode, :string
   end
 end

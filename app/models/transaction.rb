@@ -125,10 +125,6 @@ class Transaction < ActiveRecord::Base
     end
   end  
 
-  def production?
-    mode == "production"
-  end
-
   def mes?
     gateway == "mes"
   end
