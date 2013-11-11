@@ -7,11 +7,11 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   acts_as_paranoid
   validates_as_paranoid
 
-  # validates :login, :presence => true
-  # validates :merchant_key, :presence => true
-  # validates :password, :presence => true
-  # validates :gateway, :presence => true
-  # validates :club, :presence => true
+  validates :login, :presence => true
+  validates :merchant_key, :presence => true
+  validates :password, :presence => true
+  validates :gateway, :presence => true
+  validates :club, :presence => true
   
   before_create :only_one_is_allowed
   
