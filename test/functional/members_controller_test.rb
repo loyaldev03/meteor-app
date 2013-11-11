@@ -10,9 +10,9 @@ class MembersControllerTest < ActionController::TestCase
     sign_in @agent
   end
 
-  def generate_post_bill_event(amount, description)
+  def generate_post_bill_event(amount, description, type)
     post :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, 
-                                member_prefix: @saved_member.id, amount: amount, description: description
+                                member_prefix: @saved_member.id, amount: amount, description: description, :type => type
   end
 
   def generate_post_manual_bill(amount, payment_type)
@@ -54,11 +54,20 @@ class MembersControllerTest < ActionController::TestCase
     end
   end
 
-  test "should bill an event" do
+  test "One time billing" do
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['admin', 'supervisor'].each do |role|
       @agent.update_attribute :roles, [role]
-      generate_post_bill_event(200, "testing billing event")
+      generate_post_bill_event(200, "testing billing event", "one-time")
+      assert_response :success
+    end
+  end
+
+  test "Donation billing" do
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    ['admin', 'supervisor'].each do |role|
+      @agent.update_attribute :roles, [role]
+      generate_post_bill_event(200, "testing billing event", "donation")
       assert_response :success
     end
   end
@@ -67,14 +76,14 @@ class MembersControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
       @agent.update_attribute :roles, [role]
-      generate_post_bill_event(200, "testing billing event")
+      generate_post_bill_event(200, "testing billing event", "one-time")
       assert_response :unauthorized
     end
   end
   
   test "billing event with negative amount" do
     club = FactoryGirl.create(:simple_club_with_gateway)
-    generate_post_bill_event(-100, "testing billing event")
+    generate_post_bill_event(-100, "testing billing event", "one-time")
     assert_response :success
     assert @response.body.include?("Amount must be greater than 0.")
   end

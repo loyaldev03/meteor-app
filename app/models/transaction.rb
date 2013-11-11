@@ -16,6 +16,8 @@ class Transaction < ActiveRecord::Base
 
   scope :refunds, lambda { where('transaction_type IN (?, ?)', 'credit', 'refund') }
 
+  ONE_TIME_BILLINGS = ["one-time", "donation"]
+
   def full_label
     I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
       ( response_result.nil? ? '' : ' : ' + response_result)
@@ -84,6 +86,11 @@ class Transaction < ActiveRecord::Base
     }    
   end
 
+  def prepare_no_recurrent(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, type)
+    operation_type = type=="one-time" ? Settings.operation_types.no_recurrent_billing : Settings.operation_types.no_reccurent_billing_donation
+    prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id, membership, operation_type)
+  end
+
   def prepare_for_manual(member, amount, operation_type_to_set)
     self.terms_of_membership_id = member.terms_of_membership.id
     self.member = member
@@ -135,6 +142,10 @@ class Transaction < ActiveRecord::Base
 
   def authorize_net?
     gateway == "authorize_net"
+  end
+
+  def one_time_type?
+    operation_type == Settings.operation_types.no_recurrent_billing
   end
 
   # answer credit card token

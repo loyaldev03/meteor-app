@@ -744,7 +744,7 @@ class TransactionTest < ActiveSupport::TestCase
     amount = 200
     assert_difference("Transaction.count") do
       assert_difference("Operation.count") do
-        member.no_recurrent_billing(amount,"testing event")
+        member.no_recurrent_billing(amount,"testing event", "one-time")
       end
     end
     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first
@@ -775,7 +775,7 @@ class TransactionTest < ActiveSupport::TestCase
     amount = 200
     assert_difference("Transaction.count") do
       assert_difference("Operation.count") do
-        member.no_recurrent_billing(amount,"testing event")
+        member.no_recurrent_billing(amount,"testing event", "one-time")
       end
     end
   end

@@ -35,3 +35,7 @@ class String
     return false
   end
 end
+
+require 'bureaucrat'
+require 'bureaucrat/quickfields'
+require 'bureaucrat/form'

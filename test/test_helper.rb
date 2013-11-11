@@ -113,6 +113,11 @@ class ActiveSupport::TestCase
     active_member
   end  
 
+  def excecute_like_server(club_timezone)
+    Time.zone = "UTC"
+    yield
+    Time.zone = club_timezone
+  end
 end
 
 class ActionController::TestCase

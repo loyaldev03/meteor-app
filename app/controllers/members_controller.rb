@@ -3,13 +3,26 @@ class MembersController < ApplicationController
 
   before_filter :validate_club_presence
   before_filter :validate_member_presence, :except => [ :index, :new, :search_result ]
-  before_filter :check_permissions
+  before_filter :check_permissions, :except => [ :additional_data ]
   
   def index
     @countries = Carmen::Country.coded('US').subregions + Carmen::Country.coded('CA').subregions
     respond_to do |format|
       format.html
       format.js
+    end
+  end
+
+  def additional_data
+    my_authorize! :update, MemberAdditionalData, @current_club.id
+    if request.post?
+      @form = @current_member.additional_data_form.new params
+      if @form.valid?
+        @current_member.update_attribute :additional_data, @form.cleaned_data
+        redirect_to show_member_path, notice: 'Additional data updated with success'
+      end
+    else
+      @form = @current_member.additional_data_form.new @current_member.additional_data
     end
   end
 
@@ -335,7 +348,7 @@ class MembersController < ApplicationController
 
   def no_recurrent_billing
     if request.post?
-      answer = @current_member.no_recurrent_billing(params[:amount], params[:description])
+      answer = @current_member.no_recurrent_billing(params[:amount], params[:description], params[:type])
       if answer[:code] == Settings.error_codes.success
         flash[:notice] = answer[:message]
         redirect_to show_member_path

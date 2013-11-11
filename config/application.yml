@@ -48,7 +48,9 @@ defaults: &defaults
     membership_manual_check_billing: 119
     membership_billing_with_error: 120
     manual_billing_with_error: 121
-    credit_error_gateway_differs_from_current: 122
+    no_reccurent_billing_donation: 122
+    no_recurrent_billing_donation_with_error: 123
+    credit_error_gateway_differs_from_current: 124
     #profile
     cancel: 200 
     future_cancel: 201

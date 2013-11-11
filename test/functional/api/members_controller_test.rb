@@ -95,6 +95,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     get( :find_all_by_created, { :club_id => club_id, :start_date => start_date, :end_date => end_date })
   end
 
+  def generate_post_sale(amount, description, type)
+    post( :sale, { :id => @member.id, :amount => amount, :description => description, :type => type } )
+  end
+
   # Store the membership id at enrollment_infos table when enrolling a new member
   # Admin should enroll/create member with preferences
   # Billing membership by Provisional amount
@@ -1186,7 +1190,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(date_to_check.utc, :format => :only_date)
   end
 
-
   test "Update member's next_bill_date active status" do
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -1696,5 +1699,73 @@ class Api::MembersControllerTest < ActionController::TestCase
     @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the terms of membership."
+  end
+
+  test "One time billing throught API." do
+    sign_in @admin_user
+    ['admin', 'api'].each do |role|
+      @admin_user.update_attribute :roles, [role]
+      @member = create_active_member(@terms_of_membership, :member_with_api)
+      FactoryGirl.create :credit_card, :member_id => @member.id
+      @member.set_as_provisional
+      
+      Timecop.travel(@member.next_retry_bill_date) do
+        assert_difference('Operation.count') do
+          assert_difference('Transaction.count') do
+            generate_post_sale(@member.terms_of_membership.installment_amount, "testing", "one-time")
+          end
+        end 
+      end
+      @member.reload
+      assert_equal @member.operations.order("created_at DESC").first.operation_type, Settings.operation_types.no_recurrent_billing
+    end
+  end
+
+  test "Donation billing throught API" do
+    sign_in @admin_user
+    ['admin', 'api'].each do |role|
+      @admin_user.update_attribute :roles, [role]
+      @member = create_active_member(@terms_of_membership, :member_with_api)
+      FactoryGirl.create :credit_card, :member_id => @member.id
+      @member.set_as_provisional
+      
+      Timecop.travel(@member.next_retry_bill_date) do
+        assert_difference('Operation.count') do
+          assert_difference('Transaction.count') do
+            generate_post_sale(@member.terms_of_membership.installment_amount, "testing", "donation")
+          end
+        end 
+      end
+      @member.reload
+      assert_equal @member.operations.order("created_at DESC").first.operation_type, Settings.operation_types.no_reccurent_billing_donation
+    end
+  end
+
+  test "One-time or Donation billing throught API without amount, description or type" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    @member.set_as_provisional
+
+    Timecop.travel(@member.next_retry_bill_date) do
+      generate_post_sale(nil, "testing", "donation")
+      assert @response.body.include? "Amount, description and type cannot be blank."
+      generate_post_sale(@member.terms_of_membership.installment_amount, nil,"donation")
+      assert @response.body.include? "Amount, description and type cannot be blank."
+      generate_post_sale(@member.terms_of_membership.installment_amount, "testing", nil)
+      assert @response.body.include? "Amount, description and type cannot be blank."
+    end
+  end
+ 
+  test "Should not allow sale transaction for agents that are not admin or api." do
+    sign_in @admin_user
+    ['representative', 'supervisor', 'agency', 'fulfillment_managment'].each do |role|
+      @admin_user.update_attribute :roles, [role]
+      @member = create_active_member(@terms_of_membership, :member_with_api)
+      FactoryGirl.create :credit_card, :member_id => @member.id
+      @member.set_as_provisional
+      generate_post_sale(@member.terms_of_membership.installment_amount, "testing", "one-time")
+      assert_response :unauthorized
+    end
   end
 end
