@@ -600,6 +600,18 @@ function fulfillment_files_functions() {
     }
   });
   $(".dataTables_paginate").css({ float: "left" });
+
+  $("#mark_as_sent").live("click", function(event){
+    if($(this).attr('disabled') == 'disabled'){
+      event.preventDefault();
+    }else{
+    if(confirm("Are you sure you want to mark all the fulfillments that are in progress as sent?")){
+        $(this).attr('disabled', 'disabled');
+      }else{
+        event.preventDefault();
+      }
+    }
+  });
 }  
 
 function club_cash_transactions_functions(column_count){
