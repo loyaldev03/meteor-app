@@ -504,14 +504,14 @@ class MembersBillTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
-    assert page.has_content?("Amount and description cannot be blank.")
+    assert page.has_content?("Amount, description and type cannot be blank.")
     fill_in('amount', :with => '100')
     click_link_or_button (I18n.t('buttons.no_recurrent_billing'))
-    assert page.has_content?("Amount and description cannot be blank.")
+    assert page.has_content?("Amount, description and type cannot be blank.")
     fill_in('amount', :with => '')
     fill_in('description', :with => 'asd')
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
-    assert page.has_content?("Amount and description cannot be blank.")
+    assert page.has_content?("Amount, description and type cannot be blank.")
   end
 
   test "Try billing a member without providing the amount and/or description." do
