@@ -6,9 +6,6 @@
         <b> <%= t('activerecord.attributes.terms_of_membership.name') %>: </b> <%= @tom.name %> 
       </div>
       <div class="span2"> 
-        <b> <%= t('activerecord.attributes.terms_of_membership.mode') %>: </b> <%= @tom.mode %> 
-      </div>
-      <div class="span2"> 
         <b> <%= t('activerecord.attributes.terms_of_membership.installment_amount') %>: </b> 
         <%= number_to_currency(@tom.installment_amount) %> 
       </div>
@@ -121,11 +118,8 @@
 <div id="table_payment_gateway_configuration" class="div-table container"> 
   <div> <h4> Payment Gateway Configurations</h4> </div>
   <div class="table-bordered control-group">
-    <div  class="row-fluid <%= 'red' if @payment_gateway_configuration_development.nil? %>">
-      <b> <%= @payment_gateway_configuration_development.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_development') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_development') %> </b> 
-    </div>
-    <div  class="row-fluid <%= 'red' if @payment_gateway_configuration_production.nil? %>">
-      <b> <%= @payment_gateway_configuration_production.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway_production') : t('activerecord.attributes.terms_of_membership.has_payment_gateway_production') %>  </b>
+    <div  class="row-fluid <%= 'red' if @payment_gateway_configuration.nil? %>">
+      <b> <%= @payment_gateway_configuration.nil? ? t('activerecord.attributes.terms_of_membership.not_have_payment_gateway') : t('activerecord.attributes.terms_of_membership.has_payment_gateway') %> </b> 
     </div>
   </div>
 </div>
