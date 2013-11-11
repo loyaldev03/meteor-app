@@ -286,6 +286,7 @@ function retrieve_information(){
       last_name: $("#member_last_name").val(),
       city: $("#member_city").val(),
       zip: $("#member_zip").val(),
+      birth_date: $("#member_birth_date").val(),
       phone_country_code: $("#member_phone_country_code").val(),
       phone_area_code: $("#member_phone_area_code").val(),
       phone_local_number: $("#member_phone_local_number").val(),
