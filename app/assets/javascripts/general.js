@@ -314,6 +314,9 @@ function retrieve_information(){
   }
   if( $("#setter_cc_blank").length > 0 )
     data["setter"] = { "cc_blank": $("#setter_cc_blank").is(":checked") ? 1 : 0 }
+    
+  if( $("#setter_wrong_phone_number").length > 0 )
+    data["setter"] = { "wrong_phone_number": $("#setter_wrong_phone_number").is(":checked") ? 1 : 0 }
 
   return data
 }
