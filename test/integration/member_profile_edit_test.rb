@@ -192,7 +192,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     }
   end
 
-  test "edit a note at operations tab" do
+  # edit a note at operations tab
+  test "edit a note and click on link" do
     setup_member
     
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -217,44 +218,20 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
     
     assert page.has_content?("Edited operation note")
-    click_on 'Cancel'
-
-    within(".nav-tabs"){ click_on("Operations") }
-    within("#operations_table") do
-      assert page.has_content?("Edited operation note")
-      assert page.has_content?(operation.id.to_s)
-    end
-  end
-
-  test "edit a note and click on link" do
-    setup_member
-    
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    
-    click_link_or_button 'Set undeliverable'
-    confirm_ok_js
-    click_link_or_button 'Set wrong address'
-    
-    within(".nav-tabs"){ click_on("Operations") }
-    within("#operations_table") do
-      assert page.has_content?("undeliverable")
-      find('.icon-zoom-in').click
-    end
-    
-    text_note = "text note 123456789"
-    fill_in "operation_notes", :with => text_note
-    
-    assert_difference ['Operation.count'] do 
-      click_on 'Save operation'
-    end
-    
-    assert page.has_content?("Edited operation note")
     within(".alert") {
       within("p") {
         find("a").click    
       }
     }
     assert find_field("operation_notes").value == text_note  
+
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within(".nav-tabs"){ click_on("Operations") }
+    within("#operations_table") do
+      assert page.has_content?("Edited operation note")
+      assert page.has_content?(operation.id.to_s)
+    end
+
   end
 
   test "change unreachable phone number to reachable by check" do
@@ -283,54 +260,26 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     assert_equal @saved_member.wrong_phone_number, nil
   end
 
-  test "change unreachable address to undeliverable when changeing address" do
-    setup_member
-    set_as_undeliverable_member(@saved_member,'reason')
+  # change unreachable address to undeliverable when changeing address
+  # change unreachable address to undeliverable when changeing city
+  # change unreachable address to undeliverable when changeing zip
+  test "change unreachable address to undeliverable when changeing address, city or zip" do
+    setup_member 
+    {"member[address]"=>"random address", "member[city]"=>"random city", "member[zip]"=>"98765" }.each do |field, value|
+      set_as_undeliverable_member(@saved_member,'reason')
 
-    click_link_or_button "Edit"
-    within("#table_demographic_information"){ fill_in 'member[address]', :with => 'another address' }
-    alert_ok_js
-    click_link_or_button 'Update Member'
-    within("#table_demographic_information"){ assert !page.has_css?('tr.yellow') }
-    @saved_member.reload
-    assert_equal @saved_member.wrong_phone_number, nil
-  end
-
-  test "change unreachable address to undeliverable when changeing city" do
-    setup_member
-    set_as_undeliverable_member(@saved_member,'reason')
-
-    click_link_or_button "Edit"
-    within("#table_demographic_information")do
-      fill_in 'member[city]', :with => 'another city'
-    end
-    alert_ok_js
-    click_link_or_button 'Update Member'
-    within("#table_demographic_information")do
-      assert !page.has_css?('tr.yellow')
+      click_link_or_button "Edit"
+      within("#table_demographic_information"){ fill_in field, :with => value }
+      alert_ok_js
+      click_link_or_button 'Update Member'
+      within("#table_demographic_information"){ assert !page.has_css?('tr.yellow') }
+      @saved_member.reload
+      assert_equal @saved_member.wrong_phone_number, nil
     end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_phone_number, nil
   end
 
-  test "change unreachable address to undeliverable when changeing zip" do
-    setup_member
-    set_as_undeliverable_member(@saved_member,'reason')
-
-    click_link_or_button "Edit"
-    within("#table_demographic_information")do
-      fill_in 'member[zip]', :with => '12345'
-    end
-    alert_ok_js
-    click_link_or_button 'Update Member'
-    within("#table_demographic_information")do
-      assert !page.has_css?('tr.yellow')
-    end 
-    @saved_member.reload
-    assert_equal @saved_member.wrong_phone_number, nil
-  end
-
-  test "change unreachable address to undeliverable when changeing state" do
+  # change unreachable address to undeliverable when changing country
+  test "change unreachable address to undeliverable when changing state or country and state" do
     setup_member
     set_as_undeliverable_member(@saved_member,'reason')
 
@@ -345,12 +294,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end 
     @saved_member.reload
     assert_equal @saved_member.wrong_phone_number, nil
-  end
-
-  test "change unreachable address to undeliverable when changeing country" do
-    setup_member
+    
     set_as_undeliverable_member(@saved_member,'reason')
-
     click_link_or_button "Edit"
     within("#table_demographic_information")do
       select('Canada', :from => 'member[country]')
@@ -529,43 +474,27 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
   end
 
- test "go from member index to edit member's classification to VIP" do
+  # go from member index to edit member's classification to celebrity
+  test "go from member index to edit member's classification to VIP and to Celebrity" do
     setup_member
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    within("#personal_details") do
-      fill_in 'member[id]', :with => @saved_member.id.to_s
-      fill_in 'member[first_name]', :with => @saved_member.first_name
-      fill_in 'member[last_name]', :with => @saved_member.last_name
+    ["VIP", "Celebrity"].each do |value|
+      visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+      within("#personal_details") do
+        fill_in 'member[id]', :with => @saved_member.id.to_s
+        fill_in 'member[first_name]', :with => @saved_member.first_name
+        fill_in 'member[last_name]', :with => @saved_member.last_name
+      end
+      click_link_or_button 'Search'
+      within("#members"){ find(".icon-pencil").click }  
+      select(value, :from => 'member[member_group_type_id]')
+
+      alert_ok_js
+      click_link_or_button 'Update Member'
+
+      assert find_field('input_member_group_type').value == value
     end
-    click_link_or_button 'Search'
-    within("#members"){ find(".icon-pencil").click }  
-    select('VIP', :from => 'member[member_group_type_id]')
-
-    alert_ok_js
-    click_link_or_button 'Update Member'
-
-    assert find_field('input_member_group_type').value == 'VIP'
   end
   
-  test "go from member index to edit member's classification to celebrity" do
-    setup_member
-
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    within("#personal_details")do
-      fill_in 'member[id]', :with => @saved_member.id
-      fill_in 'member[first_name]', :with => @saved_member.first_name
-      fill_in 'member[last_name]', :with => @saved_member.last_name
-    end
-    click_link_or_button 'Search'
-    within("#members"){ find(".icon-pencil").click }
-    select('Celebrity', :from => 'member[member_group_type_id]')
-
-    alert_ok_js
-    click_link_or_button 'Update Member'
-    
-    assert find_field('input_member_group_type').value == 'Celebrity'
-  end
-
   test "Update external id" do
     setup_member(false)
     @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
@@ -592,7 +521,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#td_mi_external_id"){ assert page.has_content?(@member_with_external_id.external_id) }
   end
 
-  test "change member gender from male to female" do
+  # change member gender from female to male
+  test "change member gender from male to female and then to male again." do
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
 
@@ -610,14 +540,8 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @saved_member.reload
     assert find_field('input_gender').value == ('Female')
     assert_equal @saved_member.gender, 'F'
-  end
 
-  test "change member gender from female to male" do
-    setup_member
-    @saved_member.gender = 'F'
-    @saved_member.save
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-
     assert find_field('input_gender').value == (@saved_member.gender == 'F' ? 'Female' : 'Male')
 
     click_link_or_button 'Edit'
@@ -626,11 +550,10 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     alert_ok_js
     click_link_or_button 'Update Member'
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-
     assert find_field('input_first_name').value == @saved_member.first_name
     @saved_member.reload
     assert find_field('input_gender').value == ('Male')
-    assert_equal @saved_member.gender, 'M'
+    assert_equal @saved_member.gender, 'M'  
   end
 
   test "Should not show destroy button on credit card when this one is the last one" do
@@ -700,43 +623,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     end
     assert page.has_content?("Credit Card #{second_credit_card.last_digits} was successfully destroyed")
   end
-  test "create a member billing enroll > 0" do
-    active_merchant_stubs
-    setup_member
-    bill_member(@saved_member, false)
-  end 
-
-  test "create a member billing enroll > 0 + refund" do
-    active_merchant_stubs
-    setup_member
-    bill_member(@saved_member, true)
-  end 
-
-  test "create a member billing enroll = 0 provisional_days = 0 installment amount > 0" do
-    active_merchant_stubs
-    setup_member(false, true)
-    bill_member(@saved_member, false)
-  end 
-
-  test "create a member + bill + check fultillment" do
-    active_merchant_stubs
-    setup_member(false)
-    @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-
-    unsaved_member =  FactoryGirl.build(:provisional_member_with_cc, :club_id => @club.id, :email => 'testing@withthisemail.com')
-    credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :enrollment_amount => 0.0)
-    @terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
-    create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_member = Member.find_by_email(unsaved_member.email)
-
-    @saved_member.send_fulfillment
-
-    bill_member(@saved_member, false)
-
-    within('.nav-tabs'){ click_on 'Fulfillments' }
-    within("#fulfillments"){ assert page.has_content?("KIT-CARD") }
-  end
 
   test "member save the sale full save" do
     active_merchant_stubs
@@ -750,296 +636,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table"){ assert page.has_content?("Full save done") }
   end
- 
-  test "uncontrolled refund more than transaction amount" do
-    active_merchant_stubs
-    setup_member
-    bill_member(@saved_member, false)
-    
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
-    fill_in 'refunded_amount', :with => "99999999"   
-      
-    click_on 'Refund'
-    assert page.has_content?("Cant credit more $ than the original transaction amount")
-  end
-
-  test "two uncontrolled refund more than transaction amount" do
-    active_merchant_stubs
-    setup_member
-    bill_member(@saved_member, true, (@terms_of_membership_with_gateway.installment_amount / 2))
-    
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
-    fill_in 'refund_amount', :with => ((@terms_of_membership_with_gateway.installment_amount / 2) + 1).to_s      
-    
-    assert_difference('Transaction.count', 0) do 
-      click_on 'Refund'
-    end
-    assert page.has_content?("Cant credit more $ than the original transaction amount")
-  end
-
-  test "partial refund - uncontrolled refund" do
-    active_merchant_stubs
-    setup_member
-    bill_member(@saved_member, true, (@terms_of_membership_with_gateway.installment_amount / 2))
-  end 
-
-  test "two partial refund - uncontrolled refund" do
-    active_merchant_stubs
-    setup_member
-    final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
-
-    bill_member(@saved_member, true, final_amount)
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
-    fill_in 'refunded_amount', :with => final_amount.to_s
-    assert_difference('Transaction.count') do 
-      click_on 'Refund'
-    end
-    
-    within(".nav-tabs"){ click_on("Operations") }
-    within("#operations_table") do 
-      assert page.has_content?("Communication 'Test refund' sent")
-      assert page.has_content?("Refund success $#{final_amount}")
-    end
-  end 
-
-  test "uncontrolled refund special characters" do
-    active_merchant_stubs
-    setup_member
-    bill_member(@saved_member, false)
-    
-    visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => Transaction.last.id)
-    fill_in 'refund_amount', :with => "&%$"
-    alert_ok_js
-    assert_difference('Transaction.count', 0) do 
-      click_on 'Refund'
-    end
-  end
-
-  test "Change member from Provisional (trial) status to Lapse (inactive) status" do
-    setup_member
-    @saved_member.set_as_canceled
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-   
-    within("#td_mi_next_retry_bill_date")do
-      assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date))
-    end
-  end
-
-  test "Change member from active status to lapse status" do
-    setup_member
-    @saved_member.set_as_active!
-    @saved_member.set_as_canceled
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-   
-    within("#td_mi_next_retry_bill_date"){ assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) }
-  end
-
-  test "Change member from Lapsed status to Provisional status" do
-    setup_member false, true
-    @saved_member.set_as_canceled
-    @tom_with_provisional_days = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :provisional_days => 5)
-
-    @saved_member.reload
-    @saved_member.recover(@tom_with_provisional_days)
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-    
-    @saved_member.reload 
-    next_bill_date = @saved_member.current_membership.join_date + (@tom_with_provisional_days.provisional_days).days
-    within("#table_membership_information") do
-      within("#td_mi_next_retry_bill_date") do
-        # TODO: I cant figure out why the nbd above is diff than the one set on the web site (same as member)
-        assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) 
-        assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date)) 
-      end
-    end
-  end
-  
-  test "Change Next Bill Date for blank" do
-    setup_member false, true
-    @saved_member.set_as_canceled
-    @saved_member.recover(@terms_of_membership_with_gateway)
-    @saved_member.set_as_active
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-    
-    click_link_or_button 'Change'
-    page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date'))
-
-    click_link_or_button 'Change next bill date'
-    assert page.has_content?(I18n.t('error_messages.next_bill_date_blank'))
-  end  
-
-  test "Change Next Bill Date for tomorrow" do
-    setup_member false, true
-    active_merchant_stubs
-    @saved_member.set_as_canceled
-    @saved_member.recover(@terms_of_membership_with_gateway)
-    @saved_member.set_as_active
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-   
-    assert find_field('input_first_name').value == @saved_member.first_name
-    
-    click_link_or_button 'Change'
-    page.has_content?(I18n.t('activerecord.attributes.member.next_retry_bill_date')) 
-    page.execute_script("window.jQuery('#next_bill_date').next().click()")
-    within("#ui-datepicker-div") do
-      if ((Time.zone.now+1.day).month != Time.zone.now.month)
-        within(".ui-datepicker-header"){ find(".ui-icon-circle-triangle-e").click }
-      end
-      click_on("#{(Time.zone.now+1.day).day}")
-    end
-    click_link_or_button 'Change next bill date'
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    
-    assert find_field('input_first_name').value == @saved_member.first_name
-    next_bill_date = Time.zone.now + 1.day
-    within("#td_mi_next_retry_bill_date"){ assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)) }
-  end  
-
-  test "Next Bill Date for monthly memberships" do
-    setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name 
-
-    next_bill_date = @saved_member.join_date + @terms_of_membership_with_gateway.installment_period.days
-
-    within("#td_mi_next_retry_bill_date")do
-      assert page.has_no_content?(I18n.l(@saved_member.current_membership.join_date+1.month, :format => :only_date)) 
-    end
-  end  
-
-  test "Successful payment." do
-    setup_member
-    @saved_member.current_membership.join_date = Time.zone.now-3.day
-    final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
-    bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-  end  
-
-  test "Provisional member" do
-    setup_member(false, true)
-
-    @saved_member.current_membership.join_date = Time.zone.now-3.day
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-    
-    within("#td_mi_status"){ assert page.has_content?("provisional") }
-
-    within(".nav-tabs"){ click_on("Operations") }
-    within("#operations_table")do
-      assert page.has_content?("Member enrolled successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
-    end
-  end 
-
-  test "Lapsed member" do
-    setup_member
-    @saved_member.set_as_canceled
-    @saved_member.current_membership.join_date = Time.zone.now-3.day
-    final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
-    answer = @saved_member.bill_membership
-    assert (answer[:code] == Settings.error_codes.member_status_dont_allow), answer[:message]
-  end 
-
-  test "Refund from CS" do
-    setup_member
-    @saved_member.current_membership.join_date = Time.zone.now-3.day
-    final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
-    bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-    
-    within(".nav-tabs"){ click_on("Transactions") }
-    within("#transactions_table_wrapper")do
-      assert page.has_selector?('#refund')
-      click_link_or_button("Refund")
-    end
-    fill_in 'refund_amount', :with => final_amount
-    click_link_or_button 'Refund'
-
-    page.has_content?("This transaction has been approved")
-
-    within(".nav-tabs"){ click_on("Operations") }
-    within("#operations_table")do
-      assert page.has_content?("Refund success $#{final_amount.to_f}")
-      assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
-    end
-  end 
-
-  test "Partial refund from CS" do
-    setup_member
-    active_merchant_stubs
-    @saved_member.current_membership.join_date = Time.zone.now-3.day
-    final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
-    bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-    within(".nav-tabs"){ click_on("Transactions") }
-    within("#transactions_table_wrapper")do
-      assert page.has_selector?('#refund')
-      click_link_or_button("Refund")
-    end
-    fill_in 'refund_amount', :with => final_amount
-    click_link_or_button 'Refund'
-
-    page.has_content?("This transaction has been approved")
-
-    within(".nav-tabs"){ click_on("Operations") }
-    within("#operations_table")do
-    assert page.has_content?("Refund success $#{final_amount.to_f}")
-    assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
-    end
-  end 
-
-  test "Refund a transaction with error" do
-    setup_member
-    active_merchant_stubs(999, message = "Error on transaccion", false)
-    @terms_of_membership_with_gateway.update_attribute(:installment_amount, 45.56)
-    @saved_member.active_credit_card.update_attribute(:number,'0000000000000000')
-
-
-    @saved_member.bill_membership
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-    
-    within(".nav-tabs"){ click_on("Transactions") }
-    within("#transactions_table"){ assert page.has_no_selector?('#refund') }
-  end
-
-  test "Billing membership amount on the Next Bill Date" do
-    active_merchant_stubs
-    setup_member
-    @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
-
-    next_bill_date = @saved_member.current_membership.join_date + @terms_of_membership_with_gateway.installment_period.days
-    next_bill_date_after_billing = @saved_member.bill_date + @terms_of_membership_with_gateway.installment_period.days
-
-    Member.bill_all_members_up_today
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-
-    within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(next_bill_date_after_billing, :format => :only_date)) }
-
-    within(".nav-tabs"){ click_on("Operations") }
-    within("#operations") do
-      assert page.has_selector?("#operations_table")
-      assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}") 
-    end
-
-    within('.nav-tabs'){ click_on 'Transactions' }
-    within("#transactions") do 
-      assert page.has_selector?("#transactions_table")
-      assert page.has_content?("Sale : This transaction has been approved")
-      assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
-    end
-
-    within("#transactions_table"){ assert page.has_selector?('#refund') }
-  end 
 
   test "See operations on CS" do
     setup_member(false, true)
@@ -1072,33 +668,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       assert page.has_content?("Full save done")
     end
   end 
-
-  test "Send Prebill email (7 days before NBD)" do
-    setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name 
-    @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now+7.day)
-    @saved_member.update_attribute(:bill_date, Time.zone.now+7.day)
-
-    Member.send_prebill
-
-    sleep 2 #Wait untill script finish.
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-
-    assert find_field('input_first_name').value == @saved_member.first_name
-
-    within(".nav-tabs"){ click_on 'Communications' }
-    within("#communication") do
-      assert page.has_content?("Test prebill")
-      assert page.has_content?("prebill")
-      assert_equal(Communication.last.template_type, 'prebill')
-    end
-   
-    within(".nav-tabs"){ click_on 'Operations' }
-    within("#operations_table") do
-      assert page.has_content?("Communication 'Test prebill' sent")
-    end
-  end
 
  test "Sorting transaction table" do
     setup_member
