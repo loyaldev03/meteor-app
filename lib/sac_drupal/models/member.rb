@@ -39,7 +39,7 @@ module Drupal
     end
 
     def destroy!
-      res = conn.delete('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }) unless self.member.new_record?
+      res = conn.post('/api/user/%{drupal_id}/cancel' % { drupal_id: self.member.api_id }) unless self.member.new_record?
     rescue Faraday::Error::ParsingError # Drupal sends invalid application/json
       Drupal.logger.info "  => #{$!.to_s}"
     ensure

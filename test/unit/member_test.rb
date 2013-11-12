@@ -18,7 +18,7 @@ class MemberTest < ActiveSupport::TestCase
     assert !member.save, member.errors.inspect
     member.club = @terms_of_membership_with_gateway.club
     Delayed::Worker.delay_jobs = true
-    assert_difference('Delayed::Job.count', 2, 'should ceate job for #desnormalize_preferences and mkt tool sync') do
+    assert_difference('Delayed::Job.count', 3, 'should ceate job for #desnormalize_preferences and mkt tool sync') do
       assert member.save, "member cant be save #{member.errors.inspect}"
     end
     Delayed::Worker.delay_jobs = false
@@ -248,15 +248,14 @@ class MemberTest < ActiveSupport::TestCase
     saved_member.current_membership.join_date = "Wed, 03 May 2012 13:10:51 UTC 00:00"
     saved_member.next_retry_bill_date = "Wed, 03 May 2012 00:10:51 UTC 00:00"
     Time.zone = "Eastern Time (US & Canada)"
-    assert_equal I18n.l(Time.zone.at(saved_member.member_since_date)), "05/02/2012"
-    assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date)), "05/02/2012"
-    assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "05/03/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.member_since_date.to_i)), "05/02/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date.to_i)), "05/02/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date.to_i)), "05/03/2012"
     Time.zone = "Ekaterinburg"
-    assert_equal I18n.l(Time.zone.at(saved_member.member_since_date)), "05/03/2012"
-    assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date)), "05/03/2012"
-    assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date)), "05/03/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.member_since_date.to_i)), "05/03/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.next_retry_bill_date.to_i)), "05/03/2012"
+    assert_equal I18n.l(Time.zone.at(saved_member.current_membership.join_date.to_i)), "05/03/2012"
   end
-
 
   test "Recycle credit card with billing success" do
     @club = @wordpress_terms_of_membership.club
@@ -361,7 +360,9 @@ class MemberTest < ActiveSupport::TestCase
     next_bill_date = @saved_member.bill_date + @terms_of_membership_with_gateway.installment_period.days
 
     Timecop.freeze( @saved_member.next_retry_bill_date ) do
+      Time.zone = "UTC"
       Member.bill_all_members_up_today
+      Time.zone = @club.time_zone
       @saved_member.reload
 
       assert_equal(@saved_member.current_membership.status, "active")
@@ -397,13 +398,15 @@ class MemberTest < ActiveSupport::TestCase
     @saved_member.manual_payment =true
     @saved_member.bill_date = Time.zone.now-1.day
     @saved_member.save
+    Time.zone = 'UTC'
     assert_difference("Operation.count",3) do
       Member.cancel_all_member_up_today
     end
+    Time.zone = @club.time_zone
     @saved_member.reload
     assert_equal @saved_member.status, "lapsed"
     assert_nil @saved_member.next_retry_bill_date
-    assert @saved_member.cancel_date > @saved_member.join_date
+    assert @saved_member.cancel_date.utc > @saved_member.join_date.utc, "#{@saved_member.cancel_date.utc} Not > #{@saved_member.join_date.utc}"
     assert Operation.find_by_operation_type(Settings.operation_types.bill_overdue_cancel)
   end 
 
@@ -421,5 +424,57 @@ class MemberTest < ActiveSupport::TestCase
       member.update_attribute :email, wrong_email
       assert !member.valid?, "Member with email #{member.email} is valid when it should not be."
     end   
-  end 
+  end
+
+  ##################################################
+  # => PREBILL
+  ##################################################
+
+  test "Send Prebill email (7 days before NBD)" do
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)    
+
+    excecute_like_server(@club.time_zone) do 
+      Timecop.travel(member.next_retry_bill_date-7.days) do
+        assert_difference("Operation.count") do
+         assert_difference("Communication.count") do
+            Member.send_prebill
+          end
+        end
+      end
+    end 
+    member.reload
+    assert_equal member.communications.last.template_name, "Test prebill"
+  end
+
+  test "Do not Send Prebill email (7 days before NBD) when member's installment_amount is 0" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_amount => 0)
+    member = create_active_member(@terms_of_membership, :provisional_member_with_cc)
+    
+    excecute_like_server(@club.time_zone) do 
+      Timecop.travel(member.next_retry_bill_date-7.days) do
+        assert_difference("Operation.count",0) do
+          assert_difference("Communication.count",0) do
+            Member.send_prebill
+          end
+        end
+      end
+    end
+    Time.zone = @club.time_zone
+  end
+
+  test "Do not Send Prebill email (7 days before NBD) when member's recycled_times is not 0" do
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)    
+    member.update_attribute :recycled_times, 1
+    
+    excecute_like_server(@club.time_zone) do 
+      Timecop.travel(member.next_retry_bill_date-7.days) do
+        assert_difference("Operation.count",0) do
+          assert_difference("Communication.count",0) do
+            Member.send_prebill
+          end
+        end
+      end
+    end
+  end
+
 end

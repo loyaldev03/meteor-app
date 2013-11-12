@@ -131,16 +131,26 @@ en:
     drupal_error_sync: "Unable to add club cash. There was a synchronization error, while requesting this." 
     club_cash_not_supported: "Club cash is not supported for this club."
     unable_to_perform_due_member_status: "Unable to perfom this action. The member is not in the right status to perform this."
+    not_expecting_billing: "Unable to perfom this action. The member is not expected to get billed."
     airbrake_error_message: "Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience."
     birth_date_is_invalid: "is invalid, it must be null or greater than '1900-01-01'"
+    payment_gateway_time_out: "Time out trying to connect with the payment gateway."
+    transaction_gateway_differs_from_current: "Transaction does not have the same active gateway."
+    credit_card_gateway_differs_from_current: "Credit card does not have the same active gateway."
   activerecord:
+    errors:
+      models:
+        terms_of_membership:
+          attributes:
+            base:
+              club_payment_gateway_configuration: 'Payment Gateway Configuration is not configured within the club'
     model:
       members: 'Members'
       products: 'Products'
       fulfillments: 'Fulfillments'
       fulfillment_files: 'Fulfillment Files'
       disposition_types: 'Disposition Types'
-      subscriptions_plans: 'Subscriptions Plans'
+      subscription_plans: 'Subscription Plans'
     member: 'Member'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
@@ -279,6 +289,10 @@ en:
           unsynced: Not Synced
           error: Sync Error
         is_lapsed: 'Member was canceled.'
+        billing_is_not_expected: 'Billing is not expected.'
+      enrollment_info:
+        kit_card_product_sku: KIT-CARD
+        product_sku: Product
       membership:
         id: 'ID'
         status: 'Status'
@@ -318,10 +332,8 @@ en:
         installment_type: 'Installment type'
         grace_period: 'Grace period'
         provisional_days: 'Provisional days'
-        has_payment_gateway_development: 'The club has payment gateway configuration for development mode'
-        has_payment_gateway_production: 'The club has payment gateway configuration for production mode'
-        not_have_payment_gateway_development: 'The club does not have payment gateway configuration for development mode'
-        not_have_payment_gateway_production: 'The club does not have payment gateway configuration for production mode'
+        has_payment_gateway: 'The club has payment gateway configuration'
+        not_have_payment_gateway: 'The club does not have payment gateway configuration'
         id: 'ID'
         plan_name: 'Plan Name'
         external_code: 'External Code'

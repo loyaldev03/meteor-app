@@ -51,6 +51,7 @@ class MembersBillTest < ActionController::IntegrationTest
       within("#operations_table")do
         assert page.has_content?("Communication 'Test refund' sent")
         assert page.has_content?("Refund success $#{amount.to_f}")
+        assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
       end
     end
   end
@@ -74,7 +75,6 @@ class MembersBillTest < ActionController::IntegrationTest
     click_link_or_button 'Change next bill date'
   end
 
-
   ############################################################
   # TEST
   ############################################################
@@ -82,7 +82,7 @@ class MembersBillTest < ActionController::IntegrationTest
   test "Change Next Bill Date" do
     setup_member(nil,true)
     bill_member(@saved_member,false,nil,false)
-    next_bill_date = Time.zone.now+1.day
+    next_bill_date = Time.zone.now.to_date + 1.day
     change_next_bill_date(next_bill_date)
     assert page.has_content?("Next bill date changed to #{next_bill_date.to_date}")
   end
@@ -151,23 +151,6 @@ class MembersBillTest < ActionController::IntegrationTest
     bill_member(@saved_member, false)
   end 
 
-  # Does not work. We have to check fulfillment first. 
-  # test "create a member + bill + check fultillment" do
-  #   active_merchant_stubs
-  #   setup_member
-  #   @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-  #   @saved_member.current_membership.enrollment_info.update_attribute(:product_sku, "kit-kard")
-  #   @saved_member.send_fulfillment
-
-  #   bill_member(@saved_member, false)
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments") do 
-  #     assert page.has_content?("kit-kard")
-  #   end
-  # end
- 
   test "uncontrolled refund more than transaction amount" do
     active_merchant_stubs
     setup_member
@@ -226,7 +209,7 @@ class MembersBillTest < ActionController::IntegrationTest
     end
   end
 
-  test "Change member from active status to lapse status" do
+  test "Change member from active status to lapsed status" do
     setup_member
     @saved_member.set_as_active!
     @saved_member.set_as_canceled
@@ -238,7 +221,7 @@ class MembersBillTest < ActionController::IntegrationTest
     end
   end
 
-  test "Change member from Lapse status to Provisional statuss" do
+  test "Change member from Lapse status to Provisional status" do
     setup_member
     @saved_member.set_as_canceled
     @saved_member.recover(@terms_of_membership_with_gateway)
@@ -336,9 +319,7 @@ class MembersBillTest < ActionController::IntegrationTest
       assert page.has_content?("provisional")
     end
 
-    within(".nav-tabs") do
-      click_on("Operations")
-    end
+    within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
       assert page.has_content?("Member enrolled successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-")
     end
@@ -360,12 +341,8 @@ class MembersBillTest < ActionController::IntegrationTest
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
-    within(".nav-tabs") do
-      click_on("Transactions")
-    end
-    within("#transactions_table_wrapper")do
-      assert page.has_selector?('#refund')
-    end    
+    within(".nav-tabs"){ click_on("Transactions") }
+    within("#transactions_table_wrapper"){ assert page.has_selector?('#refund') }
     make_a_refund(Transaction.last, final_amount)
   end 
 
@@ -376,14 +353,17 @@ class MembersBillTest < ActionController::IntegrationTest
     bill_member(@saved_member, false, final_amount)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
-    within(".nav-tabs") do
-      click_on("Transactions")
-    end
+    within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table_wrapper")do
       assert page.has_selector?('#refund')
     end
     make_a_refund(Transaction.last, final_amount)
     page.has_content?("This transaction has been approved")
+    within(".nav-tabs"){ click_on("Operations") }
+    within("#operations_table")do
+      assert page.has_content?("Refund success $#{final_amount.to_f}")
+      assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
+    end
   end 
 
   test "Billing membership amount on the Next Bill Date" do
@@ -406,119 +386,14 @@ class MembersBillTest < ActionController::IntegrationTest
     end
   end 
 
-  test "See operations on CS" do
-    setup_member
-    @saved_member.current_membership.join_date = Time.zone.now-3.day
-    final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
-    bill_member(@saved_member, false, final_amount)
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-
-    within(".nav-tabs"){ click_on("Transactions") }
-    within("#transactions_table_wrapper")do
-      assert page.has_selector?('#refund')
-    end
-    make_a_refund(Transaction.last, final_amount, true)
-    visit member_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    click_on 'Full save'
-    assert page.has_content?("Full save done")
-
-    within(".nav-tabs"){ click_on("Operations") }
-    within("#operations_table")do
-      assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
-      assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-")
-      assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
-      assert page.has_content?("Refund success $#{final_amount.to_f}")
-      assert page.has_content?("Full save done")
-    end
-  end 
-
-  test "Send Prebill email (7 days before NBD)" do
-    setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-    @saved_member.next_retry_bill_date = Time.zone.now.utc+7.day
-    @saved_member.bill_date = Time.zone.now.utc+7.day
-    @saved_member.save(:validate => false)
-    Member.send_prebill
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-
-    within('.nav-tabs'){ click_on 'Communications' }
-    within("#communication") do
-      assert page.has_content?("prebill")
-      assert_equal(Communication.last.template_type, 'prebill')
-    end
-   
-    within('.nav-tabs'){click_on 'Operations'}
-    within("#operations_table") do
-      assert page.has_content?("Communication 'Test prebill' sent")
-    end
-  end
-
-  test "Do not Send Prebill email (7 days before NBD) when member's installment_amount is 0" do
-    setup_member(0,false)
-    @terms_of_membership_with_gateway.update_attribute :installment_amount, 0.0
-    unsaved_member = FactoryGirl.build(:member_with_cc, :club_id => @club.id)
-    @saved_member = create_member(unsaved_member)
-
-    @saved_member.next_retry_bill_date = @saved_member.join_date+7.day
-    @saved_member.bill_date = @saved_member.join_date+7.day
-    @saved_member.save(:validate => false)
-    Member.send_prebill
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-
-    within('.nav-tabs'){ click_on 'Communications'}
-    within("#communication") do 
-      assert page.has_no_content?("prebill")
-    end
-    within('.nav-tabs'){ click_on 'Operations' }
-    within("#operations_table") do
-      assert page.has_no_content?("Communication 'Test prebill' sent")
-    end
-  end
-
-  test "Do not Send Prebill email (7 days before NBD) when member's recycled_times is not 0" do
-    setup_member
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name   
-    @saved_member.recycled_times = 1
-    @saved_member.next_retry_bill_date = Time.zone.now.utc+7.day
-    @saved_member.bill_date = Time.zone.now.utc+7.day
-    @saved_member.save(:validate => false)
-    @saved_member.save
-    
-    Member.send_prebill
-
-    sleep 2 #waiting for the email to be sent. 
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    assert find_field('input_first_name').value == @saved_member.first_name
-
-    within('.nav-tabs'){ click_on 'Communications' }
-    within("#communication") do 
-      assert page.has_no_content?("prebill")
-    end
-    within('.nav-tabs'){ click_on 'Operations' }
-    within("#operations_table") do
-      assert page.has_no_content?("Communication 'Test prebill' sent")
-    end
-  end
-
-  test "representative should be able to refund" do
+  # supervisor should be able to refund
+  test "Representative and Supervisor should be able to refund" do
     active_merchant_stubs
     setup_member
-    @admin_agent.update_attribute(:roles, ["representative"])
-    bill_member(@saved_member, true)
-  end 
-
-  test "supervisor should be able to refund" do
-    active_merchant_stubs
-    setup_member
-    @admin_agent.update_attribute(:roles, ["supervisor"])
-    bill_member(@saved_member, true)
+    ["representative", "supervisor"].each do |role|
+      @admin_agent.update_attribute(:roles, [role])
+      bill_member(@saved_member, true)
+    end
   end 
 
   test "Hard decline for user without CC information when the billing date arrives" do
@@ -578,14 +453,14 @@ class MembersBillTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
-    assert page.has_content?("Amount and description cannot be blank.")
+    assert page.has_content?("Amount, description and type cannot be blank.")
     fill_in('amount', :with => '100')
     click_link_or_button (I18n.t('buttons.no_recurrent_billing'))
-    assert page.has_content?("Amount and description cannot be blank.")
+    assert page.has_content?("Amount, description and type cannot be blank.")
     fill_in('amount', :with => '')
     fill_in('description', :with => 'asd')
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
-    assert page.has_content?("Amount and description cannot be blank.")
+    assert page.has_content?("Amount, description and type cannot be blank.")
   end
 
   test "Try billing a member without providing the amount and/or description." do

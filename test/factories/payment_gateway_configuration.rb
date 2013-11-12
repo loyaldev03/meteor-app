@@ -4,7 +4,6 @@ FactoryGirl.define do
     login "94100010879200000001"
     merchant_key "SAC, Inc"
     password "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU"
-    mode "development"
     gateway "mes"
     report_group "SAC_STAGING_TEST"
   end
@@ -13,7 +12,6 @@ FactoryGirl.define do
     login "litle"
     merchant_key "SAC, Inc"
     password "a"
-    mode "development"
     gateway "litle"
     report_group "SAC_STAGING_TEST"
   end
@@ -22,7 +20,6 @@ FactoryGirl.define do
     login  "7g6zBUa54"
     merchant_key "SAC, Inc"
     password "7RkC6yG74etY545X"
-    mode "development"
     gateway "authorize_net"
     report_group "SAC_STAGING_TEST"
   end

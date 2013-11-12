@@ -277,12 +277,12 @@ class MembersClubCashTest < ActionController::IntegrationTest
     @saved_member.reload
     @saved_member.current_membership.update_attribute :join_date, Time.zone.now-12.months
     @saved_member.bill_membership 
-    assert_equal(@saved_member.club_cash_amount, 200 )
+    assert_equal(@saved_member.club_cash_amount, @saved_member.terms_of_membership.club_cash_installment_amount )
     @saved_member.reload
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_membership_information")do
       within("#td_mi_club_cash_amount")do
-        assert page.has_content?('200.0')
+        assert page.has_content?(@saved_member.terms_of_membership.club_cash_installment_amount.to_s)
       end
       within("#td_mi_club_cash_expire_date")do
         assert page.has_content?(I18n.l(@saved_member.club_cash_expire_date, :format => :only_date))

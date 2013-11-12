@@ -99,7 +99,7 @@ group :test do
   gem 'faker'
   gem 'mocha', require: false
   gem 'capybara'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '~> 2.35.1'
   gem 'brakeman'
   gem 'simplecov'
   gem 'database_cleaner'
@@ -113,4 +113,6 @@ gem 'LitleOnline'
 ### only for Auth.Net  without tokenization.
 gem 'encryptor'
 ###################
+
+gem 'bureaucrat', :github => 'vsizov/bureaucrat'
 

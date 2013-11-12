@@ -544,4 +544,38 @@ class Api::MembersController < ApplicationController
     Auditory.report_issue("API::TermsOfMembership::change", e, { :params => params.inspect })
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
+
+  ##
+  # Charge a non-recurrent amount to a member. This could be either a "donation" or an "one-time" only amount.
+  #
+  # @resource /api/v1/members/:id/sale
+  # @action POST
+  #
+  # @required [Float] amount Amount to charge the member.
+  # @required [String] description Description of why the member is being charged.
+  # @required [String] type Type of the operation. It could be either "donation" or "one-time".
+  #
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [String] code Code related to the method result.
+  #
+  # @example_request
+  #   curl -v -k -X POST -d "api_key=YUiVENNdFbNpRiYFd83Q&amount=10&description=paid related to product&type=one-time" https://dev.stoneacrehq.com:3000/api/v1/members/3/sale
+  # @example_request_description Example of valid request. 
+  #
+  # @example_response
+  #   {"message":"Member billed successfully $10 Transaction id: 6043044a-1185-4323-aa46-64cd4941d511. Reason: paid related to product","code":"000"}
+  # @example_response_description Example response to a valid request.
+  #
+  def sale
+    member = Member.find(params[:id])
+    my_authorize! :api_sale, Member, member.club_id
+    render json: member.no_recurrent_billing(params[:amount], params[:description], params[:type])
+  rescue ActiveRecord::RecordNotFound => e 
+    if e.to_s.include? "TermsOfMembership"
+      message = "Terms of membership not found"
+    elsif e.to_s.include? "Member"
+      message = "Member not found"
+    end
+    render json: { :message => message, :code => Settings.error_codes.not_found }
+  end
 end

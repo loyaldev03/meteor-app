@@ -47,6 +47,9 @@ class CreditCardsController < ApplicationController
         new_credit_card.set_as_active!
         @current_member.api_member.save!(force: true) rescue nil
         redirect_to show_member_path, notice: "Credit card #{new_credit_card.last_digits} activated."
+      rescue CreditCardDifferentGatewaysException
+        flash[:error] = t('error_messages.credit_card_gateway_differs_from_current')
+        redirect_to show_member_path
       rescue Exception => e
         Auditory.report_issue("CreditCardsController::activate", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :params => params.inspect, :member => @current_member.inspect })
         flash[:error] = t('error_messages.airbrake_error_message')

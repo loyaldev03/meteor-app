@@ -82,6 +82,10 @@ class Club < ActiveRecord::Base
     ].none?(&:blank?)
   end
 
+  def payment_gateway_configuration
+    payment_gateway_configurations.first
+  end
+
   # Improvements #25771 - Club cash transactions will be managed by Drupal User Points plugin. 
   def is_not_drupal?
     api_type != 'Drupal::Member'

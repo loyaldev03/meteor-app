@@ -1,5 +1,5 @@
 class TermsOfMembership < ActiveRecord::Base
-  attr_accessible :mode, :needs_enrollment_approval, :provisional_days, 
+  attr_accessible :needs_enrollment_approval, :provisional_days, 
     :installment_amount, :description, :installment_type, :club, :name, :initial_club_cash_amount, 
     :club_cash_installment_amount, :skip_first_club_cash
 
@@ -7,7 +7,7 @@ class TermsOfMembership < ActiveRecord::Base
   has_many :transactions
   has_many :memberships
   has_many :prospects
-  has_many :email_templates
+  has_many :email_templates, :dependent => :destroy
   belongs_to :downgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'downgrade_tom_id'
   belongs_to :upgrade_tom, :class_name => 'TermsOfMembership', :foreign_key => 'upgrade_tom_id'
   belongs_to :agent
@@ -16,22 +16,22 @@ class TermsOfMembership < ActiveRecord::Base
 
   after_create :setup_default_email_templates
 
-  validates :name, :presence => true
-  validates :mode, :presence => true
+  validates :name, :presence => true, :uniqueness => { :scope => :club_id }
   #validates :needs_enrollment_approval, :presence => true
   validates :club, :presence => true
-  validates :provisional_days, :presence => true
-  # validates :installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
-  # validates :installment_period, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :installment_period, :numericality => { :greater_than_or_equal_to => 1 }, if: Proc.new{ |tom| tom.is_payment_expected }
+  validates :provisional_days, :presence => true, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :installment_amount, :numericality => { :greater_than_or_equal_to => 0 }, if: Proc.new{ |tom| tom.is_payment_expected }
   validates :installment_type, :presence => true
   validates :initial_club_cash_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validates :club_cash_installment_amount, :numericality => { :greater_than_or_equal_to => 0 }
   # validates :initial_fee, :numericality => { :greater_than_or_equal_to => 0 }
-  validates :trial_period_amount, :numericality => { :greater_than_or_equal_to => 0 }
-  validates :is_payment_expected, :presence => true
+  # validates :trial_period_amount, :numericality => { :greater_than_or_equal_to => 0 }
+  validates :is_payment_expected, :inclusion => { :in => [true, false] } 
   validates :subscription_limits, :numericality => { :greater_than_or_equal_to => 0 }
   validates :if_cannot_bill, :presence => true
   validates :downgrade_tom_id, :presence => true, if: Proc.new { |tom| tom.downgradable? }
+  validates :upgrade_tom_period, :presence => true, :numericality => { :greater_than_or_equal_to => 1 }, if: Proc.new{ |tom| tom.upgradable? }
 
   validate :validate_payment_gateway_configuration
 
@@ -40,16 +40,8 @@ class TermsOfMembership < ActiveRecord::Base
 
   ###########################################
   
-  def production?
-    self.mode == 'production'
-  end
-
-  def development?
-    self.mode == 'development'
-  end
-
   def payment_gateway_configuration
-    club.payment_gateway_configurations.find_by_mode(mode)
+    club.payment_gateway_configurations.first
   end
   
   def downgradable?
@@ -58,6 +50,10 @@ class TermsOfMembership < ActiveRecord::Base
 
   def suspendable?
     self.if_cannot_bill == 'suspend'
+  end
+
+  def upgradable?
+    !self.upgrade_tom_id.nil?
   end
 
   def cancelable?
@@ -79,7 +75,7 @@ class TermsOfMembership < ActiveRecord::Base
     end
 
     def setup_default_email_templates
-      if development?
+      unless Rails.env.production?
         EmailTemplate::TEMPLATE_TYPES.each do |type|
           if type!=:rejection or (type==:rejection and self.needs_enrollment_approval)
             et = EmailTemplate.new 

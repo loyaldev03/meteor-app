@@ -48,6 +48,9 @@ defaults: &defaults
     membership_manual_check_billing: 119
     membership_billing_with_error: 120
     manual_billing_with_error: 121
+    no_reccurent_billing_donation: 122
+    no_recurrent_billing_donation_with_error: 123
+    credit_error_gateway_differs_from_current: 124
     #profile
     cancel: 200 
     future_cancel: 201
@@ -94,6 +97,7 @@ defaults: &defaults
     save_the_sale_through_api: 243
     bill_overdue_cancel: 244
     remote_club_cash_transaction_failed: 245
+    tom_upgrade: 246
     #communication
     active_email: 300     
     prebill_email: 301    
@@ -199,7 +203,10 @@ defaults: &defaults
     credit_card_in_use: '9507'
     credit_card_blacklisted: '9508'
     credit_card_blank: '9509'
+    credit_card_gateway_differs_from_current: '9510'
+    member_not_expecting_billing: '9787'
     refund_invalid: '9788'
+    transaction_gateway_differs_from_current: '9786'
     manual_billing_with_less_amount_than_permitted: '9880'
     manual_billing_error: '9881'
     membership_billing_error: '9882' 
@@ -227,6 +234,8 @@ defaults: &defaults
     fulfillment_reason_blank: '9802'
     fulfillment_is_renwed: '9803'
     operation_not_saved: '9900'
+    payment_gateway_time_out: '9901'
+    payment_gateway_error: '9900'
   fulfillment_products:
     all: All
     kit_card: Kit - Card

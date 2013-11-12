@@ -38,7 +38,7 @@ class AuthorizeNetTransaction < Transaction
     end
 
     def load_gateway(recurrent = false)
-      @login_data = { :login => login, :password => password, :test => !production? }
+      @login_data = { :login => login, :password => password, :test => !Rails.env.production? }
       @gateway = ActiveMerchant::Billing::AuthorizeNetGateway.new @login_data
       @options[:card_number] = credit_card_token.number
     end

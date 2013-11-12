@@ -71,7 +71,11 @@ class CreditCard < ActiveRecord::Base
   end
 
   def can_be_activated?
-    not self.active and not self.member.lapsed? and not self.blacklisted
+    not self.active and not self.member.lapsed? and not self.blacklisted and is_same_gateway_as_current_tom?
+  end
+
+  def is_same_gateway_as_current_tom?
+    self.member.club.payment_gateway_configuration.gateway == self.gateway
   end
 
   def self.am_card(number, expire_month, expire_year, first_name, last_name)
@@ -90,9 +94,13 @@ class CreditCard < ActiveRecord::Base
   end
 
   def set_as_active!
-    self.member.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
-    self.update_attribute :active , true
-    Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member, Settings.operation_types.credit_card_activated)
+    if is_same_gateway_as_current_tom?
+      self.member.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
+      self.update_attribute :active , true
+      Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member, Settings.operation_types.credit_card_activated)
+    else
+      raise CreditCardDifferentGatewaysException.new(:message => "Different Gateway")
+    end
   end
 
   def get_token(pgc, pmember, allow_cc_blank = false)
@@ -155,7 +163,7 @@ class CreditCard < ActiveRecord::Base
   def update_expire(year, month, current_agent = nil)
     if year.to_i == expire_year.to_i and month.to_i == expire_month.to_i
       { :code => Settings.error_codes.success, :message => "New expiration date its identically than the one we have in database." }
-    elsif Time.new(year, month, nil, nil, nil, nil, self.member.get_offset_related) >= Time.now.in_time_zone(self.member.club.time_zone).beginning_of_month
+    elsif Time.new(year, month, nil, nil, nil, nil, self.member.get_offset_related) >= Time.now.in_time_zone(self.member.get_club_timezone).beginning_of_month
       message = "Changed credit card XXXX-XXXX-XXXX-#{last_digits} from #{expire_month}/#{expire_year} to #{month}/#{year}"
       update_attributes(:expire_month => month, :expire_year => year)
       Auditory.audit(current_agent, self, message, self.member, Settings.operation_types.credit_card_updated)

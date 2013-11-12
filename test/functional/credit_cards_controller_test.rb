@@ -120,10 +120,8 @@ class CreditCardsControllerTest < ActionController::TestCase
     assert_equal(@saved_member.active_credit_card.expire_month, @credit_card.expire_month)
   end
 
-
   test "Should activate old credit when it is already created, if it is not expired and dates have changed" do
     sign_in @admin_user
-
     @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @saved_member.id
     cc_number = @credit_card.number
     cc_token = @credit_card.token
@@ -142,7 +140,6 @@ class CreditCardsControllerTest < ActionController::TestCase
     assert_equal(@saved_member.active_credit_card.number, nil)
     assert_equal(@saved_member.active_credit_card.token, cc_token)
   end
-
 
   test "Should activate old credit when it is already created, if it is not expired" do
     sign_in @admin_user
@@ -227,5 +224,19 @@ class CreditCardsControllerTest < ActionController::TestCase
     assert_equal(@saved_member.active_credit_card.number, nil)
     assert_equal(@saved_member.active_credit_card.token, cc_token)
     assert_not_equal(@saved_member.active_credit_card.expire_year, @credit_card.expire_year)
+  end
+
+  test "Should not activate credit card if it's gateway is different than current terms of membership gateway" do
+    sign_in @admin_user
+    # @saved_member.active_credit_card.update_attribute :gateway, "mes"
+    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:member_id => @saved_member.id, :gateway => "litle"
+    active_merchant_stubs_store(@credit_card.number)
+
+    assert_difference('Operation.count',0) do
+      assert_difference('CreditCard.count',0) do
+        generate_post_message
+      end
+    end
+    assert_response :redirect
   end
 end

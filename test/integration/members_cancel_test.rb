@@ -36,7 +36,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:blank_credit_card)
     @unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     @terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
-    @terms_of_membership_with_gateway.update_attribute(:downgrade_tom_id, @terms_of_membership_with_gateway_to_downgrade.id)
+    @terms_of_membership_with_gateway.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => @terms_of_membership_with_gateway_to_downgrade.id)
     @saved_member = create_member(@unsaved_member, credit_card, @terms_of_membership_with_gateway.name, true)
     
     active_merchant_stubs_process(@hd_decline.response_code, @hd_decline.notes)
@@ -91,7 +91,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     @unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     @terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
-    @terms_of_membership_with_gateway.update_attribute(:downgrade_tom_id, @terms_of_membership_with_gateway_to_downgrade.id)
+    @terms_of_membership_with_gateway.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => @terms_of_membership_with_gateway_to_downgrade.id)
     @saved_member = create_member(@unsaved_member, credit_card, @terms_of_membership_with_gateway.name, false)
     
     active_merchant_stubs_process(@sd_decline.response_code, @sd_decline.notes)

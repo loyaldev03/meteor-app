@@ -4,8 +4,10 @@ namespace :fulfillments do
     begin
       Rails.logger = Logger.new("#{Rails.root}/log/fulfillment_naamma_report.log")
       Rails.logger.level = Logger::DEBUG
-      tall = Time.zone.now
+      ActiveRecord::Base.logger = Rails.logger
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
+
+      tall = Time.zone.now
 
       fulfillment_file = FulfillmentFile.new 
       fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
@@ -64,7 +66,7 @@ namespace :fulfillments do
       temp.close 
       temp.unlink
 
-      fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
+      fulfillment_file.mark_fulfillments_as_in_process
       fulfillment_file.processed
     
     rescue Exception => e
@@ -84,6 +86,7 @@ namespace :fulfillments do
 
       Rails.logger = Logger.new("#{Rails.root}/log/sloop_naamma_report.log")
       Rails.logger.level = Logger::DEBUG
+      ActiveRecord::Base.logger = Rails.logger
       tall = Time.zone.now
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
 
@@ -143,7 +146,7 @@ namespace :fulfillments do
           ftp.chdir(folder)
         end
         ftp.putbinaryfile(temp_file, File.basename(temp_file))
-        fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
+        fulfillment_file.mark_fulfillments_as_in_process
         fulfillment_file.processed
       rescue Exception => e
         Auditory.report_issue('NaammaSloopReport:create', e, { :fulfillment_file => fulfillment_file.inspect })
@@ -167,6 +170,7 @@ namespace :fulfillments do
       require 'csv'
       Rails.logger = Logger.new("#{Rails.root}/log/nfla_report.log")
       Rails.logger.level = Logger::DEBUG
+      ActiveRecord::Base.logger = Rails.logger
       tall = Time.zone.now
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
 
@@ -247,7 +251,7 @@ namespace :fulfillments do
       temp.close 
       temp.unlink
 
-      fulfillment_file.fulfillments.each { |x| x.set_as_in_process }
+      fulfillment_file.mark_fulfillments_as_in_process
       fulfillment_file.processed
 
     rescue Exception => e

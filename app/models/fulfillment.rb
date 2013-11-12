@@ -60,23 +60,25 @@ class Fulfillment < ActiveRecord::Base
     event :set_as_canceled do
       transition all => :canceled
     end
-    #First status. fulfillment is waiting to be processed.
+    #First status. fulfillment is waiting to be processed. Stock will be decreased by one.
     state :not_processed
-    #This status will be automatically set after the new fulfillment list is downloaded. Only if magento 
-    #has stock. Stock will be decreased in one.
+    #This status will be automatically set after the new fulfillment list is downloaded.
     state :in_process
     #Used due to some type of error
     state :on_hold
-    #Manually set through CS, by selecting all or some fulfillments in in_process status.
+    #Manually set through CS, by selecting all or some fulfillments in in_process status. Also, when we 
+    #mark as sent a fulfillment file, we set every fulfillment related to it as sent.
     state :sent 
     #Set automatically using Magento, when a representative or supervisor downloads the file with 
     #fulfillments in not_processed status
     state :out_of_stock 
     #Will be similar than Bad address
     state :returned
-    #when member gets lapsed status, all not_processed / in_process / Out of stock fulfillments gets this status.
+    #when member gets lapsed status, all not_processed / in_process / out_of_stock / bad_address fulfillments gets this status.
     state :canceled
-    #if delivery fail this status is set and wrong address on member file should be filled with the reason
+    #if delivery fail this status is set and wrong address on member file should be filled with the reason. If the member
+    #is set as undeliverable every fulfillment in 'not_processed','in_process','out_of_stock' and 'returned' will also be
+    #set as 'bad_address' 
     state :bad_address
   end
 
@@ -152,7 +154,7 @@ class Fulfillment < ActiveRecord::Base
     end
     Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
     return { :message => message, :code => Settings.error_codes.success }
-  rescue 
+  rescue Exception => e
     message = I18n.t('error_messages.fulfillment_error')
     Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_error )
     return { :message => message, :code => Settings.error_codes.fulfillment_error }
@@ -195,13 +197,13 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def get_file_line(change_status = false, type_others = true)
+  def get_file_line(change_status = false, fulfillment_file)
     return [] if product.nil?
     if change_status
-      Fulfillment.find(self.id).set_as_in_process unless self.in_process? or self.renewed?
+      Fulfillment.find(self.id).update_status(fulfillment_file.agent_id, "in_process", "Fulfillment file generated", fulfillment_file.id) unless self.in_process? or self.renewed?
     end
     member = self.member
-    if type_others
+    if fulfillment_file.other_type?
       [ self.tracking_code, self.product.cost_center, member.full_name, member.address, member.city,
             member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
             self.product.weight, 'MID']
@@ -212,16 +214,16 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def self.generateXLS(fulfillments, change_status = false, type_others = true)
+  def self.generateXLS(fulfillment_file, change_status = false)
     package = Axlsx::Package.new
     package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
-      if type_others
+      if fulfillment_file.other_type?
         sheet.add_row Fulfillment::SLOOPS_HEADER
       else
         sheet.add_row Fulfillment::KIT_CARD_HEADER
       end
-      fulfillments.each do |fulfillment|
-        row = fulfillment.get_file_line(change_status, type_others)
+      fulfillment_file.fulfillments.each do |fulfillment|
+        row = fulfillment.get_file_line(change_status, fulfillment_file)
         sheet.add_row row unless row.empty?
       end
     end
@@ -231,7 +233,6 @@ class Fulfillment < ActiveRecord::Base
   def product
     @product ||= Product.find_by_sku_and_club_id(self.product_sku, self.member.club_id)
   end
-
 
   private
     def set_default_values

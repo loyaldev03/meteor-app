@@ -13,6 +13,7 @@ class Member < ActiveRecord::Base
   has_many :club_cash_transactions
   has_many :enrollment_infos, :order => "created_at DESC"
   has_many :member_preferences
+  has_many :member_additional_data
   has_many :memberships, :order => "created_at DESC"
   belongs_to :current_membership, :class_name => 'Membership'
   
@@ -43,6 +44,7 @@ class Member < ActiveRecord::Base
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
   after_save :after_marketing_tool_sync
+  
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
@@ -211,6 +213,10 @@ class Member < ActiveRecord::Base
     increment!(:reactivation_times, 1)
   end
 
+  def additional_data_form
+    "Form#{club_id}".constantize rescue nil
+  end
+
   # Sets join date. It is called multiple times.
   def set_join_date
     membership = current_membership
@@ -229,23 +235,28 @@ class Member < ActiveRecord::Base
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
   def schedule_first_membership(set_join_date, skip_send_fulfillment = false, nbd_update_for_sts = false, skip_add_club_cash = false)
-    send_fulfillment unless skip_send_fulfillment
-
     membership = current_membership
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
-    end
-    unless nbd_update_for_sts
+    end    
+
+    send_fulfillment unless skip_send_fulfillment
+    
+    if not nbd_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
     end
     self.save(:validate => false)
-    self.delay.assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
+    # self.delay.assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
+    self.assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
   end
 
   # Changes next bill date.
   def change_next_bill_date(next_bill_date, current_agent = nil)
-    if not self.can_change_next_bill_date?
+    if not is_billing_expected?
+      errors = { :member => 'is not expected to get billed.' }
+      answer = { :message => I18n.t('error_messages.not_expecting_billing'), :code => Settings.error_codes.member_not_expecting_billing, :errors => errors }
+    elsif not self.can_change_next_bill_date?
       errors = { :member => 'is not in billable status' }
       answer = { :message => I18n.t('error_messages.unable_to_perform_due_member_status'), :code => Settings.error_codes.next_bill_date_blank, :errors => errors }
     elsif next_bill_date.blank?
@@ -324,13 +335,21 @@ class Member < ActiveRecord::Base
     self.active? or self.provisional?
   end
 
+  def is_billing_expected?
+    terms_of_membership.is_payment_expected
+  end
+
   def status_enable_to_bill?
     self.active? or self.provisional?
   end
 
   # Returns true if member is active or provisional.
-  def can_bill_membership?
+  def billing_enabled?
     status_enable_to_bill? and self.club.billing_enable
+  end
+
+  def membership_billing_enabled?
+    billing_enabled? and is_billing_expected?
   end
 
   def manual_billing?
@@ -442,9 +461,22 @@ class Member < ActiveRecord::Base
     enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, enrollment_info_params, true, false)
   end
 
+  def has_problems_to_bill?
+    if not self.club.billing_enable
+      { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
+    elsif not status_enable_to_bill?
+      { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
+    elsif not is_billing_expected?
+      { :message => "Member is not expected to get billed.", :code => Settings.error_codes.member_not_expecting_billing }
+    else
+      false
+    end
+  end
+
   def bill_membership
     trans = nil
-    if can_bill_membership? and self.next_retry_bill_date <= Time.zone.now
+    validation = has_problems_to_bill?
+    if not validation and self.next_retry_bill_date.to_date <= Time.zone.now.to_date
       amount = terms_of_membership.installment_amount
       if terms_of_membership.payment_gateway_configuration.nil?
         message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
@@ -462,20 +494,16 @@ class Member < ActiveRecord::Base
         answer = trans.process
         if trans.success?
           credit_card.save # lets update year if we recycle this member
-          proceed_with_billing_logic(trans, Settings.operation_types.membership_billing, false ,"Billing")
+          proceed_with_billing_logic(trans)
         else
           message = set_decline_strategy(trans)
           answer # TODO: should we answer set_decline_strategy message too?
         end
       end
+    elsif not self.next_retry_bill_date.nil? and self.next_retry_bill_date > Time.zone.now
+      { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
     else
-      if not self.club.billing_enable
-        { :message => "Member's club is not allowing billing", :code => Settings.error_codes.member_club_dont_allow }
-      elsif not status_enable_to_bill?
-        { :message => "Member is not in a billing status.", :code => Settings.error_codes.member_status_dont_allow }
-      else
-        { :message => "We haven't reach next bill date yet.", :code => Settings.error_codes.billing_date_not_reached }
-      end
+      validation
     end
   rescue Exception => e
     trans.update_attribute :operation_type, Settings.operation_types.membership_billing_with_error if trans
@@ -483,26 +511,29 @@ class Member < ActiveRecord::Base
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
-  def no_recurrent_billing(amount, description)
+  def no_recurrent_billing(amount, description, type)
     trans = nil
-    if amount.blank? or description.blank?
-      answer = { :message =>"Amount and description cannot be blank.", :code => Settings.error_codes.wrong_data }
+    if amount.blank? or description.blank? or type.blank?
+      answer = { :message =>"Amount, description and type cannot be blank.", :code => Settings.error_codes.wrong_data }
+    elsif not Transaction::ONE_TIME_BILLINGS.include? type
+      answer = { :message =>"Type should be 'one-time' or 'donation'.", :code => Settings.error_codes.wrong_data }
     elsif amount.to_f <= 0.0
       answer = { :message =>"Amount must be greater than 0.", :code => Settings.error_codes.wrong_data }
     else
-      if can_bill_membership?
+      if billing_enabled?
         trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
-        trans.prepare(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.no_recurrent_billing)
+        trans.prepare_no_recurrent(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, type)
         answer = trans.process
         if trans.success?
           message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
           trans.update_attribute :response_result, trans.response_result+". Reason: #{description}"
           answer = { :message => message, :code => Settings.error_codes.success }
-          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing)
+          Auditory.audit(nil, trans, answer[:message], self, trans.operation_type)
         else
           answer = { :message => trans.response_result, :code => Settings.error_codes.no_reccurent_billing_error }
-          Auditory.audit(nil, trans, answer[:message], self, Settings.operation_types.no_recurrent_billing_with_error)
+          operation_type = trans.one_time_type? ? Settings.operation_types.no_recurrent_billing_with_error : Settings.operation_types.no_recurrent_billing_donation_with_error
+          Auditory.audit(nil, trans, answer[:message], self, operation_type)
         end
       else
         if not self.club.billing_enable
@@ -521,22 +552,27 @@ class Member < ActiveRecord::Base
 
   def manual_billing(amount, payment_type)
     trans = nil
-    if amount.blank? or payment_type.blank?
-      answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
-    elsif amount.to_f < current_membership.terms_of_membership.installment_amount
-      answer = { :message => "Amount to bill cannot be less than terms of membership installment amount.", :code => Settings.error_codes.manual_billing_with_less_amount_than_permitted }
-    else
-      trans = Transaction.new
-      trans.transaction_type = "sale_manual_#{payment_type}"
-      operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
-      trans.prepare_for_manual(self, amount, operation_type)
-      trans.process
-      answer = proceed_with_billing_logic(trans, operation_type, true, "Billing:manual_billing")
-      unless self.manual_payment
-        self.manual_payment = true 
-        self.save(:validate => false)
+    validation = has_problems_to_bill?
+    if not validation
+      if amount.blank? or payment_type.blank?
+        answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
+      elsif amount.to_f < current_membership.terms_of_membership.installment_amount
+        answer = { :message => "Amount to bill cannot be less than terms of membership installment amount.", :code => Settings.error_codes.manual_billing_with_less_amount_than_permitted }
+      else
+        trans = Transaction.new
+        trans.transaction_type = "sale_manual_#{payment_type}"
+        operation_type = Settings.operation_types["membership_manual_#{payment_type}_billing"]
+        trans.prepare_for_manual(self, amount, operation_type)
+        trans.process
+        answer = proceed_with_manual_billing_logic(trans, operation_type)
+        unless self.manual_payment
+          self.manual_payment = true 
+          self.save(:validate => false)
+        end
+        answer
       end
-      answer
+    else
+      validation
     end
   rescue Exception => e
     logger.error e.inspect
@@ -685,7 +721,7 @@ class Member < ActiveRecord::Base
   end
 
   def send_pre_bill
-    Communication.deliver!( self.manual_payment ? :manual_payment_prebill : :prebill, self) if can_bill_membership?
+    Communication.deliver!( self.manual_payment ? :manual_payment_prebill : :prebill, self) if membership_billing_enabled?
   end
 
   def send_fulfillment
@@ -887,14 +923,14 @@ class Member < ActiveRecord::Base
           Auditory.audit(agent, self, message, self, Settings.operation_types.blacklisted)
           self.credit_cards.each { |cc| cc.blacklist }
           unless self.lapsed?
-            self.cancel! Time.zone.now, "Automatic cancellation"
+            self.cancel! Time.zone.now.in_time_zone(get_club_timezone), "Automatic cancellation"
             self.set_as_canceled!
           end
-          marketing_tool_sync_unsubscription
+          marketing_tool_sync_unsubscription  
           answer = { :message => message, :code => Settings.error_codes.success }
         rescue Exception => e
           Auditory.report_issue("Member::blacklist", e, { :member => self.inspect })
-          answer = { :message => I18n.t('error_messages.airbrake_error_message'), :success => Settings.error_codes.member_could_no_be_blacklisted }
+          answer = { :message => I18n.t('error_messages.airbrake_error_message')+e.to_s, :success => Settings.error_codes.member_could_no_be_blacklisted }
           raise ActiveRecord::Rollback
         end
       end
@@ -921,8 +957,7 @@ class Member < ActiveRecord::Base
 
   def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
     cancel_date = cancel_date.to_date
-    cancel_date = (self.join_date.to_date == cancel_date ? "#{cancel_date} 23:59:59" : cancel_date).to_datetime
-
+    cancel_date = (self.join_date.in_time_zone(get_club_timezone).to_date == cancel_date ? "#{cancel_date} 23:59:59" : cancel_date).to_datetime
     if not message.blank?
       if cancel_date.change(:offset => self.get_offset_related).to_date >= Time.new.getlocal(self.get_offset_related).to_date
         if self.cancel_date == cancel_date
@@ -973,9 +1008,7 @@ class Member < ActiveRecord::Base
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
 
-    # base = Member.includes(:current_membership => :terms_of_membership).where("next_retry_bill_date <= ? AND members.club_id IN (select id from clubs where billing_enable = true) AND members.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now).limit(2000)
-   
-    base = Member.where("next_retry_bill_date <= ? and club_id IN (select id from clubs where billing_enable = true) and status NOT IN ('applied','lapsed') AND manual_payment = false", Time.zone.now).limit(2000) 
+    base = Member.includes(:current_membership => :terms_of_membership).where("DATE(next_retry_bill_date) <= ? AND members.club_id IN (select id from clubs where billing_enable = true) AND members.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now.to_date).limit(2000)
 
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:billing rake task, processing #{base.count} members"
     base.to_enum.with_index.each do |member,index| 
@@ -1061,7 +1094,7 @@ class Member < ActiveRecord::Base
         tz = Time.zone.now
         begin
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-          member.cancel!(Time.zone.now, "Billing date is overdue.", nil, Settings.operation_types.bill_overdue_cancel) if member.manual_payment and not member.cancel_date
+          member.cancel!(Time.zone.now.in_time_zone(member.get_club_timezone), "Billing date is overdue.", nil, Settings.operation_types.bill_overdue_cancel) if member.manual_payment and not member.cancel_date
           member.set_as_canceled!
         rescue Exception => e
           Auditory.report_issue("Members::Cancel", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
@@ -1192,10 +1225,13 @@ class Member < ActiveRecord::Base
   end
 
   def self.send_prebill
-    base = Member.where([" ((date(next_retry_bill_date) = ? AND recycled_times = 0) 
+    base = Member.joins(:current_membership => :terms_of_membership).where(
+                          ["((date(next_retry_bill_date) = ? AND recycled_times = 0) 
                            OR (date(next_retry_bill_date) = ? AND manual_payment = true)) 
-                           AND terms_of_memberships.installment_amount != 0.0", 
-    (Time.zone.now + 7.days).to_date, (Time.zone.now + 14.days).to_date ]).includes(:current_membership => :terms_of_membership) 
+                           AND terms_of_memberships.installment_amount != 0.0 
+                           AND terms_of_memberships.is_payment_expected = true", 
+                           (Time.zone.now + 7.days).to_date, (Time.zone.now + 14.days).to_date 
+                          ])
 
     base.find_in_batches do |group|
       group.each_with_index do |member,index| 
@@ -1300,7 +1336,7 @@ class Member < ActiveRecord::Base
   def add_new_credit_card(new_credit_card, current_agent = nil)
     answer = {}
     CreditCard.transaction do 
-      begin
+      begin    
         new_credit_card.member = self
         new_credit_card.gateway = self.terms_of_membership.payment_gateway_configuration.gateway if new_credit_card.gateway.nil?
         if new_credit_card.errors.size == 0
@@ -1321,6 +1357,17 @@ class Member < ActiveRecord::Base
     answer
   end
 
+  def desnormalize_additional_data
+    if self.additional_data.present?
+      self.additional_data.each do |key, value|
+        pref = MemberAdditionalData.find_or_create_by_member_id_and_club_id_and_param(self.id, self.club_id, key)
+        pref.value = value
+        pref.save
+      end
+    end
+  end
+  handle_asynchronously :desnormalize_additional_data, :queue => :generic_queue
+
   def desnormalize_preferences
     if self.preferences.present?
       self.preferences.each do |key, value|
@@ -1339,7 +1386,13 @@ class Member < ActiveRecord::Base
 
   # used for member blacklist
   def marketing_tool_sync_unsubscription
-    exact_target_member.unsubscribe! if defined?(SacExactTarget::MemberModel)
+    if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
+      exact_target_after_create_sync_to_remote_domain
+      exact_target_member.unsubscribe!
+    end
+  rescue Exception => e
+    logger.error "* * * * * #{e}"
+    Auditory.report_issue("Member::unsubscribe", e, { :member => self.inspect })
   end
   handle_asynchronously :marketing_tool_sync_unsubscription, :queue => :exact_target_sync
 
@@ -1350,7 +1403,11 @@ class Member < ActiveRecord::Base
   handle_asynchronously :marketing_tool_sync_subscription, :queue => :exact_target_sync
 
   def get_offset_related
-    Time.now.in_time_zone(self.club.time_zone).formatted_offset
+    Time.now.in_time_zone(get_club_timezone).formatted_offset
+  end
+
+  def get_club_timezone
+    @club_timezone ||= self.club.time_zone
   end
 
   private
@@ -1362,6 +1419,16 @@ class Member < ActiveRecord::Base
       self.next_retry_bill_date = new_bill_date
       self.save(:validate => false)
       Auditory.audit(nil, self, "Renewal scheduled. NBD set #{new_bill_date.to_date}", self, Settings.operation_types.renewal_scheduled)
+    end
+
+    def check_upgradable
+      if terms_of_membership.upgradable?
+        if join_date.to_date + terms_of_membership.upgrade_tom_period.days <=  Time.new.getlocal(self.get_offset_related).to_date
+          change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade)
+          return false
+        end
+      end
+      true
     end
 
     def set_status_on_enrollment!(agent, trans, amount, info)
@@ -1393,13 +1460,27 @@ class Member < ActiveRecord::Base
       message
     end
 
-    def proceed_with_billing_logic(trans, operation_type, manual, bill_type="Billing")
+    def proceed_with_manual_billing_logic(trans, operation_type)
       unless set_as_active
-        Auditory.report_issue("#{bill_type}::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+        Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
       end
-      schedule_renewal(manual)
-      message = (manual ? "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}" : "Member billed successfully $#{trans.amount} Transaction id: #{trans.id}" )
+      message = "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}"
       Auditory.audit(nil, trans, message, self, operation_type)
+      if check_upgradable 
+        schedule_renewal(true)
+      end
+      { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
+    end
+
+    def proceed_with_billing_logic(trans)
+      unless set_as_active
+        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+      end
+      if check_upgradable 
+        schedule_renewal
+      end
+      message = "Member billed successfully $#{trans.amount} Transaction id: #{trans.id}"
+      Auditory.audit(nil, trans, message, self, Settings.operation_types.membership_billing)
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
     end
 
@@ -1483,7 +1564,7 @@ class Member < ActiveRecord::Base
         if tom.downgradable?
           downgrade_member
         else
-          self.cancel! Time.zone.now, "HD cancellation"
+          self.cancel! Time.zone.now.in_time_zone(get_club_timezone), "HD cancellation"
           set_as_canceled!
           Communication.deliver!(:hard_decline, self)    
         end
@@ -1498,6 +1579,7 @@ class Member < ActiveRecord::Base
 
     def asyn_desnormalize_preferences(opts = {})
       self.desnormalize_preferences if opts[:force] || self.changed.include?('preferences') 
+      self.desnormalize_additional_data if opts[:force] || self.changed.include?('additional_data') 
     end
 
     def wrong_address_logic

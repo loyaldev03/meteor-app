@@ -95,6 +95,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     get( :find_all_by_created, { :club_id => club_id, :start_date => start_date, :end_date => end_date })
   end
 
+  def generate_post_sale(amount, description, type)
+    post( :sale, { :id => @member.id, :amount => amount, :description => description, :type => type } )
+  end
+
   # Store the membership id at enrollment_infos table when enrolling a new member
   # Admin should enroll/create member with preferences
   # Billing membership by Provisional amount
@@ -560,9 +564,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :success
     @member.reload
     cc_token = @member.active_credit_card.token
-    
-    @credit_card.expire_month = @credit_card.expire_month+1
-    @credit_card.expire_year = @credit_card.expire_year+1
+
+
+    @credit_card.expire_year = @credit_card.expire_year + 1
     @member.reload
     assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
@@ -1153,8 +1157,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     @active_credit_card = FactoryGirl.create :credit_card_american_express, :active => true, :member_id => @member.id
 
     @credit_card = FactoryGirl.build :credit_card_american_express
-    @credit_card.expire_year = (Time.zone.now.utc).year
-    @credit_card.expire_month = (Time.zone.now.utc).month 
+    @credit_card.expire_year = (Time.zone.now.in_time_zone(@member.get_club_timezone)).year
+    @credit_card.expire_month = (Time.zone.now.in_time_zone(@member.get_club_timezone)).month 
 
     active_merchant_stubs_store(@credit_card.number)
 
@@ -1186,7 +1190,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(date_to_check.utc, :format => :only_date)
   end
 
-
   test "Update member's next_bill_date active status" do
     sign_in @admin_user
     @member = create_active_member(@terms_of_membership, :member_with_api)
@@ -1198,7 +1201,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed).to_datetime
     assert_difference('Operation.count') do
       generate_put_next_bill_date(next_bill_date)
-      puts @member.club.time_zone
+      puts @member.get_club_timezone
     end
     @member.reload
     date_to_check = next_bill_date.to_datetime.change(:offset => @member.get_offset_related)
@@ -1229,6 +1232,20 @@ class Api::MembersControllerTest < ActionController::TestCase
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
     end
     assert @response.body.include?(I18n.t('error_messages.unable_to_perform_due_member_status'))
+  end
+
+  test "Update member's next_bill_date when payment is not expected" do
+    sign_in @admin_user
+    @terms_of_membership_no_payment_expected = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false
+    @member = create_active_member(@terms_of_membership_no_payment_expected, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+
+    @member.set_as_provisional
+    @member.set_as_canceled!
+    assert_difference('Operation.count',0) do
+      generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
+    end
+    assert @response.body.include?(I18n.t('error_messages.not_expecting_billing'))
   end
 
   test "Update member's next_bill_date with wrong date format" do
@@ -1315,7 +1332,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
    test "Api agent should update member's next_bill_date" do
      sign_in @admin_user
-    next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed)
+     next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed)
  
      @member = create_active_member(@terms_of_membership, :member_with_api)
      FactoryGirl.create :credit_card, :member_id => @member.id
@@ -1532,7 +1549,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       @member.reload
       cancel_date_to_check = cancel_date.to_datetime.change(:offset => @member.get_offset_related)  
       assert @member.current_membership.cancel_date > @member.current_membership.join_date
-      assert_equal I18n.l(@member.current_membership.cancel_date.in_time_zone(@member.club.time_zone), :format => :only_date), I18n.l(cancel_date_to_check, :format => :only_date)
+      assert_equal I18n.l(@member.current_membership.cancel_date.in_time_zone(@member.get_club_timezone), :format => :only_date), I18n.l(cancel_date_to_check, :format => :only_date)
     end
   end
 
@@ -1682,5 +1699,73 @@ class Api::MembersControllerTest < ActionController::TestCase
     @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the terms of membership."
+  end
+
+  test "One time billing throught API." do
+    sign_in @admin_user
+    ['admin', 'api'].each do |role|
+      @admin_user.update_attribute :roles, [role]
+      @member = create_active_member(@terms_of_membership, :member_with_api)
+      FactoryGirl.create :credit_card, :member_id => @member.id
+      @member.set_as_provisional
+      
+      Timecop.travel(@member.next_retry_bill_date) do
+        assert_difference('Operation.count') do
+          assert_difference('Transaction.count') do
+            generate_post_sale(@member.terms_of_membership.installment_amount, "testing", "one-time")
+          end
+        end 
+      end
+      @member.reload
+      assert_equal @member.operations.order("created_at DESC").first.operation_type, Settings.operation_types.no_recurrent_billing
+    end
+  end
+
+  test "Donation billing throught API" do
+    sign_in @admin_user
+    ['admin', 'api'].each do |role|
+      @admin_user.update_attribute :roles, [role]
+      @member = create_active_member(@terms_of_membership, :member_with_api)
+      FactoryGirl.create :credit_card, :member_id => @member.id
+      @member.set_as_provisional
+      
+      Timecop.travel(@member.next_retry_bill_date) do
+        assert_difference('Operation.count') do
+          assert_difference('Transaction.count') do
+            generate_post_sale(@member.terms_of_membership.installment_amount, "testing", "donation")
+          end
+        end 
+      end
+      @member.reload
+      assert_equal @member.operations.order("created_at DESC").first.operation_type, Settings.operation_types.no_reccurent_billing_donation
+    end
+  end
+
+  test "One-time or Donation billing throught API without amount, description or type" do
+    sign_in @admin_user
+    @member = create_active_member(@terms_of_membership, :member_with_api)
+    FactoryGirl.create :credit_card, :member_id => @member.id
+    @member.set_as_provisional
+
+    Timecop.travel(@member.next_retry_bill_date) do
+      generate_post_sale(nil, "testing", "donation")
+      assert @response.body.include? "Amount, description and type cannot be blank."
+      generate_post_sale(@member.terms_of_membership.installment_amount, nil,"donation")
+      assert @response.body.include? "Amount, description and type cannot be blank."
+      generate_post_sale(@member.terms_of_membership.installment_amount, "testing", nil)
+      assert @response.body.include? "Amount, description and type cannot be blank."
+    end
+  end
+ 
+  test "Should not allow sale transaction for agents that are not admin or api." do
+    sign_in @admin_user
+    ['representative', 'supervisor', 'agency', 'fulfillment_managment'].each do |role|
+      @admin_user.update_attribute :roles, [role]
+      @member = create_active_member(@terms_of_membership, :member_with_api)
+      FactoryGirl.create :credit_card, :member_id => @member.id
+      @member.set_as_provisional
+      generate_post_sale(@member.terms_of_membership.installment_amount, "testing", "one-time")
+      assert_response :unauthorized
+    end
   end
 end

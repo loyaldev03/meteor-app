@@ -71,7 +71,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#table_membership_information")do
       within("#td_mi_terms_of_membership_name"){ click_link_or_button("#{saved_member.terms_of_membership.name}") }
     end
-    within("#table_information")do
+    within("#div_description_feature")do
       assert page.has_content?(@terms_of_membership_with_gateway.name) if @terms_of_membership_with_gateway.name
       assert page.has_content?(@terms_of_membership_with_gateway.description) if @terms_of_membership_with_gateway.description
       assert page.has_content?(@terms_of_membership_with_gateway.provisional_days.to_s) if @terms_of_membership_with_gateway.provisional_days
@@ -157,6 +157,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
+  #Create a member selecting only a kit-card
   test "create member" do
   	setup_member(false)
 
@@ -169,7 +170,10 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) }
     within(".nav-tabs"){ click_on 'Transactions' }
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
-    assert_equal(Fulfillment.count,Club::DEFAULT_PRODUCT.count)
+    within(".nav-tabs"){ click_on 'Fulfillments' }
+    within("#fulfillments") { assert page.has_content?('KIT-CARD') }
+    assert_equal(Fulfillment.count, 1)
+    assert_equal created_member.fulfillments.last.product_sku, 'KIT-CARD'
   end
 
   # Reject new enrollments if billing is disable
@@ -245,7 +249,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#error_explanation")do
       assert page.has_content?("first_name: can't be blank,is invalid"), "Failure on first_name validation message"
       assert page.has_content?("last_name: can't be blank,is invalid"), "Failure on last_name validation message"
-      assert page.has_content?("email: is invalid"), "Failure on email validation message"
+      assert page.has_content?("email: email address is invalid"), "Failure on email validation message"
       assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_country_code validation message"
       assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
       assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_local_number validation message"
@@ -319,7 +323,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#error_explanation") do
         assert page.has_content?("first_name: is invalid"), "Failure on first_name validation message"
         assert page.has_content?("last_name: is invalid"), "Failure on last_name validation message"
-        assert page.has_content?("email: is invalid"), "Failure on email validation message"
+        assert page.has_content?("email: email address is invalid"), "Failure on email validation message"
         assert page.has_content?("phone_country_code: is not a number"), "Failure on phone_country_code validation message"
         assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
         assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
@@ -363,7 +367,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     alert_ok_js
     click_link_or_button 'Create Member'
     within("#error_explanation") do
-        assert page.has_content?("email: is invalid"), "Failure on email validation message"
+        assert page.has_content?("email: email address is invalid"), "Failure on email validation message"
     end    
   end
   
@@ -372,8 +376,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     setup_member
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     validate_terms_of_membership_show_page(@saved_member) 
-    click_link_or_button('Return to member show')
-    assert find_field('input_id').value == "#{@saved_member.id}"
+    click_link_or_button('Return')
   end
 
   test "create member with gender male" do
@@ -1056,21 +1059,20 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   test "Update a profile with CC used by another member and Family Membership = True" do
     setup_member(false)
-    @club = FactoryGirl.create(:simple_club_with_gateway_with_family)
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @club_with_family = FactoryGirl.create(:simple_club_with_gateway_with_family)
+    @partner = @club_with_family.partner
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club_with_family.id)
 
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club_with_family.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     created_member = Member.find_by_email(unsaved_member.email)  
 
-    visit clubs_path(@partner.prefix)
-    within("#clubs_table"){ click_link_or_button 'Edit' }
+    visit edit_club_path(@club_with_family.partner.prefix, @club_with_family.id)
+    assert_nil find(:xpath, "//input[@id='club_family_memberships_allowed']").set(true)
 
-    assert find(:xpath, "//input[@id='club_family_memberships_allowed']").set(true)
-
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club_with_family.id)
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
   end
 
@@ -1171,5 +1173,56 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_content?("Member information is invalid.")
       assert page.has_content?("number: An error was encountered while processing your request.")
     end
+  end
+
+  test "Create a member selecting only a product" do
+    setup_member(false)
+    product = FactoryGirl.create(:product, :club_id => @club.id,)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    created_member = create_member(unsaved_member,nil,nil,false,[product.sku])
+
+    validate_view_member_base(created_member)
+    within(".nav-tabs"){ click_on 'Operations' }
+    within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
+    within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) }
+    within(".nav-tabs"){ click_on 'Transactions' }
+    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
+    within(".nav-tabs"){ click_on 'Fulfillments' }
+    within("#fulfillments") { assert page.has_content?(product.sku) }
+    assert_equal(Fulfillment.count, 1)
+    assert_equal created_member.fulfillments.last.product_sku, product.sku
+  end
+
+  test "Create a member without selecting any " do
+    setup_member(false)
+    product = FactoryGirl.create(:product, :club_id => @club.id, :name => 'PRODUCT_RANDOM')
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    created_member = create_member(unsaved_member,nil,nil,false,[''])
+
+    validate_view_member_base(created_member)
+    within(".nav-tabs"){ click_on 'Operations' }
+    within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
+    within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) }
+    within(".nav-tabs"){ click_on 'Transactions' }
+    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
+    assert_equal(Fulfillment.count, 0)
+  end
+
+  test "Create a member selecting kit-card and product" do
+    setup_member(false)
+    product = FactoryGirl.create(:product, :club_id => @club.id)
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    created_member = create_member(unsaved_member,nil,nil,false,[product.sku,'KIT-CARD'])
+
+    validate_view_member_base(created_member)
+    within(".nav-tabs"){ click_on 'Operations' }
+    within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
+    within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.member.has_no_preferences_saved')) }
+    within(".nav-tabs"){ click_on 'Transactions' }
+    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
+    within(".nav-tabs"){ click_on 'Fulfillments' }
+    within("#fulfillments") { assert page.has_content?(product.sku) }
+    within("#fulfillments") { assert page.has_content?('KIT-CARD') }
+    assert_equal(Fulfillment.count, 2)
   end
 end

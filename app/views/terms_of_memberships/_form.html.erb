@@ -1,3 +1,15 @@
+<% if @tom.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= pluralize(@tom.errors.count, "error") %> founded:</h2>
+    <ul>
+      <% @tom.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+  <br>
+<% end %>
+
 <% # First step %>
 <div class="step" id="first">
   <div class="control-group"><%= wizard_steps_indicator(1) %></div>
@@ -44,7 +56,7 @@
   <div class="control-group">
     <%= label_tag 'trial_period_amount', t('activerecord.attributes.terms_of_membership.wizard.trial_period'), :class => 'control-label' %>
     <div class="controls">
-      $&nbsp;<%= text_field_tag 'trial_period_amount', @tom.trial_period_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
+<!--       $&nbsp;<%= text_field_tag 'trial_period_amount', @tom.trial_period_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %> -->
       <%= t('activerecord.attributes.terms_of_membership.wizard.lasting') %>
       <%= text_field_tag 'trial_period_lasting', @tom.provisional_days, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("trial_period_lasting_time_span") %>
@@ -57,17 +69,17 @@
   <div class="control-group">
     <%= label_tag 'is_payment_expected', t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), :class => 'control-label' %>
     <div class="controls">
-      <%= radio_button_tag 'is_payment_expected', 'yes', ((@tom.is_payment_expected == 1 unless !@tom.is_payment_expected) or true), :class => 'required' %>
+      <%= radio_button_tag 'is_payment_expected', 'yes', ((@tom.is_payment_expected == true unless !@tom.is_payment_expected) or true), :class => 'required' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.payment_is_expected') %>&nbsp;
-<!--       <%= radio_button_tag 'is_payment_expected', 'no', @tom.is_payment_expected == 0 %>
+       <%= radio_button_tag 'is_payment_expected', 'no', @tom.is_payment_expected == false %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.no_pay_is_expected') %>&nbsp;
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), 
-        :content => t('lorem') } %>  -->
+        :content => t('lorem') } %>
     </div>
   </div>
 
-  <div class="control-group" style="<%= @tom.is_payment_expected == 0 ? 'display:none' : ''%>" id="recurring_amount_group">
+  <div class="control-group" style="<%= @tom.is_payment_expected == false ? 'display:none' : ''%>" id="recurring_amount_group">
     <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label' %>
     <div class="controls">
       $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
@@ -129,24 +141,24 @@
       <br /><br />
  -->      <%= radio_button_tag 'if_cannot_bill_member', 'downgrade_to', @tom.if_cannot_bill == 'downgrade_tom' %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.downgrade_to') %>
-      <%= select_for_toms('downgrade_to_tom', @tom.downgrade_tom_id) %>
+      <%= select_for_toms('downgrade_to_tom', @tom.downgrade_tom_id, @tom) %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_member_then'), 
         :content => t('lorem') } %> 
     </div>
+    <div class="control-group">
+      <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
+      <div class="controls">
+        <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id, @tom) %>&nbsp;
+        <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
+        <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
+        <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
+        <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
+          :content => t('lorem') } %> 
+      </div>
+    </div> 
   </div>
-<!--   <div class="control-group">
-    <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
-    <div class="controls">
-      <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id) %>&nbsp;
-      <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
-      <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
-      <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
-        :content => t('lorem') } %> 
-    </div>
-  </div> -->
 </div>
 
 <div id="" class="form-actions">
@@ -159,8 +171,7 @@
 </div>
 
 <script type="text/javascript">
-  // Second Step
-
+  // Second Step  
   function until_cancel_logic(){
     $('#subscription_terms_stop_billing_after').removeAttr('required');
     $('#subscription_terms_stop_billing_after').prop('disabled',true);
@@ -324,13 +335,15 @@
           } else {
             $('#if_cannot_bill_member_options').hide('fast');
           }
-          if( $("#subscription_terms_until_cancelled").is(":checked") ){ 
+          
+          if( $("#if_cannot_bill_member_cancel").is(":checked") ){ 
             cancel_radio_logic(); 
           }
           else if( $("#if_cannot_bill_member_suspend").is(":checked") ){ 
             suspend_radio_logic(); 
           }
-          else if( $("#if_cannot_bill_member_downgrade_to").is(":checked") ){ downgrade_radio_logic();
+          else if( $("#if_cannot_bill_member_downgrade_to").is(":checked") ){ 
+            downgrade_radio_logic();
           }
 
           if( $("#upgrade_to_tom").val() == "" ){ 
