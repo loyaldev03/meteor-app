@@ -42,12 +42,10 @@ class MembersBillTest < ActionController::IntegrationTest
   
     alert_ok_js      
     click_on 'Refund'
-
+    sleep(5) #wait for communication to be sent. 
     if check_refund
       page.has_content?("This transaction has been approved")
-      within(".nav-tabs") do
-        click_on("Operations")
-      end
+      within(".nav-tabs"){ click_on("Operations") }
       within("#operations_table")do
         assert page.has_content?("Communication 'Test refund' sent")
         assert page.has_content?("Refund success $#{amount.to_f}")
