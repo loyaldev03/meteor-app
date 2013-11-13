@@ -6,7 +6,7 @@ FactoryGirl.define do
     decline_type 'soft'
     credit_card_type 'all'
     gateway 'mes'
-    limit '4'
+    max_retries '4'
   end
 
   factory :without_grace_period_decline_strategy_monthly, class: DeclineStrategy do
@@ -15,7 +15,7 @@ FactoryGirl.define do
     decline_type 'hard'
     credit_card_type 'all'
     gateway 'mes'
-    limit '1'
+    max_retries '1'
   end
 
   factory :without_grace_period_decline_strategy_yearly, class: DeclineStrategy do
@@ -24,7 +24,7 @@ FactoryGirl.define do
     decline_type 'hard'
     credit_card_type 'all'
     gateway 'mes'
-    limit '1'
+    max_retries '1'
   end
 
   factory :hard_decline_strategy, class: DeclineStrategy do
@@ -33,7 +33,7 @@ FactoryGirl.define do
     decline_type 'hard'
     credit_card_type 'all'
     gateway 'mes'
-    limit '1'
+    max_retries '1'
   end
 
   factory :hard_decline_strategy_for_billing, class: DeclineStrategy do
@@ -43,6 +43,6 @@ FactoryGirl.define do
     decline_type 'hard'
     credit_card_type 'all'
     gateway 'mes'
-    limit '0'
+    max_retries '0'
   end
 end
