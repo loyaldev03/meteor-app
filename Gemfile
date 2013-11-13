@@ -67,7 +67,6 @@ gem "zendesk_api"
 # Use unicorn as the app server
 # gem 'unicorn'
 
-gem 'newrelic_rpm'
 gem 'oboe'
 
 # To use debugger
