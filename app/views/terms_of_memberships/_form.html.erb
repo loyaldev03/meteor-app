@@ -79,7 +79,7 @@
     </div>
   </div>
 
-  <div class="control-group" style="<%= @tom.is_payment_expected == false ? 'display:none' : ''%>" id="recurring_amount_group">
+  <div class="control-group" id="recurring_amount_group">
     <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label' %>
     <div class="controls">
       $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
@@ -108,19 +108,21 @@
     </div>
   </div>
 
-  <div class="control-group">
-    <%= label_tag 'initial_club_cash_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number' %>
+  <div id="club_cash_group">
+    <div class="control-group">
+      <%= label_tag 'initial_club_cash_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number' %>
+      </div>
     </div>
-  </div>
 
-  <div class="control-group">
-    <%= label_tag 'club_cash_installment_amount', t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number' %>
-      <%= t('activerecord.attributes.terms_of_membership.wizard.skip_first_club_cash') %>
-      <%= f.check_box 'skip_first_club_cash' %>
+    <div class="control-group">
+      <%= label_tag 'club_cash_installment_amount', t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number' %>
+        <%= t('activerecord.attributes.terms_of_membership.wizard.skip_first_club_cash') %>
+        <%= f.check_box 'skip_first_club_cash' %>
+      </div>
     </div>
   </div>
 </div>
@@ -146,18 +148,21 @@
         :title => t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_member_then'), 
         :content => t('lorem') } %> 
     </div>
-    <div class="control-group">
-      <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
-      <div class="controls">
-        <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id, @tom) %>&nbsp;
-        <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
-        <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
-        <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
-        <%= render :partial => "shared/help", :locals => { 
-          :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
-          :content => t('lorem') } %> 
-      </div>
-    </div> 
+  </div>
+  <div class="control-group" id="upgrade_options">
+    <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
+    <div class="controls">
+      <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id, @tom) %>&nbsp;
+      <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
+      <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
+      <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.upgrade_help') } %> 
+    </div>
+  </div> 
+  <div id="no_configuration_message" style="display:none">
+    <%= t('activerecord.attributes.terms_of_membership.wizard.no_downgrade_upgrade_configuration') %>
   </div>
 </div>
 
@@ -181,17 +186,13 @@
 
   $('#is_payment_expected_yes').click(function() {
     window.atTheEndOfTheTrial = "payment";
-    $('#recurring_amount_group').show('fast');
-    $('#installment_amount').prop('required', true);
-    $('#installment_amount_days').prop('required', true);
+    select_payment_is_expected();
     update_labels();
   });
 
   $('#is_payment_expected_no').click(function() {
     window.atTheEndOfTheTrial = "no payment";
-    $('#recurring_amount_group').hide('fast');
-    $('#installment_amount').removeAttr('required');
-    $('#installment_amount_days').removeAttr('required');
+    select_payment_is_not_expected();
     update_labels();
   });
 
@@ -244,6 +245,24 @@
     $('#upgrade_to_tom_days').prop('required', true);
     $('#upgrade_to_tom_days_time_span').prop('disabled', false);          
     $('#upgrade_to_tom_days_time_span').prop('required', true);
+  }
+
+  function select_payment_is_expected(){
+    $('#recurring_amount_group').show('fast');
+    $('#club_cash_group').show('fast');
+    $('#installment_amount').prop('required', true);
+    $('#installment_amount_days').prop('required', true);
+    $('#initial_club_cash_amount').prop('required', true);
+    $('#club_cash_installment_amount').prop('required', true);
+  }
+
+  function select_payment_is_not_expected(){
+    $('#recurring_amount_group').hide('fast');
+    $('#club_cash_group').hide('fast');
+    $('#installment_amount').removeAttr('required');
+    $('#installment_amount_days').removeAttr('required');
+    $('#initial_club_cash_amount').removeAttr('required');
+    $('#club_cash_installment_amount').removeAttr('required');
   }
 
   $('#if_cannot_bill_member_cancel').click(function() {
@@ -328,12 +347,21 @@
           if ($("#subscription_terms_until_cancelled").is(":checked") ){ 
             until_cancel_logic(); 
           }
+          if ($('#is_payment_expected_yes').is(':checked')) {
+            select_payment_is_expected();
+          } else {
+            select_payment_is_not_expected();
+          }
           break;
         case "third":
           if ($('#is_payment_expected_yes').is(':checked')) {
             $('#if_cannot_bill_member_options').show();
+            $('#upgrade_options').show();
+            $('#no_configuration_message').hide('fast');
           } else {
             $('#if_cannot_bill_member_options').hide('fast');
+            $('#upgrade_options').hide('fast');
+            $('#no_configuration_message').show();
           }
           
           if( $("#if_cannot_bill_member_cancel").is(":checked") ){ 
