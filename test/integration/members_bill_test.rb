@@ -49,7 +49,6 @@ class MembersBillTest < ActionController::IntegrationTest
       within("#operations_table")do
         assert page.has_content?("Communication 'Test refund' sent")
         assert page.has_content?("Refund success $#{amount.to_f}")
-        assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
       end
     end
   end
@@ -352,7 +351,7 @@ class MembersBillTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
     within(".nav-tabs"){ click_on("Transactions") }
-    within("#transactions_table_wrapper")do
+    within("#transactions_table_wrapper")
       assert page.has_selector?('#refund')
     end
     make_a_refund(Transaction.last, final_amount)
