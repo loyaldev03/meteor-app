@@ -351,7 +351,7 @@ class MembersBillTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
     within(".nav-tabs"){ click_on("Transactions") }
-    within("#transactions_table_wrapper")
+    within("#transactions_table_wrapper")do
       assert page.has_selector?('#refund')
     end
     make_a_refund(Transaction.last, final_amount)
