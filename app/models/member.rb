@@ -1539,7 +1539,7 @@ class Member < ActiveRecord::Base
           return message
         end
         message = "Billing error. No decline rule configured limit reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-        operation_type = Settings.operation_types.membership_billing_without_decline_strategy_limit
+        operation_type = Settings.operation_types.membership_billing_without_decline_strategy_max_retries
         cancel_member = true
       else
         trans.decline_strategy_id = decline.id
@@ -1551,9 +1551,9 @@ class Member < ActiveRecord::Base
           message="Soft Declined: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
           self.next_retry_bill_date = decline.days.days.from_now
           operation_type = Settings.operation_types.membership_billing_soft_decline
-          if self.recycled_times > (decline.limit-1)
+          if self.recycled_times > (decline.max_retries-1)
             message = "Soft recycle limit (#{self.recycled_times}) reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
-            operation_type = (tom.downgradable? ? Settings.operation_types.downgraded_because_of_hard_decline_by_limit : Settings.operation_types.membership_billing_hard_decline_by_limit)
+            operation_type = (tom.downgradable? ? Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries : Settings.operation_types.membership_billing_hard_decline_by_max_retries)
             cancel_member = true
           end
         end

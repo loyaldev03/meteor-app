@@ -35,7 +35,7 @@ def strategy_to_sql(dsid)
   data += "`installment_type` = '#{ds.installment_type}',\n"
   data += "`credit_card_type` = '#{ds.credit_card_type}',\n"
   data += "`response_code` = '#{ds.response_code}',\n"
-  data += "`limit` = #{ds.limit},\n"
+  data += "`max_retries` = #{ds.max_retries},\n"
   data += "`days` = #{ds.days},\n"
   data += "`decline_type` = '#{ds.decline_type}',\n"
   data += "`created_at` = NOW(),\n"
@@ -55,7 +55,7 @@ strategies << {
   :installment_type => "1.month",
   :credit_card_type => "all",
   :response_code => "005",
-  :limit => 6,
+  :max_retries => 6,
   :days => 6,
   :decline_type => "soft"
 }
@@ -72,7 +72,7 @@ end
 
 # getting the last strategy
 # 
-# select id from decline_strategies order by id desc limit 1;
+# select id from decline_strategies order by id desc max_retries 1;
 
 # 
 # the inserts for Carla
@@ -82,7 +82,7 @@ end
 # installment_type = "1.month",
 # credit_card_type = "all",
 # response_code = "061",
-# `limit` = 4,
+# `max_retries` = 4,
 # days = 9,
 # decline_type = "soft";
 # 
@@ -91,7 +91,7 @@ end
 # installment_type = "1.year",
 # credit_card_type = "all",
 # response_code = "061",
-# `limit` = 4,
+# `max_retries` = 4,
 # days = 9,
 # decline_type = "soft";
 
