@@ -675,7 +675,9 @@ class Member < ActiveRecord::Base
       unless trans.success?
         operation_type = Settings.operation_types.error_on_enrollment_billing
         Auditory.audit(agent, trans, "Transaction was not successful.", (self.new_record? ? nil : self), operation_type)
-        trans.update_attribute :operation_type, operation_type
+        trans.operation_type = operation_type
+        trans.membership_id = nil
+        trans.save
         return answer 
       end
     end
