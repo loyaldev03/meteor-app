@@ -202,7 +202,7 @@ class MembersBillTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_member.first_name
    
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
+      assert page.has_no_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
     end
   end
 
@@ -214,7 +214,7 @@ class MembersBillTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_member.first_name
    
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
+      assert page.has_no_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
     end
   end
 
