@@ -248,7 +248,6 @@ GEM
     net-ssh (2.6.7)
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
-    newrelic_rpm (3.6.2.96)
     nokogiri (1.6.0)
       mini_portile (~> 0.5.0)
     nori (1.1.5)
@@ -438,7 +437,6 @@ DEPENDENCIES
   jquery-ui-rails (= 1.1.0)
   mocha
   mysql2 (= 0.3.11)
-  newrelic_rpm
   nokogiri
   oboe
   paperclip (~> 3.0)

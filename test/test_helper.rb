@@ -456,6 +456,7 @@ module ActionController
       visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
       wait_until{ assert find_field('input_first_name').value == member.first_name  }
       within("#table_membership_information"){ click_on 'Add club cash' }
+      find( "tr", :text => I18n.t('activerecord.attributes.club_cash_transaction.amount_help') )
       
       alert_ok_js
       fill_in 'club_cash_transaction[amount]', :with => amount

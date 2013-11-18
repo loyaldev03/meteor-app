@@ -1,20 +1,20 @@
 module MesAccountUpdater
   CHARGEBACKS_TO_NOT_PROCESS = [ 'Duplicate Processing' ]
 
-  def self.process_chargebacks(mode)
-    PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
+  def self.process_chargebacks
+    PaymentGatewayConfiguration.find_all_by_gateway('mes').each do |gateway|
       MesAccountUpdater.process_chargebacks_for_gateway gateway
     end
   end
 
-  def self.account_updater_process_answers(mode)
-    PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
+  def self.account_updater_process_answers
+    PaymentGatewayConfiguration.find_all_by_gateway('mes').each do |gateway|
       MesAccountUpdater.account_updater_process_answers_for_gateway gateway unless gateway.aus_login.blank?
     end
   end
   
-  def self.account_updater_send_file_to_process(mode)
-    PaymentGatewayConfiguration.find_all_by_gateway_and_mode('mes', mode).each do |gateway|
+  def self.account_updater_send_file_to_process
+    PaymentGatewayConfiguration.find_all_by_gateway('mes').each do |gateway|
       MesAccountUpdater.account_updater_send_file_to_process_for_gateway gateway unless gateway.aus_login.blank?
     end
   end

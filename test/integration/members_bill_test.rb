@@ -42,16 +42,13 @@ class MembersBillTest < ActionController::IntegrationTest
   
     alert_ok_js      
     click_on 'Refund'
-
+    sleep(5) #wait for communication to be sent. 
     if check_refund
       page.has_content?("This transaction has been approved")
-      within(".nav-tabs") do
-        click_on("Operations")
-      end
+      within(".nav-tabs"){ click_on("Operations") }
       within("#operations_table")do
         assert page.has_content?("Communication 'Test refund' sent")
         assert page.has_content?("Refund success $#{amount.to_f}")
-        assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
       end
     end
   end
@@ -205,7 +202,7 @@ class MembersBillTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_member.first_name
    
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date))
+      assert page.has_no_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
     end
   end
 
@@ -217,7 +214,7 @@ class MembersBillTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_member.first_name
    
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_no_content?(I18n.l(Time.zone.now, :format => :only_date))
+      assert page.has_no_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
     end
   end
 
@@ -345,7 +342,7 @@ class MembersBillTest < ActionController::IntegrationTest
     within("#transactions_table_wrapper"){ assert page.has_selector?('#refund') }
     make_a_refund(Transaction.last, final_amount)
   end 
-
+  
   test "Partial refund from CS" do
     setup_member
     @saved_member.current_membership.join_date = Time.zone.now-3.day
@@ -362,7 +359,7 @@ class MembersBillTest < ActionController::IntegrationTest
     within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
       assert page.has_content?("Refund success $#{final_amount.to_f}")
-      assert page.has_content?(I18n.l(Time.zone.now, :format => :dashed))
+      assert page.has_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
     end
   end 
 

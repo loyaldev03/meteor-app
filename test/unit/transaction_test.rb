@@ -224,7 +224,7 @@ class TransactionTest < ActiveSupport::TestCase
           assert_nil member.bill_date
           assert_not_nil member.cancel_date
           assert_equal 0, member.recycled_times
-          assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_hard_decline_by_limit).count
+          assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_hard_decline_by_max_retries).count
         else
           nbd = nbd + @sd_strategy.days.days
           assert_equal nbd.to_date, member.next_retry_bill_date.to_date
@@ -271,7 +271,7 @@ class TransactionTest < ActiveSupport::TestCase
           assert_nil member.cancel_date
           assert_not_nil member.bill_date          
           assert_not_nil member.next_retry_bill_date          
-          assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.downgraded_because_of_hard_decline_by_limit).count
+          assert_equal 1, member.operations.find_all_by_operation_type(Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries).count
         else
           nbd = nbd + @sd_strategy.days.days
           assert_equal nbd.to_date, member.next_retry_bill_date.to_date
@@ -365,7 +365,7 @@ class TransactionTest < ActiveSupport::TestCase
         assert_nil active_member.bill_date, "bill_date should be nil"
         assert_equal active_member.recycled_times, 0, "recycled_times should be 0"
         trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
-        assert_equal trans.operation_type, Settings.operation_types.membership_billing_hard_decline_by_limit
+        assert_equal trans.operation_type, Settings.operation_types.membership_billing_hard_decline_by_max_retries
         assert_equal trans.transaction_type, 'sale'
       end
     end
@@ -411,7 +411,7 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal active_member.recycled_times, 4, "recycled_times remain the same"
       assert_equal active_member.terms_of_membership.id, @terms_of_membership_for_downgrade.id
       trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
-      assert_equal trans.operation_type, Settings.operation_types.downgraded_because_of_hard_decline_by_limit
+      assert_equal trans.operation_type, Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries
       assert_equal trans.transaction_type, 'sale'    
     end
   end
@@ -460,9 +460,9 @@ class TransactionTest < ActiveSupport::TestCase
     answer = active_member.bill_membership
     active_member.reload
     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
-    assert_equal trans.operation_type, Settings.operation_types.membership_billing_without_decline_strategy_limit
+    assert_equal trans.operation_type, Settings.operation_types.membership_billing_without_decline_strategy_max_retries
     assert_equal trans.transaction_type, 'sale' 
-    assert_equal Operation.find_by_member_id_and_operation_type(active_member.id, Settings.operation_types.membership_billing_without_decline_strategy_limit).description, "Billing error. No decline rule configured limit reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
+    assert_equal Operation.find_by_member_id_and_operation_type(active_member.id, Settings.operation_types.membership_billing_without_decline_strategy_max_retries).description, "Billing error. No decline rule configured limit reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
   end
 
   # TODO: how do we stub faraday?

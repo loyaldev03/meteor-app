@@ -40,6 +40,7 @@ class MembersClubCashTest < ActionController::IntegrationTest
 
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     within("#table_membership_information"){ click_on 'Add club cash' }
+    find( "tr", :text => I18n.t('activerecord.attributes.club_cash_transaction.amount_help') )
 
     fill_in 'club_cash_transaction[amount]', :with => 5
     fill_in 'club_cash_transaction[description]', :with => "description"

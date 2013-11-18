@@ -40,10 +40,10 @@ defaults: &defaults
     error_on_enrollment_billing: 111
     no_recurrent_billing: 112
     no_recurrent_billing_with_error: 113
-    membership_billing_hard_decline_by_limit: 114
+    membership_billing_hard_decline_by_max_retries: 114
     downgraded_because_of_hard_decline: 115
-    downgraded_because_of_hard_decline_by_limit: 116
-    membership_billing_without_decline_strategy_limit: 117
+    downgraded_because_of_hard_decline_by_max_retries: 116
+    membership_billing_without_decline_strategy_max_retries: 117
     membership_manual_cash_billing: 118
     membership_manual_check_billing: 119
     membership_billing_with_error: 120
