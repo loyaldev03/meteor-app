@@ -231,15 +231,29 @@ function new_product_functions(){
 }
 
 function member_index_functions(){
-  $('#index_search_form').submit(function (){
-    startAjaxLoader();
-    $('#submit_button').attr('disabled', 'disabled');
-    update_select_only = false;
-    $.get(this.action, $(this).serialize(), null, 'script').done(function(data) {
-      endAjaxLoader();
-      $('#submit_button').removeAttr('disabled');
+  $('#index_search_form').submit(function (event){
+    var atLeastOneFilled = false;
+    $('form :text, form select').each( function(){
+      if($(this).val() != "")
+        atLeastOneFilled = true;
     });
-    return false;
+    $('form :checkbox').each( function(){
+      if($(this).is(":checked"))
+        atLeastOneFilled = true;
+    });
+    if(atLeastOneFilled == false){
+      alert("No filters selected.");
+      event.preventDefault(); 
+    }else{
+      startAjaxLoader();
+      $('#submit_button').attr('disabled', 'disabled');
+      update_select_only = false;
+      $.get(this.action, $(this).serialize(), null, 'script').done(function(data) {
+        endAjaxLoader();
+        $('#submit_button').removeAttr('disabled');
+      });
+      return false;
+    }
   });
 
   $(".datepicker_for_search_nbd").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
