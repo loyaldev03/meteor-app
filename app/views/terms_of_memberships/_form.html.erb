@@ -108,21 +108,19 @@
     </div>
   </div>
 
-  <div id="club_cash_group">
-    <div class="control-group">
-      <%= label_tag 'initial_club_cash_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number' %>
-      </div>
+  <div class="control-group">
+    <%= label_tag 'initial_club_cash_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number' %>
     </div>
+  </div>
 
-    <div class="control-group">
-      <%= label_tag 'club_cash_installment_amount', t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number' %>
-        <%= t('activerecord.attributes.terms_of_membership.wizard.skip_first_club_cash') %>
-        <%= f.check_box 'skip_first_club_cash' %>
-      </div>
+  <div class="control-group" id="club_cash_installment">
+    <%= label_tag 'club_cash_installment_amount', t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number', :placeholder => '0.0' %>
+      <%= t('activerecord.attributes.terms_of_membership.wizard.skip_first_club_cash') %>
+      <%= f.check_box 'skip_first_club_cash' %>
     </div>
   </div>
 </div>
@@ -249,19 +247,17 @@
 
   function select_payment_is_expected(){
     $('#recurring_amount_group').show('fast');
-    $('#club_cash_group').show('fast');
+    $('#club_cash_installment').show('fast');
     $('#installment_amount').prop('required', true);
     $('#installment_amount_days').prop('required', true);
-    $('#initial_club_cash_amount').prop('required', true);
     $('#club_cash_installment_amount').prop('required', true);
   }
 
   function select_payment_is_not_expected(){
     $('#recurring_amount_group').hide('fast');
-    $('#club_cash_group').hide('fast');
+    $('#club_cash_installment').hide('fast');
     $('#installment_amount').removeAttr('required');
     $('#installment_amount_days').removeAttr('required');
-    $('#initial_club_cash_amount').removeAttr('required');
     $('#club_cash_installment_amount').removeAttr('required');
   }
 
