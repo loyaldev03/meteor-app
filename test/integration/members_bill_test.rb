@@ -202,7 +202,7 @@ class MembersBillTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_member.first_name
    
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
+      assert page.has_no_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
     end
   end
 
@@ -214,7 +214,7 @@ class MembersBillTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_member.first_name
    
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
+      assert page.has_no_content?(I18n.l(Time.zone.now.in_time_zone(@saved_member.get_club_timezone), :format => :only_date))
     end
   end
 
@@ -407,7 +407,11 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
 
     assert_difference("Communication.count",2)do
-      Member.bill_all_members_up_today
+      excecute_like_server(@club.time_zone) do
+        excecute_like_server(@club.time_zone) do
+          Member.bill_all_members_up_today
+        end
+      end
     end
 
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
@@ -421,7 +425,6 @@ class MembersBillTest < ActionController::IntegrationTest
     within("#communication"){ assert page.has_content?("hard_decline") }
     within("#communication"){ assert page.has_content?("cancellation") }
   end
-
 
   test "Try billing a member with credit card ok, and within a club that allows billing." do
     setup_member

@@ -109,61 +109,55 @@ Club.all.each_with_index do |c, i|
   if (i % 2) == 0
     pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
       :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
-      :mode => "development", :gateway => "mes", :report_group => "SAC_STAGING_TEST", 
-      :aus_login => '941000108792', :aus_password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU"
-    pgc.club = c
-    pgc.save!
-    pgc = PaymentGatewayConfiguration.new :login => "94100010879200000001", 
-      :merchant_key => "SAC, Inc", :password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU", 
-      :mode => "production", :gateway => "mes", :report_group => "SAC_STAGING_TEST",
+      :gateway => "mes", :report_group => "SAC_STAGING_TEST", 
       :aus_login => '941000108792', :aus_password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU"
     pgc.club = c
     pgc.save!
   else
     pgc = PaymentGatewayConfiguration.new :login => "a", 
       :merchant_key => "SAC, Inc", :password => "a", 
-      :mode => "development", :gateway => "litle", :report_group => "SAC_STAGING_TEST", 
+      :gateway => "litle", :report_group => "SAC_STAGING_TEST", 
       :aus_login => '', :aus_password => ""
     pgc.club = c
     pgc.save!
   end
 
-  tom = TermsOfMembership.new :installment_amount => 34.56, :mode => 'development',
+  tom = TermsOfMembership.new :installment_amount => 34.56,
     :needs_enrollment_approval => false, :name => "test2",
     :installment_period => 30, :initial_fee => 0, :trial_period_amount => 0, :is_payment_expected => 1, :subscription_limits => 0, :if_cannot_bill => 'cancel'
   tom.club = c
   tom.save!
-  tom = TermsOfMembership.new :installment_amount => 100.56, :mode => 'development',
+  tom = TermsOfMembership.new :installment_amount => 100.56,
     :needs_enrollment_approval => false, :name => "test2 year",
     :installment_period => 365, :initial_fee => 0, :trial_period_amount => 0, :is_payment_expected => 1, :subscription_limits => 0, :if_cannot_bill => 'cancel'
   tom.club = c
   tom.save!
-  tom = TermsOfMembership.new :installment_amount => 45, :mode => 'development',
+  tom = TermsOfMembership.new :installment_amount => 45,
     :needs_enrollment_approval => false, :name => "test",
     :installment_period => 365, :initial_fee => 0, :trial_period_amount => 0, :is_payment_expected => 1, :subscription_limits => 0, :if_cannot_bill => 'cancel'
   tom.club = c
   tom.save!
-  tom = TermsOfMembership.new :installment_amount => 25, :mode => 'development',
+  tom = TermsOfMembership.new :installment_amount => 25,
     :needs_enrollment_approval => false, :name => "test paid", :club_cash_amount => 10,
     :installment_period => 30, :initial_fee => 0, :trial_period_amount => 0, :is_payment_expected => 1, :subscription_limits => 0, :if_cannot_bill => 'cancel'
   tom.club = c
   tom.save!
-  tom = TermsOfMembership.new :installment_amount => 100, :mode => 'development',
+  tom = TermsOfMembership.new :installment_amount => 100,
     :needs_enrollment_approval => false, :name => "test annual",
     :installment_period => 365, :initial_fee => 0, :trial_period_amount => 0, :is_payment_expected => 1, :subscription_limits => 0, :if_cannot_bill => 'cancel'
   tom.club = c
   tom.save!
-  tom = TermsOfMembership.new :installment_amount => 50, :mode => 'development',
+  tom = TermsOfMembership.new :installment_amount => 50,
     :needs_enrollment_approval => true, :name => "test approval",
     :installment_period => 30, :initial_fee => 0, :trial_period_amount => 0, :is_payment_expected => 1, :subscription_limits => 0, :if_cannot_bill => 'cancel'
   tom.club = c
   tom.save!
-  tom = TermsOfMembership.new :installment_amount => 50, :mode => 'development',
+  tom = TermsOfMembership.new :installment_amount => 50,
     :needs_enrollment_approval => true, :name => "test anual approval",
     :installment_period => 365, :initial_fee => 0, :trial_period_amount => 0, :is_payment_expected => 1, :subscription_limits => 0, :if_cannot_bill => 'cancel'
   tom.club = c
   tom.save!
-  tom = TermsOfMembership.new :installment_amount => 84, :mode => 'development',
+  tom = TermsOfMembership.new :installment_amount => 84,
     :needs_enrollment_approval => false, :name => "test for drupal", :provisional_days => 30,
     :installment_period => 30, :initial_fee => 0, :trial_period_amount => 0, :is_payment_expected => 1, :subscription_limits => 0, :if_cannot_bill => 'cancel'
   tom.club = c

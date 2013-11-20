@@ -379,7 +379,7 @@ en:
           subscription_terms: 'Subscription Terms'
           bill_until_cancelled: 'Bill until Member Cancelled'
           stop_billing_after: 'Stop billing after'
-          keep_active_until_manually_cancelled: 'Keep provisional until manually cancelled'
+          keep_active_until_manually_cancelled: 'Keep provisional until manually cancel'
           cancel_member_after: 'Cancel member after'
           step_2_button_next: 'Define Upgrades / Downgrades'
           step_2_edit_button_next: 'Edit Upgrades / Downgrades'
