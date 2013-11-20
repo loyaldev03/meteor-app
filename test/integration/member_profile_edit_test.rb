@@ -1,4 +1,4 @@
-require 'test_helper'
+  require 'test_helper'
  
 class MemberProfileEditTest < ActionController::IntegrationTest
 
@@ -272,6 +272,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
       within("#table_demographic_information"){ fill_in field, :with => value }
       alert_ok_js
       click_link_or_button 'Update Member'
+      sleep 5
       within("#table_demographic_information"){ assert !page.has_css?('tr.yellow') }
       @saved_member.reload
       assert_equal @saved_member.wrong_phone_number, nil

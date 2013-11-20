@@ -78,6 +78,7 @@ class TermsOfMembershipsController < ApplicationController
       @tom.initial_fee = post_data[:initial_fee_amount]
       @tom.trial_period_amount = post_data[:trial_period_amount]
       @tom.provisional_days = post_data[:trial_period_lasting_time_span] == 'months' ? months_to_days(post_data[:trial_period_lasting].to_i) : post_data[:trial_period_lasting].to_i
+      @tom.club_cash_installment_amount = post_data[:terms_of_membership][:club_cash_installment_amount]
       @tom.is_payment_expected = post_data[:is_payment_expected] == 'yes' ? true : false
       if @tom.is_payment_expected
         @tom.installment_amount = post_data[:installment_amount]
@@ -85,10 +86,10 @@ class TermsOfMembershipsController < ApplicationController
       else
         @tom.installment_period = nil
         @tom.installment_amount = nil
+        @tom.club_cash_installment_amount = nil
       end
       @tom.subscription_limits = post_data[:subscription_terms] == 'until_cancelled' ? 0 : (post_data[:subscription_terms_stop_billing_after_time_span] == 'months' ? months_to_days(post_data[:subscription_terms_stop_billing_after].to_i) : post_data[:subscription_terms_stop_billing_after].to_i)
       @tom.initial_club_cash_amount = post_data[:terms_of_membership][:initial_club_cash_amount]
-      @tom.club_cash_installment_amount = post_data[:terms_of_membership][:club_cash_installment_amount]
       @tom.skip_first_club_cash = post_data[:terms_of_membership][:skip_first_club_cash]
       # Step 3
       case post_data[:if_cannot_bill_member]

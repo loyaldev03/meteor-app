@@ -369,8 +369,10 @@ class MembersBillTest < ActionController::IntegrationTest
     next_bill_date = @saved_member.current_membership.join_date + @terms_of_membership_with_gateway.provisional_days.days
     next_bill_date_after_billing = @saved_member.next_retry_bill_date + @terms_of_membership_with_gateway.installment_period.days
 
-    bill_member(@saved_member, false)
-
+    excecute_like_server(@club.time_zone) do
+      bill_member(@saved_member, false)
+    end
+    
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_membership_information") do
       within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
@@ -389,7 +391,9 @@ class MembersBillTest < ActionController::IntegrationTest
     setup_member
     ["representative", "supervisor"].each do |role|
       @admin_agent.update_attribute(:roles, [role])
-      bill_member(@saved_member, true)
+      excecute_like_server(@club.time_zone) do
+        bill_member(@saved_member, true)
+      end
     end
   end 
 
@@ -407,7 +411,11 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
 
     assert_difference("Communication.count",2)do
-      Member.bill_all_members_up_today
+      excecute_like_server(@club.time_zone) do
+        excecute_like_server(@club.time_zone) do
+          Member.bill_all_members_up_today
+        end
+      end
     end
 
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
@@ -422,7 +430,6 @@ class MembersBillTest < ActionController::IntegrationTest
     within("#communication"){ assert page.has_content?("cancellation") }
   end
 
-
   test "Try billing a member with credit card ok, and within a club that allows billing." do
     setup_member
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)      
@@ -433,7 +440,6 @@ class MembersBillTest < ActionController::IntegrationTest
 
     trans = Transaction.last
     assert page.has_content? "Member billed successfully $100 Transaction id: #{trans.uuid}. Reason: asd"
-
 
     within(".nav-tabs") {click_on 'Operations'}
     within("#operations") {assert page.has_content? "Member billed successfully $100 Transaction id: #{trans.uuid}. Reason: asd"}
