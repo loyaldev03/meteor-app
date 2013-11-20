@@ -140,7 +140,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @saved_member = Member.find_by_email(unsaved_member.email)  
 
     @saved_member.current_membership.update_attribute(:join_date, Time.zone.now - amount_of_days.day)
-    Member.send_pillar_emails
+    excecute_like_server(@club.time_zone) do
+      Member.send_pillar_emails
+    end
     sleep 5
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){ click_on 'Communications' }
@@ -907,7 +909,9 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == unsaved_member.first_name
     @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:birth_date, Time.zone.now)
-    Member.send_happy_birthday
+    excecute_like_server(@club.time_zone) do
+      Member.send_happy_birthday
+    end
     sleep(5)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
