@@ -112,6 +112,7 @@ Club.all.each_with_index do |c, i|
       :gateway => "mes", :report_group => "SAC_STAGING_TEST", 
       :aus_login => '941000108792', :aus_password => "SjVFXAYZtUeejfMQnJDblkEEvqkLUvgU"
     pgc.club = c
+    pgc.save!
   else
     pgc = PaymentGatewayConfiguration.new :login => "a", 
       :merchant_key => "SAC, Inc", :password => "a", 
