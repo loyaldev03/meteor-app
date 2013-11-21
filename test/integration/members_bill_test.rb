@@ -66,6 +66,7 @@ class MembersBillTest < ActionController::IntegrationTest
             find(".ui-icon-circle-triangle-e").click
           end
         end
+        sleep 1
         first(:link, date.day.to_s).click
       end
     end

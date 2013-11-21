@@ -76,55 +76,6 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
   ###########################################################
   # TESTS
   ###########################################################
- 
-  # cancel member and check if not_processed fulfillments were updated to canceled
-  test "cancel member before two days of enrollment and check if not_processed fulfillments were updated to canceled" do
-    setup_member
-    
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    within(".nav-tabs") do
-      click_on("Fulfillments")
-    end
-    within("#fulfillments")do
-      assert page.has_content?('not_processed')
-    end
-
-    @saved_member.set_as_canceled!
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    within(".nav-tabs") do
-      click_on("Fulfillments")
-    end
-    within("#fulfillments")do
-      assert page.has_content?('canceled')
-    end
-    @fulfillment.reload
-    assert_equal @fulfillment.status, 'canceled'
-  end
- 
-  test "cancel member after more than two days  of enrollment. It should not cancel the fulfillment." do
-    setup_member
-    
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    within(".nav-tabs") do
-      click_on("Fulfillments")
-    end
-    within("#fulfillments")do
-      assert page.has_content?('not_processed')
-    end
-    @saved_member.current_membership.update_attribute :join_date, Time.zone.now - 2.day
-    @saved_member.set_as_canceled!
-
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    within(".nav-tabs") do
-      click_on("Fulfillments")
-    end
-    within("#fulfillments")do
-      assert page.has_content?('not_processed')
-    end
-    @fulfillment.reload
-    assert_equal @fulfillment.status, 'not_processed'
-  end 
 
   test "cancel member and check if in_process fulfillments were updated to canceled" do
     setup_member
