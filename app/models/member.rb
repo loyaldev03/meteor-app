@@ -1134,8 +1134,8 @@ class Member < ActiveRecord::Base
     base2 = Member.where('status = "lapsed" and last_sync_error like "The e-mail address <em class=\"placeholder\">%</em> is already taken."')
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members with error sync related to wrong api_id, processing #{base.count+base2.count} members"
     tz = Time.zone.now
+    index = 0
     [base,base2].each do |group|
-      index = 0
       group.each do |member|
         begin
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
