@@ -1131,31 +1131,35 @@ class Member < ActiveRecord::Base
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
 
     base = Member.where('last_sync_error like "There is no user with ID%"')
-                  .where('status = "lapsed" and last_sync_error like "The e-mail address <em class=\"placeholder\">%</em> is already taken."')
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members with error sync related to wrong api_id, processing #{base.count} members"
+    base2 = Member.where('status = "lapsed" and last_sync_error like "The e-mail address <em class=\"placeholder\">%</em> is already taken."')
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members with error sync related to wrong api_id, processing #{base.count+base2.count} members"
     tz = Time.zone.now
-    base.to_enum.with_index.each do |member,index|
-      begin
-        Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-        member.api_id = nil 
-        member.last_sync_error = nil
-        member.last_sync_error_at = nil
-        member.last_synced_at = nil
-        member.sync_status = "not_synced"
-        member.save(:validate => false)
-        unless member.lapsed?
-          api_m = member.api_member
-          unless api_m.nil?
-            if api_m.save!(force: true)
-              unless member.last_sync_error_at
-                Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
+    index = 0
+    [base,base2].each do |group|
+      group.each do |member|
+        begin
+          Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
+          member.api_id = nil 
+          member.last_sync_error = nil
+          member.last_sync_error_at = nil
+          member.last_synced_at = nil
+          member.sync_status = "not_synced"
+          member.save(:validate => false)
+          unless member.lapsed?
+            api_m = member.api_member
+            unless api_m.nil?
+              if api_m.save!(force: true)
+                unless member.last_sync_error_at
+                  Auditory.audit(nil, member, "Member synchronized by batch script", member, Settings.operation_types.member_drupal_account_synced_batch)
+                end
               end
             end
           end
+          index = index + 1
+        rescue Exception => e
+          Auditory.report_issue("Members::Sync", e, {:member => member.inspect})
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
-      rescue Exception => e
-        Auditory.report_issue("Members::Sync", e, {:member => member.inspect})
-        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
