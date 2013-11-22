@@ -1131,7 +1131,7 @@ class Member < ActiveRecord::Base
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
 
     base = Member.where('last_sync_error like "There is no user with ID%"')
-    base2 = Member.where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken.%"')
+    base2 = Member.where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"')
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members with error sync related to wrong api_id, processing #{base.count+base2.count} members"
     tz = Time.zone.now
     index = 0
@@ -1192,7 +1192,7 @@ class Member < ActiveRecord::Base
 
   def self.process_email_sync_error
     member_list = {}
-    base = Member.where("sync_status = 'with_error' AND last_sync_error like '%The e-mail address%is already taken.%'")
+    base = Member.where("sync_status = 'with_error' AND last_sync_error like '%The e-mail address%is already taken%'")
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_email_sync_error rake task, processing #{base.count} members"
     base.find_in_batches do |group|
       group.each_with_index do |member, index|
