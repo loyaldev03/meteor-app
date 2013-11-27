@@ -826,10 +826,6 @@ class Member < ActiveRecord::Base
     self.delay.assign_club_cash unless terms_of_membership.skip_first_club_cash
   end
 
-  def assign_club_cash_on_successful_billing
-    self.delay.assign_club_cash
-  end
-
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing", enroll = false)
     amount = enroll ? terms_of_membership.initial_club_cash_amount : terms_of_membership.club_cash_installment_amount
