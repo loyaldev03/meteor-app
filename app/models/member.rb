@@ -1163,7 +1163,7 @@ class Member < ActiveRecord::Base
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
 
-    base = Member.where("sync_status IN ('with_error', 'not_synced') and status != 'lapsed' ").limit(2000)
+    base = Member.joins(:club).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{base.count} members"
     tz = Time.zone.now
     base.to_enum.with_index.each do |member,index|
