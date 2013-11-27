@@ -269,7 +269,7 @@ class MembersController < ApplicationController
         @current_member.last_synced_at = nil
         @current_member.sync_status = "not_synced"
       else
-        @current_member.api_id = params[:member][:api_id]
+        @current_member.api_id = params[:member][:api_id].strip
       end
       begin
         if @current_member.save

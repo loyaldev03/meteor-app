@@ -14,6 +14,27 @@ class FulfillmentTest < ActiveSupport::TestCase
     @product_recurrent = FactoryGirl.create(:product_with_recurrent, club_id: @terms_of_membership_with_gateway.club.id)
   end
 
+  def enroll_member(tom, amount=23, cc_blank=false, cc_card = nil)
+    credit_card = cc_card.nil? ? @credit_card : cc_card
+    answer = Member.enroll(tom, @current_agent, amount, 
+      { first_name: @member.first_name,
+        last_name: @member.last_name, address: @member.address, city: @member.city, gender: 'M',
+        zip: @member.zip, state: @member.state, email: @member.email, type_of_phone_number: @member.type_of_phone_number,
+        phone_country_code: @member.phone_country_code, phone_area_code: @member.phone_area_code,
+        type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US', 
+        product_sku: Settings.kit_card_product }, 
+      { number: credit_card.number, 
+        expire_year: credit_card.expire_year, expire_month: credit_card.expire_month },
+      cc_blank)
+
+    assert (answer[:code] == Settings.error_codes.success), answer[:message]+answer.inspect
+
+    member = Member.find(answer[:member_id])
+    assert_not_nil member
+    assert_equal member.status, 'provisional'
+    member
+  end
+
   test "active member can't renew fulfillments" do 
     [ 1, 5, 15, 25 ].each do |time|
       [ 1, 3 ].each do |recycled_times|
@@ -72,7 +93,6 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert_equal Fulfillment.to_be_renewed.count, 0
   end
 
-
   test "fulfillment sent renewal" do 
     member = create_active_member(@terms_of_membership_with_gateway)
     member.reload
@@ -121,5 +141,43 @@ class FulfillmentTest < ActiveSupport::TestCase
     fulfillment_out_of_stock = member.fulfillments.first
     assert_equal fulfillment_out_of_stock.recurrent, true, "Recurrent on fulfillment is not recurrent when it should be."
     assert_equal fulfillment_out_of_stock.renewable_at, fulfillment_out_of_stock.assigned_at + 1.year, "Renewable date was not set properly."
+  end
+
+  # cancel member and check if not_processed fulfillments were updated to canceled
+  test "cancel member after more than two days of enrollment. It should not cancel the fulfillment." do
+    setup_products
+    @member = FactoryGirl.build(:member)
+    @credit_card = FactoryGirl.build(:credit_card)
+    member = enroll_member(@terms_of_membership_with_gateway)
+    fulfillment = member.fulfillments.first
+    assert_equal fulfillment.status, "not_processed"
+
+    cancel_date = member.join_date + Settings.days_to_wait_to_cancel_fulfillments.days
+    member.cancel! cancel_date, "canceling"
+    Timecop.travel(cancel_date) do
+      Member.cancel_all_member_up_today
+      member.reload
+      assert_equal member.status, "lapsed"
+      assert_equal fulfillment.status, "not_processed"
+    end
+  end
+
+  test "cancel member before two days of enrollment. It should cancel the fulfillment." do
+    setup_products
+    @member = FactoryGirl.build(:member)
+    @credit_card = FactoryGirl.build(:credit_card)
+    member = enroll_member(@terms_of_membership_with_gateway)
+    fulfillment = member.fulfillments.first
+    assert_equal fulfillment.status, "not_processed"
+
+    cancel_date = member.join_date + 1.day
+    member.cancel! cancel_date, "canceling"
+    Timecop.travel(cancel_date) do
+      Member.cancel_all_member_up_today
+      member.reload
+      fulfillment.reload
+      assert_equal member.status, "lapsed"
+      assert_equal fulfillment.status, "canceled"
+    end
   end
 end

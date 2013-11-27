@@ -319,7 +319,7 @@ class MemberTest < ActiveSupport::TestCase
     Timecop.freeze( @member.next_retry_bill_date ) do
       assert_difference('Operation.count', 0) do
         assert_difference('Transaction.count', 0) do
-          Member.bill_all_members_up_today
+          excecute_like_server(@club.time_zone){ Member.bill_all_members_up_today }
         end
       end
       @member.reload
@@ -340,7 +340,9 @@ class MemberTest < ActiveSupport::TestCase
     Timecop.freeze( @member.next_retry_bill_date ) do
       assert_difference('Operation.count', 3) do
         assert_difference('Transaction.count', 1) do
-          Member.bill_all_members_up_today
+          excecute_like_server(@club.time_zone) do
+            Member.bill_all_members_up_today
+          end
         end
       end
 
@@ -360,9 +362,9 @@ class MemberTest < ActiveSupport::TestCase
     next_bill_date = @saved_member.bill_date + @terms_of_membership_with_gateway.installment_period.days
 
     Timecop.freeze( @saved_member.next_retry_bill_date ) do
-      Time.zone = "UTC"
-      Member.bill_all_members_up_today
-      Time.zone = @club.time_zone
+      excecute_like_server(@club.time_zone) do
+        Member.bill_all_members_up_today
+      end
       @saved_member.reload
 
       assert_equal(@saved_member.current_membership.status, "active")
@@ -398,11 +400,11 @@ class MemberTest < ActiveSupport::TestCase
     @saved_member.manual_payment =true
     @saved_member.bill_date = Time.zone.now-1.day
     @saved_member.save
-    Time.zone = 'UTC'
     assert_difference("Operation.count",3) do
-      Member.cancel_all_member_up_today
+      excecute_like_server(@club.time_zone) do
+        Member.cancel_all_member_up_today
+      end
     end
-    Time.zone = @club.time_zone
     @saved_member.reload
     assert_equal @saved_member.status, "lapsed"
     assert_nil @saved_member.next_retry_bill_date
@@ -459,7 +461,6 @@ class MemberTest < ActiveSupport::TestCase
         end
       end
     end
-    Time.zone = @club.time_zone
   end
 
   test "Do not Send Prebill email (7 days before NBD) when member's recycled_times is not 0" do
