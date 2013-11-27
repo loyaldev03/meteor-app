@@ -128,7 +128,7 @@ class Member < ActiveRecord::Base
     after_transition :provisional => 
                         :active, :do => [:assign_first_club_cash]
     after_transition :active => 
-                    :active, :do => 'assign_club_cash()'
+                    :active, :do => 'self.delay.assign_club_cash()'
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
@@ -823,7 +823,7 @@ class Member < ActiveRecord::Base
   end
 
   def assign_first_club_cash 
-    assign_club_cash unless terms_of_membership.skip_first_club_cash
+    self.delay.assign_club_cash unless terms_of_membership.skip_first_club_cash
   end
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
