@@ -247,8 +247,7 @@ class Member < ActiveRecord::Base
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
     end
     self.save(:validate => false)
-    # self.delay.assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
-    self.assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
+    self.delay(:run_at => 5.minutes.from_now).assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
   end
 
   # Changes next bill date.

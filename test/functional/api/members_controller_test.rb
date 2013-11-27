@@ -116,8 +116,13 @@ class Api::MembersControllerTest < ActionController::TestCase
           assert_difference('Transaction.count')do
             assert_difference('MemberPreference.count',@preferences.size) do 
               assert_difference('Member.count') do
-                generate_post_message
-                assert_response :success
+                Delayed::Worker.delay_jobs = true
+                assert_difference('DelayedJob.count',6)do
+                  generate_post_message
+                  assert_response :success
+                end
+                Delayed::Worker.delay_jobs = false
+                Delayed::Job.all.each{ |x| x.invoke_job }
               end
             end
           end
