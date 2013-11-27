@@ -167,7 +167,12 @@ class TransactionTest < ActiveSupport::TestCase
 
     # bill members the day trial days expires. Member should be billed
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
-      Member.bill_all_members_up_today
+      Delayed::Worker.delay_jobs = true
+      assert_difference('DelayedJob.count',3)do
+        Member.bill_all_members_up_today
+      end
+      Delayed::Worker.delay_jobs = false  
+      Delayed::Job.all.each{ |x| x.invoke_job }
       member.reload
       nbd = nbd + member.terms_of_membership.installment_period.days
       assert_equal I18n.l(nbd, :format => :only_date), I18n.l(member.next_retry_bill_date, :format => :only_date)
@@ -178,7 +183,12 @@ class TransactionTest < ActiveSupport::TestCase
     2.upto(5) do |time|
       Timecop.travel(next_year) do
         next_year = next_year + member.terms_of_membership.installment_period.days
-        Member.bill_all_members_up_today
+        Delayed::Worker.delay_jobs = true
+        assert_difference('DelayedJob.count',3)do
+          Member.bill_all_members_up_today
+        end
+        Delayed::Worker.delay_jobs = false
+        Delayed::Job.all.each{ |x| x.invoke_job }
         member.reload
         nbd = nbd + member.terms_of_membership.installment_period.days
         assert_equal I18n.l(nbd, :format => :only_date), I18n.l(member.next_retry_bill_date, :format => :only_date)
