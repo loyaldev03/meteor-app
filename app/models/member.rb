@@ -128,7 +128,7 @@ class Member < ActiveRecord::Base
     after_transition :provisional => 
                         :active, :do => [:assign_first_club_cash]
     after_transition :active => 
-                    :active, :do => 'self.delay.assign_club_cash()'
+                    :active, :do => 'assign_club_cash'
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
@@ -247,7 +247,7 @@ class Member < ActiveRecord::Base
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
     end
     self.save(:validate => false)
-    self.delay(:run_at => 5.minutes.from_now).assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
+    assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
   end
 
   # Changes next bill date.
@@ -823,7 +823,7 @@ class Member < ActiveRecord::Base
   end
 
   def assign_first_club_cash 
-    self.delay.assign_club_cash unless terms_of_membership.skip_first_club_cash
+    assign_club_cash unless terms_of_membership.skip_first_club_cash
   end
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
@@ -841,7 +841,8 @@ class Member < ActiveRecord::Base
     # If there is connectivity problems or data errors with drupal. Do not stop billing!! 
     Auditory.report_issue("Member:assign_club_cash:sync", e, { :member => self.inspect, :amount => amount, :message => message })
   end
-  
+  handle_asynchronously :assign_club_cash, :queue => :generic_queue, :run_at => 5.minutes.from_now
+
   # Adds club cash transaction. 
   def add_club_cash(agent, amount = 0,description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful, :message => "Could not save club cash transaction"  }
