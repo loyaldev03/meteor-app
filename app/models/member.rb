@@ -841,7 +841,7 @@ class Member < ActiveRecord::Base
     # If there is connectivity problems or data errors with drupal. Do not stop billing!! 
     Auditory.report_issue("Member:assign_club_cash:sync", e, { :member => self.inspect, :amount => amount, :message => message })
   end
-  handle_asynchronously :assign_club_cash, :queue => :generic_queue, :run_at => 5.minutes.from_now
+  handle_asynchronously :assign_club_cash, :queue => :generic_queue, :run_at => Proc.new { 5.minutes.from_now }
 
   # Adds club cash transaction. 
   def add_club_cash(agent, amount = 0,description = nil)
