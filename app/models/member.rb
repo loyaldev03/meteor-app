@@ -128,7 +128,7 @@ class Member < ActiveRecord::Base
     after_transition :provisional => 
                         :active, :do => [:assign_first_club_cash]
     after_transition :active => 
-                    :active, :do => 'assign_club_cash()'
+                    :active, :do => 'self.delay.assign_club_cash()'
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
@@ -823,7 +823,7 @@ class Member < ActiveRecord::Base
   end
 
   def assign_first_club_cash 
-    assign_club_cash unless terms_of_membership.skip_first_club_cash
+    self.delay.assign_club_cash unless terms_of_membership.skip_first_club_cash
   end
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
@@ -1163,7 +1163,7 @@ class Member < ActiveRecord::Base
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}"
 
-    base = Member.where("sync_status IN ('with_error', 'not_synced') and status != 'lapsed' ").limit(2000)
+    base = Member.joins(:club).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{base.count} members"
     tz = Time.zone.now
     base.to_enum.with_index.each do |member,index|
