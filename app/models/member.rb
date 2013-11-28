@@ -40,7 +40,7 @@ class Member < ActiveRecord::Base
   before_save :wrong_address_logic
 
   after_update :after_save_sync_to_remote_domain
-  after_destroy :cancel_member_at_remote_domain
+  after_destroy 'cancel_member_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
   after_save :after_marketing_tool_sync
@@ -55,6 +55,7 @@ class Member < ActiveRecord::Base
     # Because maybe we have already bill this member.
     Auditory.report_issue("Member:account_cancel:sync", e, { :member => self.inspect })
   end
+  handle_asynchronously :cancel_member_at_remote_domain, :queue => :drupal_queue
 
   def after_save_sync_to_remote_domain
     unless @skip_api_sync || api_member.nil?
@@ -195,7 +196,7 @@ class Member < ActiveRecord::Base
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
     Notifier.active_with_approval(emails,self).deliver!
   end
-  handle_asynchronously :send_active_needs_approval_email_dj, :queue => :generic_queue
+  handle_asynchronously :send_active_needs_approval_email_dj, :queue => :email_queue
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_recover_needs_approval_email
@@ -206,7 +207,7 @@ class Member < ActiveRecord::Base
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
     Notifier.recover_with_approval(emails,self).deliver!
   end
-  handle_asynchronously :send_recover_needs_approval_email_dj, :queue => :generic_queue
+  handle_asynchronously :send_recover_needs_approval_email_dj, :queue => :email_queue
 
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
   def increment_reactivations
