@@ -2,7 +2,7 @@ require 'auditory'
 require 'exception_notification'
 SacPlatform::Application.config.middleware.use ExceptionNotifier if ['production', 'staging', 'prototype'].include?(Rails.env)
 require 'lyris_service'
-require 'clean_find_in_batches'
+#require 'clean_find_in_batches'
 require 'axlsx'
 require "exceptions"
 
@@ -16,7 +16,7 @@ ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device = File.open("#{Rail
 ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device.sync = true
 
 
-ActiveRecord::Batches.send(:include, CleanFindInBatches)
+#ActiveRecord::Batches.send(:include, CleanFindInBatches)
 
 # config/initializers/delayed_job_config.rb
 Delayed::Worker.destroy_failed_jobs = false

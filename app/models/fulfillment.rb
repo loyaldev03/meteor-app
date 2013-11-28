@@ -180,22 +180,7 @@ class Fulfillment < ActiveRecord::Base
   # end
 
 
-  def self.process_fulfillments_up_today
-    index = 0
-    Fulfillment.to_be_renewed.find_in_batches do |group|
-      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_fulfillments_up_today rake task, processing #{group.count} fulfillments"
-      group.each do |fulfillment| 
-        begin
-          index = index+1
-          Rails.logger.info "  *[#{index}] processing member ##{fulfillment.member_id} fulfillment ##{fulfillment.id}"
-          fulfillment.renew!
-        rescue Exception => e
-          Auditory.report_issue("Member::Fulfillment", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :fulfillment => fulfillment.inspect })
-          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-        end
-      end
-    end
-  end
+
 
   def get_file_line(change_status = false, fulfillment_file)
     return [] if product.nil?
