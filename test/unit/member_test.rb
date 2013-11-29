@@ -134,6 +134,7 @@ class MemberTest < ActiveSupport::TestCase
   test "Lapsed member can be recovered unless it needs approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     member = create_active_member(@tom_approval, :lapsed_member)
+    answer = {}
     Delayed::Worker.delay_jobs = true
     assert_difference("DelayedJob.count", 4) do  # :send_recover_needs_approval_email_dj_without_delay and three times :marketing_tool_sync_without_delay 
       answer = member.recover(@tom_approval)
