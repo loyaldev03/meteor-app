@@ -82,8 +82,8 @@ class Member < ActiveRecord::Base
 
   ########### SEARCH ###############
   searchable do
-    integer :id
-    integer :club_id
+    long :id
+    long :club_id
     text :first_name
     text :last_name
     text :address
@@ -105,10 +105,10 @@ class Member < ActiveRecord::Base
     text :notes do
       member_notes.map { |comment| comment.description }
     end
-    # time :billed_dates do
-    #   # filter by sales
-    #   transactions.map { |transaction| transaction.created_at  }
-    # end
+    time :billed_dates, :multiple => true do
+      # filter by sales
+      transactions.where('transaction_type = "sale"').map { |transaction| transaction.created_at  }
+    end
     string :cc_token do 
       active_credit_card.token
     end
