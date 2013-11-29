@@ -138,6 +138,38 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
   end
 
+ test "Admin should enroll/create member with preferences when needs approval" do
+    sign_in @admin_user
+    @terms_of_membership.update_attribute :needs_enrollment_approval, true
+    @credit_card = FactoryGirl.build :credit_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count')do
+      assert_difference('EnrollmentInfo.count')do
+        assert_difference('Transaction.count')do
+          assert_difference('MemberPreference.count',@preferences.size) do 
+            assert_difference('Member.count') do
+              Delayed::Worker.delay_jobs = true
+              assert_difference('DelayedJob.count',5) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
+                generate_post_message
+                assert_response :success
+              end
+              Delayed::Worker.delay_jobs = false
+              Delayed::Job.all.each{ |x| x.invoke_job }
+            end
+          end
+        end
+      end
+    end
+    saved_member = Member.find_by_email(@member.email)
+    membership = Membership.last
+    enrollment_info = EnrollmentInfo.last
+    assert_equal(enrollment_info.membership_id, membership.id)
+  end
+
   test "Admin should enroll/create member within club related to drupal" do
     sign_in @admin_user
     @club = @club_with_api
