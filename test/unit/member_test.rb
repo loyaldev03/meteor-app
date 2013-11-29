@@ -130,10 +130,16 @@ class MemberTest < ActiveSupport::TestCase
     end
   end
 
+  # When enrolling/recovering a member should send approval email as DJ
   test "Lapsed member can be recovered unless it needs approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     member = create_active_member(@tom_approval, :lapsed_member)
-    answer = member.recover(@tom_approval)
+    Delayed::Worker.delay_jobs = true
+    assert_difference("DelayedJob.count", 4) do  # :send_recover_needs_approval_email_dj_without_delay and three times :marketing_tool_sync_without_delay 
+      answer = member.recover(@tom_approval)
+    end
+    Delayed::Worker.delay_jobs = false
+    Delayed::Job.all.each{ |x| x.invoke_job }
     member.reload
     assert answer[:code] == Settings.error_codes.success, answer[:message]
     assert_equal 'applied', member.status
