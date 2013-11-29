@@ -27,6 +27,7 @@ class MembersController < ApplicationController
   end
 
   def search_result
+    current_club = @current_club
     @members = Member.search do
       # members
       [ :first_name, :last_name, :address, :city, :zip, :email, :external_id, :notes ].each do |field|
@@ -54,13 +55,14 @@ class MembersController < ApplicationController
       end
      # .with_billed_date_from(params[:member][:billing_date_start])
      # .with_billed_date_to(params[:member][:billing_date_end])
-
-      with :club_id, @current_club
-      order_by sort_column, sort_direction
+      with :club_id, current_club.id
+      # order_by sort_column, sort_direction
       paginate :page => params[:page], :per_page => 25
     end.results
   rescue Errno::ECONNREFUSED
-    @members = []
+    # TODO: raise an error to ZD
+  ensure
+    render 'index'
   end
 
   def show

@@ -87,6 +87,7 @@ group :development do
   gem 'daemons'
   gem 'foreman'
   gem 'quiet_assets'
+  gem 'progress_bar'
 end
 
 group :prototype do

@@ -11,16 +11,31 @@ production:
 development:
   solr:
     hostname: localhost
-    port: 8982
+    port: 8984
     log_level: DEBUG
     path: /solr/development
+    auto_commit_after_request: false
+
+prototype:
+  solr:
+    hostname: localhost
+    port: 8985
+    log_level: DEBUG
+    path: /solr/prototype
+    auto_commit_after_request: false
+
+staging:
+  solr:
+    hostname: localhost
+    port: 8985
+    log_level: DEBUG
+    path: /solr/staging
     auto_commit_after_request: false
 
 test:
   solr:
     hostname: localhost
-    port: 8981
+    port: 8985
     log_level: WARNING
     path: /solr/test
     auto_commit_after_request: false
-    

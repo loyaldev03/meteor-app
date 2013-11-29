@@ -100,21 +100,25 @@ class Member < ActiveRecord::Base
     text :sync_status
     text :external_id
     time :join_date do
-      current_membership.join_date
+      join_date
     end
     text :notes do
       member_notes.map { |comment| comment.description }
     end
-    text :cc_token do 
+    # time :billed_dates do
+    #   # filter by sales
+    #   transactions.map { |transaction| transaction.created_at  }
+    # end
+    string :cc_token do 
       active_credit_card.token
     end
-    integer :last_digits do 
+    string :last_digits do 
       active_credit_card.last_digits
     end
   end
   # Async indexing
-  handle_asynchronously :solr_index, queue: 'indexing', priority: 50
-  handle_asynchronously :solr_index!, queue: 'indexing', priority: 50
+  handle_asynchronously :solr_index, queue: 'solr_indexing', priority: 50
+  handle_asynchronously :solr_index!, queue: 'solr_indexing', priority: 50
   ########### SEARCH ###############
 
 
