@@ -117,14 +117,14 @@ class TransactionTest < ActiveSupport::TestCase
 
     # bill members the day before trial days expires. Member should not be billed
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days - 2.days) do
-      Member.bill_all_members_up_today
+      TasksHelpers.bill_all_members_up_today
       member.reload
       assert_equal I18n.l(nbd, :format => :only_date), I18n.l(member.bill_date, :format => :only_date)
     end
 
     # bill members the day trial days expires. Member should be billed
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
-      Member.bill_all_members_up_today
+      TasksHelpers.bill_all_members_up_today
       member.reload
       nbd = nbd + member.terms_of_membership.installment_period.days
       assert_equal I18n.l(nbd, :format => :only_date), I18n.l(member.next_retry_bill_date, :format => :only_date)
@@ -137,7 +137,7 @@ class TransactionTest < ActiveSupport::TestCase
     1.upto(24) do |time|
       Timecop.travel(actual_month) do
         actual_month = member.next_retry_bill_date + member.terms_of_membership.installment_period.days
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
         member.reload
         nbd = nbd + member.terms_of_membership.installment_period.days
         assert_equal I18n.l(nbd, :format => :only_date), I18n.l(member.next_retry_bill_date, :format => :only_date) 
@@ -160,7 +160,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     # bill members the day before trial days expires. Member should not be billed
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days - 2.days) do
-      Member.bill_all_members_up_today
+      TasksHelpers.bill_all_members_up_today
       member.reload
       assert_equal nbd, member.bill_date
     end
@@ -169,7 +169,7 @@ class TransactionTest < ActiveSupport::TestCase
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
       Delayed::Worker.delay_jobs = true
       assert_difference('DelayedJob.count',3)do
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
       end
       Delayed::Worker.delay_jobs = false  
       Delayed::Job.all.each{ |x| x.invoke_job }
@@ -185,7 +185,7 @@ class TransactionTest < ActiveSupport::TestCase
         next_year = next_year + member.terms_of_membership.installment_period.days
         Delayed::Worker.delay_jobs = true
         assert_difference('DelayedJob.count',3)do
-          Member.bill_all_members_up_today
+          TasksHelpers.bill_all_members_up_today
         end
         Delayed::Worker.delay_jobs = false
         Delayed::Job.all.each{ |x| x.invoke_job }
@@ -212,7 +212,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     # bill members the day trial days expires. Member should be billed but SD'd
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
-      Member.bill_all_members_up_today
+      TasksHelpers.bill_all_members_up_today
       member.reload
       nbd = nbd + @sd_strategy.days.days
       assert_equal nbd.to_date, member.next_retry_bill_date.to_date
@@ -275,7 +275,7 @@ class TransactionTest < ActiveSupport::TestCase
     nbd = member.next_retry_bill_date
     2.upto(15) do |time|
       Timecop.travel(nbd) do
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
         member.reload
         if @terms_of_membership_for_downgrade.id == member.terms_of_membership.id
           assert_nil member.cancel_date
@@ -340,7 +340,7 @@ class TransactionTest < ActiveSupport::TestCase
       assert_difference('Operation.count', 0) do
         assert_difference('Communication.count', 0) do
           assert_difference('Transaction.count', 0) do
-            Member.bill_all_members_up_today
+            TasksHelpers.bill_all_members_up_today
           end
         end
       end
@@ -676,7 +676,7 @@ class TransactionTest < ActiveSupport::TestCase
     nbd = member.bill_date + @terms_of_membership2.installment_period.days
 
     Timecop.freeze( member.next_retry_bill_date ) do
-      Member.bill_all_members_up_today
+      TasksHelpers.bill_all_members_up_today
       member.reload
       assert_equal member.bill_date, nbd 
       assert_equal member.next_retry_bill_date.to_date, nbd.to_date
@@ -700,7 +700,7 @@ class TransactionTest < ActiveSupport::TestCase
     nbd = member.bill_date + @terms_of_membership2.installment_period.days
 
     Timecop.freeze( member.next_retry_bill_date ) do
-      Member.bill_all_members_up_today
+      TasksHelpers.bill_all_members_up_today
       member.reload
       assert_equal member.bill_date, nbd 
       assert_equal member.next_retry_bill_date, nbd 
@@ -722,7 +722,7 @@ class TransactionTest < ActiveSupport::TestCase
     nbd = member.bill_date + @terms_of_membership2.installment_period.days
 
     Timecop.freeze( member.next_retry_bill_date ) do
-      Member.bill_all_members_up_today
+      TasksHelpers.bill_all_members_up_today
       member.reload
       assert_equal member.bill_date, nbd 
       assert_equal member.next_retry_bill_date, nbd 
@@ -743,7 +743,7 @@ class TransactionTest < ActiveSupport::TestCase
     nbd = member.next_retry_bill_date + @terms_of_membership2.installment_period.days
 
     Timecop.freeze( member.next_retry_bill_date ) do
-      Member.bill_all_members_up_today
+      TasksHelpers.bill_all_members_up_today
       member.reload
       assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd, :format => :only_date) 
     end
@@ -810,7 +810,7 @@ class TransactionTest < ActiveSupport::TestCase
     Timecop.travel(Time.zone.now + member_manual_billing.terms_of_membership.provisional_days.days) do
       assert_difference("Operation.count",0)do
         assert_difference("Transaction.count",0)do
-          Member.bill_all_members_up_today
+          TasksHelpers.bill_all_members_up_today
         end
       end
     end
@@ -1029,10 +1029,10 @@ class TransactionTest < ActiveSupport::TestCase
       @member = FactoryGirl.build(:member)
       member = enroll_member(@terms_of_membership)
       Timecop.travel(member.next_retry_bill_date) do
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
       end
       Timecop.travel(member.next_retry_bill_date) do
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
         member.reload
         nbd = member.next_retry_bill_date + days
         assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd, :format => :only_date)
@@ -1046,11 +1046,11 @@ class TransactionTest < ActiveSupport::TestCase
       member = enroll_member(@terms_of_membership)
 
       Timecop.travel(member.next_retry_bill_date) do
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
       end
       Timecop.travel(member.next_retry_bill_date) do
         nbd = member.next_retry_bill_date + (months*30.4166667).to_i.days
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
         member.reload
         assert_equal I18n.l(member.next_retry_bill_date, :format => :only_date), I18n.l(nbd, :format => :only_date)
       end      

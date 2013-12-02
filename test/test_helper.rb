@@ -10,7 +10,7 @@ require 'capybara/dsl'
 require 'database_cleaner'
 require 'mocha/setup'
 require "timeout"
-
+require 'tasks/tasks_helpers'
 
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
