@@ -48,6 +48,10 @@ $(document).ready( function() {
           alert('Agent is not authorized to make this request.');
         else if (jqXHR.status == 500)
           alert('Unexpected error, a ticket has been submitted.');
+        else if (jqXHR.status == 524)
+          alert('Out of service.');
+      },
+      timeout: 200000
       }
     });
   });
