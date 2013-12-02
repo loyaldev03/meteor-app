@@ -40,12 +40,6 @@ task :envfile do
   run "echo RAILS_ENV=#{rails_env} >> #{release_path}/.env"
 end
 
-task :bundle_install do
-  puts "  **** bundle_install"
-  run "id"
-  run "cd #{release_path}; #{sudo} bundle install"
-end
-
 desc "Restart delayed jobs"
 task :restart_delayed_jobs do
   run "#{sudo} service #{application} stop && #{sudo} service #{application} start" 

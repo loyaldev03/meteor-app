@@ -8,3 +8,8 @@ set :rails_env, "staging"
 
 server "staging.platform.xagax.com", :app, :web
 
+task :bundle_install do
+  puts "  **** bundle_install"
+  run "id"
+  run "cd #{release_path}; #{sudo} bundle install --without development test prototype"
+end
