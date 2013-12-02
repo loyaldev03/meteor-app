@@ -1,6 +1,7 @@
 # Do you want to put in mantainance mode the site during deployment?
 # Use :
 # cap -S put_in_maintenance_mode="true" prototype deploy
+# cap -S solr_reindex="true" prototype deploy
 # default value is false
 
 set :stages, %w(production prototype staging demo)
