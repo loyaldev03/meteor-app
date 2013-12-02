@@ -145,7 +145,7 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### Cancellation =====>>>>
     after_transition [:provisional, :active ] => 
-                        :lapsed, :do => [:cancellation, :nillify_club_cash]
+                        :lapsed, :do => [:cancellation, 'nillify_club_cash']
     after_transition :applied => 
                         :lapsed, :do => [:set_member_as_rejected, :send_rejection_communication]
     ###### <<<<<<========
