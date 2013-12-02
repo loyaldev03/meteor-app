@@ -38,7 +38,11 @@ end
       product.weight = row[5].to_i
       product.allow_backorder = (row[6].upcase=='YES' ? true : false )
       product.cost_center = row[7]
-      product.save
+      begin
+        product.save
+      rescue ActiveRecord::RecordNotUnique => e
+        puts "[ WARNING ] There are at least 2 products with same sku '#{product.sku}'. Only first one was created."
+      end
     end
   end
 
