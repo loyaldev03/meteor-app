@@ -77,8 +77,6 @@ class Member < ActiveRecord::Base
   validates :email, :email => true
 
   scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }  
-  # scope :with_billed_date_from, lambda{ |value| joins(:transactions).where('date(transactions.created_at) >= ?', value) unless value.blank? }
-  # scope :with_billed_date_to, lambda{ |value| joins(:transactions).where('date(transactions.created_at) <= ?', value) unless value.blank? }
 
   ########### SEARCH ###############
   searchable do
@@ -88,16 +86,16 @@ class Member < ActiveRecord::Base
     text :last_name
     text :address
     text :city
-    text :country
-    text :state
+    string :country
+    string :state
     text :zip
     text :email
-    text :status
+    string :status
     time :next_retry_bill_date
     integer :phone_country_code
     integer :phone_area_code
     integer :phone_local_number
-    text :sync_status
+    string :sync_status
     text :external_id
     time :join_date do
       join_date

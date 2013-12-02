@@ -41,7 +41,7 @@ class MembersController < ApplicationController
       end
       unless params[:member][:next_retry_bill_date].blank?
         next_retry_bill_date = params[:member][:next_retry_bill_date].to_date.to_time_in_current_zone
-        with(:next_retry_bill_date).between(next_retry_bill_date.beginning_of_day, next_retry_bill_date.end_of_day)
+        with(:next_retry_bill_date, next_retry_bill_date.beginning_of_day..next_retry_bill_date.end_of_day)
       end
       case params[:member][:sync_status]
         when true, 'true', 'synced'
@@ -53,8 +53,14 @@ class MembersController < ApplicationController
         when 'noerror'
           without :sync_status, ["not_synced", "synced"]
       end
-     # .with_billed_date_from(params[:member][:billing_date_start])
-     # .with_billed_date_to(params[:member][:billing_date_end])
+      unless params[:member][:billing_date_start].blank?
+        billing_date_start = params[:member][:billing_date_start].to_date.to_time_in_current_zone
+        with(:billed_dates).greater_than(billing_date_start)
+      end
+      unless params[:member][:billing_date_end].blank?
+        billing_date_end = params[:member][:billing_date_end].to_date.to_time_in_current_zone
+        with(:billed_dates).less_than(billing_date_end)
+      end
       with :club_id, current_club.id
       # order_by sort_column, sort_direction
       paginate :page => params[:page], :per_page => 25
