@@ -35,6 +35,9 @@ class ProductsController < ApplicationController
     else
       render action: "new"
     end
+  rescue ActiveRecord::RecordNotUnique => e
+    flash.now[:error] = "Product with sku '#{@product.sku}' already exists within this club."
+    render action: "new"
   end
 
   # PUT /products/1
@@ -46,6 +49,9 @@ class ProductsController < ApplicationController
     else
       render action: "edit"
     end
+  rescue ActiveRecord::RecordNotUnique => e
+    flash.now[:error] = "Sku '#{@product.sku}' is already taken within this club."
+    render action: "edit"  
   end
 
   # DELETE /products/1
