@@ -3,7 +3,7 @@ development:
     hostname: localhost
     port: 8984
     log_level: DEBUG
-    path: /solr/data/development
+    path: /solr/development
     auto_commit_after_request: false
 
 production:
@@ -37,5 +37,5 @@ test:
     hostname: localhost
     port: 8985
     log_level: WARNING
-    path: /solr/data/test
+    path: /solr/test
     auto_commit_after_request: false

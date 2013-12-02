@@ -86,6 +86,8 @@ class Member < ActiveRecord::Base
     text :last_name
     text :address
     text :city
+    string :full_name
+    string :full_address
     string :country
     string :state
     text :zip

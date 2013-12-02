@@ -62,7 +62,7 @@ class MembersController < ApplicationController
         with(:billed_dates).less_than(billing_date_end)
       end
       with :club_id, current_club.id
-      # order_by sort_column, sort_direction
+      order_by sort_column, sort_direction
       paginate :page => params[:page], :per_page => 25
     end.results
   rescue Errno::ECONNREFUSED
@@ -385,7 +385,7 @@ class MembersController < ApplicationController
 
   private 
     def sort_column
-      @sort_column ||= ['members.status', 'members.id', 'members.first_name, members.last_name', 'members.address, members.city' ].include?(params[:sort]) ? params[:sort] : 'memberships.join_date'
+      @sort_column ||= ['status', 'id', 'full_name', 'full_address' ].include?(params[:sort]) ? params[:sort] : 'join_date'
     end
     
     def sort_direction
