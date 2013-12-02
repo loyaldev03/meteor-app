@@ -12,6 +12,8 @@ class MembersSearchTest < ActionController::IntegrationTest
   ############################################################
 
   setup do
+    Member.any_instance.unstub(:solr_index)
+    Member.any_instance.unstub(:solr_index!)
   end
 
   def setup_member(create_new_member = true)

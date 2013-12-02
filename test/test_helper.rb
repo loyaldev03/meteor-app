@@ -144,6 +144,7 @@ module ActionController
     self.use_transactional_fixtures = false # DOES WORK! Damn it!
 
     setup do
+      stubs_solr_index
       DatabaseCleaner.start
       FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")
       page.driver.browser.manage.window.resize_to(1024,720)
