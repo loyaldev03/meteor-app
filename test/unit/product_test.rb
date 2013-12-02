@@ -1,10 +1,6 @@
 require 'test_helper'
 
 class ProductTest < ActiveSupport::TestCase
-	setup do 
-		stubs_solr_index
-	end
-
 	test "should create product" do
 			@product = FactoryGirl.build(:product)
 			assert @product.save

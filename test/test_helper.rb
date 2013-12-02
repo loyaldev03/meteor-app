@@ -43,6 +43,10 @@ class ActiveSupport::TestCase
 
   # Add more helper methods to be used by all tests here...
 
+  setup do
+    stubs_solr_index
+  end
+
   def stubs_solr_index
     Member.any_instance.stubs(:solr_index).returns(true) 
     Member.any_instance.stubs(:solr_index!).returns(true)
@@ -127,6 +131,10 @@ end
 
 class ActionController::TestCase
   include Devise::TestHelpers
+
+  setup do 
+    stubs_solr_index
+  end
 end
 
 module ActionController

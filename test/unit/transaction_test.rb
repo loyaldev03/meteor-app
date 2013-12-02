@@ -2,7 +2,7 @@
 
 class TransactionTest < ActiveSupport::TestCase
   setup do
-    stubs_solr_index
+
     @current_agent = FactoryGirl.create(:agent)
     @club = FactoryGirl.create(:simple_club_with_gateway)
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)

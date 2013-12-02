@@ -2,10 +2,6 @@ require 'test_helper'
 
 class PartnerTest < ActiveSupport::TestCase
 
-  setup do
-    stubs_solr_index
-  end
-
   test "Shouldn not save partner without name and prefix" do
     partner = FactoryGirl.build(:partner)
     partner.prefix = nil

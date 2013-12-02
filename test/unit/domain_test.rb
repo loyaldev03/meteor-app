@@ -1,9 +1,6 @@
 require 'test_helper'
 
 class DomainTest < ActiveSupport::TestCase
-  setup do
-    stubs_solr_index
-  end
 
   test "Domain should not be create without a url" do
     domain = FactoryGirl.build(:domain, :url => nil)

@@ -1,10 +1,6 @@
 require 'test_helper'
 
 class AgentTest < ActiveSupport::TestCase
-  setup do 
-    stubs_solr_index
-  end
-
   test "Shouldnt be two users with samen username" do
     first = FactoryGirl.create(:agent, :username => 'billy')
     assert first.valid?
