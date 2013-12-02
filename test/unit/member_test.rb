@@ -4,6 +4,7 @@ require 'test_helper'
 class MemberTest < ActiveSupport::TestCase
 
   setup do
+    stubs_solr_index
     @club = FactoryGirl.create(:simple_club_with_gateway)
     @partner = @club.partner
     Time.zone = @club.time_zone

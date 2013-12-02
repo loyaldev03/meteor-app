@@ -43,6 +43,11 @@ class ActiveSupport::TestCase
 
   # Add more helper methods to be used by all tests here...
 
+  def stubs_solr_index
+    Member.any_instance.stubs(:solr_index).returns(true) 
+    Member.any_instance.stubs(:solr_index!).returns(true)
+  end
+
   CREDIT_CARD_TOKEN = { nil => "c25ccfecae10384698a44360444dea", "4012301230123010" => "c25ccfecae10384698a44360444dead8", 
     "5589548939080095" => "c25ccfecae10384698a44360444dead7",
     "340504323632976" => "c25ccfecae10384698a44360444dead6", "123456" => "anytransactioniditsvalid.forinvalidccnumber", 

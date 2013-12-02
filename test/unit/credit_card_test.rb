@@ -1,7 +1,10 @@
 require 'test_helper'
 
 class CreditCardTest < ActiveSupport::TestCase
-	
+	setup do
+    stubs_solr_index
+  end
+
 	test "Should not let activate a blacklisted credit card" do
 	  credit_card_one = FactoryGirl.create(:credit_card)
 	  credit_card_two = FactoryGirl.create(:credit_card_master_card)

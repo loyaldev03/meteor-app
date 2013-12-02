@@ -3,6 +3,7 @@ require 'test_helper'
 class ClubTest < ActiveSupport::TestCase
 
   setup do
+    stubs_solr_index
     @club = FactoryGirl.build(:club)
   end
 
