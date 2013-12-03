@@ -780,6 +780,23 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal trans.transaction_type, 'refund'
   end
 
+  test "Should be able to do a full refund 9.95." do
+    member = enroll_member(@terms_of_membership, 0, false)
+    amount = 9.97
+
+    member.no_recurrent_billing(amount,"testing event", "one-time")
+    transaction = Transaction.last
+
+    answer = Transaction.refund(amount, transaction)
+    assert_equal answer[:code], Settings.error_codes.success, answer[:message]
+    transaction.reload
+    assert_equal transaction.refunded_amount.to_f, amount.to_f
+    assert_equal transaction.amount_available_to_refund, 0.0
+    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', member.id]).first
+    assert_equal trans.operation_type, Settings.operation_types.credit
+    assert_equal trans.transaction_type, 'refund'
+  end
+
   test "Make no recurrent billing with member not expecting billing" do
     @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
     member = enroll_member(@terms_of_membership_not_expected_to_be_billed, 0, false)

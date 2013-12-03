@@ -185,7 +185,7 @@ class Transaction < ActiveRecord::Base
         amount = amount.to_f
         if amount <= 0.0
           return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
-        elsif sale_transaction.amount_available_to_refund < amount
+        elsif sale_transaction.amount_available_to_refund.to_f < amount
           return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
         end
         trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
