@@ -47,6 +47,11 @@ class ActiveSupport::TestCase
     stubs_solr_index
   end
 
+  def unstubs_solr_index
+    Member.any_instance.unstub(:solr_index)
+    Member.any_instance.unstub(:solr_index!)
+  end
+
   def stubs_solr_index
     Member.any_instance.stubs(:solr_index).returns(true) 
     Member.any_instance.stubs(:solr_index!).returns(true)

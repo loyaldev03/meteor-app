@@ -1140,7 +1140,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @fulfillment_renewable.set_as_canceled
     @fulfillment_renewable.reload
 
-    Fulfillment.process_fulfillments_up_today
+    TasksHelpers.process_fulfillments_up_today
     @fulfillment.reload
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -1184,7 +1184,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @fulfillment_renewable.set_as_in_process
     @fulfillment_renewable.set_as_sent
     
-    Fulfillment.process_fulfillments_up_today
+    TasksHelpers.process_fulfillments_up_today
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
@@ -1220,7 +1220,7 @@ test "Enroll a member with recurrent product and it on the list" do
     @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true)
     @fulfillment_renewable.update_attribute(:renewable_at, Time.zone.now)
     
-    Fulfillment.process_fulfillments_up_today
+    TasksHelpers.process_fulfillments_up_today
 
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name

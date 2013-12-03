@@ -141,7 +141,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     @saved_member.current_membership.update_attribute(:join_date, Time.zone.now - amount_of_days.day)
     excecute_like_server(@club.time_zone) do
-      Member.send_pillar_emails
+      TasksHelpers.send_pillar_emails
     end
     sleep 5
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -211,6 +211,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
   # Display external_id at member search
   test "create a member inside a club with external_id in true" do
+    unstubs_solr_index
   	setup_member(false)
   	@club.requires_external_id = true
   	@club.save!
@@ -910,7 +911,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:birth_date, Time.zone.now)
     excecute_like_server(@club.time_zone) do
-      Member.send_happy_birthday
+      TasksHelpers.send_happy_birthday
     end
     sleep(5)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
