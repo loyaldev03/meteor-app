@@ -137,6 +137,7 @@ en:
     payment_gateway_time_out: "Time out trying to connect with the payment gateway."
     transaction_gateway_differs_from_current: "Transaction does not have the same active gateway."
     credit_card_gateway_differs_from_current: "Credit card does not have the same active gateway."
+    search_member_is_out_of_service: "Members search is out of service. Please try again in a few minutes or contact the site admin if problem persist."
   activerecord:
     errors:
       models:
