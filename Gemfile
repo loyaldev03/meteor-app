@@ -86,11 +86,17 @@ group :development do
   #####
   gem 'daemons'
   gem 'foreman'
+  gem 'quiet_assets'
+  gem 'progress_bar'
 end
 
 group :prototype do
   gem "bullet"
 end
+
+gem 'sunspot_rails'
+gem 'sunspot_solr'
+
 
 group :test do
   gem 'turn'

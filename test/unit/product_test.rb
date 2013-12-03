@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class ProductTest < ActiveSupport::TestCase
-
 	test "should create product" do
 			@product = FactoryGirl.build(:product)
 			assert @product.save

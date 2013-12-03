@@ -2,6 +2,24 @@
 
 RAILS_ENV=production rake db:drop; RAILS_ENV=production rake db:create ; RAILS_ENV=production rake db:migrate ; RAILS_ENV=production rake db:seed 
 
+# Do you want to use members search page locally?
+Use the following command to start solr
+rake sunspot:solr:start
+Use the following command to stop solr
+rake sunspot:solr:stop
+
+Use the following command to add/update member records if DJ is not running on your dev env.
+rake sunspot:solr:reindex
+
+
+# Do you want to run run integration tests locally? 
+Use the following command to start solr:
+RAILS_ENV=test rake sunspot:solr:start
+Use the following command to stop solr
+RAILS_ENV=test rake sunspot:solr:stop
+
+
+
 
 http://rails-erd.rubyforge.org/install.html
 sudo aptitude install graphviz

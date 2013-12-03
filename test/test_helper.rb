@@ -10,7 +10,7 @@ require 'capybara/dsl'
 require 'database_cleaner'
 require 'mocha/setup'
 require "timeout"
-
+require 'tasks/tasks_helpers'
 
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
@@ -42,6 +42,20 @@ class ActiveSupport::TestCase
   # fixtures :all
 
   # Add more helper methods to be used by all tests here...
+
+  setup do
+    stubs_solr_index
+  end
+
+  def unstubs_solr_index
+    Member.any_instance.unstub(:solr_index)
+    Member.any_instance.unstub(:solr_index!)
+  end
+
+  def stubs_solr_index
+    Member.any_instance.stubs(:solr_index).returns(true) 
+    Member.any_instance.stubs(:solr_index!).returns(true)
+  end
 
   CREDIT_CARD_TOKEN = { nil => "c25ccfecae10384698a44360444dea", "4012301230123010" => "c25ccfecae10384698a44360444dead8", 
     "5589548939080095" => "c25ccfecae10384698a44360444dead7",
@@ -122,6 +136,10 @@ end
 
 class ActionController::TestCase
   include Devise::TestHelpers
+
+  setup do 
+    stubs_solr_index
+  end
 end
 
 module ActionController
@@ -131,6 +149,7 @@ module ActionController
     self.use_transactional_fixtures = false # DOES WORK! Damn it!
 
     setup do
+      stubs_solr_index
       DatabaseCleaner.start
       FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")
       page.driver.browser.manage.window.resize_to(1024,720)

@@ -414,7 +414,7 @@ class MembersBillTest < ActionController::IntegrationTest
     assert_difference("Communication.count",2)do
       excecute_like_server(@club.time_zone) do
         excecute_like_server(@club.time_zone) do
-          Member.bill_all_members_up_today
+          TasksHelpers.bill_all_members_up_today
         end
       end
     end

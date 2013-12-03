@@ -7,3 +7,9 @@ set :database_name, 'sac_platform_prototype'
 set :rails_env, "prototype"
 
 server "prototype.platform.xagax.com", :app, :web
+
+task :bundle_install do
+  puts "  **** bundle_install"
+  run "id"
+  run "cd #{release_path}; #{sudo} bundle install --without development test staging"
+end

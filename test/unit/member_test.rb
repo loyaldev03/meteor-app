@@ -18,7 +18,7 @@ class MemberTest < ActiveSupport::TestCase
     assert !member.save, member.errors.inspect
     member.club = @terms_of_membership_with_gateway.club
     Delayed::Worker.delay_jobs = true
-    assert_difference('Delayed::Job.count', 3, 'should ceate job for #desnormalize_preferences and mkt tool sync') do
+    assert_difference('Delayed::Job.count', 3, 'should create job for #desnormalize_preferences and mkt tool sync') do
       assert member.save, "member cant be save #{member.errors.inspect}"
     end
     Delayed::Worker.delay_jobs = false
@@ -326,7 +326,7 @@ class MemberTest < ActiveSupport::TestCase
     Timecop.freeze( @member.next_retry_bill_date ) do
       assert_difference('Operation.count', 0) do
         assert_difference('Transaction.count', 0) do
-          excecute_like_server(@club.time_zone){ Member.bill_all_members_up_today }
+          excecute_like_server(@club.time_zone){ TasksHelpers.bill_all_members_up_today }
         end
       end
       @member.reload
@@ -348,7 +348,7 @@ class MemberTest < ActiveSupport::TestCase
       assert_difference('Operation.count', 3) do
         assert_difference('Transaction.count', 1) do
           excecute_like_server(@club.time_zone) do
-            Member.bill_all_members_up_today
+            TasksHelpers.bill_all_members_up_today
           end
         end
       end
@@ -370,7 +370,7 @@ class MemberTest < ActiveSupport::TestCase
 
     Timecop.freeze( @saved_member.next_retry_bill_date ) do
       excecute_like_server(@club.time_zone) do
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
       end
       @saved_member.reload
 
@@ -409,7 +409,7 @@ class MemberTest < ActiveSupport::TestCase
     @saved_member.save
     assert_difference("Operation.count",3) do
       excecute_like_server(@club.time_zone) do
-        Member.cancel_all_member_up_today
+        TasksHelpers.cancel_all_member_up_today
       end
     end
     @saved_member.reload
@@ -446,7 +446,7 @@ class MemberTest < ActiveSupport::TestCase
       Timecop.travel(member.next_retry_bill_date-7.days) do
         assert_difference("Operation.count") do
          assert_difference("Communication.count") do
-            Member.send_prebill
+            TasksHelpers.send_prebill
           end
         end
       end
@@ -463,7 +463,7 @@ class MemberTest < ActiveSupport::TestCase
       Timecop.travel(member.next_retry_bill_date-7.days) do
         assert_difference("Operation.count",0) do
           assert_difference("Communication.count",0) do
-            Member.send_prebill
+            TasksHelpers.send_prebill
           end
         end
       end
@@ -478,7 +478,7 @@ class MemberTest < ActiveSupport::TestCase
       Timecop.travel(member.next_retry_bill_date-7.days) do
         assert_difference("Operation.count",0) do
           assert_difference("Communication.count",0) do
-            Member.send_prebill
+            TasksHelpers.send_prebill
           end
         end
       end

@@ -21,7 +21,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     @preferences = {'color' => 'green','car'=> 'dodge'}
     # request.env["devise.mapping"] = Devise.mappings[:agent]
  
-
     @unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     @credit_card = FactoryGirl.build(:credit_card_master_card)
     @enrollment_info = FactoryGirl.build(:enrollment_info)

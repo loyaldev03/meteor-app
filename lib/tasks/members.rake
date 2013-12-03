@@ -1,3 +1,5 @@
+require 'tasks/tasks_helpers'
+
 namespace :billing do
   desc "Find members that have NBD for today. and bill them all!"
   # This task should be run each day at 3 am ?
@@ -7,7 +9,7 @@ namespace :billing do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      Member.bill_all_members_up_today
+      TasksHelpers.bill_all_members_up_today
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run billing:for_today task"
     end
@@ -22,7 +24,7 @@ namespace :billing do
     tall = Time.zone.now
     begin
       # We use bill_date because we will only send this email once!
-      Member.send_prebill
+      TasksHelpers.send_prebill
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run billing:send_prebill task"
     end
@@ -38,7 +40,7 @@ namespace :members do
       ActiveRecord::Base.logger = Rails.logger
       tall = Time.zone.now
       Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
-      Member.refresh_autologin
+      TasksHelpers.refresh_autologin
     rescue Exception => e
       Auditory.report_issue("Billing::Today", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"})"
@@ -53,7 +55,7 @@ namespace :members do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      Member.cancel_all_member_up_today
+      TasksHelpers.cancel_all_member_up_today
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:cancel task"
     end
@@ -67,7 +69,7 @@ namespace :members do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      Member.send_happy_birthday
+      TasksHelpers.send_happy_birthday
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:send_happy_birthday task"
     end
@@ -80,7 +82,7 @@ namespace :members do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      Member.send_pillar_emails
+      TasksHelpers.send_pillar_emails
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:send_pillar_emails task"
     end
@@ -94,7 +96,7 @@ namespace :members do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      Member.reset_club_cash_up_today
+      TasksHelpers.reset_club_cash_up_today
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_club_cash task"
     end
@@ -108,7 +110,7 @@ namespace :members do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      Fulfillment.process_fulfillments_up_today
+      TasksHelpers.process_fulfillments_up_today
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_fulfillments task"
     end
@@ -122,7 +124,7 @@ namespace :members do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      Member.process_sync
+      TasksHelpers.process_sync
     ensure 
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_sync task"
     end
@@ -136,7 +138,7 @@ namespace :members do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      Member.process_email_sync_error
+      TasksHelpers.process_email_sync_error
     ensure 
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_email_sync_error task"
     end 

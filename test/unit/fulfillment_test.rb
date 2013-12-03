@@ -155,7 +155,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     cancel_date = member.join_date + Settings.days_to_wait_to_cancel_fulfillments.days
     member.cancel! cancel_date, "canceling"
     Timecop.travel(cancel_date) do
-      Member.cancel_all_member_up_today
+      TasksHelpers.cancel_all_member_up_today
       member.reload
       assert_equal member.status, "lapsed"
       assert_equal fulfillment.status, "not_processed"
@@ -173,7 +173,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     cancel_date = member.join_date + 1.day
     member.cancel! cancel_date, "canceling"
     Timecop.travel(cancel_date) do
-      Member.cancel_all_member_up_today
+      TasksHelpers.cancel_all_member_up_today
       member.reload
       fulfillment.reload
       assert_equal member.status, "lapsed"
