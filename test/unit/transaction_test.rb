@@ -780,7 +780,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal trans.transaction_type, 'refund'
   end
 
-  test "Should be able to do a full refund 9.95." do
+  test "Should be able to do a full refund 9.97." do
     member = enroll_member(@terms_of_membership, 0, false)
     amount = 9.97
 
