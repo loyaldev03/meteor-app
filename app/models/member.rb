@@ -145,7 +145,7 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### Cancellation =====>>>>
     after_transition [:provisional, :active ] => 
-                        :lapsed, :do => [:cancellation, :nillify_club_cash]
+                        :lapsed, :do => [:cancellation, 'nillify_club_cash']
     after_transition :applied => 
                         :lapsed, :do => [:set_member_as_rejected, :send_rejection_communication]
     ###### <<<<<<========
@@ -813,6 +813,7 @@ class Member < ActiveRecord::Base
       end
     end
   end
+  handle_asynchronously :nillify_club_cash, :queue => :generic_queue
 
   # Resets member club cash in case the club cash has expired.
   def reset_club_cash
@@ -822,6 +823,7 @@ class Member < ActiveRecord::Base
       self.save(:validate => false)
     end
   end
+  handle_asynchronously :reset_club_cash, :queue => :generic_queue
 
   def assign_first_club_cash 
     assign_club_cash unless terms_of_membership.skip_first_club_cash
