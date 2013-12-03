@@ -66,6 +66,7 @@ class MembersController < ApplicationController
       paginate :page => params[:page], :per_page => 25
     end.results
   rescue Errno::ECONNREFUSED
+    @solr_is_down = true
     Auditory.report_issue("Member:search_result", "SOLR is down. Confirm that server is running, if problem persist restart it")
   ensure
     render 'index'
