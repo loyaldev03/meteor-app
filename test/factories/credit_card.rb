@@ -2,8 +2,8 @@ FactoryGirl.define do
 
   factory :credit_card do
     active true
-    expire_month { (Date.today + 1.month).month }
-    expire_year { (Date.today + 1.year).year }
+    expire_month { (Date.today + 3.month).month }
+    expire_year { (Date.today + 2.year).year }
     number "4012301230123010"
     token "c25ccfecae10384698a44360444dead8"
     gateway "mes"

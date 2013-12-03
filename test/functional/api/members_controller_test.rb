@@ -539,7 +539,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
   end
 
-
   # Multiple same credit cards with different expiration date
   test "Should update credit card only year" do
     sign_in @admin_user
@@ -549,7 +548,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     
     active_merchant_stubs_store("5589548939080095")
 
-    validate_credit_card_updated_only_year(active_credit_card, token, "5589548939080095", 0)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5589548939080095", 2)
     validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 3)
     validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 4)
     validate_credit_card_updated_only_year(active_credit_card, token, "5589/5489/3908/0095", 5)
