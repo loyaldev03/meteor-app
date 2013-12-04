@@ -79,10 +79,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     #Second billing, it should not upgrade 
     Timecop.travel(member.next_retry_bill_date) do
       assert_difference("Operation.count", 3) do
-        require "ruby-debug"
-        debugger
         TasksHelpers.bill_all_members_up_today
-        puts "hel"
       end
       member.reload
       assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
