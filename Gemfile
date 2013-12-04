@@ -94,6 +94,10 @@ group :prototype do
   gem "bullet"
 end
 
+group :prototype_pantheon do
+  gem "bullet"
+end
+
 gem 'sunspot_rails'
 gem 'sunspot_solr'
 
