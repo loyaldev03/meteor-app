@@ -87,7 +87,6 @@ group :development do
   gem 'daemons'
   gem 'foreman'
   gem 'quiet_assets'
-  gem 'progress_bar'
 end
 
 group :prototype do
@@ -96,6 +95,7 @@ end
 
 gem 'sunspot_rails'
 gem 'sunspot_solr'
+gem 'progress_bar'
 
 
 group :test do
