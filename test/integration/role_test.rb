@@ -97,7 +97,6 @@ class RolesTest < ActionController::IntegrationTest
     setup_member false
     @agent_no_role = FactoryGirl.create :confirmed_agent
     7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
-    sleep 500
     club1 = Club.first
     club2 = Club.find(2)
     club3 = Club.find(3)
