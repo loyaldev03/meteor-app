@@ -52,7 +52,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
-
   test "Do not display token field (club with auth.net) - Admin" do
     setup_member(false)
     @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
@@ -430,7 +429,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#table_contact_information"){ assert page.has_content?('Mobile') }
     assert_equal Member.last.type_of_phone_number, 'mobile'
   end
-
   
   test "Update external id" do
     setup_member(false)
@@ -438,13 +436,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @terms_of_membership_with_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id, :club_id => @club_external_id.id)
     @member_with_external_id = create_active_member(@terms_of_membership_with_external_id, :active_member_with_external_id, nil, {}, { :created_by => @admin_agent })
 
-
-    visit members_path(:partner_prefix => @terms_of_membership_with_external_id.club.partner.prefix, :club_prefix => @terms_of_membership_with_external_id.club.name)
-    assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
-    
-    within("#personal_details"){ fill_in "member[external_id]", :with => @member_with_external_id.external_id }
-    click_link_or_button 'Search'
-    within("#members"){ find(".icon-pencil").click }   
+    visit edit_member_path(:partner_prefix => @member_with_external_id.club.partner.prefix, :club_prefix => @member_with_external_id.club.name, :member_prefix => @member_with_external_id.id)
 
     within("#external_id"){ fill_in 'member[external_id]', :with => '987654321' }
     alert_ok_js
