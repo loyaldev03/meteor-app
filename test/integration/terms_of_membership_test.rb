@@ -8,7 +8,9 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		sign_in_as(@admin_agent)
 	end
 
-	def fill_in_form(options = {}, options_for_select = {}, options_for_check = [])		
+	def fill_in_form(options = {}, options_for_select = {}, options_for_check = [])
+		require "ruby-debug"
+		debugger
 		options_for_check.each do |value|
 			choose(value)
 		end
@@ -675,8 +677,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_no","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a member then")
-		choose('if_cannot_bill_member_cancel')
+		first("div", I18n.t('activerecord.attributes.terms_of_membership.wizard.no_downgrade_upgrade_configuration'))
 		click_link_or_button 'Update Plan'
 		assert page.has_content?('was updated succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
@@ -816,33 +817,33 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	# end
 
-	# test "Create subcription plan with Downgrade to option - No membership associated" do
-	# 	tom_name = 'TOM Name'
-	# 	tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
-	# 	tom_to_downgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Downgradable TOM')
-	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
-	# 	within('#terms_of_memberships_table') do
-	# 		find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
-	# 		within("tr", :text => tom_name) do
-	# 			click_link_or_button "Edit"
-	# 		end
-	# 	end
+	test "Create subcription plan with Downgrade to option - No membership associated" do
+		tom_name = 'TOM Name'
+		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+		tom_to_downgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Downgradable TOM')
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		within('#terms_of_memberships_table') do
+			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
+			within("tr", :text => tom_name) do
+				click_link_or_button "Edit"
+			end
+		end
 
-	# 	fill_in_step_1(tom_name + ' Updated')
-	# 	click_link_or_button 'Edit Membership Terms'
-	# 	fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, 
-	# 		              installment_amount:10, installment_amount_days:24, subscription_terms_stop_billing_after:10},
-	# 							   {installment_amount_days_time_span: 'Month(s)', subscription_terms_stop_billing_after_time_span: "Day(s)"},
-	# 	               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
-	# 	click_link_or_button 'Edit Upgrades / Downgrades'
+		fill_in_step_1(tom_name + ' Updated')
+		click_link_or_button 'Edit Membership Terms'
+		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, 
+			              installment_amount:10, installment_amount_days:24, subscription_terms_stop_billing_after:10},
+								   {installment_amount_days_time_span: 'Month(s)', subscription_terms_stop_billing_after_time_span: "Day(s)"},
+		               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
+		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-	# 	find("label", :text => "If we cannot bill a member then")
-	# 	choose('if_cannot_bill_member_downgrade_to')
-	# 	select(tom_to_downgrade.name, :from => 'downgrade_to_tom')
-	# 	click_link_or_button 'Update Plan'
-	# 	assert page.has_content?('was updated succesfully') # TOM was created
-	# 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
-	# end
+		find("label", :text => "If we cannot bill a member then")
+		choose('if_cannot_bill_member_downgrade_to')
+		select(tom_to_downgrade.name, :from => 'downgrade_to_tom')
+		click_link_or_button 'Update Plan'
+		assert page.has_content?('was updated succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	end
 
 	test "Update subcription plan with external code and description - No membership associated" do
 		tom_name = 'TOM Name'
