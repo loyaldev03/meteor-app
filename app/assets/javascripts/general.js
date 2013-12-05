@@ -44,20 +44,25 @@ $(document).ready( function() {
   $(function() {
     $.ajaxSetup({
       error: function(jqXHR, exception) {
-        if (jqXHR.status == 401)
-          alert('Agent is not authorized to make this request.');
-        else if (jqXHR.status == 500)
-          alert('Unexpected error, a ticket has been submitted.');
-        else{
-          alert('Out of service.');
+        if (jqXHR.status == 0) {
+          alert('The operation is taking more than expected. Please wait a moment while we finish processing this request and check if it was done.');
           endAjaxLoader();
-          $('#submit_button').removeAttr('disabled');
-        }
+        }else
+          alert(global_ajax_error_messages(jqXHR));
       },
-      timeout: 200000
+      timeout: 60000
     });
   });
 });
+
+function global_ajax_error_messages(jqXHR){
+  if (jqXHR.status == 401)
+    return 'Agent is not authorized to make this request.';
+  else if (jqXHR.status == 500)
+    return 'Unexpected error, a ticket has been submitted.';
+  else
+    return 'Something went wrong.'
+}
 
 function startAjaxLoader(){
   var opts = {
@@ -254,9 +259,25 @@ function member_index_functions(){
       startAjaxLoader();
       $('#submit_button').attr('disabled', 'disabled');
       update_select_only = false;
-      $.get(this.action, $(this).serialize(), null, 'script').done(function(data) {
-        endAjaxLoader();
-        $('#submit_button').removeAttr('disabled');
+
+    $.ajax({
+        type: "GET",
+        url: "members/search_result",
+        dataType: 'script',
+        contentType: 'application/javascript',
+        data: $(this).serialize(),
+        success: function(data){
+          endAjaxLoader();
+          $('#submit_button').removeAttr('disabled');
+        },
+        error: function(jqXHR, exception){
+          if (jqXHR.status == 0) {
+            alert('The search is talking more than expected. Please, try again in a moment.');
+            endAjaxLoader();
+            $('#submit_button').removeAttr('disabled');
+          }else
+            global_ajax_error_messages(jqXHR);
+        }
       });
       return false;
     }
