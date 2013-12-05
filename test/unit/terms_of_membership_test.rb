@@ -140,5 +140,4 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
       assert_not_nil member.operations.where(operation_type: Settings.operation_types.tom_upgrade).first
     end
   end
-
 end
