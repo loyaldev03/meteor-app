@@ -4,7 +4,7 @@
 # cap -S solr_reindex="true" prototype deploy
 # default value is false
 
-set :stages, %w(production prototype staging demo)
+set :stages, %w(production prototype staging demo prototype_pantheon staging_pantheon)
 set :default_stage, "prototype"
 default_run_options[:pty] = true
 require 'capistrano/ext/multistage'

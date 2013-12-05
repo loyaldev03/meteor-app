@@ -39,3 +39,20 @@ test:
     log_level: WARNING
     path: /solr/test
     auto_commit_after_request: false
+
+prototype_pantheon:
+  solr:
+    hostname: solr.stoneacrehq.com
+    port: 8983
+    log_level: DEBUG
+    path: /solr/prototype_pantheon
+    auto_commit_after_request: false
+
+staging_pantheon:
+  solr:
+    hostname: solr.stoneacrehq.com
+    port: 8983
+    log_level: DEBUG
+    path: /solr/staging_pantheon
+    auto_commit_after_request: false
+
