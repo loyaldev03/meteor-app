@@ -50,7 +50,7 @@ $(document).ready( function() {
         }else
           alert(global_ajax_error_messages(jqXHR));
       },
-      timeout: 60000
+      timeout: 200000
     });
   });
 });
