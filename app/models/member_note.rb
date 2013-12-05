@@ -5,4 +5,5 @@ class MemberNote < ActiveRecord::Base
   belongs_to :disposition_type
   belongs_to :communication_type
 
+  after_create 'member.solr_index'
 end
