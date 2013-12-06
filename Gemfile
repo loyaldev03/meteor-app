@@ -93,6 +93,7 @@ group :prototype do
   gem "bullet"
 end
 
+
 gem 'sunspot_rails'
 gem 'sunspot_solr'
 gem 'progress_bar'

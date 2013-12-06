@@ -65,8 +65,8 @@
         <filter class="solr.StandardFilterFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.NGramFilterFactory"
-            minGramSize="3"
-            maxGramSize="30"/>
+            minGramSize="2"
+            maxGramSize="80"/>
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.StandardTokenizerFactory"/>

@@ -374,3 +374,12 @@ staging:
 demo:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada82012
+
+prototype_pantheon:
+  <<: *defaults
+  xxxyyyzzz: reibel3y5estrada8
+
+staging_pantheon:
+  <<: *defaults
+  email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
+  xxxyyyzzz: reibel3y5estrada8
