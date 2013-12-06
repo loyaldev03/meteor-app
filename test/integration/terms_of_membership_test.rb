@@ -9,8 +9,6 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	def fill_in_form(options = {}, options_for_select = {}, options_for_check = [])
-		require "ruby-debug"
-		debugger
 		options_for_check.each do |value|
 			choose(value)
 		end
