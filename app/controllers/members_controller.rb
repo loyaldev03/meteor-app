@@ -51,7 +51,7 @@ class MembersController < ApplicationController
         when 'error'
           with :sync_status, "with_error"
         when 'noerror'
-          without :sync_status, ["not_synced", "synced"]
+          with :sync_status, ["not_synced", "synced"]
       end
       unless params[:member][:billing_date_start].blank?
         billing_date_start = params[:member][:billing_date_start].to_date.to_time_in_current_zone

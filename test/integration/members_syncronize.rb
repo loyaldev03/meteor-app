@@ -101,6 +101,7 @@ class MembersSyncronize < ActionController::IntegrationTest
         confirm_ok_js
         click_on 'Update'
     end
+    within(".nav-tabs"){ click_on "Operations"}
     within("#operations_table") do
       assert page.has_content?("Member's api_id changed from \"1234\" to nil")
     end
@@ -196,63 +197,67 @@ class MembersSyncronize < ActionController::IntegrationTest
   end
 
   test "Search members by Synced Sync Status" do
+    unstubs_solr_index
     setup_environment 
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     @saved_member = create_member(unsaved_member, credit_card)
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     @saved_member.update_attribute(:updated_at, Time.zone.now-1)
     @saved_member.update_attribute(:last_synced_at, Time.zone.now)
     @saved_member.update_attribute(:sync_status, "synced")
+    sleep 10   #we need time to update this member. Whiout this the test fails
 
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     fill_in("member[last_name]", :with => unsaved_member.last_name)
     select("Synced", :from => 'member[sync_status]')
-
     click_link_or_button 'Search'
 
     within("#members")do
+      find("tr", :text => @saved_member.full_name)
       assert page.has_content?(@saved_member.id.to_s)
       assert page.has_content?(@saved_member.external_id.to_s)
-      assert page.has_content?(@saved_member.full_name)
     end
   end
 
   test "Search members by Without Error Sync Status " do
+    unstubs_solr_index
     setup_environment 
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-
     @saved_member = create_member(unsaved_member, credit_card)
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    sleep 10   #we need time to create this member. Whiout this the test fails
 
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     select("Without Error", :from => 'member[sync_status]')
     click_link_or_button 'Search'
 
     within("#members")do
+      find("tr", :text => @saved_member.full_name)
       assert page.has_content?(@saved_member.id.to_s)
       assert page.has_content?(@saved_member.external_id.to_s)
-      assert page.has_content?(@saved_member.full_name)
     end
   end
 
   test "Search members by With Error Sync Status " do
+    unstubs_solr_index
     setup_environment 
     unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
 
     @saved_member = create_member(unsaved_member, credit_card)
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     @saved_member.update_attribute(:last_sync_error_at, Time.zone.now)
     @saved_member.update_attribute(:sync_status, "with_error")
+    sleep 20   #we need time to upadte this member. Whiout this the test fails
 
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     select("With Error", :from => 'member[sync_status]')
     click_link_or_button 'Search'
 
     within("#members")do
+      find("tr", :text => @saved_member.full_name)
       assert page.has_content?(@saved_member.id.to_s)
       assert page.has_content?(@saved_member.external_id.to_s)
-      assert page.has_content?(@saved_member.full_name)
     end
   end
 
@@ -487,8 +492,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == unsaved_member.first_name
     
-    within(".nav-tabs"){ click_on("Sync Status") }
-    within("#sync_status"){ assert page.has_no_selector?("edit_api_id") }
+    within(".nav-tabs"){ page.has_no_selector?("#sync_status_tab") }
   end
 
   test "Should not let agent to update api_id when member is applied" do
@@ -517,19 +521,14 @@ class MembersSyncronize < ActionController::IntegrationTest
     
     create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_approval)
     @saved_member = Member.find_by_email(unsaved_member.email)
-    visit members_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name)
-
-
-    search_member('member[id]', @saved_member.id.to_s, @saved_member)
-
     @saved_member.set_as_canceled
+
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == unsaved_member.first_name
-    
-    within(".nav-tabs"){ click_on("Sync Status") }
-    within("#span_api_id"){ assert page.has_content?("none") }
-    within("#span_mi_sync_status"){ assert page.has_content?('Not Synced') } 
+    within(".nav-tabs") do
+      page.has_no_selector?("#sync_status_tab")
+    end
+    assert_equal @saved_member.api_id, nil
   end
-
 end
 
