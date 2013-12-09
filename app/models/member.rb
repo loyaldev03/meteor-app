@@ -91,7 +91,7 @@ class Member < ActiveRecord::Base
     string :country
     string :state
     text :zip
-    text :email
+    text :email, :as => :code_textemail
     string :status
     time :next_retry_bill_date
     integer :phone_country_code
