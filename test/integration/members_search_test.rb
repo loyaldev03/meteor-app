@@ -61,7 +61,7 @@ class MembersSearchTest < ActionController::IntegrationTest
   end 
 
   test "Bill date filter" do
-    setup_member(false,false)
+    setup_member(false)
     unsaved_member=FactoryGirl.build(:member_with_api, :club_id => @club.id)
     unsaved_member_2=FactoryGirl.build(:member_with_api, :club_id => @club.id)
     credit_cardd=FactoryGirl.build(:credit_card_american_express)
@@ -81,7 +81,6 @@ class MembersSearchTest < ActionController::IntegrationTest
       assert page.has_no_content? c2.full_name
     end
   end
-
 
   test "go from member index to edit member's phone number to a wrong phone number" do
     setup_member
