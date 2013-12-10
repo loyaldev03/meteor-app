@@ -23,14 +23,14 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	def fill_in_step_1(name = nil, external_code = nil, description = nil)
-		find("label", :text => "Subscription Plan Name")
+		find(".step_selected", :text => "1")
 		fill_in 'terms_of_membership[name]', :with => name if name
 		fill_in 'terms_of_membership[api_role]', :with => external_code if external_code
 		fill_in 'terms_of_membership[description]', :with => description if description
 	end
 
 	def fill_in_step_2(options = {}, options_for_select = [], options_for_check = {})
-		find("label", :text => "At the end of the Trial Period")
+		find(".step_selected", :text => "2")
 		fill_in_form(options, options_for_select, options_for_check)
 	end
 
@@ -300,39 +300,39 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
     assert_nil saved_member.next_retry_bill_date
 	end
 
-	# test "Create subcription plan with Stop billing after at Subscription Terms - month" do
-	# 	tom_name = 'TOM with with Stop billing after Months'
-	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
-	# 	click_link_or_button 'Add New Plan'
+	# # test "Create subcription plan with Stop billing after at Subscription Terms - month" do
+	# # 	tom_name = 'TOM with with Stop billing after Months'
+	# # 	visit terms_of_memberships_path(@partner.prefix, @club.name)
+	# # 	click_link_or_button 'Add New Plan'
 
-	# 	fill_in_step_1(tom_name)
-	# 	click_link_or_button 'Define Membership Terms'
-	# 	fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, installment_amount:1, installment_amount_days:1,subscription_terms_stop_billing_after:0},{subscription_terms_stop_billing_after_time_span:"Month(s)"},["subscription_terms_stop_cancel_after"])
-	# 	click_link_or_button 'Define Upgrades / Downgrades'
+	# # 	fill_in_step_1(tom_name)
+	# # 	click_link_or_button 'Define Membership Terms'
+	# # 	fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, installment_amount:1, installment_amount_days:1,subscription_terms_stop_billing_after:0},{subscription_terms_stop_billing_after_time_span:"Month(s)"},["subscription_terms_stop_cancel_after"])
+	# # 	click_link_or_button 'Define Upgrades / Downgrades'
 
-	# 	find("label", :text => "If we cannot bill a member then")
-	# 	choose('if_cannot_bill_member_cancel')
-	# 	click_link_or_button 'Create Plan'
-	# 	assert page.has_content?('was created succesfully') # TOM was created
-	# 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
-	# end
+	# # 	find("label", :text => "If we cannot bill a member then")
+	# # 	choose('if_cannot_bill_member_cancel')
+	# # 	click_link_or_button 'Create Plan'
+	# # 	assert page.has_content?('was created succesfully') # TOM was created
+	# # 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	# # end
 
-	# test "Create subcription plan with Stop billing after at Subscription Terms - days" do
-	# 	tom_name = 'TOM with with Stop billing after Days'
-	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
-	# 	click_link_or_button 'Add New Plan'
+	# # test "Create subcription plan with Stop billing after at Subscription Terms - days" do
+	# # 	tom_name = 'TOM with with Stop billing after Days'
+	# # 	visit terms_of_memberships_path(@partner.prefix, @club.name)
+	# # 	click_link_or_button 'Add New Plan'
 
-	# 	fill_in_step_1(tom_name)
-	# 	click_link_or_button 'Define Membership Terms'
-	# 	fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, installment_amount:1, installment_amount_days:1,subscription_terms_stop_billing_after:0},{subscription_terms_stop_billing_after_time_span:"Day(s)"},["subscription_terms_stop_cancel_after"])
-	# 	click_link_or_button 'Define Upgrades / Downgrades'
+	# # 	fill_in_step_1(tom_name)
+	# # 	click_link_or_button 'Define Membership Terms'
+	# # 	fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, installment_amount:1, installment_amount_days:1,subscription_terms_stop_billing_after:0},{subscription_terms_stop_billing_after_time_span:"Day(s)"},["subscription_terms_stop_cancel_after"])
+	# # 	click_link_or_button 'Define Upgrades / Downgrades'
 
-	# 	find("label", :text => "If we cannot bill a member then")
-	# 	choose('if_cannot_bill_member_cancel')
-	# 	click_link_or_button 'Create Plan'
-	# 	assert page.has_content?('was created succesfully') # TOM was created
-	# 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
-	# end
+	# # 	find("label", :text => "If we cannot bill a member then")
+	# # 	choose('if_cannot_bill_member_cancel')
+	# # 	click_link_or_button 'Create Plan'
+	# # 	assert page.has_content?('was created succesfully') # TOM was created
+	# # 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	# # end
 
 	test "Create a member at TOM created by Subscription Plan" do
 		# First, create the TOM
@@ -815,33 +815,33 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	# end
 
-	test "Create subcription plan with Downgrade to option - No membership associated" do
-		tom_name = 'TOM Name'
-		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
-		tom_to_downgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Downgradable TOM')
-		visit terms_of_memberships_path(@partner.prefix, @club.name)
-		within('#terms_of_memberships_table') do
-			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
-			within("tr", :text => tom_name) do
-				click_link_or_button "Edit"
-			end
-		end
+	# test "Create subcription plan with Downgrade to option - No membership associated" do
+	# 	tom_name = 'TOM Name'
+	# 	tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+	# 	tom_to_downgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Downgradable TOM')
+	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
+	# 	within('#terms_of_memberships_table') do
+	# 		find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
+	# 		within("tr", :text => tom_name) do
+	# 			click_link_or_button "Edit"
+	# 		end
+	# 	end
 
-		fill_in_step_1(tom_name + ' Updated')
-		click_link_or_button 'Edit Membership Terms'
-		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, 
-			              installment_amount:10, installment_amount_days:24, subscription_terms_stop_billing_after:10},
-								   {installment_amount_days_time_span: 'Month(s)', subscription_terms_stop_billing_after_time_span: "Day(s)"},
-		               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
-		click_link_or_button 'Edit Upgrades / Downgrades'
+	# 	fill_in_step_1(tom_name + ' Updated')
+	# 	click_link_or_button 'Edit Membership Terms'
+	# 	fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, 
+	# 		              installment_amount:10, installment_amount_days:24, subscription_terms_stop_billing_after:10},
+	# 							   {installment_amount_days_time_span: 'Month(s)', subscription_terms_stop_billing_after_time_span: "Day(s)"},
+	# 	               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
+	# 	click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a member then")
-		choose('if_cannot_bill_member_downgrade_to')
-		select(tom_to_downgrade.name, :from => 'downgrade_to_tom')
-		click_link_or_button 'Update Plan'
-		assert page.has_content?('was updated succesfully') # TOM was created
-		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
-	end
+	# 	find("label", :text => "If we cannot bill a member then")
+	# 	choose('if_cannot_bill_member_downgrade_to')
+	# 	select(tom_to_downgrade.name, :from => 'downgrade_to_tom')
+	# 	click_link_or_button 'Update Plan'
+	# 	assert page.has_content?('was updated succesfully') # TOM was created
+	# 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	# end
 
 	test "Update subcription plan with external code and description - No membership associated" do
 		tom_name = 'TOM Name'
