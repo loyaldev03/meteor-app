@@ -209,22 +209,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
   end
 
-  # Display external_id at member search
-  test "create a member inside a club with external_id in true" do
-    unstubs_solr_index
-  	setup_member(false)
-  	@club.requires_external_id = true
-  	@club.save!
-
-  	unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id, :external_id => "9876543210")
-    created_member = create_member(unsaved_member)
-
-    within("#td_mi_external_id") { assert page.has_content?(unsaved_member.external_id) }
-
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
-    search_member("member[id]", "#{created_member.id}", created_member)
-  end
-
 	test "new member for with external_id not requiered" do
   	setup_member(false)
   	@club.requires_external_id = true
