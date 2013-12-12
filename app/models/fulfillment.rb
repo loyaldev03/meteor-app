@@ -139,7 +139,7 @@ class Fulfillment < ActiveRecord::Base
     self.status = new_status
     self.save    
     if answer[:code] == Settings.error_codes.success        
-      self.audit_status_transition(@current_agent, old_status, reason, file)
+      self.audit_status_transition(agent, old_status, reason, file)
     else
       answer
     end
