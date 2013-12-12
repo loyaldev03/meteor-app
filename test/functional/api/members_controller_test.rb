@@ -1739,7 +1739,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "One time billing throught API." do
     sign_in @admin_user
     ['admin', 'api'].each do |role|
-      @admin_user.update_attribute :roles, [role]
+      @admin_user.update_attribute :roles, role
       @member = create_active_member(@terms_of_membership, :member_with_api)
       FactoryGirl.create :credit_card, :member_id => @member.id
       @member.set_as_provisional
@@ -1759,7 +1759,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Donation billing throught API" do
     sign_in @admin_user
     ['admin', 'api'].each do |role|
-      @admin_user.update_attribute :roles, [role]
+      @admin_user.update_attribute :roles, role
       @member = create_active_member(@terms_of_membership, :member_with_api)
       FactoryGirl.create :credit_card, :member_id => @member.id
       @member.set_as_provisional
@@ -1795,7 +1795,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not allow sale transaction for agents that are not admin or api." do
     sign_in @admin_user
     ['representative', 'supervisor', 'agency', 'fulfillment_managment'].each do |role|
-      @admin_user.update_attribute :roles, [role]
+      @admin_user.update_attribute :roles, role
       @member = create_active_member(@terms_of_membership, :member_with_api)
       FactoryGirl.create :credit_card, :member_id => @member.id
       @member.set_as_provisional

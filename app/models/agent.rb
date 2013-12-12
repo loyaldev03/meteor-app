@@ -8,7 +8,6 @@ class Agent < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable, 
          :encryptable, :token_authenticatable
 
-  easy_roles :roles
   ROLES = %W(admin api representative supervisor agency fulfillment_managment)
 
   acts_as_paranoid
@@ -52,6 +51,14 @@ class Agent < ActiveRecord::Base
     self.club_roles.where(club_id: club_id).first
   end
 
+  def has_role?(role)
+    self.roles = role
+  end
+
+  def add_role(role)
+    has_role?(role) ? false : self.roles = role
+  end
+
   def has_role_with_club?(role, club_id = nil)
     # logger.debug "role: #{role} club_id: #{club_id}        #{self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?}"
     club_id = club_id.to_param
@@ -64,7 +71,7 @@ class Agent < ActiveRecord::Base
   end
 
   def has_global_role?
-    !self.roles.empty?
+    !self.roles.blank?
   end
 
   def has_club_roles?

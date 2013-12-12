@@ -62,11 +62,9 @@
   </p>
 <% end %>
 
-<h2 id="global_roles">Global Roles</h2>
+<h2 id="global_roles">Global Role</h2>
 <ul>
-  <% @agent.roles.each do |role| %>
-    <li><%= role %></li>
-  <% end %>
+  <% @agent.roles %>
 </ul>
 
 <h2>Club Roles</h2>
