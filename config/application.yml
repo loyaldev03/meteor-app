@@ -204,6 +204,7 @@ defaults: &defaults
     credit_card_blacklisted: '9508'
     credit_card_blank: '9509'
     credit_card_gateway_differs_from_current: '9510'
+    credit_amount_invalid: '9785'
     member_not_expecting_billing: '9787'
     refund_invalid: '9788'
     transaction_gateway_differs_from_current: '9786'
