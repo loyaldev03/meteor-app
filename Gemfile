@@ -106,7 +106,6 @@ group :test do
   gem 'mocha', require: false
   gem 'capybara'
   gem 'selenium-webdriver', '~> 2.35.1'
-  gem 'rubyzip', '~> 2.35.1'
   gem 'brakeman'
   gem 'simplecov'
   gem 'database_cleaner'
