@@ -105,7 +105,7 @@ group :test do
   gem 'faker'
   gem 'mocha', require: false
   gem 'capybara'
-  gem "selenium-webdriver", "~> 2.38.0"
+  gem 'selenium-webdriver', '~> 2.35.1'
   gem "rubyzip", "~> 1.1.0"
   gem 'brakeman'
   gem 'simplecov'
