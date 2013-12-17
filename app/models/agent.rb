@@ -52,7 +52,7 @@ class Agent < ActiveRecord::Base
   end
 
   def has_role?(role)
-    self.roles = role
+    self.roles == role
   end
 
   def add_role(role)

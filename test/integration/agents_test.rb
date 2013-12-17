@@ -269,7 +269,6 @@ class AgentsTest < ActionController::IntegrationTest
     page.has_content?("Your password was changed successfully. You are now signed in.")
   end
 
- 
   test "create agent with global role and them remove that role." do
     setup_environment
     visit new_admin_agent_path
@@ -295,8 +294,6 @@ class AgentsTest < ActionController::IntegrationTest
     end
     saved_agent = Agent.find_by_username(unsaved_agent.username)
 
-    require "ruby-debug"
-    debugger
     assert saved_agent.roles.blank?
   end 
 end

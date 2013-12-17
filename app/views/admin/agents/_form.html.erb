@@ -29,7 +29,7 @@
       &nbsp &nbsp &nbsp<%= link_to "clear", "#", :class => "btn btn-mini", :style => "display: #{@agent.roles.blank? ? 'none' : true}", :id => "clear_global_role"%>
       <%= f.label :roles, 'Global Roles', :class => 'control-label' %>
       <div class="controls">
-        <% Agent::ROLES.each do |role| %>
+         <% Agent::ROLES.each do |role| %>
           <%= label_tag nil, role, class: 'radiobutton' do %>
             <%= radio_button_tag "agent[roles]", role, @agent.has_role?(role), id: "agent_roles_#{role}"%>
             <%= role -%>
