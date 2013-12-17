@@ -66,7 +66,7 @@ SacPlatform::Application.configure do
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
-  config.action_mailer.default_url_options = { :host => 'stage.stoneacrehq.com:3102', :protocol => 'https' }
+  config.action_mailer.default_url_options = { :host => 'stage-pantheon.stoneacrehq.com:3102', :protocol => 'https' }
 
   # these options are only needed if you choose smtp delivery
   config.action_mailer.smtp_settings = {
