@@ -46,7 +46,7 @@ gem 'hashie'
 gem 'state_machine', '1.1.2'
 gem 'cancan'
 gem 'easy_roles'
-gem "axlsx", :git => 'git@github.com:randym/axlsx.git', :branch => 'master'
+gem "axlsx", :git => 'https://github.com/randym/axlsx.git', :branch => 'master'
 
 gem 'twitter-bootstrap-rails', '2.0.6'
 
