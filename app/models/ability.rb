@@ -42,7 +42,8 @@ class Ability
     cannot :see_nice, Transaction
     cannot :manage, MemberAdditionalData
 
-    role = agent.roles || agent.which_is_the_role_for_this_club?(club_id).role rescue nil
+
+    role = agent.roles.blank? ? agent.which_is_the_role_for_this_club?(club_id).role : agent.roles rescue nil
 
     case role
     when 'admin' then
