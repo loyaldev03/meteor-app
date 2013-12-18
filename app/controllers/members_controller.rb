@@ -75,11 +75,7 @@ class MembersController < ApplicationController
   def show
     @operation_filter = params[:filter]
     @current_membership = @current_member.current_membership
-    @notes = @current_member.member_notes.includes([ :communication_type, :disposition_type ]).paginate(:page => params[:page], :per_page => 10, :order => "created_at DESC")
-    @credit_cards = @current_member.credit_cards.all
     @active_credit_card = @current_member.active_credit_card
-    @fulfillments = @current_member.fulfillments.all
-    @communications = @current_member.communications.all
   end
 
   def new
@@ -382,6 +378,46 @@ class MembersController < ApplicationController
         flash.now[:error] = answer[:message]
       end
     end
+  end
+
+  def transactions_content
+    render :partial => 'members/transactions'
+  end
+
+  def notes_content
+    @notes = @current_member.member_notes.includes([ :communication_type, :disposition_type ]).paginate(:page => params[:page], :per_page => 10, :order => "created_at DESC")
+    render :partial => 'members/notes', :locals => { :notes => @notes }
+  end
+
+  def fulfillments_content
+    @fulfillments = @current_member.fulfillments.all
+    render :partial => "members/fulfillments", :locals => { :fulfillments => @fulfillments }
+  end
+
+  def communications_content
+    @communications = @current_member.communications.all
+    render :partial => 'members/communications', :locals => { :communications => @communications }
+  end
+
+  def operations_content
+    render :partial => 'members/operations'
+  end
+
+  def credit_cards_content 
+    @credit_cards = @current_member.credit_cards.all
+    render :partial => 'members/credit_cards', :locals => { :credit_cards => @credit_cards }
+  end
+
+  def club_cash_transactions_content
+    render :partial => 'members/club_cash_transactions'
+  end
+
+  def sync_status_content
+    render :partial => 'members/sync_status', :locals => { :member => @current_member }
+  end
+
+  def memberships_content
+    render :partial => 'members/memberships'
   end
 
   private 

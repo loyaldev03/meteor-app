@@ -192,7 +192,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     @saved_member = create_member(unsaved_member, credit_card)
 
     within(".nav-tabs") do
-      page.has_no_selector?("#sync_status_tab")
+      page.has_no_selector?("#sync_status")
     end
   end
 
@@ -393,7 +393,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == unsaved_member.first_name
 
-    within(".nav-tabs"){ page.has_selector?("#sync_status_tab") }
+    within(".nav-tabs"){ page.has_selector?("#sync_status") }
   end
 
   test "Create a member with Not Synced status" do
@@ -432,7 +432,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     assert find_field('input_first_name').value == unsaved_member.first_name
 
     within(".nav-tabs") do
-      page.has_selector?("#sync_status_tab")
+      page.has_selector?("#sync_status")
       click_on("Sync Status")
     end
     within("#span_mi_sync_status"){ page.has_content?('Sync Error') }
@@ -492,7 +492,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == unsaved_member.first_name
     
-    within(".nav-tabs"){ page.has_no_selector?("#sync_status_tab") }
+    within(".nav-tabs"){ page.has_no_selector?("#sync_status") }
   end
 
   test "Should not let agent to update api_id when member is applied" do
@@ -526,7 +526,7 @@ class MembersSyncronize < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == unsaved_member.first_name
     within(".nav-tabs") do
-      page.has_no_selector?("#sync_status_tab")
+      page.has_no_selector?("#sync_status")
     end
     assert_equal @saved_member.api_id, nil
   end

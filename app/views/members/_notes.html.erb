@@ -1,25 +1,28 @@
 <%= will_paginate notes %>
-
-<% notes.each do |note| %>
-  <table class="table table-bordered">
-    <thead> 
-      <tr> 
-        <th>
-          <%= note.disposition_type if !note.disposition_type.nil? %> - 
-          <%= note.communication_type if !note.communication_type.nil? %>        
-          <%= t('added_by') %>
-          <%= note.created_by.username %>
-          <%= distance_of_time_in_words(note.created_at, Time.now, include_seconds = false, options = {}) %> <%= t(:ago) %>
-        </th>
-        <td style = "width:300px">
-          <%= t('created_at') %>:
-          <%= I18n.l note.created_at, :format => :dashed %>
-        </td>
-      <tr class= "comment <%= cycle("odd", "even", :name => "row_class") -%>" > 
-        <td colspan="2">
-          <%= note.description %>
-        </td>
-      </tr>
-    </thead>
-  </table>
+<% unless notes.empty? %>
+  <% notes.each do |note| %>
+    <table class="table table-bordered">
+      <thead> 
+        <tr> 
+          <th>
+            <%= note.disposition_type if !note.disposition_type.nil? %> - 
+            <%= note.communication_type if !note.communication_type.nil? %>        
+            <%= t('added_by') %>
+            <%= note.created_by.username %>
+            <%= distance_of_time_in_words(note.created_at, Time.now, include_seconds = false, options = {}) %> <%= t(:ago) %>
+          </th>
+          <td style = "width:300px">
+            <%= t('created_at') %>:
+            <%= I18n.l note.created_at, :format => :dashed %>
+          </td>
+        <tr class= "comment <%= cycle("odd", "even", :name => "row_class") -%>" > 
+          <td colspan="2">
+            <%= note.description %>
+          </td>
+        </tr>
+      </thead>
+    </table>
+  <% end %>
+<% else %>
+  <%= t('activerecord.attributes.member.no_member_notes') %>
 <% end %>

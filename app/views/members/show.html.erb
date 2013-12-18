@@ -353,58 +353,51 @@
 <% end %>
 
 <ul class="nav nav-tabs">
-  <li class="active"><a href="#transactions" data-toggle="tab">Transactions</a></li>
-  <li><a href="#notes" data-toggle="tab">Notes</a></li>
-  <li><a href="#fulfillments" data-toggle="tab">Fulfillments</a></li>
-  <li><a href="#communication" data-toggle="tab">Communications</a></li>
-  <li><a href="#operations" data-toggle="tab">Operations</a></li>
-  <li><a href="#credit_cards" data-toggle="tab">Credit Cards</a></li>
+  <li class="active"><a href="#transactions" data-toggle="tab" id="transactions">Transactions</a></li>
+  <li><a href="#notes" data-toggle="tab" id="notes">Notes</a></li>
+  <li><a href="#fulfillments" data-toggle="tab" id="fulfillments">Fulfillments</a></li>
+  <li><a href="#communication" data-toggle="tab" id="communications">Communications</a></li>
+  <li><a href="#operations" data-toggle="tab" id="operations">Operations</a></li>
+  <li><a href="#credit_cards" data-toggle="tab" id="credit_cards">Credit Cards</a></li>
   <% if @current_member.has_link_to_api? and can? :see_sync_status, Member %>
-    <li><a href="#sync_status" data-toggle="tab" id="sync_status_tab">Sync Status</a></li>
+    <li><a href="#sync_status" data-toggle="tab" id="sync_status">Sync Status</a></li>
   <% end %>
   <% if @current_club.is_not_drupal? %>
     <% if @current_club.allow_club_cash_transaction? %>
-      <li><a href="#club_cash_transactions" data-toggle="tab">Club Cash</a></li>
+      <li><a href="#club_cash_transactions" data-toggle="tab" id="club_cash_transactions">Club Cash</a></li>
     <% end %>  
   <% end %>
-  <li><a href="#memberships" data-toggle="tab">Memberships</a></li>
+  <li><a href="#memberships" data-toggle="tab" id="memberships">Memberships</a></li>
 </ul>
 
 <div class="tab-content">
   <div class="tab-pane active" id="transactions">
 	 <div class="tab_body_padding">
-	    <%= render :partial => 'transactions' %>
 	  </div>
 	</div>
 	<div class="tab-pane" id="notes">
 	  <div class="tab_body_padding">
-	    <%= render :partial => 'notes', :locals => { :notes => @notes} %>
 	  </div>
 	</div>	
 	<div class="tab-pane" id="fulfillments">
 	  <div class="tab_body_padding">
-	    <%= render :partial => 'fulfillments', :locals => { :fulfillments => @fulfillments} %>
 	  </div>
 	</div> 
-	<div class="tab-pane" id="communication">
+	<div class="tab-pane" id="communications">
 	  <div class="tab_body_padding">
-	    <%= render :partial => 'communications', :locals => { :communications => @communications} %>
 	  </div>
 	</div>
 	<div class="tab-pane" id="operations">
 	  <div class="tab_body_padding">
-	    <%= render :partial => 'operations' %>
 	  </div>
 	</div>	
 	<div class="tab-pane" id="credit_cards">
 	  <div class="tab_body_padding">
-	    <%= render :partial => 'credit_cards', :locals => { :credit_cards => @credit_cards} %>
 	  </div>
 	</div>  		
 	<% if @current_member.has_link_to_api? and can? :see_sync_status, Member %>
 	  <div class="tab-pane" id="sync_status">
 	    <div class="tab_body_padding">
-	      <%= render :partial => 'sync_status', :locals => { :member => @current_member} %>
 	    </div>
 	  </div>
 	<% end %>
@@ -412,18 +405,19 @@
 	  <% if @current_club.allow_club_cash_transaction? %>
 	    <div class="tab-pane" id="club_cash_transactions">
 	      <div class="tab_body_padding">
-	        <%= render :partial => 'club_cash_transactions' %>
 	      </div>
 	    </div>
 	  <% end %>
 	<% end %>
 	<div class="tab-pane" id="memberships">
 	  <div class="tab_body_padding">
-	    <%= render :partial => 'memberships' %>
 	  </div>
 	</div>
 </div>
 
 <script>
+  partner_prefix = "<%= @current_partner.prefix %>"
+  club_prefix = "<%= @current_club.name %>"
+  member_prefix = "<%= @current_member.id %>"
   $(document).ready(show_member_functions());
 </script>

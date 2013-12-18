@@ -678,6 +678,32 @@ function show_member_functions(){
   $('.help').popover();
   mark_as_sent_fulfillment("../fulfillments/");
   resend_fulfillment("../fulfillments/");
+
+  $.ajax({
+    url: member_prefix+"/transactions_content",
+      cache: false,
+      success: function(html){
+        $(".tab-content #transactions .tab_body_padding div").remove();
+        $(".tab-content #transactions .tab_body_padding").append(html);
+      }
+  })
+
+  $(".nav-tabs li a").click(function(){
+    var objects_to_search = $(this).attr("id");
+    startAjaxLoader();
+    $.ajax({
+      url: member_prefix+"/"+objects_to_search+"_content",
+      cache: false,
+      success: function(html){
+        $(".tab-content #"+objects_to_search+" .tab_body_padding").children().remove();
+        $(".tab-content #"+objects_to_search+" .tab_body_padding").append(html);
+        $(".tab-content .active").removeClass("active");
+        $(".tab-content #"+objects_to_search+"").addClass("active");
+      }
+    });
+    endAjaxLoader();
+  });
+
 };
 
 function member_cancellation_functions(){
