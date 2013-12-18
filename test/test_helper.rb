@@ -386,12 +386,15 @@ module ActionController
       next_bill_date = member.next_retry_bill_date + member.terms_of_membership.installment_period.days
 
       member.update_attribute(:next_retry_bill_date, Time.zone.now)
+      Time.zone = "UTC"
+      member.reload
       answer = member.bill_membership
+      Time.zone = member.club.time_zone
       member.update_attribute(:next_retry_bill_date, member.next_retry_bill_date + diff_between_next_bill_date_and_today)
-      
+
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
-      visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix =>member.club.name, :member_prefix => member.id)
-      
+      visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix =>member.club.name, :member_prefix => member.id)  
+
       # if current_membership.quota%12==0 and current_membership.quota!=12
       #   within("#table_membership_information")do
       #     within("#td_mi_club_cash_amount") { assert page.has_content?("#{member.terms_of_membership.club_cash_amount}") }
