@@ -10,7 +10,7 @@ gem 'uuidtools'
 
 gem "paperclip", "~> 3.0"
 
-gem 'acts_as_list'
+gem 'acts_as_list', '0.2.0'
 gem 'delayed_job_active_record'
 # uncomment if pardot is enabled again
 # gem "ruby-pardot"
@@ -46,7 +46,7 @@ gem 'hashie'
 gem 'state_machine', '1.1.2'
 gem 'cancan'
 gem 'easy_roles'
-gem "axlsx"
+gem "axlsx", :git => 'https://github.com/randym/axlsx.git', :branch => 'master'
 
 gem 'twitter-bootstrap-rails', '2.0.6'
 
@@ -77,7 +77,7 @@ group :development do
   gem "yard"  , :git => 'git://github.com/stoneacre/yard.git'
   gem 'yard-rest'
   gem 'redcarpet'
-  gem "bullet"
+  gem "bullet", '4.6.0'
   gem 'ruby-prof'
   # -> deploy
   gem 'rvm-capistrano'
@@ -90,7 +90,8 @@ group :development do
 end
 
 group :prototype do
-  gem "bullet"
+  gem "bullet", '4.6.0'
+  
 end
 
 
@@ -105,7 +106,7 @@ group :test do
   gem 'faker'
   gem 'mocha', require: false
   gem 'capybara'
-  gem 'selenium-webdriver', '~> 2.35.1'
+  gem 'selenium-webdriver', '~> 2.38.0'
   gem 'brakeman'
   gem 'simplecov'
   gem 'database_cleaner'
@@ -113,7 +114,7 @@ group :test do
 end
 
 gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant"
-gem 'LitleOnline'
+gem 'LitleOnline', '8.16.0'
 
 # TODO => remove the following requires after tokenization is implemented
 ### only for Auth.Net  without tokenization.
