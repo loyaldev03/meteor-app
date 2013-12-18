@@ -719,7 +719,6 @@ class Member < ActiveRecord::Base
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "Member:enroll" : "Member:recovery/save the sale") + " -- member turned invalid while enrolling"
-      trans.update_attribute :operation_type, Settings.operation_types.error_on_enrollment_billing if trans and not trans.operation_type
       Auditory.report_issue(error_message, e, { :member => self.inspect, :credit_card => credit_card.inspect, :enrollment_info => enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing) 
