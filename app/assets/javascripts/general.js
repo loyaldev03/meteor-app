@@ -967,6 +967,18 @@ function admin_form_functions(){
     });
   });
 
+  $("*[id^='agent_roles']").live("click", function(){
+    $("#clear_global_role").show();
+  });
+
+  $("#clear_global_role").click(function(event){
+    $("*[id^='agent_roles']").each(function(){
+      $(this).attr('checked', false);
+      event.preventDefault();
+      $("#clear_global_role").hide();
+    });
+  });
+
   $("#club_role_delete").live("click", function(){
     if (confirm("Are you sure you want to delete this club role?")) {
       $("#club_role_table tr[id='tr_club_rol_["+$(this).attr('name')+"]']").remove();

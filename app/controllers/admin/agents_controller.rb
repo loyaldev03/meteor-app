@@ -111,7 +111,7 @@ class Admin::AgentsController < ApplicationController
           hash.delete(:password_confirmation)
         end
         if hash[:roles].blank?
-          hash[:roles] = []
+          hash[:roles] = ""
         end
       end
     end

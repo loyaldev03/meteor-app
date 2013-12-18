@@ -21,7 +21,7 @@ FactoryGirl.define do
     password_confirmation { password }
     sequence(:email) {|n| "admin#{n}@test.no" }
     confirmed_at Date.today-1.month
-    roles ["admin"]
+    roles "admin"
   end
 
   factory :confirmed_representative_agent, class: Agent do
@@ -30,7 +30,7 @@ FactoryGirl.define do
     password_confirmation { password }
     sequence(:email) {|n| "representative#{n}@test.no" }
     confirmed_at Date.today-1.month
-    roles ["representative"]
+    roles "representative"
   end
 
   factory :confirmed_fulfillment_manager_agent, class: Agent do
@@ -39,7 +39,7 @@ FactoryGirl.define do
     password_confirmation { password }
     sequence(:email) {|n| "fulfillment_manager#{n}@test.no" }
     confirmed_at Date.today-1.month
-    roles ["fulfillment_managment"]
+    roles "fulfillment_managment"
   end
 
   factory :confirmed_supervisor_agent, class: Agent do
@@ -48,7 +48,7 @@ FactoryGirl.define do
     password_confirmation { password }
     sequence(:email) {|n| "supervisor#{n}@test.no" }
     confirmed_at Date.today-1.month
-    roles ["supervisor"]
+    roles "supervisor"
   end
 
   factory :confirmed_api_agent, class: Agent do
@@ -57,7 +57,7 @@ FactoryGirl.define do
     password_confirmation { password }
     sequence(:email) {|n| "api#{n}@test.no" }
     confirmed_at Date.today-1.month
-    roles ["api"]
+    roles "api"
   end
 
   factory :confirmed_agency_agent, class: Agent do
@@ -66,7 +66,7 @@ FactoryGirl.define do
     password_confirmation { password }
     sequence(:email) {|n| "agency#{n}@test.no" }
     confirmed_at Date.today-1.month
-    roles ["agency"]
+    roles "agency"
   end
 
   factory :batch_agent, class: Agent do
