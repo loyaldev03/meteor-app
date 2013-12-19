@@ -391,7 +391,7 @@ class MembersBillTest < ActionController::IntegrationTest
     active_merchant_stubs
     setup_member
     ["representative", "supervisor"].each do |role|
-      @admin_agent.update_attribute(:roles, [role])
+      @admin_agent.update_attribute(:roles, role)
       excecute_like_server(@club.time_zone) do
         bill_member(@saved_member, true)
       end
