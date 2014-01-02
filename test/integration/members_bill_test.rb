@@ -252,7 +252,7 @@ class MembersBillTest < ActionController::IntegrationTest
     change_next_bill_date(next_bill_date)
     assert find_field('input_first_name').value == @saved_member.first_name
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_content?(I18n.l(next_bill_date, :format => :only_date))
+      assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)), "Timezone: #{Time.zone}, date: #{next_bill_date}"
     end
   end  
 
