@@ -18,12 +18,12 @@ private
         domain.description,
         domain.data_rights,
         domain.hosted,
-        (link_to(I18n.t(:show), @url_helpers.domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')if @current_agent.can? :read, Domain)+
-        (link_to(I18n.t(:edit),@url_helpers.edit_domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')if @current_agent.can? :edit, Domain)+
+        (link_to(I18n.t(:show), @url_helpers.domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')if @current_agent.can? :read, Domain).to_s+
+        (link_to(I18n.t(:edit),@url_helpers.edit_domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id), :class => 'btn btn-mini')if @current_agent.can? :edit, Domain).to_s+
         (link_to(I18n.t(:destroy),@url_helpers.domain_path(:partner_prefix=> @current_partner.prefix, :id => domain.id),
                       :method => :delete, 
                       :confirm => I18n.t("are_you_sure"),
-                      :class => 'btn btn-mini btn-danger')if @current_agent.can? :delete, Domain)
+                      :class => 'btn btn-mini btn-danger')if @current_agent.can? :delete, Domain).to_s
       ]
     end
   end
