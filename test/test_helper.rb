@@ -10,7 +10,7 @@ require 'capybara/dsl'
 require 'database_cleaner'
 require 'mocha/setup'
 require "timeout"
-
+require 'tasks/tasks_helpers'
 
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
@@ -42,6 +42,20 @@ class ActiveSupport::TestCase
   # fixtures :all
 
   # Add more helper methods to be used by all tests here...
+
+  setup do
+    stubs_solr_index
+  end
+
+  def unstubs_solr_index
+    Member.any_instance.unstub(:solr_index)
+    Member.any_instance.unstub(:solr_index!)
+  end
+
+  def stubs_solr_index
+    Member.any_instance.stubs(:solr_index).returns(true) 
+    Member.any_instance.stubs(:solr_index!).returns(true)
+  end
 
   CREDIT_CARD_TOKEN = { nil => "c25ccfecae10384698a44360444dea", "4012301230123010" => "c25ccfecae10384698a44360444dead8", 
     "5589548939080095" => "c25ccfecae10384698a44360444dead7",
@@ -122,6 +136,10 @@ end
 
 class ActionController::TestCase
   include Devise::TestHelpers
+
+  setup do 
+    stubs_solr_index
+  end
 end
 
 module ActionController
@@ -131,6 +149,7 @@ module ActionController
     self.use_transactional_fixtures = false # DOES WORK! Damn it!
 
     setup do
+      stubs_solr_index
       DatabaseCleaner.start
       FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")
       page.driver.browser.manage.window.resize_to(1024,720)
@@ -367,12 +386,15 @@ module ActionController
       next_bill_date = member.next_retry_bill_date + member.terms_of_membership.installment_period.days
 
       member.update_attribute(:next_retry_bill_date, Time.zone.now)
+      Time.zone = "UTC"
+      member.reload
       answer = member.bill_membership
+      Time.zone = member.club.time_zone
       member.update_attribute(:next_retry_bill_date, member.next_retry_bill_date + diff_between_next_bill_date_and_today)
-      
+
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
-      visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix =>member.club.name, :member_prefix => member.id)
-      
+      visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix =>member.club.name, :member_prefix => member.id)  
+
       # if current_membership.quota%12==0 and current_membership.quota!=12
       #   within("#table_membership_information")do
       #     within("#td_mi_club_cash_amount") { assert page.has_content?("#{member.terms_of_membership.club_cash_amount}") }

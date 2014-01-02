@@ -3,13 +3,13 @@
 <table class="table table-bordered table-condensed" id="table_member_search_result">
   <thead>
   	<tr>
-      <th style="width: 110px;"><%= sortable "members.status", t('activerecord.attributes.member.status') %></th>
-      <th style="width: 125px;" NOWRAP id="th_member_id"> <%= sortable "members.id", t('activerecord.attributes.member.id') %> </th>
+      <th style="width: 110px;"><%= sortable "status", t('activerecord.attributes.member.status') %></th>
+      <th style="width: 125px;" NOWRAP id="th_member_id"> <%= sortable "id", t('activerecord.attributes.member.id') %> </th>
       <% if @current_club.requires_external_id %>
         <th> <%= t('activerecord.attributes.member.external_id') %> </th>
       <% end %>
-      <th style="width: 170px;"> <%= sortable "members.first_name, members.last_name", t('activerecord.attributes.member.full_name') %></th>
-      <th style="width: 170px;"> <%= sortable "members.address, members.city", t('activerecord.attributes.member.full_address') %></th>
+      <th style="width: 170px;"> <%= sortable "full_name", t('activerecord.attributes.member.full_name') %></th>
+      <th style="width: 170px;"> <%= sortable "full_address", t('activerecord.attributes.member.full_address') %></th>
       <th> <%= t('activerecord.attributes.member.member_classification_type') %> </th>
       <th style="width: 20px;">View</th>
       <th style="width: 20px;">Edit</th>
@@ -53,6 +53,7 @@
       <% end %> 
     <% end %>
   <% end %>
+
   </tbody>
 </table>
 

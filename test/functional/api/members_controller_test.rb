@@ -21,7 +21,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     @preferences = {'color' => 'green','car'=> 'dodge'}
     # request.env["devise.mapping"] = Devise.mappings[:agent]
  
-
     @unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
     @credit_card = FactoryGirl.build(:credit_card_master_card)
     @enrollment_info = FactoryGirl.build(:enrollment_info)
@@ -540,7 +539,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@member.active_credit_card.expire_month, @credit_card.expire_month)
   end
 
-
   # Multiple same credit cards with different expiration date
   test "Should update credit card only year" do
     sign_in @admin_user
@@ -550,7 +548,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     
     active_merchant_stubs_store("5589548939080095")
 
-    validate_credit_card_updated_only_year(active_credit_card, token, "5589548939080095", 0)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5589548939080095", 2)
     validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 3)
     validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 4)
     validate_credit_card_updated_only_year(active_credit_card, token, "5589/5489/3908/0095", 5)
@@ -1741,7 +1739,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "One time billing throught API." do
     sign_in @admin_user
     ['admin', 'api'].each do |role|
-      @admin_user.update_attribute :roles, [role]
+      @admin_user.update_attribute :roles, role
       @member = create_active_member(@terms_of_membership, :member_with_api)
       FactoryGirl.create :credit_card, :member_id => @member.id
       @member.set_as_provisional
@@ -1761,7 +1759,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Donation billing throught API" do
     sign_in @admin_user
     ['admin', 'api'].each do |role|
-      @admin_user.update_attribute :roles, [role]
+      @admin_user.update_attribute :roles, role
       @member = create_active_member(@terms_of_membership, :member_with_api)
       FactoryGirl.create :credit_card, :member_id => @member.id
       @member.set_as_provisional
@@ -1797,7 +1795,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not allow sale transaction for agents that are not admin or api." do
     sign_in @admin_user
     ['representative', 'supervisor', 'agency', 'fulfillment_managment'].each do |role|
-      @admin_user.update_attribute :roles, [role]
+      @admin_user.update_attribute :roles, role
       @member = create_active_member(@terms_of_membership, :member_with_api)
       FactoryGirl.create :credit_card, :member_id => @member.id
       @member.set_as_provisional

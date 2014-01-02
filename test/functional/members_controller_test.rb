@@ -37,7 +37,7 @@ class MembersControllerTest < ActionController::TestCase
   test "should get to bill event section" do
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['admin', 'supervisor'].each do |role|
-      @agent.update_attribute :roles, [role]
+      @agent.update_attribute :roles, role
       get :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id
       assert_response :success
     end
@@ -48,7 +48,7 @@ class MembersControllerTest < ActionController::TestCase
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     ['representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      @agent.update_attribute :roles, [role]
+      @agent.update_attribute :roles, role
       get :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, member_prefix: @saved_member.id
       assert_response :unauthorized
     end
@@ -57,7 +57,7 @@ class MembersControllerTest < ActionController::TestCase
   test "One time billing" do
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['admin', 'supervisor'].each do |role|
-      @agent.update_attribute :roles, [role]
+      @agent.update_attribute :roles, role
       generate_post_bill_event(200, "testing billing event", "one-time")
       assert_response :success
     end
@@ -66,7 +66,7 @@ class MembersControllerTest < ActionController::TestCase
   test "Donation billing" do
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['admin', 'supervisor'].each do |role|
-      @agent.update_attribute :roles, [role]
+      @agent.update_attribute :roles, role
       generate_post_bill_event(200, "testing billing event", "donation")
       assert_response :success
     end
@@ -75,7 +75,7 @@ class MembersControllerTest < ActionController::TestCase
   test "should not bill an event" do
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      @agent.update_attribute :roles, [role]
+      @agent.update_attribute :roles, role
       generate_post_bill_event(200, "testing billing event", "one-time")
       assert_response :unauthorized
     end
@@ -91,7 +91,7 @@ class MembersControllerTest < ActionController::TestCase
   test "should manual bill" do
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['admin', 'supervisor', 'representative'].each do |role|
-      @agent.update_attribute :roles, [role]
+      @agent.update_attribute :roles, role
       generate_post_manual_bill(200, "cash")
       assert_response :success
     end
@@ -100,7 +100,7 @@ class MembersControllerTest < ActionController::TestCase
   test "should not manual bill" do
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['api', 'agency', 'fulfillment_managment'].each do |role|
-      @agent.update_attribute :roles, [role]
+      @agent.update_attribute :roles, role
       generate_post_manual_bill(200, "cash")
       assert_response :unauthorized
     end

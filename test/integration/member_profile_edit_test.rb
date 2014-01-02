@@ -52,6 +52,66 @@ class MemberProfileEditTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
+  test "Do not display token field (club with auth.net) - Admin" do
+    setup_member(false)
+    @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert has_no_content?("CC Token")
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within("#table_active_credit_card") do
+      assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards") do
+     assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+  end
+
+  test "Do not display token field (club with auth.net) - Supervisor" do
+    setup_member(false)
+    @admin_agent.update_attribute(:roles,["supervisor"])
+    @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert has_no_content?("CC Token")
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within("#table_active_credit_card") do
+      assert page.has_no_content?("#{saved_credit_card.token}")
+     end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards") do
+     assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+  end
+
+  test "Do not display token field (club with auth.net) - Representative" do
+    setup_member(false)
+    @admin_agent.update_attribute(:roles,["representative"])
+    @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
+    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+    saved_credit_card = @saved_member.active_credit_card
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert has_no_content?("CC Token")
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within("#table_active_credit_card") do
+      assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+    within(".nav-tabs"){ click_on("Credit Cards") }
+    within("#credit_cards") do
+     assert page.has_no_content?("#{saved_credit_card.token}")
+    end
+  end
+
+
   # test "Add additional data to member"
   # test "Do not display Additional data section if it does not have"
   test "See Additional Member Data" do
@@ -64,28 +124,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#table_additional_data") do
       assert page.has_content?("data_field_one: green")
       assert page.has_content?("data_field_two: dodge")
-    end
-  end
-
-  test "Bill date filter" do
-    setup_member(false,false)
-    unsaved_member=FactoryGirl.build(:member_with_api, :club_id => @club.id)
-    unsaved_member_2=FactoryGirl.build(:member_with_api, :club_id => @club.id)
-    credit_cardd=FactoryGirl.build(:credit_card_american_express)
-    c = create_member(unsaved_member, credit_cardd)
-    c2 = create_member(unsaved_member_2)
-    tran_1 = FactoryGirl.create(:transaction, :member_id => c.id)
-    tran_1.update_attribute(:created_at, Time.zone.now + 10.days)
-    tran_2 = FactoryGirl.create(:transaction, :member_id => c2.id)
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-
-    select_from_datepicker("member_billing_date_start", Time.zone.now+9.days)
-    select_from_datepicker("member_billing_date_end", Time.zone.now+11.days)
- 
-    click_link_or_button('Search')
-      within("#members") do
-      assert find("tr", :text => c.full_name)
-      assert page.has_no_content? c2.full_name
     end
   end
 
@@ -391,110 +429,6 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     within("#table_contact_information"){ assert page.has_content?('Mobile') }
     assert_equal Member.last.type_of_phone_number, 'mobile'
   end
-
-  test "go from member index to edit member's phone number to a wrong phone number" do
-    setup_member
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    within("#personal_details")do
-      fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
-      fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
-      fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
-    end
-    click_link_or_button 'Search'
-    within("#members"){ find(".icon-pencil").click }
-    within("#table_contact_information")do
-      fill_in 'member[phone_country_code]', :with => 'TYUIYTRTYUYT'
-      fill_in 'member[phone_area_code]', :with => 'TYUIYTRTYUYT'
-      fill_in 'member[phone_local_number]', :with => 'TYUIYTRTYUYT'
-    end
-    alert_ok_js
-    click_link_or_button 'Update Member'
-    within("#error_explanation")do
-      assert page.has_content?('phone_country_code: is not a number')
-      assert page.has_content?('phone_area_code: is not a number')
-      assert page.has_content?('phone_local_number: is not a number')
-    end
-  end
-
-  test "go from member index to edit member's type of phone number to home type" do
-    setup_member
-    @saved_member.update_attribute(:type_of_phone_number, 'mobile')
-
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    within("#personal_details")do
-      fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
-      fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
-      fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
-    end
-    click_link_or_button 'Search'
-    within("#members")do
-      find(".icon-pencil").click
-    end   
-    within("#table_contact_information")do
-      assert find_field('member[type_of_phone_number]').value == @saved_member.type_of_phone_number
-      assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
-      assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
-      assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
-      select('Home', :from => 'member[type_of_phone_number]' )
-    end
-    alert_ok_js
-    click_link_or_button 'Update Member'
-    within("#table_contact_information")do
-      @saved_member.reload
-      assert page.has_content?(@saved_member.full_phone_number)
-      assert page.has_content?(@saved_member.type_of_phone_number.capitalize)
-    end
-  end
-
-  test "go from member index to edit member's type of phone number to other type" do
-    setup_member
-
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    within("#personal_details")do
-      fill_in 'member[phone_country_code]', :with => @saved_member.phone_country_code
-      fill_in 'member[phone_area_code]', :with => @saved_member.phone_area_code
-      fill_in 'member[phone_local_number]', :with => @saved_member.phone_local_number
-    end
-    click_link_or_button 'Search'
-    within("#members")do
-      find(".icon-pencil").click
-    end   
-    within("#table_contact_information")do
-      assert find_field('member[type_of_phone_number]').value == @saved_member.type_of_phone_number
-      assert find_field('member[phone_country_code]').value == @saved_member.phone_country_code.to_s
-      assert find_field('member[phone_area_code]').value == @saved_member.phone_area_code.to_s
-      assert find_field('member[phone_local_number]').value == @saved_member.phone_local_number.to_s
-      select('Other', :from => 'member[type_of_phone_number]' )
-    end
-    alert_ok_js
-    click_link_or_button 'Update Member'
-
-    within("#table_contact_information")do
-      assert page.has_content?(@saved_member.full_phone_number)
-      assert page.has_content?('Other')
-    end
-  end
-
-  # go from member index to edit member's classification to celebrity
-  test "go from member index to edit member's classification to VIP and to Celebrity" do
-    setup_member
-    ["VIP", "Celebrity"].each do |value|
-      visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-      within("#personal_details") do
-        fill_in 'member[id]', :with => @saved_member.id.to_s
-        fill_in 'member[first_name]', :with => @saved_member.first_name
-        fill_in 'member[last_name]', :with => @saved_member.last_name
-      end
-      click_link_or_button 'Search'
-      within("#members"){ find(".icon-pencil").click }  
-      select(value, :from => 'member[member_group_type_id]')
-
-      alert_ok_js
-      click_link_or_button 'Update Member'
-
-      assert find_field('input_member_group_type').value == value
-    end
-  end
   
   test "Update external id" do
     setup_member(false)
@@ -502,13 +436,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
     @terms_of_membership_with_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id, :club_id => @club_external_id.id)
     @member_with_external_id = create_active_member(@terms_of_membership_with_external_id, :active_member_with_external_id, nil, {}, { :created_by => @admin_agent })
 
-
-    visit members_path(:partner_prefix => @terms_of_membership_with_external_id.club.partner.prefix, :club_prefix => @terms_of_membership_with_external_id.club.name)
-    assert_equal @club_external_id.requires_external_id, true, "Club does not have require external id"
-    
-    within("#personal_details"){ fill_in "member[external_id]", :with => @member_with_external_id.external_id }
-    click_link_or_button 'Search'
-    within("#members"){ find(".icon-pencil").click }   
+    visit edit_member_path(:partner_prefix => @member_with_external_id.club.partner.prefix, :club_prefix => @member_with_external_id.club.name, :member_prefix => @member_with_external_id.id)
 
     within("#external_id"){ fill_in 'member[external_id]', :with => '987654321' }
     alert_ok_js

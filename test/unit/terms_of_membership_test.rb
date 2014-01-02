@@ -71,7 +71,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     #first billing, it should not upgrade 
     Timecop.travel(member.next_retry_bill_date) do
       assert_difference("Operation.count", 3) do
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
       end      
       member.reload
       assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
@@ -79,7 +79,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     #Second billing, it should not upgrade 
     Timecop.travel(member.next_retry_bill_date) do
       assert_difference("Operation.count", 3) do
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
       end
       member.reload
       assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
@@ -87,7 +87,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     #Third billing, it should upgrade 
     Timecop.travel(member.next_retry_bill_date) do
       assert_difference("Operation.count", 4) do
-        Member.bill_all_members_up_today
+        TasksHelpers.bill_all_members_up_today
       end
       member.reload
       assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership.id
@@ -140,5 +140,4 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
       assert_not_nil member.operations.where(operation_type: Settings.operation_types.tom_upgrade).first
     end
   end
-
 end

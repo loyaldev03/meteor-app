@@ -19,8 +19,9 @@ class Transaction < ActiveRecord::Base
   ONE_TIME_BILLINGS = ["one-time", "donation"]
 
   def full_label
+    transaction_type ?
     I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
-      ( response_result.nil? ? '' : ' : ' + response_result)
+      ( response_result.nil? ? '' : ' : ' + response_result) : ''
   end
 
   def self.datatable_columns
@@ -185,7 +186,7 @@ class Transaction < ActiveRecord::Base
         amount = amount.to_f
         if amount <= 0.0
           return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
-        elsif sale_transaction.amount_available_to_refund < amount
+        elsif sale_transaction.amount_available_to_refund.to_f < amount
           return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
         end
         trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
@@ -199,7 +200,7 @@ class Transaction < ActiveRecord::Base
           Communication.deliver!(:refund, sale_transaction.member)
           sale_transaction.member.marketing_tool_sync
         else
-          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]} #{trans.inspect}", sale_transaction.member, Settings.operation_types.credit_error)
+          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
           trans.update_attribute :operation_type, Settings.operation_types.credit_error
         end
         answer

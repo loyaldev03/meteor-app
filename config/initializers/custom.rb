@@ -2,7 +2,6 @@ require 'auditory'
 require 'exception_notification'
 SacPlatform::Application.config.middleware.use ExceptionNotifier if ['production', 'staging', 'prototype'].include?(Rails.env)
 require 'lyris_service'
-require 'clean_find_in_batches'
 require 'axlsx'
 require "exceptions"
 
@@ -15,8 +14,6 @@ LitleOnline::Configuration.logger.level = Logger::DEBUG
 ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_auth_net.log", "a+")  
 ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device.sync = true
 
-
-ActiveRecord::Batches.send(:include, CleanFindInBatches)
 
 # config/initializers/delayed_job_config.rb
 Delayed::Worker.destroy_failed_jobs = false

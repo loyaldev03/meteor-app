@@ -102,8 +102,12 @@ class FulfillmentsController < ApplicationController
   def mark_file_as_sent
     my_authorize! :report, Fulfillment, @current_club.id
     file = FulfillmentFile.find(params[:fulfillment_file_id])
-    file.processed!
-    flash[:notice] = "Fulfillment file marked as sent successfully"
+    unless file.sent?
+      file.processed!
+      flash[:notice] = "Fulfillment file marked as sent successfully."
+    else
+      flash[:notice] = "Fulfillment file was already marked as sent."
+    end
   rescue
     flash[:error] = t('error_messages.airbrake_error_message')
     Auditory.report_issue("FulfillmentFile:mark_file_as_sent", $!, { :file => file.inspect })

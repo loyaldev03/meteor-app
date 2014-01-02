@@ -1,10 +1,10 @@
 set :scm, :git
-set :application, 'backend-sac-platform'
+set :application, 'backend-sac-platform-pantheon'
 set :cplatform, 'all'
 set :deploy_to, "/var/www/#{application}"
 set :repository, 'git@github.com:stoneacre/sac-platform.git'
-set :database_name, 'sac_platform_prototype'
-set :rails_env, "prototype"
+set :database_name, 'pantheon_sac_platform_prototype'
+set :rails_env, "prototype_pantheon"
 
 server "prototype.platform.xagax.com", :app, :web
 

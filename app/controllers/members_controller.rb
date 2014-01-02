@@ -27,36 +27,49 @@ class MembersController < ApplicationController
   end
 
   def search_result
-    @members = Member.paginate(:page => params[:page], :per_page => 25)
-                       .joins([:current_membership])
-                       .with_id(params[:member][:id])
-                       .with_first_name_like(params[:member][:first_name])
-                       .with_last_name_like(params[:member][:last_name])
-                       .with_address_like(params[:member][:address])
-                       .with_city_like(params[:member][:city])
-                       .with_country_like(params[:member][:country])
-                       .with_state_like(params[:member][:state])
-                       .with_zip(params[:member][:zip])
-                       .with_email_like(params[:member][:email])
-                       .with_next_retry_bill_date(params[:member][:next_retry_bill_date])
-                       .with_credit_card_last_digits(params[:member][:last_digits])
-                       .with_credit_card_token(params[:member][:cc_token])
-                       .with_member_notes(params[:member][:notes])
-                       .with_phone_country_code(params[:member][:phone_country_code])
-                       .with_phone_area_code(params[:member][:phone_area_code])
-                       .with_phone_local_number(params[:member][:phone_local_number])
-                       .with_sync_status(params[:member][:sync_status])
-                       .with_external_id(params[:member][:external_id])
-                       .with_billed_date_from(params[:member][:billing_date_start])
-                       .with_billed_date_to(params[:member][:billing_date_end])
-                       .where(:club_id => @current_club)
-                       .needs_approval(params[:member][:needs_approval])
-                       .order(sort_column + " " + sort_direction)
-                       .group('members.id')
-    respond_to do |format|
-      format.html {render 'index'}
-      format.js {render 'index'}
-    end
+    current_club = @current_club
+    @members = Member.search do
+      # members
+      [ :first_name, :last_name, :address, :city, :zip, :email, :external_id, :notes ].each do |field|
+        fulltext("*#{params[:member][field].strip}*", :fields => field) unless params[:member][field].blank?
+      end
+      [ :id, :state, :country, :phone_country_code, :phone_area_code, :phone_local_number, :last_digits, :cc_token ].each do |field|
+        with(field, params[:member][field].strip) unless params[:member][field].blank?
+      end
+      if params[:member][:needs_approval].to_i != 0
+        with(:status, 'applied')
+      end
+      unless params[:member][:next_retry_bill_date].blank?
+        next_retry_bill_date = params[:member][:next_retry_bill_date].to_date.to_time_in_current_zone
+        with(:next_retry_bill_date, next_retry_bill_date.beginning_of_day..next_retry_bill_date.end_of_day)
+      end
+      case params[:member][:sync_status]
+        when true, 'true', 'synced'
+          with :sync_status, "synced"
+        when false, 'false', 'unsynced'
+          with :sync_status, "not_synced"
+        when 'error'
+          with :sync_status, "with_error"
+        when 'noerror'
+          with :sync_status, ["not_synced", "synced"]
+      end
+      unless params[:member][:billing_date_start].blank?
+        billing_date_start = params[:member][:billing_date_start].to_date.to_time_in_current_zone
+        with(:billed_dates).greater_than(billing_date_start)
+      end
+      unless params[:member][:billing_date_end].blank?
+        billing_date_end = params[:member][:billing_date_end].to_date.to_time_in_current_zone
+        with(:billed_dates).less_than(billing_date_end)
+      end
+      with :club_id, current_club.id
+      order_by sort_column, sort_direction
+      paginate :page => params[:page], :per_page => 25
+    end.results
+  rescue Errno::ECONNREFUSED
+    @solr_is_down = true
+    Auditory.report_issue("Member:search_result", "SOLR is down. Confirm that server is running, if problem persist restart it")
+  ensure
+    render 'index'
   end
 
   def show
@@ -373,7 +386,7 @@ class MembersController < ApplicationController
 
   private 
     def sort_column
-      @sort_column ||= ['members.status', 'members.id', 'members.first_name, members.last_name', 'members.address, members.city' ].include?(params[:sort]) ? params[:sort] : 'memberships.join_date'
+      @sort_column ||= ['status', 'id', 'full_name', 'full_address' ].include?(params[:sort]) ? params[:sort] : 'join_date'
     end
     
     def sort_direction

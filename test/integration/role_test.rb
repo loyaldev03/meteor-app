@@ -13,7 +13,7 @@ class RolesTest < ActionController::IntegrationTest
 
   def setup_agent_no_rol
     @agent = FactoryGirl.create(:confirmed_agent)
-    @agent.update_attribute(:roles, [])
+    @agent.update_attribute(:roles, "")
     sign_in_as(@agent)   
   end
 
@@ -24,25 +24,25 @@ class RolesTest < ActionController::IntegrationTest
 
   def setup_representative
     @agent = FactoryGirl.create(:confirmed_representative_agent)
-    @agent.update_attribute(:roles, ['representative'])
+    @agent.update_attribute(:roles, 'representative')
     sign_in_as(@agent)
   end
 
   def setup_agency
     @agent = FactoryGirl.create(:confirmed_agency_agent)
-    @agent.update_attribute(:roles, ['agency'])
+    @agent.update_attribute(:roles, 'agency')
     sign_in_as(@agent)
   end
 
   def setup_api
     @agent = FactoryGirl.create(:confirmed_api_agent)
-    @agent.update_attribute(:roles, ['api'])
+    @agent.update_attribute(:roles, 'api')
     sign_in_as(@agent)
   end
 
   def setup_fulfillment_managment
     @agent = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
-    @agent.update_attribute(:roles, ['fulfillment_managment'])
+    @agent.update_attribute(:roles, 'fulfillment_managment')
     sign_in_as(@agent)
   end
 
@@ -65,11 +65,13 @@ class RolesTest < ActionController::IntegrationTest
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
     
     if create_new_member
-      unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-      credit_card = FactoryGirl.build(:credit_card_master_card)
-      enrollment_info = FactoryGirl.build(:enrollment_info)
       @agent_admin = FactoryGirl.create(:confirmed_admin_agent)
-      create_member_by_sloop(@agent_admin, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+      unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+      excecute_like_server(@club.time_zone) do 
+        credit_card = FactoryGirl.build(:credit_card_master_card)
+        enrollment_info = FactoryGirl.build(:enrollment_info)
+        create_member_by_sloop(@agent_admin, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+      end
       @saved_member = Member.find_by_email(unsaved_member.email)
     end
    end
@@ -97,7 +99,6 @@ class RolesTest < ActionController::IntegrationTest
     setup_member false
     @agent_no_role = FactoryGirl.create :confirmed_agent
     7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
-    sleep 500
     club1 = Club.first
     club2 = Club.find(2)
     club3 = Club.find(3)
@@ -482,7 +483,7 @@ test "Agency role - Recover a member" do
   test "Profile fulfillment_managment - Add a Credit Card" do
     setup_fulfillment_managment
     setup_member
-    @agent.update_attribute(:roles, ['fulfillment_managment'])
+    @agent.update_attribute(:roles, 'fulfillment_managment')
     credit_card = FactoryGirl.build(:credit_card_american_express)
 
     add_credit_card(@saved_member,credit_card)
@@ -497,7 +498,7 @@ test "Agency role - Recover a member" do
   test "Profile fulfillment_managment - Refund active member" do
     setup_fulfillment_managment
     setup_member
-    @agent.update_attribute(:roles, ['fulfillment_managment'])
+    @agent.update_attribute(:roles, 'fulfillment_managment')
     
     bill_member(@saved_member, true)
   end
@@ -520,12 +521,12 @@ test "Agency role - Recover a member" do
     visit products_path(@club.partner.prefix, @club.name)
     assert page.has_content?("401 You are Not Authorized.")
 
-    @agent.roles = ['representative']
+    @agent.roles = 'representative'
     @agent.save
     visit products_path(@club.partner.prefix, @club.name)
     assert page.has_content?("401 You are Not Authorized.")
 
-    @agent.roles = ['admin']
+    @agent.roles = 'admin'
     @agent.save
     visit products_path(@club.partner.prefix, @club.name)
     within("#products_table_wrapper")do
@@ -720,28 +721,28 @@ test "Agency role - Recover a member" do
       assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
     end
 
-    @agent.update_attribute(:roles, ['supervisor'])
+    @agent.update_attribute(:roles, 'supervisor')
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_active_credit_card")do
       assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
       assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
     end
 
-    @agent.update_attribute(:roles, ['fulfillment_managment'])
+    @agent.update_attribute(:roles, 'fulfillment_managment')
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_active_credit_card")do
       assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
       assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
     end 
 
-    @agent.update_attribute(:roles, ['representative'])
+    @agent.update_attribute(:roles, 'representative')
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_active_credit_card")do
       assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
       assert page.has_content?("#{@saved_member.active_credit_card.cc_type}")
     end
 
-    @agent.update_attribute(:roles, ['agency'])
+    @agent.update_attribute(:roles, 'agency')
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_active_credit_card")do
       assert page.has_content?(@saved_member.active_credit_card.last_digits.to_s)
@@ -1011,7 +1012,7 @@ test "Agency role - Recover a member" do
     setup_agency
     setup_member false
     
-    @agent.update_attribute(:roles,['agency'])
+    @agent.update_attribute(:roles,'agency')
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     find("#my_clubs").click
@@ -1030,7 +1031,7 @@ test "Agency role - Recover a member" do
     setup_representative
     setup_member false
 
-    @agent.update_attribute(:roles,['representative'])
+    @agent.update_attribute(:roles,'representative')
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     find("#my_clubs").click
@@ -1048,7 +1049,7 @@ test "Agency role - Recover a member" do
   test "Should see every club on my clubs table when has supervisor role." do
     setup_supervisor
     setup_member false
-    @agent.update_attribute(:roles,['supervisor'])
+    @agent.update_attribute(:roles,'supervisor')
     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     find("#my_clubs").click

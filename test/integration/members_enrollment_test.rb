@@ -141,7 +141,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
 
     @saved_member.current_membership.update_attribute(:join_date, Time.zone.now - amount_of_days.day)
     excecute_like_server(@club.time_zone) do
-      Member.send_pillar_emails
+      TasksHelpers.send_pillar_emails
     end
     sleep 5
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
@@ -207,21 +207,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     validate_view_member_base(created_member)
     within(".nav-tabs"){ click_on 'Operations' }
     within("#operations_table") { assert page.has_content?("Member enrolled successfully $0.0") }
-  end
-
-  # Display external_id at member search
-  test "create a member inside a club with external_id in true" do
-  	setup_member(false)
-  	@club.requires_external_id = true
-  	@club.save!
-
-  	unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id, :external_id => "9876543210")
-    created_member = create_member(unsaved_member)
-
-    within("#td_mi_external_id") { assert page.has_content?(unsaved_member.external_id) }
-
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
-    search_member("member[id]", "#{created_member.id}", created_member)
   end
 
 	test "new member for with external_id not requiered" do
@@ -910,7 +895,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     @saved_member = Member.find_by_email(unsaved_member.email)
     @saved_member.update_attribute(:birth_date, Time.zone.now)
     excecute_like_server(@club.time_zone) do
-      Member.send_happy_birthday
+      TasksHelpers.send_happy_birthday
     end
     sleep(5)
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)

@@ -1,9 +1,10 @@
 # Do you want to put in mantainance mode the site during deployment?
 # Use :
 # cap -S put_in_maintenance_mode="true" prototype deploy
+# cap -S solr_reindex="true" prototype deploy
 # default value is false
 
-set :stages, %w(production prototype staging demo)
+set :stages, %w(production prototype staging demo prototype_pantheon staging_pantheon)
 set :default_stage, "prototype"
 default_run_options[:pty] = true
 require 'capistrano/ext/multistage'
@@ -39,12 +40,6 @@ task :envfile do
   run "echo RAILS_ENV=#{rails_env} >> #{release_path}/.env"
 end
 
-task :bundle_install do
-  puts "  **** bundle_install"
-  run "id"
-  run "cd #{release_path}; #{sudo} bundle install"
-end
-
 desc "Restart delayed jobs"
 task :restart_delayed_jobs do
   run "#{sudo} service #{application} stop && #{sudo} service #{application} start" 
@@ -54,6 +49,22 @@ desc "Notify Campfire room"
 task :notify_campfire do
   campfire_room.speak "#{cplatform} #{application}: env #{rails_env}"
 end
+
+namespace :solr do
+  desc "start solr"
+  task :start, :roles => :app, :except => { :no_release => true } do 
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:start"
+  end
+  desc "stop solr"
+  task :stop, :roles => :app, :except => { :no_release => true } do 
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:stop"
+  end
+  desc "reindex the whole database"
+  task :reindex, :roles => :app do
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:reindex"
+  end
+end
+ 
 
 namespace :deploy do
   namespace :db do
@@ -200,6 +211,7 @@ after "deploy:update", "maintenance_mode:start" if fetch(:put_in_maintenance_mod
 after "deploy:update", "deploy:migrate"
 after "deploy:update", "maintenance_mode:stop" if fetch(:put_in_maintenance_mode, false)
 after 'deploy:update', 'restart_delayed_jobs'
+after "deploy:update", "solr:reindex" if fetch(:solr_reindex, false)
 after 'deploy', 'notify_campfire'
 after "deploy", "deploy:tag"
 
