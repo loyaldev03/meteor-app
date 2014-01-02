@@ -65,11 +65,13 @@ class RolesTest < ActionController::IntegrationTest
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
     
     if create_new_member
-      unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-      credit_card = FactoryGirl.build(:credit_card_master_card)
-      enrollment_info = FactoryGirl.build(:enrollment_info)
       @agent_admin = FactoryGirl.create(:confirmed_admin_agent)
-      create_member_by_sloop(@agent_admin, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+      unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+      excecute_like_server(@club.time_zone) do 
+        credit_card = FactoryGirl.build(:credit_card_master_card)
+        enrollment_info = FactoryGirl.build(:enrollment_info)
+        create_member_by_sloop(@agent_admin, unsaved_member, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+      end
       @saved_member = Member.find_by_email(unsaved_member.email)
     end
    end
