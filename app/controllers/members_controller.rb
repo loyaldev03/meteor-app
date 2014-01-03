@@ -68,6 +68,9 @@ class MembersController < ApplicationController
   rescue Errno::ECONNREFUSED
     @solr_is_down = true
     Auditory.report_issue("Member:search_result", "SOLR is down. Confirm that server is running, if problem persist restart it")
+  rescue Timeout::Error
+    @solr_is_down = true
+    Auditory.report_issue("Member:search_result", "SOLR Timeout Error received. Confirm that service is available.")  
   ensure
     render 'index'
   end
