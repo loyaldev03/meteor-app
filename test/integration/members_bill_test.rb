@@ -82,7 +82,7 @@ class MembersBillTest < ActionController::IntegrationTest
     bill_member(@saved_member,false,nil,false)
     next_bill_date = Time.zone.now.to_date + 1.day
     change_next_bill_date(next_bill_date)
-    assert page.has_content?("Next bill date changed to #{next_bill_date.to_date}")
+    find(".alert", :text => "Next bill date changed to #{next_bill_date.to_date}")
   end
 
   test "See HD for 'Soft recycle limit'" do
