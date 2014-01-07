@@ -53,7 +53,7 @@ DATE=`date +"%u"` # 1 monday
 if [ "$1" == "production" ]; then
   if [ "$DATE" == "1" ]; then
     cd /var/www/$2/current && rake fulfillments:generate_fulfillment_naamma_report >> $LOGFILE 2>&1 
-    cd /var/www/$2/current && rake fulfillments:generate_nfla_report >> $LOGFILE 2>&1 
+    # cd /var/www/$2/current && rake fulfillments:generate_nfla_report >> $LOGFILE 2>&1 
   fi
   ssh carla@50.116.28.74 -p 30003 '/var/sac-platform-reporting/generate_reporting_database >> /var/sac-platform-reporting/log/nightly.log'
 fi
