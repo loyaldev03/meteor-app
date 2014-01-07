@@ -34,7 +34,6 @@ class MembersBillTest < ActionController::IntegrationTest
   ############################################################
   # UTILS
   ############################################################
-
     
   def make_a_refund(transaction, amount, check_refund = true)
     visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => transaction.id)
