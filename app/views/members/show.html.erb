@@ -353,21 +353,21 @@
 <% end %>
 
 <ul class="nav nav-tabs">
-  <li class="active"><a href="#transactions" data-toggle="tab" id="transactions">Transactions</a></li>
-  <li><a href="#notes" data-toggle="tab" id="notes">Notes</a></li>
-  <li><a href="#fulfillments" data-toggle="tab" id="fulfillments">Fulfillments</a></li>
-  <li><a href="#communication" data-toggle="tab" id="communications">Communications</a></li>
-  <li><a href="#operations" data-toggle="tab" id="operations">Operations</a></li>
-  <li><a href="#credit_cards" data-toggle="tab" id="credit_cards">Credit Cards</a></li>
+  <li class="active"><a href="#transactions" data-toggle="tab" name="transactions">Transactions</a></li>
+  <li><a href="#notes" data-toggle="tab" name="notes">Notes</a></li>
+  <li><a href="#fulfillments" data-toggle="tab" name="fulfillments">Fulfillments</a></li>
+  <li><a href="#communication" data-toggle="tab" name="communications">Communications</a></li>
+  <li><a href="#operations" data-toggle="tab" name="operations">Operations</a></li>
+  <li><a href="#credit_cards" data-toggle="tab" name="credit_cards">Credit Cards</a></li>
   <% if @current_member.has_link_to_api? and can? :see_sync_status, Member %>
-    <li><a href="#sync_status" data-toggle="tab" id="sync_status">Sync Status</a></li>
+    <li><a href="#sync_status" data-toggle="tab" name="sync_status">Sync Status</a></li>
   <% end %>
   <% if @current_club.is_not_drupal? %>
     <% if @current_club.allow_club_cash_transaction? %>
-      <li><a href="#club_cash_transactions" data-toggle="tab" id="club_cash_transactions">Club Cash</a></li>
+      <li><a href="#club_cash_transactions" data-toggle="tab" name="club_cash_transactions">Club Cash</a></li>
     <% end %>  
   <% end %>
-  <li><a href="#memberships" data-toggle="tab" id="memberships">Memberships</a></li>
+  <li><a href="#memberships" data-toggle="tab" name="memberships">Memberships</a></li>
 </ul>
 
 <div class="tab-content">
@@ -416,8 +416,6 @@
 </div>
 
 <script>
-  partner_prefix = "<%= @current_partner.prefix %>"
-  club_prefix = "<%= @current_club.name %>"
   member_prefix = "<%= @current_member.id %>"
   $(document).ready(show_member_functions());
 </script>

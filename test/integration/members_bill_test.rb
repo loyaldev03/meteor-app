@@ -425,9 +425,9 @@ class MembersBillTest < ActionController::IntegrationTest
     within("#operations"){ assert page.has_content?("Communication 'Test hard_decline' sent") } 
     within("#operations"){ assert page.has_content?("Communication 'Test cancellation' sent") } 
     within("#operations"){ assert page.has_content?("Member canceled") } 
-    within(".nav-tabs"){ click_on 'Communication' }
-    within("#communication"){ assert page.has_content?("hard_decline") }
-    within("#communication"){ assert page.has_content?("cancellation") }
+    within(".nav-tabs"){ click_on 'Communications' }
+    within("#communications"){ assert page.has_content?("hard_decline") }
+    within("#communications"){ assert page.has_content?("cancellation") }
   end
 
   test "Try billing a member with credit card ok, and within a club that allows billing." do

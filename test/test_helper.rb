@@ -443,7 +443,7 @@ module ActionController
           assert page.has_content?(final_amount)
         end
         within(".nav-tabs"){ click_on 'Communications' }
-        within("#communication") do 
+        within("#communications") do 
           assert page.has_content?("Test refund")
           assert page.has_content?("refund")
         end

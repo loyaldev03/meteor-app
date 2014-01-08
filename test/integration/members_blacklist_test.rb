@@ -44,13 +44,8 @@ class MembersBlacklistTest < ActionController::IntegrationTest
       end
     end
 
-    within(".nav-tabs") do
-      click_on("Operations")
-    end
-
-    within("#operations_table") do
-      assert page.has_content?(text_reason)
-    end
+    within(".nav-tabs"){ click_on("Operations") }
+    within("#operations_table"){ assert page.has_content?(text_reason) }
     
     active_credit_card = member.active_credit_card
       within('.nav-tabs'){click_on 'Credit Cards'}

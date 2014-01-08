@@ -670,6 +670,81 @@ function club_cash_transactions_functions(column_count){
 }
 
 function show_member_functions(){
+
+  var transactionsWasFetch = true;
+  var notesWasFetch = false;
+  var fulfillmentsWasFetch = false;
+  var communicationsWasFetch = false;
+  var operationsWasFetch = false;
+  var creditCardsWasFetch = false;
+  var syncStatusWasFetch = false;
+  var clubCashTransactionsWasFetch = false;
+  var membershipsWasFetch = false;
+
+  function check_already_fetch(objects){
+    switch(objects){
+      case "transactions":
+        return transactionsWasFetch;
+        break;
+      case "notes":
+        return notesWasFetch;
+        break;
+      case "fulfillments":
+        return fulfillmentsWasFetch;
+        break;
+      case "communications":
+        return communicationsWasFetch;
+        break;
+      case "operations":
+        return operationsWasFetch;
+        break;
+      case "credit_cards":
+        return creditCardsWasFetch;
+        break;
+      case "sync_status":
+        return syncStatusWasFetch;
+        break;
+      case "club_cash_transactions":
+        return clubCashTransactionsWasFetch;
+        break;
+      case "memberships":
+        return membershipsWasFetch;
+        break;
+    }
+  }
+
+  function set_as_fetch(objects){
+    switch(objects){
+      case "transactions":
+        transactionsWasFetch = true;
+        break;
+      case "notes":
+        notesWasFetch = true;
+        break;
+      case "fulfillments":
+        fulfillmentsWasFetch = true;
+        break;
+      case "communications":
+        communicationsWasFetch = true;
+        break;
+      case "operations":
+        operationsWasFetch = true;
+        break;
+      case "credit_cards":
+        creditCardsWasFetch = true;
+        break;
+      case "sync_status":
+        syncStatusWasFetch = true;
+        break;
+      case "club_cash_transactions":
+        clubCashTransactionsWasFetch = true;
+        break;
+      case "memberships":
+        membershipsWasFetch = true;
+        break;
+    } 
+  }
+
   $(".btn").on('click',function(event){
     if($(this).attr('disabled') == 'disabled')
       event.preventDefault(); 
@@ -681,7 +756,6 @@ function show_member_functions(){
 
   $.ajax({
     url: member_prefix+"/transactions_content",
-      cache: false,
       success: function(html){
         $(".tab-content #transactions .tab_body_padding div").remove();
         $(".tab-content #transactions .tab_body_padding").append(html);
@@ -689,21 +763,22 @@ function show_member_functions(){
   })
 
   $(".nav-tabs li a").click(function(){
-    var objects_to_search = $(this).attr("id");
-    startAjaxLoader();
-    $.ajax({
-      url: member_prefix+"/"+objects_to_search+"_content",
-      cache: false,
-      success: function(html){
-        $(".tab-content #"+objects_to_search+" .tab_body_padding").children().remove();
-        $(".tab-content #"+objects_to_search+" .tab_body_padding").append(html);
-        $(".tab-content .active").removeClass("active");
-        $(".tab-content #"+objects_to_search+"").addClass("active");
-      }
-    });
-    endAjaxLoader();
+    var objects_to_search = $(this).attr("name");
+    if(!check_already_fetch(objects_to_search)){
+      startAjaxLoader();
+      $.ajax({
+        url: member_prefix+"/"+objects_to_search+"_content",
+        success: function(html){
+          $(".tab-content #"+objects_to_search+" .tab_body_padding").children().remove();
+          $(".tab-content #"+objects_to_search+" .tab_body_padding").append(html);
+          set_as_fetch(objects_to_search);
+        }
+      });
+      endAjaxLoader();
+    }
+    $(".tab-content .active").removeClass("active");
+    $(".tab-content #"+objects_to_search+"").addClass("active");
   });
-
 };
 
 function member_cancellation_functions(){

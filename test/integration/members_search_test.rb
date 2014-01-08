@@ -374,7 +374,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     within(".nav-tabs"){ click_on("Fulfillments") }
     within("#fulfillments") { assert page.has_content?(fulfillments_table_empty_text) }
     within(".nav-tabs"){ click_on("Communications") }
-    within("#communication") { assert page.has_content?(communication_table_empty_text) }
+    within("#communications") { assert page.has_content?(communication_table_empty_text) }
   end
 
   #Search member with duplicated letters at Last Name
