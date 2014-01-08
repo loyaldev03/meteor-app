@@ -34,7 +34,6 @@ class MembersBillTest < ActionController::IntegrationTest
   ############################################################
   # UTILS
   ############################################################
-
     
   def make_a_refund(transaction, amount, check_refund = true)
     visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id, :transaction_id => transaction.id)
@@ -82,7 +81,7 @@ class MembersBillTest < ActionController::IntegrationTest
     bill_member(@saved_member,false,nil,false)
     next_bill_date = Time.zone.now.to_date + 1.day
     change_next_bill_date(next_bill_date)
-    assert page.has_content?("Next bill date changed to #{next_bill_date.to_date}")
+    find(".alert", :text => "Next bill date changed to #{next_bill_date.to_date}")
   end
 
   test "See HD for 'Soft recycle limit'" do

@@ -105,13 +105,12 @@ class MembersRecoveryTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
   
-  # TO FIX(pablo)
-  # test "Recover a member using CS which was enrolled with a product sku that does not have stock" do
-  #   setup_member(true, true)
-  #   prods = Product.find_all_by_sku @saved_member.enrollment_infos.first.product_sku.split(',')
-  #   prods.each {|p| p.update_attributes :stock =>  0, :allow_backorder => false }
-  #   recover_member(@saved_member,:terms_of_membership_with_gateway)
-  # end
+  test "Recover a member using CS which was enrolled with a product sku that does not have stock" do
+    setup_member(true, true)
+    prods = Product.find_all_by_sku @saved_member.enrollment_infos.first.product_sku.split(',')
+    prods.each {|p| p.update_attributes :stock =>  0, :allow_backorder => false }
+    recover_member(@saved_member,@terms_of_membership_with_gateway)
+  end
 
   test "recovery a member with provisional TOM" do
     setup_member
@@ -124,7 +123,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
 
   test "recovery a member 3 times" do
     setup_member
-    3.times{ 
+    3.times do
       if @saved_member.current_membership.terms_of_membership.name == "another_tom"
         tom = @terms_of_membership_with_gateway
       else
@@ -133,10 +132,9 @@ class MembersRecoveryTest < ActionController::IntegrationTest
       recover_member(@saved_member, tom)
       wait_until{ assert find_field('input_first_name').value == @saved_member.first_name }
       if page.has_no_content?("Cant recover member. Max reactivations reached")
-        sleep(2)
         cancel_member(@saved_member,Time.zone.now + 1.day)        
       end
-    }
+    end
     assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
     within("#td_mi_reactivation_times") do
       assert page.has_content?("3")
@@ -265,7 +263,7 @@ class MembersRecoveryTest < ActionController::IntegrationTest
 
     @saved_member.bill_membership
 
-    next_bill_date = Time.zone.now + eval(@new_terms_of_membership_with_gateway.installment_type)
+    next_bill_date = Time.zone.now + @new_terms_of_membership_with_gateway.installment_period.days
     within('.nav-tabs'){ click_on 'Operations' }
     within("#operations_table") do
       assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@new_terms_of_membership_with_gateway.id}) -#{@new_terms_of_membership_with_gateway.name}-")

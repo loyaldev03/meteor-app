@@ -736,17 +736,21 @@ class Member < ActiveRecord::Base
     if self.fulfillments.where_not_processed.empty?
       fulfillments = fulfillments_products_to_send
       fulfillments.each do |sku|
-        product = Product.find_by_sku_and_club_id(sku, self.club_id)
-        f = Fulfillment.new :product_sku => sku
-        unless product.nil?
-          f.product_package = product.package
-          f.recurrent = product.recurrent 
-        end
-        f.member_id = self.id
-        f.save
-        answer = f.decrease_stock!
-        unless answer[:code] == Settings.error_codes.success
-          Auditory.report_issue(answer[:message], answer[:message], { :member => self.inspect, :credit_card => self.active_credit_card.inspect, :enrollment_info => self.current_membership.enrollment_info.inspect })
+        begin
+          product = Product.find_by_sku_and_club_id(sku, self.club_id)
+          f = Fulfillment.new :product_sku => sku
+          unless product.nil?
+            f.product_package = product.package
+            f.recurrent = product.recurrent 
+          end
+          f.member_id = self.id
+          f.save
+          answer = f.decrease_stock!
+          unless answer[:code] == Settings.error_codes.success
+            Auditory.report_issue(answer[:message], answer[:message], { :member => self.inspect, :credit_card => self.active_credit_card.inspect, :enrollment_info => self.current_membership.enrollment_info.inspect })
+          end
+        rescue Exception => e
+          Auditory.report_issue(I18n.t("error_messages.fulfillments_decrease_stock_error"), e, { :member => self.inspect, :fulfillment => f, :product => product})
         end
       end
     end
