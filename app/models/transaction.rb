@@ -19,8 +19,9 @@ class Transaction < ActiveRecord::Base
   ONE_TIME_BILLINGS = ["one-time", "donation"]
 
   def full_label
+    transaction_type ?
     I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
-      ( response_result.nil? ? '' : ' : ' + response_result)
+      ( response_result.nil? ? '' : ' : ' + response_result) : ''
   end
 
   def self.datatable_columns
@@ -199,7 +200,7 @@ class Transaction < ActiveRecord::Base
           Communication.deliver!(:refund, sale_transaction.member)
           sale_transaction.member.marketing_tool_sync
         else
-          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]} #{trans.inspect}", sale_transaction.member, Settings.operation_types.credit_error)
+          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
           trans.update_attribute :operation_type, Settings.operation_types.credit_error
         end
         answer

@@ -27,7 +27,7 @@ class AgentsTest < ActionController::IntegrationTest
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
     fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
-    check('agent_roles_admin')
+    choose('agent_roles_admin')
 
     assert_difference('Agent.count') do
       click_link_or_button 'Create Agent'
@@ -127,7 +127,7 @@ class AgentsTest < ActionController::IntegrationTest
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
     fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
-    check('agent_roles_admin')
+    choose('agent_roles_admin')
 
     assert_difference('Agent.count') do
       click_link_or_button 'Create Agent'
@@ -177,7 +177,7 @@ class AgentsTest < ActionController::IntegrationTest
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
     fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
-    check('agent_roles_supervisor')
+    choose('agent_roles_supervisor')
 
     assert_difference('Agent.count') do
       click_link_or_button 'Create Agent'
@@ -187,7 +187,7 @@ class AgentsTest < ActionController::IntegrationTest
     
     saved_agent = Agent.last
     assert_equal saved_agent.email, unsaved_agent.email
-    assert_equal saved_agent.roles, ['supervisor']
+    assert_equal saved_agent.roles, 'supervisor'
   end
 
   test "create agent with representative role" do
@@ -198,7 +198,7 @@ class AgentsTest < ActionController::IntegrationTest
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
     fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
-    check('agent_roles_representative')
+    choose('agent_roles_representative')
 
     assert_difference('Agent.count') do
       click_link_or_button 'Create Agent'
@@ -208,7 +208,7 @@ class AgentsTest < ActionController::IntegrationTest
     
     saved_agent = Agent.last
     assert_equal saved_agent.email, unsaved_agent.email
-    assert_equal saved_agent.roles, ['representative']
+    assert_equal saved_agent.roles, 'representative'
   end
 
   test "create agent with api role" do
@@ -219,7 +219,7 @@ class AgentsTest < ActionController::IntegrationTest
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
     fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
-    check('agent_roles_api')
+    choose('agent_roles_api')
 
     assert_difference('Agent.count') do
       click_link_or_button 'Create Agent'
@@ -229,7 +229,7 @@ class AgentsTest < ActionController::IntegrationTest
     
     saved_agent = Agent.last
     assert_equal saved_agent.email, unsaved_agent.email
-    assert_equal saved_agent.roles, ['api']
+    assert_equal saved_agent.roles, 'api'
   end
 
   test "create agent like Administrator, Supervisor and representative" do
@@ -269,7 +269,6 @@ class AgentsTest < ActionController::IntegrationTest
     page.has_content?("Your password was changed successfully. You are now signed in.")
   end
 
- 
   test "create agent with global role and them remove that role." do
     setup_environment
     visit new_admin_agent_path
@@ -279,13 +278,13 @@ class AgentsTest < ActionController::IntegrationTest
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
     fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
-    check('agent_roles_admin')
+    choose('agent_roles_admin')
 
     click_link_or_button 'Create Agent'
 
     assert page.has_content?("Agent was successfully created")
     click_link_or_button 'Edit'
-    uncheck('agent_roles_admin')
+    click_on "clear"
 
     click_link_or_button 'Update Agent'
     assert page.has_content?("Agent was successfully updated")
@@ -294,6 +293,7 @@ class AgentsTest < ActionController::IntegrationTest
       assert page.has_no_content?("admin")
     end
     saved_agent = Agent.find_by_username(unsaved_agent.username)
-    assert saved_agent.roles.empty?
+
+    assert saved_agent.roles.blank?
   end 
 end

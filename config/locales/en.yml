@@ -128,6 +128,7 @@ en:
     fulfillment_reason_blank: "Reason is blank, please enter a reason."
     fulfillment_is_renwed: "Fulfillment is renewed. No operation can be done."
     fulfillment_file_cant_be_empty: "No fulfillments selected. Please, select fulfillments in order to crate XLS file."
+    fulfillments_decrease_stock_error: "Could not decrease stock on product related to fulfillment."
     drupal_error_sync: "Unable to add club cash. There was a synchronization error, while requesting this." 
     club_cash_not_supported: "Club cash is not supported for this club."
     unable_to_perform_due_member_status: "Unable to perfom this action. The member is not in the right status to perform this."

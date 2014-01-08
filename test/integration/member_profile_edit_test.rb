@@ -73,7 +73,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "Do not display token field (club with auth.net) - Supervisor" do
     setup_member(false)
-    @admin_agent.update_attribute(:roles,["supervisor"])
+    @admin_agent.update_attribute(:roles,"supervisor")
     @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
@@ -93,7 +93,7 @@ class MemberProfileEditTest < ActionController::IntegrationTest
 
   test "Do not display token field (club with auth.net) - Representative" do
     setup_member(false)
-    @admin_agent.update_attribute(:roles,["representative"])
+    @admin_agent.update_attribute(:roles,"representative")
     @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)

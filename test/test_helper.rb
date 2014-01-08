@@ -395,16 +395,8 @@ module ActionController
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
       visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix =>member.club.name, :member_prefix => member.id)  
 
-      # if current_membership.quota%12==0 and current_membership.quota!=12
-      #   within("#table_membership_information")do
-      #     within("#td_mi_club_cash_amount") { assert page.has_content?("#{member.terms_of_membership.club_cash_amount}") }
-      #   end
-      # end
-
       within("#table_membership_information")do
-        within("#td_mi_next_retry_bill_date")do
-          assert page.has_content?(I18n.l(next_bill_date, :format => :only_date))
-        end
+        find("#td_mi_next_retry_bill_date", :text => I18n.l(next_bill_date, :format => :only_date) )
         assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date )
       end
 
@@ -428,16 +420,14 @@ module ActionController
       end
       
       if do_refund
-        transaction = Transaction.last
+        transaction = member.transactions.where("operation_type = 101").order(:created_at).last
         visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id, :transaction_id => transaction.id)
 
         assert page.has_content?(transaction.amount_available_to_refund.to_s)
 
-        # final_amount = member.terms_of_membership.installment_amount.to_s
-        final_amount = transaction.amount_available_to_refund
-        final_amount = refund_amount.to_s if not refund_amount.nil?
+        final_amount = refund_amount.nil? ? transaction.amount_available_to_refund : refund_amount.to_s
 
-        fill_in 'refund_amount', :with => final_amount   
+        fill_in 'refund_amount', :with => final_amount
         assert_difference ['Transaction.count'] do 
           click_on 'Refund'
         end

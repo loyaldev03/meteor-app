@@ -655,17 +655,17 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     within("#operations_table"){ assert page.has_content?('Member was updated successfully last - 1000') }
   end
 
-  test "create a member with an expired credit card" do
+  test "create a member with an expired credit card (if actual month is not january)" do
     setup_member(false)
-    unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card, :expire_month => 1, :expire_year => Time.zone.now.year)
-    
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New Member'
-
-    fill_in_member(unsaved_member, credit_card)
-
-    assert page.has_content?("expire_year: expired")
+    unless(Time.zone.now.month == 1)
+      unsaved_member =  FactoryGirl.build(:active_member, :club_id => @club.id)
+      credit_card = FactoryGirl.build(:credit_card_master_card, :expire_month => 1, :expire_year => Time.zone.now.year)
+      
+      visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+      click_link_or_button 'New Member'
+      fill_in_member(unsaved_member, credit_card)
+      assert page.has_content?("expire_year: expired")
+    end
   end
 
   test "create blank member note" do
