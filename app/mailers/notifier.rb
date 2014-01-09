@@ -84,6 +84,11 @@ class Notifier < ActionMailer::Base
          :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NFLA kit-card fulfillments report"
   end
 
+  def manual_fulfillment_file(agent, fulfillment_file, file)
+    attachments["fulfillments_xls_file_##{fulfillment_file.id}.xlsx"] = File.read(file)
+    mail :to => agent.email, :subject => "Fulfillment file ##{fulfillment_file.id}"
+  end
+
 end
  
 
