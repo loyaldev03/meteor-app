@@ -3,7 +3,7 @@ class OperationsDatatable < Datatable
 private
 
   def total_records
-    @current_member.operations.count
+    operations.count
   end
 
   def total_entries
