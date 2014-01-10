@@ -1261,9 +1261,7 @@ class Member < ActiveRecord::Base
       self.cancel_member_at_remote_domain
       if (Time.zone.now.to_date - join_date.to_date).to_i <= Settings.days_to_wait_to_cancel_fulfillments
         fulfillments.where_cancellable.each do |fulfillment| 
-          former_status = fulfillment.status
-          fulfillment.set_as_canceled
-          fulfillment.audit_status_transition(nil,former_status,nil)
+          fulfillment.update_status(nil, 'canceled', "Member canceled")
         end
       end
       self.next_retry_bill_date = nil
