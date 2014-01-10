@@ -28,7 +28,7 @@ private
   end
 
   def fetch_operations
-    operations = Operation.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member.id).is_visible
+    operations = @current_member.operations.order("#{sort_column} #{sort_direction}").is_visible
     
     if params[:sSearch].present?
       if params[:sSearch] == 'billing'
