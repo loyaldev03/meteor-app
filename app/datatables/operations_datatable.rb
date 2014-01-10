@@ -32,19 +32,17 @@ private
     
     if params[:sSearch].present?
       if params[:sSearch] == 'billing'
-        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 100 and 199",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where(["operation_type BETWEEN 100 and 199",@current_member.id]).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'profile'
-        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 200 and 299",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where(["operation_type BETWEEN 200 and 299",@current_member.id]).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'communications'
-        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 300 and 399",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where(["operation_type BETWEEN 300 and 399",@current_member.id]).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'fulfillments'
-        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 400 and 499",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where(["operation_type BETWEEN 400 and 499",@current_member.id]).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'vip'
-        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 900 and 999",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where(["operation_type BETWEEN 900 and 999",@current_member.id]).order("#{sort_column} #{sort_direction}")
       elsif params[:sSearch] == 'others'
-        operations = Operation.where(["member_id = ? AND operation_type BETWEEN 1000 and 1099",@current_member.id]).order("#{sort_column} #{sort_direction}")
-      elsif params[:sSearch] == 'all'
-        operations = Operation.where('member_id' => @current_member.id).order("#{sort_column} #{sort_direction}").is_visible
+        operations = operations.where(["operation_type BETWEEN 1000 and 1099",@current_member.id]).order("#{sort_column} #{sort_direction}")
       end
     end
     operations = operations.page(page).per_page(per_page)
