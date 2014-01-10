@@ -32,17 +32,17 @@ private
     
     if params[:sSearch].present?
       if params[:sSearch] == 'billing'
-        operations = operations.where(["operation_type BETWEEN 100 and 199",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where("operation_type BETWEEN 100 and 199")
       elsif params[:sSearch] == 'profile'
-        operations = operations.where(["operation_type BETWEEN 200 and 299",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where("operation_type BETWEEN 200 and 299")
       elsif params[:sSearch] == 'communications'
-        operations = operations.where(["operation_type BETWEEN 300 and 399",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where("operation_type BETWEEN 300 and 399")
       elsif params[:sSearch] == 'fulfillments'
-        operations = operations.where(["operation_type BETWEEN 400 and 499",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where("operation_type BETWEEN 400 and 499")
       elsif params[:sSearch] == 'vip'
-        operations = operations.where(["operation_type BETWEEN 900 and 999",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where("operation_type BETWEEN 900 and 999")
       elsif params[:sSearch] == 'others'
-        operations = operations.where(["operation_type BETWEEN 1000 and 1099",@current_member.id]).order("#{sort_column} #{sort_direction}")
+        operations = operations.where("operation_type BETWEEN 1000 and 1099")
       end
     end
     operations = operations.page(page).per_page(per_page)
