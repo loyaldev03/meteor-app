@@ -36,4 +36,20 @@ class FulfillmentFile < ActiveRecord::Base
   def other_type?
     self.product == Settings.others_product
   end
+
+  def send_email_with_file(only_in_progress)
+    if only_in_progress
+      fulfillments = self.fulfillments.where_in_process.includes(:member)
+    else
+      fulfillments = self.fulfillments.includes(:member)
+    end
+    xls_package = Fulfillment.generateXLS(self, false)
+    temp_file = Tempfile.new("fulfillment_file_#{self.id}.xls")
+    xls_package.serialize temp_file.path
+    
+    temp_file.close
+    Notifier.manual_fulfillment_file(self.agent,self,temp_file).deliver!
+    temp_file.unlink
+  end
+  handle_asynchronously :send_email_with_file, :queue => :email_queue
 end

@@ -87,16 +87,12 @@ class FulfillmentsController < ApplicationController
 
   def download_xls
     my_authorize! :report, Fulfillment, @current_club.id
-    ff = FulfillmentFile.find(params[:fulfillment_file_id])
-    if params[:only_in_progress]
-      fulfillments = ff.fulfillments.where_in_process.includes(:member)
-    else
-      fulfillments = ff.fulfillments.includes(:member)
-    end
-    xls_package = Fulfillment.generateXLS(ff, false)
-    send_data xls_package.to_stream.read, :filename => "miworkingfile2.xlsx",
-             :type => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-             :disposition => "attachment; filename=miworkingfile2.xlsx"
+    fulfillment_file = FulfillmentFile.find(params[:fulfillment_file_id])
+    fulfillment_file.send_email_with_file(params[:only_in_progress])
+
+    flash[:notice] = "We are generating the Fulfillment File requested, and it will be delivered to your configured email as soon as it is ready. Have in mind this could take up to 15 minutes depending on the amount of members and fulfillments involved."
+
+    redirect_to list_fulfillment_files_path
   end
 
   def mark_file_as_sent
