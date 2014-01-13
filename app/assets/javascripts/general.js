@@ -670,6 +670,9 @@ function club_cash_transactions_functions(column_count){
 }
 
 function show_member_functions(){
+
+  var objectsFetch = {transactions:true, notes:false, fulfillments:false, communications:false, operations:false, credit_cards:false, sync_status:false, club_cash_transactions:false, memberships:false }
+
   $(".btn").on('click',function(event){
     if($(this).attr('disabled') == 'disabled')
       event.preventDefault(); 
@@ -678,6 +681,32 @@ function show_member_functions(){
   $('.help').popover();
   mark_as_sent_fulfillment("../fulfillments/");
   resend_fulfillment("../fulfillments/");
+
+  $.ajax({
+    url: member_prefix+"/transactions_content",
+      success: function(html){
+        $(".tab-content #transactions .tab_body_padding div").remove();
+        $(".tab-content #transactions .tab_body_padding").append(html);
+      }
+  })
+
+  $(".nav-tabs li a").click(function(){
+    var objects_to_search = $(this).attr("name");
+    if(!objectsFetch[objects_to_search]){
+      startAjaxLoader();
+      $.ajax({
+        url: member_prefix+"/"+objects_to_search+"_content",
+        success: function(html){
+          $(".tab-content #"+objects_to_search+" .tab_body_padding").children().remove();
+          $(".tab-content #"+objects_to_search+" .tab_body_padding").append(html);
+          objectsFetch[objects_to_search] = true
+        }
+      });
+      endAjaxLoader();
+    }
+    $(".tab-content .active").removeClass("active");
+    $(".tab-content #"+objects_to_search+"").addClass("active");
+  });
 };
 
 function member_cancellation_functions(){

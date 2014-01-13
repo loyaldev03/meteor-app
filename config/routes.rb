@@ -87,6 +87,16 @@ SacPlatform::Application.routes.draw do
         post '/reset_password' => 'members#reset_password', as: 'member_reset_password'
         post '/resend_welcome' => 'members#resend_welcome', as: 'member_resend_welcome'
         get  '/login_as_member' => 'members#login_as_member', as: 'login_as_member'
+
+        get  '/transactions_content' => 'members#transactions_content', as: 'transactions_content'
+        get  '/notes_content' => 'members#notes_content', as: 'notes_content'
+        get  '/fulfillments_content' => 'members#fulfillments_content', as: 'fulfillments_content'
+        get  '/communications_content' => 'members#communications_content', as: 'communications_content'
+        get  '/operations_content' => 'members#operations_content', as: 'operations_content'
+        get  '/credit_cards_content' => 'members#credit_cards_content', as: 'credit_cards_content'
+        get  '/club_cash_transactions_content' => 'members#club_cash_transactions_content', as: 'club_cash_transactions_content'
+        get  '/sync_status_content' => 'members#sync_status_content', as: 'sync_status_content'
+        get  '/memberships_content' => 'members#memberships_content', as: 'memberships_content'
       end
 
       resources :products
