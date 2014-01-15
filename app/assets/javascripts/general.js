@@ -1051,6 +1051,22 @@ function tom_create_wizard() {
   $("#tom_wizard_form").formwizard({ 
     formPluginEnabled: false,
     validationEnabled: true,
+    validationOptions:{
+      errorPlacement: function(error, element) {
+        $("label[for="+error.attr("for")+"][generated=true]").each(function(){
+          if($(this).text() == error.text()){
+            $(this).remove();
+          }
+        })
+        error.removeClass("error");
+        error.appendTo($("#"+$(element).attr("id")).parent());
+      },
+      success: function(error){
+        $("label[for="+error.attr("for")+"][generated=true]").each(function(){
+          $(this).remove();
+        })
+      }
+    },
     focusFirstInput : true,
     disableUIStyles: true,
     textNext: '',

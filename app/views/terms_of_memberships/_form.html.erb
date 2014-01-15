@@ -84,7 +84,7 @@
     <div class="controls">
       $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
-      <%= text_field_tag 'installment_amount_days', @tom.installment_period, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
+      <%= text_field_tag 'installment_amount_days', @tom.installment_period, :class => 'text_field input-small required', :placeholder => '0', :type => 'number', :min => 1 %>
       <%= select_for_date_span("installment_amount_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), 
