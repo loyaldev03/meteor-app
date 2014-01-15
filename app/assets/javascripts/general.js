@@ -671,7 +671,7 @@ function club_cash_transactions_functions(column_count){
 
 function show_member_functions(){
 
-  var objectsFetch = {transactions:true, notes:false, fulfillments:false, communications:false, operations:false, credit_cards:false, sync_status:false, club_cash_transactions:false, memberships:false }
+  var objectsFetch = {transactions:true, notes:false, fulfillments:false, communications:false, operations:false, credit_cards:false, club_cash_transactions:false, memberships:false }
 
   $(".btn").on('click',function(event){
     if($(this).attr('disabled') == 'disabled')
@@ -692,17 +692,21 @@ function show_member_functions(){
 
   $(".nav-tabs li a").click(function(){
     var objects_to_search = $(this).attr("name");
-    if(!objectsFetch[objects_to_search]){
-      startAjaxLoader();
-      $.ajax({
-        url: member_prefix+"/"+objects_to_search+"_content",
-        success: function(html){
-          $(".tab-content #"+objects_to_search+" .tab_body_padding").children().remove();
-          $(".tab-content #"+objects_to_search+" .tab_body_padding").append(html);
-          objectsFetch[objects_to_search] = true
+    for(var key in objectsFetch){ 
+      if(key == objects_to_search){
+        if(!objectsFetch[objects_to_search]){
+          startAjaxLoader();
+          $.ajax({
+            url: member_prefix+"/"+objects_to_search+"_content",
+            success: function(html){
+              $(".tab-content #"+objects_to_search+" .tab_body_padding").children().remove();
+              $(".tab-content #"+objects_to_search+" .tab_body_padding").append(html);
+              objectsFetch[objects_to_search] = true
+            }
+          });
+          endAjaxLoader();
         }
-      });
-      endAjaxLoader();
+      }
     }
     $(".tab-content .active").removeClass("active");
     $(".tab-content #"+objects_to_search+"").addClass("active");

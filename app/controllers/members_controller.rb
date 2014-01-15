@@ -415,10 +415,6 @@ class MembersController < ApplicationController
     render :partial => 'members/club_cash_transactions'
   end
 
-  def sync_status_content
-    render :partial => 'members/sync_status', :locals => { :member => @current_member }
-  end
-
   def memberships_content
     render :partial => 'members/memberships'
   end

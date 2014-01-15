@@ -398,6 +398,7 @@
 	<% if @current_member.has_link_to_api? and can? :see_sync_status, Member %>
 	  <div class="tab-pane" id="sync_status">
 	    <div class="tab_body_padding">
+        <%= render :partial => 'sync_status', :locals => { :member => @current_member} %>
 	    </div>
 	  </div>
 	<% end %>
