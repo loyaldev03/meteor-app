@@ -778,7 +778,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_member(false)
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id, :gender => "")
     @saved_member = create_member(unsaved_member)
-		assert find_field('input_gender').value == I18n.t('activerecord.attributes.member.no_gender')
+    assert find_field('member_gender').value == ''
   end
 
   test "create member without type of phone number" do
