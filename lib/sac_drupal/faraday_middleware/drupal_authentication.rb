@@ -111,7 +111,9 @@ module Drupal
       def auth_headers
         {
           'Content-Type' => 'application/x-www-form-urlencoded', 
-          'Accept'       => 'application/json'
+          'Accept'       => 'application/json',
+          # This is stoneacre:stoneacre Base64 encoded using http://www.motobit.com/util/base64-decoder-encoder.asp
+          'Authorization' => 'Basic c3RvbmVhY3JlOnN0b25lYWNyZQ=='
         }
       end
 
