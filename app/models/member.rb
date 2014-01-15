@@ -94,9 +94,9 @@ class Member < ActiveRecord::Base
     text :email, :as => :code_textemail
     string :status
     time :next_retry_bill_date
-    long :phone_country_code
-    long :phone_area_code
-    long :phone_local_number
+    integer :phone_country_code
+    integer :phone_area_code
+    integer :phone_local_number
     string :sync_status
     text :external_id
     time :join_date do
