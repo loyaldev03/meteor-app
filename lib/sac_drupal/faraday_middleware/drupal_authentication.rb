@@ -112,6 +112,8 @@ module Drupal
         {
           'Content-Type' => 'application/x-www-form-urlencoded', 
           'Accept'       => 'application/json',
+          # FIX ME!!
+          # We need to be able to change the username and password and not to harcode it here.
           # This is stoneacre:stoneacre Base64 encoded using http://www.motobit.com/util/base64-decoder-encoder.asp
           'Authorization' => 'Basic c3RvbmVhY3JlOnN0b25lYWNyZQ=='
         }
