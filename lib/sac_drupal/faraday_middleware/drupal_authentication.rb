@@ -111,7 +111,7 @@ module Drupal
       def auth_headers
         headers = {
           'Content-Type' => 'application/x-www-form-urlencoded', 
-          'Accept'       => 'application/json',
+          'Accept'       => 'application/json'
         }
         # This is stoneacre:stoneacre Base64 encoded using http://www.motobit.com/util/base64-decoder-encoder.asp
         headers['Authorization'] = 'Basic c3RvbmVhY3JlOnN0b25lYWNyZQ==' unless Rails.env.production?
