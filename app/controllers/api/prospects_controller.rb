@@ -65,7 +65,8 @@ class Api::ProspectsController < ApplicationController
       tom = TermsOfMembership.find(params[:prospect][:terms_of_membership_id])
       my_authorize! :manage_prospects_api, Prospect, tom.club_id
     	response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
-    	prospect = Prospect.new(params[:prospect])
+    	standarize_params(params[:prospect])
+      prospect = Prospect.new(params[:prospect])
       prospect.club_id = tom.club_id
     	if prospect.save
     	  response[:message] = "Prospect was successfuly saved."
@@ -78,4 +79,14 @@ class Api::ProspectsController < ApplicationController
     render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
   end
 
+  private 
+    def standarize_params(params)
+      params[:product_sku] = params[:product_sku].upcase if params[:product_sku] 
+      params[:mega_channel] = params[:mega_channel].downcase if params[:mega_channel]
+      params[:marketing_code] = params[:marketing_code].downcase if params[:marketing_code]
+      params[:fulfillment_code] = params[:fulfillment_code].downcase if params[:fulfillment_code]
+      params[:landing_url] = params[:landing_url].downcase if params[:landing_url]
+      params[:campaign_medium] = params[:campaign_medium].downcase if params[:campaign_medium]
+      params[:campaign_medium_version] = params[:campaign_medium_version].downcase if params[:campaign_medium_version]
+    end
 end
