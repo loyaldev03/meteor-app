@@ -361,6 +361,7 @@ class MemberTest < ActiveSupport::TestCase
 
   test "Change member from Lapsed status to active status" do
     @club = @terms_of_membership_with_gateway.club
+    Time.zone = @club.time_zone
     @saved_member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)
     @saved_member.set_as_canceled
     
