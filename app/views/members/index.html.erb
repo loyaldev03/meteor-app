@@ -55,7 +55,7 @@
                       <%= text_field :member, :phone_area_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.member.phone_area_code'),
                                      :value => (params[:member][:phone_area_code] if params[:member]), :maxlength => 3 %> 
                       <%= text_field :member, :phone_local_number, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.member.phone_local_number'),
-                                     :value => (params[:member][:phone_local_number] if params[:member]), :maxlength => 4 %> 
+                                     :value => (params[:member][:phone_local_number] if params[:member]), :maxlength => 7 %> 
                     </td>
                   </tr>
                   <tr>
