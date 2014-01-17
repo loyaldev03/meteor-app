@@ -165,7 +165,7 @@ class MembersBillTest < ActionController::IntegrationTest
     bill_member(@saved_member, true, (@terms_of_membership_with_gateway.installment_amount / 2))
     amount_to_refund = (@terms_of_membership_with_gateway.installment_amount / 2) + 1
     assert_difference('Transaction.count', 0) do 
-      make_a_refund(Transaction.last, amount_to_refund, false)
+      make_a_refund(Transaction.find_by_operation_type(101), amount_to_refund, false)
     end
     assert page.has_content?("Cant credit more $ than the original transaction amount")
   end
@@ -182,7 +182,7 @@ class MembersBillTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, true, final_amount)
     assert_difference('Transaction.count') do 
-      make_a_refund(Transaction.last, final_amount)
+      make_a_refund(Transaction.where("operation_type = 101").first, final_amount)
     end
   end 
 
