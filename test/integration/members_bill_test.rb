@@ -182,7 +182,8 @@ class MembersBillTest < ActionController::IntegrationTest
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
     bill_member(@saved_member, true, final_amount)
     assert_difference('Transaction.count') do 
-      make_a_refund(Transaction.where("operation_type = 101").first, final_amount)
+      @saved_member.reload
+      make_a_refund(@saved_member.transactions.where("operation_type = 101").order("created_at ASC").first, final_amount)
     end
   end 
 
