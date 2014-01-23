@@ -37,16 +37,16 @@ class FulfillmentFile < ActiveRecord::Base
     self.product == Settings.others_product
   end
 
-  def self.generateXLS(fulfillment_file, change_status = false)
+  def generateXLS(change_status = false)
     package = Axlsx::Package.new
     package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
-      if fulfillment_file.other_type?
+      if self.other_type?
         sheet.add_row Fulfillment::SLOOPS_HEADER
       else
         sheet.add_row Fulfillment::KIT_CARD_HEADER
       end
-      fulfillment_file.fulfillments.each do |fulfillment|
-        row = fulfillment.get_file_line(change_status, fulfillment_file)
+      self.fulfillments.each do |fulfillment|
+        row = fulfillment.get_file_line(change_status, self)
         sheet.add_row row unless row.empty?
       end
     end
@@ -59,7 +59,7 @@ class FulfillmentFile < ActiveRecord::Base
     else
       fulfillments = self.fulfillments.includes(:member)
     end
-    xls_package = FulfillmentFile.generateXLS(self, false)
+    xls_package = self.generateXLS(false)
     temp_file = Tempfile.new("fulfillment_file_#{self.id}.xls")
     xls_package.serialize temp_file.path
     
