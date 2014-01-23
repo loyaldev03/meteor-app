@@ -37,13 +37,29 @@ class FulfillmentFile < ActiveRecord::Base
     self.product == Settings.others_product
   end
 
+  def self.generateXLS(fulfillment_file, change_status = false)
+    package = Axlsx::Package.new
+    package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
+      if fulfillment_file.other_type?
+        sheet.add_row Fulfillment::SLOOPS_HEADER
+      else
+        sheet.add_row Fulfillment::KIT_CARD_HEADER
+      end
+      fulfillment_file.fulfillments.each do |fulfillment|
+        row = fulfillment.get_file_line(change_status, fulfillment_file)
+        sheet.add_row row unless row.empty?
+      end
+    end
+    package
+  end
+
   def send_email_with_file(only_in_progress)
     if only_in_progress
       fulfillments = self.fulfillments.where_in_process.includes(:member)
     else
       fulfillments = self.fulfillments.includes(:member)
     end
-    xls_package = Fulfillment.generateXLS(self, false)
+    xls_package = FulfillmentFile.generateXLS(self, false)
     temp_file = Tempfile.new("fulfillment_file_#{self.id}.xls")
     xls_package.serialize temp_file.path
     
@@ -52,4 +68,5 @@ class FulfillmentFile < ActiveRecord::Base
     temp_file.unlink
   end
   handle_asynchronously :send_email_with_file, :queue => :email_queue
+
 end
