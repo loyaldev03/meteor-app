@@ -96,7 +96,7 @@ class Member < ActiveRecord::Base
     time :next_retry_bill_date
     integer :phone_country_code
     integer :phone_area_code
-    integer :phone_local_number
+    long :phone_local_number
     string :sync_status
     text :external_id
     time :join_date do
