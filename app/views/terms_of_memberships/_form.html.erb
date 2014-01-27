@@ -58,7 +58,7 @@
     <div class="controls">
 <!--       $&nbsp;<%= text_field_tag 'trial_period_amount', @tom.trial_period_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %> -->
       <%= t('activerecord.attributes.terms_of_membership.wizard.lasting') %>
-      <%= text_field_tag 'trial_period_lasting', @tom.provisional_days, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
+      <%= text_field_tag 'trial_period_lasting', @tom.provisional_days, :class => 'text_field input-small required', :placeholder => '0', :type => 'number', :min => 0 %>
       <%= select_for_date_span("trial_period_lasting_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.trial_period'), 
@@ -111,14 +111,14 @@
   <div class="control-group">
     <%= label_tag 'initial_club_cash_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number' %>
+      <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number', :min => 0 %>
     </div>
   </div>
 
   <div class="control-group" id="club_cash_installment">
     <%= label_tag 'club_cash_installment_amount', t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number', :placeholder => '0.0' %>
+      <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number', :placeholder => '0.0', :min => 0 %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.skip_first_club_cash') %>
       <%= f.check_box 'skip_first_club_cash' %>
     </div>
@@ -152,7 +152,7 @@
     <div class="controls">
       <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id, @tom) %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
-      <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
+      <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number', :min => 1 %>
       <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 

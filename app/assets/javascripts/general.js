@@ -1054,7 +1054,7 @@ function tom_create_wizard() {
     validationOptions:{
       errorPlacement: function(error, element) {
         $("label[for="+error.attr("for")+"][generated=true]").each(function(){
-          if($(this).text() == error.text()){
+          if($(this).text() == error.text() || $(this).text() != error.text()){
             $(this).remove();
           }
         })
