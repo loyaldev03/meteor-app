@@ -3,7 +3,10 @@ class MembersController < ApplicationController
 
   before_filter :validate_club_presence
   before_filter :validate_member_presence, :except => [ :index, :new, :search_result ]
-  before_filter :check_permissions, :except => [ :additional_data ]
+  before_filter :check_permissions, :except => [ :additional_data, :transactions_content, :notes_content, 
+                                                 :fulfillments_content, :communications_content, 
+                                                 :operations_content, :credit_cards_content, 
+                                                 :club_cash_transactions_content, :memberships_content ]
   
   def index
     @countries = Carmen::Country.coded('US').subregions + Carmen::Country.coded('CA').subregions
@@ -388,38 +391,46 @@ class MembersController < ApplicationController
   end
 
   def transactions_content
+    my_authorize! :list, Transaction, @current_club.id
     render :partial => 'members/transactions'
   end
 
   def notes_content
+    my_authorize! :list, MemberNote, @current_club.id
     @notes = @current_member.member_notes.includes([ :communication_type, :disposition_type ]).paginate(:page => params[:page], :per_page => 10, :order => "created_at DESC")
     render :partial => 'members/notes', :locals => { :notes => @notes }
   end
 
   def fulfillments_content
+    my_authorize! :list, Fulfillment, @current_club.id
     @fulfillments = @current_member.fulfillments.all
     render :partial => "members/fulfillments", :locals => { :fulfillments => @fulfillments }
   end
 
   def communications_content
+    my_authorize! :list, Communication, @current_club.id
     @communications = @current_member.communications.all
     render :partial => 'members/communications', :locals => { :communications => @communications }
   end
 
   def operations_content
+    my_authorize! :list, Operation, @current_club.id
     render :partial => 'members/operations'
   end
 
   def credit_cards_content 
+    my_authorize! :list, CreditCard, @current_club.id
     @credit_cards = @current_member.credit_cards.all
     render :partial => 'members/credit_cards', :locals => { :credit_cards => @credit_cards }
   end
 
   def club_cash_transactions_content
+    my_authorize! :list, ClubCashTransaction, @current_club.id
     render :partial => 'members/club_cash_transactions'
   end
 
   def memberships_content
+    my_authorize! :list, Membership, @current_club.id
     render :partial => 'members/memberships'
   end
 

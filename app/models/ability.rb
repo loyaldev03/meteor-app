@@ -143,6 +143,7 @@ class Ability
     when 'agency' then
       can :manage, Product
       can :read, Fulfillment
+      can :list, Fulfillment
       can :report, Fulfillment
       can :read, Member
       can :search_result, Member    
