@@ -139,6 +139,10 @@ class MembersController < ApplicationController
       flash[:error] = "Transaction not found."
       redirect_to show_member_path
       return
+    elsif not @transaction.can_be_refunded?
+      flash[:error] = "Transaction cannot be refunded."
+      redirect_to show_member_path
+      return
     end
     if request.post?
       answer = Transaction.refund(params[:refund_amount], params[:transaction_id], current_agent)
