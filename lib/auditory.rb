@@ -9,7 +9,7 @@ class Auditory
     @batch_agent ||= Agent.find_by_email('batch@xagax.com') if current_agent.nil?
     o = Operation.new :operation_date => operation_date, 
       :resource => object, :description => description, :operation_type => operation_type
-    o.created_by_id = (current_agent.nil? ? @batch_agent.id : current_agent.id)
+    o.created_by = (current_agent.nil? ? @batch_agent : current_agent)
     o.notes = notes
     o.member = member
     o.save!
