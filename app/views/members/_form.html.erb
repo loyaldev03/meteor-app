@@ -151,7 +151,7 @@
               </th>
               <th id="th_terms_of_memberships"> 
                 <%= select_tag('member[terms_of_membership_id]', options_from_collection_for_select(@terms_of_memberships, "id", "name")) %>
-                <% if @terms_of_memberships %>
+                <% unless @terms_of_memberships.empty? %>
                   <%= render :partial => 'shared/help', :locals => { :title => t('activerecord.model.subscription_plans'), :content => ( render :partial => "terms_of_memberships/resumed_information", :locals => {:tom => @terms_of_memberships.first})} %>
                 <% end %>
               </th>  
