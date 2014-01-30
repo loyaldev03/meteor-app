@@ -21,28 +21,28 @@ class EnrollmentInfo < ActiveRecord::Base
   #
   def update_enrollment_info_by_hash(params)
     unless params.nil?
-      self.product_sku = params[:product_sku]
+      self.product_sku = params[:product_sku].upcase if params[:product_sku] 
       self.product_description = params[:product_description]
-      self.mega_channel = params[:mega_channel]
-      self.marketing_code = params[:marketing_code]
-      self.fulfillment_code = params[:fulfillment_code]
+      self.mega_channel = params[:mega_channel].downcase if params[:mega_channel]
+      self.marketing_code = params[:marketing_code].downcase if params[:marketing_code]
+      self.fulfillment_code = params[:fulfillment_code].downcase if params[:fulfillment_code]
       self.ip_address = params[:ip_address]
       self.user_agent = params[:user_agent]
       self.referral_host = params[:referral_host]
       self.referral_parameters = params[:referral_parameters]
       self.referral_path = params[:referral_path]
       self.user_id = params[:user_id]
-      self.landing_url = params[:landing_url]
+      self.landing_url = params[:landing_url].downcase if params[:landing_url]
       self.preferences = params[:preferences]
       self.cookie_value = params[:cookie_value]
       self.cookie_set = params[:cookie_set]
       self.source = params[:source]
-      self.campaign_medium = params[:campaign_medium]
+      self.campaign_medium = params[:campaign_medium].downcase if params[:campaign_medium]
       self.campaign_description = params[:campaign_description]
-      self.campaign_medium_version = params[:campaign_medium_version]
+      self.campaign_medium_version = params[:campaign_medium_version].downcase if params[:campaign_medium_version]
       self.prospect_id = params[:prospect_id]
       self.joint = params[:joint]
     end
-  end
+  end 
 end
 

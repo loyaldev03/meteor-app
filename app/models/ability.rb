@@ -62,6 +62,13 @@ class Ability
       can :manage, Transaction
       cannot :see_nice, Transaction
       can :manage, ClubCashTransaction
+      can :manage, DelayedJob
+      can :manage, DispositionType
+      can :manage, MemberAdditionalData
+      can :manage_club_cash_api, ClubCashTransaction
+      can :manage_prospects_api, Prospect
+      can :manage_token_api, Agent
+      can :manage_operations_api, Operation
       can :api_enroll, Member
       can :api_update, Member
       can :api_profile, Member
@@ -73,13 +80,7 @@ class Ability
       can :manage_product_api, Product
       can :api_change, TermsOfMembership
       can :api_sale, Member
-      can :manage_club_cash_api, ClubCashTransaction
-      can :manage_prospects_api, Prospect
-      can :manage_token_api, Agent
-      can :manage_operations_api, Operation
-      can :manage, DelayedJob
-      can :manage, DispositionType
-      can :manage, MemberAdditionalData
+      can :list, Communication
     when 'representative' then
       can :manage, Member
       cannot :api_profile, Member
@@ -93,17 +94,19 @@ class Ability
       cannot :no_recurrent_billing, Member
       cannot :api_sale, Member
       can :manage, Operation
-      can :list, Membership
       can :manage, CreditCard
       cannot :destroy, CreditCard
       cannot :see_cc_token, CreditCard
       can :manage, MemberNote
-      can :show, TermsOfMembership
-      can :list, Transaction
-      can :refund, Transaction
-      can :list, ClubCashTransaction
-      can :see_nice, Transaction
       can :manage, MemberAdditionalData
+      can :see_nice, Transaction
+      can :show, TermsOfMembership
+      can :refund, Transaction
+      can :list, Membership
+      can :list, Transaction
+      can :list, ClubCashTransaction
+      can :list, Communication
+      can :list, Fulfillment
     when 'supervisor' then
       can :manage, Member
       cannot :api_profile, Member
@@ -115,14 +118,16 @@ class Ability
       cannot :api_find_all_by_created, Member
       cannot :api_sale, Member
       can :manage, Operation
-      can :list, Membership
       can :manage, MemberNote
       can :manage, CreditCard
-      can :show, TermsOfMembership
       can :manage, Transaction
       can :manage, ClubCashTransaction
-      can :see_nice, Transaction
       can :manage, MemberAdditionalData
+      can :show, TermsOfMembership
+      can :see_nice, Transaction
+      can :list, Membership
+      can :list, Communication
+      can :list, Fulfillment
     when 'api' then
       can :api_enroll, Member
       can :api_update, Member
@@ -143,15 +148,19 @@ class Ability
     when 'agency' then
       can :manage, Product
       can :read, Fulfillment
+      can :list, Fulfillment
       can :report, Fulfillment
       can :read, Member
       can :search_result, Member    
-      can :list, Membership
-      can :list, Operation
       can :show, Operation
       can :show, TermsOfMembership
+      can :list, Membership
+      can :list, Operation
       can :list, Transaction
       can :list, ClubCashTransaction
+      can :list, CreditCard
+      can :list, MemberNote
+      can :list, Communication
     # Fulfillment Managment role: Team de Fulfillment
     when 'fulfillment_managment' then
       can :manage, Member
@@ -165,17 +174,18 @@ class Ability
       cannot :manual_billing, Member
       cannot :api_sale, Member
       can :manage, Operation
-      can :list, Membership
       can :manage, CreditCard
       cannot :destroy, CreditCard
       cannot :see_cc_token, CreditCard
-      can :manage, MemberNote
-      can :show, TermsOfMembership
-      can :list, Transaction
-      can :refund, Transaction
-      can :list, ClubCashTransaction
       can :manage, Product
+      can :manage, MemberNote
       can :manage, Fulfillment
+      can :show, TermsOfMembership
+      can :refund, Transaction
+      can :list, Transaction
+      can :list, ClubCashTransaction
+      can :list, Communication
+      can :list, Membership
     end
 
     # Define abilities for the passed in user here. For example:

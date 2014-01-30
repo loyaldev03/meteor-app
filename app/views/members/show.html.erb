@@ -353,77 +353,99 @@
 <% end %>
 
 <ul class="nav nav-tabs">
-  <li class="active"><a href="#transactions" data-toggle="tab">Transactions</a></li>
-  <li><a href="#notes" data-toggle="tab">Notes</a></li>
-  <li><a href="#fulfillments" data-toggle="tab">Fulfillments</a></li>
-  <li><a href="#communication" data-toggle="tab">Communications</a></li>
-  <li><a href="#operations" data-toggle="tab">Operations</a></li>
-  <li><a href="#credit_cards" data-toggle="tab">Credit Cards</a></li>
-  <% if @current_member.has_link_to_api? and can? :see_sync_status, Member %>
-    <li><a href="#sync_status" data-toggle="tab" id="sync_status_tab">Sync Status</a></li>
+  
+  <% if @current_agent.can? :list, Transaction, @current_club.id %>
+    <li class="active"><a href="#transactions" data-toggle="tab" name="transactions">Transactions</a></li>
   <% end %>
-  <% if @current_club.is_not_drupal? %>
+  <% if @current_agent.can? :list, MemberNote, @current_club.id %>
+    <li><a href="#notes" data-toggle="tab" name="notes">Notes</a></li>
+  <% end %>
+  <% if @current_agent.can? :list, Fulfillment, @current_club.id %>
+    <li><a href="#fulfillments" data-toggle="tab" name="fulfillments">Fulfillments</a></li>
+  <% end %>
+  <% if @current_agent.can? :list, Communication, @current_club.id %>
+    <li><a href="#communication" data-toggle="tab" name="communications">Communications</a></li>
+  <% end %>
+  <% if @current_agent.can? :list, Operation, @current_club.id %>
+    <li><a href="#operations" data-toggle="tab" name="operations">Operations</a></li>
+  <% end %>
+  <% if @current_agent.can? :list, CreditCard, @current_club.id %>
+    <li><a href="#credit_cards" data-toggle="tab" name="credit_cards">Credit Cards</a></li>
+  <% end %>
+  <% if @current_member.has_link_to_api? and can? :see_sync_status, Member, @current_club.id %>
+    <li><a href="#sync_status" data-toggle="tab" name="sync_status">Sync Status</a></li>
+  <% end %>
+  <% if @current_club.is_not_drupal? and @current_agent.can? :list, ClubCashTransaction, @current_club.id%>
     <% if @current_club.allow_club_cash_transaction? %>
-      <li><a href="#club_cash_transactions" data-toggle="tab">Club Cash</a></li>
+      <li><a href="#club_cash_transactions" data-toggle="tab" name="club_cash_transactions">Club Cash</a></li>
     <% end %>  
   <% end %>
-  <li><a href="#memberships" data-toggle="tab">Memberships</a></li>
+  <% if @current_agent.can? :list, Membership, @current_club.id %>
+    <li><a href="#memberships" data-toggle="tab" name="memberships">Memberships</a></li>
+  <% end %>
 </ul>
 
 <div class="tab-content">
-  <div class="tab-pane active" id="transactions">
-	 <div class="tab_body_padding">
-	    <%= render :partial => 'transactions' %>
-	  </div>
-	</div>
-	<div class="tab-pane" id="notes">
-	  <div class="tab_body_padding">
-	    <%= render :partial => 'notes', :locals => { :notes => @notes} %>
-	  </div>
-	</div>	
-	<div class="tab-pane" id="fulfillments">
-	  <div class="tab_body_padding">
-	    <%= render :partial => 'fulfillments', :locals => { :fulfillments => @fulfillments} %>
-	  </div>
-	</div> 
-	<div class="tab-pane" id="communication">
-	  <div class="tab_body_padding">
-	    <%= render :partial => 'communications', :locals => { :communications => @communications} %>
-	  </div>
-	</div>
-	<div class="tab-pane" id="operations">
-	  <div class="tab_body_padding">
-	    <%= render :partial => 'operations' %>
-	  </div>
-	</div>	
-	<div class="tab-pane" id="credit_cards">
-	  <div class="tab_body_padding">
-	    <%= render :partial => 'credit_cards', :locals => { :credit_cards => @credit_cards} %>
-	  </div>
-	</div>  		
-	<% if @current_member.has_link_to_api? and can? :see_sync_status, Member %>
+  <% if @current_agent.can? :list, Transaction, @current_club.id %>
+    <div class="tab-pane active" id="transactions">
+  	 <div class="tab_body_padding">
+  	  </div>
+  	</div>
+  <% end %>
+  <% if @current_agent.can? :list, MemberNote, @current_club.id %>
+  	<div class="tab-pane" id="notes">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div>	
+  <% end %>
+  <% if @current_agent.can? :list, Fulfillment, @current_club.id %>
+  	<div class="tab-pane" id="fulfillments">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div> 
+  <% end %>
+  <% if @current_agent.can? :list, Communication, @current_club.id %>
+  	<div class="tab-pane" id="communications">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div>
+  <% end %>
+  <% if @current_agent.can? :list, Operation, @current_club.id %>
+  	<div class="tab-pane" id="operations">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div>	
+  <% end %>
+  <% if @current_agent.can? :list, CreditCard, @current_club.id %>
+  	<div class="tab-pane" id="credit_cards">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div>
+  <% end %>
+	<% if @current_member.has_link_to_api? and can? :see_sync_status, Member, @current_club.id %>
 	  <div class="tab-pane" id="sync_status">
 	    <div class="tab_body_padding">
-	      <%= render :partial => 'sync_status', :locals => { :member => @current_member} %>
+        <%= render :partial => 'sync_status', :locals => { :member => @current_member} %>
 	    </div>
 	  </div>
 	<% end %>
-	<% if @current_club.is_not_drupal? %>
+  <% if @current_club.is_not_drupal? and @current_agent.can? :list, ClubCashTransaction, @current_club.id%>
 	  <% if @current_club.allow_club_cash_transaction? %>
 	    <div class="tab-pane" id="club_cash_transactions">
 	      <div class="tab_body_padding">
-	        <%= render :partial => 'club_cash_transactions' %>
 	      </div>
 	    </div>
 	  <% end %>
 	<% end %>
-	<div class="tab-pane" id="memberships">
-	  <div class="tab_body_padding">
-	    <%= render :partial => 'memberships' %>
-	  </div>
-	</div>
+  <% if @current_agent.can? :list, Membership, @current_club.id %>
+  	<div class="tab-pane" id="memberships">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div>
+  <% end %>
 </div>
 
 <script>
+  var member_prefix = "<%= @current_member.id %>"
   $(document).ready(show_member_functions());
 </script>

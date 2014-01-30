@@ -165,7 +165,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     within('.nav-tabs'){ click_on "Operations"}
     within("#operations_table"){ assert page.has_content?("Member canceled") }
     within('.nav-tabs'){ click_on "Communications"}
-    within("#communication") do
+    within("#communications") do
       assert page.has_content?("Test cancellation")
       assert page.has_content?("cancellation")
     end

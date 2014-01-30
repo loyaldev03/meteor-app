@@ -315,6 +315,20 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
+  test "Chargeback a member" do 
+    active_merchant_stubs_store
+    active_member = create_active_member(@terms_of_membership)
+    nbd = active_member.bill_date
+    answer = active_member.bill_membership
+    active_member.reload
+    assert !active_member.lapsed?, "member cant be lapsed"
+    
+    trans = Transaction.where("operation_type = 101").first
+    active_member.chargeback!(trans,{:reason => "testing", :transaction_amount => trans.amount, :auth_code => trans.response_auth_code })
+    chargeback_trans = Transaction.find_by_operation_type 110
+    assert_equal chargeback_trans.amount, -trans.amount
+  end
+
   test "Billing with grace period disable on tom and missing CC" do
     active_member = create_active_member( @terms_of_membership, :active_member_without_cc )
     blank_cc = FactoryGirl.create( :blank_credit_card, :member_id => active_member.id )

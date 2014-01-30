@@ -146,7 +146,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     sleep 5
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within('.nav-tabs'){ click_on 'Communications' }
-    within("#communication"){ assert page.has_content?(template_name) }
+    within("#communications"){ assert page.has_content?(template_name) }
     within('.nav-tabs'){ click_on 'Operations' }
     within("#operations"){ select 'communications', :from => "operation[operation_type]" }
 
@@ -901,7 +901,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
     within('.nav-tabs'){ click_on 'Communications' }
-    within("#communication") do
+    within("#communications") do
       assert page.has_content?("Test birthday")
       assert page.has_content?("birthday")
       assert_equal(Communication.last.template_type, 'birthday')

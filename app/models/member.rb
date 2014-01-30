@@ -998,9 +998,7 @@ class Member < ActiveRecord::Base
       if self.update_attribute(:wrong_address, reason)
         if set_fulfillments
           self.fulfillments.where_to_set_bad_address.each do |fulfillment| 
-            former_status = fulfillment.status
-            fulfillment.set_as_bad_address
-            fulfillment.audit_status_transition(agent,former_status,nil)
+            fulfillment.update_status(nil, 'bad_address', "Member set as undeliverable")
           end
         end
         message = "Address #{self.full_address} is undeliverable. Reason: #{reason}"
@@ -1018,9 +1016,9 @@ class Member < ActiveRecord::Base
 
   def self.supported_states(country='US')
     if country == 'US'
-      Carmen::Country.coded('US').subregions.select{ |s| %w{AK AL AR AZ CA CO CT DE FL 
-        GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH  NJ NM NV NY OH 
-        OK OR PA RI SC SD TN TX UT VA VI VT WA WI WV WY}.include?(s.code) }
+      Carmen::Country.coded('US').subregions.select{ |s| %w{AK AL AR AZ CA CO CT DC DE 
+        FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH  NJ NM NV NY 
+        OH OK OR PA RI SC SD TN TX UT VA VI VT WA WI WV WY}.include?(s.code) }
     else
       Carmen::Country.coded('CA').subregions
     end
@@ -1261,9 +1259,7 @@ class Member < ActiveRecord::Base
       self.cancel_member_at_remote_domain
       if (Time.zone.now.to_date - join_date.to_date).to_i <= Settings.days_to_wait_to_cancel_fulfillments
         fulfillments.where_cancellable.each do |fulfillment| 
-          former_status = fulfillment.status
-          fulfillment.set_as_canceled
-          fulfillment.audit_status_transition(nil,former_status,nil)
+          fulfillment.update_status(nil, 'canceled', "Member canceled")
         end
       end
       self.next_retry_bill_date = nil

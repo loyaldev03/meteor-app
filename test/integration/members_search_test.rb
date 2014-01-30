@@ -374,7 +374,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     within(".nav-tabs"){ click_on("Fulfillments") }
     within("#fulfillments") { assert page.has_content?(fulfillments_table_empty_text) }
     within(".nav-tabs"){ click_on("Communications") }
-    within("#communication") { assert page.has_content?(communication_table_empty_text) }
+    within("#communications") { assert page.has_content?(communication_table_empty_text) }
   end
 
   #Search member with duplicated letters at Last Name
@@ -778,7 +778,7 @@ class MembersSearchTest < ActionController::IntegrationTest
     setup_member(false)
     unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id, :gender => "")
     @saved_member = create_member(unsaved_member)
-		assert find_field('input_gender').value == I18n.t('activerecord.attributes.member.no_gender')
+    assert find_field('member_gender').value == ''
   end
 
   test "create member without type of phone number" do

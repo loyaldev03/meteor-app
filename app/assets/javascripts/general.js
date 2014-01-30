@@ -670,6 +670,9 @@ function club_cash_transactions_functions(column_count){
 }
 
 function show_member_functions(){
+
+  var objectsFetch = {transactions:true, notes:false, fulfillments:false, communications:false, operations:false, credit_cards:false, club_cash_transactions:false, memberships:false }
+
   $(".btn").on('click',function(event){
     if($(this).attr('disabled') == 'disabled')
       event.preventDefault(); 
@@ -678,6 +681,36 @@ function show_member_functions(){
   $('.help').popover();
   mark_as_sent_fulfillment("../fulfillments/");
   resend_fulfillment("../fulfillments/");
+
+  $.ajax({
+    url: member_prefix+"/transactions_content",
+      success: function(html){
+        $(".tab-content #transactions .tab_body_padding div").remove();
+        $(".tab-content #transactions .tab_body_padding").append(html);
+      }
+  })
+
+  $(".nav-tabs li a").click(function(){
+    var objects_to_search = $(this).attr("name");
+    for(var key in objectsFetch){ 
+      if(key == objects_to_search){
+        if(!objectsFetch[objects_to_search]){
+          startAjaxLoader();
+          $.ajax({
+            url: member_prefix+"/"+objects_to_search+"_content",
+            success: function(html){
+              $(".tab-content #"+objects_to_search+" .tab_body_padding").children().remove();
+              $(".tab-content #"+objects_to_search+" .tab_body_padding").append(html);
+              objectsFetch[objects_to_search] = true
+            }
+          });
+          endAjaxLoader();
+        }
+      }
+    }
+    $(".tab-content .active").removeClass("active");
+    $(".tab-content #"+objects_to_search+"").addClass("active");
+  });
 };
 
 function member_cancellation_functions(){
@@ -1018,6 +1051,22 @@ function tom_create_wizard() {
   $("#tom_wizard_form").formwizard({ 
     formPluginEnabled: false,
     validationEnabled: true,
+    validationOptions:{
+      errorPlacement: function(error, element) {
+        $("label[for="+error.attr("for")+"][generated=true]").each(function(){
+          if($(this).text() == error.text() || $(this).text() != error.text()){
+            $(this).remove();
+          }
+        })
+        error.removeClass("error");
+        error.appendTo($("#"+$(element).attr("id")).parent());
+      },
+      success: function(error){
+        $("label[for="+error.attr("for")+"][generated=true]").each(function(){
+          $(this).remove();
+        })
+      }
+    },
     focusFirstInput : true,
     disableUIStyles: true,
     textNext: '',

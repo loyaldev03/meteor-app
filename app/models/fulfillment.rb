@@ -199,22 +199,6 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
-  def self.generateXLS(fulfillment_file, change_status = false)
-    package = Axlsx::Package.new
-    package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
-      if fulfillment_file.other_type?
-        sheet.add_row Fulfillment::SLOOPS_HEADER
-      else
-        sheet.add_row Fulfillment::KIT_CARD_HEADER
-      end
-      fulfillment_file.fulfillments.each do |fulfillment|
-        row = fulfillment.get_file_line(change_status, fulfillment_file)
-        sheet.add_row row unless row.empty?
-      end
-    end
-    package
-  end
-
   def product
     @product ||= Product.find_by_sku_and_club_id(self.product_sku, self.member.club_id)
   end

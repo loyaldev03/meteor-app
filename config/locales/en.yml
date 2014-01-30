@@ -237,6 +237,7 @@ en:
         gender: 'Gender'
         no_gender: 'No gender selected'
         member_notes: 'Member Notes'
+        no_member_notes: 'There are no member notes to be shown.'
         phone_country_code: Country
         phone_local_number: Number
         phone_area_code: Area
