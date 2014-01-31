@@ -149,8 +149,11 @@
               <th>
                 <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline required_asterick' %>
               </th>
-              <th> 
+              <th id="th_terms_of_memberships"> 
                 <%= select_tag('member[terms_of_membership_id]', options_from_collection_for_select(@terms_of_memberships, "id", "name")) %>
+                <% unless @terms_of_memberships.empty? %>
+                  <%= render :partial => 'shared/help', :locals => { :title => t('activerecord.model.subscription_plans'), :content => ( render :partial => "terms_of_memberships/resumed_information", :locals => {:tom => @terms_of_memberships.first})} %>
+                <% end %>
               </th>  
             <% elsif can? :manual_billing, Member and not @member.manual_payment %>
               <th>
