@@ -19,7 +19,7 @@ class Fulfillment < ActiveRecord::Base
   KIT_CARD_HEADER = ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
                 'ADDRESS','CITY','STATE','ZIP','Product','Charter Member Status' ]
 
-  scope :where_bad_address, lambda { where("status = 'bad_address'") }
+  scope :where_bad_address, lambda { where("status in ('bad_address','returned')") }
   scope :where_in_process, lambda { where("status = 'in_process'") }
   scope :where_not_processed, lambda { where("status = 'not_processed'") }
   scope :where_to_set_bad_address, lambda { where("status IN ('not_processed','in_process','out_of_stock','returned')") }
@@ -197,22 +197,6 @@ class Fulfillment < ActiveRecord::Base
               (I18n.l self.renewable_at, :format => :only_date_short if self.renewable_at), member.address, member.city,
               member.state,"=\"#{member.zip}\"", self.product_sku, ('C' if member.member_group_type_id) ]
     end
-  end
-
-  def self.generateXLS(fulfillment_file, change_status = false)
-    package = Axlsx::Package.new
-    package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
-      if fulfillment_file.other_type?
-        sheet.add_row Fulfillment::SLOOPS_HEADER
-      else
-        sheet.add_row Fulfillment::KIT_CARD_HEADER
-      end
-      fulfillment_file.fulfillments.each do |fulfillment|
-        row = fulfillment.get_file_line(change_status, fulfillment_file)
-        sheet.add_row row unless row.empty?
-      end
-    end
-    package
   end
 
   def product

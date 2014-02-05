@@ -26,7 +26,8 @@ module Drupal
             last_synced_at: Time.now,
             last_sync_error: nil,
             last_sync_error_at: nil,
-            sync_status: "synced"
+            sync_status: "synced",
+            club_cash_amount: (res.body['total_points'].to_f / 100)
           }
         else
           {

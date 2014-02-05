@@ -2818,4 +2818,58 @@ test "Update the status of all the fulfillments - In process using individual ch
 
     assert page.has_content?("Fulfillments for file")
   end
+
+  test "Change fulfillment status from Returned to Not Processed when removing undeliverable" do
+    setup_member(true)
+    stubs_solr_index
+    FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')
+    @saved_member.fulfillments.each{ |x| x.update_status(nil,"returned","testing") }
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    @saved_member.fulfillments do |fulfillment|
+      assert_equal fulfillment.status, 'returned'
+    end
+    click_link_or_button "Edit" 
+    within("#table_demographic_information") do
+      fill_in 'member[address]', :with => "new address 123"
+    end
+
+    alert_ok_js
+    click_link_or_button "Update Member"
+    @saved_member.reload
+    @saved_member.fulfillments do |fulfillment|
+      assert_equal fulfillment.status, 'not_processed'
+    end  
+  end
+
+  test "Change fulfillment status from bad_addres to Not Processed when removing undeliverable" do
+    setup_member(true)
+    stubs_solr_index
+    FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')
+    @saved_member.fulfillments.each{ |x| x.update_status(nil,"bad_address","testing") }
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
+    @saved_member.fulfillments do |fulfillment|
+      assert_equal fulfillment.status, 'bad_address'
+    end
+    click_link_or_button "Edit" 
+    within("#table_demographic_information") do
+      fill_in 'member[address]', :with => "new address 123"
+    end
+
+    alert_ok_js
+    click_link_or_button "Update Member"
+    @saved_member.reload
+    @saved_member.fulfillments do |fulfillment|
+      assert_equal fulfillment.status, 'not_processed'
+    end  
+  end
 end

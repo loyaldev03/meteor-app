@@ -446,7 +446,17 @@ function new_member_functions(){
   $('#member_country').on('change',  function(){
     country = $('#member_country').val();
     $.get(this.action, { country_code:country }, null, 'script'); 
-  })
+  });
+
+  $("#member_terms_of_membership_id").change(function(){
+    $.ajax({
+      type: 'GET',
+      url: "../subscription_plans/"+$(this).val()+"/resumed_information",
+      success: function(data){
+        $("#th_terms_of_memberships .help").attr("data-content", data);
+      }
+    });
+  });
 };
 
 function edit_member_functions(){
@@ -1051,6 +1061,22 @@ function tom_create_wizard() {
   $("#tom_wizard_form").formwizard({ 
     formPluginEnabled: false,
     validationEnabled: true,
+    validationOptions:{
+      errorPlacement: function(error, element) {
+        $("label[for="+error.attr("for")+"][generated=true]").each(function(){
+          if($(this).text() == error.text() || $(this).text() != error.text()){
+            $(this).remove();
+          }
+        })
+        error.removeClass("error");
+        error.appendTo($("#"+$(element).attr("id")).parent());
+      },
+      success: function(error){
+        $("label[for="+error.attr("for")+"][generated=true]").each(function(){
+          $(this).remove();
+        })
+      }
+    },
     focusFirstInput : true,
     disableUIStyles: true,
     textNext: '',

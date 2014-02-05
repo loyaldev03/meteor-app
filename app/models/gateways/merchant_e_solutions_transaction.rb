@@ -23,7 +23,7 @@ class MerchantESolutionsTransaction < Transaction
     trans = MerchantESolutionsTransaction.find_by_response args.to_json
     if trans.nil?
       self.transaction_type = "chargeback"
-      self.prepare(sale_transaction.member, sale_transaction.credit_card, args[:transaction_amount], 
+      self.prepare(sale_transaction.member, sale_transaction.credit_card, -args[:transaction_amount], 
                     sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
       self.response_auth_code=args[:auth_code]
       self.response_result=args[:reason]
@@ -38,10 +38,10 @@ class MerchantESolutionsTransaction < Transaction
   end
 
   def fill_transaction_type_for_credit(sale_transaction)
-    if sale_transaction.amount.to_f == amount
+    if sale_transaction.amount.to_f == amount.abs
       self.transaction_type = "refund"
       self.refund_response_transaction_id = sale_transaction.response_transaction_id
-    elsif sale_transaction.amount.to_f > amount
+    elsif sale_transaction.amount.to_f > amount.abs
       self.transaction_type = "credit"
     end
   end    
