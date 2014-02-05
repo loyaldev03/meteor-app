@@ -671,6 +671,7 @@ class Member < ActiveRecord::Base
     membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent)
     self.current_membership = membership
 
+    operation_type = check_enrollment_operation
     if amount.to_f != 0.0
       trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
       trans.transaction_type = "sale"
@@ -684,6 +685,7 @@ class Member < ActiveRecord::Base
         trans.save
         return answer 
       end
+      trans.update_attribute :operation_type, operation_type
     end
     
     begin
@@ -711,7 +713,7 @@ class Member < ActiveRecord::Base
         credit_card.accepted_on_billing
       end
       self.reload
-      message = set_status_on_enrollment!(agent, trans, amount, enrollment_info)
+      message = set_status_on_enrollment!(agent, trans, amount, enrollment_info, operation_type)
 
       response = { :message => message, :code => Settings.error_codes.success, :member_id => self.id, :autologin_url => self.full_autologin_url.to_s, :status => self.status }
       response.merge!(:api_role => tom.api_role.to_s.split(',')) unless self.is_not_drupal?
@@ -1194,32 +1196,40 @@ class Member < ActiveRecord::Base
       true
     end
 
-    def set_status_on_enrollment!(agent, trans, amount, info)
-      operation_type = Settings.operation_types.enrollment_billing
-      description = 'enrolled'
+    def check_enrollment_operation
+      if terms_of_membership.needs_enrollment_approval?
+        if self.lapsed?
+          Settings.operation_types.recovery_needs_approval
+        else
+          Settings.operation_types.enrollment_needs_approval
+        end
+      elsif self.lapsed?
+        Settings.operation_types.recovery
+      else
+        Settings.operation_types.enrollment_billing
+      end
+    end
 
+    def set_status_on_enrollment!(agent, trans, amount, info, operation_type)
+      description = 'enrolled'
       # Member approval need it?
       if terms_of_membership.needs_enrollment_approval?
         self.set_as_applied!
         # is a recovery?
         if self.lapsed?
           description = 'recovered pending approval'
-          operation_type = Settings.operation_types.recovery_needs_approval
         else
           description = 'enrolled pending approval'
-          operation_type = Settings.operation_types.enrollment_needs_approval
         end
       elsif self.lapsed? # is a recovery?
         self.recovered!
         description = 'recovered'
-        operation_type = Settings.operation_types.recovery
       else      
         self.set_as_provisional! # set join_date
       end
 
       message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership.id}) -#{terms_of_membership.name}-"
       Auditory.audit(agent, (trans.nil? ? terms_of_membership : trans), message, self, operation_type)
-      trans.update_attribute :operation_type, operation_type unless trans.nil?
       message
     end
 

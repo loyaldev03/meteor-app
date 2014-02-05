@@ -446,7 +446,17 @@ function new_member_functions(){
   $('#member_country').on('change',  function(){
     country = $('#member_country').val();
     $.get(this.action, { country_code:country }, null, 'script'); 
-  })
+  });
+
+  $("#member_terms_of_membership_id").change(function(){
+    $.ajax({
+      type: 'GET',
+      url: "../subscription_plans/"+$(this).val()+"/resumed_information",
+      success: function(data){
+        $("#th_terms_of_memberships .help").attr("data-content", data);
+      }
+    });
+  });
 };
 
 function edit_member_functions(){
