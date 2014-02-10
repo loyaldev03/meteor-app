@@ -26,7 +26,7 @@ class FulfillmentFile < ActiveRecord::Base
   end
 
   def mark_fulfillments_as_in_process
-    self.fulfillments.each { |x| x.update_status(agent, 'in_progress', 'Fulfillment file generated', self.id)  unless x.in_process? or x.renewed? }
+    self.fulfillments.each { |x| x.update_status(agent, 'in_process', 'Fulfillment file generated', self.id)  unless x.in_process? or x.renewed? }
   end
 
   def mark_fulfillments_as_sent
