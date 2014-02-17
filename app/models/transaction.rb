@@ -200,7 +200,8 @@ class Transaction < ActiveRecord::Base
           Communication.deliver!(:refund, sale_transaction.member)
           sale_transaction.member.marketing_tool_sync
         else
-          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
+          answer = answer.is_a?(Hash) ? answer[:message].to_s : answer.to_s
+          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer}", sale_transaction.member, Settings.operation_types.credit_error)
           trans.update_attribute :operation_type, Settings.operation_types.credit_error
         end
         answer
