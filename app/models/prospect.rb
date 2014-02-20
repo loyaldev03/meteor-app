@@ -25,7 +25,7 @@ class Prospect < ActiveRecord::Base
     self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::ProspectModel)
     self.pardot_after_create_sync_to_remote_domain if defined?(Pardot::ProspectModel)
   end
-  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync
+  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync, priority: 30
 
   def skip_sync!
     @skip_sync = true
