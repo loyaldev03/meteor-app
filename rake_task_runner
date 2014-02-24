@@ -18,6 +18,8 @@ echo "`date` env variable => `env`"
 
 cd /var/www/$2/current && rake members:cancel  >> $LOGFILE 2>&1
 cd /var/www/$2/current && rake members:process_sync  >> $LOGFILE 2>&1
+cd /var/www/$2/current && rake members:sync_to_exact_target  >> $LOGFILE 2>&1
+cd /var/www/$2/current && rake prospects:sync_to_exact_target  >> $LOGFILE 2>&1
 
 if [ "$1" == "production" ]; then
   cd /var/www/$2/current && rake mes:chargeback_report  >> $LOGFILE 2>&1 

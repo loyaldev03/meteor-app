@@ -99,7 +99,8 @@ module SacExactTarget
           exact_target_last_synced_at: Time.zone.now,
           exact_target_synced_status: 'synced',
           exact_target_last_sync_error: nil,
-          exact_target_last_sync_error_at: nil
+          exact_target_last_sync_error_at: nil,
+          need_exact_target_sync: false
         }
       end
       ::Member.where(id: self.member.id).limit(1).update_all(data)

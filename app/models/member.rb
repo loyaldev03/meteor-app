@@ -43,7 +43,6 @@ class Member < ActiveRecord::Base
   after_destroy 'cancel_member_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
-  after_save :after_marketing_tool_sync
   
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
@@ -58,7 +57,7 @@ class Member < ActiveRecord::Base
   handle_asynchronously :cancel_member_at_remote_domain, :queue => :drupal_queue, priority: 15
 
   def after_save_sync_to_remote_domain
-    unless @skip_api_sync || api_member.nil?
+    unless s_api_sync || api_member.nil?
       api_member.save!
     end
   rescue Exception => e
@@ -962,6 +961,7 @@ class Member < ActiveRecord::Base
           self.send("#{key}=", params[key]) if params.include? key
     end
     self.type_of_phone_number = params[:type_of_phone_number].to_s.downcase if params.include? :type_of_phone_number
+    self.need_exact_target_sync = true if defined?(SacExactTarget::MemberModel)
   end
 
   def chargeback!(transaction_chargebacked, args)
@@ -1227,6 +1227,7 @@ class Member < ActiveRecord::Base
       else      
         self.set_as_provisional! # set join_date
       end
+      marketing_tool_sync
 
       message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership.id}) -#{terms_of_membership.name}-"
       Auditory.audit(agent, (trans.nil? ? terms_of_membership : trans), message, self, operation_type)
@@ -1276,6 +1277,7 @@ class Member < ActiveRecord::Base
       self.bill_date = nil
       self.recycled_times = 0
       self.save(:validate => false)
+      marketing_tool_sync
       Communication.deliver!(:cancellation, self)
       Auditory.audit(nil, current_membership, "Member canceled", self, Settings.operation_types.cancel)
     end
@@ -1367,9 +1369,5 @@ class Member < ActiveRecord::Base
           end
         end
       end
-    end
-
-    def after_marketing_tool_sync
-      marketing_tool_sync
     end
 end

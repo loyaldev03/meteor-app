@@ -15,27 +15,9 @@ class Prospect < ActiveRecord::Base
             :campaign_medium, :campaign_description, :campaign_medium_version , :terms_of_membership_id, 
             :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description, :source
 
-  after_create :after_marketing_tool_sync
 
   def full_phone_number
     "(#{self.phone_country_code}) #{self.phone_area_code} - #{self.phone_local_number}"
   end
-
-  def marketing_tool_sync
-    self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::ProspectModel)
-    self.pardot_after_create_sync_to_remote_domain if defined?(Pardot::ProspectModel)
-  end
-  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync, priority: 30
-
-  def skip_sync!
-    @skip_sync = true
-  end
-
-  private 
-
-    def after_marketing_tool_sync
-      marketing_tool_sync unless @skip_sync
-    end
-
 
 end
