@@ -22,13 +22,11 @@ class MerchantESolutionsTransaction < Transaction
   def new_chargeback(sale_transaction, args)
     trans = MerchantESolutionsTransaction.find_by_response args.to_json
     if trans.nil?
-      if args[:adjudication_date][args[:adjudication_date].size - 1] == '+'
-        transaction_description = 'Billing: Chargeback rebutted'
-        operation_description = 'Billing: Chargeback rebutted'
+      if args[:adjudication_date].last == '+'
+        operation_description = 'Rebutted Chargeback processed $#{self.amount}'
         chargeback_operation_type = Settings.operation_types.chargeback_rebutted
         chargeback_amount = args[:transaction_amount].to_f
-      else 
-        transaction_description = args[:reason]
+      else
         operation_description = "Chargeback processed $#{self.amount}"
         chargeback_operation_type = Settings.operation_types.chargeback
         chargeback_amount = -args[:transaction_amount].to_f
@@ -38,7 +36,7 @@ class MerchantESolutionsTransaction < Transaction
       self.prepare(sale_transaction.member, sale_transaction.credit_card, chargeback_amount, 
                     sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
       self.response_auth_code = args[:auth_code]
-      self.response_result = transaction_description
+      self.response_result = args[:reason]
       self.response_code ='000'
       self.response = args
       self.success = true
