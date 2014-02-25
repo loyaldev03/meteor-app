@@ -28,7 +28,6 @@ fi
 # nowadys we will run billing once per day 
 cd /var/www/$2/current && rake billing:for_today  >> $LOGFILE 2>&1
 
-cd /var/www/$2/current && rake billing:send_prebill  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake members:process_fulfillments  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake members:process_email_sync_error  >> $LOGFILE 2>&1 &
 
@@ -39,6 +38,7 @@ WAIT_PIDS=`jobs -l | awk '{print $2}'`
 wait $WAIT_PIDS
 
 # cd /var/www/$2/current && rake members:sync_members_to_pardot  >> $LOGFILE 2>&1 &
+cd /var/www/$2/current && rake billing:send_prebill  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake members:send_happy_birthday  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake products:send_product_list_email  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake members:send_pillar_emails  >> $LOGFILE 2>&1 &
