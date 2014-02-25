@@ -1226,7 +1226,6 @@ class Member < ActiveRecord::Base
       else      
         self.set_as_provisional! # set join_date
       end
-      marketing_tool_sync
 
       message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership.id}) -#{terms_of_membership.name}-"
       Auditory.audit(agent, (trans.nil? ? terms_of_membership : trans), message, self, operation_type)
@@ -1276,7 +1275,6 @@ class Member < ActiveRecord::Base
       self.bill_date = nil
       self.recycled_times = 0
       self.save(:validate => false)
-      marketing_tool_sync
       Communication.deliver!(:cancellation, self)
       Auditory.audit(nil, current_membership, "Member canceled", self, Settings.operation_types.cancel)
     end
