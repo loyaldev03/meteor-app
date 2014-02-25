@@ -1,6 +1,6 @@
 class AddNeedEtSyncOnMembers < ActiveRecord::Migration
   def up
-  	add_column :members, :need_exact_target_sync, :boolean
+  	add_column :members, :need_exact_target_sync, :boolean, :default => false
   end
 
   def down

@@ -20,4 +20,9 @@ class Prospect < ActiveRecord::Base
     "(#{self.phone_country_code}) #{self.phone_area_code} - #{self.phone_local_number}"
   end
 
+  def marketing_tool_sync
+    self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::ProspectModel)
+    self.pardot_after_create_sync_to_remote_domain if defined?(Pardot::ProspectModel)
+  end
+
 end

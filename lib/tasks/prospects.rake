@@ -8,13 +8,13 @@ namespace :prospects do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-	    base = Prospect.where("date(created_at) = ?", Time.zone.now.to_date-1.day)
+	    base = Prospect.where("exact_target_sync_result != 'Success'")
 	    base.find_in_batches do |group|
 	      tz = Time.zone.now
 	      group.each_with_index do |prospect,index|
 	        begin
 	          Rails.logger.info "  *[#{index+1}] processing prospect ##{prospect.id}"
- 						prospect.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::ProspectModel)
+ 						prospect.marketing_tool_sync
 	        rescue Exception => e
 	          Auditory.report_issue("Prospect::SyncExactTarget", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :prospect => prospect.inspect })
 	          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        

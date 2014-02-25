@@ -38,12 +38,13 @@ class Member < ActiveRecord::Base
 
   before_create :record_date
   before_save :wrong_address_logic
+  before_save :set_exact_target_sync_as_needed
 
   after_update :after_save_sync_to_remote_domain
   after_destroy 'cancel_member_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
-  
+  after_create :after_marketing_tool_sync
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
@@ -844,9 +845,8 @@ class Member < ActiveRecord::Base
     self.add_club_cash(nil, amount, message)
     if is_not_drupal?
       if self.club_cash_expire_date.nil? # first club cash assignment
-        self.club_cash_expire_date = join_date + 1.year
+        self.update_attribute :club_cash_expire_date, join_date + 1.year
       end
-      self.save(:validate => false)
     end
   rescue Exception => e
     # refs #21133
@@ -961,7 +961,6 @@ class Member < ActiveRecord::Base
           self.send("#{key}=", params[key]) if params.include? key
     end
     self.type_of_phone_number = params[:type_of_phone_number].to_s.downcase if params.include? :type_of_phone_number
-    self.need_exact_target_sync = true if defined?(SacExactTarget::MemberModel)
   end
 
   def chargeback!(transaction_chargebacked, args)
@@ -1369,5 +1368,14 @@ class Member < ActiveRecord::Base
           end
         end
       end
+    end
+
+
+    def after_marketing_tool_sync
+      marketing_tool_sync
+    end
+
+    def set_exact_target_sync_as_needed
+      self.need_exact_target_sync = true if defined?(SacExactTarget::MemberModel)
     end
 end
