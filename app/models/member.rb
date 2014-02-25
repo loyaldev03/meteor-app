@@ -44,7 +44,6 @@ class Member < ActiveRecord::Base
   after_destroy 'cancel_member_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
-  after_create :after_marketing_tool_sync
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
@@ -137,11 +136,11 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
-                        :provisional, :do => 'schedule_first_membership(true)'
+                        :provisional, :do => ['schedule_first_membership(true)','after_marketing_tool_sync']
     after_transition [ :provisional, :active ] => 
                         :provisional, :do => 'schedule_first_membership(true, true, true, true)' # save the sale
     after_transition :applied => 
-                        :provisional, :do => 'schedule_first_membership(false)'
+                        :provisional, :do => ['schedule_first_membership(false)', 'after_marketing_tool_sync']
     ###### <<<<<<========
     ###### Reactivation handling =====>>>>
     after_transition :lapsed => 
@@ -149,7 +148,7 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### Cancellation =====>>>>
     after_transition [:provisional, :active ] => 
-                        :lapsed, :do => [:cancellation, 'nillify_club_cash']
+                        :lapsed, :do => [:cancellation, 'nillify_club_cash', 'after_marketing_tool_sync']
     after_transition :applied => 
                         :lapsed, :do => [:set_member_as_rejected, :send_rejection_communication]
     ###### <<<<<<========
@@ -1143,8 +1142,13 @@ class Member < ActiveRecord::Base
   end
   handle_asynchronously :desnormalize_preferences, :queue => :generic_queue, priority: 40
 
-  def marketing_tool_sync
+  def marketing_tool_sync_call
     self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
+  end
+
+  def marketing_tool_sync
+    self.reload
+    marketing_tool_sync_call
   end
   handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync, priority: 30
 
@@ -1226,7 +1230,6 @@ class Member < ActiveRecord::Base
       else      
         self.set_as_provisional! # set join_date
       end
-      marketing_tool_sync
 
       message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership.id}) -#{terms_of_membership.name}-"
       Auditory.audit(agent, (trans.nil? ? terms_of_membership : trans), message, self, operation_type)
@@ -1276,7 +1279,6 @@ class Member < ActiveRecord::Base
       self.bill_date = nil
       self.recycled_times = 0
       self.save(:validate => false)
-      marketing_tool_sync
       Communication.deliver!(:cancellation, self)
       Auditory.audit(nil, current_membership, "Member canceled", self, Settings.operation_types.cancel)
     end
@@ -1369,7 +1371,6 @@ class Member < ActiveRecord::Base
         end
       end
     end
-
 
     def after_marketing_tool_sync
       marketing_tool_sync

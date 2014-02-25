@@ -25,4 +25,14 @@ class Prospect < ActiveRecord::Base
     self.pardot_after_create_sync_to_remote_domain if defined?(Pardot::ProspectModel)
   end
 
+
+  def skip_sync!
+     @skip_sync = true
+  end
+ 
+  private 
+ 
+    def after_marketing_tool_sync
+      marketing_tool_sync unless @skip_sync
+    end
 end

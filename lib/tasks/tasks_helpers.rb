@@ -262,7 +262,7 @@ module TasksHelpers
       group.each_with_index do |member,index|
         begin
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-          member.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
+          memebr.marketing_tool_sync_call
         rescue Exception => e
           Auditory.report_issue("Member::SyncExactTarget", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
