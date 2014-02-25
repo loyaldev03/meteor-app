@@ -99,7 +99,7 @@ module SacExactTarget
           exact_target_last_synced_at: Time.zone.now,
           exact_target_synced_status: 'synced',
           exact_target_last_sync_error: nil,
-          exact_target_last_sync_error_at: nil,
+          exact_target_last_sync_error_at: nil
         }
       end
       data = data.merge(need_exact_target_sync: false)

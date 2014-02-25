@@ -262,9 +262,9 @@ module TasksHelpers
       group.each_with_index do |member,index|
         begin
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-          memebr.marketing_tool_sync_call
+          member.marketing_tool_sync_without_dj
         rescue Exception => e
-          Auditory.report_issue("Member::SyncExactTarget", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
+          Auditory.report_issue("Member::SyncExactTargetWithBatch", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect }) unless e.to_s.include?("Timeout")
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"

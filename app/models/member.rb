@@ -140,7 +140,7 @@ class Member < ActiveRecord::Base
     after_transition [ :provisional, :active ] => 
                         :provisional, :do => 'schedule_first_membership(true, true, true, true)' # save the sale
     after_transition :applied => 
-                        :provisional, :do => ['schedule_first_membership(false)', 'after_marketing_tool_sync']
+                        :provisional, :do => 'schedule_first_membership(false)'
     ###### <<<<<<========
     ###### Reactivation handling =====>>>>
     after_transition :lapsed => 
@@ -1142,13 +1142,12 @@ class Member < ActiveRecord::Base
   end
   handle_asynchronously :desnormalize_preferences, :queue => :generic_queue, priority: 40
 
-  def marketing_tool_sync_call
+  def marketing_tool_sync_without_dj
     self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
   end
 
   def marketing_tool_sync
-    self.reload
-    marketing_tool_sync_call
+    marketing_tool_sync_without_dj
   end
   handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync, priority: 30
 

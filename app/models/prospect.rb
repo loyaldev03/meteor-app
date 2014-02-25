@@ -20,11 +20,15 @@ class Prospect < ActiveRecord::Base
     "(#{self.phone_country_code}) #{self.phone_area_code} - #{self.phone_local_number}"
   end
 
-  def marketing_tool_sync
+  def marketing_tool_sync_without_dj
     self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::ProspectModel)
     self.pardot_after_create_sync_to_remote_domain if defined?(Pardot::ProspectModel)
   end
 
+  def marketing_tool_sync
+    marketing_tool_sync_without_dj
+  end
+  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync
 
   def skip_sync!
      @skip_sync = true
