@@ -153,7 +153,7 @@ namespace :members do
     begin
       TasksHelpers.sync_to_exact_target
     ensure 
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_email_sync_error task"
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:sync_to_exact_target task"
     end 
   end
 end

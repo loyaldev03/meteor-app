@@ -57,7 +57,7 @@ class Member < ActiveRecord::Base
   handle_asynchronously :cancel_member_at_remote_domain, :queue => :drupal_queue, priority: 15
 
   def after_save_sync_to_remote_domain
-    unless s_api_sync || api_member.nil?
+    unless @skip_api_sync || api_member.nil?
       api_member.save!
     end
   rescue Exception => e
