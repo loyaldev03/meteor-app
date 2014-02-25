@@ -8,7 +8,7 @@ namespace :prospects do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-	    base = Prospect.joins(:club).where("exact_target_sync_result IS NULL and clubs.marketing_tool_attributes like 'et_business_unit'")
+	    base = Prospect.joins(:club).where("exact_target_sync_result IS NULL and clubs.marketing_tool_attributes like '%et_business_unit%'")
 	    base.find_in_batches do |group|
 	      tz = Time.zone.now
 	      group.each_with_index do |prospect,index|
