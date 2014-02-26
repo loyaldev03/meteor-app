@@ -186,7 +186,7 @@ module Drupal
               value: { date: (m.next_retry_bill_date.nil? ? '' : m.next_retry_bill_date.to_date.strftime("%m/%d/%Y")) }
             }
           ]          
-        }
+        },
         roles: role_list,
       }
 
