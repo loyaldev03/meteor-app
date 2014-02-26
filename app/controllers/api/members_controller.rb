@@ -89,6 +89,8 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account. This value wll be returned as blank in case the club is not related to drupal.
+  # @response_field [String] api_role Only for drupal. We will send the members's api role id within this field.
+  # @response_field [String] bill_date Only for drupal. Date when the billing will be done. In case bill date is not set (for example for applied member) the date will be send as blank.
   # @response_field [String] status Member's membership status after enrolling. There are two possibles status when the member is enrolled:
   #   <ul>
   #     <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
@@ -522,6 +524,8 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account. This value wll be returned as blank in case the club is not related to drupal.
+  # @response_field [String] api_role Only for drupal. We will send the members's api role id within this field.
+  # @response_field [String] bill_date Only for drupal. Date when the billing will be done. In case bill date is not set (for example for applied member) the date will be send as blank.
   # @response_field [String] status Member's membership status after enrolling. There are two possibles status when the member is enrolled:
   #   <ul>
   #     <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
