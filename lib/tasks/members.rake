@@ -143,4 +143,17 @@ namespace :members do
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_email_sync_error task"
     end 
   end
+
+  desc "Process to sync members updated today to exact target"
+  task :sync_to_exact_target => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/sync_to_exact_target.log")
+    Rails.logger.level = Logger::DEBUG
+    ActiveRecord::Base.logger = Rails.logger
+    tall = Time.zone.now
+    begin
+      TasksHelpers.sync_to_exact_target
+    ensure 
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:sync_to_exact_target task"
+    end 
+  end
 end

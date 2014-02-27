@@ -255,6 +255,23 @@ module TasksHelpers
     Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
+  def self.sync_to_exact_target
+    base = Member.where("need_exact_target_sync = 1")
+    base.find_in_batches do |group|
+      tz = Time.zone.now
+      group.each_with_index do |member,index|
+        begin
+          Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
+          member.marketing_tool_sync_without_dj
+        rescue Exception => e
+          Auditory.report_issue("Member::SyncExactTargetWithBatch", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect }) unless e.to_s.include?("Timeout")
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
+        end
+        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+      end
+    end
+  end
+
   #######################################################
   ################ FULFILLMENT ##########################
   #######################################################

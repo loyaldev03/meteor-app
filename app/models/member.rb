@@ -38,13 +38,12 @@ class Member < ActiveRecord::Base
 
   before_create :record_date
   before_save :wrong_address_logic
+  before_save :set_exact_target_sync_as_needed
 
   after_update :after_save_sync_to_remote_domain
   after_destroy 'cancel_member_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_update :asyn_desnormalize_preferences
-  after_save :after_marketing_tool_sync
-  
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_member_at_remote_domain
@@ -55,7 +54,7 @@ class Member < ActiveRecord::Base
     # Because maybe we have already bill this member.
     Auditory.report_issue("Member:account_cancel:sync", e, { :member => self.inspect })
   end
-  handle_asynchronously :cancel_member_at_remote_domain, :queue => :drupal_queue
+  handle_asynchronously :cancel_member_at_remote_domain, :queue => :drupal_queue, priority: 15
 
   def after_save_sync_to_remote_domain
     unless @skip_api_sync || api_member.nil?
@@ -117,8 +116,8 @@ class Member < ActiveRecord::Base
     end
   end
   # Async indexing
-  handle_asynchronously :solr_index, queue: 'solr_indexing', priority: 50
-  handle_asynchronously :solr_index!, queue: 'solr_indexing', priority: 50
+  handle_asynchronously :solr_index, queue: 'solr_indexing', priority: 10
+  handle_asynchronously :solr_index!, queue: 'solr_indexing', priority: 10
   ########### SEARCH ###############
 
 
@@ -137,7 +136,7 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
-                        :provisional, :do => 'schedule_first_membership(true)'
+                        :provisional, :do => ['schedule_first_membership(true)','after_marketing_tool_sync']
     after_transition [ :provisional, :active ] => 
                         :provisional, :do => 'schedule_first_membership(true, true, true, true)' # save the sale
     after_transition :applied => 
@@ -149,7 +148,7 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### Cancellation =====>>>>
     after_transition [:provisional, :active ] => 
-                        :lapsed, :do => [:cancellation, 'nillify_club_cash']
+                        :lapsed, :do => [:cancellation, 'nillify_club_cash', 'after_marketing_tool_sync']
     after_transition :applied => 
                         :lapsed, :do => [:set_member_as_rejected, :send_rejection_communication]
     ###### <<<<<<========
@@ -200,7 +199,7 @@ class Member < ActiveRecord::Base
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
     Notifier.active_with_approval(emails,self).deliver!
   end
-  handle_asynchronously :send_active_needs_approval_email_dj, :queue => :email_queue
+  handle_asynchronously :send_active_needs_approval_email_dj, :queue => :email_queue, priority: 20
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_recover_needs_approval_email
@@ -211,7 +210,7 @@ class Member < ActiveRecord::Base
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
     Notifier.recover_with_approval(emails,self).deliver!
   end
-  handle_asynchronously :send_recover_needs_approval_email_dj, :queue => :email_queue
+  handle_asynchronously :send_recover_needs_approval_email_dj, :queue => :email_queue, priority: 20
 
   # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
   def increment_reactivations
@@ -823,7 +822,7 @@ class Member < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :nillify_club_cash, :queue => :generic_queue
+  handle_asynchronously :nillify_club_cash, :queue => :generic_queue, priority: 18
 
   # Resets member club cash in case the club cash has expired.
   def reset_club_cash
@@ -833,7 +832,7 @@ class Member < ActiveRecord::Base
       self.save(:validate => false)
     end
   end
-  handle_asynchronously :reset_club_cash, :queue => :generic_queue
+  handle_asynchronously :reset_club_cash, :queue => :generic_queue, priority: 18
 
   def assign_first_club_cash 
     assign_club_cash unless terms_of_membership.skip_first_club_cash
@@ -845,16 +844,15 @@ class Member < ActiveRecord::Base
     self.add_club_cash(nil, amount, message)
     if is_not_drupal?
       if self.club_cash_expire_date.nil? # first club cash assignment
-        self.club_cash_expire_date = join_date + 1.year
+        self.update_attribute :club_cash_expire_date, join_date + 1.year
       end
-      self.save(:validate => false)
     end
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop billing!! 
     Auditory.report_issue("Member:assign_club_cash:sync", e, { :member => self.inspect, :amount => amount, :message => message })
   end
-  handle_asynchronously :assign_club_cash, :queue => :generic_queue, :run_at => Proc.new { 5.minutes.from_now }
+  handle_asynchronously :assign_club_cash, :queue => :generic_queue, :run_at => Proc.new { 5.minutes.from_now }, priority: 5
 
   # Adds club cash transaction. 
   def add_club_cash(agent, amount = 0,description = nil)
@@ -1131,7 +1129,7 @@ class Member < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :desnormalize_additional_data, :queue => :generic_queue
+  handle_asynchronously :desnormalize_additional_data, :queue => :generic_queue, priority: 40
 
   def desnormalize_preferences
     if self.preferences.present?
@@ -1142,12 +1140,16 @@ class Member < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :desnormalize_preferences, :queue => :generic_queue
+  handle_asynchronously :desnormalize_preferences, :queue => :generic_queue, priority: 40
 
-  def marketing_tool_sync
+  def marketing_tool_sync_without_dj
     self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
   end
-  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync
+
+  def marketing_tool_sync
+    marketing_tool_sync_without_dj
+  end
+  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync, priority: 30
 
   # used for member blacklist
   def marketing_tool_sync_unsubscription
@@ -1159,13 +1161,13 @@ class Member < ActiveRecord::Base
     logger.error "* * * * * #{e}"
     Auditory.report_issue("Member::unsubscribe", e, { :member => self.inspect })
   end
-  handle_asynchronously :marketing_tool_sync_unsubscription, :queue => :exact_target_sync
+  handle_asynchronously :marketing_tool_sync_unsubscription, :queue => :exact_target_sync, priority: 30
 
   # used for member unblacklist
   def marketing_tool_sync_subscription
     exact_target_member.subscribe! if defined?(SacExactTarget::MemberModel)
   end
-  handle_asynchronously :marketing_tool_sync_subscription, :queue => :exact_target_sync
+  handle_asynchronously :marketing_tool_sync_subscription, :queue => :exact_target_sync, priority: 30
 
   def get_offset_related
     Time.now.in_time_zone(get_club_timezone).formatted_offset
@@ -1371,5 +1373,9 @@ class Member < ActiveRecord::Base
 
     def after_marketing_tool_sync
       marketing_tool_sync
+    end
+
+    def set_exact_target_sync_as_needed
+      self.need_exact_target_sync = true if defined?(SacExactTarget::MemberModel)
     end
 end
