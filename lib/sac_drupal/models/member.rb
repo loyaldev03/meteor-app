@@ -183,7 +183,7 @@ module Drupal
         field_profile_billing_date:{
           und: [
             {
-              value: { date: (m.next_retry_bill_date.nil? ? '' : m.next_retry_bill_date.to_date.strftime("%m/%d/%Y")) }
+              value: { date: (m.next_retry_bill_date.nil? ? '' : m.next_retry_bill_date.utc.to_date.strftime("%m/%d/%Y")) }
             }
           ]          
         },
