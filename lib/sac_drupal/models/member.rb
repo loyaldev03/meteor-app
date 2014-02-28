@@ -1,6 +1,6 @@
 module Drupal
   class Member < Struct.new(:member)
-    OBSERVED_FIELDS = %w(first_name last_name gender address city email phone_country_code phone_area_code phone_local_number state zip country id type_of_phone_number birth_date type_of_phone_number club_cash_amount).to_set.freeze
+    OBSERVED_FIELDS = %w(first_name last_name gender address city email phone_country_code phone_area_code phone_local_number state zip country id type_of_phone_number birth_date type_of_phone_number club_cash_amount next_retry_bill_date).to_set.freeze
 
     def get
       res = conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }).body unless self.new_record?
@@ -179,6 +179,13 @@ module Drupal
               thoroughfare: m.address
             } 
           ]
+        },
+        field_profile_billing_date:{
+          und: [
+            {
+              value: { date: (m.next_retry_bill_date.nil? ? '' : m.next_retry_bill_date.to_date.strftime("%m/%d/%Y")) }
+            }
+          ]          
         },
         roles: role_list,
       }
