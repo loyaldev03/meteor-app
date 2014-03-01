@@ -78,6 +78,7 @@ module SacExactTarget
       else
         { exact_target_sync_result: 'Success' }
       end
+      data = data.merge(need_exact_target_sync: false)
       ::Prospect.where(uuid: self.prospect.id).limit(1).update_all(data)
       self.prospect.reload rescue self.prospect
     end
