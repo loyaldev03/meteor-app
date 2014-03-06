@@ -116,7 +116,7 @@ class Api::MembersControllerTest < ActionController::TestCase
             assert_difference('MemberPreference.count',@preferences.size) do 
               assert_difference('Member.count') do
                 Delayed::Worker.delay_jobs = true
-                assert_difference('DelayedJob.count',6)do
+                assert_difference('DelayedJob.count',4)do
                   generate_post_message
                   assert_response :success
                 end
@@ -152,7 +152,7 @@ class Api::MembersControllerTest < ActionController::TestCase
           assert_difference('MemberPreference.count',@preferences.size) do 
             assert_difference('Member.count') do
               Delayed::Worker.delay_jobs = true
-              assert_difference('DelayedJob.count',5) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
+              assert_difference('DelayedJob.count',3) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
                 generate_post_message
                 assert_response :success
               end
@@ -191,7 +191,9 @@ class Api::MembersControllerTest < ActionController::TestCase
         end
       end
     end
+    @member_created = Member.find_by_email @member.email
     assert @response.body.include? '"api_role":["91284557"]'
+    assert @response.body.include? '"bill_date":"'+@member_created.next_retry_bill_date.strftime("%m/%d/%Y")+'"'
   end
 
   test "Member should not be enrolled if the email is already is used." do
