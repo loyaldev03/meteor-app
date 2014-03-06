@@ -165,7 +165,7 @@ namespace :members do
     tall = Time.zone.now
 
     club_id = 1 #WE HAVE TO SET THIS VAlUE.
-    members = Members.where("status != 'lapsed' and sync_status = 'synced' and club_id = ?",club_id)
+    members = Member.where("status != 'lapsed' and sync_status = 'synced' and club_id = ?",club_id)
 
     members.find_in_batches(:batch_size=>20) do |group|
       tall = Time.zone.now
