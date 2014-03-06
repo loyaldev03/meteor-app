@@ -156,4 +156,33 @@ namespace :members do
       Rails.logger.info "It all took #{Time.zone.now - tall} to run members:sync_to_exact_target task"
     end 
   end
+
+  desc "Sync all members available"
+  task :sync_all_to_drupal => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/sync_all.log")
+    Rails.logger.level = Logger::DEBUG
+    ActiveRecord::Base.logger = Rails.logger
+    tall = Time.zone.now
+
+    club_id = 1 #WE HAVE TO SET THIS VAlUE.
+    members = Members.where("status != 'lapsed' and sync_status = 'synced' and club_id = ?",club_id)
+
+    members.find_in_batches(:batch_size=>20) do |group|
+      tall = Time.zone.now
+      group.each do |member|
+        api_m = member.api_member
+        if api_m.save!(force: true)
+          if member.last_sync_error_at
+            Logger.info "Member #{memeber.id} was not successfully synced: Error: #{member.last_sync_error_at}."
+          else
+            Logger.info "Member #{memeber.id} successfully synced."
+          end
+        end
+      end
+      while Time.zone.now-tall < 60 do 
+        sleep(1)
+      end
+    end
+    Rails.logger.info "Finished running members:sync_all_to_drupal task"
+  end
 end
