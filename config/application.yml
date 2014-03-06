@@ -51,6 +51,7 @@ defaults: &defaults
     no_reccurent_billing_donation: 122
     no_recurrent_billing_donation_with_error: 123
     credit_error_gateway_differs_from_current: 124
+    chargeback_rebutted: 125
     #profile
     cancel: 200 
     future_cancel: 201

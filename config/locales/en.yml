@@ -191,6 +191,7 @@ en:
           type_117: 'Membership: Soft Decline Limit Reach (No Strategy)' # membership_billing_without_decline_strategy_limit
           type_118: 'Billing: Manual Cash Transaction' # membership_manual_cash_billing
           type_119: 'Billing: Manual Check Transaction' # membership_manual_check_billing
+          type_125: 'Billing: Member Rebuttal Chargeback' # chargeback
           type_203: 'Membership: Recovery' # recovery
           type_206: 'Membership: Requires Approval' # enrollment_needs_approval
         amount_available_to_refund: Max

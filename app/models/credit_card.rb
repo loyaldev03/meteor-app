@@ -47,7 +47,7 @@ class CreditCard < ActiveRecord::Base
 
   # Bug #27501 this method was added just to be used from console.
   def unblacklist
-    update_attribute :blackslites, false
+    update_attribute :blacklisted, false
   end
 
   def blacklist

@@ -66,6 +66,11 @@ class TermsOfMembershipsController < ApplicationController
     @payment_gateway_configuration = @tom.club.payment_gateway_configuration
   end
 
+  def resumed_information
+    @tom = TermsOfMembership.find(params[:terms_of_membership_id])
+    render :partial => "resumed_information", :locals => { :tom => @tom }
+  end
+
   private
     def prepare_tom_data_to_save(post_data)
       @tom.club_id = @current_club.id
