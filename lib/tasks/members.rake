@@ -170,13 +170,17 @@ namespace :members do
     members.find_in_batches(:batch_size=>20) do |group|
       tall = Time.zone.now
       group.each do |member|
-        api_m = member.api_member
-        if api_m.save!(force: true)
-          if member.last_sync_error_at
-            Logger.info "Member #{member.id} was not successfully synced: Error: #{member.last_sync_error}."
-          else
-            Logger.info "Member #{member.id} successfully synced."
+        begin
+          api_m = member.api_member
+          if api_m.save!(force: true)
+            if member.last_sync_error_at
+              Logger.info "Member #{member.id} was not successfully synced: Error: #{member.last_sync_error}."
+            else
+              Logger.info "Member #{member.id} successfully synced."
+            end
           end
+        rescue Exception => e
+          Logger.info "Member #{member.id} could not get synced due to error: Error: #{e.to_s}"
         end
       end
       time_to_sleep = Time.zone.now-tall
