@@ -173,7 +173,7 @@ namespace :members do
         api_m = member.api_member
         if api_m.save!(force: true)
           if member.last_sync_error_at
-            Logger.info "Member #{member.id} was not successfully synced: Error: #{member.last_sync_error_at}."
+            Logger.info "Member #{member.id} was not successfully synced: Error: #{member.last_sync_error}."
           else
             Logger.info "Member #{member.id} successfully synced."
           end
