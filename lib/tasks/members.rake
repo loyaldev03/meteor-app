@@ -179,9 +179,7 @@ namespace :members do
           end
         end
       end
-      while Time.zone.now-tall < 60 do 
-        sleep(1)
-      end
+    sleep(Time.zone.now-tall) if Time.zone.now-tall > 0
     end
     Rails.logger.info "Finished running members:sync_all_to_drupal task"
   end
