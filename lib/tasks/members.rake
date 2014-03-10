@@ -172,13 +172,13 @@ namespace :members do
       group.each do |member|
         api_m = member.api_member
         begin
-        if api_m.save!(force: true)
-          if member.last_sync_error_at
-            Rails.logger.info "Member #{member.id} was not successfully synced: Error: #{member.last_sync_error_at}."
-          else
-            Rails.logger.info "Member #{member.id} successfully synced."
+          if api_m.save!(force: true)
+            if member.last_sync_error_at
+              Rails.logger.info "Member #{member.id} was not successfully synced: Error: #{member.last_sync_error_at}."
+            else
+              Rails.logger.info "Member #{member.id} successfully synced."
+            end
           end
-        end
         rescue
           Rails.logger.info "Member #{member.id} not synced because of Timeout"
         end
