@@ -282,7 +282,8 @@ namespace :fulfillments do
       # HOF Complimentary Account = 53
       if [47, 49, 53].include? tom_id.to_i
         'Professional'
-      elsif [48, 50, 51, 52].include? tom_id.to_i
+      elsif condition
+          [48, 50, 51, 52].include? tom_id.to_i
         'Associate'
       else
         ''
@@ -305,31 +306,222 @@ namespace :fulfillments do
   desc "Create magazine fulfillment file for Hot Rod" 
   task :generate_magazine_hot_rod => :environment do
     require 'net/ftp'
-    Rails.logger = Logger.new("#{Rails.root}/log/hot_rod_magazine.log")
+    Rails.logger = Logger.new("#{Rails.root}/log/hot_rod_magazine_report.log")
     Rails.logger.level = Logger::DEBUG
     ActiveRecord::Base.logger = Rails.logger
 
+    fulfillment_file = FulfillmentFile.new 
+    fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
 
-    #FILE GENERATION HERE...
+    if Rails.env=='prototype'
+      fulfillment_file.club = Club.find 2
+    elsif Rails.env=='production'
+      fulfillment_file.club = Club.find 6
+    elsif Rails.env=='staging'
+      fulfillment_file.club = Club.find 19
+    end
 
+    Time.zone = fulfillment_file.club.time_zone
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
+    tall = Time.zone.now
+    fulfillment_file.initial_date = Time.zone.now-7.days
+    fulfillment_file.end_date = Time.zone.now
+    fulfillment_file.product = "SLOOPS"
+    fulfillment_file.save!
+    file_info = ""
+    file_info << process_fulfillments_enroll_and_reinstatement(fulfillment_file).to_s
+    file_info << process_fulfillments_cancel_fulfillments(fulfillment_file).to_s
+    file_info << process_fulfillments_changed_address_fulfillments(fulfillment_file).to_s
+    file_info << process_fulfillments_renwed(fulfillment_file).to_s
+    
+    temp_file = Tempfile.new("#{I18n.l(Time.zone.now, :format => :only_date)}_magazine_hot_rod.txt")
+    temp_file.write(file_info)
+    temp_file.close
+    
+    puts file_info
+    # begin
+    #   ftp = Net::FTP.new('ftp.stoneacreinc.com')
+    #   ftp.login(user = "phoenix", passwd = "ph03n1xFTPu$3r")
+    #   folder = fulfillment_file.club.name
+    #   begin
+    #     ftp.mkdir(folder)
+    #     ftp.chdir(folder)
+    #   rescue Net::FTPPermError
+    #     ftp.chdir(folder)
+    #   end
+    #   ftp.putbinaryfile(temp_file, File.basename(temp_file))
+    #   fulfillment_file.mark_fulfillments_as_in_process
+    #   fulfillment_file.processed
+    # rescue Exception => e
+    #   Auditory.report_issue('NaammaSloopReport:create', e, { :fulfillment_file => fulfillment_file.inspect })
+    # ensure
+    #   ftp.quit()
+    # end
+    # temp_file.unlink
+    Rails.logger.info "It all took #{Time.zone.now - tall} to run task"
+  end
 
-    begin
-      ftp = Net::FTP.new('ftp.stoneacreinc.com')
-      ftp.login(user = "phoenix", passwd = "ph03n1xFTPu$3r")
-      folder = fulfillment_file.club.name
-      begin
-        ftp.mkdir(folder)
-        ftp.chdir(folder)
-      rescue Net::FTPPermError
-        ftp.chdir(folder)
+  def process_fulfillments(fulfillments, fulfillment_file ,record_type = nil)
+    fulfillment_lines = ""
+    fulfillments.each do |fulfillment|
+      tz = Time.zone.now
+      Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
+      temp_file = Tempfile.new("member_#{fulfillment.member_id}_fulfillment_#{fulfillment.id}.txt")
+      unless record_type 
+        record_type = fulfillment.member.memberships.count==1 ? "1" : "5"
       end
-      ftp.putbinaryfile(temp_file, File.basename(temp_file))
-      fulfillment_file.mark_fulfillments_as_in_process
-      fulfillment_file.processed
-    rescue Exception => e
-      Auditory.report_issue('NaammaSloopReport:create', e, { :fulfillment_file => fulfillment_file.inspect })
-    ensure
-      ftp.quit()
+      fulfillment_lines << generate_string(fulfillment, record_type)
+      Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
+    end
+    fulfillment_lines
+  end
+
+  def self.process_fulfillments_enroll_and_reinstatement(fulfillment_file)
+    fulfillments = Fulfillment.includes(:member=>:memberships, :member=>:transactions).where(
+    ["members.club_id = ? and fulfillments.status = 'not_processed' and transactions.operation_type = 101 
+      and transactions.membership_id = members.current_membership_id and transactions.created_at between ? and ?
+      and fulfillments.renewed = 0",
+      fulfillment_file.club_id, 
+      fulfillment_file.initial_date, 
+      fulfillment_file.end_date
+    ])
+    process_fulfillments(fulfillments, fulfillment_file)
+  end
+
+  def self.process_fulfillments_cancel_fulfillments(fulfillment_file)
+    fulfillments = Fulfillment.includes(:member=>:memberships).where(
+    ["members.club_id = ? and memberships.status = 'lapsed' and fulfillments.status = 'sent' and 
+      memberships.cancel_date BETWEEN ? and ?",
+      fulfillment_file.club_id, 
+      fulfillment_file.initial_date, 
+      fulfillment_file.end_date
+    ])
+    process_fulfillments(fulfillments, fulfillment_file, "3")
+  end
+
+  def self.process_fulfillments_changed_address_fulfillments(fulfillment_file)
+    fulfillments = Fulfillment.includes(:member => :operations).includes(:member=>:memberships).where([
+      "members.club_id = ? and operations.operation_type = 223 and fulfillments.status = 'sent' 
+       and memberships.status != 'lapsed' and operations.created_at BETWEEN ? and ?",
+      fulfillment_file.club_id, 
+      fulfillment_file.initial_date, 
+      fulfillment_file.end_date
+    ])
+    process_fulfillments(fulfillments, fulfillment_file, "4")
+  end
+
+  def self.process_fulfillments_renwed(fulfillment_file)
+    fulfillments = Fulfillment.includes(:member=>:transactions).where(["members.club_id = ? and renewed = 1 and 
+      transactions.operation_type = 101 and transactions.membership_id = members.current_membership_id and
+      renewable_at between ? and ?",
+      fulfillment_file.club_id,
+      fulfillment_file.initial_date, 
+      fulfillment_file.end_date      
+    ])
+    process_fulfillments(fulfillments, fulfillment_file, "2")
+  end
+
+  def generate_string(fulfillment, record_type)
+    line = ""
+    @member = fulfillment.member
+    @membership = @member.current_membership
+    line << record_type # RECORD TYPE
+    line << (record_type=="4" ? "2" : "1") # RECORD CODE
+    line << "".rjust(4, ' ') # AGENT ID NUMBER 
+    line << "".rjust(13, ' ') # FILLER
+    line << "00670".rjust(5, '0') # UNIVERSAL MAGAZINE CODE
+    line << ((@membership.terms_of_membership.installment_period/30.416667).round.to_s).rjust(3, '0') # TERM
+    line << "1".rjust(5,'0') # COPY SUB (BULK)
+    line << "".rjust(7,'0') # GROSS AMOUNT
+    line << "".rjust(7,'0') # NET/REMIT AMOUNT
+    line << "1" # ABC CODE
+    line << "".rjust(1, ' ') # RENEWAL PROMOTION CODE  - NO LONGER USED
+    line << "".rjust(1, ' ') # FILLER
+    line << "".rjust(1, ' ') # PREMIUM NUMBER 1
+    line << "".rjust(1, ' ') # PREMIUM NUMBER 2
+    line << "".rjust(11, ' ') # Trans ID
+    line << "".rjust(7, ' ') # FILLER
+    line << Time.zone.now.to_date.strftime("%Y%m%d") # CLEARING DATE
+    line << get_reinstate_or_cancel_date(record_type).to_date.strftime("%Y%m%d").rjust(8, '0') # REINSTATE / CANCEL DATE
+    line << "".rjust(3, ' ') # ISSUES TO GO
+    line << record_type=="3" ? check_for_refund_upon_cancel : " " # PAID / UNPAID
+    line << "".rjust(3, ' ') # ISSUES PAID
+    line << "".rjust(7, ' ') # ISSUES PAID DOLLARS
+    line << @member.full_name.truncate(27, omission:"").ljust(27,' ') # NAME
+    line << "".rjust(3, ' ') # FILLER
+    line << @member.full_address.truncate(27, omission:"").ljust(27,' ') # ADDRESS
+    line << "".rjust(3, ' ') # FILLER
+    line << "".rjust(27, ' ') # SUPPLEMENT (IF NECESSARY)
+    line << "".rjust(3, ' ') # FILLER
+    line << "".ljust(30, ' ') # COMPANY NAME
+    line << @member.city.ljust(15, ' ') # CITY
+    line << @member.state.ljust(2, ' ') # STATE
+    line << @member.country.ljust(3, ' ') # COUNTRY CODE
+    line << @member.zip.ljust(9, ' ') # ZIP / CANADA
+    line << "".rjust(15, ' ') # FOREIGN REGION
+    line << "".rjust(1, ' ') # ID NUMBER 1 INDICATOR
+    line << "".rjust(15, ' ') # ID NUMBER 1
+    line << "".rjust(1, ' ') # ID NUMBER 2 INDICATOR
+    line << "".rjust(15, ' ') # ID NUMBER 2
+    line << "".rjust(1, ' ') # ID NUMBER 3 INDICATOR
+    line << "".rjust(15, ' ') # ID NUMBER 3
+    line << "".rjust(1, ' ') # ID NUMBER 4 INDICATOR
+    line << "".rjust(15, ' ') # ID NUMBER 4
+    line << "".rjust(1, ' ') # ID NUMBER 5 INDICATOR
+    line << "".rjust(15, ' ') # ID NUMBER 5
+    line << "".rjust(9, ' ') # FILLER
+    line << "".rjust(1, ' ') # SPECIAL ID
+    line << "".rjust(24, ' ') # FILLER
+    line << "".rjust(3, ' ') # VERIFIED LOCATION
+    line << "".rjust(1, ' ') # CASH / PAID DURING SRVC
+    line << "".rjust(18, ' ') # FILLER
+    line << "".rjust(4, ' ') # PREFERRED START
+    line << "".rjust(44, ' ') # FILLER / FUTURE USE
+    line << "".rjust(1, ' ') # FILLER
+    line << "".rjust(75, ' ') # FILLER
+    line << "".rjust(1, ' ') # NO LONGER ACTIVE
+    line << (@member.type_of_phone_number=="home" ? @member.full_phone_number : "").rjust(15, '0') # HOME PHONE NUMBER
+    line << "".rjust(15, '0') # HOME FAX NUMBER
+    line << (@member.type_of_phone_number!="home" ? @member.full_phone_number : "").rjust(15, '0') # BUSINESS PHONE NUMBER
+    line << "".rjust(15, '0') # BUSINESS FAX NUMBER
+    line << "".rjust(20, '0') # FILLER
+    line << "".rjust(1, '0')  # RENEWAL TEST CODE - NO LONGER USED
+    line << "X".rjust(1, '0')  # HOME PHONE OPTOUT
+    line << "X".rjust(1, '0')  # 3RD PARTY OPTOUT
+    line << "X".rjust(1, '0')  # OFFICE OPTOUT
+    line << "X".rjust(1, '0')  # 3RD PARTY OFF. OPTOUT
+    line << "X".rjust(1, '0')  # HOME FAX OPTOUT
+    line << "X".rjust(1, '0')  # 3RD HOME FAX OPTOUT
+    line << "X".rjust(1, '0')  # OFFICE FAX OPTOUT
+    line << "X".rjust(1, '0')  # 3RD OFFICE FAX OPTOUT
+    line << "X".rjust(1, '0')  # EMAIL SUBSCRIPTION OPTOUT
+    line << "X".rjust(1, '0')  # EMAIL PUBLISHER OPTOUT
+    line << "X".rjust(1, '0')  # EMAIL 3RD PARTY OPTOUT
+    line << "X".rjust(1, '0')  # Recip EMAIL SUBSCRIPTION OPTOUT
+    line << "X".rjust(1, '0')  # Recip EMAIL PUBLISHER OPTOUT
+    line << "X".rjust(1, '0')  # Recip EMAIL 3RD PARTY OPTOUT
+    line << "P".rjust(1, '0')  # MARKETING 20
+    line << "\n".rjust(1, '0')
+    line
+  end
+
+  def get_reinstate_or_cancel_date(record_type)
+    if record_type == "3"
+      @member.cancel_date
+    else
+      @member.transactions.where("membership_id = ? and operation_type = ?", 
+                                @member.current_membership_id, Settings.operation_types.membership_billing).
+                                order("created_at DESC").first.created_at
+    end
+  end
+
+  def check_for_refund_upon_cancel
+    operations_refund = @member.operations.where("operation_type = ? and created_at between ? and ?", 
+                          @member.id, Settings.operation_types.credit, @member.cancel_date-1.day, @member.cancel_date+1.day )
+    if operations_refund.empty?
+      "P"
+    else
+      "U"
     end
   end
 end
