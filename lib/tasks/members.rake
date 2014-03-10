@@ -164,23 +164,23 @@ namespace :members do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
 
-    club_id = 1 #WE HAVE TO SET THIS VAlUE.
+    #club_id = 1 #WE HAVE TO SET THIS VAlUE.
     members = Member.where("status != 'lapsed' and sync_status = 'synced' and club_id = ?",club_id)
 
-    members.find_in_batches(:batch_size=>20) do |group|
+    members.find_in_batches(:batch_size=>40) do |group|
       tall = Time.zone.now
       group.each do |member|
+        api_m = member.api_member
         begin
-          api_m = member.api_member
           if api_m.save!(force: true)
             if member.last_sync_error_at
-              Logger.info "Member #{member.id} was not successfully synced: Error: #{member.last_sync_error}."
+              Rails.logger.info "Member #{member.id} was not successfully synced: Error: #{member.last_sync_error_at}."
             else
-              Logger.info "Member #{member.id} successfully synced."
+              Rails.logger.info "Member #{member.id} successfully synced."
             end
           end
-        rescue Exception => e
-          Logger.info "Member #{member.id} could not get synced due to error: Error: #{e.to_s}"
+        rescue
+          Rails.logger.info "Member #{member.id} not synced because of Timeout"
         end
       end
       time_to_sleep = Time.zone.now-tall
@@ -188,4 +188,5 @@ namespace :members do
     end
     Rails.logger.info "Finished running members:sync_all_to_drupal task"
   end
+
 end
