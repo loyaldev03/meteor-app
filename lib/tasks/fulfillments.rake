@@ -301,35 +301,4 @@ namespace :fulfillments do
       return ""
     end
   end
-
-  desc "Create magazine fulfillment file for Hot Rod" 
-  task :generate_magazine_hot_rod => :environment do
-    require 'net/ftp'
-    Rails.logger = Logger.new("#{Rails.root}/log/hot_rod_magazine.log")
-    Rails.logger.level = Logger::DEBUG
-    ActiveRecord::Base.logger = Rails.logger
-
-
-    #FILE GENERATION HERE...
-
-
-    begin
-      ftp = Net::FTP.new('ftp.stoneacreinc.com')
-      ftp.login(user = "phoenix", passwd = "ph03n1xFTPu$3r")
-      folder = fulfillment_file.club.name
-      begin
-        ftp.mkdir(folder)
-        ftp.chdir(folder)
-      rescue Net::FTPPermError
-        ftp.chdir(folder)
-      end
-      ftp.putbinaryfile(temp_file, File.basename(temp_file))
-      fulfillment_file.mark_fulfillments_as_in_process
-      fulfillment_file.processed
-    rescue Exception => e
-      Auditory.report_issue('NaammaSloopReport:create', e, { :fulfillment_file => fulfillment_file.inspect })
-    ensure
-      ftp.quit()
-    end
-  end
 end
