@@ -305,7 +305,7 @@ namespace :fulfillments do
   desc "Create magazine fulfillment file for Hot Rod" 
   task :send_print_magazine_hot_rod_file => :environment do
     require 'net/ftp'
-    Rails.logger = Logger.new("#{Rails.root}/log/hot_rod_magazine_report.log")
+    Rails.logger = Logger.new("#{Rails.root}/log/send_print_magazine_hot_rod_file.log")
     Rails.logger.level = Logger::DEBUG
     ActiveRecord::Base.logger = Rails.logger
 
@@ -313,7 +313,7 @@ namespace :fulfillments do
     fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
 
     if Rails.env=='prototype'
-      fulfillment_file.club = Club.find 2
+      fulfillment_file.club = Club.find 48
     elsif Rails.env=='production'
       fulfillment_file.club = Club.find 6
     elsif Rails.env=='staging'
@@ -363,7 +363,7 @@ namespace :fulfillments do
       fulfillment_file.end_date]).group("members.id")
     members.each do |member| 
       fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent' and created_at > ?", fulfillment_file.product, member.join_date).last
-      if fulfillment and fulfillment.sent?
+      if fulfillment
         file_info << process_fulfillment(fulfillment, fulfillment_file, "3")
       end
     end
