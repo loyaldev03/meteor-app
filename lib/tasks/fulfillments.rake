@@ -326,14 +326,65 @@ namespace :fulfillments do
     tall = Time.zone.now
     fulfillment_file.initial_date = Time.zone.now-7.days
     fulfillment_file.end_date = Time.zone.now
-    fulfillment_file.product = "SLOOPS"
+    fulfillment_file.product = "PRINTMAGAZINE"
     fulfillment_file.save!
     file_info = ""
-    file_info << process_fulfillments_enroll_and_reinstatement(fulfillment_file).to_s
-    file_info << process_fulfillments_cancel_fulfillments(fulfillment_file).to_s
-    file_info << process_fulfillments_changed_address_fulfillments(fulfillment_file).to_s
-    file_info << process_fulfillments_renwed(fulfillment_file).to_s
-    
+
+    # NEW JOIN and REINSTATEMENT
+    members = Member.joins(:transactions, :fulfillments).where(["club_id = ? AND fulfillments.status = 'not_processed' 
+      AND transactions.operation_type = 101 AND transactions.membership_id = members.current_membership_id AND 
+      transactions.created_at BETWEEN ? AND ?", fulfillment_file.club_id, fulfillment_file.initial_date, 
+      fulfillment_file.end_date]).group("members.id")
+
+    members.each do |member| 
+      fulfillment = member.fulfillments.where("product_sku = ? and status = 'not_processed'", fulfillment_file.product).last
+      if fulfillment
+        if member.transactions.where(["operation_type = ? and membership_id = ?", Settings.operation_types.membership_billing, member.current_membership_id]).count == 1
+          if member.operations.where(["operation_type = ?", Settings.operation_types.recovery]).empty?
+            file_info << process_fulfillment(fulfillment, fulfillment_file, "1")
+          else
+            file_info << process_fulfillment(fulfillment, fulfillment_file, "5")
+          end
+        end
+      end
+    end
+    # RENEWAL
+    fulfillments = Fulfillment.joins(:member).where(["members.club_id = ? AND renewed = 1 AND fulfillments.renewable_at BETWEEN ? and ?",
+     fulfillment_file.club_id, fulfillment_file.initial_date, fulfillment_file.end_date])
+    fulfillments.each do |fulfillment|
+      if fulfillment.member.recycled_times == 0
+        file_info << process_fulfillment(fulfillment, fulfillment_file, "2")
+      else
+        fulfillment.update_attribute :renewable_at, fulfillment.member.next_retry_bill_date+1.day
+      end
+    end
+    # CANCEL
+    members = Member.joins(:current_membership, :transactions).where(["members.club_id = ? AND memberships.status = 'lapsed' AND 
+      cancel_date BETWEEN ? and ?", fulfillment_file.club_id, fulfillment_file.initial_date, 
+      fulfillment_file.end_date]).group("members.id")
+    members.each do |member| 
+      fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent' and created_at > ?", fulfillment_file.product, member.join_date).last
+      if fulfillment and fulfillment.sent?
+        file_info << process_fulfillment(fulfillment, fulfillment_file, "3")
+      end
+    end
+    # CHANGED ADDRESS 
+    members = Member.joins(:operations).where(["members.club_id = ? AND operations.operation_type = ? AND 
+      operations.created_at BETWEEN ? and ?", fulfillment_file.club_id, Settings.operation_types.profile_updated,
+      fulfillment_file.initial_date, fulfillment_file.end_date]).group("members.id")
+    members.each do |member|
+      fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent'", fulfillment_file.product).last
+      if fulfillment
+        profile_edit_operations = member.operations.where(["operation_type = ? AND notes is not null AND 
+          created_at BETWEEN ? and ?", Settings.operation_types.profile_updated, fulfillment_file.initial_date, 
+          fulfillment_file.end_date])
+        if check_address_changed(profile_edit_operations)
+          file_info << process_fulfillment(fulfillment, fulfillment_file, "4")
+        end
+      end
+    end
+
+    fulfillment_file.save
     temp_file = Tempfile.new("#{I18n.l(Time.zone.now, :format => :only_date)}_magazine_hot_rod.txt")
     temp_file.write(file_info)
     temp_file.close
@@ -361,67 +412,9 @@ namespace :fulfillments do
     Rails.logger.info "It all took #{Time.zone.now - tall} to run task"
   end
 
-  def process_fulfillments(fulfillments, fulfillment_file ,record_type = nil)
-    fulfillment_lines = ""
-    fulfillments.each do |fulfillment|
-      tz = Time.zone.now
-      Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
-      temp_file = Tempfile.new("member_#{fulfillment.member_id}_fulfillment_#{fulfillment.id}.txt")
-      unless record_type 
-        record_type = fulfillment.member.memberships.count==1 ? "1" : "5"
-      end
-      fulfillment_lines << generate_string(fulfillment, record_type)
-      Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
-    end
-    fulfillment_lines
-  end
-
-  def self.process_fulfillments_enroll_and_reinstatement(fulfillment_file)
-    fulfillments = Fulfillment.includes(:member=>:memberships, :member=>:transactions).where(
-    ["members.club_id = ? and fulfillments.status = 'not_processed' and transactions.operation_type = 101 
-      and transactions.membership_id = members.current_membership_id and transactions.created_at between ? and ?
-      and fulfillments.renewed = 0",
-      fulfillment_file.club_id, 
-      fulfillment_file.initial_date, 
-      fulfillment_file.end_date
-    ])
-    process_fulfillments(fulfillments, fulfillment_file)
-  end
-
-  def self.process_fulfillments_cancel_fulfillments(fulfillment_file)
-    fulfillments = Fulfillment.includes(:member=>:memberships).where(
-    ["members.club_id = ? and memberships.status = 'lapsed' and fulfillments.status = 'sent' and 
-      memberships.cancel_date BETWEEN ? and ?",
-      fulfillment_file.club_id, 
-      fulfillment_file.initial_date, 
-      fulfillment_file.end_date
-    ])
-    process_fulfillments(fulfillments, fulfillment_file, "3")
-  end
-
-  def self.process_fulfillments_changed_address_fulfillments(fulfillment_file)
-    fulfillments = Fulfillment.includes(:member => :operations).includes(:member=>:memberships).where([
-      "members.club_id = ? and operations.operation_type = 223 and fulfillments.status = 'sent' 
-       and memberships.status != 'lapsed' and operations.created_at BETWEEN ? and ?",
-      fulfillment_file.club_id, 
-      fulfillment_file.initial_date, 
-      fulfillment_file.end_date
-    ])
-    process_fulfillments(fulfillments, fulfillment_file, "4")
-  end
-
-  def self.process_fulfillments_renwed(fulfillment_file)
-    fulfillments = Fulfillment.includes(:member=>:transactions).where(["members.club_id = ? and renewed = 1 and 
-      transactions.operation_type = 101 and transactions.membership_id = members.current_membership_id and
-      renewable_at between ? and ?",
-      fulfillment_file.club_id,
-      fulfillment_file.initial_date, 
-      fulfillment_file.end_date      
-    ])
-    process_fulfillments(fulfillments, fulfillment_file, "2")
-  end
-
-  def generate_string(fulfillment, record_type)
+  def process_fulfillment(fulfillment, fulfillment_file, record_type)
+    tz = Time.zone.now
+    Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
     line = ""
     @member = fulfillment.member
     @membership = @member.current_membership
@@ -502,7 +495,21 @@ namespace :fulfillments do
     line << "X".rjust(1, '0')  # Recip EMAIL 3RD PARTY OPTOUT
     line << "P".rjust(1, '0')  # MARKETING 20
     line << "\n".rjust(1, '0')
+    fulfillment_file.fulfillments << fulfillment
+    Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
     line
+  end
+
+  def check_address_changed(profile_edit_operations)
+    changed = false
+    profile_edit_operations.each do |operation|
+      unless changed
+        ["address", "state,", "city", "zip", "country"].each do |word|
+          return true  if operation.notes.include? word
+        end
+      end
+    end
+    changed
   end
 
   def get_reinstate_or_cancel_date(record_type)
