@@ -453,6 +453,7 @@ en:
         package: Package
         package_help: 'This value is part of the Packageid on the fulfillment file. e.g: set as package NCARFLAG and platform will add the member id. The packageid obtained will be NCARFLAG20243911111'
         sku_help: 'Members get fulfills according to the list of SKUs stored while enrollment.'
+        is_visible_help: 'This option makes a product invisible in the fulfillment file manager.'
       delayed_job:
         id: 'ID'
         attempts: 'Attempts'
