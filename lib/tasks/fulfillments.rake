@@ -319,7 +319,6 @@ namespace :fulfillments do
     elsif Rails.env=='staging'
       fulfillment_file.club = Club.find 19
     end
-      fulfillment_file.club = Club.find 7
 
     Time.zone = fulfillment_file.club.time_zone
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
