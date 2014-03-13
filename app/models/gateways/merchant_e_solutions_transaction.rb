@@ -50,7 +50,7 @@ class MerchantESolutionsTransaction < Transaction
       self.membership_id = sale_transaction.membership_id
       self.operation_type = chargeback_operation_type
       self.save
-      Auditory.audit(nil, self, operation_description, sale_transaction.member, Settings.operation_types.chargeback)
+      Auditory.audit(nil, self, operation_description, sale_transaction.member, chargeback_operation_type)
     end
   end
 
