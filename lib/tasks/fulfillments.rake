@@ -282,8 +282,7 @@ namespace :fulfillments do
       # HOF Complimentary Account = 53
       if [47, 49, 53].include? tom_id.to_i
         'Professional'
-      elsif condition
-          [48, 50, 51, 52].include? tom_id.to_i
+      elsif [48, 50, 51, 52].include? tom_id.to_i
         'Associate'
       else
         ''
@@ -339,12 +338,10 @@ namespace :fulfillments do
     members.each do |member| 
       fulfillment = member.fulfillments.where("product_sku = ? and status = 'not_processed'", fulfillment_file.product).last
       if fulfillment
-        if member.transactions.where(["operation_type = ? and membership_id = ?", Settings.operation_types.membership_billing, member.current_membership_id]).count == 1
-          if member.operations.where(["operation_type = ?", Settings.operation_types.recovery]).empty?
-            file_info << process_fulfillment(fulfillment, fulfillment_file, "1")
-          else
-            file_info << process_fulfillment(fulfillment, fulfillment_file, "5")
-          end
+        if member.operations.where(["operation_type = ?", Settings.operation_types.recovery]).empty?
+          file_info << process_fulfillment(fulfillment, fulfillment_file, "1")
+        else
+          file_info << process_fulfillment(fulfillment, fulfillment_file, "5")
         end
       end
     end
@@ -359,7 +356,7 @@ namespace :fulfillments do
       end
     end
     # CANCEL
-    members = Member.joins(:current_membership, :transactions).where(["members.club_id = ? AND memberships.status = 'lapsed' AND 
+    members = Member.joins(:transactions).where(["members.club_id = ? AND members.status = 'lapsed' AND 
       cancel_date BETWEEN ? and ?", fulfillment_file.club_id, fulfillment_file.initial_date, 
       fulfillment_file.end_date]).group("members.id")
     members.each do |member| 
