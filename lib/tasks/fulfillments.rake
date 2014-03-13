@@ -303,7 +303,7 @@ namespace :fulfillments do
   end
 
   desc "Create magazine fulfillment file for Hot Rod" 
-  task :generate_magazine_hot_rod => :environment do
+  task :send_print_magazine_hot_rod_file => :environment do
     require 'net/ftp'
     Rails.logger = Logger.new("#{Rails.root}/log/hot_rod_magazine_report.log")
     Rails.logger.level = Logger::DEBUG
@@ -319,6 +319,7 @@ namespace :fulfillments do
     elsif Rails.env=='staging'
       fulfillment_file.club = Club.find 19
     end
+      fulfillment_file.club = Club.find 7
 
     Time.zone = fulfillment_file.club.time_zone
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
@@ -346,17 +347,19 @@ namespace :fulfillments do
       end
     end
     # RENEWAL
-    fulfillments = Fulfillment.joins(:member).where(["members.club_id = ? AND renewed = 1 AND fulfillments.renewable_at BETWEEN ? and ?",
+    fulfillments = Fulfillment.joins(:member).where(["members.club_id = ? AND fulfillments.renewable_at BETWEEN ? and ?",
      fulfillment_file.club_id, fulfillment_file.initial_date, fulfillment_file.end_date])
     fulfillments.each do |fulfillment|
-      if fulfillment.member.recycled_times == 0
-        file_info << process_fulfillment(fulfillment, fulfillment_file, "2")
-      else
-        fulfillment.update_attribute :renewable_at, fulfillment.member.next_retry_bill_date+1.day
+      if fulfillment.sent?
+        if fulfillment.renewed
+          file_info << process_fulfillment(fulfillment, fulfillment_file, "2")
+        else
+          fulfillment.update_attribute :renewable_at, fulfillment.member.next_retry_bill_date+1.day
+        end
       end
     end
     # CANCEL
-    members = Member.joins(:transactions).where(["members.club_id = ? AND members.status = 'lapsed' AND 
+    members = Member.joins(:current_membership).where(["members.club_id = ? AND members.status = 'lapsed' AND 
       cancel_date BETWEEN ? and ?", fulfillment_file.club_id, fulfillment_file.initial_date, 
       fulfillment_file.end_date]).group("members.id")
     members.each do |member| 
@@ -382,6 +385,8 @@ namespace :fulfillments do
     end
 
     fulfillment_file.save
+    fulfillment_file.mark_fulfillments_as_in_process
+    fulfillment_file.processed
     temp_file = Tempfile.new("#{I18n.l(Time.zone.now, :format => :only_date)}_magazine_hot_rod.txt")
     temp_file.write(file_info)
     temp_file.close

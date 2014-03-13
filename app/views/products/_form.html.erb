@@ -45,9 +45,9 @@
     </div>
   </div>
   <div class="control-group">
-    <%= f.label :is_visible, :class => 'control-label' %>
+    <%= f.label :is_visible, t('activerecord.attributes.product.is_visible_label') ,:class => 'control-label' %>
     <div class="controls">
-      <%= f.check_box :is_visible, :class => 'check_box' %> <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.product.is_visible_help')} %>
+      <%= f.check_box :is_visible, :class => 'check_box' %> <%= render :partial => "shared/help", :locals => { :title => t('activerecord.attributes.product.is_visible'), :content => t('activerecord.attributes.product.is_visible_help')} %>
     </div>
   </div>
   <div class="control-group">
