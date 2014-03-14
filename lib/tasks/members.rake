@@ -202,11 +202,10 @@ namespace :members do
       if Rails.env=='prototype'
         club = Club.find 48
       elsif Rails.env=='production'
-        club = Club.find 6
+        club = Club.find 9
       elsif Rails.env=='staging'
-        club = Club.find 19
+        club = Club.find 21
       end
-        club = Club.find 7
       Time.zone = club.time_zone
       initial_date = Time.zone.now - 7.days
       end_date = Time.zone.now 
