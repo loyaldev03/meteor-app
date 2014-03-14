@@ -10,7 +10,7 @@ defaults: &defaults
   call_these_members_recipients: platformadmins@xagax.com
   email_to_send_product_list: 'platformadmins@xagax.com'
   email_to_use_on_action_mailer_as_recipient: platformadmins@xagax.com
-  hot_rod_cancellation_emails: 'sebastian@xagax.com'
+  hot_rod_cancellation_emails: 'sonia@xagax.com'
   others_product: "SLOOPS"
   kit_card_product: 'KIT-CARD'
   lyris_service:
