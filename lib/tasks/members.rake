@@ -210,7 +210,7 @@ namespace :members do
       Time.zone = club.time_zone
       initial_date = Time.zone.now - 7.days
       end_date = Time.zone.now 
-      members = Member.joins(:memberships).where(["members.club_id = ? AND memberships.status = 'lapsed' AND
+      members = Member.joins(:current_membership).where(["members.club_id = ? AND memberships.status = 'lapsed' AND
         cancel_date BETWEEN ? and ? ", club.id, initial_date, end_date])
       unless members.empty?
         temp_file = "#{I18n.l(Time.zone.now, :format => :only_date)}_magazine_cancellation.csv"
