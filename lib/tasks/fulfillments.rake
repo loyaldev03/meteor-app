@@ -359,13 +359,16 @@ namespace :fulfillments do
       end
     end
     # CANCEL
-    members = Member.joins(:current_membership).where(["members.club_id = ? AND members.status = 'lapsed' AND 
-      cancel_date BETWEEN ? and ?", fulfillment_file.club_id, fulfillment_file.initial_date, 
-      fulfillment_file.end_date]).group("members.id")
-    members.each do |member| 
-      fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent' and created_at > ?", fulfillment_file.product, member.join_date).last
-      if fulfillment
-        file_info << process_fulfillment(fulfillment, fulfillment_file, "3")
+    memberships = Membership.joins(:terms_of_membership).where(["terms_of_memberships.club_id = ? AND
+      memberships.cancel_date BETWEEN ? and ?", fulfillment_file.club_id, fulfillment_file.initial_date, 
+      fulfillment_file.end_date]).group("memberships.id") 
+    memberships.each do |membership| 
+      member = membership.member 
+      if member.lapsed?
+        fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent' and created_at >= ?", fulfillment_file.product, member.join_date).last
+        if fulfillment
+          file_info << process_fulfillment(fulfillment, fulfillment_file, "3")
+        end
       end
     end
     # CHANGED ADDRESS 
