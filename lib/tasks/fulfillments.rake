@@ -325,19 +325,18 @@ namespace :fulfillments do
     tall = Time.zone.now
     fulfillment_file.initial_date = Time.zone.now-7.days
     fulfillment_file.end_date = Time.zone.now
-    fulfillment_file.product = "PRINTMAGAZINE"
+    fulfillment_file.product = "HOTRODPRINTMAGAZINE"
     fulfillment_file.save!
     file_info = ""
 
     # NEW JOIN and REINSTATEMENT
-    members = Member.joins(:transactions, :fulfillments).where(["club_id = ? AND fulfillments.status = 'not_processed' 
-      AND transactions.operation_type = 101 AND transactions.membership_id = members.current_membership_id AND 
-      transactions.created_at BETWEEN ? AND ?", fulfillment_file.club_id, fulfillment_file.initial_date, 
-      fulfillment_file.end_date]).group("members.id")
-
+    members = Member.joins(:fulfillments).where(["club_id = ? AND fulfillments.product_sku = ?
+      AND fulfillments.status = 'not_processed'", fulfillment_file.club_id, fulfillment_file.product]).group("members.id")
     members.each do |member| 
-      fulfillment = member.fulfillments.where("product_sku = ? and status = 'not_processed'", fulfillment_file.product).last
-      if fulfillment
+      membership_billing_transaction = member.transactions.where(["operation_type = 101 AND 
+        membership_id = ? AND created_at BETWEEN ? AND ?", 
+        member.current_membership_id, fulfillment_file.initial_date, fulfillment_file.end_date]).last
+      if membership_billing_transaction
         if member.operations.where(["operation_type = ?", Settings.operation_types.recovery]).empty?
           file_info << process_fulfillment(fulfillment, fulfillment_file, "1")
         else

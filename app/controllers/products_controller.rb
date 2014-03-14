@@ -28,8 +28,9 @@ class ProductsController < ApplicationController
 
   # POST /products
   def create
-    @product = Product.new(params[:product])
+    @product = Product.new
     @product.club_id = @current_club.id
+    @product.update_product_data_by_params(params[:product])
     if @product.save
       redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully created.'
     else
