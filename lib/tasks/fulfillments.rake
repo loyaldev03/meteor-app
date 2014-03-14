@@ -330,9 +330,10 @@ namespace :fulfillments do
     file_info = ""
 
     # NEW JOIN and REINSTATEMENT
-    members = Member.joins(:fulfillments).where(["club_id = ? AND fulfillments.product_sku = ?
+    fulfillments = Fulfillment.joins(:members).where(["club_id = ? AND fulfillments.product_sku = ?
       AND fulfillments.status = 'not_processed'", fulfillment_file.club_id, fulfillment_file.product]).group("members.id")
-    members.each do |member| 
+    fulfillments.each do |fulfillment| 
+      member = fulfillment.member
       membership_billing_transaction = member.transactions.where(["operation_type = 101 AND 
         membership_id = ? AND created_at BETWEEN ? AND ?", 
         member.current_membership_id, fulfillment_file.initial_date, fulfillment_file.end_date]).last
