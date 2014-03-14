@@ -330,8 +330,9 @@ namespace :fulfillments do
     file_info = ""
 
     # NEW JOIN and REINSTATEMENT
-    fulfillments = Fulfillment.joins(:members).where(["club_id = ? AND fulfillments.product_sku = ?
+    fulfillments = Fulfillment.joins(:member).where(["members.club_id = ? AND product_sku = ?
       AND fulfillments.status = 'not_processed'", fulfillment_file.club_id, fulfillment_file.product]).group("members.id")
+
     fulfillments.each do |fulfillment| 
       member = fulfillment.member
       membership_billing_transaction = member.transactions.where(["operation_type = 101 AND 
@@ -346,7 +347,7 @@ namespace :fulfillments do
       end
     end
     # RENEWAL
-    fulfillments = Fulfillment.joins(:member).where(["members.club_id = ? AND fulfillments.renewable_at BETWEEN ? and ?",
+    fulfillments = Fulfillment.includes(:member).where(["members.club_id = ? AND fulfillments.renewable_at BETWEEN ? and ?",
      fulfillment_file.club_id, fulfillment_file.initial_date, fulfillment_file.end_date])
     fulfillments.each do |fulfillment|
       if fulfillment.sent?
