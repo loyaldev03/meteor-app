@@ -301,49 +301,4 @@ namespace :fulfillments do
       return ""
     end
   end
-
-  desc "Magazine cancellation file generation for hot rod"
-  task :send_magazine_cancellation => :environment do
-    begin
-      require 'csv'
-      Rails.logger = Logger.new("#{Rails.root}/log/send_magazine_cancellation.log")
-      Rails.logger.level = Logger::DEBUG
-      ActiveRecord::Base.logger = Rails.logger
-      tall = Time.zone.now
-      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
-
-      if Rails.env=='prototype'
-        club = Club.find 48
-      elsif Rails.env=='production'
-        club = Club.find 6
-      elsif Rails.env=='staging'
-        club = Club.find 19
-      end
-        club = Club.find 2
-      Time.zone = club.time_zone
-      initial_date = Time.zone.now - 7.days
-      end_date = Time.zone.now 
-      members = Member.joins(:memberships).where(["members.club_id = ? AND memberships.status = 'lapsed' AND
-        cancel_date BETWEEN ? and ? ", club.id, initial_date, end_date])
-
-      package = Axlsx::Package.new
-      package.workbook.add_worksheet(:name => tom.name) do |sheet|
-      package.workbook.add_worksheet(:name => "Cancelation Magazine") do |sheet|
-        sheet.add_row ["RecType", "FHID", "PubCode", "Email", "CustomerCode", "CheckDigit", 
-          "Keyline", "ISSN", "FirstName", "LastName", "JobTitle", "Company", "Address", "SupAddress", 
-          "City", "State", "Zip", "Country", "CountryCode", "BusPhone", "HomePhone", "FaxPhone", 
-          "ZFTerm", "AgentID", "AuditCode", "VersionCode", "PromoCode", "StartIssue", "EndIssue", 
-          "Term", "CurrencyCode", "GrossPrice", "NetPrice", "IssuesRemaining", "OrderNumber", 
-          "AutoRenew", "UMC", "Premium", "PayStatus","SubType", "TimesRenewed", "FutureUse"]
-        member.each do |member|
-          row = [ '', '', '', member.email, member.email, '', '', '', member.first_name, member.last_name, '', '',
-                member.address, '', member.city, member.state, member.zip, member.country, '', '', '', '', '-8',
-                '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'cancel', '', '', '' ]
-
-
-          seet.add_row row
-        end
-      end
-    end
-  end
 end
