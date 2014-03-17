@@ -32,14 +32,14 @@ u.save!
 
 data = 'platform@xagax.com'
 admin = Agent.new :email => data, 
-  :roles    => ['admin'],
+  :roles    => 'admin',
   :username => 'admin', 
   :password => 'xagax2012', 
   :password_confirmation => 'xagax2012'
 admin.save!
 
 data = 'test@test.com.ar'
-u = Agent.new :email => data, :username => data, :password => data, :password_confirmation => data, :roles => ['admin']
+u = Agent.new :email => data, :username => data, :password => data, :password_confirmation => data, :roles => 'admin'
 u.save!
 
 p = Partner.new :prefix => 'NFL', :name => 'NFL'

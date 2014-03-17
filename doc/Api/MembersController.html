@@ -326,7 +326,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 <ul>
   <li><strong>first_name</strong> The first name of the member that is enrolling. </li>
   <li><strong>last_name</strong> The last name of the member that is enrolling. </li>
-  <li><strong>address</strong> The address of the member that is being enrolled. </li>
+  <li><strong>address</strong> The address of the member that is being enrolled. (regex we use to validate: /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð\/ '-.,#]+$/) </li>
   <li><strong>city</strong> City from where the member is from. </li>
   <li><strong>state</strong> The state standard code where the member is from. </li>
   <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.) </li>
@@ -586,7 +586,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 <ul>
   <li><strong>first_name</strong> The first name of the member that is enrolling. [optional] </li>
   <li><strong>last_name</strong> The last name of the member that is enrolling. [optional] </li>
-  <li><strong>address</strong> The address of the member that is being enrolled. [optional] </li>
+  <li><strong>address</strong> The address of the member that is being enrolled.  (regex we use to validate: /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð\/ '-.,#]+$/) [optional] </li>
   <li><strong>city</strong> City from where the member is from. [optional]</li>
   <li><strong>state</strong> The state standard code where the member is from. [optional]</li>
   <li><strong>zip</strong> Member's address's zip code. We are accpeting only formats like: xxxxx or xxxxx-xxxx for US. Only numbers. In case the member is from Canada, we accept canadian zips with the valid format (LNL NLN or LNLNLN where 'L' stands for letters and 'N' for numbers.) [optional] </li>

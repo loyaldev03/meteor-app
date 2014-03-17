@@ -857,52 +857,58 @@ class Member < ActiveRecord::Base
   # Adds club cash transaction. 
   def add_club_cash(agent, amount = 0,description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful, :message => "Could not save club cash transaction"  }
-    ClubCashTransaction.transaction do
-      begin
-        if not club.allow_club_cash_transaction?
-          answer = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
-        elsif amount.to_f == 0
-          answer[:message] = I18n.t("error_messages.club_cash_transaction_invalid_amount")
-          answer[:errors] = { :amount => "Invalid amount" } 
-        elsif is_not_drupal?
-          if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
-            cct = ClubCashTransaction.new(:amount => amount, :description => description)
-            self.club_cash_transactions << cct
-            raise "Could not save club cash transaction" unless cct.valid? and self.valid?
-            self.club_cash_amount = self.club_cash_amount + amount.to_f
-            self.save(:validate => false)
-            message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }."+(description.blank? ? '' : " Concept: #{description}")
-            if amount.to_f > 0
-              Auditory.audit(agent, cct, message, self, Settings.operation_types.add_club_cash)
-            elsif amount.to_f < 0 and amount.to_f.abs == club_cash_amount 
-              Auditory.audit(agent, cct, message, self, Settings.operation_types.reset_club_cash)
-            elsif amount.to_f < 0 
-              Auditory.audit(agent, cct, message, self, Settings.operation_types.deducted_club_cash)
+    begin
+      if not club.allow_club_cash_transaction?
+        answer = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
+      elsif amount.to_f == 0
+        answer[:message] = I18n.t("error_messages.club_cash_transaction_invalid_amount")
+        answer[:errors] = { :amount => "Invalid amount" } 
+      elsif is_not_drupal?
+        ClubCashTransaction.transaction do
+          begin
+            if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
+              cct = ClubCashTransaction.new(:amount => amount, :description => description)
+              self.club_cash_transactions << cct
+              raise "Could not save club cash transaction" unless cct.valid? and self.valid?
+              self.club_cash_amount = self.club_cash_amount + amount.to_f
+              self.save(:validate => false)
+              message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }."+(description.blank? ? '' : " Concept: #{description}")
+              if amount.to_f > 0
+                Auditory.audit(agent, cct, message, self, Settings.operation_types.add_club_cash)
+              elsif amount.to_f < 0 and amount.to_f.abs == club_cash_amount 
+                Auditory.audit(agent, cct, message, self, Settings.operation_types.reset_club_cash)
+              elsif amount.to_f < 0 
+                Auditory.audit(agent, cct, message, self, Settings.operation_types.deducted_club_cash)
+              end
+              answer = { :message => message, :code => Settings.error_codes.success }
+            else
+              answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
+              answer[:errors] = { :amount => "Club cash amount is greater that member's actual club cash." }
             end
-            answer = { :message => message, :code => Settings.error_codes.success }
-          else
-            answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
-            answer[:errors] = { :amount => "Club cash amount is greater that member's actual club cash." }
+          rescue Exception => e
+            answer[:errors] = cct.errors_merged(self) unless cct.nil?
+            Auditory.report_issue('Club cash Transaction', e.to_s + answer[:message], { :member => self.inspect, :amount => amount, :description => description, :club_cash_transaction => (cct.inspect unless cct.nil?) })
+            answer[:message] = I18n.t('error_messages.airbrake_error_message')
+            raise ActiveRecord::Rollback
           end
-        elsif not api_id.nil?
-          Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
-          message = last_sync_error || "Club cash processed at drupal correctly."
-          auditory_code = Settings.operation_types.remote_club_cash_transaction_failed
-          if self.last_sync_error.nil?
-            auditory_code = Settings.operation_types.remote_club_cash_transaction
-            answer = { :message => message, :code => Settings.error_codes.success }
-          else
-            answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
-          end
-          answer[:message] = I18n.t('error_messages.drupal_error_sync') if message.blank?
-          Auditory.audit(agent, self, answer[:message], self, auditory_code)
         end
-      rescue Exception => e
-        answer[:errors] = cct.errors_merged(self) unless cct.nil?
-        Auditory.report_issue('Club cash Transaction', e.to_s + answer[:message], { :member => self.inspect, :amount => amount, :description => description, :club_cash_transaction => (cct.inspect unless cct.nil?) })
-        answer[:message] = I18n.t('error_messages.airbrake_error_message')
-        raise ActiveRecord::Rollback
+      elsif not api_id.nil?
+        Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
+        message = last_sync_error || "Club cash processed at drupal correctly."
+        auditory_code = Settings.operation_types.remote_club_cash_transaction_failed
+        if self.last_sync_error.nil?
+          auditory_code = Settings.operation_types.remote_club_cash_transaction
+          answer = { :message => message, :code => Settings.error_codes.success }
+        else
+          answer = { :message => last_sync_error, :code => Settings.error_codes.club_cash_transaction_not_successful }
+        end
+        answer[:message] = I18n.t('error_messages.drupal_error_sync') if message.blank?
+        Auditory.audit(agent, self, answer[:message], self, auditory_code)
       end
+    rescue Exception => e
+      answer[:errors] = cct.errors_merged(self) unless cct.nil?
+      Auditory.report_issue('Club cash Transaction', e.to_s + answer[:message], { :member => self.inspect, :amount => amount, :description => description, :club_cash_transaction => (cct.inspect unless cct.nil?) })
+      answer[:message] = I18n.t('error_messages.airbrake_error_message')
     end
     answer
   end
@@ -916,12 +922,12 @@ class Member < ActiveRecord::Base
           self.save(:validate => false)
           Auditory.audit(agent, self, "Un-blacklisted member and all its credit cards.", self, Settings.operation_types.unblacklisted)
           self.credit_cards.each { |cc| cc.unblacklist }
-          marketing_tool_sync_subscription
         rescue Exception => e
           Auditory.report_issue("Member::unblacklist", e, { :member => self.inspect })
           raise ActiveRecord::Rollback
         end
       end
+      marketing_tool_sync_subscription unless self.blacklisted?
     end
   end
 
@@ -939,7 +945,6 @@ class Member < ActiveRecord::Base
             self.cancel! Time.zone.now.in_time_zone(get_club_timezone), "Automatic cancellation"
             self.set_as_canceled!
           end
-          marketing_tool_sync_unsubscription  
           answer = { :message => message, :code => Settings.error_codes.success }
         rescue Exception => e
           Auditory.report_issue("Member::blacklist", e, { :member => self.inspect })
@@ -948,6 +953,7 @@ class Member < ActiveRecord::Base
         end
       end
     end
+    marketing_tool_sync_unsubscription if self.blacklisted?
     answer
   end
   ###################################################################
