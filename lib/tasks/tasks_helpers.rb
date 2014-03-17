@@ -272,6 +272,49 @@ module TasksHelpers
     end
   end
 
+  def self.send_hot_rod_magazine_cancellation_email
+    require 'csv'
+    if Rails.env=='prototype'
+      club = Club.find 48
+    elsif Rails.env=='production'
+      club = Club.find 9
+    elsif Rails.env=='staging'
+      club = Club.find 21
+    end
+      club = Club.find 7
+    Time.zone = club.time_zone
+    initial_date = Time.zone.now - 7.days
+    end_date = Time.zone.now 
+    members = Member.joins(:current_membership).where(["members.club_id = ? AND memberships.status = 'lapsed' AND
+      cancel_date BETWEEN ? and ? ", club.id, initial_date, end_date])
+    unless members.empty?
+      temp_file = "#{I18n.l(Time.zone.now, :format => :only_date)}_magazine_cancellation.csv"
+      CSV.open(temp_file, "w") do |csv|
+        csv << ["RecType", "FHID", "PubCode", "Email", "CustomerCode", "CheckDigit", 
+          "Keyline", "ISSN", "FirstName", "LastName", "JobTitle", "Company", "Address", "SupAddress", 
+          "City", "State", "Zip", "Country", "CountryCode", "BusPhone", "HomePhone", "FaxPhone", 
+          "ZFTerm", "AgentID", "AuditCode", "VersionCode", "PromoCode", "StartIssue", "EndIssue", 
+          "Term", "CurrencyCode", "GrossPrice", "NetPrice", "IssuesRemaining", "OrderNumber", 
+          "AutoRenew", "UMC", "Premium", "PayStatus","SubType", "TimesRenewed", "FutureUse"]
+        members.each do |member|
+          begin
+            tz = Time.zone.now
+            Rails.logger.info " *** Processing member #{member.id}"
+            csv << [ '', '', '', member.email, member.email, '', '', '', member.first_name, member.last_name, '', '',
+                  member.address, '', member.city, member.state, member.zip, member.country, '', '', '', '', '-8',
+                  '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'cancel', '', '', '' ]
+            Rails.logger.info " *** It took #{Time.zone.now - tz} to process member #{member.id}"
+          rescue Exception => e
+            Auditory.report_issue("Members::HotRodMagazineCancellation", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+          end
+        end
+      end
+    end
+    Notifier.hot_rod_magazine_cancellation(File.read(temp_file), members.count).deliver!
+    File.delete(temp_file)
+  end
+
   #######################################################
   ################ FULFILLMENT ##########################
   #######################################################
