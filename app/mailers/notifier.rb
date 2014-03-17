@@ -91,7 +91,7 @@ class Notifier < ActionMailer::Base
 
   def hot_rod_magazine_cancellation(members_csv_file, quantity)
     @quantity = quantity
-    attachments["#{I18n.l(Time.zone.now, :format => :only_date)}_magazine_cancellation.csv"] = { :mime_type => 'text/csv', :content => members_csv_file }
+    attachments["#{I18n.l(Time.zone.now, :format => :only_date)}_hotrod_magazine_cancellation.csv"] = { :mime_type => 'text/csv', :content => members_csv_file }
     mail :to => Settings.hot_rod_cancellation_emails, :subject => "#{I18n.l(Time.zone.now, :format => :default )} - HOT ROD magazine cancellation"
   end
 
