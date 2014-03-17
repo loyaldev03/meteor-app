@@ -331,31 +331,40 @@ namespace :fulfillments do
 
     # NEW JOIN and REINSTATEMENT
     fulfillments = Fulfillment.joins(:member).where(["members.club_id = ? AND product_sku = ?
-      AND fulfillments.status = 'not_processed'", fulfillment_file.club_id, fulfillment_file.product]).group("members.id")
-
+      AND fulfillments.status = 'not_processed'", fulfillment_file.club_id, fulfillment_file.product]).group("members.id") 
     fulfillments.each do |fulfillment| 
-      member = fulfillment.member
-      membership_billing_transaction = member.transactions.where(["operation_type = 101 AND 
-        membership_id = ? AND created_at BETWEEN ? AND ?", 
-        member.current_membership_id, fulfillment_file.initial_date, fulfillment_file.end_date]).last
-      if membership_billing_transaction
-        if member.operations.where(["operation_type = ?", Settings.operation_types.recovery]).empty?
-          file_info << process_fulfillment(fulfillment, fulfillment_file, "1")
-        else
-          file_info << process_fulfillment(fulfillment, fulfillment_file, "5")
+      begin
+        member = fulfillment.member
+        membership_billing_transaction = member.transactions.where(["operation_type = 101 AND 
+          membership_id = ? AND created_at BETWEEN ? AND ?", 
+          member.current_membership_id, fulfillment_file.initial_date, fulfillment_file.end_date]).last
+        if membership_billing_transaction
+          if member.operations.where(["operation_type = ?", Settings.operation_types.recovery]).empty?
+            file_info << process_fulfillment(fulfillment, fulfillment_file, "1")
+          else
+            file_info << process_fulfillment(fulfillment, fulfillment_file, "5")
+          end
         end
+      rescue Exception => e
+        Auditory.report_issue("Fulfillments:HotRodPrintMagazine", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+        Rails.logger.info "    [!] failed: NEW JOIN or REINSTATEMENT #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
     # RENEWAL
     fulfillments = Fulfillment.includes(:member).where(["members.club_id = ? AND fulfillments.renewable_at BETWEEN ? and ?",
      fulfillment_file.club_id, fulfillment_file.initial_date, fulfillment_file.end_date])
     fulfillments.each do |fulfillment|
-      if fulfillment.sent?
-        if fulfillment.renewed
-          file_info << process_fulfillment(fulfillment, fulfillment_file, "2")
-        else
-          fulfillment.update_attribute :renewable_at, fulfillment.member.next_retry_bill_date+1.day
+      begin
+        if fulfillment.sent?
+          if fulfillment.renewed
+            file_info << process_fulfillment(fulfillment, fulfillment_file, "2")
+          else
+            fulfillment.update_attribute :renewable_at, fulfillment.member.next_retry_bill_date+1.day
+          end
         end
+      rescue Exception => e
+        Auditory.report_issue("Fulfillments:HotRodPrintMagazine", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+        Rails.logger.info "    [!] failed: RENEWAL #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
     # CANCEL
@@ -363,12 +372,17 @@ namespace :fulfillments do
       memberships.cancel_date BETWEEN ? and ?", fulfillment_file.club_id, fulfillment_file.initial_date, 
       fulfillment_file.end_date]).group("memberships.id") 
     memberships.each do |membership| 
-      member = membership.member 
-      if member.lapsed?
-        fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent' and created_at >= ?", fulfillment_file.product, member.join_date).last
-        if fulfillment
-          file_info << process_fulfillment(fulfillment, fulfillment_file, "3")
+      begin
+        member = membership.member 
+        if member.lapsed?
+          fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent' and created_at >= ?", fulfillment_file.product, member.join_date).last
+          if fulfillment
+            file_info << process_fulfillment(fulfillment, fulfillment_file, "3")
+          end
         end
+      rescue Exception => e
+        Auditory.report_issue("Fulfillments:HotRodPrintMagazine", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+        Rails.logger.info "    [!] failed: CANCEl #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
     # CHANGED ADDRESS 
@@ -376,14 +390,19 @@ namespace :fulfillments do
       operations.created_at BETWEEN ? and ?", fulfillment_file.club_id, Settings.operation_types.profile_updated,
       fulfillment_file.initial_date, fulfillment_file.end_date]).group("members.id")
     members.each do |member|
-      fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent'", fulfillment_file.product).last
-      if fulfillment
-        profile_edit_operations = member.operations.where(["operation_type = ? AND notes is not null AND 
-          created_at BETWEEN ? and ?", Settings.operation_types.profile_updated, fulfillment_file.initial_date, 
-          fulfillment_file.end_date])
-        if check_address_changed(profile_edit_operations)
-          file_info << process_fulfillment(fulfillment, fulfillment_file, "4")
+      begin
+        fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent'", fulfillment_file.product).last
+        if fulfillment
+          profile_edit_operations = member.operations.where(["operation_type = ? AND notes is not null AND 
+            created_at BETWEEN ? and ?", Settings.operation_types.profile_updated, fulfillment_file.initial_date, 
+            fulfillment_file.end_date])
+          if check_address_changed(profile_edit_operations)
+            file_info << process_fulfillment(fulfillment, fulfillment_file, "4")
+          end
         end
+      rescue Exception => e
+        Auditory.report_issue("Fulfillments:HotRodPrintMagazine", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+        Rails.logger.info "    [!] failed: CHANGED ADDRESS #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
 
@@ -413,7 +432,7 @@ namespace :fulfillments do
     # ensure
     #   ftp.quit()
     # end
-    # temp_file.unlink
+    temp_file.unlink
     Rails.logger.info "It all took #{Time.zone.now - tall} to run task"
   end
 
