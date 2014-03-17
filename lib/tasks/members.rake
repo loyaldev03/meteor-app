@@ -189,4 +189,18 @@ namespace :members do
     Rails.logger.info "Finished running members:sync_all_to_drupal task"
   end
 
+  desc "Magazine cancellation file generation for hot rod"
+  task :send_magazine_cancellation_email => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/send_magazine_cancellation.log")
+    Rails.logger.level = Logger::DEBUG
+    ActiveRecord::Base.logger = Rails.logger
+    tall = Time.zone.now
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
+    begin 
+      TasksHelpers.send_hot_rod_magazine_cancellation_email
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall} to run task"        
+    end
+  end
+
 end
