@@ -41,12 +41,12 @@ class CreditCardsController < ApplicationController
   end
 
   def activate
+    new_credit_card = CreditCard.find(params[:credit_card_id])
+    success = false
     CreditCard.transaction do 
       begin
-        new_credit_card = CreditCard.find(params[:credit_card_id])
         new_credit_card.set_as_active!
-        @current_member.api_member.save!(force: true) rescue nil
-        redirect_to show_member_path, notice: "Credit card #{new_credit_card.last_digits} activated."
+        success = true
       rescue CreditCardDifferentGatewaysException
         flash[:error] = t('error_messages.credit_card_gateway_differs_from_current')
         redirect_to show_member_path
@@ -57,6 +57,10 @@ class CreditCardsController < ApplicationController
         logger.error e.inspect
         raise ActiveRecord::Rollback
       end
+    end
+    if success 
+      @current_member.api_member.save!(force: true) rescue nil
+      redirect_to show_member_path, notice: "Credit card #{new_credit_card.last_digits} activated."
     end
   end
 
