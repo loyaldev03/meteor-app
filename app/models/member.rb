@@ -885,7 +885,10 @@ class Member < ActiveRecord::Base
               answer[:message] = "You can not deduct #{amount.to_f.abs} because the member only has #{self.club_cash_amount} club cash."
               answer[:errors] = { :amount => "Club cash amount is greater that member's actual club cash." }
             end
-          rescue 
+          rescue Exception => e
+            answer[:errors] = cct.errors_merged(self) unless cct.nil?
+            Auditory.report_issue('Club cash Transaction', e.to_s + answer[:message], { :member => self.inspect, :amount => amount, :description => description, :club_cash_transaction => (cct.inspect unless cct.nil?) })
+            answer[:message] = I18n.t('error_messages.airbrake_error_message')
             raise ActiveRecord::Rollback
           end
         end
