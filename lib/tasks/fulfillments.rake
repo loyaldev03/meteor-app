@@ -304,7 +304,8 @@ namespace :fulfillments do
 
   desc "Create magazine fulfillment file for Hot Rod" 
   task :send_print_magazine_hot_rod_file => :environment do
-    require 'net/ftp'
+    require 'csv'
+    require 'net/ftp'    
     Rails.logger = Logger.new("#{Rails.root}/log/send_print_magazine_hot_rod_file.log")
     Rails.logger.level = Logger::DEBUG
     ActiveRecord::Base.logger = Rails.logger
@@ -315,9 +316,9 @@ namespace :fulfillments do
     if Rails.env=='prototype'
       fulfillment_file.club = Club.find 48
     elsif Rails.env=='production'
-      fulfillment_file.club = Club.find 6
+      fulfillment_file.club = Club.find 9
     elsif Rails.env=='staging'
-      fulfillment_file.club = Club.find 19
+      fulfillment_file.club = Club.find 21
     end
 
     Time.zone = fulfillment_file.club.time_zone
@@ -407,32 +408,22 @@ namespace :fulfillments do
     end
 
     fulfillment_file.save
-    fulfillment_file.mark_fulfillments_as_in_process
-    fulfillment_file.processed
-    temp_file = Tempfile.new("#{I18n.l(Time.zone.now, :format => :only_date)}_magazine_hot_rod.txt")
+    temp_file = File.new("#{I18n.l(Time.zone.now, :format => :only_date)}_magazine_hot_rod.txt", 'w')
     temp_file.write(file_info)
     temp_file.close
     
-    puts file_info
-    # begin
-    #   ftp = Net::FTP.new('ftp.stoneacreinc.com')
-    #   ftp.login(user = "phoenix", passwd = "ph03n1xFTPu$3r")
-    #   folder = fulfillment_file.club.name
-    #   begin
-    #     ftp.mkdir(folder)
-    #     ftp.chdir(folder)
-    #   rescue Net::FTPPermError
-    #     ftp.chdir(folder)
-    #   end
-    #   ftp.putbinaryfile(temp_file, File.basename(temp_file))
-    #   fulfillment_file.mark_fulfillments_as_in_process
-    #   fulfillment_file.processed
-    # rescue Exception => e
-    #   Auditory.report_issue('NaammaSloopReport:create', e, { :fulfillment_file => fulfillment_file.inspect })
-    # ensure
-    #   ftp.quit()
-    # end
-    temp_file.unlink
+    begin
+      ftp = Net::FTP.new('ftp.palmcoastd.com')
+      ftp.login(user = "agy700-hotrodclub", passwd = "3lP585sv")
+      ftp.putbinaryfile(temp_file, File.basename(temp_file))
+      fulfillment_file.mark_fulfillments_as_in_process
+      fulfillment_file.processed
+    rescue Exception => e
+      Auditory.report_issue('HotRodPrintMagazine:create', e, { :fulfillment_file => fulfillment_file.inspect })
+    ensure
+      ftp.quit()
+      File.delete(temp_file)
+    end
     Rails.logger.info "It all took #{Time.zone.now - tall} to run task"
   end
 
@@ -444,7 +435,7 @@ namespace :fulfillments do
     @membership = @member.current_membership
     line << record_type # RECORD TYPE
     line << (record_type=="4" ? "2" : "1") # RECORD CODE
-    line << "".rjust(4, ' ') # AGENT ID NUMBER 
+    line << "".rjust(4, '5HRC') # AGENT ID NUMBER 
     line << "".rjust(13, ' ') # FILLER
     line << "00670".rjust(5, '0') # UNIVERSAL MAGAZINE CODE
     line << ((@membership.terms_of_membership.installment_period/30.416667).round.to_s).rjust(3, '0') # TERM
