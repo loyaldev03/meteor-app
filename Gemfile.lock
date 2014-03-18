@@ -43,6 +43,16 @@ GIT
       i18n (~> 0.6)
 
 GIT
+  remote: git@github.com:randym/axlsx.git
+  revision: 2f09f7530acfb47ebc772a609b2cf9d523ac60b7
+  branch: master
+  specs:
+    axlsx (2.0.1)
+      htmlentities (~> 4.3.1)
+      nokogiri (>= 1.4.1)
+      rubyzip (~> 1.0.0)
+
+GIT
   remote: https://github.com/brynary/rack-bug.git
   revision: 1e6d33664fb21a5f08836e5d8a9d7bfcc47c8d81
   branch: rails3
@@ -69,7 +79,7 @@ GEM
       rack-cache (~> 1.2)
       rack-test (~> 0.6.1)
       sprockets (~> 2.2.1)
-    active_utils (2.0.2)
+    active_utils (1.0.5)
       activesupport (>= 2.3.11)
       i18n
     activemodel (3.2.11)
@@ -95,10 +105,6 @@ GEM
       nokogiri (>= 1.4.0)
     ansi (1.4.3)
     arel (3.0.2)
-    axlsx (2.0.1)
-      htmlentities (~> 4.3.1)
-      nokogiri (>= 1.4.1)
-      rubyzip (~> 1.0.0)
     bcrypt-ruby (3.0.1)
     bootstrap-will_paginate (0.0.9)
       will_paginate
@@ -209,7 +215,7 @@ GEM
     http_parser.rb (0.5.3)
     httpi (0.9.7)
       rack
-    i18n (0.6.9)
+    i18n (0.6.4)
     i18n-country-translations (1.0.1)
       i18n (~> 0.5)
       railties (>= 3.0.0)
@@ -239,7 +245,7 @@ GEM
       metaclass (~> 0.0.1)
     money (5.1.1)
       i18n (~> 0.6.0)
-    multi_json (1.9.0)
+    multi_json (1.7.7)
     multipart-post (1.2.0)
     mysql2 (0.3.11)
     net-scp (1.1.1)
@@ -425,7 +431,7 @@ DEPENDENCIES
   activemerchant!
   acts_as_list (= 0.2.0)
   acts_as_paranoid
-  axlsx (~> 2.0.1)
+  axlsx!
   bootstrap-will_paginate
   brakeman
   bullet (= 4.6.0)
