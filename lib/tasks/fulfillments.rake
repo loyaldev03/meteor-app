@@ -449,7 +449,7 @@ namespace :fulfillments do
     line << "".rjust(1, ' ') # PREMIUM NUMBER 2
     line << "".rjust(11, ' ') # Trans ID
     line << "".rjust(7, ' ') # FILLER
-    line << Time.zone.now.to_date.strftime("%Y%m%d") # CLEARING DATE
+    line << Time.zone.now.to_date.strftime("%Y%m%d").to_s.rjust(8, '0') # CLEARING DATE
     line << get_reinstate_or_cancel_date(record_type).to_date.strftime("%Y%m%d").rjust(8, '0') # REINSTATE / CANCEL DATE
     line << "".rjust(3, ' ') # ISSUES TO GO
     line << record_type=="3" ? check_for_refund_upon_cancel : " " # PAID / UNPAID
@@ -485,6 +485,9 @@ namespace :fulfillments do
     line << "".rjust(18, ' ') # FILLER
     line << "".rjust(4, ' ') # PREFERRED START
     line << "".rjust(44, ' ') # FILLER / FUTURE USE
+    line << "".rjust(1, ' ') # FILLER
+    line << "".ljust(75, ' ') # Subscriber E-MAIL ADDRESS 1
+    line << "".rjust(1, ' ') # NO LONGER ACTIVE
     line << "".rjust(1, ' ') # FILLER
     line << "".rjust(75, ' ') # FILLER
     line << "".rjust(1, ' ') # NO LONGER ACTIVE
