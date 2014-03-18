@@ -331,7 +331,7 @@ namespace :fulfillments do
     file_info = ""
 
     # NEW JOIN and REINSTATEMENT
-    fulfillments = Fulfillment.joins(:member).where(["members.club_id = ? AND product_sku = ?
+    fulfillments = Fulfillment.joins(:member).readonly(false).where(["members.club_id = ? AND product_sku = ?
       AND fulfillments.status = 'not_processed'", fulfillment_file.club_id, fulfillment_file.product]).group("members.id") 
     fulfillments.each do |fulfillment| 
       begin
@@ -352,7 +352,7 @@ namespace :fulfillments do
       end
     end
     # RENEWAL
-    fulfillments = Fulfillment.includes(:member).where(["members.club_id = ? AND fulfillments.renewable_at BETWEEN ? and ?",
+    fulfillments = Fulfillment.joins(:member).readonly(false).where(["members.club_id = ? AND fulfillments.renewable_at BETWEEN ? and ?",
      fulfillment_file.club_id, fulfillment_file.initial_date, fulfillment_file.end_date])
     fulfillments.each do |fulfillment|
       begin
@@ -417,13 +417,13 @@ namespace :fulfillments do
       ftp.login(user = "agy700-hotrodclub", passwd = "3lP585sv")
       ftp.putbinaryfile(temp_file, File.basename(temp_file))
       fulfillment_file.mark_fulfillments_as_in_process
-      fulfillment_file.processed
+      fulfillment_file.processed   
     rescue Exception => e
       Auditory.report_issue('HotRodPrintMagazine:create', e, { :fulfillment_file => fulfillment_file.inspect })
     ensure
       ftp.quit()
       File.delete(temp_file)
-    end
+    end 
     Rails.logger.info "It all took #{Time.zone.now - tall} to run task"
   end
 
