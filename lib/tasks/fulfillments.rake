@@ -66,7 +66,7 @@ namespace :fulfillments do
       temp.close 
       temp.unlink
 
-      fulfillment_file.mark_fulfillments_as_in_process
+      fulfillment_file.fulfillments.where_not_processed.each{ |x| x.update_status(fulfillment_file.agent, 'in_process', 'Fulfillment file generated', fulfillment_file.id)}
       fulfillment_file.processed
     
     rescue Exception => e
