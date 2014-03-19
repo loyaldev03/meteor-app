@@ -66,7 +66,7 @@ namespace :fulfillments do
       temp.close 
       temp.unlink
 
-      fulfillment_file.fulfillments.where_not_processed.each{ |x| x.update_status(fulfillment_file.agent, 'in_process', 'Fulfillment file generated', fulfillment_file.id)}
+      fulfillment_file.mark_fulfillments_as_in_process
       fulfillment_file.processed
     
     rescue Exception => e
@@ -416,7 +416,7 @@ namespace :fulfillments do
       ftp = Net::FTP.new('ftp.palmcoastd.com')
       ftp.login(user = "agy700-hotrodclub", passwd = "3lP585sv")
       ftp.putbinaryfile(temp_file, File.basename(temp_file))
-      fulfillment_file.mark_fulfillments_as_in_process
+      fulfillment_file.fulfillments.where_not_processed.each{ |x| x.update_status(fulfillment_file.agent, 'in_process', 'Fulfillment file generated', fulfillment_file.id)}
       fulfillment_file.processed   
     rescue Exception => e
       Auditory.report_issue('HotRodPrintMagazine:create', e, { :fulfillment_file => fulfillment_file.inspect })
