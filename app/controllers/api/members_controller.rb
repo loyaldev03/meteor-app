@@ -582,4 +582,55 @@ class Api::MembersController < ApplicationController
     end
     render json: { :message => message, :code => Settings.error_codes.not_found }
   end
+
+
+  ##
+  # Hetp to manage PTX content, allowing to pulling content on the source page and a way to verify if a user is a member or not.
+  #
+  # @resource /api/v1/members/:id/get_banner_by_email
+  # @action POST
+  #
+  # @optional [String] email Members personal email.
+  #
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is already created.
+  # @response_field [String] landing_url Club's landing_url. This will be set deppending if the email belongs to a created member or not. 
+  # @response_field [String] banner_url Club's banner_url. This will be set deppending if the email belongs to a created member or not. 
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [String] code Code related to the method result.
+  #
+  # @example_request
+  #   curl -v -k -X POST -d "api_key=YUiVENNdFbNpRiYFd83Q&amount=10&description=paid related to product&type=one-time" https://dev.stoneacrehq.com:3000/api/v1/members/3/sale
+  # @example_request_description Example of valid request. 
+  #
+  # @example_response
+  #   {"message":"Member billed successfully $10 Transaction id: 6043044a-1185-4323-aa46-64cd4941d511. Reason: paid related to product","code":"000"}
+  # @example_response_description Example response to a valid request.
+  #
+  def get_banner_by_email
+    club = @current_agent.clubs.first
+    my_authorize! :api_get_banner_by_email, Member, club.id
+
+    if params[:email].blank?
+      answer = { :message => message, :landing_url => club.non_member_landing_url, 
+                    :non_banner_url => club.non_banner_url ,:code => Settings.error_codes.not_found }
+    else 
+      member = Member.new email: params[:email]
+      member.valid? 
+      if member.errors.messages.include?(:email) and member.errors.messages[:email].include? "email address is invalid"
+        answer = { :message => message, :landing_url => club.non_member_landing_url, 
+                    :non_banner_url => club.non_banner_url ,:code => Settings.error_codes.not_found }      
+      else
+        member = Member.find_by_club_id_and_email(club.id, params[:email])
+        if member
+          answer = { :message => message, :landing_url => club.member_landing_url, 
+            :non_banner_url => club.banner_url, :member_id => member.id, :code => Settings.error_codes.not_found }
+        else
+          answer = { :message => message, :landing_url => club.non_member_landing_url, 
+            :non_banner_url => club.non_banner_url, :code => Settings.error_codes.not_found }
+        end
+      end
+    end
+    render json: answer
+  end
 end

@@ -153,6 +153,7 @@ en:
       fulfillment_files: 'Fulfillment Files'
       disposition_types: 'Disposition Types'
       subscription_plans: 'Subscription Plans'
+      clubs: 'Clubs'
     member: 'Member'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
