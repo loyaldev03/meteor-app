@@ -169,7 +169,7 @@ class TransactionTest < ActiveSupport::TestCase
     # bill members the day trial days expires. Member should be billed
     Timecop.travel(Time.zone.now + member.terms_of_membership.provisional_days.days) do
       Delayed::Worker.delay_jobs = true
-      assert_difference('DelayedJob.count',3)do
+      assert_difference('DelayedJob.count',1)do
         TasksHelpers.bill_all_members_up_today
       end
       Delayed::Worker.delay_jobs = false  
@@ -185,7 +185,7 @@ class TransactionTest < ActiveSupport::TestCase
       Timecop.travel(next_year) do
         next_year = next_year + member.terms_of_membership.installment_period.days
         Delayed::Worker.delay_jobs = true
-        assert_difference('DelayedJob.count',3)do
+        assert_difference('DelayedJob.count',1)do
           TasksHelpers.bill_all_members_up_today
         end
         Delayed::Worker.delay_jobs = false
@@ -324,7 +324,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert !active_member.lapsed?, "member cant be lapsed"
     
     trans = Transaction.where("operation_type = 101").first
-    active_member.chargeback!(trans,{:reason => "testing", :transaction_amount => trans.amount, :auth_code => trans.response_auth_code })
+    active_member.chargeback!(trans,{:reason => "testing", :transaction_amount => trans.amount, :auth_code => trans.response_auth_code, adjudication_date: (Time.zone.now).to_s })
     chargeback_trans = Transaction.find_by_operation_type 110
     assert_equal chargeback_trans.amount, -trans.amount
   end

@@ -37,6 +37,10 @@
   <strong><%= model_class.human_attribute_name(:club_id) %>:</strong><br>
   <%= @product.club_id %>
 </p>
+<p>
+  <strong><%= model_class.human_attribute_name(:is_visible) %>:</strong><br>
+  <%= @product.is_visible %>
+</p>
 
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),

@@ -34,21 +34,23 @@
 				</tr>
 			<% end %>
 			<% @fulfillments.each_with_index do |fulfillment, index| %>
-				<tr>
-					<td> <%= index+1 %></td>
-					<td> <a href="<%= show_member_path(:member_prefix => fulfillment.member.id) %>" > <%= fulfillment.member.id %></a></td>
-					<td> <%= fulfillment.member.full_name %> </td>
-					<td> <%= I18n.l fulfillment.assigned_at, :format => :only_date %> </td>
-					<td> <%= I18n.l fulfillment.renewable_at, :format => :only_date unless fulfillment.renewable_at.nil? %> </td>
-					<td> <%= fulfillment.product_sku %> </td>
-					<td> <%= fulfillment.tracking_code %> </td>
-					<td> <%= fulfillment.status %> </td>
-					<td> 
-						<div id=<%= "div_fulfillment_selected_#{fulfillment.id}" %>>
-							<%= check_box_tag "fulfillment_selected[#{fulfillment.id}]", fulfillment.id, false, :class => 'fulfillment_selected', 'data-url' => update_fulfillment_status_path(:id => fulfillment.id) %> 
-						</div>
-					</td>
-				</tr>
+				<% if fulfillment.product.is_visible %>
+					<tr>
+						<td> <%= index+1 %></td>
+						<td> <a href="<%= show_member_path(:member_prefix => fulfillment.member.id) %>" > <%= fulfillment.member.id %></a></td>
+						<td> <%= fulfillment.member.full_name %> </td>
+						<td> <%= I18n.l fulfillment.assigned_at, :format => :only_date %> </td>
+						<td> <%= I18n.l fulfillment.renewable_at, :format => :only_date unless fulfillment.renewable_at.nil? %> </td>
+						<td> <%= fulfillment.product_sku %> </td>
+						<td> <%= fulfillment.tracking_code %> </td>
+						<td> <%= fulfillment.status %> </td>
+						<td> 
+							<div id=<%= "div_fulfillment_selected_#{fulfillment.id}" %>>
+								<%= check_box_tag "fulfillment_selected[#{fulfillment.id}]", fulfillment.id, false, :class => 'fulfillment_selected', 'data-url' => update_fulfillment_status_path(:id => fulfillment.id) %> 
+							</div>
+						</td>
+					</tr>
+				<% end %>
 			<% end %>
 		</tbody>
 	</table>
