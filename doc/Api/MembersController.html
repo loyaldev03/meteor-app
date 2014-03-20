@@ -1703,7 +1703,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<li>
 									<span class="name">email</span>
 									<span class="type">String</span>
-									<span class="text">Members personal email. If no email is given, we will answer with non-member banner and landing urls.</span>
+									<span class="text">Members personal email. If no email is given, or if the email is invalid, we will answer with non-member banner and landing urls.</span>
 								</li>
 							</ul>
 						
@@ -1735,7 +1735,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							<li>
 								<span class="name">landing_url</span>
 								<span class="type">String</span>
-								<span class="text">Club's landing_url. This will be set deppending if the email belongs to a created member or not.</span>
+								<span class="text">Club's landing_url. The value returned will depend if the email belongs to a created member or not.</span>
 							</li>
 						</ul>
 					
@@ -1743,7 +1743,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 							<li>
 								<span class="name">banner_url</span>
 								<span class="type">String</span>
-								<span class="text">Club's banner_url. This will be set deppending if the email belongs to a created member or not.</span>
+								<span class="text">Club's banner_url. The value returned will depend if the email belongs to a created member or not.</span>
 							</li>
 						</ul>
 					
@@ -1785,7 +1785,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<strong class="type">Request</strong>
 								
 									
-										curl -v -k -X POST -d "api_key=5yzCzGvsVCSYkycjaKjS&email=email@domain.com" http://127.0.0.1:3000/api/v1/members/get_banner_by_email
+										curl -v -k -X POST -d "api_key=5yzCzGvsVCSYkycjaKjS&email=email@domain.com" https://dev.stoneacrehq.com:3000/api/v1/members/get_banner_by_email
 									
 								
 							</span>
@@ -1829,7 +1829,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Thu Mar 20 10:43:09 2014 with ruby-1.9.3
+  Generated on Thu Mar 20 10:58:23 2014 with ruby-1.9.3
 </div>
 
   </body>

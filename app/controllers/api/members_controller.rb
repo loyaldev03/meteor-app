@@ -600,7 +600,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] code Code related to the method result.
   #
   # @example_request
-  #   curl -v -k -X POST -d "api_key=5yzCzGvsVCSYkycjaKjS&email=email@domain.com" http://127.0.0.1:3000/api/v1/members/get_banner_by_email
+  #   curl -v -k -X POST -d "api_key=5yzCzGvsVCSYkycjaKjS&email=email@domain.com" https://dev.stoneacrehq.com:3000/api/v1/members/get_banner_by_email
   # @example_request_description Example of valid request. 
   #
   # @example_response
