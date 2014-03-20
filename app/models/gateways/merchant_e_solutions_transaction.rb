@@ -23,7 +23,7 @@ class MerchantESolutionsTransaction < Transaction
     trans = MerchantESolutionsTransaction.find_by_response args.to_json
     if trans.nil?
       if args[:adjudication_date].last == '+'
-        operation_description = 'Rebutted Chargeback processed $#{self.amount}'
+        operation_description = "Rebutted Chargeback processed $#{self.amount}"
         chargeback_operation_type = Settings.operation_types.chargeback_rebutted
         chargeback_amount = args[:transaction_amount].to_f
       else
