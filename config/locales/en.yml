@@ -88,6 +88,7 @@ en:
     manual_billing_help: 'This Payment is a membership payment that will be applied to the membership and is received offline (not via credit card). Payments of this type will act as if they were credit card transactions adjusting next bill date accordingly.'
     reschedule: 'Reschedule'
     return: 'Return'
+    club_edit: 'Edit Club'
   admin:
     agents:
       index:
@@ -153,7 +154,6 @@ en:
       fulfillment_files: 'Fulfillment Files'
       disposition_types: 'Disposition Types'
       subscription_plans: 'Subscription Plans'
-      clubs: 'Clubs'
     member: 'Member'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
