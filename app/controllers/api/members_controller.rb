@@ -616,11 +616,7 @@ class Api::MembersController < ApplicationController
                    :banner_url => club.non_member_banner_url ,:code => Settings.error_codes.success }
       else 
         member = Member.new email: params[:email]
-        member.valid? 
-        if member.errors.messages.include?(:email) and member.errors.messages[:email].include? "email address is invalid"
-          answer = { :message => "Email address is invalid.", :landing_url => club.non_member_landing_url, 
-                     :banner_url => club.non_member_banner_url, :code => Settings.error_codes.success }      
-        else
+        if EmailValidator.new(member).validate(member).nil?
           member = Member.find_by_club_id_and_email(club.id, params[:email])
           if member
             answer = { :message => "Email address belongs to an already created member.", :landing_url => club.member_landing_url, 
@@ -629,6 +625,9 @@ class Api::MembersController < ApplicationController
             answer = { :message => "Email address does not belongs to an already created member.", :landing_url => club.non_member_landing_url, 
                      :banner_url => club.non_member_banner_url, :code => Settings.error_codes.success }
           end
+        else
+          answer = { :message => "Email address is invalid.", :landing_url => club.non_member_landing_url, 
+                     :banner_url => club.non_member_banner_url, :code => Settings.error_codes.success }      
         end
       end
     else
