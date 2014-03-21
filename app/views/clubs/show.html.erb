@@ -38,7 +38,22 @@
   <strong><%= model_class.human_attribute_name(:logo) %>:</strong><br>
   <%= image_tag(@club.logo(:small)) %>
 </p>
-
+<p>
+  <strong><%= model_class.human_attribute_name(:member_banner_url) %>:</strong><br>
+  <%= @club.member_banner_url %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:non_member_banner_url) %>:</strong><br>
+  <%= @club.non_member_banner_url %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:member_landing_url) %>:</strong><br>
+  <%= @club.member_landing_url %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:non_member_landing_url) %>:</strong><br>
+  <%= @club.non_member_landing_url %>
+</p>
 
 
 <h3>Remote domain</h3>

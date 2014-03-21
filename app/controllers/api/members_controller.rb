@@ -582,4 +582,58 @@ class Api::MembersController < ApplicationController
     end
     render json: { :message => message, :code => Settings.error_codes.not_found }
   end
+
+
+  ##
+  # Help to manage PTX content, allowing to pulling content on the source page and a way to verify if a user is a member or not. The member will be search within agent's related club.
+  #
+  # @resource /api/v1/members/get_banner_by_email
+  # @action POST
+  #
+  # @optional [String] email Members personal email. If no email is given, or if the email is invalid, we will answer with non-member banner and landing urls.
+  #
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is already created.
+  # @response_field [String] landing_url Club's landing_url. The value returned will depend if the email belongs to a created member or not. 
+  # @response_field [String] banner_url Club's banner_url. The value returned will depend if the email belongs to a created member or not. 
+  # @response_field [String] message Shows the method results and also informs the errors.
+  # @response_field [String] code Code related to the method result.
+  #
+  # @example_request
+  #   curl -v -k -X POST -d "api_key=5yzCzGvsVCSYkycjaKjS&email=email@domain.com" https://dev.stoneacrehq.com:3000/api/v1/members/get_banner_by_email
+  # @example_request_description Example of valid request. 
+  #
+  # @example_response
+  #   {"message":"Email address belongs to an already created member.","landing_url":"http://member_landing.com","banner_url":"http://member_banner.com","member_id":15,"code":"000"}
+  # @example_response_description Example response to a valid request.
+  #
+  def get_banner_by_email
+    club = @current_agent.clubs.first
+    if club
+      my_authorize! :api_get_banner_by_email, Member, club.id
+      if params[:email].blank?
+        answer = { :message => "Email address is blank.", :landing_url => club.non_member_landing_url, 
+                   :banner_url => club.non_member_banner_url ,:code => Settings.error_codes.success }
+      else 
+        member = Member.new email: params[:email]
+        if EmailValidator.new(member).validate(member).nil?
+          member = Member.find_by_club_id_and_email(club.id, params[:email])
+          if member
+            answer = { :message => "Email address belongs to an already created member.", :landing_url => club.member_landing_url, 
+                     :banner_url => club.member_banner_url, :member_id => member.id, :code => Settings.error_codes.success }
+          else
+            answer = { :message => "Email address does not belongs to an already created member.", :landing_url => club.non_member_landing_url, 
+                     :banner_url => club.non_member_banner_url, :code => Settings.error_codes.success }
+          end
+        else
+          answer = { :message => "Email address is invalid.", :landing_url => club.non_member_landing_url, 
+                     :banner_url => club.non_member_banner_url, :code => Settings.error_codes.success }      
+        end
+      end
+    else
+      answer = { :message => "Agent does not have access to any club.", :code => Settings.error_codes.wrong_data }
+    end
+    render json: answer
+  end
+
 end

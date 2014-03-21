@@ -1688,6 +1688,128 @@ It will also send a welcome email and charge the enrollment to the member's cred
 			
 		</div>	
     
+		<div class="method">
+			<p class="method_desc">Help to manage PTX content, allowing to pulling content on the source page and a way to verify if a user is a member or not. The member will be search within agent's related club.</p>
+			<h3 class="resource_url"><strong>/api/v1/members/get_banner_by_email</strong> [POST]</h3>
+
+			<div class="parameters">	
+				
+
+				
+					<div class="optional">
+						<h4>Optional Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">email</span>
+									<span class="type">String</span>
+									<span class="text">Members personal email. If no email is given, or if the email is invalid, we will answer with non-member banner and landing urls.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method results and also informs the errors.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">member_id</span>
+								<span class="type">Integer</span>
+								<span class="text">Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is already created.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">landing_url</span>
+								<span class="type">String</span>
+								<span class="text">Club's landing_url. The value returned will depend if the email belongs to a created member or not.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">banner_url</span>
+								<span class="type">String</span>
+								<span class="text">Club's banner_url. The value returned will depend if the email belongs to a created member or not.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method results and also informs the errors.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">String</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Example of valid request.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										curl -v -k -X POST -d "api_key=5yzCzGvsVCSYkycjaKjS&email=email@domain.com" https://dev.stoneacrehq.com:3000/api/v1/members/get_banner_by_email
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										{"message":"Email address belongs to an already created member.","landing_url":"http://member_landing.com","banner_url":"http://member_banner.com","member_id":15,"code":"000"}
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Example response to a valid request.
+									
+								
+							</span>
+						</div>
+					
+				</div>
+			
+		</div>	
+    
   </div>
 
 </div>
@@ -1707,7 +1829,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Wed Feb 26 13:32:00 2014 with ruby-1.9.3
+  Generated on Thu Mar 20 10:58:23 2014 with ruby-1.9.3
 </div>
 
   </body>
