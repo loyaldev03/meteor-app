@@ -44,6 +44,6 @@ class Prospect < ActiveRecord::Base
     end
 
     def set_exact_target_sync_as_needed
-      self.need_exact_target_sync = true if defined?(SacExactTarget::ProspectModel)
+      self.need_exact_target_sync = true if defined?(SacExactTarget::ProspectModel) and not self.email.blank?
     end
 end
