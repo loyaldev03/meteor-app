@@ -15,7 +15,13 @@
 /tmp
 /solr
 
+# DO NOT UPLOAD ANY OF THESE FILES THAT SET THE RUBY or GEMSET VERSION. 
+# THEY MIGHT BREAK THE CORRECT OPERATION OF PRODUCTION SCRIPTS. SEE #67983314 
 .rvmrc
+.ruby-version
+.ruby-gemset
+#######
+
 
 /test/fixtures
 
