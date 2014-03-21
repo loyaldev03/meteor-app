@@ -21,7 +21,7 @@ class Member < ActiveRecord::Base
   delegate :terms_of_membership, :to => :current_membership
   # attr :terms_of_membership_id # is it necesarilly??? 
   delegate :terms_of_membership_id, :to => :current_membership
-  delegate :start_date, :to => :current_membership
+  delegate :join_date, :to => :current_membership
   delegate :cancel_date, :to => :current_membership
   delegate :time_zone, :to => :club
   ##### 
@@ -98,8 +98,8 @@ class Member < ActiveRecord::Base
     integer :phone_local_number
     string :sync_status
     text :external_id
-    time :start_date do
-      start_date
+    time :join_date do
+      join_date
     end
     text :notes do
       member_notes.map { |comment| comment.description }
@@ -124,9 +124,9 @@ class Member < ActiveRecord::Base
   state_machine :status, :initial => :none, :action => :save_state do
     ###### member gets applied =====>>>>
     after_transition :lapsed => 
-                        :applied, :do => [:set_start_date, :send_recover_needs_approval_email]
+                        :applied, :do => [:set_join_date, :send_recover_needs_approval_email]
     after_transition [ :none, :provisional, :active ] => # none is new join. provisional and active are save the sale
-                        :applied, :do => [:set_start_date, :send_active_needs_approval_email]
+                        :applied, :do => [:set_join_date, :send_active_needs_approval_email]
     ###### <<<<<<========
     ###### member gets active =====>>>>
     after_transition :provisional => 
@@ -222,9 +222,9 @@ class Member < ActiveRecord::Base
   end
 
   # Sets join date. It is called multiple times.
-  def set_start_date
+  def set_join_date
     membership = current_membership
-    membership.start_date = Time.zone.now
+    membership.join_date = Time.zone.now
     membership.save
   end
 
@@ -238,10 +238,10 @@ class Member < ActiveRecord::Base
   end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
-  def schedule_first_membership(set_start_date, skip_send_fulfillment = false, nbd_update_for_sts = false, skip_add_club_cash = false, set_current_join_date = false)
+  def schedule_first_membership(set_join_date, skip_send_fulfillment = false, nbd_update_for_sts = false, skip_add_club_cash = false, set_current_join_date = false)
     membership = current_membership
-    if set_start_date
-      membership.update_attribute :start_date, Time.zone.now
+    if set_join_date
+      membership.update_attribute :join_date, Time.zone.now
     end
     if set_current_join_date
       self.current_join_date = Time.zone.now
@@ -249,8 +249,8 @@ class Member < ActiveRecord::Base
     send_fulfillment unless skip_send_fulfillment
     
     if not nbd_update_for_sts and is_billing_expected?
-      self.bill_date = membership.start_date + terms_of_membership.provisional_days.days
-      self.next_retry_bill_date = membership.start_date + terms_of_membership.provisional_days.days
+      self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
+      self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
     end
     self.save(:validate => false)
     assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
@@ -848,7 +848,7 @@ class Member < ActiveRecord::Base
     self.add_club_cash(nil, amount, message)
     if is_not_drupal?
       if self.club_cash_expire_date.nil? # first club cash assignment
-        self.update_attribute :club_cash_expire_date, start_date + 1.year
+        self.update_attribute :club_cash_expire_date, join_date + 1.year
       end
     end
   rescue Exception => e
@@ -979,7 +979,7 @@ class Member < ActiveRecord::Base
 
   def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
     cancel_date = cancel_date.to_date
-    cancel_date = (self.start_date.in_time_zone(get_club_timezone).to_date == cancel_date ? "#{cancel_date} 23:59:59" : cancel_date).to_datetime
+    cancel_date = (self.join_date.in_time_zone(get_club_timezone).to_date == cancel_date ? "#{cancel_date} 23:59:59" : cancel_date).to_datetime
     if not message.blank?
       if cancel_date.change(:offset => self.get_offset_related).to_date >= Time.new.getlocal(self.get_offset_related).to_date
         if self.cancel_date == cancel_date
@@ -1199,7 +1199,7 @@ class Member < ActiveRecord::Base
 
     def check_upgradable
       if terms_of_membership.upgradable?
-        if start_date.to_date + terms_of_membership.upgrade_tom_period.days <=  Time.new.getlocal(self.get_offset_related).to_date
+        if join_date.to_date + terms_of_membership.upgrade_tom_period.days <=  Time.new.getlocal(self.get_offset_related).to_date
           change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade)
           return false
         end
@@ -1236,7 +1236,7 @@ class Member < ActiveRecord::Base
         self.recovered!
         description = 'recovered'
       else      
-        self.set_as_provisional! # set start_date
+        self.set_as_provisional! # set join_date
       end
 
       message = "Member #{description} successfully $#{amount} on TOM(#{terms_of_membership.id}) -#{terms_of_membership.name}-"
@@ -1278,7 +1278,7 @@ class Member < ActiveRecord::Base
 
     def cancellation
       self.cancel_member_at_remote_domain
-      if (Time.zone.now.to_date - start_date.to_date).to_i <= Settings.days_to_wait_to_cancel_fulfillments
+      if (Time.zone.now.to_date - join_date.to_date).to_i <= Settings.days_to_wait_to_cancel_fulfillments
         fulfillments.where_cancellable.each do |fulfillment| 
           fulfillment.update_status(nil, 'canceled', "Member canceled")
         end
