@@ -1199,7 +1199,7 @@ class Member < ActiveRecord::Base
 
     def check_upgradable
       if terms_of_membership.upgradable?
-        if join_date.to_date + terms_of_membership.upgrade_tom_period.days <=  Time.new.getlocal(self.get_offset_related).to_date
+        if join_date.to_date + terms_of_membership.upgrade_tom_period.days <= Time.new.getlocal(self.get_offset_related).to_date
           change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade)
           return false
         end
