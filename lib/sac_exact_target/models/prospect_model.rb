@@ -22,7 +22,7 @@ module SacExactTarget
           raise e
         end
       end
-      update_prospect(res) unless res.nil?
+      update_prospect(res)
     end
 
     def self.destroy_by_email!(email, club_id)
@@ -72,11 +72,14 @@ module SacExactTarget
     end
 
     def update_prospect(res)
-      data = if res.OverallStatus != "OK"
-        SacExactTarget::report_error("SacExactTarget:Prospect:save", res)
-        { exact_target_sync_result: res.Results.first.status_message }
-      else
-        { exact_target_sync_result: 'Success' }
+      data = {}
+      unless res.nil?
+        data = if res.OverallStatus != "OK"
+          SacExactTarget::report_error("SacExactTarget:Prospect:save", res)
+          { exact_target_sync_result: res.Results.first.status_message }
+        else
+          { exact_target_sync_result: 'Success' }
+        end
       end
       data = data.merge(need_exact_target_sync: false)
       ::Prospect.where(uuid: self.prospect.id).limit(1).update_all(data)
