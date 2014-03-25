@@ -22,14 +22,21 @@ class MerchantESolutionsTransaction < Transaction
   def new_chargeback(sale_transaction, args)
     trans = MerchantESolutionsTransaction.find_by_response args.to_json
     if trans.nil?
-      if args[:adjudication_date].last == '+'
+      if args[:adjudication_date].blank?
+        operation_description = 'Unprocessed Chargeback processed $#{self.amount}'
+        chargeback_operation_type = Settings.operation_types.unprocessed_chargeback
+        chargeback_amount = -args[:transaction_amount].to_f
+        chargeback_success = false
+      elsif args[:adjudication_date].last == '+'
         operation_description = 'Rebutted Chargeback processed $#{self.amount}'
         chargeback_operation_type = Settings.operation_types.chargeback_rebutted
         chargeback_amount = args[:transaction_amount].to_f
+        chargeback_success = true
       else
         operation_description = "Chargeback processed $#{self.amount}"
         chargeback_operation_type = Settings.operation_types.chargeback
         chargeback_amount = -args[:transaction_amount].to_f
+        chargeback_success = true
       end
 
       self.transaction_type = "chargeback"
@@ -39,11 +46,11 @@ class MerchantESolutionsTransaction < Transaction
       self.response_result = args[:reason]
       self.response_code ='000'
       self.response = args
-      self.success = true
+      self.success = chargeback_success
       self.membership_id = sale_transaction.membership_id
       self.operation_type = chargeback_operation_type
       self.save
-      Auditory.audit(nil, self, operation_description, sale_transaction.member, Settings.operation_types.chargeback)
+      Auditory.audit(nil, self, operation_description, sale_transaction.member, chargeback_operation_type)
     end
   end
 
