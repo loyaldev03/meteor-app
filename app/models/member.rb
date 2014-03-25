@@ -136,7 +136,7 @@ class Member < ActiveRecord::Base
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
-                        :provisional, :do => ['schedule_first_membership(true, false, false, false, true)','after_marketing_tool_sync']
+                        :provisional, :do => ['schedule_first_membership(true, false, false, false)','after_marketing_tool_sync']
     after_transition [ :provisional, :active ] => 
                         :provisional, :do => 'schedule_first_membership(true, true, true, true)' # save the sale
     after_transition :applied => 
@@ -238,19 +238,17 @@ class Member < ActiveRecord::Base
   end
 
   # Sends the fulfillment, and it settes bill_date and next_retry_bill_date according to member's terms of membership.
-  def schedule_first_membership(set_join_date, skip_send_fulfillment = false, nbd_update_for_sts = false, skip_add_club_cash = false, set_current_join_date = false)
+  def schedule_first_membership(set_join_date, skip_send_fulfillment = false, skip_nbd_and_current_join_date_update_for_sts = false, skip_add_club_cash = false)
     membership = current_membership
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
     end
-    if set_current_join_date
-      self.current_join_date = Time.zone.now
-    end
     send_fulfillment unless skip_send_fulfillment
     
-    if not nbd_update_for_sts and is_billing_expected?
+    if not skip_nbd_and_current_join_date_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
+      self.current_join_date = Time.zone.now
     end
     self.save(:validate => false)
     assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
