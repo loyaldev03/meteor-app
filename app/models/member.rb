@@ -910,6 +910,7 @@ class Member < ActiveRecord::Base
     rescue Exception => e
       Auditory.report_issue('Club cash Transaction', e.to_s + answer[:message], { :member => self.inspect, :amount => amount, :description => description })
       answer[:message] = I18n.t('error_messages.airbrake_error_message')
+      answer[:errors] = ""
     end
     answer
   end
