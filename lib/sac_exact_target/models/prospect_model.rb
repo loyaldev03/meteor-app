@@ -95,7 +95,7 @@ module SacExactTarget
       end
 
       def setup_club(club)
-        @club = club.nil? self.prospect.club : club
+        @club = club.nil? ? self.prospect.club : club
       end
 
       def client_id
