@@ -29,8 +29,9 @@ class Fulfillment < ActiveRecord::Base
   scope :not_renewed, lambda { where("renewed = false") }
 
   scope :to_be_renewed, lambda { joins(:member => :club).readonly(false).where([ 
-    " date(renewable_at) <= ? AND fulfillments.status NOT IN ('canceled', 'in_process') " + 
-    " AND recurrent = true   AND renewed = false AND clubs.billing_enable = true ", 
+    " date(renewable_at) <= ? AND fulfillments.status NOT IN ('canceled', 'in_process') 
+      AND recurrent = true AND renewed = false AND clubs.billing_enable = true 
+      AND members.status = 'active' AND members.recycled_times = 0",  
     Time.zone.now.to_date]) }
 
   delegate :club, :to => :member
