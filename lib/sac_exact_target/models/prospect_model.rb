@@ -1,8 +1,9 @@
 module SacExactTarget
   class ProspectModel < Struct.new(:prospect)
-    
-    def save!
+
+    def save!(club = nil)
       return unless self.prospect.email
+      setup_club(club)
       # Find by email . I didnt have luck looking for a subscriber by email and List.
       subscriber = SacExactTarget::ProspectModel.find_by_email self.prospect.email, club_id
       res = if subscriber.nil?
@@ -26,6 +27,7 @@ module SacExactTarget
     end
 
     def self.destroy_by_email!(email, club_id)
+      setup_club
       subscribers = find_all_by_email!(email, club_id)
       unless subscribers.empty?
         subscribers.each do |subscriber|
@@ -85,23 +87,27 @@ module SacExactTarget
       ::Prospect.where(uuid: self.prospect.id).limit(1).update_all(data)
       self.prospect.reload rescue self.prospect
     end
-
+    
     private
 
       def client
         ExactTargetSDK::Client.new
       end
 
+      def setup_club(club)
+        @club = club.nil? self.prospect.club : club
+      end
+
       def client_id
         ExactTargetSDK::SubscriberClient.new(ID: business_unit_id)
       end
-       
+    
       def subscriber_key
         Rails.env.production? ? self.prospect.uuid : "#{Rails.env}-#{self.prospect.uuid.to_s}"
       end
 
       def subscriber(subscriber_key, options ={})
-        attributes, list =  [], [ ExactTargetSDK::List.new(ID: self.prospect.club.marketing_tool_attributes['et_prospect_list'], Status: 'Active', Action: 'create') ]
+        attributes, list =  [], [ ExactTargetSDK::List.new(ID: @club.marketing_tool_attributes['et_prospect_list'] , Status: 'Active', Action: 'create') ]
         fields_map.collect do |api_field, our_field| 
           attributes << SacExactTarget.format_attribute(self.prospect, api_field, our_field)
         end
@@ -109,7 +115,7 @@ module SacExactTarget
         ExactTargetSDK::Subscriber.new({
           'SubscriberKey' => subscriber_key, 
           'EmailAddress' => self.prospect.email, 'Client' => client_id, 'ObjectID' => true, 
-          'Attributes' => attributes.compact }.merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ))        
+          'Attributes' => attributes.compact }.merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} ))
       end
 
       def fields_map
@@ -135,11 +141,11 @@ module SacExactTarget
       end
 
       def club_id
-        Rails.env.production? ? self.prospect.club_id.to_s : '9999'
+        Rails.env.production? ? @club.id.to_s : '9999'
       end
 
       def business_unit_id
-        Rails.env.production? ? self.prospect.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
+        Rails.env.production? ? @club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
       end
   end
 end

@@ -25,7 +25,7 @@ namespace :mkt_tools do
     tall = Time.zone.now
     begin
       if defined? SacExactTarget::MemberModel
-        Member.sync_members_to_exact_target
+        Member.sync_members_to_exact_target()
       end
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall} to run mkt_tools:sync_members_to_exact_target task"
