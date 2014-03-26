@@ -24,6 +24,7 @@ module SacExactTarget
               Rails.logger.info "    ... took #{Time.zone.now - tz} for prospect ##{prospect.id}"
             end
           end
+          Rails.logger.info "    ... took #{Time.zone.now - tz} for club ##{club.id}"
         end
       end
     end   
