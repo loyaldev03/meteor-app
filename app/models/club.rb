@@ -143,10 +143,9 @@ class Club < ActiveRecord::Base
     def complete_urls
       [:member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url].each do |field|
         if self.changes.include? field
-          url = eval("self.#{field}")
+          url = self.send field
           if not url.blank? and not url.match(/^(http|https):\/\//)
-            complete_field = "http://"+url
-            eval("self.#{field} = '#{complete_field}'")
+            self.send field.to_s+"=", "http://"+url
           end
         end
       end
