@@ -39,6 +39,8 @@ class Club < ActiveRecord::Base
                            :url => "/system/:attachment/:id/:style/:filename",
                            :styles => { :header => "120x40", :thumb => "100x100#", :small  => "150x150>" }
 
+  before_validation :complete_urls
+
   DEFAULT_PRODUCT = ['KIT-CARD']
 
   # marketing_tool_attributes possible keys:
@@ -135,6 +137,17 @@ class Club < ActiveRecord::Base
         d.name = name
         d.club_id = self.id
         d.save
+      end
+    end
+
+    def complete_urls
+      [:member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url].each do |field|
+        if self.changes.include? field
+          url = self.send field
+          if not url.blank? and not url.match(/^(http|https):\/\//)
+            self.send field.to_s+"=", "http://"+url
+          end
+        end
       end
     end
 end
