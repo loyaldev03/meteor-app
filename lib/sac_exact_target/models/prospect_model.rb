@@ -27,7 +27,6 @@ module SacExactTarget
     end
 
     def self.destroy_by_email!(email, club_id)
-      setup_club
       subscribers = find_all_by_email!(email, club_id)
       unless subscribers.empty?
         subscribers.each do |subscriber|
@@ -87,15 +86,15 @@ module SacExactTarget
       ::Prospect.where(uuid: self.prospect.id).limit(1).update_all(data)
       self.prospect.reload rescue self.prospect
     end
-    
+ 
+    def setup_club(club)
+      @club = club.nil? ? self.prospect.club : club
+    end
+ 
     private
 
       def client
         ExactTargetSDK::Client.new
-      end
-
-      def setup_club(club)
-        @club = club.nil? ? self.prospect.club : club
       end
 
       def client_id

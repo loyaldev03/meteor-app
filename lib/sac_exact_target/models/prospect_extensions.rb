@@ -9,7 +9,8 @@ module SacExactTarget
       def sync_prospects_to_exact_target
         club_base = Club.exact_target_related
         club_base.each do |club|
-          base = club.includes(:prospects).where("need_exact_target_sync = 1")
+          tzc = Time.zone.now
+          base = club.prospects.where("need_exact_target_sync = 1")
           Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting mkt_tools:sync_prospects_to_exact_target, processing #{base.count} prospects for club #{club.id}"
           base.find_in_batches do |group|
             group.each_with_index do |prospect,index|
@@ -24,7 +25,7 @@ module SacExactTarget
               Rails.logger.info "    ... took #{Time.zone.now - tz} for prospect ##{prospect.id}"
             end
           end
-          Rails.logger.info "    ... took #{Time.zone.now - tz} for club ##{club.id}"
+          Rails.logger.info "    ... took #{Time.zone.now - tzc} for club ##{club.id}"
         end
       end
     end   
