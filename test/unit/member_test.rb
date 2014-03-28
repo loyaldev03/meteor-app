@@ -430,6 +430,20 @@ class MemberTest < ActiveSupport::TestCase
     assert_equal saved_member.current_membership.parent_membership_id, old_membership_id
   end
 
+  test "Upgrade member should fill parent_membership_id" do
+    terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    terms_of_membership.upgrade_tom_id = terms_of_membership2.id
+    terms_of_membership.upgrade_tom_period = 0
+    terms_of_membership.save(validate: false)
+    saved_member = create_active_member(terms_of_membership, :provisional_member_with_cc)
+    old_membership_id = saved_member.current_membership_id
+    Timecop.travel(saved_member.next_retry_bill_date) do
+      saved_member.bill_membership
+    end
+    assert_equal saved_member.current_membership.parent_membership_id, old_membership_id
+  end
+
   test "manual payment member should be canceled when its billing date is overdue" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @saved_member = create_active_member(@terms_of_membership, :provisional_member_with_cc)

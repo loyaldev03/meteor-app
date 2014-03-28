@@ -93,6 +93,7 @@ class Ability
       cannot :api_cancel, Member
       cannot :api_find_all_by_updated, Member
       cannot :api_find_all_by_created, Member
+      cannot :api_get_banner_by_email, Member
       cannot :no_recurrent_billing, Member
       cannot :api_sale, Member
       can :manage, Operation
@@ -118,6 +119,7 @@ class Ability
       cannot :api_cancel, Member
       cannot :api_find_all_by_updated, Member
       cannot :api_find_all_by_created, Member
+      cannot :api_get_banner_by_email, Member
       cannot :api_sale, Member
       can :manage, Operation
       can :manage, MemberNote
@@ -174,6 +176,7 @@ class Ability
       cannot :api_find_all_by_updated, Member
       cannot :api_find_all_by_created, Member
       cannot :no_recurrent_billing, Member
+      cannot :api_get_banner_by_email, Member
       cannot :manual_billing, Member
       cannot :api_sale, Member
       can :manage, Operation
