@@ -426,6 +426,7 @@ class Member < ActiveRecord::Base
           if res[:code] == Settings.error_codes.success
             Auditory.audit(agent, new_tom, operation_message, self, operation_type)
             Membership.find(prev_membership_id).cancel_because_of_membership_change
+            self.current_membership.update_attribute :parent_membership_id, prev_membership_id
           # update manually this fields because we cant cancel member
           end
           res
@@ -668,8 +669,7 @@ class Member < ActiveRecord::Base
     enrollment_info = EnrollmentInfo.new :enrollment_amount => amount, :terms_of_membership_id => tom.id
     enrollment_info.update_enrollment_info_by_hash member_params
 
-    parent_membership_id = self.new_record? ? nil : current_membership_id
-    membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent, :parent_membership_id => parent_membership_id)
+    membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent)
     self.current_membership = membership
 
     operation_type = check_enrollment_operation

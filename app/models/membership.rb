@@ -5,7 +5,7 @@ class Membership < ActiveRecord::Base
   has_one :enrollment_info
   has_many :transactions
 
-  attr_accessible :created_by, :join_date, :status, :cancel_date, :terms_of_membership_id, :parent_membership_id
+  attr_accessible :created_by, :join_date, :status, :cancel_date, :terms_of_membership_id
 
   # validates :terms_of_membership, :presence => true
   # validates :member, :presence => true
@@ -18,4 +18,3 @@ class Membership < ActiveRecord::Base
     self.update_attributes :cancel_date => Time.zone.now, :status => 'lapsed'
   end
 end
-

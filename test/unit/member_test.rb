@@ -128,7 +128,7 @@ class MemberTest < ActiveSupport::TestCase
       assert answer[:code] == Settings.error_codes.success, answer[:message]
       assert_equal 'provisional', member.status, "Status was not updated."
       assert_equal 1, member.reactivation_times, "Reactivation_times was not updated."
-      assert_equal member.current_membership.parent_membership_id, old_membership_id
+      assert_equal member.current_membership.parent_membership_id, nil
     end
   end
 
