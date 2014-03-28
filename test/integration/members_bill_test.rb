@@ -52,7 +52,7 @@ class MembersBillTest < ActionController::IntegrationTest
     end
   end
   
-  def change_next_bill_date(date)
+  def change_next_bill_date(date, error_message = "")
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
     click_link_or_button 'Change'
@@ -65,11 +65,15 @@ class MembersBillTest < ActionController::IntegrationTest
             find(".ui-icon-circle-triangle-e").click
           end
         end
-        sleep 1
-        first(:link, date.day.to_s).click
+        if first(:link, date.day.to_s) 
+          first(:link, date.day.to_s).click
+        end
       end
     end
     click_link_or_button 'Change next bill date'
+  rescue Exception => e
+    puts "Timezone: #{Time.zone}, date: #{next_bill_date}, error_message: #{error_message}"
+    raise e
   end
 
   ############################################################
@@ -250,7 +254,8 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.recover(@terms_of_membership_with_gateway) 
     @saved_member.set_as_active
     next_bill_date = Time.zone.now + 1.day
-    change_next_bill_date(next_bill_date)
+
+    change_next_bill_date(next_bill_date, "Change Next Bill Date for tomorrow")
     assert find_field('input_first_name').value == @saved_member.first_name
     within("#td_mi_next_retry_bill_date")do
       assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)), "Timezone: #{Time.zone}, date: #{next_bill_date}"
