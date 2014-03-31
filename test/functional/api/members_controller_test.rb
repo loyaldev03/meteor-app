@@ -98,6 +98,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     post( :sale, { :id => @member.id, :amount => amount, :description => description, :type => type } )
   end
 
+  def generate_post_get_banner_by_email(email)
+    post( :get_banner_by_email, { email: email } )
+  end
+
   # Store the membership id at enrollment_infos table when enrolling a new member
   # Admin should enroll/create member with preferences
   # Billing membership by Provisional amount
@@ -1802,6 +1806,42 @@ class Api::MembersControllerTest < ActionController::TestCase
       FactoryGirl.create :credit_card, :member_id => @member.id
       @member.set_as_provisional
       generate_post_sale(@member.terms_of_membership.installment_amount, "testing", "one-time")
+      assert_response :unauthorized
+    end
+  end
+
+  test "Api should be allowed to get banner by email" do
+    sign_in @admin_user
+    ['api', 'admin'].each do |role|
+      @admin_user.update_attribute :roles, nil
+      @admin_user.add_role_with_club(role, @club)
+      @member = create_active_member(@terms_of_membership, :member_with_api)
+      @club.member_banner_url = "https://member_banner_url.com"
+      @club.non_member_banner_url = "https://non_member.banner_url.com"
+      @club.member_landing_url = "https://member_landing_url.com"
+      @club.non_member_landing_url = "https://non_member_landing_url.com"
+      @club.save(validate: false)
+      generate_post_get_banner_by_email("")
+      assert @response.body.include? @club.non_member_banner_url
+      assert @response.body.include? @club.non_member_landing_url
+      generate_post_get_banner_by_email("wrongFormat") 
+      assert @response.body.include? @club.non_member_banner_url
+      assert @response.body.include? @club.non_member_landing_url
+      generate_post_get_banner_by_email("does@notexist.com") 
+      assert @response.body.include? @club.non_member_banner_url
+      assert @response.body.include? @club.non_member_landing_url
+      generate_post_get_banner_by_email(@member.email) 
+      assert @response.body.include? @club.member_banner_url
+      assert @response.body.include? @club.member_landing_url
+    end
+  end
+
+  test "Should not allow get banner by email for agents that are not admin or api." do
+    sign_in @admin_user
+    ['representative', 'supervisor', 'agency', 'fulfillment_managment'].each do |role|
+      @admin_user.update_attribute :roles, nil
+      @admin_user.add_role_with_club(role, @club)
+      generate_post_get_banner_by_email("")
       assert_response :unauthorized
     end
   end

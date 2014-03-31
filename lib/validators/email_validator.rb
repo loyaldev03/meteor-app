@@ -1,4 +1,4 @@
-class EmailValidator < ActiveModel::EachValidator  
+class EmailValidator < ActiveModel::Validator  
 	def validate(record)
 		parts = record.email.to_s.split("@")
 		valid = if parts.count == 2

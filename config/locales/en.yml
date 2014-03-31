@@ -88,6 +88,7 @@ en:
     manual_billing_help: 'This Payment is a membership payment that will be applied to the membership and is received offline (not via credit card). Payments of this type will act as if they were credit card transactions adjusting next bill date accordingly.'
     reschedule: 'Reschedule'
     return: 'Return'
+    club_edit: 'Edit Club'
   admin:
     agents:
       index:
@@ -192,6 +193,7 @@ en:
           type_118: 'Billing: Manual Cash Transaction' # membership_manual_cash_billing
           type_119: 'Billing: Manual Check Transaction' # membership_manual_check_billing
           type_125: 'Billing: Member Rebuttal Chargeback' # chargeback
+          type_126: 'Billing: Member Unprocessed Chargeback' # chargeback
           type_203: 'Membership: Recovery' # recovery
           type_206: 'Membership: Requires Approval' # enrollment_needs_approval
         amount_available_to_refund: Max

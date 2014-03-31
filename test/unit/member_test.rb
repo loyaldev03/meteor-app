@@ -123,10 +123,12 @@ class MemberTest < ActiveSupport::TestCase
   test "Lapsed member can be recovered" do
     assert_difference('Fulfillment.count',Club::DEFAULT_PRODUCT.count) do
       member = create_active_member(@terms_of_membership_with_gateway, :lapsed_member)
+      old_membership_id = member.current_membership_id 
       answer = member.recover(@terms_of_membership_with_gateway)
       assert answer[:code] == Settings.error_codes.success, answer[:message]
       assert_equal 'provisional', member.status, "Status was not updated."
       assert_equal 1, member.reactivation_times, "Reactivation_times was not updated."
+      assert_equal member.current_membership.parent_membership_id, nil
     end
   end
 
@@ -388,6 +390,20 @@ class MemberTest < ActiveSupport::TestCase
     answer = member.add_club_cash(agent, 12385243.2)
   end
 
+  test "save the sale should update membership" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @saved_member = create_active_member(@terms_of_membership, :provisional_member_with_cc)
+
+    old_membership_id = @saved_member.current_membership_id
+    @saved_member.save_the_sale @terms_of_membership2.id
+    @saved_member.reload
+      
+    assert_equal @saved_member.current_membership.status, @saved_member.status
+    assert_equal @saved_member.current_membership.cancel_date, nil
+    assert_equal @saved_member.current_membership.parent_membership_id, old_membership_id
+  end
+
   test "save the sale should not update membership if it failed" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
@@ -400,6 +416,32 @@ class MemberTest < ActiveSupport::TestCase
       
     assert_equal @saved_member.current_membership.status, @saved_member.status
     assert_equal @saved_member.current_membership.cancel_date, nil
+  end
+
+  test "Downgrade member should fill parent_membership_id" do
+    terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    terms_of_membership.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => terms_of_membership_with_gateway_to_downgrade.id)
+    saved_member = create_active_member(terms_of_membership, :provisional_member_with_cc)
+    old_membership_id = saved_member.current_membership_id
+    saved_member.downgrade_member
+    saved_member.reload
+      
+    assert_equal saved_member.current_membership.parent_membership_id, old_membership_id
+  end
+
+  test "Upgrade member should fill parent_membership_id" do
+    terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    terms_of_membership.upgrade_tom_id = terms_of_membership2.id
+    terms_of_membership.upgrade_tom_period = 0
+    terms_of_membership.save(validate: false)
+    saved_member = create_active_member(terms_of_membership, :provisional_member_with_cc)
+    old_membership_id = saved_member.current_membership_id
+    Timecop.travel(saved_member.next_retry_bill_date) do
+      saved_member.bill_membership
+    end
+    assert_equal saved_member.current_membership.parent_membership_id, old_membership_id
   end
 
   test "manual payment member should be canceled when its billing date is overdue" do

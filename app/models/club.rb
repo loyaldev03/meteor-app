@@ -23,7 +23,8 @@ class Club < ActiveRecord::Base
 
   attr_accessible :description, :name, :logo, :drupal_domain_id, :theme, :requires_external_id,
     :api_type, :api_username, :api_password, :time_zone, :pardot_email, :pardot_password, :pardot_user_key,
-    :cs_phone_number, :family_memberships_allowed, :club_cash_enable
+    :cs_phone_number, :family_memberships_allowed, :club_cash_enable, :member_banner_url, :non_member_banner_url,
+    :member_landing_url, :non_member_landing_url
 
   acts_as_paranoid
 
@@ -31,10 +32,16 @@ class Club < ActiveRecord::Base
 
   validates :partner_id, :cs_phone_number, :presence => true
   validates :name, :presence => true, :uniqueness => true
+  validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url,
+            :format =>  /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
+
+  scope :exact_target_related, lambda { where("marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes like '%et_prospect_list%' AND marketing_tool_attributes like '%et_members_list%' ") }
 
   has_attached_file :logo, :path => ":rails_root/public/system/:attachment/:id/:style/:filename", 
                            :url => "/system/:attachment/:id/:style/:filename",
                            :styles => { :header => "120x40", :thumb => "100x100#", :small  => "150x150>" }
+
+  before_validation :complete_urls
 
   DEFAULT_PRODUCT = ['KIT-CARD']
 
@@ -132,6 +139,17 @@ class Club < ActiveRecord::Base
         d.name = name
         d.club_id = self.id
         d.save
+      end
+    end
+
+    def complete_urls
+      [:member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url].each do |field|
+        if self.changes.include? field
+          url = self.send field
+          if not url.blank? and not url.match(/^(http|https):\/\//)
+            self.send field.to_s+"=", "http://"+url
+          end
+        end
       end
     end
 end

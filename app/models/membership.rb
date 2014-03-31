@@ -18,4 +18,3 @@ class Membership < ActiveRecord::Base
     self.update_attributes :cancel_date => Time.zone.now, :status => 'lapsed'
   end
 end
-
