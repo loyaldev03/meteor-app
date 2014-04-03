@@ -116,10 +116,23 @@ class Member < ActiveRecord::Base
     end
   end
   # Async indexing
-  handle_asynchronously :solr_index, queue: 'solr_indexing', priority: 10
-  handle_asynchronously :solr_index!, queue: 'solr_indexing', priority: 10
-  ########### SEARCH ###############
+  alias_method :solr_index_with_exception_catch, :solr_index
+  alias_method :solr_index_with_exception_catch!, :solr_index!
+  handle_asynchronously :solr_index_with_exception_catch, queue: 'solr_indexing', priority: 10
+  handle_asynchronously :solr_index_with_exception_catch!, queue: 'solr_indexing', priority: 10
 
+  def solr_index_with_exception_catch
+    solr_index
+  rescue Exception => e
+    Auditory.report_issue("Member:IndexingAgainstSolr", e, { :member => self.inspect })
+  end
+  
+  def solr_index_with_exception_catch!
+    solr_index!
+  rescue Exception => e
+    Auditory.report_issue("Member:IndexingAgainstSolr", e, { :member => self.inspect })
+  end
+  ########### SEARCH ###############
 
   state_machine :status, :initial => :none, :action => :save_state do
     ###### member gets applied =====>>>>
