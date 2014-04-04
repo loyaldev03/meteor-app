@@ -39,7 +39,7 @@ class Member < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
   before_save :set_exact_target_sync_as_needed
-
+  after_save 'asyn_solr_index'
   after_update :after_save_sync_to_remote_domain
   after_destroy 'cancel_member_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
@@ -78,7 +78,7 @@ class Member < ActiveRecord::Base
   scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }  
 
   ########### SEARCH ###############
-  searchable do
+  searchable :auto_index => false do
     long :id
     long :club_id
     text :first_name
@@ -116,22 +116,13 @@ class Member < ActiveRecord::Base
     end
   end
   # Async indexing
-  alias_method :solr_index_with_exception_catch, :solr_index
-  alias_method :solr_index_with_exception_catch!, :solr_index!
-  handle_asynchronously :solr_index_with_exception_catch, queue: 'solr_indexing', priority: 10
-  handle_asynchronously :solr_index_with_exception_catch!, queue: 'solr_indexing', priority: 10
-
-  def solr_index_with_exception_catch
+  def asyn_solr_index
     solr_index
   rescue Exception => e
     Auditory.report_issue("Member:IndexingAgainstSolr", e, { :member => self.inspect })
+    raise e
   end
-  
-  def solr_index_with_exception_catch!
-    solr_index!
-  rescue Exception => e
-    Auditory.report_issue("Member:IndexingAgainstSolr", e, { :member => self.inspect })
-  end
+  handle_asynchronously :asyn_solr_index, queue: :solr_indexing, priority: 10
   ########### SEARCH ###############
 
   state_machine :status, :initial => :none, :action => :save_state do
