@@ -181,23 +181,20 @@ class Fulfillment < ActiveRecord::Base
   #   { :message => I18n.t('error_messages.fulfillment_out_of_stock'), :code => Settings.error_codes.fulfillment_out_of_stock }
   # end
 
-
-
-
   def get_file_line(change_status = false, fulfillment_file)
     return [] if product.nil?
     if change_status
       Fulfillment.find(self.id).update_status(fulfillment_file.agent_id, "in_process", "Fulfillment file generated", fulfillment_file.id) unless self.in_process? or self.renewed?
     end
     member = self.member
-    if fulfillment_file.other_type?
-      [ self.tracking_code, self.product.cost_center, member.full_name, member.address, member.city,
-            member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
-            self.product.weight, 'MID']
-    else
+    if fulfillment_file.kit_kard_type?
       [ member.id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
               (I18n.l self.renewable_at, :format => :only_date_short if self.renewable_at), member.address, member.city,
               member.state,"=\"#{member.zip}\"", self.product_sku, ('C' if member.member_group_type_id) ]
+    else
+      [ self.tracking_code, self.product.cost_center, member.full_name, member.address, member.city,
+            member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
+            self.product.weight, 'MID']
     end
   end
 
