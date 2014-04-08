@@ -36,7 +36,7 @@ en:
   all_times: 'All times'
   text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
-  loading: 'Loading'
+  loading: 'Loading. Please wait.'
   test_api_connection: 'Test API Connection'
   index: '#'
   lorem: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'

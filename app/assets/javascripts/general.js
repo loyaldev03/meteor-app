@@ -85,10 +85,12 @@ function startAjaxLoader(){
   };
   var spinner = new Spinner(opts).spin();
   $("#ajax_loader").append(spinner.el);
+  $("#blocker").show();
   $("#ajax_loader").slideDown("slow");
 };
 
 function endAjaxLoader(){
+  $("#blocker").hide();
   $("#ajax_loader").slideUp();
   $('.spinner').remove();
 };
@@ -856,13 +858,54 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
 
   $("#create_xls_file").click(function() {
     var fuls = $('.fulfillment_selected:checked');
+    var ff_id = "";
     for (x in fuls) {
       $('<input>').attr({ type: 'hidden', name: fuls[x].name, value: fuls[x].value }).appendTo($('#fulfillment_report_form'));
     }
     if (fuls.length != 0) {
       set_product_type_at_fulfillments_index(settings_kit_card_product, settings_others_product)
       $('#fulfillment_report_form').attr("action", create_xls_file_url);
-      $('#fulfillment_report_form').submit();
+      startAjaxLoader();
+      $.ajax({
+        type: "POST",
+        async: false,
+        url: "fulfillments/generate_xls",
+        data: $('#fulfillment_report_form').serialize(),
+        success: function(data){
+          ff_id = data.fulfillment_file_id;
+          alert(data.message);
+        },
+        error: function(jqXHR, exception){
+          alert("Something went wrong.");
+          endAjaxLoader();
+        }
+      });
+      if(ff_id != ""){
+        var counter = 0;
+        var timer = $.timer(function() {
+          counter++;
+          $.ajax({
+            type: "GET",
+            url: "fulfillments/check_if_fulfillment_file_was_generated",
+            data: $('#fulfillment_report_form').serialize() + "&fulfillment_file_id=" + ff_id,
+            success: function(data){
+              if(data.code == "000"){
+                alert("Fulfillment File creation proccess finished successfully.");
+                $("#report_results").remove();
+                $(".container .content").prepend("<div class='alert-info alert'>"+data.message+"</div>");
+                timer.stop();  
+                endAjaxLoader();
+              }
+            },
+            error: function(jqXHR, exception){
+              alert("Something went wrong.");
+              endAjaxLoader();
+              timer.stop();
+            }
+          });
+        });
+        timer.set({ time : 20000, autostart : true });
+      }
     } else {
       alert(fulfillment_file_cant_be_empty_message);
     }

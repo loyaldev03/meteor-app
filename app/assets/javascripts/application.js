@@ -17,6 +17,7 @@
 //= require dataTables/jquery.dataTables.bootstrap
 //= require jquery.validate
 //= require jquery.tablesorter
+//= require jquery.timer
 //= require spinner_generator
 //= require twitter/bootstrap/bootstrap-tab
 //= require twitter/bootstrap/bootstrap-tooltip

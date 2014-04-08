@@ -237,6 +237,7 @@ defaults: &defaults
     fulfillment_error: '9801'
     fulfillment_reason_blank: '9802'
     fulfillment_is_renwed: '9803'
+    fulfillment_file_not_finished_yet: '9804'
     operation_not_saved: '9900'
     payment_gateway_time_out: '9901'
     payment_gateway_error: '9900'

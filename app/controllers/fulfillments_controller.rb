@@ -57,7 +57,7 @@ class FulfillmentsController < ApplicationController
 
   def generate_xls
     my_authorize! :report, Fulfillment, @current_club.id
-    ff = FulfillmentFile.new   
+    ff = FulfillmentFile.new
     ff.agent = current_agent
     ff.club = @current_club
     if params[:all_times] == '1'
@@ -67,22 +67,25 @@ class FulfillmentsController < ApplicationController
     end
     ff.product = params[:product_type]
     if not params[:fulfillment_selected].nil?
-      begin
-        ff.save!
-        params[:fulfillment_selected].each do |fs|
-          fulfillment = Fulfillment.find(fs.first)
-          ff.fulfillments << fulfillment
-          fulfillment.update_status(ff.agent, "in_process", "Fulfillment file generated", ff.id)
-        end
-        flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
-      rescue Exception => e
-        flash.now[:error] = t('error_messages.airbrake_error_message')
-        Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
-      end
+      ff.save!
+      ff.process_fulfillments_for_file(params[:fulfillment_selected])
+      answer = { :code => Settings.error_codes.success, :fulfillment_file_id => ff.id, :message => "Fulfillment File is being generated. Please, wait until we are finished. It may take a while." }
     else
-      flash.now[:error] = t('error_messages.fulfillment_file_cant_be_empty')
+      answer = { :code => Settings.error_codes.wrong_data, :message => t('error_messages.fulfillment_file_cant_be_empty') }
     end
-    render :index
+  else  
+    render json: answer
+  end
+
+  def check_if_fulfillment_file_was_generated
+    my_authorize! :report, Fulfillment, @current_club.id
+    fulfillment_file = FulfillmentFile.find(params[:fulfillment_file_id].to_i)
+    if fulfillment_file.fulfillments.count == params[:fulfillment_selected].count
+      answer = { code: Settings.error_codes.success, :message => "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => fulfillment_file.id)}' class='btn btn-success'>Download it from here</a>".html_safe }
+    else
+      answer = { code: Settings.error_codes.fulfillment_file_not_finished_yet, :message => "Processed #{fulfillment_file.fulfillments.count} out of #{params[:fulfillment_selected].count}." }
+    end
+    render json: answer
   end
 
   def download_xls

@@ -37,6 +37,17 @@ class FulfillmentFile < ActiveRecord::Base
     self.product == Settings.others_product
   end
 
+  def process_fulfillments_for_file(fulfillment_selected)
+  fulfillment_selected.each do |fs|
+    fulfillment = Fulfillment.find(fs.first)
+    self.fulfillments << fulfillment
+    fulfillment.update_status(self.agent, "in_process", "Fulfillment file generated", self.id)
+  end
+  rescue Exception => e
+    Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
+  end
+  handle_asynchronously :process_fulfillments_for_file
+
   def generateXLS(change_status = false)
     package = Axlsx::Package.new
     package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
