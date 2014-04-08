@@ -819,7 +819,7 @@ function set_product_type_at_fulfillments_index(settings_kit_card_product, setti
   }
 }
 
-function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message, settings_kit_card_product, settings_others_product){
+function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message, settings_kit_card_product, settings_others_product, error_message){
   $("#report_results").tablesorter({
     headers: { 
       0: { sorter: false }, 
@@ -874,10 +874,6 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
         success: function(data){
           ff_id = data.fulfillment_file_id;
           alert(data.message);
-        },
-        error: function(jqXHR, exception){
-          alert("Something went wrong.");
-          endAjaxLoader();
         }
       });
       if(ff_id != ""){
@@ -896,13 +892,13 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
                 timer.stop();  
                 endAjaxLoader();
               }
-            },
-            error: function(jqXHR, exception){
-              alert("Something went wrong.");
-              endAjaxLoader();
-              timer.stop();
             }
           });
+          if(counter == 30){
+            timer.stop();  
+            endAjaxLoader();
+            alert("It is taking more than expected. Wait a little longer and if you do not see the fulfillment file created, contact IT crew, please.");
+          }
         });
         timer.set({ time : 20000, autostart : true });
       }
