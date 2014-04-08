@@ -33,17 +33,17 @@ class FulfillmentFile < ActiveRecord::Base
     self.fulfillments.where_in_process.each { |x| x.update_status(agent, 'sent', 'Fulfillment file set as sent', self.id) }
   end
 
-  def other_type?
-    self.product == Settings.others_product
+  def kit_kard_type?
+    self.product == Settings.kit_card_product
   end
 
   def generateXLS(change_status = false)
     package = Axlsx::Package.new
     package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
-      if self.other_type?
-        sheet.add_row Fulfillment::SLOOPS_HEADER
-      else
+      if self.kit_kard_type?
         sheet.add_row Fulfillment::KIT_CARD_HEADER
+      else
+        sheet.add_row Fulfillment::SLOOPS_HEADER
       end
       self.fulfillments.each do |fulfillment|
         row = fulfillment.get_file_line(change_status, self)
