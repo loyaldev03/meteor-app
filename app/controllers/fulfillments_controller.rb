@@ -73,17 +73,19 @@ class FulfillmentsController < ApplicationController
     else
       answer = { :code => Settings.error_codes.wrong_data, :message => t('error_messages.fulfillment_file_cant_be_empty') }
     end
-  else  
     render json: answer
+  rescue Exception => e
+    Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
+    render json: { :code => Settings.error_codes.unexpected_error, :message => t('error_messages.airbrake_error_message') }
   end
 
-  def check_if_fulfillment_file_was_generated
+  def check_if_file_is_in_process
     my_authorize! :report, Fulfillment, @current_club.id
     fulfillment_file = FulfillmentFile.find(params[:fulfillment_file_id].to_i)
-    if fulfillment_file.fulfillments.count == params[:fulfillment_selected].count
-      answer = { code: Settings.error_codes.success, :message => "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => fulfillment_file.id)}' class='btn btn-success'>Download it from here</a>".html_safe }
+    if fulfillment_file.not_ready?
+      answer = { code: Settings.error_codes.fulfillment_file_not_finished_yet }
     else
-      answer = { code: Settings.error_codes.fulfillment_file_not_finished_yet, :message => "Processed #{fulfillment_file.fulfillments.count} out of #{params[:fulfillment_selected].count}." }
+      answer = { code: Settings.error_codes.success, :message => "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => fulfillment_file.id)}' class='btn btn-success'>Download it from here</a>".html_safe }
     end
     render json: answer
   end

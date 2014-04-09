@@ -872,8 +872,13 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
         url: "fulfillments/generate_xls",
         data: $('#fulfillment_report_form').serialize(),
         success: function(data){
-          ff_id = data.fulfillment_file_id;
-          alert(data.message);
+          if(data.code == "500"){
+            endAjaxLoader();
+            $(".container .content").prepend("<div class='alert-error alert'>"+data.message+"</div>");
+          }else{
+            ff_id = data.fulfillment_file_id;
+            alert(data.message);
+          }
         }
       });
       if(ff_id != ""){
@@ -882,8 +887,8 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
           counter++;
           $.ajax({
             type: "GET",
-            url: "fulfillments/check_if_fulfillment_file_was_generated",
-            data: $('#fulfillment_report_form').serialize() + "&fulfillment_file_id=" + ff_id,
+            url: "fulfillments/files/"+ff_id+"/check_if_is_in_process ",
+            data: $('#fulfillment_report_form').serialize(),
             success: function(data){
               if(data.code == "000"){
                 alert("Fulfillment File creation proccess finished successfully.");
