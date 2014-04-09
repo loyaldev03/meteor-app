@@ -819,7 +819,7 @@ function set_product_type_at_fulfillments_index(settings_kit_card_product, setti
   }
 }
 
-function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message, settings_kit_card_product, settings_others_product, error_message){
+function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message, settings_kit_card_product, settings_others_product){
   $("#report_results").tablesorter({
     headers: { 
       0: { sorter: false }, 
@@ -887,7 +887,7 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
           counter++;
           $.ajax({
             type: "GET",
-            url: "fulfillments/files/"+ff_id+"/check_if_is_in_process ",
+            url: "fulfillments/files/"+ff_id+"/check_if_is_in_process",
             data: $('#fulfillment_report_form').serialize(),
             success: function(data){
               if(data.code == "000"){

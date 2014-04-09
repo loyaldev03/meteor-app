@@ -58,7 +58,7 @@
 <%= render :partial => "report_result" %>
 
 <script type="text/javascript">
-  $(document).ready( fulfillments_index_functions('<%= generate_xls_fulfillments_path %>', '<%= fulfillments_index_path %>', '<%= t("error_messages.fulfillment_file_cant_be_empty") %>', '<%= Settings.kit_card_product %>', '<%= Settings.others_product %>', '<%= t("error_messages.airbrake_error_message")%>') );
+  $(document).ready( fulfillments_index_functions('<%= generate_xls_fulfillments_path %>', '<%= fulfillments_index_path %>', '<%= t("error_messages.fulfillment_file_cant_be_empty") %>', '<%= Settings.kit_card_product %>', '<%= Settings.others_product %>') );
 </script>
 
 
