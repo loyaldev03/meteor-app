@@ -14,13 +14,13 @@ private
       [ 
         file.id, 
         I18n.l(file.created_at.to_date),
-        file.status=='sent' ? "" : link_to('<i class="icon-file"></i>'.html_safe, @url_helpers.download_xls_fulfillments_path(@current_partner.prefix,@current_club.name,file.id, :only_in_progress => true), :class => "btn", :id=>"download_xls_#{file.id}"),
-        link_to("View", @url_helpers.fulfillment_list_for_file_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn"),
+        file.in_process? ? link_to('<i class="icon-file"></i>'.html_safe, @url_helpers.download_xls_fulfillments_path(@current_partner.prefix,@current_club.name,file.id, :only_in_progress => true), :class => "btn", :id=>"download_xls_#{file.id}") : "",
+        file.not_ready? ? "" : link_to("View", @url_helpers.fulfillment_list_for_file_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn"),
         file.status, 
         file.product,
         file.dates,
         file.fulfillments_processed,
-        (file.sent? ? '' : link_to("Mark as sent", @url_helpers.fulfillment_file_mark_as_sent_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn btn-warning", :id=>'mark_as_sent'))
+        (file.in_process? ? link_to("Mark as sent", @url_helpers.fulfillment_file_mark_as_sent_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn btn-warning", :id=>'mark_as_sent') : '')
       ]
     end
   end

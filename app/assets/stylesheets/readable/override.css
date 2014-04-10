@@ -128,16 +128,27 @@ div.dataTables_filter input {
 
 .required_asterick:after { content:" *"; }
 
+#blocker{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: none;
+  background-color: #333333;
+  z-index: 190000;
+  opacity: 0.6;
+  filter:alpha(opacity=60); /* For IE8 and earlier */
+}
+
 #ajax_loader {
   position: fixed;
   background-color: #EBE9EA;
   text-align: left;
   border-radius: 6px 6px 6px 6px;
-  width: 130px;
+  width: 25%;
   height: 35px;
   border: 2px solid #D2D2D2;
   overflow: hidden; 
-  left: 45%;
+  left: 35%;
   top: 0px;
   display: none;
   z-index: 200000;
