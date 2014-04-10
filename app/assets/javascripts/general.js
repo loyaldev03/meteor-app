@@ -865,6 +865,7 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
     if (fuls.length != 0) {
       set_product_type_at_fulfillments_index(settings_kit_card_product, settings_others_product)
       $('#fulfillment_report_form').attr("action", create_xls_file_url);
+      $(this).attr('disabled', 'disabled');
       startAjaxLoader();
       $.ajax({
         type: "POST",
@@ -874,6 +875,7 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
         success: function(data){
           if(data.code == "500"){
             endAjaxLoader();
+            $(this).removeAttr('disabled');
             $(".container .content").prepend("<div class='alert-error alert'>"+data.message+"</div>");
           }else{
             ff_id = data.fulfillment_file_id;
@@ -896,12 +898,14 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
                 $(".container .content").prepend("<div class='alert-info alert'>"+data.message+"</div>");
                 timer.stop();  
                 endAjaxLoader();
+                $(this).removeAttr('disabled');
               }
             }
           });
           if(counter == 30){
             timer.stop();  
             endAjaxLoader();
+            $(this).removeAttr('disabled');
             alert("It is taking more than expected. Wait a little longer and if you do not see the fulfillment file created, contact IT crew, please.");
           }
         });
