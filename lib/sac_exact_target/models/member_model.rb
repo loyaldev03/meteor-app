@@ -194,9 +194,10 @@ module SacExactTarget
       case self.member.club_id
         when 1
           {
-            "pref_field_1" => "driver_2",
-            "pref_field_2" => "car",
-            "pref_field_3" => "track"
+            "pref_field_1" => "driver_1",
+            "pref_field_2" => "driver_2",
+            "pref_field_3" => "car",
+            "pref_field_4" => "track"
           }
         when 5
           {
