@@ -125,6 +125,13 @@ module SacExactTarget
       enrollment_fieldmap.each do |api_field, our_field| 
         attributes << SacExactTarget.format_attribute(enrollment_info, api_field, our_field)
       end  
+      if Rails.env.production?
+        member_preferences = self.member.member_preferences
+        preferences_fieldmap.each do |api_field, our_field|
+          member_preference = member_preferences.where(:param => our_field).first
+          attributes << SacExactTarget.format_attribute(member_preference, api_field, our_field) if member_preference
+        end
+      end
       attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
       ExactTargetSDK::Subscriber.new({
         'SubscriberKey' => subscriber_key, 
@@ -181,6 +188,37 @@ module SacExactTarget
       { 
         'Installment_amount' => 'installment_amount'
       }
+    end
+
+    def preferences_fieldmap
+      case self.member.club_id
+        when 1
+          {
+            "pref_field_1" => "driver_1",
+            "pref_field_2" => "driver_2",
+            "pref_field_3" => "car",
+            "pref_field_4" => "track"
+          }
+        when 5
+          {
+            "pref_field_1" => "rv_type",
+            "pref_field_2" => "rv_make",
+            "pref_field_3" => "rv_model",
+            "pref_field_4" => "rv_year",
+            "pref_field_5" => "rv_miles",
+            "pref_field_6" => "fav_dest",
+            "pref_field_7" => "fav_use"
+          }
+        when 8
+          {
+            "pref_field_1" => "fav_team"
+          }
+        when 9
+          {
+            "pref_field_1" => "car_year",
+            "pref_field_2" => "car_made"
+          }
+      end
     end
 
     def subscriber_key
