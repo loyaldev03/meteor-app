@@ -873,13 +873,13 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
         url: "fulfillments/generate_xls",
         data: $('#fulfillment_report_form').serialize(),
         success: function(data){
-          if(data.code == "500"){
+          if(data.code == "000"){
+            ff_id = data.fulfillment_file_id;
+            alert(data.message);
+          }else{
             endAjaxLoader();
             $(this).removeAttr('disabled');
             $(".container .content").prepend("<div class='alert-error alert'>"+data.message+"</div>");
-          }else{
-            ff_id = data.fulfillment_file_id;
-            alert(data.message);
           }
         }
       });
@@ -903,10 +903,12 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
             }
           });
           if(counter == 30){
-            timer.stop();  
+            var message = "It is taking more than expected. Wait a little longer and if you do not see the fulfillment file created, contact IT crew, please.";
+            timer.stop();
             endAjaxLoader();
             $(this).removeAttr('disabled');
-            alert("It is taking more than expected. Wait a little longer and if you do not see the fulfillment file created, contact IT crew, please.");
+            alert(message);
+            $(".container .content").prepend("<div class='alert-error alert'>"+message+"</div>");
           }
         });
         timer.set({ time : 20000, autostart : true });

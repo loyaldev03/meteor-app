@@ -57,21 +57,25 @@ class FulfillmentsController < ApplicationController
 
   def generate_xls
     my_authorize! :report, Fulfillment, @current_club.id
-    ff = FulfillmentFile.new
-    ff.agent = current_agent
-    ff.club = @current_club
-    if params[:all_times] == '1'
-      ff.initial_date, ff.end_date, ff.all_times = nil, nil, true
+    if FulfillmentFile.where(status: "not_ready", club_id: @current_club.id, product: params[:product_type]).empty?
+      ff = FulfillmentFile.new
+      ff.agent = current_agent
+      ff.club = @current_club
+      if params[:all_times] == '1'
+        ff.initial_date, ff.end_date, ff.all_times = nil, nil, true
+      else
+        ff.initial_date, ff.end_date, ff.all_times = params[:initial_date], params[:end_date], false
+      end
+      ff.product = params[:product_type]
+      if not params[:fulfillment_selected].nil?
+        ff.save!
+        ff.process_fulfillments_for_file(params[:fulfillment_selected])
+        answer = { :code => Settings.error_codes.success, :fulfillment_file_id => ff.id, :message => "Fulfillment File is being generated. Please, wait until we are finished. It may take a while." }
+      else
+        answer = { :code => Settings.error_codes.wrong_data, :message => t('error_messages.fulfillment_file_cant_be_empty') }
+      end
     else
-      ff.initial_date, ff.end_date, ff.all_times = params[:initial_date], params[:end_date], false
-    end
-    ff.product = params[:product_type]
-    if not params[:fulfillment_selected].nil?
-      ff.save!
-      ff.process_fulfillments_for_file(params[:fulfillment_selected])
-      answer = { :code => Settings.error_codes.success, :fulfillment_file_id => ff.id, :message => "Fulfillment File is being generated. Please, wait until we are finished. It may take a while." }
-    else
-      answer = { :code => Settings.error_codes.wrong_data, :message => t('error_messages.fulfillment_file_cant_be_empty') }
+      answer = { :code => Settings.error_codes.fulfillment_file_not_finished_yet, :message => t('error_messages.fulfillment_file_not_ready_wait') }
     end
     render json: answer
   rescue Exception => e
