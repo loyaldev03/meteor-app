@@ -30,7 +30,7 @@ module SacExactTarget
     elsif value.class == Date
       ExactTargetSDK::Attributes.new(Name: api_field, Value: I18n.l(value)) 
     else
-      ExactTargetSDK::Attributes.new(Name: api_field, Value: value) 
+      ExactTargetSDK::Attributes.new(Name: api_field, Value: value.to_s) 
     end
   end 
 
