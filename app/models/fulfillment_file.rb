@@ -4,20 +4,14 @@ class FulfillmentFile < ActiveRecord::Base
   belongs_to :agent
   belongs_to :club
 
-  state_machine :status, :initial => :not_ready do
+  state_machine :status, :initial => :in_process do
     after_transition :in_process => :sent, :do => :mark_fulfillments_as_sent
-
-    event :is_ready do
-      transition :not_ready => :in_process
-    end
 
     event :processed do
       transition :in_process => :sent
     end
     
-    #First state. Creation process was started. 
-    state :not_ready
-    #Creation process was finished. 
+    #First status. fulfillment file was created
     state :in_process
     #Manually set through CS. Every fulfillment inside was processed.
     state :sent 
@@ -42,18 +36,6 @@ class FulfillmentFile < ActiveRecord::Base
   def kit_kard_type?
     self.product == Settings.kit_card_product
   end
-
-  def process_fulfillments_for_file(fulfillment_selected)
-  fulfillment_selected.each do |fs|
-    fulfillment = Fulfillment.find(fs.first)
-    self.fulfillments << fulfillment
-    fulfillment.update_status(self.agent, "in_process", "Fulfillment file generated", self.id)
-  end
-  self.is_ready!
-  rescue Exception => e
-    Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
-  end
-  handle_asynchronously :process_fulfillments_for_file
 
   def generateXLS(change_status = false)
     package = Axlsx::Package.new

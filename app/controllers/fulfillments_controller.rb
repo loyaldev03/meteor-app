@@ -5,7 +5,7 @@ class FulfillmentsController < ApplicationController
     my_authorize! :report, Fulfillment, @current_club.id
     if request.post?
       @status = params[:status]
-    	if params[:all_times] == '1'
+      if params[:all_times] == '1'
         if params[:product_type] == Settings.others_product
           @fulfillments = Fulfillment.includes(:member).joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_others.not_renewed
         else
@@ -57,41 +57,32 @@ class FulfillmentsController < ApplicationController
 
   def generate_xls
     my_authorize! :report, Fulfillment, @current_club.id
-    if FulfillmentFile.where(status: "not_ready", club_id: @current_club.id, product: params[:product_type]).empty?
-      ff = FulfillmentFile.new
-      ff.agent = current_agent
-      ff.club = @current_club
-      if params[:all_times] == '1'
-        ff.initial_date, ff.end_date, ff.all_times = nil, nil, true
-      else
-        ff.initial_date, ff.end_date, ff.all_times = params[:initial_date], params[:end_date], false
-      end
-      ff.product = params[:product_type]
-      if not params[:fulfillment_selected].nil?
+    ff = FulfillmentFile.new   
+    ff.agent = current_agent
+    ff.club = @current_club
+    if params[:all_times] == '1'
+      ff.initial_date, ff.end_date, ff.all_times = nil, nil, true
+    else
+      ff.initial_date, ff.end_date, ff.all_times = params[:initial_date], params[:end_date], false
+    end
+    ff.product = params[:product_type]
+    if not params[:fulfillment_selected].nil?
+      begin
         ff.save!
-        ff.process_fulfillments_for_file(params[:fulfillment_selected])
-        answer = { :code => Settings.error_codes.success, :fulfillment_file_id => ff.id, :message => "Fulfillment File is being generated. Please, wait until we are finished. It may take a while." }
-      else
-        answer = { :code => Settings.error_codes.wrong_data, :message => t('error_messages.fulfillment_file_cant_be_empty') }
+        params[:fulfillment_selected].each do |fs|
+          fulfillment = Fulfillment.find(fs.first)
+          ff.fulfillments << fulfillment
+          fulfillment.update_status(ff.agent, "in_process", "Fulfillment file generated", ff.id)
+        end
+        flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
+      rescue Exception => e
+        flash.now[:error] = t('error_messages.airbrake_error_message')
+        Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
       end
     else
-      answer = { :code => Settings.error_codes.fulfillment_file_not_finished_yet, :message => t('error_messages.fulfillment_file_not_ready_wait') }
+      flash.now[:error] = t('error_messages.fulfillment_file_cant_be_empty')
     end
-    render json: answer
-  rescue Exception => e
-    Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
-    render json: { :code => Settings.error_codes.unexpected_error, :message => t('error_messages.airbrake_error_message') }
-  end
-
-  def check_if_file_is_in_process
-    my_authorize! :report, Fulfillment, @current_club.id
-    fulfillment_file = FulfillmentFile.find(params[:fulfillment_file_id].to_i)
-    if fulfillment_file.not_ready?
-      answer = { code: Settings.error_codes.fulfillment_file_not_finished_yet }
-    else
-      answer = { code: Settings.error_codes.success, :message => "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => fulfillment_file.id)}' class='btn btn-success'>Download it from here</a>".html_safe }
-    end
-    render json: answer
+    render :index
   end
 
   def download_xls

@@ -85,12 +85,10 @@ function startAjaxLoader(){
   };
   var spinner = new Spinner(opts).spin();
   $("#ajax_loader").append(spinner.el);
-  $("#blocker").show();
   $("#ajax_loader").slideDown("slow");
 };
 
 function endAjaxLoader(){
-  $("#blocker").hide();
   $("#ajax_loader").slideUp();
   $('.spinner').remove();
 };
@@ -100,7 +98,7 @@ function agent_index_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"fp>rt<"bottom"il>',
+  "sDom": '<"top"fp>rt<"bottom"il>',
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
@@ -113,7 +111,7 @@ function agent_index_functions(column_count){
 function partner_index_functions(column_count){
   $('#partners_table').dataTable({
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"fp>rt<"bottom"il>',
+  "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -128,7 +126,7 @@ function partner_index_functions(column_count){
 function club_index_functions(column_count){
   $('#clubs_table').dataTable({
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"fp>rt<"bottom"il>',
+  "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -144,7 +142,7 @@ function club_index_functions(column_count){
 function delay_jobs_index_functions(column_count){
   $('#delayed_jobs_table').dataTable({
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"fp>rt<"bottom"il>',
+  "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -175,7 +173,7 @@ function disposition_types_index_functions(column_count){
 function my_club_index_functions(column_count){
   $('#my_clubs_table').dataTable({
     "sPaginationType": "bootstrap",
-  	"sDom": '<"top"fp>rt<"bottom"il>',
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -188,7 +186,7 @@ function my_club_index_functions(column_count){
 function domain_index_functions(column_count){
   $('#domains_table').dataTable({
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"fp>rt<"bottom"il>',
+  "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -204,7 +202,7 @@ function domain_index_functions(column_count){
 function product_index_functions(column_count){
   $('#products_table').dataTable({
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"fp>rt<"bottom"il>',
+  "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -590,7 +588,7 @@ function operation_member_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"flp>rt<"bottom"i>',
+  "sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "aaSorting": [[ 1, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ] }],
@@ -611,7 +609,7 @@ function transactions_member_functions(column_count){
     "bProcessing": true,
     "bFilter": false,
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"flp>rt<"bottom"i>',
+  "sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5,6 ] }],
@@ -625,7 +623,7 @@ function memberships_member_functions(column_count){
     "bProcessing": true,
     "bFilter": false,
     "sPaginationType": "bootstrap",
-	"sDom": '<"top"flp>rt<"bottom"i>',
+  "sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "bLengthChange": false,
     "aaSorting": [[ 0, "desc" ]],
@@ -673,7 +671,7 @@ function club_cash_transactions_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "bootstrap",
-	  "sDom": '<"top"flp>rt<"bottom"i>',
+    "sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
@@ -858,61 +856,13 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
 
   $("#create_xls_file").click(function() {
     var fuls = $('.fulfillment_selected:checked');
-    var ff_id = "";
     for (x in fuls) {
       $('<input>').attr({ type: 'hidden', name: fuls[x].name, value: fuls[x].value }).appendTo($('#fulfillment_report_form'));
     }
     if (fuls.length != 0) {
       set_product_type_at_fulfillments_index(settings_kit_card_product, settings_others_product)
       $('#fulfillment_report_form').attr("action", create_xls_file_url);
-      $(this).attr('disabled', 'disabled');
-      startAjaxLoader();
-      $.ajax({
-        type: "POST",
-        async: false,
-        url: "fulfillments/generate_xls",
-        data: $('#fulfillment_report_form').serialize(),
-        success: function(data){
-          if(data.code == "000"){
-            ff_id = data.fulfillment_file_id;
-            alert(data.message);
-          }else{
-            endAjaxLoader();
-            $(this).removeAttr('disabled');
-            $(".container .content").prepend("<div class='alert-error alert'>"+data.message+"</div>");
-          }
-        }
-      });
-      if(ff_id != ""){
-        var counter = 0;
-        var timer = $.timer(function() {
-          counter++;
-          $.ajax({
-            type: "GET",
-            url: "fulfillments/files/"+ff_id+"/check_if_is_in_process",
-            data: $('#fulfillment_report_form').serialize(),
-            success: function(data){
-              if(data.code == "000"){
-                alert("Fulfillment File creation proccess finished successfully.");
-                $("#report_results").remove();
-                $(".container .content").prepend("<div class='alert-info alert'>"+data.message+"</div>");
-                timer.stop();  
-                endAjaxLoader();
-                $(this).removeAttr('disabled');
-              }
-            }
-          });
-          if(counter == 30){
-            var message = "It is taking more than expected. Wait a little longer and if you do not see the fulfillment file created, contact IT crew, please.";
-            timer.stop();
-            endAjaxLoader();
-            $(this).removeAttr('disabled');
-            alert(message);
-            $(".container .content").prepend("<div class='alert-error alert'>"+message+"</div>");
-          }
-        });
-        timer.set({ time : 20000, autostart : true });
-      }
+      $('#fulfillment_report_form').submit();
     } else {
       alert(fulfillment_file_cant_be_empty_message);
     }
