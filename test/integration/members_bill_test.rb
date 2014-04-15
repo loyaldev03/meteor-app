@@ -252,11 +252,11 @@ class MembersBillTest < ActionController::IntegrationTest
     @saved_member.set_as_canceled
     @saved_member.recover(@terms_of_membership_with_gateway) 
     @saved_member.set_as_active
-    next_bill_date = Time.zone.now + 1.day
+    next_bill_date = Time.zone.now.utc + 1.day
 
     change_next_bill_date(next_bill_date, "Change Next Bill Date for tomorrow")
     while find_field('input_first_name').value != @saved_member.first_name
-      next_bill_date = next_bill_date + 1.hour  
+      next_bill_date = next_bill_date + 1.hour
       change_next_bill_date(next_bill_date, "Change Next Bill Date for tomorrow")  
     end
     within("#td_mi_next_retry_bill_date")do
