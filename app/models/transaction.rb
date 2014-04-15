@@ -244,8 +244,8 @@ class Transaction < ActiveRecord::Base
     rescue Timeout::Error
       save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
-      save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
       Auditory.report_issue("Transaction::Credit", e, {:member => self.member.inspect, :transaction => self.inspect })
+      save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
     end
 
     def refund
@@ -261,8 +261,8 @@ class Transaction < ActiveRecord::Base
     rescue Timeout::Error
       save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
-      save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
       Auditory.report_issue("Transaction::Refund", e, {:member => self.member.inspect, :transaction => self.inspect })
+      save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
     end    
 
     # Process only sale operations
