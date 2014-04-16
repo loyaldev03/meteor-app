@@ -74,6 +74,8 @@ module Drupal
           Drupal.logger.error AuthError.new("HTTP #{res.status} when getting token") 
           nil
         end
+      rescue Exception => e
+        Auditory.report_issue("FaradayMiddleware::DrupalAuthentication::GenerateToken", e.to_s, { drupal_response: res.to_s })
       end
 
       def cookie_age
