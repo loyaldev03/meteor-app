@@ -110,6 +110,13 @@ module SacExactTarget
         fields_map.collect do |api_field, our_field| 
           attributes << SacExactTarget.format_attribute(self.prospect, api_field, our_field)
         end
+        if Rails.env.production?
+          if preference_fields_map
+            preference_fields_map.collect do |api_field, our_field|
+              attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: self.prospect.preferences[our_field].to_s)
+            end
+          end
+        end
         attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
         ExactTargetSDK::Subscriber.new({
           'SubscriberKey' => subscriber_key, 
@@ -137,6 +144,37 @@ module SacExactTarget
           'Phone' => 'full_phone_number',
           'Gender' => 'gender'
         }
+      end
+
+      def preference_fields_map
+        case self.prospect.club_id
+          when 1
+            {
+              "pref_field_1" => "driver_1",
+              "pref_field_2" => "driver_2",
+              "pref_field_3" => "car",
+              "pref_field_4" => "track"
+            }
+          when 5
+            {
+              "pref_field_1" => "rv_type",
+              "pref_field_2" => "rv_make",
+              "pref_field_3" => "rv_model",
+              "pref_field_4" => "rv_year",
+              "pref_field_5" => "rv_miles",
+              "pref_field_6" => "fav_dest",
+              "pref_field_7" => "fav_use"
+            }
+          when 8
+            {
+              "pref_field_1" => "fav_team"
+            }
+          when 9
+            {
+              "pref_field_1" => "car_year",
+              "pref_field_2" => "car_made"
+            }
+        end
       end
 
       def club_id
