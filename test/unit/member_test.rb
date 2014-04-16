@@ -18,7 +18,7 @@ class MemberTest < ActiveSupport::TestCase
     assert !member.save, member.errors.inspect
     member.club = @terms_of_membership_with_gateway.club
     Delayed::Worker.delay_jobs = true
-    assert_difference('Delayed::Job.count', 2, 'should create job for #desnormalize_preferences and mkt tool sync') do
+    assert_difference('Delayed::Job.count', 3, 'should create job for #desnormalize_preferences and mkt tool sync') do
       assert member.save, "member cant be save #{member.errors.inspect}"
     end
     Delayed::Worker.delay_jobs = false
@@ -138,7 +138,7 @@ class MemberTest < ActiveSupport::TestCase
     member = create_active_member(@tom_approval, :lapsed_member)
     answer = {}
     Delayed::Worker.delay_jobs = true
-    assert_difference("DelayedJob.count", 1) do  # :send_recover_needs_approval_email_dj_without_delay 
+    assert_difference("DelayedJob.count", 4) do  # :send_recover_needs_approval_email_dj_without_delay 
       answer = member.recover(@tom_approval)
     end
     Delayed::Worker.delay_jobs = false

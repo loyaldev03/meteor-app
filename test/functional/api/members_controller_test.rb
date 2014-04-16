@@ -120,7 +120,7 @@ class Api::MembersControllerTest < ActionController::TestCase
             assert_difference('MemberPreference.count',@preferences.size) do 
               assert_difference('Member.count') do
                 Delayed::Worker.delay_jobs = true
-                assert_difference('DelayedJob.count',4)do
+                assert_difference('DelayedJob.count',7)do
                   generate_post_message
                   assert_response :success
                 end
@@ -156,7 +156,7 @@ class Api::MembersControllerTest < ActionController::TestCase
           assert_difference('MemberPreference.count',@preferences.size) do 
             assert_difference('Member.count') do
               Delayed::Worker.delay_jobs = true
-              assert_difference('DelayedJob.count',3) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
+              assert_difference('DelayedJob.count',5) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
                 generate_post_message
                 assert_response :success
               end
@@ -188,8 +188,11 @@ class Api::MembersControllerTest < ActionController::TestCase
         assert_difference('Transaction.count')do
           assert_difference('MemberPreference.count',@preferences.size) do 
             assert_difference('Member.count') do
+              Delayed::Worker.delay_jobs = true
               generate_post_message
               assert_response :success
+              Delayed::Worker.delay_jobs = false
+              Delayed::Job.all.each{ |x| x.invoke_job }
             end
           end
         end
@@ -212,10 +215,13 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_difference('EnrollmentInfo.count') do
         assert_difference('Transaction.count') do
           assert_difference('MemberPreference.count',@preferences.size) do 
+            Delayed::Worker.delay_jobs = true
             assert_difference('Member.count') do
               generate_post_message
               assert_response :success
             end
+            Delayed::Worker.delay_jobs = false
+            Delayed::Job.all.each{ |x| x.invoke_job }
           end
         end
       end
