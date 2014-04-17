@@ -125,7 +125,7 @@ module SacExactTarget
       enrollment_fieldmap.each do |api_field, our_field| 
         attributes << SacExactTarget.format_attribute(enrollment_info, api_field, our_field)
       end  
-      if Rails.env.production?
+      if Rails.env.production? and preferences_fieldmap
         member_preferences = self.member.member_preferences
         preferences_fieldmap.each do |api_field, our_field|
           member_preference = member_preferences.where(:param => our_field).first
