@@ -12,7 +12,7 @@ namespace :mkt_tools do
         Member.sync_members_to_pardot
       end
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run mkt_tools:sync_members_to_pardot task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run mkt_tools:sync_members_to_pardot task"
     end
   end
 
@@ -28,7 +28,7 @@ namespace :mkt_tools do
         Member.sync_members_to_exact_target
       end
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run mkt_tools:sync_members_to_exact_target task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run mkt_tools:sync_members_to_exact_target task"
     end
   end
 
@@ -44,7 +44,7 @@ namespace :mkt_tools do
         Prospect.sync_prospects_to_exact_target
       end
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run mkt_tools:sync_prospects_to_exact_target task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run mkt_tools:sync_prospects_to_exact_target task"
     end
   end
 

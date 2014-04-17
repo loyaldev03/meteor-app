@@ -20,7 +20,7 @@ module TasksHelpers
         Auditory.report_issue("Billing::Today", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect, :credit_card => member.active_credit_card.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
-      Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+      Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
     end
     file.flock(File::LOCK_UN)
   rescue Exception => e
@@ -52,7 +52,7 @@ module TasksHelpers
         template = EmailTemplate.find res[1]
         Rails.logger.info "   *[#{index+1}] processing member ##{member.id}"
         Communication.deliver!(template, member)
-        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
       rescue Exception => e
         Auditory.report_issue("Members::SendPillar", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :template => template.inspect, :membership => member.current_membership.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
@@ -76,7 +76,7 @@ module TasksHelpers
         Auditory.report_issue("Member::ClubCash", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
-      Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+      Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
     end
   rescue Exception => e
     Auditory.report_issue("Members::ClubCash", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
@@ -100,7 +100,7 @@ module TasksHelpers
           Auditory.report_issue("Members::Cancel", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
-        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
       end
     end
   rescue Exception => e
@@ -126,7 +126,7 @@ module TasksHelpers
         end
       end
     end
-    Rails.logger.info "    ... took #{Time.zone.now - tz}"
+    Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
     base = Member.where('last_sync_error like "There is no user with ID%"')
     base2 = Member.where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"')
@@ -160,7 +160,7 @@ module TasksHelpers
         end
       end
     end
-    Rails.logger.info "    ... took #{Time.zone.now - tz}"
+    Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
     base = Member.joins(:club).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:process_sync rake task with members not_synced or with_error, processing #{base.count} members"
@@ -181,7 +181,7 @@ module TasksHelpers
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end       
-    Rails.logger.info "    ... took #{Time.zone.now - tz}"
+    Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
   rescue Exception => e
     Auditory.report_issue("Members::Sync", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
@@ -220,7 +220,7 @@ module TasksHelpers
           Auditory.report_issue("Members::sendHappyBirthday", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
-        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
       end
     end
   rescue Exception => e
@@ -247,7 +247,7 @@ module TasksHelpers
           Auditory.report_issue("Billing::SendPrebill", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
-        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
       end
     end
   rescue Exception => e
@@ -267,7 +267,7 @@ module TasksHelpers
           Auditory.report_issue("Member::SyncExactTargetWithBatch", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect }) unless e.to_s.include?("Timeout")
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
         end
-        Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+        Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
       end
     end
   end
@@ -302,7 +302,7 @@ module TasksHelpers
             csv << [ '', '', '', member.email, member.email, '', '', '', member.first_name, member.last_name, '', '',
                   member.address, '', member.city, member.state, member.zip, member.country, '', '', '', '', '-8',
                   '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'cancel', '', '', '' ]
-            Rails.logger.info " *** It took #{Time.zone.now - tz} to process member #{member.id}"
+            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process member #{member.id}"
           rescue Exception => e
             Auditory.report_issue("Members::HotRodMagazineCancellation", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
             Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"

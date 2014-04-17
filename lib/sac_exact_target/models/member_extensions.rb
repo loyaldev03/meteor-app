@@ -21,7 +21,7 @@ module SacExactTarget
               Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
               Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
             end
-            Rails.logger.info "    ... took #{Time.zone.now - tz} for member ##{member.id}"
+            Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
           end
         end
       end

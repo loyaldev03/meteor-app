@@ -13,7 +13,7 @@ namespace :products do
       Auditory.report_issue("Products::SendProductList", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run products:send_product_list_email task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run products:send_product_list_email task"
     end
   end
 
