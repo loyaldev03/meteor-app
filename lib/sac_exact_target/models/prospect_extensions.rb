@@ -13,7 +13,7 @@ module SacExactTarget
           base = club.prospects.where("need_exact_target_sync = 1").order("created_at ASC").limit(1000)
           Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting mkt_tools:sync_prospects_to_exact_target, processing #{base.count} prospects for club #{club.id}"
           index = 0
-          while base do
+          while not base.empty? do
             base.each do |prospect|
               tz = Time.zone.now
               begin
