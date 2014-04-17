@@ -39,7 +39,7 @@ class Member < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
   before_save :set_exact_target_sync_as_needed
-  after_save 'asyn_solr_index'
+  after_save :solr_index_asyn_call
   after_update :after_save_sync_to_remote_domain
   after_destroy 'cancel_member_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
@@ -123,6 +123,10 @@ class Member < ActiveRecord::Base
     raise e
   end
   handle_asynchronously :asyn_solr_index, queue: :solr_indexing, priority: 10
+
+  def solr_index_asyn_call
+    asyn_solr_index
+  end
   ########### SEARCH ###############
 
   state_machine :status, :initial => :none, :action => :save_state do
