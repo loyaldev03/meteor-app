@@ -113,7 +113,7 @@ group :test do
   gem "timecop"
 end
 
-gem 'activemerchant', :git => "git://github.com/stoneacre/active_merchant"
+gem 'activemerchant', :git => "git@github.com:Shopify/active_merchant.git"
 gem 'LitleOnline', '8.16.0'
 
 # TODO => remove the following requires after tokenization is implemented
