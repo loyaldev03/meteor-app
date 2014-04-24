@@ -20,7 +20,8 @@ module SacExactTarget
                 Rails.logger.info "  *[#{index+1}] processing prospect ##{prospect.id}"
                 prospect.exact_target_after_create_sync_to_remote_domain(club) if defined?(SacExactTarget::ProspectModel)
               rescue Exception => e
-                Airbrake.notify(:error_class => "ExactTarget::ProspectSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => prospect.inspect })
+                Auditory.report_issue("ExactTarget::ProspectSync", e, { :prospect => prospect.inspect} )
+                prospect.update_attribute :need_exact_target_sync, 0
                 Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
               end
               Rails.logger.info "    ... took #{Time.zone.now - tz} for prospect ##{prospect.id}"
