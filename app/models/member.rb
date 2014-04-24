@@ -1347,6 +1347,7 @@ class Member < ActiveRecord::Base
           end
         end
       end
+      
       self.save(:validate => false)
       Auditory.audit(nil, trans, message, self, operation_type )
       if cancel_member

@@ -27,7 +27,7 @@ class FirstDataTransaction < Transaction
       self.response = answer
       self.success = answer.success?
       if answer.params
-        self.response_auth_code = answer.params['authorization_num']
+        self.response_code = answer.params['bank_resp_code']
       end
       self.response_transaction_id = answer.authorization
       self.response_result = answer.message
