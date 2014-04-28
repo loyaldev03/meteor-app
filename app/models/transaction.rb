@@ -157,6 +157,8 @@ class Transaction < ActiveRecord::Base
       LitleTransaction.store!(am_credit_card, pgc)
     elsif pgc.authorize_net?
       AuthorizeNetTransaction.store!(am_credit_card, pgc)
+    elsif pgc.first_data?
+      FirstDataTransaction.store!(am_credit_card, pgc)
     else
       raise "No payment gateway configuration set for gateway \"#{pgc.gateway}\""
     end
@@ -170,6 +172,8 @@ class Transaction < ActiveRecord::Base
       LitleTransaction.new
     when 'authorize_net'
       AuthorizeNetTransaction.new
+    when 'first_data'
+      FirstDataTransaction.new
     else
       raise "No payment gateway configuration set for gateway \"#{gateway}\""
     end

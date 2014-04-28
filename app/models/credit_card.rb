@@ -108,7 +108,7 @@ class CreditCard < ActiveRecord::Base
     am = CreditCard.am_card(number, expire_month, expire_year, pmember.first_name || member.first_name, pmember.last_name || member.last_name)
     if am.valid?
       self.cc_type = am.brand
-      begin
+      begin              
         self.token = Transaction.store!(am, pgc)
       rescue Exception => e
         Auditory.report_issue("CreditCard:GetToken", "Gateway response: " + e.to_s, { credit_card: self.inspect, member: pmember.inspect || self.member.inspect })

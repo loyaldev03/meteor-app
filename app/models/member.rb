@@ -681,7 +681,7 @@ class Member < ActiveRecord::Base
     self.current_membership = membership
 
     operation_type = check_enrollment_operation
-    if amount.to_f != 0.0
+    if amount.to_f != 0.0      
       trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
@@ -1347,6 +1347,7 @@ class Member < ActiveRecord::Base
           end
         end
       end
+      
       self.save(:validate => false)
       Auditory.audit(nil, trans, message, self, operation_type )
       if cancel_member
