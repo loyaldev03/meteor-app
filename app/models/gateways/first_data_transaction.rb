@@ -25,11 +25,7 @@ class FirstDataTransaction < Transaction
   private
 
     def credit_card_token
-      if self.member
-        [self.token, self.cc_type, self.member.first_name, self.member.last_name, self.expire_month, self.expire_year].join(";")
-      else
-        [self.token, self.cc_type, self.first_name, self.last_name, self.expire_month, self.expire_year].join(";")
-      end
+      [self.token, self.cc_type, self.first_name, self.last_name, self.expire_month, self.expire_year].join(";")
     end
 
     def save_response(answer)
