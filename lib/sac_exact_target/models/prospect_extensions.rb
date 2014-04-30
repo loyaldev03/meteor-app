@@ -10,8 +10,9 @@ module SacExactTarget
         club_base = Club.exact_target_related
         club_base.each do |club|
           tzc = Time.zone.now
+          prospect_club_count = club.prospects.where("need_exact_target_sync = 1").count
+          Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting mkt_tools:sync_prospects_to_exact_target, processing #{prospect_club_count.count} prospects for club #{club.id}"
           base = club.prospects.where("need_exact_target_sync = 1").order("created_at ASC").limit(1000)
-          Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting mkt_tools:sync_prospects_to_exact_target, processing #{base.count} prospects for club #{club.id}"
           index = 0
           while not base.empty? do
             base.each do |prospect|
@@ -25,6 +26,7 @@ module SacExactTarget
                 Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
               end
               Rails.logger.info "    ... took #{Time.zone.now - tz} for prospect ##{prospect.id}"
+              index+=1
             end
             base = club.prospects.where("need_exact_target_sync = 1").order("created_at ASC").limit(1000)
           end
