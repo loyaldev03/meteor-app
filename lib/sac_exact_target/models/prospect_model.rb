@@ -113,7 +113,7 @@ module SacExactTarget
         if Rails.env.production?
           if preference_fields_map
             preference_fields_map.collect do |api_field, our_field|
-              attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: self.prospect.preferences[our_field].to_s)
+              attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: self.prospect.preferences[our_field].to_s) if self.prospect.preferences
             end
           end
         end
