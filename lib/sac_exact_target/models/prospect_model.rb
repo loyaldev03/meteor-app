@@ -111,7 +111,7 @@ module SacExactTarget
           attributes << SacExactTarget.format_attribute(self.prospect, api_field, our_field)
         end
         if Rails.env.production?
-          if preference_fields_map and self.prospect.preferences
+          if self.prospect.preferences and preference_fields_map
             preference_fields_map.collect do |api_field, our_field|
               attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: self.prospect.preferences[our_field].to_s)
             end
