@@ -11,7 +11,7 @@ module SacExactTarget
         club_base.each do |club|
           tzc = Time.zone.now
           prospect_club_count = club.prospects.where("need_exact_target_sync = 1").count
-          Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting mkt_tools:sync_prospects_to_exact_target, processing #{prospect_club_count.count} prospects for club #{club.id}"
+          Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting mkt_tools:sync_prospects_to_exact_target, processing #{prospect_club_count} prospects for club #{club.id}"
           base = club.prospects.where("need_exact_target_sync = 1").order("created_at ASC").limit(1000)
           index = 0
           while not base.empty? do
