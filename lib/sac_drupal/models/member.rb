@@ -114,6 +114,7 @@ module Drupal
 
       map = { 
         mail: m.email,
+        conf_mail: m.email,
         field_profile_firstname: { 
           und: [ 
             { 
