@@ -186,7 +186,7 @@ class TransactionTest < ActiveSupport::TestCase
       Timecop.travel(next_year) do
         next_year = next_year + member.terms_of_membership.installment_period.days
         Delayed::Worker.delay_jobs = true
-        assert_difference('DelayedJob.count',3)do
+        assert_difference('DelayedJob.count',2)do
           TasksHelpers.bill_all_members_up_today
         end
         Delayed::Worker.delay_jobs = false
@@ -1526,5 +1526,4 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal active_member.active_credit_card.expire_year, (Time.zone.now+1.year).year #diff of 2 years because it already has 1 SD
     end
   end
-
 end

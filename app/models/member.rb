@@ -125,7 +125,7 @@ class Member < ActiveRecord::Base
   handle_asynchronously :asyn_solr_index, queue: :solr_indexing, priority: 10
 
   def solr_index_asyn_call
-    asyn_solr_index
+    asyn_solr_index if not (self.changed & ['id', 'club_id', 'first_name', 'last_name', 'address', 'city', 'country', 'state', 'zip', 'email', 'status', 'next_retry_bill_date', 'phone_country_code', 'phone_area_code', 'phone_local_number', 'sync_status', 'external_id', 'join_date']).empty?
   end
   ########### SEARCH ###############
 

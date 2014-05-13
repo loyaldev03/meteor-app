@@ -138,7 +138,7 @@ class MemberTest < ActiveSupport::TestCase
     member = create_active_member(@tom_approval, :lapsed_member)
     answer = {}
     Delayed::Worker.delay_jobs = true
-    assert_difference("DelayedJob.count", 4) do  # :send_recover_needs_approval_email_dj_without_delay 
+    assert_difference("DelayedJob.count", 2) do  # :send_recover_needs_approval_email_dj_without_delay, :asyn_solr_index_without_delay
       answer = member.recover(@tom_approval)
     end
     Delayed::Worker.delay_jobs = false
