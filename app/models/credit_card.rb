@@ -14,7 +14,7 @@ class CreditCard < ActiveRecord::Base
   BLANK_CREDIT_CARD_TOKEN = 'a'
 
   def solr_index_asyn_call
-    self.member.asyn_solr_index if self.member and not (self.changed & ['last_digits', 'token']).empty?
+    self.member.asyn_solr_index if self.member and not (self.changed & ['last_digits', 'token', 'active']).empty? and self.active
   end
 
   def number=(x)

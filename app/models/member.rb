@@ -39,7 +39,8 @@ class Member < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
   before_save :set_exact_target_sync_as_needed
-  after_save :solr_index_asyn_call
+  after_create :solr_index_asyn_call
+  before_update :solr_index_asyn_call
   after_update :after_save_sync_to_remote_domain
   after_destroy 'cancel_member_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
