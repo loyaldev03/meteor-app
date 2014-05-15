@@ -83,7 +83,7 @@ module SacExactTarget
         end
       end
       data = data.merge(need_exact_target_sync: false)
-      ::Prospect.where(uuid: self.prospect.id).limit(1).update_all(data)
+      ::Prospect.where(id: self.prospect.id).limit(1).update_all(data)
       self.prospect.reload rescue self.prospect
     end
  
@@ -102,7 +102,7 @@ module SacExactTarget
       end
     
       def subscriber_key
-        Rails.env.production? ? self.prospect.id : "#{Rails.env}-#{self.prospect.uuid.to_s}"
+        Rails.env.production? ? self.prospect.id : "#{Rails.env}-#{self.prospect.id.to_s}"
       end
 
       def subscriber(subscriber_key, options ={})
