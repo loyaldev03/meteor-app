@@ -1,4 +1,6 @@
 class Prospect < ActiveRecord::Base
+  include Extensions::UUIDNotPrimaryKey
+
   has_many :enrollment_infos
   belongs_to :terms_of_membership
   belongs_to :club

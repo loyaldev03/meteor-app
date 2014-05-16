@@ -66,9 +66,9 @@ module SacExactTarget
     # so, it wont be find it on prospect table
     def self.email_belongs_to_prospect?(subscriber_key)
       if Rails.env.production?
-        Prospect.find subscriber_key
+        Prospect.find_by_uuid subscriber_key
       else
-        Prospect.find subscriber_key.gsub(/(staging-|prototype-)/, '')
+        Prospect.find_by_uuid subscriber_key.gsub(/(staging-|prototype-)/, '')
       end
     end
 
@@ -83,7 +83,7 @@ module SacExactTarget
         end
       end
       data = data.merge(need_exact_target_sync: false)
-      ::Prospect.where(id: self.prospect.id).limit(1).update_all(data)
+      ::Prospect.where(uuid: self.prospect.uuid).limit(1).update_all(data)
       self.prospect.reload rescue self.prospect
     end
  
@@ -102,7 +102,7 @@ module SacExactTarget
       end
     
       def subscriber_key
-        Rails.env.production? ? self.prospect.id : "#{Rails.env}-#{self.prospect.id.to_s}"
+        Rails.env.production? ? self.prospect.uuid : "#{Rails.env}-#{self.prospect.uuid.to_s}"
       end
 
       def subscriber(subscriber_key, options ={})
