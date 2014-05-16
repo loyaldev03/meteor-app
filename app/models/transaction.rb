@@ -145,6 +145,10 @@ class Transaction < ActiveRecord::Base
     gateway == "authorize_net"
   end
 
+  def first_data?
+    gateway == "first_data"
+  end
+
   def one_time_type?
     operation_type == Settings.operation_types.no_recurrent_billing
   end
