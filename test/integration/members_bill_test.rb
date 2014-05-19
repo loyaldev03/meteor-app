@@ -448,10 +448,10 @@ class MembersBillTest < ActionController::IntegrationTest
     click_link_or_button (I18n.t('buttons.no_recurrent_billing'))
 
     trans = Transaction.last
-    assert page.has_content? "Member billed successfully $100 Transaction id: #{trans.uuid}. Reason: asd"
+    assert page.has_content? "Member billed successfully $100 Transaction id: #{trans.id}. Reason: asd"
 
     within(".nav-tabs") {click_on 'Operations'}
-    within("#operations") {assert page.has_content? "Member billed successfully $100 Transaction id: #{trans.uuid}. Reason: asd"}
+    within("#operations") {assert page.has_content? "Member billed successfully $100 Transaction id: #{trans.id}. Reason: asd"}
     within(".nav-tabs") {click_on 'Transactions'}  
     within("#transactions_table") do
       assert page.has_content?("Sale : This transaction has been approved")

@@ -1,6 +1,4 @@
 class Transaction < ActiveRecord::Base
-  include Extensions::UUID
-
   belongs_to :member
   belongs_to :membership
   belongs_to :payment_gateway_configuration

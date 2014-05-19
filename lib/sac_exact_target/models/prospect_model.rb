@@ -83,7 +83,7 @@ module SacExactTarget
         end
       end
       data = data.merge(need_exact_target_sync: false)
-      ::Prospect.where(uuid: self.prospect.id).limit(1).update_all(data)
+      ::Prospect.where(uuid: self.prospect.uuid).limit(1).update_all(data)
       self.prospect.reload rescue self.prospect
     end
  
