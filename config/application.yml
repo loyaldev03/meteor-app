@@ -175,7 +175,7 @@ defaults: &defaults
     vip_event_cancelation: 901 
     #other
     imported_into_platform: 1000
-    others: 1001
+    others: 1099
     #not_visible
     et_timeout_create: 5000
     et_timeout_update: 5001
