@@ -4,6 +4,8 @@ class ChangeIdColumnOnTransactionsAndProspects < ActiveRecord::Migration
   	execute "ALTER TABLE transactions ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY"
    	execute "ALTER TABLE prospects CHANGE COLUMN uuid uuid VARCHAR(36) NULL, DROP PRIMARY KEY"
   	execute "ALTER TABLE prospects ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY"
+    execute "ALTER TABLE member_preferences CHANGE COLUMN uuid uuid VARCHAR(36) NULL"
+    execute "ALTER TABLE member_preferences ADD COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY"
   end
 
   def down
@@ -13,5 +15,8 @@ class ChangeIdColumnOnTransactionsAndProspects < ActiveRecord::Migration
   execute "ALTER TABLE prospects CHANGE COLUMN id id BIGINT(20) NULL, DROP PRIMARY KEY"  
   execute "ALTER TABLE prospects CHANGE COLUMN uuid uuid VARCHAR(36) NOT NULL, ADD PRIMARY KEY (`uuid`)"
   remove_column :prospects, :id
+  execute "ALTER TABLE member_preferences CHANGE COLUMN id id BIGINT(20) NULL, DROP PRIMARY KEY"  
+  execute "ALTER TABLE member_preferences CHANGE COLUMN uuid uuid VARCHAR(36) NOT NULL"
+  remove_column :member_preferences, :id
   end
 end
