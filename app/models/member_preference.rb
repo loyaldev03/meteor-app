@@ -1,5 +1,4 @@
 class MemberPreference < ActiveRecord::Base
-  include Extensions::UUID
 
   belongs_to :member
 
