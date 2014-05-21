@@ -6,11 +6,16 @@ class CreditCard < ActiveRecord::Base
 
   before_create :set_data_before_credit_card_number_disappear
   before_destroy :confirm_presence_of_another_credit_card_related_to_member
+  after_save :solr_index_asyn_call
 
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
   validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }
 
   BLANK_CREDIT_CARD_TOKEN = 'a'
+
+  def solr_index_asyn_call
+    self.member.asyn_solr_index if self.member and not (self.changed & ['last_digits', 'token', 'active']).empty? and self.active
+  end
 
   def number=(x)
     @number = if x.include?('XXXX')

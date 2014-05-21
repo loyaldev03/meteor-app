@@ -4,6 +4,11 @@ class MemberNote < ActiveRecord::Base
   belongs_to :member
   belongs_to :disposition_type
   belongs_to :communication_type
+  
+  after_create :solr_index_asyn_call
 
-  after_create 'member.solr_index'
+	def solr_index_asyn_call
+    self.member.asyn_solr_index if self.member
+  end
+
 end
