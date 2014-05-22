@@ -129,7 +129,7 @@ module SacExactTarget
         member_preferences = self.member.member_preferences
         preferences_fieldmap.each do |api_field, our_field|
           member_preference = member_preferences.where(:param => our_field).first
-          attributes << SacExactTarget.format_attribute(member_preference, api_field, 'param') if member_preference
+          attributes << SacExactTarget.format_attribute(member_preference, api_field, 'value') if member_preference
         end
       end
       attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
