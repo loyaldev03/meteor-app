@@ -1254,7 +1254,7 @@ class Member < ActiveRecord::Base
 
     def proceed_with_manual_billing_logic(trans, operation_type)
       unless set_as_active
-        Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}" })
+        Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
       message = "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}"
       Auditory.audit(nil, trans, message, self, operation_type)
@@ -1266,7 +1266,7 @@ class Member < ActiveRecord::Base
 
     def proceed_with_billing_logic(trans)
       unless set_as_active
-        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}" })
+        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
       if check_upgradable 
         schedule_renewal
