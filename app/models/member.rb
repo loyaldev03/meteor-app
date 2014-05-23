@@ -520,7 +520,7 @@ class Member < ActiveRecord::Base
     end
   rescue Exception => e
     trans.update_attribute :operation_type, Settings.operation_types.membership_billing_with_error if trans
-    Auditory.report_issue( "Billing:membership", e, { :member => self.inspect, :exception => e.to_s, :transaction => "ID: #{trans.id}, response: #{trans.response}" } )
+    Auditory.report_issue( "Billing:membership", e, { :member => self.inspect, :exception => e.to_s, :transaction => "ID: #{trans.id}, amount: #{self.amount}, response: #{trans.response}" } )
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
