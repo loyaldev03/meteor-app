@@ -833,7 +833,7 @@ class Member < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :nillify_club_cash, :queue => :club_cash, priority: 18
+  handle_asynchronously :nillify_club_cash, :queue => :club_cash_queue, priority: 18
 
   # Resets member club cash in case the club cash has expired.
   def reset_club_cash
@@ -843,7 +843,7 @@ class Member < ActiveRecord::Base
       self.save(:validate => false)
     end
   end
-  handle_asynchronously :reset_club_cash, :queue => :club_cash, priority: 18
+  handle_asynchronously :reset_club_cash, :queue => :club_cash_queue, priority: 18
 
   def assign_first_club_cash 
     assign_club_cash unless terms_of_membership.skip_first_club_cash
@@ -863,7 +863,7 @@ class Member < ActiveRecord::Base
     # If there is connectivity problems or data errors with drupal. Do not stop billing!! 
     Auditory.report_issue("Member:assign_club_cash:sync", e, { :member => self.inspect, :amount => amount, :message => message })
   end
-  handle_asynchronously :assign_club_cash, :queue => :club_cash, :run_at => Proc.new { 5.minutes.from_now }, priority: 5
+  handle_asynchronously :assign_club_cash, :queue => :club_cash_queue, :run_at => Proc.new { 5.minutes.from_now }, priority: 5
 
   # Adds club cash transaction. 
   def add_club_cash(agent, amount = 0,description = nil)
