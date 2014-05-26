@@ -85,7 +85,9 @@ class Club < ActiveRecord::Base
     [ 
       self.marketing_tool_attributes['et_business_unit'], 
       self.marketing_tool_attributes['et_prospect_list'], 
-      self.marketing_tool_attributes['et_members_list']
+      self.marketing_tool_attributes['et_members_list'],
+      self.marketing_tool_attributes['et_username'],
+      self.marketing_tool_attributes['et_password']
     ].none?(&:blank?)
   end
 
