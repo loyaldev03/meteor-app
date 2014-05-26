@@ -246,7 +246,7 @@ module MesAccountUpdater
             raise "Chargeback ##{args[:control_number]} could not be processed. member and transaction_chargebacked are different! #{line}"
           end
         rescue 
-          Auditory.report_issue("MES::chargeback_report", $!, { :gateway => gateway.inspect, :member => member.inspect, :line => line, :transaction_chargebacked => transaction_chargebacked.inspect })
+          Auditory.report_issue("MES::chargeback_report", $!, { :gateway_id => gateway.id.to_s, :member => member.inspect, :line => line, :transaction_chargebacked_id => transaction_chargebacked.id.to_s })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end

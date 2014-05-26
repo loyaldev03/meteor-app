@@ -520,7 +520,7 @@ class Member < ActiveRecord::Base
     end
   rescue Exception => e
     trans.update_attribute :operation_type, Settings.operation_types.membership_billing_with_error if trans
-    Auditory.report_issue( "Billing:membership", e, { :member => self.inspect, :exception => e.to_s, :transaction => trans.inspect } )
+    Auditory.report_issue( "Billing:membership", e, { :member => self.inspect, :exception => e.to_s, :transaction => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" } )
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
@@ -1254,7 +1254,7 @@ class Member < ActiveRecord::Base
 
     def proceed_with_manual_billing_logic(trans, operation_type)
       unless set_as_active
-        Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+        Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
       message = "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}"
       Auditory.audit(nil, trans, message, self, operation_type)
@@ -1266,7 +1266,7 @@ class Member < ActiveRecord::Base
 
     def proceed_with_billing_logic(trans)
       unless set_as_active
-        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
       if check_upgradable 
         schedule_renewal
