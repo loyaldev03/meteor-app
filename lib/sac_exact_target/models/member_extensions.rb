@@ -58,6 +58,10 @@ module SacExactTarget
       end
 
       def exact_target_member
+        ExactTargetSDK.config(:username => self.club.marketing_tool_attributes["et_username"], :password => self.club.marketing_tool_attributes["et_password"],
+          :endpoint => 'https://webservice.s6.exacttarget.com/Service.asmx',
+          :namespace => 'http://exacttarget.com/wsdl/partnerAPI',
+          :open_timeout => 60)
         @exact_target_member ||= if !self.exact_target_sync?
           nil
         else
