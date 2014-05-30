@@ -14,7 +14,7 @@ private
       [
         I18n.l(transaction.created_at, :format => :dashed),
         transaction_description(transaction).truncate(75) + 
-          (transaction_description(transaction).length > 75 ? " <i class ='icon-eye-open help' rel= 'popover' data-toggle='modal' href='#myModal" + transaction.id + "' style='cursor: pointer'></i>" + modal(transaction) : ''), 
+          (transaction_description(transaction).length > 75 ? " <i class ='icon-eye-open help' rel= 'popover' data-toggle='modal' href='#myModal" + transaction.id.to_s + "' style='cursor: pointer'></i>" + modal(transaction) : ''), 
         number_to_currency(transaction.amount) ,
         transaction.can_be_refunded? ? number_to_currency(transaction.amount_available_to_refund) : '',
         transaction.gateway + " " + transaction.response_transaction_id.to_s,
@@ -57,7 +57,7 @@ private
   end
 
   def modal(transaction)
-    "<div id='myModal" + transaction.id + "' class='well modal hide' style='border: none;'>
+    "<div id='myModal" + transaction.id.to_s + "' class='well modal hide' style='border: none;'>
       <div class='modal-header'>
         <a href='#' class='close'>&times;</a>
         <h3> "+I18n.t('activerecord.attributes.transaction.description')+"</h3>
