@@ -1,7 +1,5 @@
 defaults: &defaults
   exact_target:
-    username: martin@xagax.com
-    password: charly-martin2013
     business_unit_for_test: '6177869'
   max_reactivations: 3
   days_to_wait_to_cancel_fulfillments: 2

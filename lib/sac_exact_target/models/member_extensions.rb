@@ -58,6 +58,7 @@ module SacExactTarget
       end
 
       def exact_target_member
+        SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
         @exact_target_member ||= if !self.exact_target_sync?
           nil
         else

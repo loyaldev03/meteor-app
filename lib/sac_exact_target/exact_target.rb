@@ -22,6 +22,12 @@ module SacExactTarget
     nil
   end
 
+  def self.config_integration(username, password)
+    ExactTargetSDK.config(:username => username, :password => password,
+      :endpoint => 'https://webservice.s6.exacttarget.com/Service.asmx',
+      :namespace => 'http://exacttarget.com/wsdl/partnerAPI',
+      :open_timeout => 60)
+  end
 
   def self.format_attribute(object, api_field, our_field)
     value = object.send(our_field)

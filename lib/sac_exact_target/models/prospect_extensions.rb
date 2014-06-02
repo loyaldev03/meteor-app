@@ -45,6 +45,7 @@ module SacExactTarget
       end
 
       def exact_target_sync_to_remote_domain(club = nil)
+        SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
         time_elapsed = Benchmark.ms do
           exact_target_prospect.save!(club)
         end
