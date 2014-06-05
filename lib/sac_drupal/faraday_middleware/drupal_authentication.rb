@@ -30,7 +30,7 @@ module Drupal
         end
         Drupal.logger.info "Drupal::#{env[:url]} took #{time_elapsed}ms"
   
-        if res.status == 401 && cookie # retry if cookie is invalid
+        if [401, 403].include?(res.status) && cookie # retry if cookie is invalid
           Drupal.logger.debug(" ** invalidating %.2f seconds-old cookie. old body #{old_body.inspect}" % self.cookie_age)
           self.invalidate_cookie!
           self.regenerate_cookie!
