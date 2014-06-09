@@ -3,6 +3,7 @@ class TermsOfMembershipsController < ApplicationController
   # before_filter :check_permissions
 
   def index
+    my_authorize! :list, TermsOfMembership, @current_club.id
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: TermsOfMembershipDatatable.new(view_context,@current_partner,@current_club,nil,@current_agent) }
@@ -10,10 +11,12 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def new
+    my_authorize! :new, TermsOfMembership, @current_club.id
     @tom = TermsOfMembership.new
   end
 
   def create
+    my_authorize! :create, TermsOfMembership, @current_club.id
     @tom = TermsOfMembership.new(params[:tom])
     prepare_tom_data_to_save(params)
     if @tom.save
@@ -25,6 +28,7 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def edit
+    my_authorize! :edit, TermsOfMembership, @current_club.id
     @tom = TermsOfMembership.find(params[:id])
     if !@tom.can_update_or_delete
       flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
@@ -33,6 +37,7 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def update
+    my_authorize! :update, TermsOfMembership, @current_club.id
     @tom = TermsOfMembership.find(params[:id])
     if @tom.can_update_or_delete
       prepare_tom_data_to_save(params)
@@ -50,6 +55,7 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def destroy
+    my_authorize! :destroy, TermsOfMembership, @current_club.id
     @tom = TermsOfMembership.find(params[:id])
     if @tom.destroy
       flash[:notice] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
@@ -60,8 +66,8 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def show
+    my_authorize! :show, TermsOfMembership, @current_club.id
     @tom = TermsOfMembership.find(params[:id])
-    my_authorize! :show, TermsOfMembership, @tom.club_id
     @email_templates = EmailTemplate.find_all_by_terms_of_membership_id(params[:id])
     @payment_gateway_configuration = @tom.club.payment_gateway_configuration
   end
