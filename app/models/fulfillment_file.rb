@@ -22,7 +22,7 @@ class FulfillmentFile < ActiveRecord::Base
   end
 
   def fulfillments_processed
-    [ fulfillments.where_in_process.count, fulfillments.count ].join(' / ')
+    [ fulfillments.where_in_process.count, self.fulfillment_count ].join(' / ')
   end
 
   def mark_fulfillments_as_in_process
