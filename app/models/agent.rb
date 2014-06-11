@@ -18,6 +18,8 @@ class Agent < ActiveRecord::Base
   has_many :fulfillment_files
   has_many :terms_of_memberships
 
+  scope :related_to_same_club, lambda { |agent| joins(:club_roles).where("club_id in (?)", agent.clubs.each.collect(&:id)) }
+
   # Virtual attribute for authenticating by either username or email
   # This is in addition to a real persisted field like 'username'
   attr_accessor :login
@@ -65,6 +67,14 @@ class Agent < ActiveRecord::Base
     self.has_role_without_club?(role) || club_id && self.role_for(role, club_id).present?
   end
   alias_method_chain :has_role?, :club
+
+  def has_role_or_has_club_role_where_can?(action, model)
+    return true if can? action, model
+    self.club_roles.each do |club_role|
+      return true if can? action, model, club_role.club_id
+    end
+    false
+  end
 
   def role_for(role, club)
     self.club_roles.where(role: role, club_id: club).first

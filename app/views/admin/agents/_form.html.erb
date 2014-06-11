@@ -24,7 +24,7 @@
     </div>
   </div>
 
-  <% if @agent.club_roles.empty? %>
+  <% if @agent.club_roles.empty? and not @current_agent.roles.empty? %>
     <div class="control-group" id="div_agent_roles">
       &nbsp &nbsp &nbsp<%= link_to "clear", "#", :class => "btn btn-mini", :style => "display: #{@agent.roles.blank? ? 'none' : true}", :id => "clear_global_role"%>
       <%= f.label :roles, 'Global Roles', :class => 'control-label' %>

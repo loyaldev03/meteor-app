@@ -1,8 +1,8 @@
 class Admin::AgentsController < ApplicationController
-  load_and_authorize_resource :agent, :except => :my_clubs
 
   # GET /agents
   def index
+    my_authorize_agents!(:list, Agent)
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: AgentsDatatable.new(view_context,nil,nil,nil,@current_agent)  }
@@ -11,22 +11,31 @@ class Admin::AgentsController < ApplicationController
 
   # GET /agents/1
   def show
-  end
+    my_authorize_agents!(:show, Agent)
+    @agent = Agent.find(params[:id])
+  end 
 
   # GET /agents/new
   def new
-    @clubs = Club.all
+    my_authorize_agents!(:new, Agent)
+    @agent = Agent.new
+    @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
   end
 
   # GET /agents/1/edit
   def edit
-    @clubs = Club.all
-    @agent.clubs.each {|c| @clubs.delete(c)}
+    my_authorize_agents!(:edit, Agent)
+    @agent = Agent.find(params[:id])
+    @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
+    @agent.clubs.each do |c|
+      @clubs = @clubs - [c]
+    end
   end
-
 
   # POST /agents
   def create
+    my_authorize_agents!(:create, Agent)
+    @agent = Agent.new(params[:agent])
     success = false
     @clubs = Club.all
     ClubRole.transaction do
@@ -57,6 +66,8 @@ class Admin::AgentsController < ApplicationController
 
   # PUT /agents/1
   def update
+    my_authorize_agents!(:update, Agent)
+    @agent = Agent.find(params[:id])
     success = false
     @clubs = Club.where(["id not in (?)", @agent.club_roles.each.collect(&:club_id)])
     ClubRole.transaction do
@@ -91,6 +102,8 @@ class Admin::AgentsController < ApplicationController
 
   # DELETE /agents/1
   def destroy
+    my_authorize_agents!(:destroy, Agent)
+    @agent = Agent.find(params[:id])
     @agent.destroy
     redirect_to(admin_agents_url, :notice => 'Agent was successfully deleted.')
   end
@@ -116,6 +129,7 @@ class Admin::AgentsController < ApplicationController
       end
     end
 
-  
-
+    def my_authorize_agents!(action, model)
+      raise CanCan::AccessDenied unless @current_agent.has_role_or_has_club_role_where_can?(action, model)
+    end
 end

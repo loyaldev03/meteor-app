@@ -18,11 +18,11 @@ private
         agent.email, 
         agent.username,
         I18n.l(agent.created_at,:format=>:long),
-        (link_to(I18n.t(:show), @url_helpers.admin_agent_path(agent), :class => 'btn btn-mini') if @current_agent.can? :read, Agent).to_s+
-        (link_to(I18n.t(:edit), @url_helpers.edit_admin_agent_path(agent), :class => 'btn btn-mini') if @current_agent.can? :edit, Agent).to_s+
+        (link_to(I18n.t(:show), @url_helpers.admin_agent_path(agent), :class => 'btn btn-mini') if @current_agent.has_role_or_has_club_role_where_can? :read, Agent).to_s+
+        (link_to(I18n.t(:edit), @url_helpers.edit_admin_agent_path(agent), :class => 'btn btn-mini') if @current_agent.has_role_or_has_club_role_where_can? :edit, Agent).to_s+
         (link_to(I18n.t(:destroy), @url_helpers.admin_agent_path(agent), :method => :delete,
                         :confirm => I18n.t("are_you_sure"),
-                        :class => 'btn btn-mini btn-danger')if @current_agent.can? :delete, Agent).to_s
+                        :class => 'btn btn-mini btn-danger') if @current_agent.has_role_or_has_club_role_where_can? :delete, Agent).to_s
       ]
     end
   end
@@ -32,7 +32,11 @@ private
   end
 
   def fetch_agents
-    agents = Agent.order("#{sort_column} #{sort_direction}")
+    agents = if @current_agent.has_global_role?
+      Agent.order("#{sort_column} #{sort_direction}")
+    else
+      Agent.related_to_same_club(@current_agent).order("#{sort_column} #{sort_direction}")
+    end
     agents = agents.page(page).per_page(per_page)
     if params[:sSearch].present?
       agents = agents.where("id like :search or email like :search or username like :search", search: "%#{params[:sSearch]}%")
