@@ -79,7 +79,8 @@ class TermsOfMembershipsController < ApplicationController
       @tom.name = post_data[:terms_of_membership][:name]
       @tom.api_role = post_data[:terms_of_membership][:api_role]
       @tom.description = post_data[:terms_of_membership][:description]
-      # Step 2      
+      # Step 2
+      @tom.needs_enrollment_approval = post_data[:terms_of_membership][:needs_enrollment_approval]
       @tom.initial_fee = post_data[:initial_fee_amount]
       @tom.trial_period_amount = post_data[:trial_period_amount]
       @tom.provisional_days = post_data[:trial_period_lasting_time_span] == 'months' ? months_to_days(post_data[:trial_period_lasting].to_i) : post_data[:trial_period_lasting].to_i
