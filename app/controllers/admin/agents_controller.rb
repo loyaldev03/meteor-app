@@ -35,7 +35,7 @@ class Admin::AgentsController < ApplicationController
     my_authorize_agents!(:create, Agent)
     @agent = Agent.new(params[:agent])
     success = false
-    @club_roles = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
+    @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
     ClubRole.transaction do
       begin
