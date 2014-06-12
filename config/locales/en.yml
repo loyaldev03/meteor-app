@@ -374,6 +374,7 @@ en:
           step_1_edit_button_next: 'Edit Membership Terms'
           # Step 2
           step_2_instructions: '<STEP_2_INSTRUCTIONS_HERE>'
+          needs_enrollment_approval: 'Needs Enrollment Approval'
           initial_fee: 'Initial Fee'
           initial_fee_amount: 'Initial Fee Amount'
           trial_period: 'Trial Period'
