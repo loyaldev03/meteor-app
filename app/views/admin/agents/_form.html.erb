@@ -48,7 +48,7 @@
         <% unless @agent.new_record? %>
           <% @agent.club_roles.each do |club_role| %>
           <tr>
-            <% if @current_agent.clubs.each.collect(&:id).include? club_role.club_id %>
+            <% if @current_agent.club_roles.empty? or @current_agent.clubs.each.collect(&:id).include? club_role.club_id %>
               <td> <%= club_role.role %> </td>
               <td> <%= club_role.club.name %> </td>
               <td>

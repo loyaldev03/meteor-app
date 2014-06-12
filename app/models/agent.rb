@@ -68,10 +68,11 @@ class Agent < ActiveRecord::Base
   end
   alias_method_chain :has_role?, :club
 
-  def has_role_or_has_club_role_where_can?(action, model)
+  def has_role_or_has_club_role_where_can?(action, model, clubs_id_list = nil)
     return true if can? action, model
-    self.club_roles.each do |club_role|
-      return true if can? action, model, club_role.club_id
+    clubs_id_list ||= self.club_roles.each.collect(&:club_id)
+    clubs_id_list.each do |club_id|
+      return true if can? action, model, club_id
     end
     false 
   end

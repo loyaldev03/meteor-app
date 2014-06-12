@@ -11,8 +11,8 @@ class Admin::AgentsController < ApplicationController
 
   # GET /agents/1
   def show
-    my_authorize_agents!(:show, Agent)
     @agent = Agent.find(params[:id])
+    my_authorize_agents!(:show, Agent, @agent.clubs.each.collect(&:id))
   end 
 
   # GET /agents/new
@@ -24,8 +24,8 @@ class Admin::AgentsController < ApplicationController
 
   # GET /agents/1/edit
   def edit
-    my_authorize_agents!(:edit, Agent)
     @agent = Agent.find(params[:id])
+    my_authorize_agents!(:edit, Agent, @agent.clubs.each.collect(&:id))
     @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
   end
@@ -102,8 +102,8 @@ class Admin::AgentsController < ApplicationController
 
   # DELETE /agents/1
   def destroy
-    my_authorize_agents!(:destroy, Agent)
     @agent = Agent.find(params[:id])
+    my_authorize_agents!(:destroy, Agent)
     @agent.destroy
     redirect_to(admin_agents_url, :notice => 'Agent was successfully deleted.')
   end
@@ -129,7 +129,7 @@ class Admin::AgentsController < ApplicationController
       end
     end
 
-    def my_authorize_agents!(action, model)
-      raise CanCan::AccessDenied unless @current_agent.has_role_or_has_club_role_where_can?(action, model)
+    def my_authorize_agents!(action, model, club_list=nil)
+      raise CanCan::AccessDenied unless @current_agent.has_role_or_has_club_role_where_can?(action, model, club_list)
     end
 end
