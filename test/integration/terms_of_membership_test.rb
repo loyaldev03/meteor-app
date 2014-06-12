@@ -1033,10 +1033,8 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		check('terms_of_membership_needs_enrollment_approval');
 		choose('is_payment_expected_no')
 		choose('subscription_terms_until_cancelled')
-		fill_in 'trial_period_lasting', :with => 30
 		click_link_or_button 'Define Upgrades / Downgrades'
 
-		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Create Plan'
 
 		assert page.has_content?('was created succesfully') # TOM was created
@@ -1061,11 +1059,8 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		check('terms_of_membership_needs_enrollment_approval');
 		choose('is_payment_expected_no')
 		choose('subscription_terms_until_cancelled')
-		fill_in 'trial_period_lasting', :with => 30
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a member then")
-		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Update Plan'
 
 		assert page.has_content?('was updated succesfully') # TOM was created
@@ -1090,11 +1085,8 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		check('terms_of_membership_needs_enrollment_approval');
 		choose('is_payment_expected_no')
 		choose('subscription_terms_until_cancelled')
-		fill_in 'trial_period_lasting', :with => 30
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a member then")
-		choose('if_cannot_bill_member_cancel')
 		click_link_or_button 'Update Plan'
 		
 		assert page.has_content?('was updated succesfully') # TOM was created
