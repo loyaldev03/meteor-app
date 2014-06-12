@@ -35,11 +35,11 @@ private
     agents = if @current_agent.has_global_role?
       Agent.order("#{sort_column} #{sort_direction}")
     else
-      Agent.related_to_same_club(@current_agent).order("#{sort_column} #{sort_direction}")
+      Agent.related_to_same_club(@current_agent).order("#{sort_column} #{sort_direction}").group("agents.id").limit(1)
     end
     agents = agents.page(page).per_page(per_page)
     if params[:sSearch].present?
-      agents = agents.where("id like :search or email like :search or username like :search", search: "%#{params[:sSearch]}%")
+      agents = agents.where("agents.id like :search or email like :search or username like :search", search: "%#{params[:sSearch]}%")
     end
     agents
   end

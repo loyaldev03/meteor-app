@@ -48,9 +48,15 @@
         <% unless @agent.new_record? %>
           <% @agent.club_roles.each do |club_role| %>
           <tr>
-            <td> <%= club_role.role %> </td>
-            <td> <%= club_role.club.name %> </td>
-            <td> Delete <%= check_box_tag "club_roles[delete][]", club_role.id %> </td>
+            <% if @current_agent.clubs.each.collect(&:id).include? club_role.club_id %>
+              <td> <%= club_role.role %> </td>
+              <td> <%= club_role.club.name %> </td>
+              <td>
+                <% unless @current_agent==@agent %>
+                   Delete <%= check_box_tag "club_roles[delete][]", club_role.id %>
+                <% end %>
+              </td>
+            <% end %>
           </tr>
           <% end %>
         <% end %>

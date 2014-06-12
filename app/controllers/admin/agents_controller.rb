@@ -27,9 +27,7 @@ class Admin::AgentsController < ApplicationController
     my_authorize_agents!(:edit, Agent)
     @agent = Agent.find(params[:id])
     @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
-    @agent.clubs.each do |c|
-      @clubs = @clubs - [c]
-    end
+    @agent.clubs.each{ |c| @clubs = @clubs - [c] }
   end
 
   # POST /agents
@@ -37,7 +35,8 @@ class Admin::AgentsController < ApplicationController
     my_authorize_agents!(:create, Agent)
     @agent = Agent.new(params[:agent])
     success = false
-    @clubs = Club.all
+    @club_roles = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
+    @agent.clubs.each{ |c| @clubs = @clubs - [c] }
     ClubRole.transaction do
       begin
         if params[:agent][:roles].present? and params[:club_roles_attributes].present?
@@ -69,7 +68,8 @@ class Admin::AgentsController < ApplicationController
     my_authorize_agents!(:update, Agent)
     @agent = Agent.find(params[:id])
     success = false
-    @clubs = Club.where(["id not in (?)", @agent.club_roles.each.collect(&:club_id)])
+    @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
+    @agent.clubs.each{ |c| @clubs = @clubs - [c] }
     ClubRole.transaction do
       begin
         cleanup_for_update!(params[:agent])

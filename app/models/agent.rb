@@ -73,7 +73,7 @@ class Agent < ActiveRecord::Base
     self.club_roles.each do |club_role|
       return true if can? action, model, club_role.club_id
     end
-    false
+    false 
   end
 
   def role_for(role, club)
