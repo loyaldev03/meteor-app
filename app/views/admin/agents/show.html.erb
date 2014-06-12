@@ -70,10 +70,12 @@
 <h2>Club Roles</h2>
 <ul>
   <% @agent.club_roles.each do |role| %>
-    <li>
-      <%= role.role %> for 
-      <%= link_to "Club##{role.club_id} "+role.club.full_name, club_path(:partner_prefix => role.club.partner.prefix, :id => role.club.id) %>
-    </li>
+    <% if @current_agent.clubs.each.collect(&:id).include? role.club_id %>
+      <li>
+          <%= role.role %> for 
+          <%= link_to "Club##{role.club_id} "+role.club.full_name, club_path(:partner_prefix => role.club.partner.prefix, :id => role.club.id) %>
+      </li>
+    <% end %>
   <% end %>
 </ul>
 
